@@ -1,0 +1,24 @@
+apply plugin: 'maven-publish'
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId GROUP_ID
+                artifactId ARTIFACT_ID
+                version releaseConfiguration.releaseVersion
+                if (project.getPlugins().hasPlugin('com.android.library')) {
+                    artifact bundleReleaseAar
+                } else {
+                    from components.java
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                url = "file://${rootProject.buildDir}/localMaven"
+            }
+        }
+    }
+}

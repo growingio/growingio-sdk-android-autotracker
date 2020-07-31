@@ -1,0 +1,32 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion buildConfiguration.compileVersion
+    defaultConfig {
+        minSdkVersion buildConfiguration.minSdkVersion
+        targetSdkVersion buildConfiguration.targetSdkVersion
+        versionName releaseConfiguration.releaseVersion
+        versionCode releaseConfiguration.releaseVersionCode
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
+    api project(':growingio-tracker')
+    implementation project(':inject-annotation')
+    annotationProcessor project(':inject-compiler')
+
+    compileOnly libraries.androidx.appcompat
+    compileOnly libraries.androidx.recyclerview
+    compileOnly libraries.android.appcompat
+    compileOnly libraries.android.recyclerview
+}
+
+apply from: "${project.rootProject.file('maven_push.gradle')}"

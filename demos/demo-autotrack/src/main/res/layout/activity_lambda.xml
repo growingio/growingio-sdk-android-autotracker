@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <Button
+        android:id="@+id/btn_simple_lambda"
+        android:text="simple lambda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_lambda_with_other_arg"
+        android:text="lambda表达式 多余参数"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/btn_before_method_lambda"
+        android:text="实现在invoke-dynamic之前"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_after_method_lambda"
+        android:text="实现在invoke-dynamic之后"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_implement_interface_lambda"
+        android:text="实现方法是OnClickListener的实现方法"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_no_lambda"
+        android:text="没有Lambda表达式"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_another_class_lambda"
+        android:text="另一个类的lambda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_static_method_lambda"
+        android:text="另一个类静态方法的lambda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
