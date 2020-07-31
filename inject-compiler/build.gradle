@@ -1,0 +1,19 @@
+import org.gradle.internal.jvm.Jvm
+
+apply plugin: 'java-library'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
+
+dependencies {
+    testImplementation libraries.test.junit
+
+    annotationProcessor libraries.google.auto_service
+    implementation libraries.google.auto_service_annotations
+    implementation libraries.squareup.javapoet
+    implementation libraries.android.gradle_plugin
+    implementation project(':inject-annotation')
+    compileOnly files(Jvm.current().getToolsJar())
+}

@@ -1,0 +1,68 @@
+apply plugin: 'com.android.application'
+
+def withAutotrack = true
+
+if (withAutotrack) {
+    apply plugin: 'com.growingio.android.autotracker'
+}
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        mavenLocal()
+    }
+    dependencies {
+        classpath "com.growingio.android:autotracker-gradle-plugin:${releaseConfiguration.releaseVersion}"
+    }
+}
+
+android {
+    compileSdkVersion buildConfiguration.compileVersion
+    defaultConfig {
+        applicationId "com.gio.test.three"
+        minSdkVersion buildConfiguration.minSdkVersion
+        targetSdkVersion buildConfiguration.targetSdkVersion
+
+        buildConfigField "boolean", "withAutotrack", "$withAutotrack"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86"
+        }
+        multiDexEnabled false
+
+        manifestPlaceholders = [
+                JPUSH_PKGNAME: applicationId,
+                JPUSH_APPKEY : "9c136e417eea46bbb2e94b4a", //JPush 上注册的包名对应的 Appkey.
+                JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
+        ]
+    }
+
+    sourceSets.main {
+        jniLibs.srcDirs = ['libs']
+        assets.srcDirs = ['assets']
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+growingAutotracker {
+    development true
+//    logEnabled true
+//    excludePackages ['com.android', 'com.android2']
+}
+
+dependencies {
+    implementation project(':growingio-tracker')
+    implementation project(':demo-core')
+    if (withAutotrack) {
+        implementation project(":demo-autotrack")
+    }
+}

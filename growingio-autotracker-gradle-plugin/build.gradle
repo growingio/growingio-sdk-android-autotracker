@@ -1,0 +1,26 @@
+apply plugin: 'java-gradle-plugin'
+
+jar {
+    manifest {
+        attributes(
+                "Manifest-Version": "1.0",
+                "Gradle-Plugin-Version": releaseConfiguration.releaseVersion
+        )
+    }
+}
+
+dependencies {
+    testImplementation libraries.test.junit
+    testImplementation libraries.test.mockito_core
+    testImplementation libraries.test.powermock_api_mockito2
+    testImplementation libraries.test.powermock_module_junit4
+    testImplementation libraries.test.powermock_module_junit4_rule
+    testImplementation libraries.test.truth
+
+    compileOnly gradleApi()
+    implementation libraries.android.gradle_plugin
+}
+
+apply from: "${project.rootProject.file('maven_push.gradle')}"
+
+

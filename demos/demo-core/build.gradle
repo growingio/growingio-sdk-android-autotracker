@@ -1,0 +1,23 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion buildConfiguration.compileVersion
+    defaultConfig {
+        minSdkVersion buildConfiguration.minSdkVersion
+        targetSdkVersion buildConfiguration.targetSdkVersion
+    }
+
+    compileOptions {
+        sourceCompatibility org.gradle.api.JavaVersion.VERSION_1_8
+        targetCompatibility org.gradle.api.JavaVersion.VERSION_1_8
+    }
+
+    sourceSets.main {
+        jniLibs.srcDirs = ['libs']
+        assets.srcDirs = ['assets']
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}

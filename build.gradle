@@ -1,0 +1,112 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        buildConfiguration = [
+                compileVersion     : 29,
+                minSdkVersion      : 17,
+                targetSdkVersion   : 29,
+                sourceCompatibility: JavaVersion.VERSION_1_7,
+                targetCompatibility: JavaVersion.VERSION_1_7,
+        ]
+
+        releaseConfiguration = [
+                releaseVersion    : "3.0.0",
+                releaseVersionCode: 300,
+        ]
+
+        versions = [
+                'gradleTool': '3.5.0',
+        ]
+
+        libraries = [
+                android            : [
+                        'gradle_plugin': "com.android.tools.build:gradle:3.3.0",
+                        'annotations'  : 'com.android.support:support-annotations:28.0.0',
+                        'appcompat'    : 'com.android.support:appcompat-v7:28.0.0',
+                        'recyclerview' : 'com.android.support:recyclerview-v7:28.0.0',
+                ],
+
+                'androidx'         : [
+                        'appcompat'   : 'androidx.appcompat:appcompat:1.0.0',
+                        'recyclerview': 'androidx.recyclerview:recyclerview:1.0.0',
+                ],
+
+                'growingio'        : [
+                        'gmonitor': 'com.growingio.android:gmonitor:1.4.0',
+                ],
+
+                'google'           : [
+                        'auto_service'            : 'com.google.auto.service:auto-service:1.0-rc6',
+                        'auto_service_annotations': 'com.google.auto.service:auto-service-annotations:1.0-rc6',
+                ],
+
+                'squareup'         : [
+                        'javapoet': 'com.squareup:javapoet:1.11.1',
+                        'okhttp3' : 'com.squareup.okhttp3:okhttp:3.12.1',
+                ],
+
+                'test'             : [
+                        'junit'                         : 'junit:junit:4.13',
+                        'runner'                        : 'androidx.test:runner:1.1.0',
+                        'rules'                         : 'androidx.test:rules:1.1.0',
+                        'mockito_core'                  : 'org.mockito:mockito-core:2.23.0',
+                        'powermock_api_mockito2'        : 'org.powermock:powermock-api-mockito2:2.0.2',
+                        'powermock_module_junit4'       : 'org.powermock:powermock-module-junit4:2.0.2',
+                        'powermock_module_junit4_rule'  : 'org.powermock:powermock-module-junit4-rule:2.0.2',
+                        'powermock_classloading_xstream': 'org.powermock:powermock-classloading-xstream:2.0.2',
+                        'truth'                         : 'com.google.truth:truth:1.0',
+                        'compile_testing'               : 'com.google.testing.compile:compile-testing:0.18',
+                ],
+
+
+                bintray_plugin     : "1.7.3",
+                maven_gradle_plugin: "1.5",
+                proguard_gradle    : "6.0",
+                recyclerview       : "recyclerview-v7:28.0.0",
+                appcompat          : "appcompat-v7:28.0.0",
+                design             : "design:28.0.0",
+                supportVersion     : "28.0.0",
+                junit              : "4.12",
+                json               : "20160810",
+                gmonitor           : "1.2.0"
+        ]
+    }
+
+    repositories {
+        mavenLocal()
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:${versions.gradleTool}"
+    }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+        google()
+    }
+}
+
+subprojects { project ->
+    apply plugin: 'checkstyle'
+
+    task checkstyle(type: Checkstyle, group: 'check') {
+        configFile rootProject.file('checkstyle/checkstyle.xml')
+        configProperties.checkstyleJavaHeader = rootProject.file('checkstyle/java.header')
+        source 'src/main/java'
+        ignoreFailures false
+        showViolations true
+        include '**/*.java'
+        classpath = files()
+    }
+
+    afterEvaluate {
+        if (project.tasks.findByName('check')) {
+            check.dependsOn('checkstyle')
+        }
+    }
+}
