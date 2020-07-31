@@ -1,4 +1,4 @@
-apply from: 'demos/settings-parent.gradle'
+//apply from: 'demos/settings-parent.gradle'
 
 include ':growingio-tracker'
 include ':growingio-autotracker'
