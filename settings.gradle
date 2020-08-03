@@ -1,4 +1,8 @@
-//apply from: 'demos/settings-parent.gradle'
+apply from: 'publicFun.gradle'
+
+if (!isExcludeDemos()) {
+    apply from: 'demos/settings-parent.gradle'
+}
 
 include ':growingio-tracker'
 include ':growingio-autotracker'
