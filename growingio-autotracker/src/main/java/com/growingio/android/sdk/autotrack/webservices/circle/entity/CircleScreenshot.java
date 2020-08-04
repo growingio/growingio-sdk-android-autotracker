@@ -166,7 +166,7 @@ public class CircleScreenshot {
 
         private ViewElement.Builder createViewElementBuilder(View view) {
             ViewElement.Builder builder = new ViewElement.Builder();
-            ViewNode viewNode = ViewHelper.getViewNode(view, null);
+            ViewNode viewNode = ViewHelper.getViewNode(view);
             int[] location = new int[2];
             view.getLocationOnScreen(location);
 

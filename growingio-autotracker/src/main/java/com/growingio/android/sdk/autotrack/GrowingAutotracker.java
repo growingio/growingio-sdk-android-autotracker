@@ -117,7 +117,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         PageProvider.PagePolicy.get().start();
 
         sInstance = autotrack;
-        GConfig.getInstance().setCanHook(true);
+        GConfig.getInstance().setInitSucceeded(true);
         LogUtil.d(TAG, "Autotrackrt module init success in ui thread");
     }
 

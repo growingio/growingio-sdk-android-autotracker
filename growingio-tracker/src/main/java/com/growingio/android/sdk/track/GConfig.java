@@ -35,7 +35,7 @@ public class GConfig {
     boolean mUseID = true;
     boolean mIsRnMode = false;
     boolean mUseRnOptimizedPath = false;
-    private volatile boolean mCanHook = false;
+    private volatile boolean mInitSucceeded = false;
     private volatile boolean mIsEnableDataCollect = true;
     private CustomerInterface.Encryption mEncryption = null;
 
@@ -68,12 +68,12 @@ public class GConfig {
         return true;
     }
 
-    public boolean canHook() {
-        return mCanHook;
+    public boolean isInitSucceeded() {
+        return mInitSucceeded;
     }
 
-    public void setCanHook(boolean mCanHook) {
-        this.mCanHook = mCanHook;
+    public void setInitSucceeded(boolean initSucceeded) {
+        this.mInitSucceeded = initSucceeded;
     }
 
     public boolean debug() {
