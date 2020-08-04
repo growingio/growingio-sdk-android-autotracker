@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -86,7 +87,7 @@ public class ImpObserver implements IViewTreeStatus {
         ListenerContainer.viewTreeStatusListeners().register(this);
     }
 
-    public void markViewImpression(ImpressionMark mark) {
+    public void markViewImpression(ImpressionConfig mark) {
         View view = mark.getView();
         if (view == null) {
             return;
@@ -100,7 +101,7 @@ public class ImpObserver implements IViewTreeStatus {
             LogUtil.e(TAG, "can't find the activity of view: " + view);
             return;
         }
-        LogUtil.d(TAG, "stampViewImp: ", mark.getEventId());
+        LogUtil.d(TAG, "stampViewImp: ", mark.getEventName());
         init();
         ActivityScope scope = mActivityScopes.get(activity);
         if (scope == null) {
@@ -121,7 +122,7 @@ public class ImpObserver implements IViewTreeStatus {
         } else if (scope.containView(view)) {
             ImpEvent impEvent = scope.getImpEvent(view);
             if (event.equals(impEvent)) {
-                LogUtil.d(TAG, "stampViewImp, and nothing changed: ", mark.getEventId());
+                LogUtil.d(TAG, "stampViewImp, and nothing changed: ", mark.getEventName());
                 impEvent.mMark = event.mMark;
                 return;
             }
@@ -132,7 +133,7 @@ public class ImpObserver implements IViewTreeStatus {
         checkAndSendViewTreeChange(activity);
     }
 
-    private ImpEvent moveGlobalId(ActivityScope scope, View view, @NonNull ImpressionMark mark, @NonNull ImpEvent impEvent) {
+    private ImpEvent moveGlobalId(ActivityScope scope, View view, @NonNull ImpressionConfig mark, @NonNull ImpEvent impEvent) {
         if (!scope.mGlobalIdToImpEvent.containsKey(mark.getGlobalId())) {
             // globalId对应的元素未被记录
             scope.mGlobalIdToImpEvent.put(mark.getGlobalId(), impEvent);
@@ -278,26 +279,22 @@ public class ImpObserver implements IViewTreeStatus {
     }
 
     private void saveImpEvent(ImpEvent impEvent) {
-        JSONObject variable = impEvent.mMark.getVariable();
+        Map <String, String> variable = impEvent.mMark.getAttributes();
         if (impEvent.mMark.isCollectContent()) {
             String content = Util.getViewContent(impEvent.mMark.getView(), null);
             if (!TextUtils.isEmpty(content)) {
                 if (variable == null) {
-                    variable = new JSONObject();
+                    variable = new HashMap<>();
                 }
-                if (!variable.has(GIO_CONTENT)) {
-                    try {
-                        variable.put(GIO_CONTENT, content);
-                    } catch (JSONException e) {
-                        LogUtil.e(TAG, e.getMessage(), e);
-                    }
+                if (!variable.containsKey(GIO_CONTENT)) {
+                    variable.put(GIO_CONTENT, content);
                 }
             }
         }
         if (variable != null) {
-            GrowingAutotracker.getInstance().trackCustomEvent(impEvent.mMark.getEventId(), JsonUtil.copyToMap(variable));
+            GrowingAutotracker.getInstance().trackCustomEvent(impEvent.mMark.getEventName(), variable);
         } else {
-            GrowingAutotracker.getInstance().trackCustomEvent(impEvent.mMark.getEventId(), null);
+            GrowingAutotracker.getInstance().trackCustomEvent(impEvent.mMark.getEventName(), null);
         }
     }
 
@@ -346,10 +343,10 @@ public class ImpObserver implements IViewTreeStatus {
         mTmpViewCache.clear();
     }
 
-    boolean checkViewVisibility(ImpressionMark mark) {
+    boolean checkViewVisibility(ImpressionConfig mark) {
         View view = mark.getView();
         if (ViewHelper.viewVisibilityInParents(view)) {
-            if (mark.getVisibleScale() == 0) {
+            if (ImpressionConfig.getVisibleScale() == 0) {
                 // 任意像素可见均被认为有效曝光
                 return true;
             }
@@ -358,7 +355,7 @@ public class ImpObserver implements IViewTreeStatus {
                 mTmpRect = new Rect();
             }
             view.getLocalVisibleRect(mTmpRect);
-            return mTmpRect.right * mTmpRect.bottom >= view.getMeasuredHeight() * view.getMeasuredWidth() * mark.getVisibleScale();
+            return mTmpRect.right * mTmpRect.bottom >= view.getMeasuredHeight() * view.getMeasuredWidth() * ImpressionConfig.getVisibleScale();
         }
         return false;
     }
@@ -473,7 +470,7 @@ public class ImpObserver implements IViewTreeStatus {
     }
 
     static class ImpEvent {
-        ImpressionMark mMark;
+        ImpressionConfig mMark;
         boolean mLastVisible;
         WeakReference<Activity> mActivity;
 
@@ -483,11 +480,10 @@ public class ImpObserver implements IViewTreeStatus {
                 return false;
             }
             ImpEvent other = (ImpEvent) obj;
-            if (!ObjectUtils.equals(mMark.getEventId(), other.mMark.getEventId())
+            if (!ObjectUtils.equals(mMark.getEventName(), other.mMark.getEventName())
                     || !ObjectUtils.equals(mMark.getGlobalId(), other.mMark.getGlobalId())
-                    || !(ObjectUtils.equals(mMark.getNum(), other.mMark.getNum()))
                     || mMark.getDelayTimeMills() != other.mMark.getDelayTimeMills()
-                    || !JsonUtil.equal(mMark.getVariable(), other.mMark.getVariable())) {
+                    || !ObjectUtils.equals(mMark.getAttributes(), other.mMark.getAttributes())) {
                 return false;
             }
 

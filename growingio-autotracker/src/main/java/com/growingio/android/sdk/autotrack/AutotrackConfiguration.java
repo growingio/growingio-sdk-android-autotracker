@@ -20,6 +20,17 @@ import com.growingio.android.sdk.track.TrackConfiguration;
 
 public class AutotrackConfiguration extends TrackConfiguration {
 
+    private float mImpressionScale;
+
+    public AutotrackConfiguration setImpressionScale(float scale) {
+        this.mImpressionScale = scale;
+        return this;
+    }
+
+    public float getImpressionScale() {
+        return mImpressionScale;
+    }
+
     @Override
     public AutotrackConfiguration setProjectId(String projectId) {
         super.setProjectId(projectId);

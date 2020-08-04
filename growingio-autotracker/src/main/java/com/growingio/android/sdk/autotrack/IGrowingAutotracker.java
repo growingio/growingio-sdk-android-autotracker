@@ -16,18 +16,34 @@
 
 package com.growingio.android.sdk.autotrack;
 
+import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.view.View;
 
+import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.track.interfaces.IGrowingTracker;
+
+import java.util.Map;
 
 /**
  * GrowingIO对外无埋点部分接口
  */
 public interface IGrowingAutotracker extends IGrowingTracker {
 
-    IGrowingTracker setCustomId(View view, String cid);
+    IGrowingTracker setUniqueTag(View view, String tag);
 
-    IGrowingTracker markViewImpression(ImpressionMark mark);
+    IGrowingAutotracker setPageAttributes(Activity activity, Map<String, String> attributes);
 
-    IGrowingTracker stopMarkViewImpression(View markedView);
+    IGrowingTracker trackViewImpression(ImpressionConfig config);
+
+    IGrowingTracker stopTrackViewImpression(View trackedView);
+
+    IGrowingTracker setPageAlias(String alias);
+
+    IGrowingTracker ignorePage(Activity activity, IgnorePolicy policy);
+
+    IGrowingTracker ignorePage(Fragment fragment, IgnorePolicy policy);
+
+    IGrowingTracker ignoreView(View view, IgnorePolicy policy);
+
 }
