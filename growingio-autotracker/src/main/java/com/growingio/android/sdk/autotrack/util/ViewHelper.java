@@ -202,7 +202,7 @@ public class ViewHelper {
                 }
 
                 viewTreeList.add((ViewGroup) parent);
-                if (ViewAttributeUtil.getCustomId((View)parent) != null) {
+                if (ViewAttributeUtil.getCustomId((View) parent) != null) {
                     break;
                 }
                 page = ViewAttributeUtil.getViewPage((View) parent);

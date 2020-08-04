@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ActionMenuView;
