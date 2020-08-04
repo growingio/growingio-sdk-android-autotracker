@@ -16,7 +16,9 @@
 
 package com.growingio.android.sdk.autotrack;
 
+import android.app.Activity;
 import android.app.Application;
+import android.support.v4.app.Fragment;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import androidx.annotation.Nullable;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
 import com.growingio.android.sdk.autotrack.variation.AutotrackEventJsonMarshaller;
+import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.track.GConfig;
 import com.growingio.android.sdk.track.GInternal;
 import com.growingio.android.sdk.track.GrowingTracker;
@@ -82,6 +85,9 @@ public class GrowingAutotracker implements IGrowingAutotracker {
                 sInitSuccess = true;
             }
         });
+
+        ImpressionConfig.setVisibleScale(autotrackConfiguration.getImpressionScale());
+
         ScreenshotProvider.ScreenshotPolicy.get();
         if (sInitSuccess) {
             return sInstance;
@@ -181,29 +187,40 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         return this;
     }
 
+
+
     @Override
-    public IGrowingTracker setCustomId(final View view, final String cid) {
+    public IGrowingTracker setUniqueTag(final View view, final String tag) {
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
-                ViewAttributeUtil.setCustomId(view, cid);
+                ViewAttributeUtil.setCustomId(view, tag);
             }
         });
         return this;
     }
 
     @Override
-    public IGrowingTracker markViewImpression(final ImpressionMark mark) {
+    public IGrowingAutotracker setPageAttributes(Activity activity, Map<String, String> attributes) {
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
-                if (ArgumentChecker.isIllegalEventName(mark.getEventId())) {
+                // TODO: setPageAttributes
+//                PageProvider.PagePolicy.get().setPageAttributes();
+            }
+        });
+        return this;
+    }
+
+    @Override
+    public IGrowingTracker trackViewImpression(final ImpressionConfig config) {
+        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
+            @Override
+            public void action() {
+                if (ArgumentChecker.isIllegalEventName(config.getEventName())) {
                     return;
                 }
-                if (mark.getVariable() != null) {
-                    mark.setVariable(ArgumentChecker.validJSONObject(mark.getVariable()));
-                }
-                AutotrackAppState.impObserver().markViewImpression(mark);
+                AutotrackAppState.impObserver().markViewImpression(config);
             }
         });
 
@@ -211,14 +228,51 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingTracker stopMarkViewImpression(final View markedView) {
+    public IGrowingTracker stopTrackViewImpression(final View trackedView) {
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
-                AutotrackAppState.impObserver().stopStampViewImp(markedView);
+                AutotrackAppState.impObserver().stopStampViewImp(trackedView);
             }
         });
 
         return this;
     }
+
+    @Override
+    public IGrowingTracker setPageAlias(String alias) {
+        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
+            @Override
+            public void action() {
+
+                // TODO: setPageAlias
+//                PageProvider.PagePolicy.get().setPageAlias();
+            }
+        });
+
+        return this;
+    }
+
+    @Override
+    public IGrowingTracker ignorePage(Activity activity, IgnorePolicy policy) {
+        return null;
+    }
+
+    @Override
+    public IGrowingTracker ignorePage(Fragment fragment, IgnorePolicy policy) {
+        return null;
+    }
+
+    @Override
+    public IGrowingTracker ignoreView(final View view, final IgnorePolicy policy) {
+
+        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
+            @Override
+            public void action() {
+                ViewAttributeUtil.setIgnoreViewKey(view, policy);
+            }
+        });
+        return this;
+    }
+
 }
