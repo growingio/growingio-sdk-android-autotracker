@@ -186,24 +186,23 @@ public class ViewAttributeUtil {
         view.setTag(GROWING_IGNORE_VIEW_KEY, policy);
     }
 
-    public static Boolean getIgnoreViewKey(View view) {
+    public static boolean getIgnoreViewKey(View view) {
 
         IgnorePolicy selfPolicy = ViewAttributeUtil.getViewIgnorePlicy(view);
-        if (selfPolicy == null) {
-            return false;
-        }
-
         View parentView = (View) view.getParent();
         IgnorePolicy parentPolicy = ViewAttributeUtil.getViewIgnorePlicy(parentView);
 
-        if (parentPolicy == null) {
-            return (selfPolicy == IgnorePolicy.IgnoreSelf) || (selfPolicy == IgnorePolicy.IgnoreAll);
+        if (selfPolicy == null &&
+                (parentPolicy == null || parentPolicy == IgnorePolicy.IgnoreSelf)) {
+            return false;
         }
 
-        return (selfPolicy == IgnorePolicy.IgnoreSelf) ||
-                (selfPolicy == IgnorePolicy.IgnoreAll) ||
-                (parentPolicy == IgnorePolicy.IgnoreAll) ||
-                (parentPolicy == IgnorePolicy.IgnoreChild);
+        if (selfPolicy == IgnorePolicy.IgnoreChild &&
+                (parentPolicy == null || parentPolicy == IgnorePolicy.IgnoreSelf)) {
+            return false;
+        }
+
+        return true;
     }
 
     public static IgnorePolicy getViewIgnorePlicy(View view) {
