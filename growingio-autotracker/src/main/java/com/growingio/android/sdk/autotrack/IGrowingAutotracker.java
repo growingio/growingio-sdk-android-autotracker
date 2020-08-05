@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
-import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.track.interfaces.IGrowingTracker;
 
 import java.util.Map;
@@ -30,20 +29,24 @@ import java.util.Map;
  */
 public interface IGrowingAutotracker extends IGrowingTracker {
 
-    IGrowingTracker setUniqueTag(View view, String tag);
+    IGrowingAutotracker setUniqueTag(View view, String tag);
 
     IGrowingAutotracker setPageAttributes(Activity activity, Map<String, String> attributes);
 
-    IGrowingTracker trackViewImpression(ImpressionConfig config);
+    IGrowingAutotracker setPageAttributes(Fragment fragment, Map<String, String> attributes);
 
-    IGrowingTracker stopTrackViewImpression(View trackedView);
+    IGrowingAutotracker trackViewImpression(ImpressionConfig config);
 
-    IGrowingTracker setPageAlias(String alias);
+    IGrowingAutotracker stopTrackViewImpression(View trackedView);
 
-    IGrowingTracker ignorePage(Activity activity, IgnorePolicy policy);
+    IGrowingAutotracker setPageAlias(Activity activity ,String alias);
 
-    IGrowingTracker ignorePage(Fragment fragment, IgnorePolicy policy);
+    IGrowingAutotracker setPageAlias(Fragment fragment ,String alias);
 
-    IGrowingTracker ignoreView(View view, IgnorePolicy policy);
+    IGrowingAutotracker ignorePage(Activity activity, IgnorePolicy policy);
+
+    IGrowingAutotracker ignorePage(Fragment fragment, IgnorePolicy policy);
+
+    IGrowingAutotracker ignoreView(View view, IgnorePolicy policy);
 
 }

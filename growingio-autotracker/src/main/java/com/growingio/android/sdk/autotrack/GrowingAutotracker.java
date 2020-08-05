@@ -25,15 +25,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.page.PageProvider;
+import com.growingio.android.sdk.autotrack.page.SuperFragment;
 import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
 import com.growingio.android.sdk.autotrack.variation.AutotrackEventJsonMarshaller;
-import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.track.GConfig;
 import com.growingio.android.sdk.track.GInternal;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.ListenerContainer;
 import com.growingio.android.sdk.track.interfaces.IActionCallback;
-import com.growingio.android.sdk.track.interfaces.IGrowingTracker;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.providers.EventSenderProvider;
@@ -134,19 +133,19 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingTracker setConversionVariables(Map<String, String> variables) {
+    public IGrowingAutotracker setConversionVariables(Map<String, String> variables) {
         GrowingTracker.getInstance().setConversionVariables(variables);
         return this;
     }
 
     @Override
-    public IGrowingTracker setLoginUserAttributes(Map<String, String> attributes) {
+    public IGrowingAutotracker setLoginUserAttributes(Map<String, String> attributes) {
         GrowingTracker.getInstance().setLoginUserAttributes(attributes);
         return this;
     }
 
     @Override
-    public IGrowingTracker setVisitorAttributes(Map<String, String> attributes) {
+    public IGrowingAutotracker setVisitorAttributes(Map<String, String> attributes) {
         GrowingTracker.getInstance().setVisitorAttributes(attributes);
         return this;
     }
@@ -158,7 +157,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingTracker setDataCollectionEnabled(boolean enabled) {
+    public IGrowingAutotracker setDataCollectionEnabled(boolean enabled) {
         GrowingTracker.getInstance().setDataCollectionEnabled(enabled);
         return this;
     }
@@ -170,7 +169,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingTracker cleanLoginUserId() {
+    public IGrowingAutotracker cleanLoginUserId() {
         GrowingTracker.getInstance().cleanLoginUserId();
         return this;
     }
@@ -182,15 +181,14 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingTracker cleanLocation() {
+    public IGrowingAutotracker cleanLocation() {
         GrowingTracker.getInstance().cleanLocation();
         return this;
     }
 
 
-
     @Override
-    public IGrowingTracker setUniqueTag(final View view, final String tag) {
+    public IGrowingAutotracker setUniqueTag(final View view, final String tag) {
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
@@ -201,19 +199,19 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingAutotracker setPageAttributes(Activity activity, Map<String, String> attributes) {
-        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
-            @Override
-            public void action() {
-                // TODO: setPageAttributes
-//                PageProvider.PagePolicy.get().setPageAttributes();
-            }
-        });
+    public IGrowingAutotracker setPageAttributes(final Activity activity, final Map<String, String> attributes) {
+        PageProvider.PagePolicy.get().setPageAttributes(activity, attributes);
         return this;
     }
 
     @Override
-    public IGrowingTracker trackViewImpression(final ImpressionConfig config) {
+    public IGrowingAutotracker setPageAttributes(final Fragment fragment, final Map<String, String> attributes) {
+        PageProvider.PagePolicy.get().setPageAttributes(SuperFragment.make(fragment), attributes);
+        return this;
+    }
+
+    @Override
+    public IGrowingAutotracker trackViewImpression(final ImpressionConfig config) {
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
@@ -228,7 +226,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingTracker stopTrackViewImpression(final View trackedView) {
+    public IGrowingAutotracker stopTrackViewImpression(final View trackedView) {
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
@@ -240,31 +238,31 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingTracker setPageAlias(String alias) {
-        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
-            @Override
-            public void action() {
-
-                // TODO: setPageAlias
-//                PageProvider.PagePolicy.get().setPageAlias();
-            }
-        });
-
+    public IGrowingAutotracker setPageAlias(final Activity activity, final String alias) {
+        PageProvider.PagePolicy.get().setActivityAlias(activity, alias);
         return this;
     }
 
     @Override
-    public IGrowingTracker ignorePage(Activity activity, IgnorePolicy policy) {
-        return null;
+    public IGrowingAutotracker setPageAlias(final Fragment fragment, final String alias) {
+        PageProvider.PagePolicy.get().setFragmentAlias(SuperFragment.make(fragment), alias);
+        return this;
     }
 
     @Override
-    public IGrowingTracker ignorePage(Fragment fragment, IgnorePolicy policy) {
-        return null;
+    public IGrowingAutotracker ignorePage(final Activity activity, final IgnorePolicy policy) {
+        PageProvider.PagePolicy.get().addActivityWithIgnorePolicy(activity, policy);
+        return this;
     }
 
     @Override
-    public IGrowingTracker ignoreView(final View view, final IgnorePolicy policy) {
+    public IGrowingAutotracker ignorePage(final Fragment fragment, final IgnorePolicy policy) {
+        PageProvider.PagePolicy.get().addFragmentWithIgnorePolicy(SuperFragment.make(fragment), policy);
+        return this;
+    }
+
+    @Override
+    public IGrowingAutotracker ignoreView(final View view, final IgnorePolicy policy) {
 
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
