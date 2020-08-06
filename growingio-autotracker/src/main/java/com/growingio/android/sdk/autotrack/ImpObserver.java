@@ -33,16 +33,11 @@ import com.growingio.android.sdk.track.interfaces.IViewTreeStatus;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
-import com.growingio.android.sdk.track.utils.JsonUtil;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 import com.growingio.android.sdk.track.utils.SysTrace;
 import com.growingio.android.sdk.track.utils.TimerToggler;
 import com.growingio.android.sdk.track.utils.WeakSet;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -279,7 +274,7 @@ public class ImpObserver implements IViewTreeStatus {
     }
 
     private void saveImpEvent(ImpEvent impEvent) {
-        Map <String, String> variable = impEvent.mMark.getAttributes();
+        Map<String, String> variable = impEvent.mMark.getAttributes();
         if (impEvent.mMark.isCollectContent()) {
             String content = Util.getViewContent(impEvent.mMark.getView(), null);
             if (!TextUtils.isEmpty(content)) {

@@ -15,15 +15,10 @@
  */
 
 package com.growingio.android.sdk.autotrack;
-
 import android.view.View;
-
 import androidx.annotation.FloatRange;
-
 import com.growingio.android.sdk.track.GConfig;
 import com.growingio.android.sdk.track.utils.LogUtil;
-
-import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -37,7 +32,7 @@ public class ImpressionConfig {
     private long mDelayTime;
     private String mGlobalId;
     private boolean mCollectV = true;          // 默认采集元素内容
-    static private float impressionScale = 0;           // 默认: 任何像素可见就算可见
+    static private float sImpressionScale = 0; // 默认: 任何像素可见就算可见
 
     public ImpressionConfig(View view, String eventName, Map<String, String> attributes) {
         this.mView = new WeakReference<>(view);
@@ -85,7 +80,7 @@ public class ImpressionConfig {
     }
 
     public static float getVisibleScale() {
-        return impressionScale;
+        return sImpressionScale;
     }
 
     /**
@@ -103,6 +98,6 @@ public class ImpressionConfig {
                 LogUtil.e("GIO.ImpressionMark", errorMsg);
             }
         }
-        impressionScale = visibleScale;
+        sImpressionScale = visibleScale;
     }
 }

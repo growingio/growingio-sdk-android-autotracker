@@ -39,9 +39,9 @@ public interface IGrowingAutotracker extends IGrowingTracker {
 
     IGrowingAutotracker stopTrackViewImpression(View trackedView);
 
-    IGrowingAutotracker setPageAlias(Activity activity ,String alias);
+    IGrowingAutotracker setPageAlias(Activity activity, String alias);
 
-    IGrowingAutotracker setPageAlias(Fragment fragment ,String alias);
+    IGrowingAutotracker setPageAlias(Fragment fragment, String alias);
 
     IGrowingAutotracker ignorePage(Activity activity, IgnorePolicy policy);
 
