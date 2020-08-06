@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.providers.EventAutotrackGeneratorProvider;
 import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
@@ -32,7 +33,6 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.GIOProviders;
 import com.growingio.android.sdk.track.utils.LogUtil;
-import com.growingio.android.sdk.track.utils.WeakSet;
 
 import java.util.HashSet;
 import java.util.List;
@@ -50,14 +50,27 @@ public interface PageProvider {
 
     void removePage(SuperFragment<?> superFragment);
 
+    void setActivityAlias(Activity activity, String alias);
+
+    void setFragmentAlias(SuperFragment<?> fragment, String alias);
+
+    void addActivityWithIgnorePolicy(Activity activity, IgnorePolicy policy);
+
+    void addFragmentWithIgnorePolicy(SuperFragment<?> fragment, IgnorePolicy policy);
+
+    void setPageAttributes(Activity activity, Map<String, String> attributes);
+
+    void setPageAttributes(SuperFragment<?> fragment, Map<String, String> attributes);
+
     class PagePolicy implements PageProvider, IActivityLifecycle {
         private static final String TAG = "PagePolicy";
 
         private static final Map<Activity, ActivityPage> ALL_PAGE_TREE = new WeakHashMap<>();
         private static final Map<Object, String> ALL_PAGE_ALIAS = new WeakHashMap<>();
         private static final Set<Class<?>> IGNORE_PAGE_CLASSES = new HashSet<>();
-        private static final Set<Object> IGNORE_PAGES = new WeakSet<>();
         private static final Map<Object, Map<String, String>> PAGE_ATTRIBUTES_CACHE = new WeakHashMap<>();
+
+        private static final Map<Object, IgnorePolicy> ALL_PAGE_IGNORE_POLICY = new WeakHashMap<>();
 
         private PagePolicy() {
         }
@@ -98,12 +111,18 @@ public interface PageProvider {
             IGNORE_PAGE_CLASSES.add(fragmentClazz);
         }
 
-        public void addIgnoreActivity(Activity activity) {
-            IGNORE_PAGES.add(activity);
+        @Override
+        public void addActivityWithIgnorePolicy(Activity activity, IgnorePolicy policy) {
+            if (activity != null && policy != null) {
+                ALL_PAGE_IGNORE_POLICY.put(activity, policy);
+            }
         }
 
-        public void addIgnoreFragment(SuperFragment<?> fragment) {
-            IGNORE_PAGES.add(fragment);
+        @Override
+        public void addFragmentWithIgnorePolicy(SuperFragment<?> fragment, IgnorePolicy policy) {
+            if (fragment != null && policy != null) {
+                ALL_PAGE_IGNORE_POLICY.put(fragment, policy);
+            }
         }
 
         @UiThread
@@ -131,6 +150,7 @@ public interface PageProvider {
             }
         }
 
+        @Override
         public void setActivityAlias(Activity activity, String alias) {
             if (TextUtils.isEmpty(alias)) {
                 return;
@@ -139,6 +159,7 @@ public interface PageProvider {
             ALL_PAGE_ALIAS.put(activity, alias);
         }
 
+        @Override
         public void setFragmentAlias(SuperFragment<?> fragment, String alias) {
             if (TextUtils.isEmpty(alias)) {
                 return;
@@ -155,13 +176,48 @@ public interface PageProvider {
         }
 
         private boolean isIgnoreActivity(Activity activity) {
-            return IGNORE_PAGE_CLASSES.contains(activity.getClass())
-                    || IGNORE_PAGES.contains(activity);
+            if (IGNORE_PAGE_CLASSES.contains(activity.getClass())) {
+                return true;
+            }
+
+            Activity parentActivity = activity.getParent();
+            IgnorePolicy selfPolicy = ALL_PAGE_IGNORE_POLICY.get(activity);
+            IgnorePolicy parentPolicy = ALL_PAGE_IGNORE_POLICY.get(parentActivity);
+
+
+            if (selfPolicy == null &&
+                    (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
+                return false;
+            }
+
+            if (selfPolicy == IgnorePolicy.IGNORE_CHILD &&
+                    (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
+                return false;
+            }
+
+            return true;
         }
 
         private boolean isIgnoreFragment(SuperFragment<?> fragment) {
-            return IGNORE_PAGE_CLASSES.contains(fragment.getRealFragment().getClass())
-                    || IGNORE_PAGES.contains(fragment);
+            if (IGNORE_PAGE_CLASSES.contains(fragment.getRealFragment().getClass())) {
+                return true;
+            }
+
+            SuperFragment<?> parentFragment = fragment.getParentFragment();
+            IgnorePolicy selfPolicy = ALL_PAGE_IGNORE_POLICY.get(fragment);
+            IgnorePolicy parentPolicy = ALL_PAGE_IGNORE_POLICY.get(parentFragment);
+
+            if (selfPolicy == null &&
+                    (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
+                return false;
+            }
+
+            if (selfPolicy == IgnorePolicy.IGNORE_CHILD &&
+                    (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
+                return false;
+            }
+
+            return true;
         }
 
         @UiThread
@@ -314,6 +370,7 @@ public interface PageProvider {
             }
         }
 
+        @Override
         public void setPageAttributes(Activity activity, Map<String, String> attributes) {
             ActivityPage page = ALL_PAGE_TREE.get(activity);
             if (page != null) {
@@ -324,6 +381,7 @@ public interface PageProvider {
             }
         }
 
+        @Override
         public void setPageAttributes(SuperFragment<?> fragment, Map<String, String> attributes) {
             PageGroup<?> page = findPage(fragment);
             if (page != null) {

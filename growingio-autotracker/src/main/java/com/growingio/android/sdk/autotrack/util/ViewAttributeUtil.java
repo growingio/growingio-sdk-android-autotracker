@@ -18,6 +18,7 @@ package com.growingio.android.sdk.autotrack.util;
 
 import android.view.View;
 
+import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.page.Page;
 
 import java.util.List;
@@ -181,14 +182,34 @@ public class ViewAttributeUtil {
         return null;
     }
 
-    public static void setIgnoreViewKey(View view, Boolean ignore) {
-        view.setTag(GROWING_IGNORE_VIEW_KEY, ignore);
+    public static void setIgnoreViewKey(View view, IgnorePolicy policy) {
+        view.setTag(GROWING_IGNORE_VIEW_KEY, policy);
     }
 
-    public static Boolean getIgnoreViewKey(View view) {
-        Object ignore = view.getTag(GROWING_IGNORE_VIEW_KEY);
-        if (ignore instanceof Boolean) {
-            return (Boolean) ignore;
+    public static boolean getIgnoreViewKey(View view) {
+
+        IgnorePolicy selfPolicy = ViewAttributeUtil.getViewIgnorePlicy(view);
+        View parentView = (View) view.getParent();
+        IgnorePolicy parentPolicy = ViewAttributeUtil.getViewIgnorePlicy(parentView);
+
+        if (selfPolicy == null &&
+                (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
+            return false;
+        }
+
+        if (selfPolicy == IgnorePolicy.IGNORE_CHILD &&
+                (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static IgnorePolicy getViewIgnorePlicy(View view) {
+        Object ignorePolicy = view.getTag(GROWING_IGNORE_VIEW_KEY);
+        if (ignorePolicy instanceof Enum) {
+            IgnorePolicy policy = (IgnorePolicy) ignorePolicy;
+            return policy;
         }
 
         return null;

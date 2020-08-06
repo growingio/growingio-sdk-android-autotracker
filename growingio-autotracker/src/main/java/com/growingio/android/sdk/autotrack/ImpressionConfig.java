@@ -15,33 +15,29 @@
  */
 
 package com.growingio.android.sdk.autotrack;
-
 import android.view.View;
-
 import androidx.annotation.FloatRange;
-
 import com.growingio.android.sdk.track.GConfig;
 import com.growingio.android.sdk.track.utils.LogUtil;
 
-import org.json.JSONObject;
-
 import java.lang.ref.WeakReference;
+import java.util.Map;
 
-public class ImpressionMark {
+public class ImpressionConfig {
 
     private final WeakReference<View> mView;
-    private final String mEventId;
+    private final String mEventName;
 
-    private Number mNum;
-    private JSONObject mVariable;
+    private Map<String, String> mAttributes;
     private long mDelayTime;
     private String mGlobalId;
     private boolean mCollectV = true;          // 默认采集元素内容
-    private float mVisibleScale = 0;           // 默认: 任何像素可见就算可见
+    static private float sImpressionScale = 0; // 默认: 任何像素可见就算可见
 
-    public ImpressionMark(View view, String eventId) {
+    public ImpressionConfig(View view, String eventName, Map<String, String> attributes) {
         this.mView = new WeakReference<>(view);
-        this.mEventId = eventId;
+        this.mEventName = eventName;
+        this.mAttributes = attributes;
     }
 
     public View getView() {
@@ -52,42 +48,24 @@ public class ImpressionMark {
         return mGlobalId;
     }
 
-    public ImpressionMark setGlobalId(String globalId) {
+    public ImpressionConfig setGlobalId(String globalId) {
         this.mGlobalId = globalId;
         return this;
     }
 
-    public String getEventId() {
-        return mEventId;
+    public String getEventName() {
+        return mEventName;
     }
 
-    public Number getNum() {
-        return mNum;
-    }
-
-    /**
-     * @deprecated 官网没有设置Num之处， 下个API变更变更删除此API
-     */
-    @Deprecated
-    public ImpressionMark setNum(Number num) {
-        this.mNum = num;
-        return this;
-    }
-
-    public JSONObject getVariable() {
-        return mVariable;
-    }
-
-    public ImpressionMark setVariable(JSONObject variable) {
-        this.mVariable = variable;
-        return this;
+    public Map<String, String> getAttributes() {
+        return mAttributes;
     }
 
     public long getDelayTimeMills() {
         return mDelayTime;
     }
 
-    public ImpressionMark setDelayTimeMills(long delayTime) {
+    public ImpressionConfig setDelayTimeMills(long delayTime) {
         this.mDelayTime = delayTime;
         return this;
     }
@@ -96,13 +74,13 @@ public class ImpressionMark {
         return this.mCollectV;
     }
 
-    public ImpressionMark setCollectContent(boolean collectV) {
+    public ImpressionConfig setCollectContent(boolean collectV) {
         this.mCollectV = collectV;
         return this;
     }
 
-    public float getVisibleScale() {
-        return mVisibleScale;
+    public static float getVisibleScale() {
+        return sImpressionScale;
     }
 
     /**
@@ -111,7 +89,7 @@ public class ImpressionMark {
      *
      * @param visibleScale 有效曝光比例, 0 -- 任意像素可见为有效曝光, 1 -- 全部像素可见时为有效曝光
      */
-    public ImpressionMark setVisibleScale(@FloatRange(from = 0.0f, to = 1.0f) float visibleScale) {
+    public static void setVisibleScale(@FloatRange(from = 0.0f, to = 1.0f) float visibleScale) {
         if (visibleScale < 0 || visibleScale > 1) {
             String errorMsg = "visibleScale 区间为[0, 1], current visibleScale is " + visibleScale;
             if (GConfig.getInstance().debug()) {
@@ -119,9 +97,7 @@ public class ImpressionMark {
             } else {
                 LogUtil.e("GIO.ImpressionMark", errorMsg);
             }
-            return this;
         }
-        this.mVisibleScale = visibleScale;
-        return this;
+        sImpressionScale = visibleScale;
     }
 }

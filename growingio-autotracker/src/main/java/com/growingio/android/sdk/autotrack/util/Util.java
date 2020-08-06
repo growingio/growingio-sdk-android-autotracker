@@ -224,7 +224,7 @@ public class Util {
     }
 
     public static boolean isIgnoredView(View view) {
-        return ViewAttributeUtil.getIgnoreViewKey(view) != null;
+        return ViewAttributeUtil.getIgnoreViewKey(view);
     }
 
     public static boolean isViewClickable(View view) {
