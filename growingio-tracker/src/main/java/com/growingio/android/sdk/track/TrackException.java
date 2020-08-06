@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.models;
+package com.growingio.android.sdk.track;
 
-public class EsidProperty {
-    private int mEsid;
-    private int mGsid;
+public class TrackException extends RuntimeException {
 
-    public int getEsid() {
-        return mEsid;
+    public TrackException(String message) {
+        super(message);
     }
 
-    public void setEsid(int esid) {
-        this.mEsid = esid;
-    }
-
-    public int getGsid() {
-        return mGsid;
-    }
-
-    public void setGsid(int gsid) {
-        this.mGsid = gsid;
+    public TrackException(Throwable t) {
+        super(t);
     }
 }

@@ -23,7 +23,7 @@ import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-import com.growingio.android.sdk.autotrack.util.DeviceUtil;
+import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.autotrack.util.WindowHelper;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.autotrack.window.DecorView;

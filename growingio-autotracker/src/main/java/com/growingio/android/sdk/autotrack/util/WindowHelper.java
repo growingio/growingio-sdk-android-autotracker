@@ -183,7 +183,7 @@ public class WindowHelper {
         }
 
 
-        if (root.hashCode() == ActivityStateProvider.ActivityStatePolicy.get().getCurrentRootWindowsHashCode()) {
+        if (root.hashCode() ==  ActivityStateProvider.get().getCurrentRootWindowsHashCode()) {
             return getMainWindowPrefix();
         }
 
@@ -218,7 +218,7 @@ public class WindowHelper {
 
     @NonNull
     public static DecorView[] getTopActivityViews() {
-        Activity activity = ActivityStateProvider.ActivityStatePolicy.get().getForegroundActivity();
+        Activity activity =  ActivityStateProvider.get().getForegroundActivity();
         if (activity == null) {
             return new DecorView[0];
         }
@@ -237,7 +237,7 @@ public class WindowHelper {
 
     public static DecorView[] getTopWindowViews() {
         List<DecorView> topViews = new ArrayList<>();
-        Activity activity = ActivityStateProvider.ActivityStatePolicy.get().getForegroundActivity();
+        Activity activity =  ActivityStateProvider.get().getForegroundActivity();
         DecorView[] decorViews = getAllWindowDecorViews();
         for (DecorView decorView : decorViews) {
             View view = decorView.getView();
@@ -275,7 +275,7 @@ public class WindowHelper {
         View[] result = new View[0];
         if (sWindowManger == null) {
             // 如果无法获取WindowManager就只遍历当前Activity的内容
-            Activity current = ActivityStateProvider.ActivityStatePolicy.get().getForegroundActivity();
+            Activity current =  ActivityStateProvider.get().getForegroundActivity();
             if (current != null) {
                 return new View[]{current.getWindow().getDecorView()};
             }

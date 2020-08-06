@@ -16,166 +16,125 @@
 
 package com.growingio.android.sdk.track.providers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings;
-import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.GConfig;
-import com.growingio.android.sdk.track.interfaces.GMainThread;
+import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
-import com.growingio.android.sdk.track.utils.GIOProviders;
+import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
-import com.growingio.android.sdk.track.utils.PersistUtil;
-import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-/**
- * 用于获取设备信息的DeviceInfo
- */
-public interface DeviceInfoProvider {
-    /**
-     * @return 获取设备imei信息
-     */
-    @AnyThread
-    String getImei();
+public class DeviceInfoProvider {
+    private static final String TAG = "DeviceInfoProvider";
 
-    /**
-     * @return 获取设备AndroidId值
-     */
-    @AnyThread
-    String getAndroidId();
+    private static final String MAGIC_ANDROID_ID = "9774d56d682e549c";
 
-    /**
-     * @return 获取设备oaid值
-     */
-    @GMainThread
-    String getOaid();
+    private final Context mContext;
+    private final GrowingIOIPC mIPC;
 
-    /**
-     * @return 获取GoogleAdId
-     */
-    @GMainThread
-    String getGoogleAdId();
+    private String mAndroidId;
+    private String mImei;
+    private String mOaid;
+    private String mGoogleAdId;
+    private String mDeviceId;
 
-    @GMainThread
-    String getDeviceId();
+    private static class SingleInstance {
+        private static final DeviceInfoProvider INSTANCE = new DeviceInfoProvider();
+    }
 
-    void setDeviceId(String deviceId);
+    private DeviceInfoProvider() {
+        mContext = ContextProvider.getApplicationContext();
+        mIPC = PersistentDataProvider.get().getIPC();
+    }
 
-    @AnyThread
-    void getDeviceId(@NonNull ResultCallback<String> callback);
+    public static DeviceInfoProvider get() {
+        return SingleInstance.INSTANCE;
+    }
 
-    class DeviceInfoPolicy implements DeviceInfoProvider {
-
-        private static final String TAG = "GIO.DeviceInfo";
-        private Context mContext;
-        private String mAndroidId;
-        private String mImei;
-        private String mOaid;
-        private String mGoogleAdId;
-        private String mDeviceId;
-        public DeviceInfoPolicy(Context context) {
-            this.mContext = context.getApplicationContext();
-            PermissionUtil.init(this.mContext);
-        }
-
-        public static DeviceInfoPolicy get(final Context context) {
-            return GIOProviders.provider(DeviceInfoPolicy.class, new GIOProviders.DefaultCallback<DeviceInfoPolicy>() {
-                @Override
-                public DeviceInfoPolicy value() {
-                    return new DeviceInfoPolicy(context);
-                }
-            });
-        }
-
-        @Override
-        public String getImei() {
-            if (TextUtils.isEmpty(mImei) && GConfig.getInstance().isEnableDataCollect()) {
-                if (PermissionUtil.checkReadPhoneStatePermission()) {
-                    try {
-                        TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                        mImei = tm.getDeviceId();
-                    } catch (Throwable e) {
-                        LogUtil.d(TAG, "don't have permission android.permission.READ_PHONE_STATE,initIMEI failed ");
-                    }
+    @SuppressLint({"MissingPermission", "HardwareIds"})
+    public String getImei() {
+        if (TextUtils.isEmpty(mImei) && ConfigurationProvider.get().isDataCollectionEnabled()) {
+            if (PermissionUtil.checkReadPhoneStatePermission()) {
+                try {
+                    TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                    mImei = tm.getDeviceId();
+                } catch (Throwable e) {
+                    LogUtil.d(TAG, "don't have permission android.permission.READ_PHONE_STATE,initIMEI failed ");
                 }
             }
-            return null;
         }
+        return null;
+    }
 
-        @Override
-        public String getAndroidId() {
-            if (TextUtils.isEmpty(mAndroidId) && GConfig.getInstance().isEnableDataCollect()) {
-                mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
+    public String getAndroidId() {
+        if (TextUtils.isEmpty(mAndroidId) && ConfigurationProvider.get().isDataCollectionEnabled()) {
+            mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
+        }
+        return mAndroidId;
+    }
+
+    public String getOaid() {
+        return mOaid;
+    }
+
+    public String getGoogleAdId() {
+        return mGoogleAdId;
+    }
+
+    public String getDeviceId() {
+        if (TextUtils.isEmpty(mDeviceId) && ConfigurationProvider.get().isDataCollectionEnabled()) {
+            mDeviceId = mIPC.getDeviceId();
+            if (TextUtils.isEmpty(mDeviceId)) {
+                mDeviceId = calculateDeviceId();
             }
-            return mAndroidId;
         }
+        return mDeviceId;
+    }
 
-        @Override
-        public String getOaid() {
-            return mOaid;
+//    public void setDeviceId(String deviceId) {
+//        this.mDeviceId = deviceId;
+//    }
+
+    public void getDeviceId(@NonNull final ResultCallback<String> callback) {
+        if (!TextUtils.isEmpty(mDeviceId)) {
+            callback.onResult(mDeviceId);
+            return;
         }
-
-        @Override
-        public String getGoogleAdId() {
-            return mGoogleAdId;
-        }
-
-        @Override
-        public String getDeviceId() {
-            if (TextUtils.isEmpty(mDeviceId) && GConfig.getInstance().isEnableDataCollect()) {
-                mDeviceId = PersistUtil.fetchDeviceId();
-                if (TextUtils.isEmpty(mDeviceId)) {
-                    mDeviceId = calculateDeviceId();
-                }
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                callback.onResult(getDeviceId());
             }
-            return mDeviceId;
-        }
+        });
+    }
 
-        @Override
-        public void setDeviceId(String deviceId) {
-            this.mDeviceId = deviceId;
-        }
-
-        @Override
-        public void getDeviceId(@NonNull final ResultCallback<String> callback) {
-            if (!TextUtils.isEmpty(mDeviceId)) {
-                callback.onResult(mDeviceId);
-                return;
+    private String calculateDeviceId() {
+        LogUtil.d(TAG, "first time calculate deviceId");
+        String adId = getAndroidId();
+        String result = null;
+        if (!TextUtils.isEmpty(adId) && !MAGIC_ANDROID_ID.equals(adId)) {
+            result = UUID.nameUUIDFromBytes(adId.getBytes(Charset.forName("UTF-8"))).toString();
+        } else {
+            String imi = getImei();
+            if (!TextUtils.isEmpty(imi)) {
+                result = UUID.nameUUIDFromBytes(imi.getBytes(Charset.forName("UTF-8"))).toString();
             }
-            ThreadUtils.postOnGIOMainThread(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onResult(getDeviceId());
-                }
-            });
         }
 
-        private String calculateDeviceId() {
-            LogUtil.d(TAG, "first time calculate deviceId");
-            String adId = getAndroidId();
-            String result = null;
-            if (!TextUtils.isEmpty(adId) && !"9774d56d682e549c".equals(adId)) {
-                result = UUID.nameUUIDFromBytes(adId.getBytes(Charset.forName("UTF-8"))).toString();
-            } else {
-                String imi = getImei();
-                if (!TextUtils.isEmpty(imi)) {
-                    result = UUID.nameUUIDFromBytes(imi.getBytes(Charset.forName("UTF-8"))).toString();
-                }
-            }
-
-            if (TextUtils.isEmpty(result)) {
-                result = UUID.randomUUID().toString();
-            }
-            // Write the value out to the prefs file
-            PersistUtil.saveDeviceId(result);
-            return result;
+        if (TextUtils.isEmpty(result)) {
+            result = UUID.randomUUID().toString();
         }
+        mIPC.setDeviceId(result);
+        return result;
     }
 }

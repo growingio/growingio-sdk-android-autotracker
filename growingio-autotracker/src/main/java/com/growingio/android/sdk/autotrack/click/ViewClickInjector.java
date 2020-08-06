@@ -34,10 +34,9 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toolbar;
 
-
 import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.util.ViewHelper;
-import com.growingio.android.sdk.track.GConfig;
+import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 import com.growingio.android.sdk.track.utils.LogUtil;
@@ -116,7 +115,7 @@ public class ViewClickInjector {
 
     @BeforeSuper(clazz = Activity.class, method = "onOptionsItemSelected", parameterTypes = {MenuItem.class})
     public static void beforeViewOnClick(Activity activity, MenuItem item) {
-        if (!GConfig.getInstance().isInitSucceeded() || PERSIST_CLICK_EVENT_RUNNABLE.havePendingEvent()) {
+        if (!GrowingTracker.isInitSucceeded() || PERSIST_CLICK_EVENT_RUNNABLE.havePendingEvent()) {
             return;
         }
 
@@ -134,7 +133,7 @@ public class ViewClickInjector {
     public static void beforeViewOnClick(ExpandableListView.OnGroupClickListener listener, AdapterView adapterView, View view, int groupPosition, long id) {
         NOT_HANDLE_CLICK_RESULT.set(true);
         try {
-            if (!GConfig.getInstance().isInitSucceeded() || PERSIST_CLICK_EVENT_RUNNABLE.havePendingEvent()) {
+            if (!GrowingTracker.isInitSucceeded() || PERSIST_CLICK_EVENT_RUNNABLE.havePendingEvent()) {
                 return;
             }
 
@@ -153,7 +152,7 @@ public class ViewClickInjector {
     public static void beforeViewOnClick(ExpandableListView.OnChildClickListener listener, AdapterView adapterView, View view, int groupPosition, int childPosition, long id) {
         NOT_HANDLE_CLICK_RESULT.set(true);
         try {
-            if (!GConfig.getInstance().isInitSucceeded() || PERSIST_CLICK_EVENT_RUNNABLE.havePendingEvent()) {
+            if (!GrowingTracker.isInitSucceeded() || PERSIST_CLICK_EVENT_RUNNABLE.havePendingEvent()) {
                 return;
             }
             ViewNode viewNode = ViewHelper.getClickViewNode(view);
@@ -201,7 +200,7 @@ public class ViewClickInjector {
 
     public static void onMenuItemClick(MenuItem menuItem) {
         try {
-            if (!GConfig.getInstance().isInitSucceeded() || PERSIST_CLICK_EVENT_RUNNABLE.havePendingEvent()) {
+            if (!GrowingTracker.isInitSucceeded() || PERSIST_CLICK_EVENT_RUNNABLE.havePendingEvent()) {
                 return;
             }
             ViewNode viewNode = ViewHelper.getClickViewNode(menuItem);
@@ -240,7 +239,7 @@ public class ViewClickInjector {
     }
 
     public static void clickOn(View view) {
-        if (GConfig.getInstance().isInitSucceeded()) {
+        if (GrowingTracker.isInitSucceeded()) {
             try {
                 SysTrace.beginSection("gio.Click");
                 ViewNode viewNode = ViewHelper.getClickViewNode(view);

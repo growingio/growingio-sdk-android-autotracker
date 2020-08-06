@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track;
+package com.growingio.android.sdk.track.interfaces;
 
-public abstract class OnConfigChangeListener {
-    protected void onUserIdChanged(String userId) {
-    }
+public interface OnTrackMainInitSDKCallback {
+    @TrackThread
+    void onTrackMainInitSDK();
 }

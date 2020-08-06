@@ -19,13 +19,14 @@ package com.growingio.android.sdk.track.events.base;
 
 import android.support.annotation.CallSuper;
 
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.EventType;
-import com.growingio.android.sdk.track.interfaces.GMainThread;
+import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
-import com.growingio.android.sdk.track.providers.ProjectInfoProvider;
+import com.growingio.android.sdk.track.providers.SessionProvider;
+import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,8 +99,6 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public static abstract class BaseEventBuilder<T extends BaseEvent> {
-        protected final CoreAppState mCoreAppState;
-
         protected EventType mEventType;
         protected long mTimestamp;
         protected String mSessionId;
@@ -108,24 +107,19 @@ public abstract class BaseEvent extends GEvent {
         private String mUserId;
         private boolean mIsInteractive;
 
-        protected BaseEventBuilder(CoreAppState coreAppState) {
-            mCoreAppState = coreAppState;
+        protected BaseEventBuilder() {
             mTimestamp = System.currentTimeMillis();
             mEventType = getEventType();
-            mIsInteractive = ActivityStateProvider.ActivityStatePolicy.get().getResumedActivity() != null;
-            mDomain = ProjectInfoProvider.AccountInfoPolicy.get().getPackageName(mCoreAppState.getGlobalContext());
+            mIsInteractive =  ActivityStateProvider.get().getResumedActivity() != null;
+            mDomain = ConfigurationProvider.get().getPackageName();
         }
 
-        @GMainThread
+        @TrackThread
         @CallSuper
-        public void readPropertyInGMain() {
-            mDeviceId = DeviceInfoProvider.DeviceInfoPolicy.get(mCoreAppState.getGlobalContext()).getDeviceId();
-            mSessionId = mCoreAppState.getGrowingIOIPC().getSessionId();
-            mUserId = mCoreAppState.getGrowingIOIPC().getUserId();
-        }
-
-        public CoreAppState getCoreAppState() {
-            return mCoreAppState;
+        public void readPropertyInTrackThread() {
+            mDeviceId = DeviceInfoProvider.get().getDeviceId();
+            mSessionId = SessionProvider.get().getSessionId();
+            mUserId = UserInfoProvider.get().getUserId();
         }
 
         public long getTimestamp() {

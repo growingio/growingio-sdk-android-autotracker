@@ -73,7 +73,7 @@ public class AutotrackPlugin implements Plugin<Project> {
             try {
                 int num = (int) (Float.parseFloat(versionNum) * 10);
                 if (num < 18) {
-                    throw new RuntimeException("GrowingIO autotrack gradle plugin 要求编译环境的JDK为1.8及以上");
+                    throw new RuntimeException("GrowingIO autotracker gradle plugin 要求编译环境的JDK为1.8及以上");
                 }
             } catch (NumberFormatException e) {
                 // ignore

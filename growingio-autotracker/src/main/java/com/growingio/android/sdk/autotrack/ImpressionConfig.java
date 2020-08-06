@@ -15,10 +15,10 @@
  */
 
 package com.growingio.android.sdk.autotrack;
+
 import android.view.View;
+
 import androidx.annotation.FloatRange;
-import com.growingio.android.sdk.track.GConfig;
-import com.growingio.android.sdk.track.utils.LogUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -92,11 +92,7 @@ public class ImpressionConfig {
     public static void setVisibleScale(@FloatRange(from = 0.0f, to = 1.0f) float visibleScale) {
         if (visibleScale < 0 || visibleScale > 1) {
             String errorMsg = "visibleScale 区间为[0, 1], current visibleScale is " + visibleScale;
-            if (GConfig.getInstance().debug()) {
-                throw new IllegalArgumentException(errorMsg);
-            } else {
-                LogUtil.e("GIO.ImpressionMark", errorMsg);
-            }
+            throw new IllegalArgumentException(errorMsg);
         }
         sImpressionScale = visibleScale;
     }

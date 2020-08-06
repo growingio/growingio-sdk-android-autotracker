@@ -16,8 +16,6 @@
 
 package com.growingio.android.sdk.track.events.base;
 
-import com.growingio.android.sdk.track.CoreAppState;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,8 +46,8 @@ public abstract class BaseAttributesEvent extends BaseEventWithSequenceId {
     public abstract static class EventBuilder<T extends BaseAttributesEvent> extends BaseEventWithSequenceId.EventBuilder<T> {
         private Map<String, String> mAttributes;
 
-        protected EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        protected EventBuilder() {
+            super();
         }
 
         public EventBuilder<T> setAttributes(Map<String, String> attributes) {

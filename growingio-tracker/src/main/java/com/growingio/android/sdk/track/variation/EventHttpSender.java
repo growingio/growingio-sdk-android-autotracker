@@ -16,14 +16,11 @@
 
 package com.growingio.android.sdk.track.variation;
 
-import com.growingio.android.sdk.track.GIOMainThread;
-import com.growingio.android.sdk.track.GInternal;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.marshaller.EventMarshaller;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.IEventSender;
-import com.growingio.android.sdk.track.models.EventUrlProvider;
-import com.growingio.android.sdk.track.providers.ProjectInfoProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.snappy.Snappy;
 import com.growingio.android.sdk.track.utils.LogUtil;
 
@@ -64,13 +61,9 @@ public class EventHttpSender implements IEventSender {
             return false;
         }
 
-        ProjectInfoProvider infoProvider = ProjectInfoProvider.AccountInfoPolicy.get();
-        GIOMainThread gioMain = GInternal.getInstance().getMainThread();
-        if (gioMain == null) {
-            return true;
-        }
-        String projectId = infoProvider.getProjectId();
-        String url = EventUrlProvider.EventUrlPolicy.get().getUrl(projectId, event.getEventType());
+        ConfigurationProvider infoProvider = ConfigurationProvider.get();
+//        String projectId = infoProvider.getProjectId();
+//        String url = EventUrlProvider.EventUrlPolicy.get().getUrl(projectId, event.getEventType());
         String data = mEventMarshaller.marshall(events).toString();
         LogUtil.printJson(TAG + "Marshaller", "send: event marshall", data);
         byte[] compressData = Snappy.compress(data.getBytes(Charset.forName("UTF-8")));

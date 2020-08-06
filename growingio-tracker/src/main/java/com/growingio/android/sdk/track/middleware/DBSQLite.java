@@ -24,7 +24,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
-import com.growingio.android.sdk.track.providers.SendPolicyProvider;
 import com.growingio.android.sdk.track.utils.LogUtil;
 
 import java.io.IOException;
@@ -37,6 +36,8 @@ import java.util.List;
  * 所有跟数据库有交互的代码
  */
 public class DBSQLite {
+    private static final long EVENT_VALID_PERIOD_MILLS = 7 * 24 * 60 * 60_000;
+
     static final int UPLOAD_FAILED = -1;
     static final int UPLOAD_SUCCESS = 1;
     static final int UPLOAD_NO_MSG = 0;
@@ -72,7 +73,7 @@ public class DBSQLite {
 
     public void cleanOldLog() {
         long current = System.currentTimeMillis();
-        long sevenDayAgo = current - SendPolicyProvider.SendPolicy.get().eventValidPeriodMills();
+        long sevenDayAgo = current - EVENT_VALID_PERIOD_MILLS;
         mDbHelper.removeOldLog(sevenDayAgo);
     }
 

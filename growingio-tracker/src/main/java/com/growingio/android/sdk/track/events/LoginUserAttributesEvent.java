@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.track.events;
 
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
 public final class LoginUserAttributesEvent extends BaseAttributesEvent {
@@ -27,8 +26,8 @@ public final class LoginUserAttributesEvent extends BaseAttributesEvent {
     }
 
     public static final class EventBuilder extends BaseAttributesEvent.EventBuilder<LoginUserAttributesEvent> {
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
         }
 
         @Override

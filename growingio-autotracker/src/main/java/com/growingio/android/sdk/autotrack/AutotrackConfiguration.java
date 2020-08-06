@@ -50,8 +50,8 @@ public class AutotrackConfiguration extends TrackConfiguration {
     }
 
     @Override
-    public AutotrackConfiguration setUploadExceptionEnable(boolean uploadExceptionEnable) {
-        super.setUploadExceptionEnable(uploadExceptionEnable);
+    public AutotrackConfiguration setUploadExceptionEnabled(boolean uploadExceptionEnabled) {
+        super.setUploadExceptionEnabled(uploadExceptionEnabled);
         return this;
     }
 

@@ -17,14 +17,13 @@
 package com.growingio.android.sdk.track.middleware;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.growingio.android.sdk.track.providers.MemoryStatusProvider;
-import com.growingio.android.sdk.track.providers.NetworkStatusProvider;
-import com.growingio.android.sdk.track.providers.SendPolicyProvider;
-import com.growingio.android.sdk.track.utils.GIOProviders;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.utils.NetworkUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.text.SimpleDateFormat;
@@ -38,6 +37,9 @@ import java.util.Date;
 class EventSender {
     private static final String TAG = "GIO.EventSender";
 
+    private static final int EVENTS_BULK_SIZE = 300;
+
+    private final Context mContext;
     private int mCacheEventNum = 0;
     private final DBSQLite mDbSQLite;
 
@@ -45,10 +47,8 @@ class EventSender {
     private final SharedPreferences mSharedPreferences;
 
     EventSender(Context context, IEventSender sender) {
+        mContext = context;
         mDbSQLite = new DBSQLite(context, sender);
-        NetworkStatusProvider.NetworkStatus.get(context);
-        MemoryStatusProvider.MemoryPolicy.get(context);
-        GIOProviders.update(EventSender.class, this);
         mSharedPreferences = context.getSharedPreferences("growing_sender", Context.MODE_PRIVATE);
     }
 
@@ -67,7 +67,7 @@ class EventSender {
             sendEvents(true);
         } else {
             mCacheEventNum++;
-            if (mCacheEventNum >= SendPolicyProvider.SendPolicy.get().bulkSize()) {
+            if (mCacheEventNum >= EVENTS_BULK_SIZE) {
                 LogUtil.d(TAG, "cacheEventNum >= 300, toggle one send action");
                 sendEvents(false);
                 mCacheEventNum = 0;
@@ -81,7 +81,7 @@ class EventSender {
     }
 
     void consumeBytes(int bytes) {
-        if (NetworkStatusProvider.NetworkStatus.get().isMobileData()) {
+        if (NetworkUtil.isMobileData(mContext)) {
             mDbSQLite.updateStatics(0, 0, bytes, 0, 0);
             todayBytes(bytes);
         }
@@ -162,28 +162,39 @@ class EventSender {
         });
     }
 
+    private ActivityManager.MemoryInfo getMemoryInfo() {
+        ActivityManager activityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        return memoryInfo;
+    }
+
+    private int numOfMaxEventsPerRequest() {
+        ActivityManager.MemoryInfo info = getMemoryInfo();
+        if (info.lowMemory) {
+            return 3;
+        }
+        return 50;
+    }
+
     /**
      * 发送事件
      *
      * @param onlyInstant true -- 仅发送实时消息
      */
     void sendEvents(boolean onlyInstant) {
-        NetworkStatusProvider networkStatusProvider = GIOProviders.provider(NetworkStatusProvider.class);
-
-        networkStatusProvider.checkNetStatus();
-        if (!networkStatusProvider.isConnected()) {
+        NetworkUtil.NetworkState networkState = NetworkUtil.getActiveNetworkState(mContext);
+        if (!networkState.isConnected()) {
             scheduleForNet(false);
             return;
         }
-        MemoryStatusProvider memoryStatusProvider = GIOProviders.provider(MemoryStatusProvider.class);
-        memoryStatusProvider.check();
 
         Boolean scheduleForNet = null;
         int[] uploadEvents;
 
         if (onlyInstant) {
             uploadEvents = new int[]{GEvent.SEND_POLICY_INSTANT};
-        } else if (networkStatusProvider.isWifi()) {
+        } else if (networkState.isWifi()) {
             uploadEvents = new int[]{
                     GEvent.SEND_POLICY_INSTANT, GEvent.SEND_POLICY_MOBILE_DATA, GEvent.SEND_POLICY_WIFI
             };
@@ -194,12 +205,12 @@ class EventSender {
             int result;
             do {
                 if (policy != GEvent.SEND_POLICY_INSTANT
-                        && networkStatusProvider.isMobileData()
-                        && SendPolicyProvider.SendPolicy.get().cellularDataLimit() < todayBytes(0)) {
+                        && networkState.isMobileData()
+                        && ConfigurationProvider.get().getTrackConfiguration().getCellularDataLimit() < todayBytes(0)) {
                     LogUtil.d(TAG, "今日流量已耗尽");
                     break;
                 }
-                result = mDbSQLite.uploadEvent(policy, memoryStatusProvider.numOfMaxEventsPerRequest());
+                result = mDbSQLite.uploadEvent(policy, numOfMaxEventsPerRequest());
                 if (result == DBSQLite.UPLOAD_FAILED
                         && (scheduleForNet == null || scheduleForNet)) {
                     scheduleForNet = policy == GEvent.SEND_POLICY_WIFI;

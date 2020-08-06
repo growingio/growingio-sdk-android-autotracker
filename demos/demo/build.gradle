@@ -31,12 +31,6 @@ android {
             abiFilters "armeabi", "armeabi-v7a", "x86"
         }
         multiDexEnabled false
-
-        manifestPlaceholders = [
-                JPUSH_PKGNAME: applicationId,
-                JPUSH_APPKEY : "9c136e417eea46bbb2e94b4a", //JPush 上注册的包名对应的 Appkey.
-                JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
-        ]
     }
 
     sourceSets.main {
@@ -55,8 +49,8 @@ android {
 
 growingAutotracker {
     development true
-//    logEnabled true
-//    excludePackages ['com.android', 'com.android2']
+    logEnabled true
+//    excludePackages "com.gio.test.three.autotrack.fragments", "com.example"
 }
 
 dependencies {

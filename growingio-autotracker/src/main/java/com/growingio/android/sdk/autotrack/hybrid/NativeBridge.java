@@ -17,9 +17,8 @@
 package com.growingio.android.sdk.autotrack.hybrid;
 
 import com.growingio.android.sdk.autotrack.variation.HybridTransformerImp;
-import com.growingio.android.sdk.track.GIOMainThread;
-import com.growingio.android.sdk.track.GInternal;
 import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.track.TrackMainThread;
 
 class NativeBridge {
     private static final String TAG = "GIO.NativeBridge";
@@ -30,10 +29,7 @@ class NativeBridge {
     }
 
     void dispatchEvent(String event) {
-        GIOMainThread mainThread = GInternal.getInstance().getMainThread();
-        if (mainThread != null) {
-            mainThread.postEventToGMain(mHybridTransformer.transform(event));
-        }
+        TrackMainThread.trackMain().postEventToTrackMain(mHybridTransformer.transform(event));
     }
 
     void setNativeUserId(String userId) {

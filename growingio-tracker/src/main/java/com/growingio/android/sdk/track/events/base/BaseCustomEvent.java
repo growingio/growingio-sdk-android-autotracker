@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.track.events.base;
 
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.EventType;
 
 import org.json.JSONException;
@@ -62,8 +61,8 @@ public abstract class BaseCustomEvent extends BaseAttributesEvent {
         private String mPageName;
         private long mPageShowTimestamp;
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
         }
 
         @Override

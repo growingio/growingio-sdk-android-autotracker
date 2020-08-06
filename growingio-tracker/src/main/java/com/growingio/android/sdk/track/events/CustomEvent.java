@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.track.events;
 
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.base.BaseCustomEvent;
 
 public class CustomEvent extends BaseCustomEvent {
@@ -27,8 +26,8 @@ public class CustomEvent extends BaseCustomEvent {
     }
 
     public static final class EventBuilder extends BaseCustomEvent.EventBuilder<CustomEvent> {
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        EventBuilder() {
+            super();
         }
 
         @Override

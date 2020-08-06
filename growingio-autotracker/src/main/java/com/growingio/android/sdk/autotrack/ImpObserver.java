@@ -50,7 +50,7 @@ import java.util.WeakHashMap;
 /**
  * 用于监听并生成imp事件
  * <p>
- * 由OnGlobalLayoutListener触发, EventBus订阅有此类自行订阅与反订阅
+ * 由OnGlobalLayoutListener触发
  */
 
 public class ImpObserver implements IViewTreeStatus {
@@ -90,7 +90,7 @@ public class ImpObserver implements IViewTreeStatus {
 
         Activity activity = ActivityUtil.findActivity(view.getContext());
         if (activity == null) {
-            activity = ActivityStateProvider.ActivityStatePolicy.get().getForegroundActivity();
+            activity =  ActivityStateProvider.get().getForegroundActivity();
         }
         if (activity == null) {
             LogUtil.e(TAG, "can't find the activity of view: " + view);
@@ -158,7 +158,7 @@ public class ImpObserver implements IViewTreeStatus {
     }
 
     private void checkAndSendViewTreeChange(Activity activity) {
-        Activity resumeActivity = ActivityStateProvider.ActivityStatePolicy.get().getResumedActivity();
+        Activity resumeActivity =  ActivityStateProvider.get().getResumedActivity();
         if (resumeActivity != null && activity == resumeActivity) {
             mViewTreeChangeTimerToggler.toggle();
         }
@@ -226,7 +226,7 @@ public class ImpObserver implements IViewTreeStatus {
     }
 
     public void onGlobalLayout(ViewTreeStatusChangeEvent event) {
-        Activity current = ActivityStateProvider.ActivityStatePolicy.get().getResumedActivity();
+        Activity current =  ActivityStateProvider.get().getResumedActivity();
         if (current != null) {
             layoutActivity(current);
         }
@@ -294,7 +294,7 @@ public class ImpObserver implements IViewTreeStatus {
     }
 
     void checkImp(TogglerWithViews togglerWithViews, WeakHashMap<View, ImpEvent> impViews) {
-        Activity current = ActivityStateProvider.ActivityStatePolicy.get().getResumedActivity();
+        Activity current =  ActivityStateProvider.get().getResumedActivity();
         if (current == null || mActivityScopes == null || !mActivityScopes.containsKey(current)) {
             return;
         }

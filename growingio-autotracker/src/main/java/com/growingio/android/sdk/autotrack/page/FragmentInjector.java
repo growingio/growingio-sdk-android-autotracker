@@ -33,14 +33,14 @@ public class FragmentInjector {
     @AfterSuper(clazz = Fragment.class, method = "onResume")
     public static void systemFragmentOnResume(Fragment fragment) {
         LogUtil.d(TAG, "systemFragmentOnResume: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+        PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = Fragment.class, method = "setUserVisibleHint", parameterTypes = {boolean.class})
     public static void systemFragmentSetUserVisibleHint(Fragment fragment, boolean isVisibleToUser) {
         LogUtil.d(TAG, "systemFragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
@@ -48,27 +48,27 @@ public class FragmentInjector {
     public static void systemFragmentOnHiddenChanged(Fragment fragment, boolean hidden) {
         LogUtil.d(TAG, "systemFragmentOnHiddenChanged: fragment = " + fragment.getClass().getName() + ", hidden" + hidden);
         if (!hidden) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
     @AfterSuper(clazz = Fragment.class, method = "onDestroyView")
     public static void systemFragmentOnDestroyView(Fragment fragment) {
         LogUtil.d(TAG, "systemFragmentOnDestroyView: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().removePage(SuperFragment.make(fragment));
+        PageProvider.get().removePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = WebViewFragment.class, method = "onResume")
     public static void webViewFragmentOnResume(WebViewFragment fragment) {
         LogUtil.d(TAG, "webViewFragmentOnResume: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+        PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = WebViewFragment.class, method = "setUserVisibleHint", parameterTypes = {boolean.class})
     public static void webViewFragmentSetUserVisibleHint(WebViewFragment fragment, boolean isVisibleToUser) {
         LogUtil.d(TAG, "webViewFragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
@@ -76,27 +76,27 @@ public class FragmentInjector {
     public static void webViewFragmentOnHiddenChanged(WebViewFragment fragment, boolean hidden) {
         LogUtil.d(TAG, "webViewFragmentOnHiddenChanged: fragment = " + fragment.getClass().getName() + ", hidden" + hidden);
         if (!hidden) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
     @AfterSuper(clazz = WebViewFragment.class, method = "onDestroyView")
     public static void webViewFragmentOnDestroyView(WebViewFragment fragment) {
         LogUtil.d(TAG, "webViewFragmentOnDestroyView: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().removePage(SuperFragment.make(fragment));
+        PageProvider.get().removePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = PreferenceFragment.class, method = "onResume")
     public static void preferenceFragmentOnResume(PreferenceFragment fragment) {
         LogUtil.d(TAG, "preferenceFragmentOnResume: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+        PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = PreferenceFragment.class, method = "setUserVisibleHint", parameterTypes = {boolean.class})
     public static void preferenceFragmentSetUserVisibleHint(PreferenceFragment fragment, boolean isVisibleToUser) {
         LogUtil.d(TAG, "preferenceFragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
@@ -104,27 +104,27 @@ public class FragmentInjector {
     public static void preferenceFragmentOnHiddenChanged(PreferenceFragment fragment, boolean hidden) {
         LogUtil.d(TAG, "preferenceFragmentOnHiddenChanged: fragment = " + fragment.getClass().getName() + ", hidden" + hidden);
         if (!hidden) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
     @AfterSuper(clazz = PreferenceFragment.class, method = "onDestroyView")
     public static void preferenceFragmentOnDestroyView(PreferenceFragment fragment) {
         LogUtil.d(TAG, "preferenceFragmentOnDestroyView: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().removePage(SuperFragment.make(fragment));
+        PageProvider.get().removePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = ListFragment.class, method = "onResume")
     public static void listFragmentOnResume(ListFragment fragment) {
         LogUtil.d(TAG, "listFragmentOnResume: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+        PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = ListFragment.class, method = "setUserVisibleHint", parameterTypes = {boolean.class})
     public static void listFragmentSetUserVisibleHint(ListFragment fragment, boolean isVisibleToUser) {
         LogUtil.d(TAG, "listFragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
@@ -132,27 +132,27 @@ public class FragmentInjector {
     public static void listFragmentOnHiddenChanged(ListFragment fragment, boolean hidden) {
         LogUtil.d(TAG, "listFragmentOnHiddenChanged: fragment = " + fragment.getClass().getName() + ", hidden" + hidden);
         if (!hidden) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
     @AfterSuper(clazz = ListFragment.class, method = "onDestroyView")
     public static void listFragmentOnDestroyView(ListFragment fragment) {
         LogUtil.d(TAG, "listFragmentOnDestroyView: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().removePage(SuperFragment.make(fragment));
+        PageProvider.get().removePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = android.support.v4.app.Fragment.class, method = "onResume")
     public static void v4FragmentOnResume(android.support.v4.app.Fragment fragment) {
         LogUtil.d(TAG, "v4FragmentOnResume: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+        PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = android.support.v4.app.Fragment.class, method = "setUserVisibleHint", parameterTypes = {boolean.class})
     public static void v4FragmentSetUserVisibleHint(android.support.v4.app.Fragment fragment, boolean isVisibleToUser) {
         LogUtil.d(TAG, "v4FragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
@@ -160,27 +160,27 @@ public class FragmentInjector {
     public static void v4FragmentOnHiddenChanged(android.support.v4.app.Fragment fragment, boolean hidden) {
         LogUtil.d(TAG, "v4FragmentOnHiddenChanged: fragment = " + fragment.getClass().getName() + ", hidden" + hidden);
         if (!hidden) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
     @AfterSuper(clazz = android.support.v4.app.Fragment.class, method = "onDestroyView")
     public static void v4FragmentOnDestroyView(android.support.v4.app.Fragment fragment) {
         LogUtil.d(TAG, "v4FragmentOnDestroyView: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().removePage(SuperFragment.make(fragment));
+        PageProvider.get().removePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = androidx.fragment.app.Fragment.class, method = "onResume")
     public static void androidxFragmentOnResume(androidx.fragment.app.Fragment fragment) {
         LogUtil.d(TAG, "androidxFragmentOnResume: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+        PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
     }
 
     @AfterSuper(clazz = androidx.fragment.app.Fragment.class, method = "setUserVisibleHint", parameterTypes = {boolean.class})
     public static void androidxFragmentSetUserVisibleHint(androidx.fragment.app.Fragment fragment, boolean isVisibleToUser) {
         LogUtil.d(TAG, "androidxFragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
@@ -188,14 +188,14 @@ public class FragmentInjector {
     public static void androidxFragmentOnHiddenChanged(androidx.fragment.app.Fragment fragment, boolean hidden) {
         LogUtil.d(TAG, "androidxFragmentOnHiddenChanged: fragment = " + fragment.getClass().getName() + ", hidden" + hidden);
         if (!hidden) {
-            PageProvider.PagePolicy.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
         }
     }
 
     @AfterSuper(clazz = androidx.fragment.app.Fragment.class, method = "onDestroyView")
     public static void androidxFragmentOnDestroyView(androidx.fragment.app.Fragment fragment) {
         LogUtil.d(TAG, "androidxFragmentOnDestroyView: fragment = " + fragment.getClass().getName());
-        PageProvider.PagePolicy.get().removePage(SuperFragment.make(fragment));
+        PageProvider.get().removePage(SuperFragment.make(fragment));
     }
 
 }

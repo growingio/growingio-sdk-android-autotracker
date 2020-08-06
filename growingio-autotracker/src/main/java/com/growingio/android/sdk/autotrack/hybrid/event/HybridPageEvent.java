@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
 import com.growingio.android.sdk.autotrack.events.base.BasePageEvent;
-import com.growingio.android.sdk.track.CoreAppState;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,8 +56,8 @@ public class HybridPageEvent extends BasePageEvent {
         private String mProtocolType;
         private String mQueryParameters;
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
         }
 
         public String getProtocolType() {

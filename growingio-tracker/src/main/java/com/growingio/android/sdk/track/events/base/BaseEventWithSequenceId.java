@@ -16,9 +16,8 @@
 
 package com.growingio.android.sdk.track.events.base;
 
-import com.growingio.android.sdk.track.CoreAppState;
-import com.growingio.android.sdk.track.models.EsidProperty;
-import com.growingio.android.sdk.track.providers.EsidProvider;
+import com.growingio.android.sdk.track.data.EventSequenceId;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +29,7 @@ public abstract class BaseEventWithSequenceId extends BaseEvent {
     protected BaseEventWithSequenceId(EventBuilder<?> eventBuilder) {
         super(eventBuilder);
         mGlobalSequenceId = eventBuilder.mGlobalRequestedId;
-        mEventSequenceId = eventBuilder.mRequestedId;
+        mEventSequenceId = eventBuilder.mEventSequenceId;
     }
 
     public int getGlobalSequenceId() {
@@ -54,18 +53,18 @@ public abstract class BaseEventWithSequenceId extends BaseEvent {
 
     public abstract static class EventBuilder<T extends BaseEventWithSequenceId> extends BaseEvent.BaseEventBuilder<T> {
         private int mGlobalRequestedId;
-        private int mRequestedId;
+        private int mEventSequenceId;
 
-        protected EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        protected EventBuilder() {
+            super();
         }
 
         @Override
-        public void readPropertyInGMain() {
-            super.readPropertyInGMain();
-            EsidProperty esidProperty = EsidProvider.EsidPolicy.get(mCoreAppState.getGlobalContext()).getAndAddEsid(getEventType(), 1);
-            mGlobalRequestedId = esidProperty.getGsid();
-            mRequestedId = esidProperty.getEsid();
+        public void readPropertyInTrackThread() {
+            super.readPropertyInTrackThread();
+            EventSequenceId sequenceId = PersistentDataProvider.get().getAndIncrement(getEventType());
+            mGlobalRequestedId = sequenceId.getGlobalId();
+            mEventSequenceId = sequenceId.getEventTypeId();
         }
     }
 }

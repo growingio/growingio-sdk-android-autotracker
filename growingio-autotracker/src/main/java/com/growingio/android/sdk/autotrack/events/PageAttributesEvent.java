@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.events;
 
 import com.growingio.android.sdk.autotrack.events.base.BasePageAttributesEvent;
-import com.growingio.android.sdk.track.CoreAppState;
 
 public class PageAttributesEvent extends BasePageAttributesEvent {
     private static final long serialVersionUID = 1L;
@@ -28,8 +27,8 @@ public class PageAttributesEvent extends BasePageAttributesEvent {
 
     public static final class EventBuilder extends BasePageAttributesEvent.EventBuilder<PageAttributesEvent> {
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        EventBuilder() {
+            super();
         }
 
         @Override

@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.events.base;
 
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 
 import org.json.JSONArray;
@@ -73,8 +72,8 @@ public abstract class BaseViewElementEvent extends BaseEvent {
         private String mPageName;
         private long mPageShowTimestamp;
 
-        protected EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        protected EventBuilder() {
+            super();
         }
 
         public EventBuilder<T> addElementBuilder(BaseViewElement.BaseElementBuilder<?> elementBuilder) {
@@ -110,10 +109,9 @@ public abstract class BaseViewElementEvent extends BaseEvent {
         }
 
         @Override
-        public void readPropertyInGMain() {
-            super.readPropertyInGMain();
+        public void readPropertyInTrackThread() {
+            super.readPropertyInTrackThread();
             // TODO: 2020/5/28 给元素赋值
-//            EsidProperty esidProperty = EsidProvider.EsidPolicy.get(mCoreAppState.getGlobalContext()).getAndAddEsid(getEventType(), 1);
             for (BaseViewElement.BaseElementBuilder<?> elementBuilder : mElementBuilders) {
                 elementBuilder.setGlobalSequenceId(0)
                         .setEventSequenceId(0);

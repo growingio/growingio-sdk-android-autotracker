@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
 import com.growingio.android.sdk.autotrack.events.base.BaseViewElementEvent;
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.EventType;
 
 import org.json.JSONException;
@@ -50,8 +49,8 @@ public final class HybridViewElementEvent extends BaseViewElementEvent {
     public final static class EventBuilder extends BaseViewElementEvent.EventBuilder<HybridViewElementEvent> {
         private String mQueryParameters;
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
         }
 
         @Override

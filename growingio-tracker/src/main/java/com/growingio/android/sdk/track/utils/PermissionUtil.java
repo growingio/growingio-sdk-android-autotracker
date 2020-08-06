@@ -19,7 +19,8 @@ package com.growingio.android.sdk.track.utils;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.support.annotation.VisibleForTesting;
+
+import com.growingio.android.sdk.track.ContextProvider;
 
 public class PermissionUtil {
     private static final String TAG = "GIO.permission";
@@ -28,51 +29,50 @@ public class PermissionUtil {
     private static final int FLAG_ACCESS_NETWORK_STATE = 1 << 1;
     private static final int FLAG_EXTERNAL_STORAGE = 1 << 2;
     private static final int FLAG_READ_PHONE_STATE = 1 << 3;
-    private static PermissionUtil sInstance;
-    private final PackageManager mPackageManager;
-    private final String mPackageName;
-    private int mPermissionFlags = 0;
+    private static PackageManager sPackageManager;
+    private static String sPackageName;
+    private static int sPermissionFlags = 0;
 
-    @VisibleForTesting
-    PermissionUtil(PackageManager packageManager, String packageName) {
-        mPackageManager = packageManager;
-        mPackageName = packageName;
+    private PermissionUtil(PackageManager packageManager, String packageName) {
+        sPackageManager = packageManager;
+        sPackageName = packageName;
     }
 
     public static boolean hasInternetPermission() {
-        return sInstance.checkPermission(Manifest.permission.INTERNET, FLAG_INTERNET);
+        return checkPermission(Manifest.permission.INTERNET, FLAG_INTERNET);
     }
 
     public static boolean hasAccessNetworkStatePermission() {
-        return sInstance.checkPermission(Manifest.permission.ACCESS_NETWORK_STATE, FLAG_ACCESS_NETWORK_STATE);
+        return checkPermission(Manifest.permission.ACCESS_NETWORK_STATE, FLAG_ACCESS_NETWORK_STATE);
     }
 
     public static boolean hasWriteExternalPermission() {
-        return sInstance.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, FLAG_EXTERNAL_STORAGE);
+        return checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, FLAG_EXTERNAL_STORAGE);
     }
 
     public static boolean checkReadPhoneStatePermission() {
-        return sInstance.checkPermission(Manifest.permission.READ_PHONE_STATE, FLAG_READ_PHONE_STATE);
+        return checkPermission(Manifest.permission.READ_PHONE_STATE, FLAG_READ_PHONE_STATE);
     }
 
-    public static void init(Context context) {
-        sInstance = new PermissionUtil(context.getPackageManager(), context.getPackageName());
-    }
+    private static boolean checkPermission(String permissionName, int flag) {
+        if (sPackageManager == null) {
+            Context context = ContextProvider.getApplicationContext();
+            sPackageManager = context.getPackageManager();
+            sPackageName = context.getPackageName();
+        }
 
-    @VisibleForTesting
-    boolean checkPermission(String permissionName, int flag) {
-        if ((mPermissionFlags & flag) != 0) {
+        if ((sPermissionFlags & flag) != 0) {
             return true;
         }
         boolean hasPermission;
         try {
-            hasPermission = PackageManager.PERMISSION_GRANTED == mPackageManager.checkPermission(permissionName, mPackageName);
+            hasPermission = PackageManager.PERMISSION_GRANTED == sPackageManager.checkPermission(permissionName, sPackageName);
         } catch (Throwable e) {
             hasPermission = false;
             LogUtil.d(TAG, e, "checkPermission failed");
         }
         if (hasPermission) {
-            mPermissionFlags |= flag;
+            sPermissionFlags |= flag;
             return true;
         }
         return false;

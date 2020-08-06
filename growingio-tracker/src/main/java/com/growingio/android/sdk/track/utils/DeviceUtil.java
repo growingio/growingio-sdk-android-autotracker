@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.util;
+package com.growingio.android.sdk.track.utils;
 
 import android.content.Context;
 import android.os.Build;

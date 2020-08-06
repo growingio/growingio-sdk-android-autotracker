@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.base.BaseCustomEvent;
 
 import org.json.JSONException;
@@ -49,8 +48,8 @@ public final class HybridCustomEvent extends BaseCustomEvent {
     public static class EventBuilder extends BaseCustomEvent.EventBuilder<HybridCustomEvent> {
         private String mQueryParameters;
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
         }
 
         public String getQueryParameters() {

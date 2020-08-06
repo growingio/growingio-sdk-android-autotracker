@@ -21,13 +21,12 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.webkit.ValueCallback;
 
-import com.growingio.android.sdk.track.GConfig;
+import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.async.HandlerDisposable;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
-import com.growingio.android.sdk.track.providers.ProjectInfoProvider;
-import com.growingio.android.sdk.track.utils.GIOProviders;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.LogUtil;
 
 import org.json.JSONException;
@@ -35,118 +34,99 @@ import org.json.JSONObject;
 
 import static com.growingio.android.sdk.autotrack.hybrid.WebViewBridgeJavascriptInterface.JAVASCRIPT_GET_DOM_TREE_METHOD;
 
-public interface HybridBridgeProvider {
-    void onDomChanged();
+public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener, Void> {
+    private static final String TAG = "HybridBridgePolicy";
 
-    void registerDomChangedListener(OnDomChangedListener listener);
+    private static final int EVALUATE_JAVASCRIPT_TIMEOUT = 5000;
 
-    void unregisterDomChangedListener(OnDomChangedListener listener);
+    private static class SingleInstance {
+        private static final HybridBridgeProvider INSTANCE = new HybridBridgeProvider();
+    }
 
-    void bridgeForWebView(SuperWebView<?> webView);
+    private HybridBridgeProvider() {
+    }
 
-    Disposable getWebViewDomTree(SuperWebView<?> webView, Callback<JSONObject> callback);
+    public static HybridBridgeProvider get() {
+        return SingleInstance.INSTANCE;
+    }
 
+    private WebViewJavascriptBridgeConfiguration getJavascriptBridgeConfiguration() {
+        String projectId = ConfigurationProvider.get().getTrackConfiguration().getProjectId();
+        String appId = ConfigurationProvider.get().getTrackConfiguration().getUrlScheme();
+        String nativeSdkVersion = SDKConfig.SDK_VERSION;
+        int nativeSdkVersionCode = SDKConfig.SDK_VERSION_CODE;
+        return new WebViewJavascriptBridgeConfiguration(projectId, appId, nativeSdkVersion, nativeSdkVersionCode);
+    }
 
-    class HybridBridgePolicy extends ListenerContainer<OnDomChangedListener, Void> implements HybridBridgeProvider {
-        private static final String TAG = "HybridBridgePolicy";
+    public void onDomChanged() {
+        dispatchActions(null);
+    }
 
-        private static final int EVALUATE_JAVASCRIPT_TIMEOUT = 5000;
+    public void registerDomChangedListener(OnDomChangedListener listener) {
+        register(listener);
+    }
 
-        private HybridBridgePolicy() {
+    public void unregisterDomChangedListener(OnDomChangedListener listener) {
+        unregister(listener);
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    public void bridgeForWebView(SuperWebView<?> webView) {
+        webView.setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration()), WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
+    }
+
+    public Disposable getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
+        LogUtil.e(TAG, "getWebViewDomTree");
+        if (callback == null) {
+            return Disposable.EMPTY_DISPOSABLE;
         }
-
-        public static HybridBridgeProvider get() {
-            return GIOProviders.provider(HybridBridgeProvider.class, new GIOProviders.DefaultCallback<HybridBridgeProvider>() {
-                @Override
-                public HybridBridgeProvider value() {
-                    return new HybridBridgePolicy();
-                }
-            });
-        }
-
-        private WebViewJavascriptBridgeConfiguration getJavascriptBridgeConfiguration() {
-            String projectId = ProjectInfoProvider.AccountInfoPolicy.get().getProjectId();
-            String appId = ProjectInfoProvider.AccountInfoPolicy.get().getUrlScheme();
-            String nativeSdkVersion = GConfig.SDK_VERSION;
-            int nativeSdkVersionCode = GConfig.SDK_VERSION_CODE;
-            return new WebViewJavascriptBridgeConfiguration(projectId, appId, nativeSdkVersion, nativeSdkVersionCode);
-        }
-
-        @Override
-        public void onDomChanged() {
-            dispatchActions(null);
-        }
-
-        @Override
-        public void registerDomChangedListener(OnDomChangedListener listener) {
-            register(listener);
-        }
-
-        @Override
-        public void unregisterDomChangedListener(OnDomChangedListener listener) {
-            unregister(listener);
-        }
-
-        @SuppressLint("SetJavaScriptEnabled")
-        @Override
-        public void bridgeForWebView(SuperWebView<?> webView) {
-            webView.setJavaScriptEnabled(true);
-            webView.addJavascriptInterface(new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration()), WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
-        }
-
-        @Override
-        public Disposable getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
-            LogUtil.e(TAG, "getWebViewDomTree");
-            if (callback == null) {
-                return Disposable.EMPTY_DISPOSABLE;
+        final Disposable disposable = new HandlerDisposable().schedule(new Runnable() {
+            @Override
+            public void run() {
+                LogUtil.e(TAG, "getWebViewDomTree timeout");
+                callback.onFailed();
             }
-            final Disposable disposable = new HandlerDisposable().schedule(new Runnable() {
-                @Override
-                public void run() {
-                    LogUtil.e(TAG, "getWebViewDomTree timeout");
-                    callback.onFailed();
-                }
-            }, EVALUATE_JAVASCRIPT_TIMEOUT);
+        }, EVALUATE_JAVASCRIPT_TIMEOUT);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                int[] location = new int[2];
-                webView.getLocationOnScreen(location);
-                webView.evaluateJavascript("javascript:" + JAVASCRIPT_GET_DOM_TREE_METHOD + "(" +
-                                location[0] + ", " + location[1] + ", " + webView.getWidth() + ", " + webView.getHeight() + ", 100)",
-                        new ValueCallback<String>() {
-                            @Override
-                            public void onReceiveValue(String value) {
-                                if (disposable.isDisposed()) {
-                                    return;
-                                }
-                                disposable.dispose();
-                                if (TextUtils.isEmpty(value) || "null".equals(value)) {
-                                    LogUtil.e(TAG, "getWebViewDomTree ValueCallback is NULL");
-                                    callback.onFailed();
-                                    return;
-                                }
-                                try {
-                                    JSONObject domTree = new JSONObject(value);
-                                    callback.onSuccess(domTree);
-                                } catch (JSONException e) {
-                                    LogUtil.e(TAG, e);
-                                    callback.onFailed();
-                                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            int[] location = new int[2];
+            webView.getLocationOnScreen(location);
+            webView.evaluateJavascript("javascript:" + JAVASCRIPT_GET_DOM_TREE_METHOD + "(" +
+                            location[0] + ", " + location[1] + ", " + webView.getWidth() + ", " + webView.getHeight() + ", 100)",
+                    new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String value) {
+                            if (disposable.isDisposed()) {
+                                return;
                             }
-                        });
-            } else {
-                LogUtil.e(TAG, "You need use after Android 4.4 to getWebViewDomTree");
-                if (!disposable.isDisposed()) {
-                    disposable.dispose();
-                    callback.onFailed();
-                }
+                            disposable.dispose();
+                            if (TextUtils.isEmpty(value) || "null".equals(value)) {
+                                LogUtil.e(TAG, "getWebViewDomTree ValueCallback is NULL");
+                                callback.onFailed();
+                                return;
+                            }
+                            try {
+                                JSONObject domTree = new JSONObject(value);
+                                callback.onSuccess(domTree);
+                            } catch (JSONException e) {
+                                LogUtil.e(TAG, e);
+                                callback.onFailed();
+                            }
+                        }
+                    });
+        } else {
+            LogUtil.e(TAG, "You need use after Android 4.4 to getWebViewDomTree");
+            if (!disposable.isDisposed()) {
+                disposable.dispose();
+                callback.onFailed();
             }
-            return disposable;
         }
+        return disposable;
+    }
 
-        @Override
-        protected void singleAction(OnDomChangedListener listener, Void action) {
-            listener.onDomChanged();
-        }
+    @Override
+    protected void singleAction(OnDomChangedListener listener, Void action) {
+        listener.onDomChanged();
     }
 }

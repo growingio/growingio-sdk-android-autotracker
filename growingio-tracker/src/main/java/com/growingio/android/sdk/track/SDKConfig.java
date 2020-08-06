@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.interfaces;
+package com.growingio.android.sdk.track;
 
-public interface OnGIOMainInitSDK {
-    @GMainThread
-    void onGIOMainInitSDK();
+import com.growingio.android.sdk.track.base.BuildConfig;
+
+public class SDKConfig {
+    private SDKConfig() {
+    }
+
+    public static final String SDK_VERSION = BuildConfig.VERSION_NAME;
+    public static final int SDK_VERSION_CODE = BuildConfig.VERSION_CODE;
 }

@@ -41,7 +41,7 @@ class WebViewBridgeJavascriptInterface {
     @JavascriptInterface
     @com.uc.webview.export.JavascriptInterface
     public void onDomChanged() {
-        HybridBridgeProvider.HybridBridgePolicy.get().onDomChanged();
+        HybridBridgeProvider.get().onDomChanged();
     }
 
     @JavascriptInterface
