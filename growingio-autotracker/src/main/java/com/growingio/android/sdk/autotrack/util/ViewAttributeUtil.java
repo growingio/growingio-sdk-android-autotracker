@@ -189,8 +189,10 @@ public class ViewAttributeUtil {
     public static boolean getIgnoreViewKey(View view) {
 
         IgnorePolicy selfPolicy = ViewAttributeUtil.getViewIgnorePlicy(view);
-        View parentView = (View) view.getParent();
-        IgnorePolicy parentPolicy = ViewAttributeUtil.getViewIgnorePlicy(parentView);
+        IgnorePolicy parentPolicy = null;
+        if (view.getParent() instanceof View) {
+            parentPolicy = ViewAttributeUtil.getViewIgnorePlicy((View) view.getParent());
+        }
 
         if (selfPolicy == null &&
                 (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {

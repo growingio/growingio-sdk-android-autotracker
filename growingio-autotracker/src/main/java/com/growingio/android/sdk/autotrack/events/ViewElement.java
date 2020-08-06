@@ -24,36 +24,18 @@ import org.json.JSONObject;
 public final class ViewElement extends BaseViewElement {
     private static final long serialVersionUID = 1L;
 
-    private final String mCid;
-
     ViewElement(ElementBuilder elementBuilder) {
         super(elementBuilder);
-        mCid = elementBuilder.mCid;
     }
 
     @Override
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
 
-        try {
-            json.put("mCid", mCid);
-        } catch (JSONException ignored) {
-        }
-
         return json;
     }
 
     public final static class ElementBuilder extends BaseViewElement.BaseElementBuilder<ViewElement> {
-        private String mCid;
-
-        public String getCid() {
-            return mCid;
-        }
-
-        public ElementBuilder setCid(String cid) {
-            mCid = cid;
-            return this;
-        }
 
         @Override
         public ViewElement build() {

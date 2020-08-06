@@ -359,8 +359,6 @@ public class ViewHelper {
         viewNode.viewContent = Util.getViewContent(view, bannerText);
         viewNode.clickableParentXPath = LinkedString.fromString(px);
         viewNode.bannerText = bannerText;
-        viewNode.cid = ViewAttributeUtil.getCustomId(view);
-
 
         return viewNode;
     }
@@ -451,7 +449,6 @@ public class ViewHelper {
     private static List<BaseViewElement.BaseElementBuilder<?>> viewNodeToElementBuilders(ViewNode viewNode) {
         List<BaseViewElement.BaseElementBuilder<?>> mElementBuilders = new ArrayList<BaseViewElement.BaseElementBuilder<?>>();
         mElementBuilders.add((new ViewElement.ElementBuilder())
-                .setCid(viewNode.cid)
                 .setXpath(viewNode.parentXPath.toStringValue())
                 .setTimestamp(System.currentTimeMillis())
                 .setIndex(viewNode.lastListPos)

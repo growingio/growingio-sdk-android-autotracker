@@ -39,7 +39,6 @@ public class ViewNode {
     public String viewContent;
     public boolean parentIdSettled = false;
     public LinkedString clickableParentXPath;
-    public String cid;
     private int mHashCode = -1;
 
     public ViewNode() {
