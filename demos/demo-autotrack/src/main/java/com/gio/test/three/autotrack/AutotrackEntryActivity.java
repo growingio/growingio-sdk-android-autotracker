@@ -102,7 +102,7 @@ public class AutotrackEntryActivity extends Activity {
         View view = getWindow().getDecorView();
         GrowingAutotracker.getInstance().setUniqueTag(view, "current_unique_tag");
         String uid = ViewAttributeUtil.getCustomId(view);
-        Log.d(TAG,"unique id = " + uid);
+        Log.d(TAG, "unique id = " + uid);
 
         GrowingAutotracker.getInstance().setPageAlias(this, "autotrack_entry_alias");
         HashMap<String, String> map = new HashMap<>();
@@ -114,7 +114,7 @@ public class AutotrackEntryActivity extends Activity {
         GrowingAutotracker.getInstance().getDeviceId(new ResultCallback<String>() {
             @Override
             public void onResult(@Nullable String result) {
-                Log.d(TAG,"device id = " + result);
+                Log.d(TAG, "device id = " + result);
             }
         });
 
