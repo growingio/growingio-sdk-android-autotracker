@@ -41,6 +41,7 @@ import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.variation.EventHttpSender;
 import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -189,10 +190,11 @@ public class GrowingAutotracker implements IGrowingAutotracker {
 
     @Override
     public IGrowingAutotracker setUniqueTag(final View view, final String tag) {
+        final WeakReference<View> weakView = new WeakReference<>(view);
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
-                ViewAttributeUtil.setCustomId(view, tag);
+                ViewAttributeUtil.setCustomId(weakView.get(), tag);
             }
         });
         return this;
@@ -227,10 +229,11 @@ public class GrowingAutotracker implements IGrowingAutotracker {
 
     @Override
     public IGrowingAutotracker stopTrackViewImpression(final View trackedView) {
+        final WeakReference<View> weakView = new WeakReference<>(trackedView);
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
-                AutotrackAppState.impObserver().stopStampViewImp(trackedView);
+                AutotrackAppState.impObserver().stopStampViewImp(weakView.get());
             }
         });
 
@@ -263,11 +266,11 @@ public class GrowingAutotracker implements IGrowingAutotracker {
 
     @Override
     public IGrowingAutotracker ignoreView(final View view, final IgnorePolicy policy) {
-
+        final WeakReference<View> weakView = new WeakReference<>(view);
         GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
             @Override
             public void action() {
-                ViewAttributeUtil.setIgnoreViewKey(view, policy);
+                ViewAttributeUtil.setIgnoreViewKey(weakView.get(), policy);
             }
         });
         return this;

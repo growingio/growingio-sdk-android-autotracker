@@ -94,8 +94,8 @@ public class AutotrackEntryActivity extends Activity {
     private void ignoreExample() {
         View view = getWindow().getDecorView();
 
-        GrowingAutotracker.getInstance().ignorePage(this, IgnorePolicy.IgnoreAll);
-        GrowingAutotracker.getInstance().ignoreView(view, IgnorePolicy.IgnoreSelf);
+        GrowingAutotracker.getInstance().ignorePage(this, IgnorePolicy.IGNORE_ALL);
+        GrowingAutotracker.getInstance().ignoreView(view, IgnorePolicy.IGNORE_SELF);
     }
 
     private void autotrackExample() {

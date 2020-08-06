@@ -193,12 +193,12 @@ public class ViewAttributeUtil {
         IgnorePolicy parentPolicy = ViewAttributeUtil.getViewIgnorePlicy(parentView);
 
         if (selfPolicy == null &&
-                (parentPolicy == null || parentPolicy == IgnorePolicy.IgnoreSelf)) {
+                (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
             return false;
         }
 
-        if (selfPolicy == IgnorePolicy.IgnoreChild &&
-                (parentPolicy == null || parentPolicy == IgnorePolicy.IgnoreSelf)) {
+        if (selfPolicy == IgnorePolicy.IGNORE_CHILD &&
+                (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
             return false;
         }
 

@@ -33,7 +33,6 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.GIOProviders;
 import com.growingio.android.sdk.track.utils.LogUtil;
-import com.growingio.android.sdk.track.utils.WeakSet;
 
 import java.util.HashSet;
 import java.util.List;
@@ -187,12 +186,12 @@ public interface PageProvider {
 
 
             if (selfPolicy == null &&
-                    (parentPolicy == null || parentPolicy == IgnorePolicy.IgnoreSelf)) {
+                    (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
                 return false;
             }
 
-            if (selfPolicy == IgnorePolicy.IgnoreChild &&
-                    (parentPolicy == null || parentPolicy == IgnorePolicy.IgnoreSelf)) {
+            if (selfPolicy == IgnorePolicy.IGNORE_CHILD &&
+                    (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
                 return false;
             }
 
@@ -209,12 +208,12 @@ public interface PageProvider {
             IgnorePolicy parentPolicy = ALL_PAGE_IGNORE_POLICY.get(parentFragment);
 
             if (selfPolicy == null &&
-                    (parentPolicy == null || parentPolicy == IgnorePolicy.IgnoreSelf)) {
+                    (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
                 return false;
             }
 
-            if (selfPolicy == IgnorePolicy.IgnoreChild &&
-                    (parentPolicy == null || parentPolicy == IgnorePolicy.IgnoreSelf)) {
+            if (selfPolicy == IgnorePolicy.IGNORE_CHILD &&
+                    (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
                 return false;
             }
 
