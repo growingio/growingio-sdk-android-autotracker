@@ -80,7 +80,6 @@ public class HookClassesConfig {
     putSuperHookMethod("androidx/fragment/app/Fragment", "setUserVisibleHint", "(Z)V", "com/growingio/android/sdk/autotrack/page/FragmentInjector", "androidxFragmentSetUserVisibleHint", "(Landroidx/fragment/app/Fragment;Z)V", true);
     putSuperHookMethod("androidx/fragment/app/Fragment", "onHiddenChanged", "(Z)V", "com/growingio/android/sdk/autotrack/page/FragmentInjector", "androidxFragmentOnHiddenChanged", "(Landroidx/fragment/app/Fragment;Z)V", true);
     putSuperHookMethod("androidx/fragment/app/Fragment", "onDestroyView", "()V", "com/growingio/android/sdk/autotrack/page/FragmentInjector", "androidxFragmentOnDestroyView", "(Landroidx/fragment/app/Fragment;)V", true);
-    putSuperHookMethod("android/view/View$OnClickListener", "onClick", "(Landroid/view/View;)V", "com/growingio/android/sdk/autotrack/click/ViewClickInjector", "viewOnClick", "(Landroid/view/View$OnClickListener;Landroid/view/View;)V", true);
   }
 
   private HookClassesConfig() {
