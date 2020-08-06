@@ -16,16 +16,18 @@
 
 package com.growingio.android.sdk.track;
 
-public class TrackConfiguration {
+import androidx.annotation.NonNull;
+
+public class TrackConfiguration implements Cloneable {
     private String mProjectId;
     private String mUrlScheme;
     private String mChannel;
     private boolean mLogEnabled;
     private int mCellularDataLimit;
     private long mDataUploadInterval;
-    private long mSessionInterval;
-
-    private boolean mUploadExceptionEnable = true;
+    private long mSessionInterval = 30_000;
+    private boolean mDataCollectionEnabled = true;
+    private boolean mUploadExceptionEnabled = true;
 
     public String getProjectId() {
         return mProjectId;
@@ -33,6 +35,15 @@ public class TrackConfiguration {
 
     public TrackConfiguration setProjectId(String projectId) {
         this.mProjectId = projectId;
+        return this;
+    }
+
+    public boolean isDataCollectionEnabled() {
+        return mDataCollectionEnabled;
+    }
+
+    public TrackConfiguration setDataCollectionEnabled(boolean dataCollectionEnabled) {
+        mDataCollectionEnabled = dataCollectionEnabled;
         return this;
     }
 
@@ -54,12 +65,12 @@ public class TrackConfiguration {
         return this;
     }
 
-    public boolean isUploadExceptionEnable() {
-        return mUploadExceptionEnable;
+    public boolean isUploadExceptionEnabled() {
+        return mUploadExceptionEnabled;
     }
 
-    public TrackConfiguration setUploadExceptionEnable(boolean uploadExceptionEnable) {
-        this.mUploadExceptionEnable = uploadExceptionEnable;
+    public TrackConfiguration setUploadExceptionEnabled(boolean uploadExceptionEnabled) {
+        this.mUploadExceptionEnabled = uploadExceptionEnabled;
         return this;
     }
 
@@ -97,5 +108,20 @@ public class TrackConfiguration {
     public TrackConfiguration setSessionInterval(long sessionInterval) {
         this.mSessionInterval = sessionInterval;
         return this;
+    }
+
+    @NonNull
+    @Override
+    public TrackConfiguration clone() {
+        TrackConfiguration clone = new TrackConfiguration();
+        clone.mProjectId = this.mProjectId;
+        clone.mUrlScheme = this.mUrlScheme;
+        clone.mChannel = this.mChannel;
+        clone.mLogEnabled = this.mLogEnabled;
+        clone.mCellularDataLimit = this.mCellularDataLimit;
+        clone.mDataUploadInterval = this.mDataUploadInterval;
+        clone.mSessionInterval = this.mSessionInterval;
+        clone.mUploadExceptionEnabled = this.mUploadExceptionEnabled;
+        return clone;
     }
 }

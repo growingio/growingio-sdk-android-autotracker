@@ -41,18 +41,23 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.UiThread;
 
-import com.growingio.android.sdk.track.GIOMainThread;
-import com.growingio.android.sdk.track.GInternal;
-import com.growingio.android.sdk.track.providers.DBJobScheduleProvider;
-import com.growingio.android.sdk.track.providers.EventSenderProvider;
-import com.growingio.android.sdk.track.providers.SendPolicyProvider;
+import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
+import com.growingio.android.sdk.track.variation.EventHttpSender;
+import com.growingio.android.sdk.track.variation.TrackEventJsonMarshaller;
 
 /**
  * 发送服务, 主要使用JobScheduler进行任务调度, 由于Android 5.0之下没有JobScheduler, 5.0以下Service长活
  */
 public class GIOSenderService extends Service {
+    private static final int JOB_SCHEDULER_START_COMMAND = 202052013;
+    private static final int JOB_SCHEDULER_WAIT_NET = 202052014;
+    private static final int WAIT_NET_MINIMUM_LATENCY = 60_000;
+    private static final int WAIT_NET_OVERRIDE_DEADLINE = 60 * 60_000;
+    private static final long DELAY_STOP_TIME_MILLS = 70_000;
+
     public static final String ARG_COMMAND = "arg_command";
     static final int ACTION_SEND_WITH_LIMIT = 1;  // 发送一次事件
     static final int ACTION_NEW_EVENT = 2;              // 接受到一个新的事件
@@ -91,7 +96,7 @@ public class GIOSenderService extends Service {
             LogUtil.e(TAG, "enqueueWork, but jobScheduler is null, return");
             return;
         }
-        JobInfo job = new JobInfo.Builder(DBJobScheduleProvider.JobSchedulePolicy.get().scheduleIdForStartCommand(),
+        JobInfo job = new JobInfo.Builder(JOB_SCHEDULER_START_COMMAND,
                 new ComponentName(context, GIOSenderService.class))
                 .setOverrideDeadline(0)
                 .build();
@@ -158,7 +163,7 @@ public class GIOSenderService extends Service {
             return;
         }
         if (sEventSender == null) {
-            sEventSender = new EventSender(getApplicationContext(), EventSenderProvider.EventSenderPolicy.get().getEventSender());
+            sEventSender = new EventSender(getApplicationContext(), new EventHttpSender(new TrackEventJsonMarshaller()));
             sEventSender.setSenderService(this);
             sEventSender.afterConstructor();
         }
@@ -171,7 +176,7 @@ public class GIOSenderService extends Service {
                 sEventSender.onEventWrite(instant != null ? instant : false);
                 if (instant != null && !instant && !mServiceHandler.hasMessages(ServiceHandler.MSG_WINDOW_SEND)) {
                     mServiceHandler.sendEmptyMessageDelayed(ServiceHandler.MSG_WINDOW_SEND,
-                            SendPolicyProvider.SendPolicy.get().flushInterval());
+                            ConfigurationProvider.get().getTrackConfiguration().getDataUploadInterval());
                 }
                 break;
             }
@@ -219,12 +224,9 @@ public class GIOSenderService extends Service {
         ThreadUtils.postOnUiThreadDelayed(new Runnable() {
             @Override
             public void run() {
-                GIOMainThread gioMainThread = GInternal.getInstance().getMainThread();
-                if (gioMainThread != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(ARG_COMMAND, ACTION_SEND_WITH_LIMIT);
-                    GIOSenderService.startService(gioMainThread.getContext(), bundle);
-                }
+                Bundle bundle = new Bundle();
+                bundle.putInt(ARG_COMMAND, ACTION_SEND_WITH_LIMIT);
+                GIOSenderService.startService(ContextProvider.getApplicationContext(), bundle);
             }
         }, 2000);
     }
@@ -357,7 +359,7 @@ public class GIOSenderService extends Service {
             }
             mService.mServiceHandler.sendMessageDelayed(
                     Message.obtain(mService.mServiceHandler, ServiceHandler.MSG_DELAY_STOP),
-                    SendPolicyProvider.SendPolicy.get().delayStopTimeMills());
+                    DELAY_STOP_TIME_MILLS);
         }
 
         @Override
@@ -367,30 +369,25 @@ public class GIOSenderService extends Service {
 
         @Override
         public void scheduleForNet(boolean isWifi) {
-            DBJobScheduleProvider jobScheduleProvider = DBJobScheduleProvider.JobSchedulePolicy.get();
-            if (jobScheduleProvider.useJobScheduler()) {
-                @SuppressLint("JobSchedulerService")
-                JobInfo.Builder builder = new JobInfo.Builder(jobScheduleProvider.scheduleIdForWaitNet(),
-                        new ComponentName(mService.getApplicationContext(), GIOSenderService.class));
-                if (isWifi) {
-                    builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
-                } else {
-                    builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-                }
-                PersistableBundle persistableBundle = new PersistableBundle();
-                persistableBundle.putInt(ARG_COMMAND, ACTION_SEND_WITH_LIMIT);
-                builder.setExtras(persistableBundle);
-                builder.setMinimumLatency(jobScheduleProvider.waitNetMinimumLatency());
-                builder.setOverrideDeadline(jobScheduleProvider.waitNetOverrideDeadline()); // 最长延迟一小时唤醒一次
-                JobInfo info = builder.build();
-                JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-                if (jobScheduler == null) {
-                    mStartCommandServiceDelegate.scheduleForNet(isWifi);
-                } else {
-                    jobScheduler.schedule(info);
-                }
+            @SuppressLint("JobSchedulerService")
+            JobInfo.Builder builder = new JobInfo.Builder(JOB_SCHEDULER_WAIT_NET,
+                    new ComponentName(mService.getApplicationContext(), GIOSenderService.class));
+            if (isWifi) {
+                builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
             } else {
+                builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+            }
+            PersistableBundle persistableBundle = new PersistableBundle();
+            persistableBundle.putInt(ARG_COMMAND, ACTION_SEND_WITH_LIMIT);
+            builder.setExtras(persistableBundle);
+            builder.setMinimumLatency(WAIT_NET_MINIMUM_LATENCY);
+            builder.setOverrideDeadline(WAIT_NET_OVERRIDE_DEADLINE); // 最长延迟一小时唤醒一次
+            JobInfo info = builder.build();
+            JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            if (jobScheduler == null) {
                 mStartCommandServiceDelegate.scheduleForNet(isWifi);
+            } else {
+                jobScheduler.schedule(info);
             }
         }
 
@@ -403,7 +400,7 @@ public class GIOSenderService extends Service {
         public void cancelScheduleForNet() {
             JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
             if (jobScheduler != null) {
-                jobScheduler.cancel(DBJobScheduleProvider.JobSchedulePolicy.get().scheduleIdForWaitNet());
+                jobScheduler.cancel(JOB_SCHEDULER_WAIT_NET);
             }
         }
 
@@ -538,7 +535,7 @@ public class GIOSenderService extends Service {
         @Override
         public void scheduleForNet(boolean isWifi) {
             mServiceHandler.sendMessageDelayed(Message.obtain(mServiceHandler, ServiceHandler.MSG_LOW_VERSION_WAIT),
-                    SendPolicyProvider.SendPolicy.get().flushInterval());
+                    ConfigurationProvider.get().getTrackConfiguration().getDataUploadInterval());
         }
 
         @Override

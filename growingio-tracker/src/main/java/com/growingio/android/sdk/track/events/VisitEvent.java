@@ -21,15 +21,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.WindowManager;
 
-import com.growingio.android.sdk.track.CoreAppState;
-import com.growingio.android.sdk.track.GConfig;
+import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.SDKConfig;
+import com.growingio.android.sdk.track.TrackConfiguration;
 import com.growingio.android.sdk.track.events.base.BaseEventWithSequenceId;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
-import com.growingio.android.sdk.track.providers.LocationProvider;
-import com.growingio.android.sdk.track.providers.ProjectInfoProvider;
+import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.utils.rom.RomChecker;
 
 import org.json.JSONException;
@@ -214,8 +213,8 @@ public final class VisitEvent extends BaseEventWithSequenceId {
         private String mGoogleAdvertisingId;
         private Map<String, String> mFeaturesVersion;
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        EventBuilder() {
+            super();
         }
 
         @Override
@@ -224,20 +223,15 @@ public final class VisitEvent extends BaseEventWithSequenceId {
         }
 
         @Override
-        public void readPropertyInGMain() {
-            super.readPropertyInGMain();
-            Context context = mCoreAppState.getGlobalContext();
+        public void readPropertyInTrackThread() {
+            super.readPropertyInTrackThread();
 
-            mAppChannel = ProjectInfoProvider.AccountInfoPolicy.get().getChannel(context);
+            Context context = ContextProvider.getApplicationContext();
+            ConfigurationProvider configurationProvider = ConfigurationProvider.get();
+            TrackConfiguration configuration = configurationProvider.getTrackConfiguration();
+            mAppChannel = configuration.getChannel();
 
-            DisplayMetrics metrics = new DisplayMetrics();
-            Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                display.getRealMetrics(metrics);
-            } else {
-                display.getMetrics(metrics);
-            }
-
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
             mScreenHeight = metrics.heightPixels;
             mScreenWidth = metrics.widthPixels;
             mDeviceBrand = Build.BRAND == null ? "UNKNOWN" : Build.BRAND;
@@ -246,9 +240,8 @@ public final class VisitEvent extends BaseEventWithSequenceId {
             mOperatingSystem = "Android";
             mOperatingSystemVersion = Build.VERSION.RELEASE == null ? "UNKNOWN" : Build.VERSION.RELEASE;
 
-            ProjectInfoProvider projectInfoProvider = ProjectInfoProvider.AccountInfoPolicy.get();
-            mAppName = projectInfoProvider.getPackageName(context);
-            mUrlScheme = projectInfoProvider.getUrlScheme();
+            mAppName = configurationProvider.getPackageName();
+            mUrlScheme = configuration.getUrlScheme();
 
             PackageManager packageManager = context.getPackageManager();
             try {
@@ -258,13 +251,10 @@ public final class VisitEvent extends BaseEventWithSequenceId {
                 e.printStackTrace();
             }
 
-            mSdkVersion = GConfig.SDK_VERSION;
+            mSdkVersion = SDKConfig.SDK_VERSION;
             mLanguage = Locale.getDefault().toString();
 
-            mLatitude = LocationProvider.LocationPolicy.get(mCoreAppState).getLatitude();
-            mLongitude = LocationProvider.LocationPolicy.get(mCoreAppState).getLongitude();
-
-            DeviceInfoProvider deviceInfo = DeviceInfoProvider.DeviceInfoPolicy.get(context);
+            DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
             mImei = deviceInfo.getImei();
             mAndroidId = deviceInfo.getAndroidId();
 
@@ -287,6 +277,16 @@ public final class VisitEvent extends BaseEventWithSequenceId {
 
         public EventBuilder setSessionId(String sessionId) {
             mSessionId = sessionId;
+            return this;
+        }
+
+        public EventBuilder setLatitude(double latitude) {
+            mLatitude = latitude;
+            return this;
+        }
+
+        public EventBuilder setLongitude(double longitude) {
+            mLongitude = longitude;
             return this;
         }
 

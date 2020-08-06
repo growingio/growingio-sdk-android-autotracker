@@ -24,9 +24,6 @@ import com.growingio.android.sdk.autotrack.hybrid.event.HybridPageAttributesEven
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridPageEvent;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridViewElement;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridViewElementEvent;
-import com.growingio.android.sdk.track.CoreAppState;
-import com.growingio.android.sdk.track.GIOMainThread;
-import com.growingio.android.sdk.track.GInternal;
 import com.growingio.android.sdk.track.events.ConversionVariablesEvent;
 import com.growingio.android.sdk.track.events.EventType;
 import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
@@ -48,17 +45,11 @@ public class HybridTransformerImp implements HybridTransformer {
     @Nullable
     @Override
     public BaseEvent.BaseEventBuilder<?> transform(String hybridEvent) {
-        GIOMainThread mainThread = GInternal.getInstance().getMainThread();
-        if (mainThread == null) {
-            return null;
-        }
-
-        CoreAppState coreAppState = mainThread.getCoreAppState();
         try {
             JSONObject evenJson = new JSONObject(hybridEvent);
             String type = evenJson.getString(Key.EVENT_TYPE);
             if (Value.EventType.PAGE.equals(type)) {
-                return new HybridPageEvent.EventBuilder(coreAppState)
+                return new HybridPageEvent.EventBuilder()
                         .setDomain(evenJson.getString(Key.DOMAIN))
                         .setProtocolType(evenJson.getString(Key.PROTOCOL_TYPE))
                         .setQueryParameters(evenJson.getString(Key.QUERY_PARAMETERS))
@@ -68,7 +59,7 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setTimestamp(evenJson.getLong(Key.TIMESTAMP));
 
             } else if (Value.EventType.PAGE_ATTRIBUTES.equals(type)) {
-                return new HybridPageAttributesEvent.EventBuilder(coreAppState)
+                return new HybridPageAttributesEvent.EventBuilder()
                         .setDomain(evenJson.getString(Key.DOMAIN))
                         .setQueryParameters(evenJson.getString(Key.QUERY_PARAMETERS))
                         .setPageName(evenJson.getString(Key.PAGE_NAME))
@@ -76,19 +67,19 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setAttributes(JsonUtil.copyToMap(evenJson.getJSONObject(Key.ATTRIBUTES)));
 
             } else if (Value.EventType.CLICK.equals(type)) {
-                return transformViewElementEventBuilder(coreAppState, evenJson)
+                return transformViewElementEventBuilder(evenJson)
                         .setEventType(EventType.CLICK);
 
             } else if (Value.EventType.CHANG.equals(type)) {
-                return transformViewElementEventBuilder(coreAppState, evenJson)
+                return transformViewElementEventBuilder(evenJson)
                         .setEventType(EventType.CHANGE);
 
             } else if (Value.EventType.SUBMIT.equals(type)) {
-                return transformViewElementEventBuilder(coreAppState, evenJson)
+                return transformViewElementEventBuilder(evenJson)
                         .setEventType(EventType.SUBMIT);
 
             } else if (Value.EventType.CUSTOM.equals(type)) {
-                return new HybridCustomEvent.EventBuilder(coreAppState)
+                return new HybridCustomEvent.EventBuilder()
                         .setDomain(evenJson.getString(Key.DOMAIN))
                         .setQueryParameters(evenJson.getString(Key.QUERY_PARAMETERS))
                         .setPageName(evenJson.getString(Key.PAGE_NAME))
@@ -97,15 +88,15 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setAttributes(JsonUtil.copyToMap(evenJson.getJSONObject(Key.ATTRIBUTES)));
 
             } else if (Value.EventType.LOGIN_USER_ATTRIBUTES.equals(type)) {
-                return new LoginUserAttributesEvent.EventBuilder(coreAppState)
+                return new LoginUserAttributesEvent.EventBuilder()
                         .setAttributes(JsonUtil.copyToMap(evenJson.getJSONObject(Key.ATTRIBUTES)));
 
             } else if (Value.EventType.VISITOR_ATTRIBUTES.equals(type)) {
-                return new VisitorAttributesEvent.EventBuilder(coreAppState)
+                return new VisitorAttributesEvent.EventBuilder()
                         .setAttributes(JsonUtil.copyToMap(evenJson.getJSONObject(Key.ATTRIBUTES)));
 
             } else if (Value.EventType.CONVERSION_VARIABLES.equals(type)) {
-                return new ConversionVariablesEvent.EventBuilder(coreAppState)
+                return new ConversionVariablesEvent.EventBuilder()
                         .setAttributes(JsonUtil.copyToMap(evenJson.getJSONObject(Key.ATTRIBUTES)));
             }
         } catch (JSONException e) {
@@ -116,8 +107,8 @@ public class HybridTransformerImp implements HybridTransformer {
         return null;
     }
 
-    private HybridViewElementEvent.EventBuilder transformViewElementEventBuilder(CoreAppState coreAppState, JSONObject json) throws JSONException {
-        HybridViewElementEvent.EventBuilder eventBuilder = (HybridViewElementEvent.EventBuilder) new HybridViewElementEvent.EventBuilder(coreAppState)
+    private HybridViewElementEvent.EventBuilder transformViewElementEventBuilder(JSONObject json) throws JSONException {
+        HybridViewElementEvent.EventBuilder eventBuilder = (HybridViewElementEvent.EventBuilder) new HybridViewElementEvent.EventBuilder()
                 .setDomain(json.getString(Key.DOMAIN))
                 .setQueryParameters(json.getString(Key.QUERY_PARAMETERS))
                 .setPageName(json.getString(Key.PAGE_NAME))

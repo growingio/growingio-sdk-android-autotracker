@@ -17,10 +17,8 @@
 package com.growingio.android.sdk.track;
 
 import com.growingio.android.sdk.track.base.event.ViewTreeStatusChangeEvent;
-import com.growingio.android.sdk.track.interfaces.IEventSaveListener;
 import com.growingio.android.sdk.track.interfaces.IViewTreeStatus;
-import com.growingio.android.sdk.track.interfaces.OnGIOMainInitSDK;
-import com.growingio.android.sdk.track.middleware.GEvent;
+import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,10 +29,6 @@ import java.util.Set;
 public abstract class ListenerContainer<L, A> {
 
     private final Set<L> mListeners = new HashSet<>();
-
-    public static EventSaveListeners eventSaveListeners() {
-        return EventSaveListeners.Instance.EVENT_SAVE_LISTENERS;
-    }
 
     public static ViewTreeStatusListeners viewTreeStatusListeners() {
         return ViewTreeStatusListeners.Instance.VIEW_TREE_STATUS_LISTENERS;
@@ -69,29 +63,11 @@ public abstract class ListenerContainer<L, A> {
 
     abstract void singleAction(L listener, A action);
 
-    public static class EventSaveListeners extends ListenerContainer<IEventSaveListener, GEvent>
-            implements IEventSaveListener {
+    public static class OnGIOMainInitSDKListeners extends ListenerContainer<OnTrackMainInitSDKCallback, Void> {
 
         @Override
-        void singleAction(IEventSaveListener listener, GEvent action) {
-            listener.onEventSaved(action);
-        }
-
-        @Override
-        public void onEventSaved(GEvent gEvent) {
-            dispatchActions(gEvent);
-        }
-
-        private static class Instance {
-            private static final EventSaveListeners EVENT_SAVE_LISTENERS = new EventSaveListeners();
-        }
-    }
-
-    public static class OnGIOMainInitSDKListeners extends ListenerContainer<OnGIOMainInitSDK, Void> {
-
-        @Override
-        void singleAction(OnGIOMainInitSDK listener, Void action) {
-            listener.onGIOMainInitSDK();
+        void singleAction(OnTrackMainInitSDKCallback listener, Void action) {
+            listener.onTrackMainInitSDK();
         }
 
         private static class Instance {

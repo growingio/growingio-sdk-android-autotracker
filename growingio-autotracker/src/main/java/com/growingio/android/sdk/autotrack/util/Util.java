@@ -36,9 +36,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.growingio.android.sdk.track.GConfig;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
-import com.growingio.android.sdk.track.utils.CustomerInterface;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.utils.WebViewUtil;
@@ -175,7 +173,7 @@ public class Util {
                 value = value.substring(0, MAX_CONTENT_LENGTH);
             }
         }
-        return encryptContent(value);
+        return value;
     }
 
     public static boolean isListView(View view) {
@@ -252,25 +250,6 @@ public class Util {
             LogUtil.d("Util", e);
         }
         return null;
-    }
-
-
-    /**
-     * 加密失败,或者数据为空返回原值
-     *
-     * @return
-     */
-    public static String encryptContent(String content) {
-        final CustomerInterface.Encryption entity = GConfig.getInstance().getEncryption();
-        if (entity == null || TextUtils.isEmpty(content)) {
-            return content;
-        }
-        try {
-            return entity.encrypt(content);
-        } catch (Exception ignore) {
-            LogUtil.e("加密失败", "V字段加密算法崩溃，传回content");
-            return content;
-        }
     }
 }
 

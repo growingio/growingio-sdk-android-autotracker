@@ -43,7 +43,7 @@ public class ThreeVersionApplication extends Application {
 
         GrowingAutotracker.startWithConfiguration(this,
                 new AutotrackConfiguration()
-                        .setUploadExceptionEnable(false)
+                        .setUploadExceptionEnabled(false)
                         .setProjectId("testProjectId")
                         .setUrlScheme("testUrlScheme")
                         .setLogEnabled(true));

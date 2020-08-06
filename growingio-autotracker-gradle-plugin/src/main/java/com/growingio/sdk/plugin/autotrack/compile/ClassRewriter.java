@@ -128,7 +128,7 @@ public class ClassRewriter {
                     context);
             classVisitor = desugaringClassVisitor;
             classReader.accept(classVisitor, ClassReader.SKIP_FRAMES | ClassReader.EXPAND_FRAMES);
-            if (desugaringClassVisitor != null && !desugaringClassVisitor.getNeedInjectTargetMethods().isEmpty()) {
+            if (!desugaringClassVisitor.getNeedInjectTargetMethods().isEmpty()) {
                 // lambda 表达式需要特殊处理两次
                 mLog.debug(String.format("GIO: deal with lambda second time:  %s", className));
                 ClassReader lambdaReader = new ClassReader(classWriter.toByteArray());

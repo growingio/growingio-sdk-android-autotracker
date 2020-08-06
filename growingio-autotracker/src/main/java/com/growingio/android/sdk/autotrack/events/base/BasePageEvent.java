@@ -18,11 +18,11 @@ package com.growingio.android.sdk.autotrack.events.base;
 
 import android.app.Activity;
 
-import com.growingio.android.sdk.track.CoreAppState;
+import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.events.EventType;
 import com.growingio.android.sdk.track.events.base.BaseEventWithSequenceId;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.NetworkStatusProvider;
+import com.growingio.android.sdk.track.utils.NetworkUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,10 +85,10 @@ public abstract class BasePageEvent extends BaseEventWithSequenceId {
         private String mNetworkState;
         private String mReferralPage;
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
             mReferralPage = "";
-            Activity activity = ActivityStateProvider.ActivityStatePolicy.get().getResumedActivity();
+            Activity activity = ActivityStateProvider.get().getResumedActivity();
             if (activity != null) {
                 mOrientation = activity.getResources().getConfiguration().orientation == 1
                         ? "PORTRAIT" : "LANDSCAPE";
@@ -96,11 +96,9 @@ public abstract class BasePageEvent extends BaseEventWithSequenceId {
         }
 
         @Override
-        public void readPropertyInGMain() {
-            super.readPropertyInGMain();
-            NetworkStatusProvider provider = NetworkStatusProvider.NetworkStatus.get(mCoreAppState.getGlobalContext());
-            provider.checkNetStatus();
-            mNetworkState = provider.getNetworkName();
+        public void readPropertyInTrackThread() {
+            super.readPropertyInTrackThread();
+            mNetworkState = NetworkUtil.getNetworkName(ContextProvider.getApplicationContext());
         }
 
         public String getPageName() {

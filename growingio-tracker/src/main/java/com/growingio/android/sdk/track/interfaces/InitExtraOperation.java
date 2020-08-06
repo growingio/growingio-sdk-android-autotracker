@@ -17,9 +17,7 @@
 package com.growingio.android.sdk.track.interfaces;
 
 public interface InitExtraOperation {
-    boolean requireWaitForCompletion();
-
-    void init();
+    void initializing();
 
     void initSuccess();
 }

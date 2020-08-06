@@ -16,185 +16,179 @@
 
 package com.growingio.android.sdk.track.providers;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.CoreAppState;
-import com.growingio.android.sdk.track.GConfig;
-import com.growingio.android.sdk.track.interfaces.GMainThread;
-import com.growingio.android.sdk.track.interfaces.IActionCallback;
-import com.growingio.android.sdk.track.interfaces.OnGIOMainInitSDK;
+import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
+import com.growingio.android.sdk.track.events.TrackEventGenerator;
+import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
+import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
-import com.growingio.android.sdk.track.utils.GIOProviders;
 import com.growingio.android.sdk.track.utils.LogUtil;
 
 import java.util.UUID;
 
 /**
- * 1. userid设置从空到非空，visit不发送，sessionid不变
- * 2. userid设置从非空到空，visit不发送，sessionid不变
- * 3. userid设置从"A"到"B", visit发送，sessionid改变
- * 4. userid设置从"A"到空再到"B", visit发送，sessionid改变
- * 5. userid设置从"A"到"A"，visit不发送，sessionID不变
+ * 1. LoginUserId设置从空到非空，visit不发送，sessionId不变
+ * 2. LoginUserId设置从非空到空，visit不发送，sessionId不变
+ * 3. LoginUserId设置从"A"到"B", visit发送，sessionId改变
+ * 4. LoginUserId设置从"A"到空再到"B", visit发送，sessionId改变
+ * 5. LoginUserId设置从"A"到"A"，visit不发送，sessionId不变
+ * 6. location任意精度从null到非null，重新发visit事件，sessionId不变
+ * <p>
+ * 总结出一句话，一个sessionId不能有两个用户ID
  */
-public interface SessionProvider extends OnGIOMainInitSDK {
+public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListener, OnTrackMainInitSDKCallback {
+    private static final String TAG = "SessionProvider";
+    private final GrowingIOIPC mIPC;
 
-    void resendVisit();
+    private volatile boolean mAlreadySendVisit = false;
+    private String mLatestNonNullUserId;
+    private int mActivityStartCount = 0;
+    private final long mSessionInterval;
+    private double mLatitude = 0;
+    private double mLongitude = 0;
 
-    void forceReissueVisit();
+    private static class SingleInstance {
+        private static final SessionProvider INSTANCE = new SessionProvider();
+    }
 
-    void setSessionInterval(long sessionInterval);
+    private SessionProvider() {
+        mSessionInterval = ConfigurationProvider.get().getTrackConfiguration().getSessionInterval();
+        mIPC = PersistentDataProvider.get().getIPC();
+        ActivityStateProvider.get().registerActivityLifecycleListener(this);
+    }
 
-    long sessionInterval();
+    public static SessionProvider get() {
+        return SingleInstance.INSTANCE;
+    }
 
-    class SessionPolicy implements SessionProvider, IActivityLifecycle, OnUserIdChangedListener {
-        private static final String TAG = "GIO.SessionPolicy";
-        private static SessionProvider sInstance;
-
-        private GrowingIOIPC mGrowingIOIPC;
-        private CoreAppState mCoreAppState;
-
-        private volatile boolean mAlreadySendVisit = false;
-        private String mLatestNonNullUserId;
-        private int mActivityStartCount = 0;
-        private long mSessionInterval = 30_000;
-
-        public SessionPolicy(@NonNull CoreAppState coreAppState) {
-            mCoreAppState = coreAppState;
-            mGrowingIOIPC = coreAppState.getGrowingIOIPC();
+    @TrackThread
+    void checkAndSendVisit(long resumeTime) {
+        long lastPause = mIPC.getLastPauseTime();
+        if (resumeTime - lastPause >= mSessionInterval) {
+            String sessionId = refreshSessionId();
+            generateVisit(sessionId, resumeTime);
         }
+    }
 
-        public static SessionProvider get(final CoreAppState coreAppState) {
-            if (sInstance == null) {
-                synchronized (SessionPolicy.class) {
-                    if (sInstance == null) {
-                        sInstance = GIOProviders.provider(SessionProvider.class, new GIOProviders.DefaultCallback<SessionProvider>() {
-                            @Override
-                            public SessionProvider value() {
-                                return new SessionPolicy(coreAppState);
-                            }
-                        });
-                    }
-                }
-            }
-            return sInstance;
+    public String getSessionId() {
+        return mIPC.getSessionId();
+    }
+
+    private String refreshSessionId() {
+        String sessionId = UUID.randomUUID().toString();
+        mIPC.setSessionId(sessionId);
+        return sessionId;
+    }
+
+    @TrackThread
+    public void resendVisit() {
+        generateVisit(getSessionId(), mIPC.getLastResumeTime());
+    }
+
+    private void generateVisit(String sessionId, long timestamp) {
+        mAlreadySendVisit = true;
+        TrackEventGenerator.generateVisitEvent(sessionId, timestamp, mLatitude, mLongitude);
+    }
+
+    public boolean createdSession() {
+        return mAlreadySendVisit;
+    }
+
+    public void forceReissueVisit() {
+        if (mAlreadySendVisit) {
+            return;
         }
-
-        @GMainThread
-        void checkAndSendVisit(long resumeTime) {
-            long lastPause = mGrowingIOIPC.getLastPauseTime();
-            if (resumeTime - lastPause >= mSessionInterval) {
-                String sessionId = refreshSessionId();
-                generateVisit(sessionId, resumeTime);
-            }
-        }
-
-        private String getSessionId() {
-            return mGrowingIOIPC.getSessionId();
-        }
-
-        private String refreshSessionId() {
-            String sessionId = UUID.randomUUID().toString();
-            mGrowingIOIPC.setSessionId(sessionId);
-            return sessionId;
-        }
-
-        @GMainThread
-        @Override
-        public void resendVisit() {
-            generateVisit(getSessionId(), mGrowingIOIPC.getLastResumeTime());
-        }
-
-        private void generateVisit(String sessionId, long timestamp) {
-            mAlreadySendVisit = true;
-            EventCoreGeneratorProvider.EventCoreGenerator.get(mCoreAppState).generateVisit(sessionId, timestamp);
-        }
-
-        @Override
-        public void forceReissueVisit() {
-            if (mAlreadySendVisit) {
-                return;
-            }
-            mCoreAppState.getGIOMain().postActionToGMain(new IActionCallback() {
-                @Override
-                public void action() {
-                    String sessionId = refreshSessionId();
-                    long eventTime = System.currentTimeMillis();
-                    mGrowingIOIPC.setLastResumeTime(eventTime);
-                    generateVisit(sessionId, eventTime);
-                }
-            });
-        }
-
-        @Override
-        public void setSessionInterval(long sessionInterval) {
-            this.mSessionInterval = sessionInterval;
-        }
-
-        @Override
-        public void onActivityLifecycle(final ActivityLifecycleEvent event) {
-            if (!GConfig.getInstance().isEnableDataCollect()) {
-                return;
-            }
-
-            if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
-                if (mActivityStartCount == 0) {
-                    mCoreAppState.getGIOMain().postActionToGMain(new IActionCallback() {
-                        @Override
-                        public void action() {
-                            long eventTime = System.currentTimeMillis();
-                            checkAndSendVisit(eventTime);
-                            mGrowingIOIPC.setLastResumeTime(eventTime);
-                        }
-                    });
-                }
-                mActivityStartCount++;
-            } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
-                mActivityStartCount--;
-                if (mActivityStartCount == 0) {
-                    mCoreAppState.getGIOMain().postActionToGMain(new IActionCallback() {
-                        @Override
-                        public void action() {
-                            mGrowingIOIPC.setLastPauseTime(System.currentTimeMillis());
-                        }
-                    });
-                }
-            }
-        }
-
-        @Override
-        public long sessionInterval() {
-            return mSessionInterval;
-        }
-
-        @Override
-        public void onGIOMainInitSDK() {
-            ActivityStateProvider.ActivityStatePolicy.get().registerActivityLifecycleListener(this);
-            mLatestNonNullUserId = UserInfoProvider.UserInfoPolicy.get(mCoreAppState).getUserId();
-            UserInfoProvider.UserInfoPolicy.get(mCoreAppState).registerUserIdChangedListener(this);
-        }
-
-
-        @Override
-        public void onUserIdChanged(@Nullable String newUserId) {
-            LogUtil.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
-
-            if (!TextUtils.isEmpty(newUserId)
-                    && !TextUtils.isEmpty(mLatestNonNullUserId)
-                    && !newUserId.equals(mLatestNonNullUserId)) {
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
                 String sessionId = refreshSessionId();
                 long eventTime = System.currentTimeMillis();
-                mGrowingIOIPC.setLastResumeTime(eventTime);
+                mIPC.setLastResumeTime(eventTime);
                 generateVisit(sessionId, eventTime);
             }
+        });
+    }
 
-            if (!TextUtils.isEmpty(newUserId)) {
-                mLatestNonNullUserId = newUserId;
+    public void setLocation(double latitude, double longitude) {
+        double eps = 1e-5;
+        if (Math.abs(latitude) < eps && Math.abs(longitude) < eps) {
+            LogUtil.d(TAG, "found invalid latitude and longitude, and return: ", latitude, ", ", longitude);
+            return;
+        }
+
+        if ((mLatitude == 0 && Math.abs(latitude) > eps) ||
+                (mLongitude == 0 && Math.abs(longitude) > eps)) {
+            resendVisit();
+        }
+
+        mLatitude = latitude;
+        mLongitude = longitude;
+    }
+
+    public void cleanLocation() {
+        mLatitude = 0;
+        mLongitude = 0;
+    }
+
+    @Override
+    public void onActivityLifecycle(final ActivityLifecycleEvent event) {
+        if (!ConfigurationProvider.get().getTrackConfiguration().isDataCollectionEnabled()) {
+            return;
+        }
+
+        if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
+            if (mActivityStartCount == 0) {
+                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                    @Override
+                    public void run() {
+                        long eventTime = System.currentTimeMillis();
+                        checkAndSendVisit(eventTime);
+                        mIPC.setLastResumeTime(eventTime);
+                    }
+                });
             }
+            mActivityStartCount++;
+        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
+            mActivityStartCount--;
+            if (mActivityStartCount == 0) {
+                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                    @Override
+                    public void run() {
+                        mIPC.setLastPauseTime(System.currentTimeMillis());
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public void onTrackMainInitSDK() {
+        mLatestNonNullUserId = UserInfoProvider.get().getUserId();
+        UserInfoProvider.get().registerUserIdChangedListener(this);
+    }
+
+
+    @Override
+    public void onUserIdChanged(@Nullable String newUserId) {
+        LogUtil.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
+
+        if (!TextUtils.isEmpty(newUserId)
+                && !TextUtils.isEmpty(mLatestNonNullUserId)
+                && !newUserId.equals(mLatestNonNullUserId)) {
+            String sessionId = refreshSessionId();
+            long eventTime = System.currentTimeMillis();
+            mIPC.setLastResumeTime(eventTime);
+            generateVisit(sessionId, eventTime);
+        }
+
+        if (!TextUtils.isEmpty(newUserId)) {
+            mLatestNonNullUserId = newUserId;
         }
     }
 }

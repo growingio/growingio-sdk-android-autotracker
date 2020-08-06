@@ -24,15 +24,15 @@ import android.util.Log;
 
 import com.growingio.android.sdk.track.crash.CrashManager;
 import com.growingio.android.sdk.track.crash.CrashUtil;
+import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.interfaces.IGrowingTracker;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
-import com.growingio.android.sdk.track.providers.EventCoreGeneratorProvider;
-import com.growingio.android.sdk.track.providers.ProjectInfoProvider;
-import com.growingio.android.sdk.track.providers.SendPolicyProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
+import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
@@ -45,7 +45,9 @@ public class GrowingTracker implements IGrowingTracker {
     static final String TAG = "GrowingIO";
 
     private static IGrowingTracker sInstance;
-    GIOMainThread mGioMain;
+    private static volatile boolean sInitSucceeded = false;
+
+    private TrackMainThread mTrackMainThread;
 
     public static IGrowingTracker getInstance() {
         if (sInstance != null) {
@@ -57,6 +59,10 @@ public class GrowingTracker implements IGrowingTracker {
             }
             return makeEmpty();
         }
+    }
+
+    public static boolean isInitSucceeded() {
+        return sInitSucceeded;
     }
 
     public static IGrowingTracker startWithConfiguration(Application application, TrackConfiguration trackConfiguration) {
@@ -73,6 +79,14 @@ public class GrowingTracker implements IGrowingTracker {
         }
         ContextProvider.setContext(application);
 
+        if (TextUtils.isEmpty(trackConfiguration.getProjectId())) {
+            throw new IllegalStateException("ProjectId is NULL");
+        }
+
+        if (TextUtils.isEmpty(trackConfiguration.getUrlScheme())) {
+            throw new IllegalStateException("UrlScheme is NULL");
+        }
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
             Log.e(TAG, "GrowingIO 暂不支持Android 4.2以下版本");
             return makeEmpty();
@@ -81,13 +95,15 @@ public class GrowingTracker implements IGrowingTracker {
             throw new IllegalStateException("GrowingIO.startWithConfiguration必须在主线程中调用。");
         }
 
+        ConfigurationProvider.get().setTrackConfiguration(trackConfiguration);
+
         if (trackConfiguration.isLogEnabled()) {
             LogUtil.add(LogUtil.DebugUtil.getInstance());
         } else {
             LogUtil.add(LogUtil.ReleaseUitl.getInstance());
         }
 
-        if (trackConfiguration.isUploadExceptionEnable()) {
+        if (trackConfiguration.isUploadExceptionEnabled()) {
             CrashManager.register(application);
             LogUtil.add(CrashUtil.getInstance());
         }
@@ -95,12 +111,7 @@ public class GrowingTracker implements IGrowingTracker {
         if (initExtraOperation == null) {
             initExtraOperation = new InitExtraOperation() {
                 @Override
-                public boolean requireWaitForCompletion() {
-                    return false;
-                }
-
-                @Override
-                public void init() {
+                public void initializing() {
                 }
 
                 @Override
@@ -108,64 +119,38 @@ public class GrowingTracker implements IGrowingTracker {
                 }
             };
         }
-
-        if (initExtraOperation.requireWaitForCompletion()) {
-            GIOMainThread.initWaitLock();
-        }
 /*
         if (configuration.isUploadExceptionEnable()){
             CrashManager.register(application);
         }*/
 
-        initAccountInfoProvider(trackConfiguration);
+        GrowingTracker tracker = new GrowingTracker();
 
-        GrowingTracker result = new GrowingTracker();
+        // ActivityState优先级最高
+        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
+
         try {
-            InitTrackSDKInUICallback.InitTrackSDKInUIPolicy.get(application).initSDK(result);
-            initExtraOperation.init();
-            GIOMainThread.releaseWaitLock();
+            initExtraOperation.initializing();
         } catch (Throwable e) {
-            if (GConfig.getInstance().debug()) {
+            if (trackConfiguration.isLogEnabled()) {
                 throw e;
             }
             LogUtil.e(TAG, e, "初始化SDK失败");
             return makeEmpty();
         }
         initExtraOperation.initSuccess();
-        initConfiguration(result, trackConfiguration);
-        sInstance = result;
+        initCoreService();
+        tracker.mTrackMainThread = TrackMainThread.trackMain();
+        sInstance = tracker;
 
+        sInitSucceeded = true;
         Log.i(TAG, "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!");
-        Log.i(TAG, "!!! GrowingIO version: " + GConfig.SDK_VERSION + " !!!");
+        Log.i(TAG, "!!! GrowingIO Tracker version: " + SDKConfig.SDK_VERSION + " !!!");
         return sInstance;
     }
 
-    private static void initAccountInfoProvider(TrackConfiguration trackConfiguration) {
-        if (!TextUtils.isEmpty(trackConfiguration.getProjectId())) {
-            ProjectInfoProvider.AccountInfoPolicy.get().setProjectId(trackConfiguration.getProjectId());
-        }
-
-        if (!TextUtils.isEmpty(trackConfiguration.getChannel())) {
-            ProjectInfoProvider.AccountInfoPolicy.get().setChannel(trackConfiguration.getChannel());
-        }
-
-        if (!TextUtils.isEmpty(trackConfiguration.getUrlScheme())) {
-            ProjectInfoProvider.AccountInfoPolicy.get().setUrlScheme(trackConfiguration.getUrlScheme());
-        }
-    }
-
-    private static void initConfiguration(GrowingTracker gio, TrackConfiguration trackConfiguration) {
-        if (trackConfiguration.getSessionInterval() > 1e-8) {
-            SessionProvider.SessionPolicy.get(gio.mGioMain.getCoreAppState()).setSessionInterval(trackConfiguration.getSessionInterval());
-        }
-
-        if (trackConfiguration.getCellularDataLimit() > 0) {
-            SendPolicyProvider.SendPolicy.get().setCellularDataLimit(trackConfiguration.getCellularDataLimit());
-        }
-
-        if (trackConfiguration.getDataUploadInterval() > 1e-8) {
-            SendPolicyProvider.SendPolicy.get().setFlushInterval(trackConfiguration.getDataUploadInterval());
-        }
+    private static void initCoreService() {
+        TrackMainThread.trackMain().register(SessionProvider.get());
     }
 
     private static IGrowingTracker makeEmpty() {
@@ -181,40 +166,34 @@ public class GrowingTracker implements IGrowingTracker {
         });
     }
 
-    static void initSDK(Application application, GrowingTracker gio) {
-        // ActivityState优先级最高
-        application.registerActivityLifecycleCallbacks((Application.ActivityLifecycleCallbacks) ActivityStateProvider.ActivityStatePolicy.get());
-        gio.mGioMain = new GIOMainThread(application.getApplicationContext());
-    }
-
     @Override
     public IGrowingTracker trackCustomEvent(String eventName, Map<String, String> attributes) {
-        eventCoreGenerator().generateCustomEvent(eventName, attributes);
+        TrackEventGenerator.generateCustomEvent(eventName, attributes);
         return this;
     }
 
     @Override
     public IGrowingTracker setConversionVariables(Map<String, String> variables) {
-        eventCoreGenerator().generateConversionVariablesEvent(variables);
+        TrackEventGenerator.generateConversionVariablesEvent(variables);
         return this;
     }
 
     @Override
     public IGrowingTracker setLoginUserAttributes(Map<String, String> attributes) {
-        eventCoreGenerator().generateLoginUserAttributesEvent(attributes);
+        TrackEventGenerator.generateLoginUserAttributesEvent(attributes);
         return this;
     }
 
     @Override
     public IGrowingTracker setVisitorAttributes(Map<String, String> attributes) {
-        eventCoreGenerator().generateVisitorAttributesEvent(attributes);
+        TrackEventGenerator.generateVisitorAttributesEvent(attributes);
         return this;
     }
 
     @Override
     public IGrowingTracker getDeviceId(@NonNull ResultCallback<String> callback) {
         if (callback != null) {
-            DeviceInfoProvider.DeviceInfoPolicy.get(mGioMain.getContext()).getDeviceId(callback);
+            DeviceInfoProvider.get().getDeviceId(callback);
         } else {
             Log.e(TAG, "getDeviceId was called, but callback is null, return");
         }
@@ -223,43 +202,59 @@ public class GrowingTracker implements IGrowingTracker {
 
     @Override
     public IGrowingTracker setDataCollectionEnabled(boolean enabled) {
-        if (enabled == GConfig.getInstance().isEnableDataCollect()) {
+        if (enabled == ConfigurationProvider.get().isDataCollectionEnabled()) {
             LogUtil.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
         } else {
-            GConfig.getInstance().setIsEnableDataCollect(enabled);
+            ConfigurationProvider.get().setDataCollectionEnabled(true);
             if (enabled) {
-                SessionProvider.SessionPolicy.get(mGioMain.getCoreAppState()).forceReissueVisit();
+                SessionProvider.get().forceReissueVisit();
             }
         }
 
         return this;
     }
 
-    private EventCoreGeneratorProvider eventCoreGenerator() {
-        return EventCoreGeneratorProvider.EventCoreGenerator.get(mGioMain.getCoreAppState());
-    }
-
     @Override
-    public IGrowingTracker setLoginUserId(String userId) {
-        mGioMain.setUserIdToGMain(userId);
+    public IGrowingTracker setLoginUserId(final String userId) {
+        mTrackMainThread.postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                UserInfoProvider.get().setUserId(userId);
+            }
+        });
         return this;
     }
 
     @Override
     public IGrowingTracker cleanLoginUserId() {
-        mGioMain.setUserIdToGMain(null);
+        mTrackMainThread.postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                UserInfoProvider.get().setUserId(null);
+            }
+        });
         return this;
     }
 
     @Override
-    public IGrowingTracker setLocation(Double latitude, Double longitude) {
-        mGioMain.setLocationToGMain(latitude, longitude);
+    public IGrowingTracker setLocation(final double latitude, final double longitude) {
+        mTrackMainThread.postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                SessionProvider.get().setLocation(latitude, longitude);
+            }
+        });
         return this;
     }
 
     @Override
     public IGrowingTracker cleanLocation() {
-        mGioMain.setLocationToGMain(null, null);
+        mTrackMainThread.postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                SessionProvider.get().cleanLocation();
+            }
+        });
         return this;
     }
 }

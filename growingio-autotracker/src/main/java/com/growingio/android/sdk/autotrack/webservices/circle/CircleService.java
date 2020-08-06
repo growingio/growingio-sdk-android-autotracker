@@ -61,11 +61,11 @@ public class CircleService implements ScreenshotProvider.OnScreenshotRefreshedLi
     }
 
     private void registerScreenshotRefreshedListener() {
-        ScreenshotProvider.ScreenshotPolicy.get().registerScreenshotRefreshedListener(this);
+        ScreenshotProvider.get().registerScreenshotRefreshedListener(this);
     }
 
     public void destroy() {
-        ScreenshotProvider.ScreenshotPolicy.get().unregisterScreenshotRefreshedListener(this);
+        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
     }
 
     @Override

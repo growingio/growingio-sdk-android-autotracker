@@ -26,7 +26,7 @@ import com.growingio.android.sdk.autotrack.hybrid.SuperWebView;
 import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
-import com.growingio.android.sdk.autotrack.util.DeviceUtil;
+import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
 import com.growingio.android.sdk.autotrack.util.ViewHelper;
 import com.growingio.android.sdk.autotrack.util.WindowHelper;
@@ -178,7 +178,7 @@ public class CircleScreenshot {
                     .setContent("xxx")
                     .setContainer(true)
                     .setNodeType("xxxx")
-                    .setPage(PageProvider.PagePolicy.get().findPage(view).path())
+                    .setPage(PageProvider.get().findPage(view).path())
                     .setParentXPath(viewNode.parentXPath.toStringValue())
                     .setXpath(viewNode.parentXPath.toStringValue())
                     .setZLevel(mViewCount++);
@@ -186,7 +186,7 @@ public class CircleScreenshot {
 
         private void getWebViewDomTree(final SuperWebView<?> webView) {
             mWebViewCount.incrementAndGet();
-            HybridBridgeProvider.HybridBridgePolicy.get().getWebViewDomTree(webView, new Callback<JSONObject>() {
+            HybridBridgeProvider.get().getWebViewDomTree(webView, new Callback<JSONObject>() {
                 @Override
                 public void onSuccess(JSONObject result) {
                     ViewElement.Builder elementBuilder = createViewElementBuilder(webView.getRealWebView());

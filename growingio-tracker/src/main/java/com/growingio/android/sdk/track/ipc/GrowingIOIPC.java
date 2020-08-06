@@ -19,10 +19,11 @@ package com.growingio.android.sdk.track.ipc;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Process;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.GConfig;
 import com.growingio.android.sdk.track.utils.LogUtil;
 
 import java.io.File;
@@ -41,16 +42,17 @@ public class GrowingIOIPC {
 
     // 按照既定顺序， 如果需要更改字节码的排序， 需要将ipc文件升级版本， 并且需要编写迁移代码, 类似数据库
     @VisibleForTesting
-    int mSessionIndex = -1;       // 0     String(10)
-    int mUserIdIndex = -1;        // 1     String(1000)
-    int mLastPauseTimeIndex = -1; // 2     long
-    int mLastResumeTimeIndex = -1; // 3     long
+    int mSessionIndex = -1;        // 0     String(10)
+    int mUserIdIndex = -1;         // 1     String(1000)
+    int mDeviceIdIndex = -1;       // 2     String(1000)
+    int mLastPauseTimeIndex = -1;  // 3     long
+    int mLastResumeTimeIndex = -1; // 4     long
 
-    public void init(Context context, GConfig config) {
-        File dirFile = new File(context.getFilesDir(), ".gio.dir");
+    public GrowingIOIPC(Context context) {
+        File dirFile = new File(context.getFilesDir(), ".gio3.dir");
         if (!dirFile.exists())
             dirFile.mkdirs();
-        File ipcFile = new File(dirFile, "gio.core.ipc.1");
+        File ipcFile = new File(dirFile, "gio3.core.ipc.1");
         mVariableSharer = new VariableSharer(ipcFile, true, Process.myPid());
         long startTime = System.currentTimeMillis();
         initVariableVersion1(context);
@@ -63,8 +65,10 @@ public class GrowingIOIPC {
         /* 1 */
         mUserIdIndex = mVariableSharer.addVariableEntity(VariableEntity.createStringVariable("userId", 1000));
         /* 2 */
-        mLastPauseTimeIndex = mVariableSharer.addVariableEntity(VariableEntity.createLongVariable("lastPauseTime"));
+        mDeviceIdIndex = mVariableSharer.addVariableEntity(VariableEntity.createStringVariable("deviceId", 1000));
         /* 3 */
+        mLastPauseTimeIndex = mVariableSharer.addVariableEntity(VariableEntity.createLongVariable("lastPauseTime"));
+        /* 4 */
         mLastResumeTimeIndex = mVariableSharer.addVariableEntity(VariableEntity.createLongVariable("lastResumeTime"));
 
 
@@ -99,6 +103,17 @@ public class GrowingIOIPC {
 
     public void setSessionId(String sessionId) {
         mVariableSharer.putStringByIndex(mSessionIndex, sessionId);
+    }
+
+    public String getDeviceId() {
+        return mVariableSharer.getStringByIndex(mDeviceIdIndex);
+    }
+
+    public void setDeviceId(@NonNull String deviceId) {
+        if (TextUtils.isEmpty(deviceId)) {
+            return;
+        }
+        mVariableSharer.putStringByIndex(mDeviceIdIndex, deviceId);
     }
 
     public String getUserId() {

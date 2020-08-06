@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
 import com.growingio.android.sdk.autotrack.events.base.BasePageAttributesEvent;
-import com.growingio.android.sdk.track.CoreAppState;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,8 +48,8 @@ public final class HybridPageAttributesEvent extends BasePageAttributesEvent {
     public static class EventBuilder extends BasePageAttributesEvent.EventBuilder<HybridPageAttributesEvent> {
         private String mQueryParameters;
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
         }
 
         public String getQueryParameters() {

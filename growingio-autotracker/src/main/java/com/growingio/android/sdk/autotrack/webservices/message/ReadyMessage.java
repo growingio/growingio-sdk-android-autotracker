@@ -19,10 +19,10 @@ package com.growingio.android.sdk.autotrack.webservices.message;
 import android.content.Context;
 import android.util.DisplayMetrics;
 
-import com.growingio.android.sdk.autotrack.util.DeviceUtil;
+import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.track.GConfig;
-import com.growingio.android.sdk.track.providers.ProjectInfoProvider;
+import com.growingio.android.sdk.track.SDKConfig;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,10 +55,10 @@ public class ReadyMessage {
 
     public static ReadyMessage createMessage() {
         Context context = ContextProvider.getApplicationContext();
-        String projectId = ProjectInfoProvider.AccountInfoPolicy.get().getProjectId();
-        String domain = ProjectInfoProvider.AccountInfoPolicy.get().getPackageName(context);
-        String sdkVersion = GConfig.SDK_VERSION;
-        int sdkVersionCode = GConfig.SDK_VERSION_CODE;
+        String projectId = ConfigurationProvider.get().getTrackConfiguration().getProjectId();
+        String domain = ConfigurationProvider.get().getPackageName();
+        String sdkVersion = SDKConfig.SDK_VERSION;
+        int sdkVersionCode = SDKConfig.SDK_VERSION_CODE;
 
         DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
         return new ReadyMessage(projectId, domain, sdkVersion, sdkVersionCode, metrics.widthPixels, metrics.heightPixels);

@@ -16,98 +16,69 @@
 
 package com.growingio.android.sdk.track.providers;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.ErrorLog;
-import com.growingio.android.sdk.track.interfaces.GMainThread;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
-import com.growingio.android.sdk.track.utils.GIOProviders;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 
-public interface UserInfoProvider {
+public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener, String> {
+    private static final String TAG = "UserInfoPolicy";
+    private final GrowingIOIPC mGrowingIOIPC;
 
-    /**
-     * @return 当前客户设置的UserId 即cs1
-     */
-    @GMainThread
-    String getUserId();
+    private static class SingleInstance {
+        private static final UserInfoProvider INSTANCE = new UserInfoProvider();
+    }
 
-    /**
-     * 客户调用setUserId后会调用此方法
-     *
-     * @param userId 需要设置的userId， null -- 表示clearUserId
-     */
-    @GMainThread
-    void setUserId(String userId);
+    private UserInfoProvider() {
+        mGrowingIOIPC = PersistentDataProvider.get().getIPC();
+    }
 
-    void registerUserIdChangedListener(OnUserIdChangedListener l);
+    public static UserInfoProvider get() {
+        return SingleInstance.INSTANCE;
+    }
 
-    void unregisterUserIdChangedListener(OnUserIdChangedListener l);
+    public String getUserId() {
+        return mGrowingIOIPC.getUserId();
+    }
 
-    class UserInfoPolicy extends ListenerContainer<OnUserIdChangedListener, String> implements UserInfoProvider {
-        private static final String TAG = "GIO.UserInfoProvider";
-        private GrowingIOIPC mGrowingIOIPC;
-
-        public UserInfoPolicy(CoreAppState coreAppState) {
-            mGrowingIOIPC = coreAppState.getGrowingIOIPC();
+    public void setUserId(String userId) {
+        if (TextUtils.isEmpty(userId)) {
+            // to null, never send visit, just return
+            mGrowingIOIPC.setUserId(null);
+            dispatchActions(null);
+            return;
         }
 
-        public static UserInfoProvider get(@NonNull final CoreAppState coreAppState) {
-            return GIOProviders.provider(UserInfoProvider.class, new GIOProviders.DefaultCallback<UserInfoProvider>() {
-                @Override
-                public UserInfoProvider value() {
-                    return new UserInfoPolicy(coreAppState);
-                }
-            });
+        if (userId.length() > 1000) {
+            LogUtil.e(TAG, ErrorLog.USER_ID_TOO_LONG);
+            return;
         }
 
-        @Override
-        public String getUserId() {
-            return mGrowingIOIPC.getUserId();
+        // to non-null
+        String oldUserId = getUserId();
+        if (ObjectUtils.equals(userId, oldUserId)) {
+            LogUtil.d(TAG, "setUserId, but the userId is same as the old userId, just return");
+            return;
         }
+        mGrowingIOIPC.setUserId(userId);
+        dispatchActions(userId);
+    }
 
-        @Override
-        public void setUserId(String userId) {
-            if (TextUtils.isEmpty(userId)) {
-                // to null, never send visit, just return
-                mGrowingIOIPC.setUserId(null);
-                dispatchActions(null);
-                return;
-            }
+    public void registerUserIdChangedListener(OnUserIdChangedListener l) {
+        register(l);
+    }
 
-            if (userId.length() > 1000) {
-                LogUtil.e(TAG, ErrorLog.USER_ID_TOO_LONG);
-                return;
-            }
+    public void unregisterUserIdChangedListener(OnUserIdChangedListener l) {
+        unregister(l);
+    }
 
-            // to non-null
-            String oldUserId = getUserId();
-            if (ObjectUtils.equals(userId, oldUserId)) {
-                LogUtil.d(TAG, "setUserId, but the userId is same as the old userId, just return");
-                return;
-            }
-            mGrowingIOIPC.setUserId(userId);
-            dispatchActions(userId);
-        }
-
-        @Override
-        public void registerUserIdChangedListener(OnUserIdChangedListener l) {
-            register(l);
-        }
-
-        @Override
-        public void unregisterUserIdChangedListener(OnUserIdChangedListener l) {
-            unregister(l);
-        }
-
-        @Override
-        protected void singleAction(OnUserIdChangedListener listener, String action) {
-            listener.onUserIdChanged(action);
-        }
+    @Override
+    protected void singleAction(OnUserIdChangedListener listener, String action) {
+        listener.onUserIdChanged(action);
     }
 }

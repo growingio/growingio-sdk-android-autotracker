@@ -61,7 +61,7 @@ public interface IGrowingTracker {
 
     IGrowingTracker cleanLoginUserId();
 
-    IGrowingTracker setLocation(Double latitude, Double longitude);
+    IGrowingTracker setLocation(double latitude, double longitude);
 
     IGrowingTracker cleanLocation();
 }

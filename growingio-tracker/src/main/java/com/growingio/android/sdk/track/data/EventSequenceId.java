@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track;
+package com.growingio.android.sdk.track.data;
 
-public class GIOException extends RuntimeException {
+public class EventSequenceId {
+    private final int mGlobalId;
+    private final int mEventTypeId;
 
-    public GIOException(String message) {
-        super(message);
+    public EventSequenceId(int globalId, int eventId) {
+        mGlobalId = globalId;
+        mEventTypeId = eventId;
     }
 
-    public GIOException(Throwable t) {
-        super(t);
+    public int getGlobalId() {
+        return mGlobalId;
+    }
+
+    public int getEventTypeId() {
+        return mEventTypeId;
     }
 }

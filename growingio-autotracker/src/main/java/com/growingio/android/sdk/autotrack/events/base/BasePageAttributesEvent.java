@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.events.base;
 
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.EventType;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
@@ -56,8 +55,8 @@ public abstract class BasePageAttributesEvent extends BaseAttributesEvent {
         private String mPageName;
         private long mPageShowTimestamp;
 
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
         }
 
         public String getPageName() {

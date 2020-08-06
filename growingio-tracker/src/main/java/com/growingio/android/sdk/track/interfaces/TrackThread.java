@@ -34,5 +34,5 @@ import static java.lang.annotation.ElementType.TYPE;
 @Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target({METHOD, CONSTRUCTOR, TYPE, PARAMETER, FIELD})
-public @interface GMainThread {
+public @interface TrackThread {
 }

@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.events;
 
 import com.growingio.android.sdk.autotrack.events.base.BaseViewElementEvent;
-import com.growingio.android.sdk.track.CoreAppState;
 import com.growingio.android.sdk.track.events.EventType;
 
 public final class ViewElementEvent extends BaseViewElementEvent {
@@ -28,8 +27,8 @@ public final class ViewElementEvent extends BaseViewElementEvent {
     }
 
     public static final class EventBuilder extends BaseViewElementEvent.EventBuilder<ViewElementEvent> {
-        public EventBuilder(CoreAppState coreAppState) {
-            super(coreAppState);
+        public EventBuilder() {
+            super();
         }
 
         @Override

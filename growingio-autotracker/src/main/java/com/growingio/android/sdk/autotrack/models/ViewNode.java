@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewParent;
 
 import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
-import com.growingio.android.sdk.track.GConfig;
 import com.growingio.android.sdk.track.utils.LinkedString;
 import com.growingio.android.sdk.track.utils.LogUtil;
 
@@ -60,10 +59,6 @@ public class ViewNode {
         this.parentXPath = parentXPath;
         originalParentXpath = originalParentXPath;
         this.windowPrefix = windowPrefix;
-
-        if (GConfig.getInstance().isRnMode() && GConfig.getInstance().useRnOptimizedPath() && this.view != null) {
-            identifyRNChangeablePath();
-        }
     }
 
     @Override

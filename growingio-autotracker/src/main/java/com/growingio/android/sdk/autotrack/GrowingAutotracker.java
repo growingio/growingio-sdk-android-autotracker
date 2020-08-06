@@ -26,22 +26,12 @@ import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
-import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
-import com.growingio.android.sdk.autotrack.variation.AutotrackEventJsonMarshaller;
-import com.growingio.android.sdk.track.GConfig;
-import com.growingio.android.sdk.track.GInternal;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.ListenerContainer;
-import com.growingio.android.sdk.track.interfaces.IActionCallback;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
-import com.growingio.android.sdk.track.providers.EventSenderProvider;
-import com.growingio.android.sdk.track.utils.ArgumentChecker;
 import com.growingio.android.sdk.track.utils.LogUtil;
-import com.growingio.android.sdk.track.variation.EventHttpSender;
-import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -71,12 +61,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     public static IGrowingAutotracker startWithConfiguration(Application application, AutotrackConfiguration autotrackConfiguration) {
         GrowingTracker.startWithConfiguration(application, autotrackConfiguration, new InitExtraOperation() {
             @Override
-            public boolean requireWaitForCompletion() {
-                return true;
-            }
-
-            @Override
-            public void init() {
+            public void initializing() {
                 initAutotrackSDKInUI();
             }
 
@@ -85,10 +70,6 @@ public class GrowingAutotracker implements IGrowingAutotracker {
                 sInitSuccess = true;
             }
         });
-
-        ImpressionConfig.setVisibleScale(autotrackConfiguration.getImpressionScale());
-
-        ScreenshotProvider.ScreenshotPolicy.get();
         if (sInitSuccess) {
             return sInstance;
         } else {
@@ -113,17 +94,12 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     private static void initAutotrackSDKInUI() {
-        GConfig.getInstance().checkVersion(GrowingAutotracker.class.getSimpleName(),
-                BuildConfig.VERSION_NAME);
-
         GrowingAutotracker autotrack = new GrowingAutotracker();
         autotrack.mAutotrackAppState = new AutotrackAppState();
         ListenerContainer.gioMainInitSDKListeners().register(autotrack.mAutotrackAppState);
-        EventSenderProvider.EventSenderPolicy.get().registerEventSender(new EventHttpSender(new AutotrackEventJsonMarshaller()));
-        PageProvider.PagePolicy.get().start();
+        PageProvider.get().start();
 
         sInstance = autotrack;
-        GConfig.getInstance().setInitSucceeded(true);
         LogUtil.d(TAG, "Autotrackrt module init success in ui thread");
     }
 
@@ -176,7 +152,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingAutotracker setLocation(Double latitude, Double longitude) {
+    public IGrowingAutotracker setLocation(double latitude, double longitude) {
         GrowingTracker.getInstance().setLocation(latitude, longitude);
         return this;
     }
@@ -187,92 +163,57 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         return this;
     }
 
-
     @Override
     public IGrowingAutotracker setUniqueTag(final View view, final String tag) {
-        final WeakReference<View> weakView = new WeakReference<>(view);
-        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
-            @Override
-            public void action() {
-                ViewAttributeUtil.setCustomId(weakView.get(), tag);
-            }
-        });
         return this;
     }
 
     @Override
     public IGrowingAutotracker setPageAttributes(final Activity activity, final Map<String, String> attributes) {
-        PageProvider.PagePolicy.get().setPageAttributes(activity, attributes);
+        PageProvider.get().setPageAttributes(activity, attributes);
         return this;
     }
 
     @Override
     public IGrowingAutotracker setPageAttributes(final Fragment fragment, final Map<String, String> attributes) {
-        PageProvider.PagePolicy.get().setPageAttributes(SuperFragment.make(fragment), attributes);
+        PageProvider.get().setPageAttributes(SuperFragment.make(fragment), attributes);
         return this;
     }
 
     @Override
     public IGrowingAutotracker trackViewImpression(final ImpressionConfig config) {
-        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
-            @Override
-            public void action() {
-                if (ArgumentChecker.isIllegalEventName(config.getEventName())) {
-                    return;
-                }
-                AutotrackAppState.impObserver().markViewImpression(config);
-            }
-        });
-
         return this;
     }
 
     @Override
     public IGrowingAutotracker stopTrackViewImpression(final View trackedView) {
-        final WeakReference<View> weakView = new WeakReference<>(trackedView);
-        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
-            @Override
-            public void action() {
-                AutotrackAppState.impObserver().stopStampViewImp(weakView.get());
-            }
-        });
-
         return this;
     }
 
     @Override
     public IGrowingAutotracker setPageAlias(final Activity activity, final String alias) {
-        PageProvider.PagePolicy.get().setActivityAlias(activity, alias);
+        PageProvider.get().setActivityAlias(activity, alias);
         return this;
     }
 
     @Override
     public IGrowingAutotracker setPageAlias(final Fragment fragment, final String alias) {
-        PageProvider.PagePolicy.get().setFragmentAlias(SuperFragment.make(fragment), alias);
+        PageProvider.get().setFragmentAlias(SuperFragment.make(fragment), alias);
         return this;
     }
 
     @Override
     public IGrowingAutotracker ignorePage(final Activity activity, final IgnorePolicy policy) {
-        PageProvider.PagePolicy.get().addActivityWithIgnorePolicy(activity, policy);
         return this;
     }
 
     @Override
     public IGrowingAutotracker ignorePage(final Fragment fragment, final IgnorePolicy policy) {
-        PageProvider.PagePolicy.get().addFragmentWithIgnorePolicy(SuperFragment.make(fragment), policy);
         return this;
     }
 
     @Override
     public IGrowingAutotracker ignoreView(final View view, final IgnorePolicy policy) {
-        final WeakReference<View> weakView = new WeakReference<>(view);
-        GInternal.getInstance().getMainThread().postActionToGMain(new IActionCallback() {
-            @Override
-            public void action() {
-                ViewAttributeUtil.setIgnoreViewKey(weakView.get(), policy);
-            }
-        });
         return this;
     }
 

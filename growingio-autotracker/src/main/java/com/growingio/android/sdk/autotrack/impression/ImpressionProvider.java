@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.events;
+package com.growingio.android.sdk.autotrack.impression;
 
-import com.growingio.android.sdk.autotrack.events.base.BasePageEvent;
+import com.growingio.android.sdk.track.listener.IActivityLifecycle;
+import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 
-public class PageEvent extends BasePageEvent {
-    private static final long serialVersionUID = 1L;
+public interface ImpressionProvider {
 
-    protected PageEvent(EventBuilder eventBuilder) {
-        super(eventBuilder);
-    }
 
-    public static class EventBuilder extends BasePageEvent.EventBuilder<PageEvent> {
-
-        EventBuilder() {
-            super();
-        }
+    class ImpressionPolicy implements ImpressionProvider, IActivityLifecycle {
 
         @Override
-        public PageEvent build() {
-            return new PageEvent(this);
+        public void onActivityLifecycle(ActivityLifecycleEvent event) {
+
         }
     }
 }

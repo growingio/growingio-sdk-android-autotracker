@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.models;
+package com.growingio.android.sdk.track.data;
 
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class EventSID implements Serializable {
+public class EventSequenceIdMap implements Serializable {
 
     private final HashMap<String, Integer> mData = new HashMap<>();
 
-    public EventSID() {
+    public EventSequenceIdMap() {
     }
 
-    public int getSid(String type) {
+    public int getSequenceId(String type) {
         Integer sid = mData.get(type);
         if (sid == null) {
             return 1;
@@ -35,7 +35,7 @@ public class EventSID implements Serializable {
         }
     }
 
-    public EventSID setSid(String type, int sid) {
+    public EventSequenceIdMap setSequenceId(String type, int sid) {
         mData.put(type, sid);
         return this;
     }

@@ -20,13 +20,13 @@ import android.content.Context;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
-import com.growingio.android.sdk.track.base.BuildConfig;
 import com.growingio.android.sdk.monitor.Monitor;
 import com.growingio.android.sdk.monitor.MonitorClient;
 import com.growingio.android.sdk.monitor.analysis.Analysed;
 import com.growingio.android.sdk.monitor.analysis.Analyser;
 import com.growingio.android.sdk.monitor.analysis.GIOAnalyser;
 import com.growingio.android.sdk.monitor.event.EventBuilder;
+import com.growingio.android.sdk.track.base.BuildConfig;
 
 /**
  * 异常捕获并上报
@@ -71,10 +71,7 @@ public class CrashManager {
             });
             client.setRelease(BuildConfig.VERSION_NAME);
 
-//            if (CoreInitialize.coreAppState() != null) {
-//                client.getContext().addTag(PROJECT_ID, CoreInitialize.coreAppState().getProjectId());
-//                client.getContext().setUser(new User(CoreInitialize.deviceUUIDFactory().getDeviceId(), CoreInitialize.config().getAppUserId()));
-//            }
+            // TODO: 2020/8/5 添加设备信息
             sEnabled = true;
         }
     }

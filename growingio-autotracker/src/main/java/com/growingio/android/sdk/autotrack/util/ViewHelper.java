@@ -36,9 +36,8 @@ import com.growingio.android.sdk.autotrack.events.base.BaseViewElement;
 import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
-import com.growingio.android.sdk.track.GConfig;
-import com.growingio.android.sdk.track.GIOMainThread;
-import com.growingio.android.sdk.track.GInternal;
+import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.EventType;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -143,10 +142,10 @@ public class ViewHelper {
     }
 
     public static ViewNode getClickViewNode(View view) {
-        if (!GConfig.getInstance().isEnabled() || view == null) {
+        if (view == null) {
             return null;
         }
-        Activity activity = ActivityStateProvider.ActivityStatePolicy.get().getForegroundActivity();
+        Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null || Util.isIgnoredView(view)) {
             return null;
         }
@@ -165,17 +164,14 @@ public class ViewHelper {
             return null;
         }
 
-        if (!GConfig.getInstance().isEnabled()) {
-            return null;
-        }
-        Activity activity = ActivityStateProvider.ActivityStatePolicy.get().getForegroundActivity();
+        Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null || Util.isIgnoredView(viewNode.view)) {
             return null;
         }
 
-        ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder(GInternal.getInstance().getMainThread().getCoreAppState());
+        ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder();
         event.setEventType(EventType.CLICK);
-        Page<?> page = PageProvider.PagePolicy.get().findPage(viewNode.view);
+        Page<?> page = PageProvider.get().findPage(viewNode.view);
         event.addElementBuilders(viewNodeToElementBuilders(viewNode))
                 .setPageName(page.path())
                 .setPageShowTimestamp(page.getShowTimestamp());
@@ -230,15 +226,13 @@ public class ViewHelper {
         if (!WindowHelper.isDecorView(rootView) && !(rootView.getParent() instanceof View)) {
             opx += "/" + Util.getSimpleClassName(rootView.getClass());
             px = opx;
-            if (GConfig.getInstance().useID()) {
-                String id = Util.getIdName(rootView, mParentIdSettled);
-                if (id != null) {
-                    if (ViewAttributeUtil.getViewId(rootView) != null) {
-                        mParentIdSettled = true;
-                    }
-                    opx += "#" + id;
-                    px += "#" + id;
+            String id = Util.getIdName(rootView, mParentIdSettled);
+            if (id != null) {
+                if (ViewAttributeUtil.getViewId(rootView) != null) {
+                    mParentIdSettled = true;
                 }
+                opx += "#" + id;
+                px += "#" + id;
             }
         } else if (ViewAttributeUtil.getCustomId(rootView) != null) {
             opx = "/" + ViewAttributeUtil.getCustomId(rootView);
@@ -333,15 +327,13 @@ public class ViewHelper {
                             px = px + "/" + viewName + "[" + viewPosition + "]";
                         }
                     }
-                    if (GConfig.getInstance().useID()) {
-                        String id = Util.getIdName(childView, mParentIdSettled);
-                        if (id != null) {
-                            if (ViewAttributeUtil.getViewId(childView) != null) {
-                                mParentIdSettled = true;
-                            }
-                            opx += "#" + id;
-                            px += "#" + id;
+                    String id = Util.getIdName(childView, mParentIdSettled);
+                    if (id != null) {
+                        if (ViewAttributeUtil.getViewId(childView) != null) {
+                            mParentIdSettled = true;
                         }
+                        opx += "#" + id;
+                        px += "#" + id;
                     }
                 }
 
@@ -383,10 +375,7 @@ public class ViewHelper {
     }
 
     public static void persistClickEvent(BaseEvent.BaseEventBuilder<?> click) {
-        GIOMainThread mainThread = GInternal.getInstance().getMainThread();
-        if (mainThread != null) {
-            mainThread.postEventToGMain(click);
-        }
+        TrackMainThread.trackMain().postEventToTrackMain(click);
     }
 
     private static View findMenuItemView(View view, MenuItem item) throws InvocationTargetException, IllegalAccessException {
@@ -418,7 +407,7 @@ public class ViewHelper {
     }
 
     public static void changeOn(View view) {
-        if (!GConfig.getInstance().isInitSucceeded() || !GConfig.getInstance().isEnabled()) {
+        if (!GrowingTracker.isInitSucceeded()) {
             return;
         }
         Activity activity = ActivityUtil.findActivity(view.getContext());
@@ -436,16 +425,13 @@ public class ViewHelper {
             return;
         }
 
-        GIOMainThread mainThread = GInternal.getInstance().getMainThread();
-        if (mainThread != null) {
-            ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder(mainThread.getCoreAppState());
-            Page<?> page = PageProvider.PagePolicy.get().findPage(viewNode.view);
-            event.setEventType(EventType.CHANGE)
-                    .addElementBuilders(viewNodeToElementBuilders(viewNode))
-                    .setPageName(page.path())
-                    .setPageShowTimestamp(page.getShowTimestamp());
-            mainThread.postEventToGMain(event);
-        }
+        ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder();
+        Page<?> page = PageProvider.get().findPage(viewNode.view);
+        event.setEventType(EventType.CHANGE)
+                .addElementBuilders(viewNodeToElementBuilders(viewNode))
+                .setPageName(page.path())
+                .setPageShowTimestamp(page.getShowTimestamp());
+        TrackMainThread.trackMain().postEventToTrackMain(event);
     }
 
     private static List<BaseViewElement.BaseElementBuilder<?>> viewNodeToElementBuilders(ViewNode viewNode) {

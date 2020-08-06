@@ -20,10 +20,7 @@ import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
 
-import androidx.annotation.NonNull;
-
-import com.growingio.android.sdk.track.GIOMainThread;
-import com.growingio.android.sdk.track.GInternal;
+import com.growingio.android.sdk.track.TrackMainThread;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -39,7 +36,6 @@ public class ThreadUtils {
     private static boolean sWillOverride = false;
 
     private static Handler sUiThreadHandler = null;
-    private static Handler sGIOMainThreadHandler = null;
 
     private ThreadUtils() {
     }
@@ -224,26 +220,7 @@ public class ThreadUtils {
         return getUiThreadHandler().getLooper();
     }
 
-    public static boolean runningOnGIOMainThread() {
-        GIOMainThread mainThread = GInternal.getInstance().getMainThread();
-        return mainThread != null && mainThread.getMainLooper() == Looper.myLooper();
-    }
-
-    public static void postOnGIOMainThread(@NonNull Runnable runnable) {
-        if (runningOnGIOMainThread()) {
-            runnable.run();
-        } else {
-            GIOMainThread mainThread = GInternal.getInstance().getMainThread();
-            if (mainThread != null) {
-                if (sGIOMainThreadHandler == null) {
-                    synchronized (ThreadUtils.class) {
-                        if (sGIOMainThreadHandler == null) {
-                            sGIOMainThreadHandler = new Handler();
-                        }
-                    }
-                }
-                sGIOMainThreadHandler.post(runnable);
-            }
-        }
+    public static boolean runningOnTrackMainThread() {
+        return TrackMainThread.trackMain().getMainLooper() == Looper.myLooper();
     }
 }

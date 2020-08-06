@@ -17,10 +17,10 @@
 package com.growingio.android.sdk.autotrack;
 
 import com.growingio.android.sdk.autotrack.providers.ActivityImpPolicy;
-import com.growingio.android.sdk.track.interfaces.OnGIOMainInitSDK;
+import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
-public class AutotrackAppState implements OnGIOMainInitSDK {
+public class AutotrackAppState implements OnTrackMainInitSDKCallback {
     private volatile static ImpObserver sImpObserver;
 
     public static ImpObserver impObserver() {
@@ -28,8 +28,8 @@ public class AutotrackAppState implements OnGIOMainInitSDK {
     }
 
     @Override
-    public void onGIOMainInitSDK() {
-        ActivityStateProvider.ActivityStatePolicy.get().registerActivityLifecycleListener(new ActivityImpPolicy());
+    public void onTrackMainInitSDK() {
+        ActivityStateProvider.get().registerActivityLifecycleListener(new ActivityImpPolicy());
         sImpObserver = new ImpObserver();
         if (sImpObserver == null) {
         }
