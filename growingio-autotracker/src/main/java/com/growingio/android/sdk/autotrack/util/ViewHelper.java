@@ -18,7 +18,6 @@ package com.growingio.android.sdk.autotrack.util;
 
 import android.app.Activity;
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -35,7 +34,6 @@ import com.growingio.android.sdk.autotrack.events.ViewElement;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.events.base.BaseViewElement;
 import com.growingio.android.sdk.autotrack.models.ViewNode;
-import com.growingio.android.sdk.autotrack.models.ViewTraveler;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.track.GConfig;
@@ -56,15 +54,6 @@ import java.util.List;
 public class ViewHelper {
 
     private final static String TAG = "GIO.ViewHelper";
-
-    private static final String MAIN_WINDOW_PREFIX = "/MainWindow";
-    private static ViewNodeTraveler sClickTraveler = new ViewNodeTraveler() {
-        @Override
-        public boolean needTraverse(ViewNode viewNode) {
-            return super.needTraverse(viewNode) && !Util.isViewClickable(viewNode.view);
-        }
-    };
-    private static ViewNodeTraveler sChangeTraveler = new ViewNodeTraveler();
 
     private ViewHelper() {
     }
@@ -162,16 +151,11 @@ public class ViewHelper {
             return null;
         }
 
-        ViewNode viewNode = getViewNode(view, sClickTraveler);
+        ViewNode viewNode = getViewNode(view);
 
         if (viewNode == null) {
             return null;
         }
-
-        sClickTraveler.resetActionStructList();
-        sClickTraveler.traverseCallBack(viewNode);
-        // TODO：是否需要上报点击View的子结点
-        viewNode.traverseChildren();
 
         return viewNode;
     }
@@ -192,14 +176,14 @@ public class ViewHelper {
         ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder(GInternal.getInstance().getMainThread().getCoreAppState());
         event.setEventType(EventType.CLICK);
         Page<?> page = PageProvider.PagePolicy.get().findPage(viewNode.view);
-        event.addElementBuilders(sClickTraveler.mElementBuilders)
+        event.addElementBuilders(viewNodeToElementBuilders(viewNode))
                 .setPageName(page.path())
                 .setPageShowTimestamp(page.getShowTimestamp());
 
         return event;
     }
 
-    public static ViewNode getViewNode(View view, @Nullable ViewTraveler viewTraveler) {
+    public static ViewNode getViewNode(View view) {
         ArrayList<View> viewTreeList = new ArrayList<View>(8);
         ViewParent parent = view.getParent();
         viewTreeList.add(view);
@@ -210,13 +194,17 @@ public class ViewHelper {
          * ["LinearLayout[3]#login_container" ,"RelativeLayout[1]", ,"FrameLayout[0]#content", "PhoneWindow$DecorView"]
          */
         Page<?> page = ViewAttributeUtil.getViewPage(view);
-        if (page == null || page.isIgnored()) {
+        boolean needTraverse = (page == null || page.isIgnored()) && ViewAttributeUtil.getCustomId(view) == null;
+        if (needTraverse) {
             while (parent instanceof ViewGroup) {
                 if (Util.isIgnoredView((View) parent)) {
                     return null;
                 }
 
                 viewTreeList.add((ViewGroup) parent);
+                if (ViewAttributeUtil.getCustomId((View) parent) != null) {
+                    break;
+                }
                 page = ViewAttributeUtil.getViewPage((View) parent);
                 if (page != null && !page.isIgnored()) {
                     break;
@@ -252,6 +240,9 @@ public class ViewHelper {
                     px += "#" + id;
                 }
             }
+        } else if (ViewAttributeUtil.getCustomId(rootView) != null) {
+            opx = "/" + ViewAttributeUtil.getCustomId(rootView);
+            px = opx;
         }
         if (rootView instanceof ViewGroup) {
             ViewGroup parentView = (ViewGroup) rootView;
@@ -260,7 +251,7 @@ public class ViewHelper {
                 View childView = viewTreeList.get(i);
                 String viewName = ViewAttributeUtil.getViewNameKey(childView);
                 if (viewName != null) {
-                    opx = "/" + viewName;
+                    opx += "/" + viewName;
                     px += "/" + viewName;
                 } else {
                     viewName = Util.getSimpleClassName(childView.getClass());
@@ -307,12 +298,12 @@ public class ViewHelper {
                                 opx = opx + "/ELVG[" + groupIdx + "]/" + viewName + "[0]";
                             }
                         }
-                    } else if (Util.isListView(parentView)) {
+                    } else if (Util.isListView(parentView) || ClassExistHelper.instanceOfRecyclerView(parentView)) {
                         // 处理有特殊的position的元素
                         List bannerTag = ViewAttributeUtil.getBannerKey(parentView);
                         if (bannerTag != null && (bannerTag).size() > 0) {
-                            viewPosition = Util.calcBannerItemPosition((List) bannerTag, viewPosition);
-                            bannerText = Util.truncateViewContent(String.valueOf(((List) bannerTag).get(viewPosition)));
+                            viewPosition = Util.calcBannerItemPosition(bannerTag, viewPosition);
+                            bannerText = Util.truncateViewContent(String.valueOf(bannerTag.get(viewPosition)));
                         }
                         listPos = viewPosition;
                         px = opx + "/" + viewName + "[-]";
@@ -322,8 +313,25 @@ public class ViewHelper {
                         opx = opx + "/" + viewName + "[0]";
                         px = px + "/" + viewName + "[0]";
                     } else {
-                        opx = opx + "/" + viewName + "[" + viewPosition + "]";
-                        px = px + "/" + viewName + "[" + viewPosition + "]";
+                        int matchTypePostion = 0;
+                        String matchType = childView.getClass().getSimpleName();
+                        boolean findChildView = false;
+                        for (int siblingIndex = 0; siblingIndex < parentView.getChildCount(); siblingIndex++) {
+                            View siblingView = parentView.getChildAt(siblingIndex);
+                            if (siblingView == childView) {
+                                findChildView = true;
+                                break;
+                            } else if (siblingView.getClass().getSimpleName().equals(matchType)) {
+                                matchTypePostion++;
+                            }
+                        }
+                        if (findChildView) {
+                            opx = opx + "/" + viewName + "[" + matchTypePostion + "]";
+                            px = px + "/" + viewName + "[" + matchTypePostion + "]";
+                        } else {
+                            opx = opx + "/" + viewName + "[" + viewPosition + "]";
+                            px = px + "/" + viewName + "[" + viewPosition + "]";
+                        }
                     }
                     if (GConfig.getInstance().useID()) {
                         String id = Util.getIdName(childView, mParentIdSettled);
@@ -345,9 +353,9 @@ public class ViewHelper {
             }
         }
 
-        ViewNode viewNode = new ViewNode(view, viewPosition, listPos, mHasListParent, prefix.equals(WindowHelper.getMainWindowPrefix()), true, mParentIdSettled,
+        ViewNode viewNode = new ViewNode(view, listPos, mHasListParent, prefix.equals(WindowHelper.getMainWindowPrefix()), true, mParentIdSettled,
                 LinkedString.fromString(opx),
-                LinkedString.fromString(px), prefix, viewTraveler);
+                LinkedString.fromString(px), prefix);
         viewNode.viewContent = Util.getViewContent(view, bannerText);
         viewNode.clickableParentXPath = LinkedString.fromString(px);
         viewNode.bannerText = bannerText;
@@ -374,7 +382,7 @@ public class ViewHelper {
         return -1;
     }
 
-    public static void persistClickEvent(BaseEvent.BaseEventBuilder<?> click, ViewNode viewNode) {
+    public static void persistClickEvent(BaseEvent.BaseEventBuilder<?> click) {
         GIOMainThread mainThread = GInternal.getInstance().getMainThread();
         if (mainThread != null) {
             mainThread.postEventToGMain(click);
@@ -410,7 +418,7 @@ public class ViewHelper {
     }
 
     public static void changeOn(View view) {
-        if (!GConfig.getInstance().canHook() || !GConfig.getInstance().isEnabled()) {
+        if (!GConfig.getInstance().isInitSucceeded() || !GConfig.getInstance().isEnabled()) {
             return;
         }
         Activity activity = ActivityUtil.findActivity(view.getContext());
@@ -418,7 +426,7 @@ public class ViewHelper {
             return;
         }
 
-        ViewNode viewNode = getViewNode(view, sChangeTraveler);
+        ViewNode viewNode = getViewNode(view);
 
         if (viewNode == null) {
             return;
@@ -428,42 +436,27 @@ public class ViewHelper {
             return;
         }
 
-        sChangeTraveler.resetActionStructList();
-        sChangeTraveler.traverseCallBack(viewNode);
-
-
         GIOMainThread mainThread = GInternal.getInstance().getMainThread();
         if (mainThread != null) {
             ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder(mainThread.getCoreAppState());
             Page<?> page = PageProvider.PagePolicy.get().findPage(viewNode.view);
             event.setEventType(EventType.CHANGE)
-                    .addElementBuilders(sChangeTraveler.mElementBuilders)
+                    .addElementBuilders(viewNodeToElementBuilders(viewNode))
                     .setPageName(page.path())
                     .setPageShowTimestamp(page.getShowTimestamp());
             mainThread.postEventToGMain(event);
         }
     }
 
-    private static class ViewNodeTraveler extends ViewTraveler {
-        private long mCurrentTime;
-        private List<BaseViewElement.BaseElementBuilder<?>> mElementBuilders = new ArrayList<BaseViewElement.BaseElementBuilder<?>>();
-
-        public void resetActionStructList() {
-            mCurrentTime = System.currentTimeMillis();
-            mElementBuilders.clear();
-        }
-
-        @Override
-        public void traverseCallBack(ViewNode viewNode) {
-            if (mElementBuilders != null) {
-                mElementBuilders.add((new ViewElement.ElementBuilder())
-                        .setCid(viewNode.cid)
-                        .setXpath(viewNode.parentXPath.toStringValue())
-                        .setTimestamp(mCurrentTime)
-                        .setIndex(viewNode.lastListPos)
-                        .setTextValue(viewNode.viewContent)
-                );
-            }
-        }
+    private static List<BaseViewElement.BaseElementBuilder<?>> viewNodeToElementBuilders(ViewNode viewNode) {
+        List<BaseViewElement.BaseElementBuilder<?>> mElementBuilders = new ArrayList<BaseViewElement.BaseElementBuilder<?>>();
+        mElementBuilders.add((new ViewElement.ElementBuilder())
+                .setCid(viewNode.cid)
+                .setXpath(viewNode.parentXPath.toStringValue())
+                .setTimestamp(System.currentTimeMillis())
+                .setIndex(viewNode.lastListPos)
+                .setTextValue(viewNode.viewContent)
+        );
+        return mElementBuilders;
     }
 }
