@@ -319,7 +319,7 @@ public class DBSQLite {
 
         @SuppressLint("SimpleDateFormat")
         private String hourStr() {
-            return new SimpleDateFormat("YYYYMMddHH").format(new Date());
+            return new SimpleDateFormat("yyyyMMddHH").format(new Date());
         }
 
         public void updateStatics(int generateNum, int sentSuccessNum,
