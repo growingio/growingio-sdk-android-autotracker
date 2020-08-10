@@ -221,10 +221,6 @@ public class Util {
         return position % bannerContent.size();
     }
 
-    public static boolean isIgnoredView(View view) {
-        return ViewAttributeUtil.getIgnoreViewKey(view);
-    }
-
     public static boolean isViewClickable(View view) {
         return view.isClickable() || view instanceof RadioGroup || view instanceof Spinner || view instanceof AbsSeekBar
                 || (view.getParent() != null && view.getParent() instanceof AdapterView

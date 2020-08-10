@@ -30,6 +30,7 @@ import android.widget.ExpandableListView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.events.ViewElement;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.events.base.BaseViewElement;
@@ -146,7 +147,7 @@ public class ViewHelper {
             return null;
         }
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
-        if (activity == null || Util.isIgnoredView(view)) {
+        if (activity == null || ViewHelper.isIgnoredView(view)) {
             return null;
         }
 
@@ -165,7 +166,7 @@ public class ViewHelper {
         }
 
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
-        if (activity == null || Util.isIgnoredView(viewNode.view)) {
+        if (activity == null || ViewHelper.isIgnoredView(viewNode.view)) {
             return null;
         }
 
@@ -193,7 +194,7 @@ public class ViewHelper {
         boolean needTraverse = (page == null || page.isIgnored()) && ViewAttributeUtil.getCustomId(view) == null;
         if (needTraverse) {
             while (parent instanceof ViewGroup) {
-                if (Util.isIgnoredView((View) parent)) {
+                if (ViewHelper.isIgnoredView((View) parent)) {
                     return null;
                 }
 
@@ -351,8 +352,6 @@ public class ViewHelper {
         viewNode.viewContent = Util.getViewContent(view, bannerText);
         viewNode.clickableParentXPath = LinkedString.fromString(px);
         viewNode.bannerText = bannerText;
-        viewNode.cid = ViewAttributeUtil.getCustomId(view);
-
 
         return viewNode;
     }
@@ -411,7 +410,7 @@ public class ViewHelper {
             return;
         }
         Activity activity = ActivityUtil.findActivity(view.getContext());
-        if (activity == null || Util.isIgnoredView(view)) {
+        if (activity == null || ViewHelper.isIgnoredView(view)) {
             return;
         }
 
@@ -437,12 +436,31 @@ public class ViewHelper {
     private static List<BaseViewElement.BaseElementBuilder<?>> viewNodeToElementBuilders(ViewNode viewNode) {
         List<BaseViewElement.BaseElementBuilder<?>> mElementBuilders = new ArrayList<BaseViewElement.BaseElementBuilder<?>>();
         mElementBuilders.add((new ViewElement.ElementBuilder())
-                .setCid(viewNode.cid)
                 .setXpath(viewNode.parentXPath.toStringValue())
                 .setTimestamp(System.currentTimeMillis())
                 .setIndex(viewNode.lastListPos)
                 .setTextValue(viewNode.viewContent)
         );
         return mElementBuilders;
+    }
+
+    public static boolean isIgnoredView(View view) {
+        IgnorePolicy ignorePolicy = ViewAttributeUtil.getIgnorePolicy(view);
+        if (ignorePolicy != null) {
+            return ignorePolicy == IgnorePolicy.IGNORE_SELF || ignorePolicy == IgnorePolicy.IGNORE_ALL;
+        }
+        return isIgnoredByParent(view);
+    }
+
+    private static boolean isIgnoredByParent(View view) {
+        ViewParent parent = view.getParent();
+        if (parent != null && parent instanceof View) {
+            IgnorePolicy ignorePolicy = ViewAttributeUtil.getIgnorePolicy((View) parent);
+            if ((ignorePolicy == IgnorePolicy.IGNORE_ALL || ignorePolicy == IgnorePolicy.IGNORE_CHILD)) {
+                return true;
+            }
+            return isIgnoredByParent((View) parent);
+        }
+        return false;
     }
 }

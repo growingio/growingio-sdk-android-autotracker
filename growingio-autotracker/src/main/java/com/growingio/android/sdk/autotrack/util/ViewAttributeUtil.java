@@ -75,19 +75,6 @@ public class ViewAttributeUtil {
         return null;
     }
 
-    public static void setImpMarked(View view, Boolean marked) {
-        view.setTag(GROWING_IMP_TAG_MARKED, marked);
-    }
-
-    public static Boolean getImpMarked(View view) {
-        Object marked = view.getTag(GROWING_IMP_TAG_MARKED);
-        if (marked instanceof Boolean) {
-            return (Boolean) marked;
-        }
-
-        return null;
-    }
-
     /**
      * 是否采集EditText中text
      */
@@ -182,34 +169,14 @@ public class ViewAttributeUtil {
         return null;
     }
 
-    public static void setIgnoreViewKey(View view, IgnorePolicy policy) {
+    public static void setIgnorePolicy(View view, IgnorePolicy policy) {
         view.setTag(GROWING_IGNORE_VIEW_KEY, policy);
     }
 
-    public static boolean getIgnoreViewKey(View view) {
-
-        IgnorePolicy selfPolicy = ViewAttributeUtil.getViewIgnorePlicy(view);
-        View parentView = (View) view.getParent();
-        IgnorePolicy parentPolicy = ViewAttributeUtil.getViewIgnorePlicy(parentView);
-
-        if (selfPolicy == null &&
-                (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
-            return false;
-        }
-
-        if (selfPolicy == IgnorePolicy.IGNORE_CHILD &&
-                (parentPolicy == null || parentPolicy == IgnorePolicy.IGNORE_SELF)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public static IgnorePolicy getViewIgnorePlicy(View view) {
+    public static IgnorePolicy getIgnorePolicy(View view) {
         Object ignorePolicy = view.getTag(GROWING_IGNORE_VIEW_KEY);
-        if (ignorePolicy instanceof Enum) {
-            IgnorePolicy policy = (IgnorePolicy) ignorePolicy;
-            return policy;
+        if (ignorePolicy instanceof IgnorePolicy) {
+            return (IgnorePolicy) ignorePolicy;
         }
 
         return null;

@@ -32,12 +32,12 @@ import com.gio.test.three.autotrack.activity.HideFragmentActivity;
 import com.gio.test.three.autotrack.activity.LambdaActivity;
 import com.gio.test.three.autotrack.activity.NavFragmentActivity;
 import com.gio.test.three.autotrack.activity.NestedFragmentActivity;
+import com.gio.test.three.autotrack.activity.RecyclerViewImpActivity;
 import com.gio.test.three.autotrack.activity.TabFragmentActivity;
 import com.gio.test.three.autotrack.activity.WebViewActivity;
 import com.gio.test.three.autotrack.activity.X5WebViewActivity;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.autotrack.ImpressionConfig;
 import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 
@@ -57,6 +57,7 @@ public class AutotrackEntryActivity extends Activity {
     private static final String GO_TO_X5_WEB_VIEW_DEBUG_ACTIVITY = "Go To X5WebView Debug Activity";
     private static final String GO_TO_DIALOG_TEST_ACTIVITY = "Go To DialogTestActivity";
     private static final String GO_TO_DIALOG_LAMBDA_ACTIVITY = "Go To LambdaActivity";
+    private static final String GO_TO_DIALOG_RECYCLER_VIEW_IMP_ACTIVITY = "Go To RecyclerViewImpActivity";
 
 
     private static final String[] ITEMS = {
@@ -69,6 +70,7 @@ public class AutotrackEntryActivity extends Activity {
             GO_TO_X5_WEB_VIEW_ACTIVITY,
             GO_TO_DIALOG_TEST_ACTIVITY,
             GO_TO_DIALOG_LAMBDA_ACTIVITY,
+            GO_TO_DIALOG_RECYCLER_VIEW_IMP_ACTIVITY,
     };
 
     @Override
@@ -121,8 +123,6 @@ public class AutotrackEntryActivity extends Activity {
         HashMap<String, String> impAttrs = new HashMap<>();
         impAttrs.put("name", "hello");
         impAttrs.put("age", "18");
-        ImpressionConfig config = new ImpressionConfig(view, "imp_event_name", impAttrs);
-        GrowingAutotracker.getInstance().trackViewImpression(config);
     }
 
     private void handleItemClick(String itemString) {
@@ -157,6 +157,9 @@ public class AutotrackEntryActivity extends Activity {
                 break;
             case GO_TO_DIALOG_LAMBDA_ACTIVITY:
                 startActivity(new Intent(this, LambdaActivity.class));
+                break;
+            case GO_TO_DIALOG_RECYCLER_VIEW_IMP_ACTIVITY:
+                startActivity(new Intent(this, RecyclerViewImpActivity.class));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

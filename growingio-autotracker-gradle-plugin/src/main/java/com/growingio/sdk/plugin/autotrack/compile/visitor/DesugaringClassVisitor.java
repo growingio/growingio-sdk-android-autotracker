@@ -64,6 +64,7 @@ public class DesugaringClassVisitor extends ClassVisitor {
     @Override
     public void visitEnd() {
         if (mGenerateMethodBlocks.isEmpty()) {
+            super.visitEnd();
             return;
         }
 

@@ -36,4 +36,7 @@ dependencies {
     implementation 'android.arch.lifecycle:livedata:1.1.1'
     implementation 'android.arch.lifecycle:viewmodel:1.1.1'
     api 'com.tencent.tbs.tbssdk:sdk:43903'
+
+    compileOnly libraries.androidx.appcompat
+    compileOnly libraries.androidx.recyclerview
 }

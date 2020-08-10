@@ -15,4 +15,10 @@
         android:text="OrangeFragment"
         android:textColor="@android:color/white" />
 
+    <FrameLayout
+        android:layout_margin="10dp"
+        android:id="@+id/fragment_connect"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
 </FrameLayout>

@@ -25,7 +25,6 @@ import android.util.Log;
 import com.growingio.android.sdk.track.crash.CrashManager;
 import com.growingio.android.sdk.track.crash.CrashUtil;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
-import com.growingio.android.sdk.track.interfaces.IGrowingTracker;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -87,12 +86,13 @@ public class GrowingTracker implements IGrowingTracker {
             throw new IllegalStateException("UrlScheme is NULL");
         }
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            Log.e(TAG, "GrowingIO 暂不支持Android 4.2以下版本");
-            return makeEmpty();
-        }
         if (!ThreadUtils.runningOnUiThread()) {
-            throw new IllegalStateException("GrowingIO.startWithConfiguration必须在主线程中调用。");
+            throw new IllegalStateException("startWithConfiguration必须在主线程中调用。");
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Log.e(TAG, "GrowingTracker 暂不支持Android 4.2以下版本");
+            return makeEmpty();
         }
 
         ConfigurationProvider.get().setTrackConfiguration(trackConfiguration);
@@ -156,7 +156,7 @@ public class GrowingTracker implements IGrowingTracker {
     private static IGrowingTracker makeEmpty() {
         return (IGrowingTracker) Proxy.newProxyInstance(GrowingTracker.class.getClassLoader(), new Class[]{IGrowingTracker.class}, new InvocationHandler() {
             @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            public Object invoke(Object proxy, Method method, Object[] args) {
                 Log.e(TAG, "SDK尚未初始化");
                 if (method.getReturnType() == IGrowingTracker.class) {
                     return proxy;

@@ -18,7 +18,9 @@ package com.growingio.android.sdk.track;
 
 import androidx.annotation.NonNull;
 
-public class TrackConfiguration implements Cloneable {
+import com.growingio.android.sdk.track.base.Configurable;
+
+public class TrackConfiguration implements Cloneable, Configurable {
     private String mProjectId;
     private String mUrlScheme;
     private String mChannel;

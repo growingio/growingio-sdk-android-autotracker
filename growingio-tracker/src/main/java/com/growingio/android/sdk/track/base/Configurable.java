@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.interfaces;
+package com.growingio.android.sdk.track.base;
 
-public interface IActionCallback {
-    void action();
+public interface Configurable {
 }

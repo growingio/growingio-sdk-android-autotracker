@@ -25,8 +25,6 @@ import com.growingio.android.sdk.autotrack.hybrid.OnDomChangedListener;
 import com.growingio.android.sdk.autotrack.util.WindowHelper;
 import com.growingio.android.sdk.autotrack.window.DecorView;
 import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.track.base.event.ViewTreeStatusChangeEvent;
-import com.growingio.android.sdk.track.interfaces.IViewTreeStatus;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.utils.LogUtil;
@@ -57,13 +55,14 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
         mScale = SCREENSHOT_STANDARD_WIDTH / Math.min(metrics.widthPixels, metrics.heightPixels);
         mHandler = new Handler(Looper.myLooper());
 
-        com.growingio.android.sdk.track.ListenerContainer.viewTreeStatusListeners().register(new IViewTreeStatus() {
-            @Override
-            public void onViewTreeStatusChanged(ViewTreeStatusChangeEvent action) {
-                LogUtil.d(TAG, "onViewTreeStatusChanged: ");
-                refreshScreenshot();
-            }
-        });
+// TODO: 2020/8/7 监听页面变化
+//        com.growingio.android.sdk.track.ListenerContainer.viewTreeStatusListeners().register(new IViewTreeStatus() {
+//            @Override
+//            public void onViewTreeStatusChanged(ViewTreeStatusChangeEvent action) {
+//                LogUtil.d(TAG, "onViewTreeStatusChanged: ");
+//                refreshScreenshot();
+//            }
+//        });
         HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
             @Override
             public void onDomChanged() {

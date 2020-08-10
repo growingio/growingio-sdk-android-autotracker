@@ -17,10 +17,9 @@
 package com.growingio.android.sdk.autotrack;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
 import android.view.View;
 
-import com.growingio.android.sdk.track.interfaces.IGrowingTracker;
+import com.growingio.android.sdk.track.IGrowingTracker;
 
 import java.util.Map;
 
@@ -33,19 +32,33 @@ public interface IGrowingAutotracker extends IGrowingTracker {
 
     IGrowingAutotracker setPageAttributes(Activity activity, Map<String, String> attributes);
 
-    IGrowingAutotracker setPageAttributes(Fragment fragment, Map<String, String> attributes);
+    IGrowingAutotracker setPageAttributes(android.app.Fragment fragment, Map<String, String> attributes);
 
-    IGrowingAutotracker trackViewImpression(ImpressionConfig config);
+    IGrowingAutotracker setPageAttributes(android.support.v4.app.Fragment fragment, Map<String, String> attributes);
+
+    IGrowingAutotracker setPageAttributes(androidx.fragment.app.Fragment fragment, Map<String, String> attributes);
+
+    IGrowingAutotracker trackViewImpression(View view, String impressionEventName);
+
+    IGrowingAutotracker trackViewImpression(View view, String impressionEventName, Map<String, String> attributes);
 
     IGrowingAutotracker stopTrackViewImpression(View trackedView);
 
     IGrowingAutotracker setPageAlias(Activity activity, String alias);
 
-    IGrowingAutotracker setPageAlias(Fragment fragment, String alias);
+    IGrowingAutotracker setPageAlias(android.app.Fragment fragment, String alias);
+
+    IGrowingAutotracker setPageAlias(android.support.v4.app.Fragment fragment, String alias);
+
+    IGrowingAutotracker setPageAlias(androidx.fragment.app.Fragment fragment, String alias);
 
     IGrowingAutotracker ignorePage(Activity activity, IgnorePolicy policy);
 
-    IGrowingAutotracker ignorePage(Fragment fragment, IgnorePolicy policy);
+    IGrowingAutotracker ignorePage(android.app.Fragment fragment, IgnorePolicy policy);
+
+    IGrowingAutotracker ignorePage(android.support.v4.app.Fragment fragment, IgnorePolicy policy);
+
+    IGrowingAutotracker ignorePage(androidx.fragment.app.Fragment fragment, IgnorePolicy policy);
 
     IGrowingAutotracker ignoreView(View view, IgnorePolicy policy);
 
