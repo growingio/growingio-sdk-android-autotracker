@@ -19,11 +19,11 @@ package com.growingio.android.sdk.autotrack.page;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.UiThread;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.events.AutoTrackEventGenerator;
 import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
@@ -31,21 +31,19 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.LogUtil;
-import com.growingio.android.sdk.track.utils.WeakSet;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 
 public class PageProvider implements IActivityLifecycle {
-    private static final String TAG = "PagePolicy";
+    private static final String TAG = "PageProvider";
 
     private static final Map<Activity, ActivityPage> ALL_PAGE_TREE = new WeakHashMap<>();
     private static final Map<Object, String> ALL_PAGE_ALIAS = new WeakHashMap<>();
-    private static final Set<Class<?>> IGNORE_PAGE_CLASSES = new HashSet<>();
-    private static final Set<Object> IGNORE_PAGES = new WeakSet<>();
+    private static final Map<Class<?>, IgnorePolicy> IGNORE_PAGE_CLASSES = new HashMap<>();
+    private static final Map<Object, IgnorePolicy> IGNORE_PAGES = new WeakHashMap<>();
     private static final Map<Object, Map<String, String>> PAGE_ATTRIBUTES_CACHE = new WeakHashMap<>();
 
     private static class SingleInstance {
@@ -63,6 +61,14 @@ public class PageProvider implements IActivityLifecycle {
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
     }
 
+    public void addIgnoreActivity(Activity activity, IgnorePolicy policy) {
+        IGNORE_PAGES.put(activity, policy);
+    }
+
+    public void addIgnoreFragment(SuperFragment<?> fragment, IgnorePolicy policy) {
+        IGNORE_PAGES.put(fragment, policy);
+    }
+
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
         Activity activity = event.getActivity();
         if (activity == null) {
@@ -76,20 +82,20 @@ public class PageProvider implements IActivityLifecycle {
         }
     }
 
-    public void addIgnoreActivityClass(Class<? extends Activity> activityClazz) {
-        IGNORE_PAGE_CLASSES.add(activityClazz);
+    public void addIgnoreActivityClass(Class<? extends Activity> activityClazz, IgnorePolicy policy) {
+        IGNORE_PAGE_CLASSES.put(activityClazz, policy);
     }
 
-    public void addIgnoreFragmentClass(Class<? extends Fragment> fragmentClazz) {
-        IGNORE_PAGE_CLASSES.add(fragmentClazz);
+    public void addIgnoreSystemFragmentClass(Class<? extends android.app.Fragment> fragmentClazz, IgnorePolicy policy) {
+        IGNORE_PAGE_CLASSES.put(fragmentClazz, policy);
     }
 
-    public void addIgnoreActivity(Activity activity) {
-        IGNORE_PAGES.add(activity);
+    public void addIgnoreV4FragmentClass(Class<? extends android.support.v4.app.Fragment> fragmentClazz, IgnorePolicy policy) {
+        IGNORE_PAGE_CLASSES.put(fragmentClazz, policy);
     }
 
-    public void addIgnoreFragment(SuperFragment<?> fragment) {
-        IGNORE_PAGES.add(fragment);
+    public void addIgnoreXFragmentClass(Class<? extends androidx.fragment.app.Fragment> fragmentClazz, IgnorePolicy policy) {
+        IGNORE_PAGE_CLASSES.put(fragmentClazz, policy);
     }
 
     @UiThread
@@ -109,7 +115,7 @@ public class PageProvider implements IActivityLifecycle {
         page.setIgnored(isIgnoreActivity(activity));
 
         if (!page.isIgnored()) {
-            Log.e(TAG, "createOrResumePage: path = " + page.path());
+            LogUtil.d(TAG, "createOrResumePage: path = " + page.path());
             AutoTrackEventGenerator.generatePageEvent(page.path(), page.getTitle(), page.getShowTimestamp());
             reissuePageAttributes(page);
         } else {
@@ -141,13 +147,33 @@ public class PageProvider implements IActivityLifecycle {
     }
 
     private boolean isIgnoreActivity(Activity activity) {
-        return IGNORE_PAGE_CLASSES.contains(activity.getClass())
-                || IGNORE_PAGES.contains(activity);
+        IgnorePolicy ignorePolicy = IGNORE_PAGES.get(activity);
+        if (ignorePolicy != null) {
+            return ignorePolicy == IgnorePolicy.IGNORE_SELF || ignorePolicy == IgnorePolicy.IGNORE_ALL;
+        }
+        return false;
     }
 
     private boolean isIgnoreFragment(SuperFragment<?> fragment) {
-        return IGNORE_PAGE_CLASSES.contains(fragment.getRealFragment().getClass())
-                || IGNORE_PAGES.contains(fragment);
+        IgnorePolicy ignorePolicy = IGNORE_PAGES.get(fragment);
+        if (ignorePolicy != null) {
+            return ignorePolicy == IgnorePolicy.IGNORE_SELF || ignorePolicy == IgnorePolicy.IGNORE_ALL;
+        }
+        return isIgnoreByParent(fragment);
+    }
+
+    private boolean isIgnoreByParent(SuperFragment<?> fragment) {
+        SuperFragment<?> parentFragment = fragment.getParentFragment();
+        if (parentFragment != null) {
+            IgnorePolicy ignorePolicy = IGNORE_PAGES.get(parentFragment);
+            if ((ignorePolicy == IgnorePolicy.IGNORE_ALL || ignorePolicy == IgnorePolicy.IGNORE_CHILD)) {
+                return true;
+            }
+            return isIgnoreByParent(parentFragment);
+        } else {
+            IgnorePolicy ignorePolicy = IGNORE_PAGES.get(fragment.getActivity());
+            return ignorePolicy == IgnorePolicy.IGNORE_ALL || ignorePolicy == IgnorePolicy.IGNORE_CHILD;
+        }
     }
 
     @UiThread

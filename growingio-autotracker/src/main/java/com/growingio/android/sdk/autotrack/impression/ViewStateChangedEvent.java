@@ -14,43 +14,47 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.base.event;
+package com.growingio.android.sdk.autotrack.impression;
 
 import android.view.View;
 
-public class ViewTreeStatusChangeEvent {
+import androidx.annotation.Nullable;
 
-    private StatusType mStatusType;
+public class ViewStateChangedEvent {
+
+    private final StateType mStateType;
     private View mOldFocus;
     private View mNewFocus;
 
-    public ViewTreeStatusChangeEvent(StatusType statusType) {
-        this.mStatusType = statusType;
+    public ViewStateChangedEvent(StateType stateType) {
+        this.mStateType = stateType;
     }
 
-    public ViewTreeStatusChangeEvent(StatusType statusType, View oldFocus, View newFocus) {
-        this.mStatusType = statusType;
+    public ViewStateChangedEvent(StateType stateType, View oldFocus, View newFocus) {
+        this.mStateType = stateType;
         this.mOldFocus = oldFocus;
         this.mNewFocus = newFocus;
     }
 
-    public StatusType getStatusType() {
-        return mStatusType;
+    public StateType getStateType() {
+        return mStateType;
     }
 
+    @Nullable
     public View getOldFocus() {
         return mOldFocus;
     }
 
+    @Nullable
     public View getNewFocus() {
         return mNewFocus;
     }
 
-    public enum StatusType {
-        FocusChanged,
-        LayoutChanged,
-        ScrollChanged,
-        Draw,
-        WindowFouchChanged
+    public enum StateType {
+        FOCUS_CHANGED,
+        LAYOUT_CHANGED,
+        SCROLL_CHANGED,
+        DRAW,
+        WINDOW_FOCUS_CHANGED
     }
 }

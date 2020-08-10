@@ -178,7 +178,7 @@ public class WindowHelper {
         }
 
 
-        if (Util.isIgnoredView(root)) {
+        if (ViewHelper.isIgnoredView(root)) {
             return IGNORED_WINDOW_PREFIX;
         }
 

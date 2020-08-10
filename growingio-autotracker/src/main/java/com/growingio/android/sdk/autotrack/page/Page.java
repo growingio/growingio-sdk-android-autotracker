@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Page<T> {
+    private final static int MAX_PAGE_LEVEL = 3;
+
     private final T mCarrier;
     private PageGroup<?> mParent;
     private long mShowTimestamp;
@@ -108,9 +110,16 @@ public abstract class Page<T> {
 
         List<Page<?>> pageTree = new ArrayList<>();
         pageTree.add(this);
+        int pageLevel = 1;
+        boolean hasMoreParent = false;
         PageGroup<?> parent = getParent();
         while (parent != null) {
             pageTree.add(parent);
+            pageLevel++;
+            if (pageLevel >= MAX_PAGE_LEVEL) {
+                hasMoreParent = parent.getParent() != null;
+                break;
+            }
             if (!TextUtils.isEmpty(parent.getAlias())) {
                 break;
             }
@@ -119,7 +128,12 @@ public abstract class Page<T> {
         StringBuilder path = new StringBuilder();
         for (int i = pageTree.size() - 1; i >= 0; i--) {
             Page<?> page = pageTree.get(i);
-            path.append("/").append(page.getName());
+            if (hasMoreParent && i == pageTree.size() - 1) {
+                path.append("*/");
+            } else {
+                path.append("/");
+            }
+            path.append(page.getName());
         }
         mPath = path.toString();
         return mPath;

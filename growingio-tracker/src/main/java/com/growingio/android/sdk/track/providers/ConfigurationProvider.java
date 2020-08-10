@@ -20,9 +20,14 @@ import androidx.annotation.NonNull;
 
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.TrackConfiguration;
+import com.growingio.android.sdk.track.base.Configurable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConfigurationProvider {
     private TrackConfiguration mTrackConfiguration;
+    private static final Map<Class<? extends Configurable>, Configurable> OTHER_CONFIGURATIONS = new HashMap();
 
     private static class SingleInstance {
         private static final ConfigurationProvider INSTANCE = new ConfigurationProvider();
@@ -38,6 +43,16 @@ public class ConfigurationProvider {
 
     public boolean isDataCollectionEnabled() {
         return getTrackConfiguration().isDataCollectionEnabled();
+    }
+
+    public void addConfiguration(Configurable config) {
+        if (config != null) {
+            OTHER_CONFIGURATIONS.put(config.getClass(), config);
+        }
+    }
+
+    public <T> T getConfiguration(Class<? extends Configurable> clazz) {
+        return (T) OTHER_CONFIGURATIONS.get(clazz);
     }
 
     @NonNull

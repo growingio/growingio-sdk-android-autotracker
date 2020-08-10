@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.interfaces;
+package com.growingio.android.sdk.track;
 
 
 import android.support.annotation.AnyThread;
 import android.support.annotation.Nullable;
+
+import com.growingio.android.sdk.track.interfaces.ResultCallback;
 
 import java.util.Map;
 

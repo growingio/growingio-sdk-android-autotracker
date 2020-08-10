@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.interfaces;
+package com.growingio.android.sdk.autotrack.impression;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
-
-/**
- * 表示该方法仅在发送线程执行
- */
-@Documented
-@Retention(RetentionPolicy.SOURCE)
-@Target({METHOD, CONSTRUCTOR, TYPE, PARAMETER})
-public @interface GSenderThread {
+public interface OnViewStateChangedListener {
+    void onViewStateChanged(ViewStateChangedEvent changedEvent);
 }

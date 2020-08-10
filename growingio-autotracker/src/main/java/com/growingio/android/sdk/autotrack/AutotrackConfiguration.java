@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.autotrack;
 
+import androidx.annotation.NonNull;
+
 import com.growingio.android.sdk.track.TrackConfiguration;
 
 public class AutotrackConfiguration extends TrackConfiguration {
@@ -77,5 +79,20 @@ public class AutotrackConfiguration extends TrackConfiguration {
     public AutotrackConfiguration setSessionInterval(long sessionInterval) {
         super.setSessionInterval(sessionInterval);
         return this;
+    }
+
+    @NonNull
+    @Override
+    public AutotrackConfiguration clone() {
+        return new AutotrackConfiguration()
+                .setProjectId(getProjectId())
+                .setUrlScheme(getUrlScheme())
+                .setChannel(getChannel())
+                .setLogEnabled(isLogEnabled())
+                .setCellularDataLimit(getCellularDataLimit())
+                .setDataUploadInterval(getDataUploadInterval())
+                .setSessionInterval(getSessionInterval())
+                .setUploadExceptionEnabled(isUploadExceptionEnabled())
+                .setImpressionScale(getImpressionScale());
     }
 }

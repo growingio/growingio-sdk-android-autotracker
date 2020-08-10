@@ -81,6 +81,7 @@ public class OrangeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_orange, container, false);
+        getChildFragmentManager().beginTransaction().replace(R.id.fragment_connect, new RedFragment(), "small").commit();
         root.findViewById(R.id.txt_orange_fragment).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
