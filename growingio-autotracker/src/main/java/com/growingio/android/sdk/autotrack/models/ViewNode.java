@@ -18,59 +18,38 @@ package com.growingio.android.sdk.autotrack.models;
 
 import android.view.View;
 
-import com.growingio.android.sdk.track.utils.LinkedString;
-
 public class ViewNode {
-    public static final String ANONYMOUS_CLASS_NAME = "Anonymous";
-    private static final String TAG = "GIO.ViewNode";
-    public View view;
-    public int lastListPos = -1;
-    public boolean fullScreen;
-    public boolean hasListParent;
-    public boolean inClickableGroup;
-    public LinkedString parentXPath;
-    public LinkedString originalParentXpath;
-    public String windowPrefix;
-    public String bannerText;
-    public String viewContent;
-    public boolean parentIdSettled = false;
-    public LinkedString clickableParentXPath;
-    private int mHashCode = -1;
+    private final View mView;
+    private final String mXPath;
+    private final String mOriginalXPath;
+    private final String mViewContent;
+    private final int mIndex;
 
-    public ViewNode() {
+    public ViewNode(View view, String xpath, String originalXPath, String viewContent, int index) {
+        mView = view;
+        mXPath = xpath;
+        mOriginalXPath = originalXPath;
+        mViewContent = viewContent;
+        mIndex = index;
     }
 
-    /**
-     * 在基本信息已经计算出来的基础上计算XPath,用于ViewHelper构建Xpath,和基于parentView构建Xpath
-     */
-    public ViewNode(View view, int lastListPos, boolean hasListParent, boolean fullScreen,
-                    boolean inClickableGroup, boolean parentIdSettled, LinkedString originalParentXPath, LinkedString parentXPath, String windowPrefix) {
-
-        this.view = view;
-        this.lastListPos = lastListPos;
-        this.fullScreen = fullScreen;
-        this.hasListParent = hasListParent;
-        this.inClickableGroup = inClickableGroup;
-        this.parentIdSettled = parentIdSettled;
-        this.parentXPath = parentXPath;
-        originalParentXpath = originalParentXPath;
-        this.windowPrefix = windowPrefix;
+    public View getView() {
+        return mView;
     }
 
-    @Override
-    public int hashCode() {
-        if (mHashCode == -1) {
-            int result = 17;
-            result = result * 31 + (viewContent != null ? viewContent.hashCode() : 0);
-            result = result * 31 + (parentXPath != null ? parentXPath.hashCode() : 0);
-            result = result * 31 + lastListPos;
-            mHashCode = result;
-        }
-        return mHashCode;
+    public String getXPath() {
+        return mXPath;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        return object instanceof ViewNode && object.hashCode() == this.hashCode();
+    public String getViewContent() {
+        return mViewContent;
+    }
+
+    public int getIndex() {
+        return mIndex;
+    }
+
+    public String getOriginalXPath() {
+        return mOriginalXPath;
     }
 }

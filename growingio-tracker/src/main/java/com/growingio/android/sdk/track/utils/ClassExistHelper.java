@@ -16,15 +16,12 @@
 
 package com.growingio.android.sdk.track.utils;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.view.menu.ListMenuItemView;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -32,21 +29,13 @@ import androidx.fragment.app.Fragment;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebView;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 public class ClassExistHelper {
     private static final String TAG = "GIO.ClassExist";
 
-    public static boolean sHasCustomRecyclerView = false;
     public static boolean sHasSupportViewPager;
     public static boolean sHasSupportListMenuItemView;
     public static boolean sHasAndroidXViewPager;
     public static boolean sHasAndroidXListMenuItemView;
-    private static Class sCRVClass; // CustomRecyclerView
-    private static Method sCRVGetChildAdapterPositionMethod;
-    // Edited by Gradle plugin
-    private static boolean sHasTransform;
     private static boolean sHasX5WebView;
     private static boolean sHasUcWebView;
     private static boolean sHasSupportRecyclerView;
@@ -59,31 +48,25 @@ public class ClassExistHelper {
     private static boolean sHasAndroidXFragment;
     private static boolean sHasAndroidXFragmentActivity;
     private static boolean sHasAndroidXAlertDialog;
-    private static boolean sHasAdvertisingIdClient;
-    private static boolean sHasMdidSdkHelper;
 
     static {
-        if (!sHasTransform) {
-            // Don't Edit This Directly, use Unit Test to generate this.
-            sHasX5WebView = hasClass("com.tencent.smtt.sdk.WebView");
-            sHasUcWebView = hasClass("com.uc.webview.export.WebView");
-            sHasSupportRecyclerView = hasClass("android.support.v7.widget.RecyclerView");
-            sHasSupportViewPager = hasClass("android.support.v4.view.ViewPager");
-            sHasSupportSwipeRefreshLayoutView = hasClass("android.support.v4.widget.SwipeRefreshLayout");
-            sHasSupportFragment = hasClass("android.support.v4.app.Fragment");
-            sHasSupportFragmentActivity = hasClass("android.support.v4.app.FragmentActivity");
-            sHasSupportAlertDialog = hasClass("android.support.v7.app.AlertDialog");
-            sHasSupportListMenuItemView = hasClass("android.support.v7.view.menu.ListMenuItemView");
-            sHasAndroidXRecyclerView = hasClass("androidx.recyclerview.widget.RecyclerView");
-            sHasAndroidXViewPager = hasClass("androidx.viewpager.widget.ViewPager");
-            sHasAndroidXSwipeRefreshLayoutView = hasClass("androidx.swiperefreshlayout.widget.SwipeRefreshLayout");
-            sHasAndroidXFragment = hasClass("androidx.fragment.app.Fragment");
-            sHasAndroidXFragmentActivity = hasClass("androidx.fragment.app.FragmentActivity");
-            sHasAndroidXAlertDialog = hasClass("androidx.appcompat.app.AlertDialog");
-            sHasAndroidXListMenuItemView = hasClass("androidx.appcompat.view.menu.ListMenuItemView");
-            sHasAdvertisingIdClient = hasClass("com.google.android.gms.ads.identifier.AdvertisingIdClient");
-            sHasMdidSdkHelper = hasClass("com.bun.miitmdid.core.MdidSdkHelper");
-        }
+        // Don't Edit This Directly, use Unit Test to generate this.
+        sHasX5WebView = hasClass("com.tencent.smtt.sdk.WebView");
+        sHasUcWebView = hasClass("com.uc.webview.export.WebView");
+        sHasSupportRecyclerView = hasClass("android.support.v7.widget.RecyclerView");
+        sHasSupportViewPager = hasClass("android.support.v4.view.ViewPager");
+        sHasSupportSwipeRefreshLayoutView = hasClass("android.support.v4.widget.SwipeRefreshLayout");
+        sHasSupportFragment = hasClass("android.support.v4.app.Fragment");
+        sHasSupportFragmentActivity = hasClass("android.support.v4.app.FragmentActivity");
+        sHasSupportAlertDialog = hasClass("android.support.v7.app.AlertDialog");
+        sHasSupportListMenuItemView = hasClass("android.support.v7.view.menu.ListMenuItemView");
+        sHasAndroidXRecyclerView = hasClass("androidx.recyclerview.widget.RecyclerView");
+        sHasAndroidXViewPager = hasClass("androidx.viewpager.widget.ViewPager");
+        sHasAndroidXSwipeRefreshLayoutView = hasClass("androidx.swiperefreshlayout.widget.SwipeRefreshLayout");
+        sHasAndroidXFragment = hasClass("androidx.fragment.app.Fragment");
+        sHasAndroidXFragmentActivity = hasClass("androidx.fragment.app.FragmentActivity");
+        sHasAndroidXAlertDialog = hasClass("androidx.appcompat.app.AlertDialog");
+        sHasAndroidXListMenuItemView = hasClass("androidx.appcompat.view.menu.ListMenuItemView");
     }
 
     private ClassExistHelper() {
@@ -98,74 +81,20 @@ public class ClassExistHelper {
         }
     }
 
-    // 仅仅用于保护
-    public static int invokeCRVGetChildAdapterPositionMethod(View customRecyclerView, View childView) {
-        try {
-            if (customRecyclerView.getClass() == sCRVClass) {
-                return (Integer) ClassExistHelper.sCRVGetChildAdapterPositionMethod.invoke(customRecyclerView, childView);
-            }
-        } catch (IllegalAccessException e) {
-            LogUtil.d(e);
-        } catch (InvocationTargetException ignored) {
-            LogUtil.d(ignored);
-        }
-        return -1;
-    }
-
-    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
-    public static void checkCustomRecyclerView(Class<?> viewClass, String viewName) {
-        if (sHasAndroidXRecyclerView || sHasSupportRecyclerView || sHasCustomRecyclerView) {
-            return;
-        }
-        if (viewName != null && viewName.contains("RecyclerView")) {
-            try {
-                Class<?> rootCRVClass = findRecyclerInSuper(viewClass);
-                if (rootCRVClass != null && sCRVGetChildAdapterPositionMethod != null) {
-                    sCRVClass = viewClass;
-                    sHasCustomRecyclerView = true;
-                }
-            } catch (Exception ignore) {
-                LogUtil.d(ignore);
-            }
-        }
-    }
-
-    public static boolean issHasAdvertisingIdClient() {
-        return sHasAdvertisingIdClient;
-    }
-
-    private static Class<?> findRecyclerInSuper(Class<?> viewClass) {
-        while (viewClass != null && !viewClass.equals(ViewGroup.class)) {
-            try {
-                sCRVGetChildAdapterPositionMethod = viewClass.getDeclaredMethod("getChildAdapterPosition", View.class);
-            } catch (NoSuchMethodException ignore) {
-            }
-            if (sCRVGetChildAdapterPositionMethod == null) {
-                try {
-                    sCRVGetChildAdapterPositionMethod = viewClass.getDeclaredMethod("getChildPosition", View.class);
-                } catch (NoSuchMethodException ignore) {
-                }
-            }
-            if (sCRVGetChildAdapterPositionMethod != null) {
-                return viewClass;
-            } else {
-                viewClass = viewClass.getSuperclass();
-            }
-        }
-        return null;
-    }
-
-    public static boolean isHasMdidSdkHelper() {
-        return sHasMdidSdkHelper;
-    }
-
     /**
      * 判断View是否是RecyclerView, 包括Support包与AndroidX， 以及部分自定义的RecyclerView
      */
     public static boolean instanceOfRecyclerView(Object view) {
         return instanceOfAndroidXRecyclerView(view)
-                || instanceOfSupportRecyclerView(view)
-                || (sHasCustomRecyclerView && view != null && sCRVClass.isAssignableFrom(view.getClass()));
+                || instanceOfSupportRecyclerView(view);
+    }
+
+    public static boolean isListView(Object view) {
+        return (view instanceof AdapterView
+                || (ClassExistHelper.instanceOfAndroidXRecyclerView(view))
+                || (ClassExistHelper.instanceOfAndroidXViewPager(view))
+                || (ClassExistHelper.instanceOfSupportRecyclerView(view))
+                || (ClassExistHelper.instanceOfSupportViewPager(view)));
     }
 
     public static boolean instanceOfSupportRecyclerView(Object view) {
@@ -235,22 +164,5 @@ public class ClassExistHelper {
     public static boolean instanceOfAndroidXListMenuItemView(Object itemView) {
         return sHasAndroidXListMenuItemView && itemView instanceof androidx.appcompat.view.menu.ListMenuItemView;
     }
-
-    public static void dumpClassInfo() {
-        String info = "For Support Class: \n"
-                + "sHasSupportRecyclerView=" + sHasSupportRecyclerView + ", sHasSupportFragmentActivity=" + sHasSupportFragmentActivity
-                + "\nsHasSupportFragment=" + sHasSupportFragment + ", sHasSupportAlertDialog=" + sHasSupportAlertDialog
-                + "\nsHasSupportSwipeRefreshLayoutView=" + sHasSupportSwipeRefreshLayoutView + ", sHasSupportViewPager=" + sHasSupportViewPager
-                + "\nsHasSupportListMenuItemView=" + sHasSupportListMenuItemView
-                + "\nFor AndroidX Class: \n"
-                + "sHasAndroidXRecyclerView=" + sHasAndroidXRecyclerView + ", sHasAndroidXFragmentActivity=" + sHasAndroidXFragmentActivity
-                + "\nsHasAndroidXFragment=" + sHasAndroidXFragment + ", sHasAndroidXAlertDialog=" + sHasAndroidXAlertDialog
-                + "\nsHasAndroidXSwipeRefreshLayoutView=" + sHasAndroidXSwipeRefreshLayoutView + ", sHasAndroidXViewPager=" + sHasAndroidXViewPager
-                + "\nsHasAndroidXListMenuItemView=" + sHasAndroidXListMenuItemView
-                + "\nsHasUcWebView=" + sHasUcWebView
-                + "\nAnd sHasTransform=" + sHasTransform;
-        LogUtil.d("GIO.ClassExist", info);
-    }
-
 
 }

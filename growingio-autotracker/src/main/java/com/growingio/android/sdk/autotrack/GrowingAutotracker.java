@@ -27,7 +27,7 @@ import androidx.annotation.Nullable;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
-import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
@@ -44,7 +44,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     private static final String TAG = "GIO.Autotrack";
 
     private static GrowingAutotracker sInstance;
-    private static boolean sInitSuccess = false;
+    private static volatile boolean sInitializedSuccessfully = false;
 
     @NonNull
     public static IGrowingAutotracker getInstance() {
@@ -59,6 +59,10 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         }
     }
 
+    public static boolean initializedSuccessfully() {
+        return sInitializedSuccessfully;
+    }
+
     public static IGrowingAutotracker startWithConfiguration(Application application, final AutotrackConfiguration autotrackConfiguration) {
         GrowingTracker.startWithConfiguration(application, autotrackConfiguration, new InitExtraOperation() {
             @Override
@@ -68,10 +72,10 @@ public class GrowingAutotracker implements IGrowingAutotracker {
 
             @Override
             public void initSuccess() {
-                sInitSuccess = true;
+                sInitializedSuccessfully = true;
             }
         });
-        if (sInitSuccess) {
+        if (sInitializedSuccessfully) {
             return sInstance;
         } else {
             return makeEmpty();

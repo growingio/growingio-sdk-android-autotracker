@@ -24,9 +24,9 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.growingio.android.sdk.track.utils.DeviceUtil;
-import com.growingio.android.sdk.autotrack.util.WindowHelper;
+import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.autotrack.window.DecorView;
+import com.growingio.android.sdk.autotrack.view.DecorView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
