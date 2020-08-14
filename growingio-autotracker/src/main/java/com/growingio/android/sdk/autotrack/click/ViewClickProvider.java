@@ -47,7 +47,6 @@ class ViewClickProvider {
 
         ViewNode viewNode = ViewHelper.getClickViewNode(view);
         if (viewNode != null) {
-            LogUtil.printJson(TAG, "viewOnClick: ", viewNode.toJSONObject().toString());
             ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder();
             event.setEventType(EventType.CLICK);
             Page<?> page = PageProvider.get().findPage(view);
