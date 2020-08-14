@@ -27,7 +27,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.gio.test.three.ModuleEntry;
+import com.gio.test.three.autotrack.activity.ClickTestActivity;
 import com.gio.test.three.autotrack.activity.DialogTestActivity;
+import com.gio.test.three.autotrack.activity.ExpandableListViewActivity;
 import com.gio.test.three.autotrack.activity.HideFragmentActivity;
 import com.gio.test.three.autotrack.activity.LambdaActivity;
 import com.gio.test.three.autotrack.activity.NavFragmentActivity;
@@ -38,7 +40,7 @@ import com.gio.test.three.autotrack.activity.WebViewActivity;
 import com.gio.test.three.autotrack.activity.X5WebViewActivity;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 
 import java.util.HashMap;
@@ -58,6 +60,8 @@ public class AutotrackEntryActivity extends Activity {
     private static final String GO_TO_DIALOG_TEST_ACTIVITY = "Go To DialogTestActivity";
     private static final String GO_TO_DIALOG_LAMBDA_ACTIVITY = "Go To LambdaActivity";
     private static final String GO_TO_DIALOG_RECYCLER_VIEW_IMP_ACTIVITY = "Go To RecyclerViewImpActivity";
+    private static final String GO_TO_CLICK_TEST_ACTIVITY = "Go To ClickTestActivity";
+    private static final String GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY = "Go To ExpandableListViewActivity";
 
 
     private static final String[] ITEMS = {
@@ -71,6 +75,8 @@ public class AutotrackEntryActivity extends Activity {
             GO_TO_DIALOG_TEST_ACTIVITY,
             GO_TO_DIALOG_LAMBDA_ACTIVITY,
             GO_TO_DIALOG_RECYCLER_VIEW_IMP_ACTIVITY,
+            GO_TO_CLICK_TEST_ACTIVITY,
+            GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY,
     };
 
     @Override
@@ -160,6 +166,12 @@ public class AutotrackEntryActivity extends Activity {
                 break;
             case GO_TO_DIALOG_RECYCLER_VIEW_IMP_ACTIVITY:
                 startActivity(new Intent(this, RecyclerViewImpActivity.class));
+                break;
+            case GO_TO_CLICK_TEST_ACTIVITY:
+                startActivity(new Intent(this, ClickTestActivity.class));
+                break;
+            case GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY:
+                startActivity(new Intent(this, ExpandableListViewActivity.class));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

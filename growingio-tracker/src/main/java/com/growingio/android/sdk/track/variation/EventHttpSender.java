@@ -22,7 +22,6 @@ import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.IEventSender;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.snappy.Snappy;
-import com.growingio.android.sdk.track.utils.LogUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,11 +47,11 @@ public class EventHttpSender implements IEventSender {
         if (events == null || events.isEmpty()) {
             return true;
         }
-        for (GEvent event : events) {
-            if (event instanceof BaseEvent) {
-                LogUtil.printJson(TAG, "send: event, type is " + ((BaseEvent) event).getEventType(), ((BaseEvent) event).toJSONObject().toString());
-            }
-        }
+//        for (GEvent event : events) {
+//            if (event instanceof BaseEvent) {
+//                LogUtil.printJson(TAG, "send: event, type is " + ((BaseEvent) event).getEventType(), ((BaseEvent) event).toJSONObject().toString());
+//            }
+//        }
 
         BaseEvent event;
         if (events.get(0) instanceof BaseEvent) {
@@ -65,7 +64,7 @@ public class EventHttpSender implements IEventSender {
 //        String projectId = infoProvider.getProjectId();
 //        String url = EventUrlProvider.EventUrlPolicy.get().getUrl(projectId, event.getEventType());
         String data = mEventMarshaller.marshall(events).toString();
-        LogUtil.printJson(TAG + "Marshaller", "send: event marshall", data);
+//        LogUtil.printJson(TAG + "Marshaller", "send: event marshall", data);
         byte[] compressData = Snappy.compress(data.getBytes(Charset.forName("UTF-8")));
 
 //        Response response = HttpRequest.postData("https://demo6984138.mockable.io/trackApi")

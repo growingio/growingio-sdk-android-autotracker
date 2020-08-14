@@ -25,7 +25,7 @@ import android.view.View;
 
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.events.AutoTrackEventGenerator;
-import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -366,7 +366,7 @@ public class PageProvider implements IActivityLifecycle {
 
     public Page<?> findPage(View view) {
         Page<?> page = ViewAttributeUtil.getViewPage(view);
-        if (page != null && !page.isIgnored()) {
+        if (page != null && (!page.isIgnored() || page instanceof ActivityPage)) {
             return page;
         }
 
@@ -383,13 +383,5 @@ public class PageProvider implements IActivityLifecycle {
 
         // TODO: 2020/6/10 这种情况需要观察
         throw new NullPointerException("Page is NULL");
-    }
-
-    public String findPageXpath(View view) {
-        Page<?> page = findPage(view);
-        if (page != null) {
-            return page.path();
-        }
-        return "";
     }
 }

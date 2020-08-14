@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.window;
+package com.growingio.android.sdk.autotrack.view;
 
 import android.graphics.Rect;
 import android.view.View;

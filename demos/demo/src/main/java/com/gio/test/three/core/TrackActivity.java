@@ -56,7 +56,6 @@ public class TrackActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = adapter.getItem(position);
                 Log.e(TAG, "onItemClick: " + item);
-                Log.e(TAG, "onItemClick: " + item);
                 handleItemClick(item);
             }
         });

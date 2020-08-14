@@ -27,11 +27,11 @@ import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
-import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
-import com.growingio.android.sdk.autotrack.util.ViewHelper;
-import com.growingio.android.sdk.autotrack.util.WindowHelper;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
+import com.growingio.android.sdk.autotrack.view.ViewHelper;
+import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.autotrack.webservices.circle.ViewUtil;
-import com.growingio.android.sdk.autotrack.window.DecorView;
+import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
@@ -166,7 +166,7 @@ public class CircleScreenshot {
 
         private ViewElement.Builder createViewElementBuilder(View view) {
             ViewElement.Builder builder = new ViewElement.Builder();
-            ViewNode viewNode = ViewHelper.getViewNode(view);
+            ViewNode viewNode = ViewHelper.getClickViewNode(view);
             int[] location = new int[2];
             view.getLocationOnScreen(location);
 
@@ -179,8 +179,8 @@ public class CircleScreenshot {
                     .setContainer(true)
                     .setNodeType("xxxx")
                     .setPage(PageProvider.get().findPage(view).path())
-                    .setParentXPath(viewNode.parentXPath.toStringValue())
-                    .setXpath(viewNode.parentXPath.toStringValue())
+//                    .setParentXPath(viewNode.mXPath.toStringValue())
+//                    .setXpath(viewNode.mXPath.toStringValue())
                     .setZLevel(mViewCount++);
         }
 

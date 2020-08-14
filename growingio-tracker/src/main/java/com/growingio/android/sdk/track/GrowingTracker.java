@@ -44,7 +44,7 @@ public class GrowingTracker implements IGrowingTracker {
     static final String TAG = "GrowingIO";
 
     private static IGrowingTracker sInstance;
-    private static volatile boolean sInitSucceeded = false;
+    private static volatile boolean sInitializedSuccessfully = false;
 
     private TrackMainThread mTrackMainThread;
 
@@ -60,8 +60,8 @@ public class GrowingTracker implements IGrowingTracker {
         }
     }
 
-    public static boolean isInitSucceeded() {
-        return sInitSucceeded;
+    public static boolean initializedSuccessfully() {
+        return sInitializedSuccessfully;
     }
 
     public static IGrowingTracker startWithConfiguration(Application application, TrackConfiguration trackConfiguration) {
@@ -143,7 +143,7 @@ public class GrowingTracker implements IGrowingTracker {
         tracker.mTrackMainThread = TrackMainThread.trackMain();
         sInstance = tracker;
 
-        sInitSucceeded = true;
+        sInitializedSuccessfully = true;
         Log.i(TAG, "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!");
         Log.i(TAG, "!!! GrowingIO Tracker version: " + SDKConfig.SDK_VERSION + " !!!");
         return sInstance;

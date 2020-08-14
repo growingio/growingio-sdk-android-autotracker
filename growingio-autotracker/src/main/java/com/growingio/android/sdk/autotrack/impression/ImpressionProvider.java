@@ -29,8 +29,8 @@ import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-import com.growingio.android.sdk.autotrack.util.ViewAttributeUtil;
-import com.growingio.android.sdk.autotrack.util.ViewHelper;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
+import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;

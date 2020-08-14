@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.util;
+package com.growingio.android.sdk.autotrack.view;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -32,9 +32,9 @@ import androidx.appcompat.view.menu.ListMenuItemView;
 
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 import com.growingio.android.sdk.track.utils.LogUtil;
-import com.growingio.android.sdk.autotrack.window.DecorView;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -45,7 +45,6 @@ import java.util.WeakHashMap;
 
 public class WindowHelper {
 
-    public static final String IGNORED_WINDOW_PREFIX = "/Ignored";
     public static final String PAGE_PREFIX = "/Page";
     private static final String MAIN_WINDOW_PREFIX = "/MainWindow";
     private static final String DIALOG_WINDOW_PREFIX = "/DialogWindow";
@@ -173,17 +172,12 @@ public class WindowHelper {
 
     public static String getWindowPrefix(View root) {
         Page<?> page = ViewAttributeUtil.getViewPage(root);
-        if (page != null && !page.isIgnored()) {
+        if (page != null) {
             return PAGE_PREFIX;
         }
 
 
-        if (ViewHelper.isIgnoredView(root)) {
-            return IGNORED_WINDOW_PREFIX;
-        }
-
-
-        if (root.hashCode() ==  ActivityStateProvider.get().getCurrentRootWindowsHashCode()) {
+        if (root.hashCode() == ActivityStateProvider.get().getCurrentRootWindowsHashCode()) {
             return getMainWindowPrefix();
         }
 
@@ -218,7 +212,7 @@ public class WindowHelper {
 
     @NonNull
     public static DecorView[] getTopActivityViews() {
-        Activity activity =  ActivityStateProvider.get().getForegroundActivity();
+        Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null) {
             return new DecorView[0];
         }
@@ -228,7 +222,7 @@ public class WindowHelper {
             View view = decorView.getView();
             if (view == activity.getWindow().getDecorView()
                     || view.getContext() == activity
-                    || (view.getContext() instanceof ContextWrapper && ((ContextWrapper) view.getContext()).getBaseContext() == activity)) {
+                    || ActivityUtil.findActivity(view.getContext()) == activity) {
                 topViews.add(decorView);
             }
         }
@@ -237,7 +231,7 @@ public class WindowHelper {
 
     public static DecorView[] getTopWindowViews() {
         List<DecorView> topViews = new ArrayList<>();
-        Activity activity =  ActivityStateProvider.get().getForegroundActivity();
+        Activity activity = ActivityStateProvider.get().getForegroundActivity();
         DecorView[] decorViews = getAllWindowDecorViews();
         for (DecorView decorView : decorViews) {
             View view = decorView.getView();
@@ -275,7 +269,7 @@ public class WindowHelper {
         View[] result = new View[0];
         if (sWindowManger == null) {
             // 如果无法获取WindowManager就只遍历当前Activity的内容
-            Activity current =  ActivityStateProvider.get().getForegroundActivity();
+            Activity current = ActivityStateProvider.get().getForegroundActivity();
             if (current != null) {
                 return new View[]{current.getWindow().getDecorView()};
             }

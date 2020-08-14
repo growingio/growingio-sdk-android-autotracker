@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.util;
+package com.growingio.android.sdk.autotrack.view;
 
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.page.Page;
-
-import java.util.List;
 
 public class ViewAttributeUtil {
 
@@ -47,19 +45,6 @@ public class ViewAttributeUtil {
     private static final int GROWING_VIEW_PAGE_KEY = GROWING_VIEW_CUSTOM_ID + 1;
 
     private ViewAttributeUtil() {
-    }
-
-    public static void setViewId(View view, String id) {
-        view.setTag(GROWING_VIEW_ID_KEY, id);
-    }
-
-    public static String getViewId(View view) {
-        Object viewId = view.getTag(GROWING_VIEW_ID_KEY);
-        if (viewId instanceof String) {
-            return (String) viewId;
-        }
-
-        return null;
     }
 
     public static void setCustomId(View view, String cid) {
@@ -104,66 +89,14 @@ public class ViewAttributeUtil {
         return null;
     }
 
-    public static void setIgnoreImpKey(View view, Boolean ignore) {
-        view.setTag(GROWING_IGNORE_VIEW_IMP_KEY, ignore);
-    }
-
-    public static Boolean getIgnoreImpKey(View view) {
-        Object ignore = view.getTag(GROWING_IGNORE_VIEW_IMP_KEY);
-        if (ignore instanceof Boolean) {
-            return (Boolean) ignore;
-        }
-
-        return null;
-    }
-
-    public static void setBannerKey(View view, List bannerContents) {
-        view.setTag(GROWING_BANNER_KEY, bannerContents);
-    }
-
-    public static List getBannerKey(View view) {
-        Object bannerContents = view.getTag(GROWING_BANNER_KEY);
-        if (bannerContents instanceof List) {
-            return (List) bannerContents;
-        }
-
-        return null;
-    }
-
-    public static void setViewNameKey(View view, String name) {
-        view.setTag(GROWING_VIEW_NAME_KEY, name);
-    }
-
-    public static String getViewNameKey(View view) {
-        Object name = view.getTag(GROWING_VIEW_NAME_KEY);
-        if (name instanceof String) {
-            return (String) name;
-        }
-
-        return null;
-    }
-
-    public static void setContentKey(View view, String content) {
+    public static void setContent(View view, String content) {
         view.setTag(GROWING_CONTENT_KEY, content);
     }
 
-    public static String getContentKey(View view) {
+    public static String getContent(View view) {
         Object content = view.getTag(GROWING_CONTENT_KEY);
         if (content instanceof String) {
             return (String) content;
-        }
-
-        return null;
-    }
-
-    public static void setRnPageKey(View view, String rnPage) {
-        view.setTag(GROWING_RN_PAGE_KEY, rnPage);
-    }
-
-    public static String getRnPageKey(View view) {
-        Object rnPage = view.getTag(GROWING_RN_PAGE_KEY);
-        if (rnPage instanceof String) {
-            return (String) rnPage;
         }
 
         return null;

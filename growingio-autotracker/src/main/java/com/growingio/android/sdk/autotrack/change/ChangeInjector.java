@@ -19,7 +19,7 @@ package com.growingio.android.sdk.autotrack.change;
 import android.view.View;
 import android.widget.TextView;
 
-import com.growingio.android.sdk.autotrack.util.ViewHelper;
+import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.sdk.inject.annotation.BeforeSuper;
 

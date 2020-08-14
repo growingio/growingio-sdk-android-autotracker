@@ -22,8 +22,8 @@ import android.util.DisplayMetrics;
 
 import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider;
 import com.growingio.android.sdk.autotrack.hybrid.OnDomChangedListener;
-import com.growingio.android.sdk.autotrack.util.WindowHelper;
-import com.growingio.android.sdk.autotrack.window.DecorView;
+import com.growingio.android.sdk.autotrack.view.WindowHelper;
+import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
