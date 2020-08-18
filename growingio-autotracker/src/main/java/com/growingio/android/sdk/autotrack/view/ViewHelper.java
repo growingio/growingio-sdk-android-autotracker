@@ -56,6 +56,7 @@ import com.growingio.android.sdk.track.utils.LogUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ViewHelper {
     private final static String TAG = "ViewHelper";
@@ -181,6 +182,19 @@ public class ViewHelper {
 
     public static ViewNode getViewNode(View view) {
         ArrayList<View> viewTreeList = new ArrayList<>(8);
+        ViewNode viewNode = getTopViewNode(view, viewTreeList);
+
+        for (int i = viewTreeList.size() - 2; i >= 0; i--) {
+            viewNode = viewNode.appendNode(viewTreeList.get(i));
+        }
+
+        return viewNode;
+    }
+
+    public static ViewNode getTopViewNode(View view, List<View> viewTreeList) {
+        if (viewTreeList == null) {
+            viewTreeList = new ArrayList<>(8);
+        }
         ViewParent parent = view.getParent();
         viewTreeList.add(view);
         Page<?> page = ViewAttributeUtil.getViewPage(view);
@@ -202,117 +216,31 @@ public class ViewHelper {
         View rootView = viewTreeList.get(viewTreeList.size() - 1);
         WindowHelper.init();
 
-        int viewPosition;
-        int listPos = -1;
-        StringBuilder xpath;
-        StringBuilder originalXpath;
+        String xpath;
+        String originalXpath;
 
         if (ViewAttributeUtil.getCustomId(rootView) != null) {
-            originalXpath = new StringBuilder("/" + ViewAttributeUtil.getCustomId(rootView));
-            xpath = new StringBuilder(originalXpath.toString());
-            viewTreeList.remove(viewTreeList.size() - 1);
+            originalXpath = "/" + ViewAttributeUtil.getCustomId(rootView);
+            xpath = originalXpath;
         } else if (ViewAttributeUtil.getViewPage(rootView) != null) {
-            originalXpath = new StringBuilder(PAGE_PREFIX);
-            xpath = new StringBuilder(originalXpath.toString());
-            viewTreeList.remove(viewTreeList.size() - 1);
+            originalXpath = PAGE_PREFIX;
+            xpath = PAGE_PREFIX;
         } else {
             String prefix = WindowHelper.getWindowPrefix(rootView);
-            xpath = new StringBuilder(prefix);
-            originalXpath = new StringBuilder(prefix);
+            xpath = prefix + "/" + ClassUtil.getSimpleClassName(rootView.getClass());
+            originalXpath = xpath;
         }
 
-        if (rootView instanceof ViewGroup) {
-            ViewGroup parentView = (ViewGroup) rootView;
-            for (int i = viewTreeList.size() - 1; i >= 0; i--) {
-                View childView = viewTreeList.get(i);
-                String viewName = ClassUtil.getSimpleClassName(childView.getClass());
-                viewPosition = parentView.indexOfChild(childView);
-                if (ClassExistHelper.instanceOfAndroidXViewPager(parentView)) {
-                    viewPosition = ((androidx.viewpager.widget.ViewPager) parentView).getCurrentItem();
-                } else if (ClassExistHelper.instanceOfSupportViewPager(parentView)) {
-                    viewPosition = ((ViewPager) parentView).getCurrentItem();
-                } else if (parentView instanceof AdapterView) {
-                    AdapterView<?> listView = (AdapterView<?>) parentView;
-                    viewPosition = listView.getFirstVisiblePosition() + viewPosition;
-                } else if (ClassExistHelper.instanceOfRecyclerView(parentView)) {
-                    int adapterPosition = getChildAdapterPositionInRecyclerView(childView, parentView);
-                    if (adapterPosition >= 0) {
-                        viewPosition = adapterPosition;
-                    }
-                }
-                if (parentView instanceof ExpandableListView) {
-                    ExpandableListView listParent = (ExpandableListView) parentView;
-                    long elp = listParent.getExpandableListPosition(viewPosition);
-                    if (ExpandableListView.getPackedPositionType(elp) == ExpandableListView.PACKED_POSITION_TYPE_NULL) {
-                        if (viewPosition < listParent.getHeaderViewsCount()) {
-                            originalXpath.append("/ELH[").append(viewPosition).append("]/").append(viewName).append("[0]");
-                            xpath.append("/ELH[").append(viewPosition).append("]/").append(viewName).append("[0]");
-                        } else {
-                            int footerIndex = viewPosition - (listParent.getCount() - listParent.getFooterViewsCount());
-                            originalXpath.append("/ELF[").append(footerIndex).append("]/").append(viewName).append("[0]");
-                            xpath.append("/ELF[").append(footerIndex).append("]/").append(viewName).append("[0]");
-                        }
-                    } else {
-                        int groupIdx = ExpandableListView.getPackedPositionGroup(elp);
-                        int childIdx = ExpandableListView.getPackedPositionChild(elp);
-                        if (childIdx != -1) {
-                            listPos = childIdx;
-                            xpath = new StringBuilder(originalXpath + "/ELVG[" + groupIdx + "]/ELVC[-]/" + viewName + "[0]");
-                            originalXpath.append("/ELVG[").append(groupIdx).append("]/ELVC[").append(childIdx).append("]/").append(viewName).append("[0]");
-                        } else {
-                            listPos = groupIdx;
-                            xpath = new StringBuilder(originalXpath + "/ELVG[-]/" + viewName + "[0]");
-                            originalXpath.append("/ELVG[").append(groupIdx).append("]/").append(viewName).append("[0]");
-                        }
-                    }
-                } else if (ClassExistHelper.isListView(parentView)) {
-                    listPos = viewPosition;
-                    xpath = new StringBuilder(originalXpath + "/" + viewName + "[-]");
-                    originalXpath.append("/").append(viewName).append("[").append(listPos).append("]");
-                } else if (ClassExistHelper.instanceofAndroidXSwipeRefreshLayout(parentView)
-                        || ClassExistHelper.instanceOfSupportSwipeRefreshLayout(parentView)) {
-                    originalXpath.append("/").append(viewName).append("[0]");
-                    xpath.append("/").append(viewName).append("[0]");
-                } else {
-                    int matchTypePosition = 0;
-                    String matchType = ClassUtil.getSimpleClassName(childView.getClass());
-                    boolean findChildView = false;
-                    for (int siblingIndex = 0; siblingIndex < parentView.getChildCount(); siblingIndex++) {
-                        View siblingView = parentView.getChildAt(siblingIndex);
-                        if (siblingView == childView) {
-                            findChildView = true;
-                            break;
-                        } else if (siblingView.getClass().getSimpleName().equals(matchType)) {
-                            matchTypePosition++;
-                        }
-                    }
-                    if (findChildView) {
-                        originalXpath.append("/").append(viewName).append("[").append(matchTypePosition).append("]");
-                        xpath.append("/").append(viewName).append("[").append(matchTypePosition).append("]");
-                    } else {
-                        originalXpath.append("/").append(viewName).append("[").append(viewPosition).append("]");
-                        xpath.append("/").append(viewName).append("[").append(viewPosition).append("]");
-                    }
-                }
-                String id = getViewPackageId(childView);
-                if (id != null) {
-                    originalXpath.append("#").append(id);
-                    xpath.append("#").append(id);
-                }
-
-                if (childView instanceof ViewGroup) {
-                    parentView = (ViewGroup) childView;
-                } else {
-                    break;
-                }
-            }
-        }
-
-        String viewContent = getViewContent(view);
-        return new ViewNode(view, xpath.toString(), originalXpath.toString(), viewContent, listPos);
+        return ViewNode.ViewNodeBuilder.newViewNode()
+                .setView(rootView)
+                .setIndex(-1)
+                .setViewContent(getViewContent(rootView))
+                .setXPath(xpath)
+                .setOriginalXPath(originalXpath)
+                .build();
     }
 
-    private static int getChildAdapterPositionInRecyclerView(View childView, ViewGroup parentView) {
+    public static int getChildAdapterPositionInRecyclerView(View childView, ViewGroup parentView) {
         if (ClassExistHelper.instanceOfAndroidXRecyclerView(parentView)) {
             return ((androidx.recyclerview.widget.RecyclerView) parentView).getChildAdapterPosition(childView);
         } else if (ClassExistHelper.instanceOfSupportRecyclerView(parentView)) {

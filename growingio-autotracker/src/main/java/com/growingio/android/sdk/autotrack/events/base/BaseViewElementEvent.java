@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.autotrack.events.base;
 
+import com.growingio.android.sdk.track.data.EventSequenceId;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 
 import org.json.JSONArray;
@@ -111,10 +113,10 @@ public abstract class BaseViewElementEvent extends BaseEvent {
         @Override
         public void readPropertyInTrackThread() {
             super.readPropertyInTrackThread();
-            // TODO: 2020/5/28 给元素赋值
             for (BaseViewElement.BaseElementBuilder<?> elementBuilder : mElementBuilders) {
-                elementBuilder.setGlobalSequenceId(0)
-                        .setEventSequenceId(0);
+                EventSequenceId sequenceId = PersistentDataProvider.get().getAndIncrement(getEventType());
+                elementBuilder.setGlobalSequenceId(sequenceId.getGlobalId())
+                        .setEventSequenceId(sequenceId.getEventTypeId());
             }
         }
     }

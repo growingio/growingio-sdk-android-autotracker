@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.impression;
+package com.growingio.android.sdk.autotrack.view;
 
 public interface OnViewStateChangedListener {
     void onViewStateChanged(ViewStateChangedEvent changedEvent);

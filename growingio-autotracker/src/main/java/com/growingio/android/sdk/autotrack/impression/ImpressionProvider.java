@@ -18,21 +18,19 @@ package com.growingio.android.sdk.autotrack.impression;
 
 import android.app.Activity;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewTreeObserver;
 
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
+import com.growingio.android.sdk.autotrack.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
-import com.growingio.android.sdk.track.listener.IActivityLifecycle;
-import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.autotrack.view.ViewStateChangedEvent;
+import com.growingio.android.sdk.autotrack.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
@@ -43,13 +41,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class ImpressionProvider implements IActivityLifecycle, OnViewStateChangedListener {
+public class ImpressionProvider implements OnViewStateChangedListener {
     private static final String TAG = "ImpressionProvider";
 
     private static final int CHECK_IMPRESSION_ANTI_SHAKE_TIME = 500;
 
     private static final Map<Activity, List<ViewImpression>> ACTIVITY_SCOPE = new WeakHashMap<>();
-    private final DeprecatedViewStateObserver mViewStateObserver;
     private final float mImpressionScale;
     private final Handler mUiHandler;
     private volatile boolean mStarted = false;
@@ -69,11 +66,6 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         mImpressionScale = configuration.getImpressionScale();
 
         mUiHandler = new Handler(Looper.getMainLooper());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            mViewStateObserver = new ViewStateObserver(this);
-        } else {
-            mViewStateObserver = new DeprecatedViewStateObserver(this);
-        }
     }
 
     public static ImpressionProvider get() {
@@ -136,7 +128,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
             return;
         }
         mStarted = true;
-        ActivityStateProvider.get().registerActivityLifecycleListener(this);
+        ViewTreeStatusProvider.get().register(this);
     }
 
     public void trackViewImpression(View view, String impressionEventName, Map<String, String> attributes) {
@@ -200,43 +192,5 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
             activity = ActivityStateProvider.get().getResumedActivity();
         }
         return activity;
-    }
-
-    @Override
-    public void onActivityLifecycle(ActivityLifecycleEvent event) {
-        Activity activity = event.getActivity();
-        if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
-            monitorViewTreeChange(activity.getWindow().getDecorView());
-        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
-            unRegisterViewTreeChange(activity.getWindow().getDecorView());
-        }
-    }
-
-    private void unRegisterViewTreeChange(View root) {
-        if (ViewAttributeUtil.isMonitoringViewTree(root)) {
-            root.getViewTreeObserver().removeOnGlobalLayoutListener(mViewStateObserver);
-            root.getViewTreeObserver().removeOnGlobalFocusChangeListener(mViewStateObserver);
-            root.getViewTreeObserver().removeOnScrollChangedListener(mViewStateObserver);
-            root.getViewTreeObserver().removeOnDrawListener(mViewStateObserver);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                root.getViewTreeObserver().removeOnWindowFocusChangeListener((ViewTreeObserver.OnWindowFocusChangeListener) mViewStateObserver);
-            }
-
-            ViewAttributeUtil.setMonitoringViewTreeEnabled(root, false);
-        }
-    }
-
-    private void monitorViewTreeChange(View root) {
-        if (!ViewAttributeUtil.isMonitoringViewTree(root)) {
-            root.getViewTreeObserver().addOnGlobalLayoutListener(mViewStateObserver);
-            root.getViewTreeObserver().addOnScrollChangedListener(mViewStateObserver);
-            root.getViewTreeObserver().addOnGlobalFocusChangeListener(mViewStateObserver);
-            root.getViewTreeObserver().addOnDrawListener(mViewStateObserver);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                root.getViewTreeObserver().addOnWindowFocusChangeListener((ViewTreeObserver.OnWindowFocusChangeListener) mViewStateObserver);
-            }
-
-            ViewAttributeUtil.setMonitoringViewTreeEnabled(root, true);
-        }
     }
 }

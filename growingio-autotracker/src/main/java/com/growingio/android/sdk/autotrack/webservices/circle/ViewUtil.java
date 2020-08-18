@@ -19,6 +19,8 @@ package com.growingio.android.sdk.autotrack.webservices.circle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.webkit.WebView;
+import android.widget.AdapterView;
 
 import androidx.annotation.Nullable;
 
@@ -48,6 +50,8 @@ public class ViewUtil {
     }
 
     public static boolean canCircle(View view) {
-        return (view.isClickable() && view.hasOnClickListeners());
+        return view instanceof WebView ||
+                view.getParent() instanceof AdapterView ||
+                (view.isClickable() && view.hasOnClickListeners());
     }
 }
