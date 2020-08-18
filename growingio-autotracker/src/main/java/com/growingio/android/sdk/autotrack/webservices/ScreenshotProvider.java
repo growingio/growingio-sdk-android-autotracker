@@ -17,11 +17,14 @@
 package com.growingio.android.sdk.autotrack.webservices;
 
 import android.os.Handler;
-import android.os.Looper;
+import android.os.HandlerThread;
 import android.util.DisplayMetrics;
 
 import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider;
 import com.growingio.android.sdk.autotrack.hybrid.OnDomChangedListener;
+import com.growingio.android.sdk.autotrack.view.OnViewStateChangedListener;
+import com.growingio.android.sdk.autotrack.view.ViewStateChangedEvent;
+import com.growingio.android.sdk.autotrack.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.track.ContextProvider;
@@ -39,6 +42,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
     private final float mScale;
     private final Handler mHandler;
+    private final HandlerThread mHandlerThread;
     private final Runnable mRefreshScreenshotRunnable = new Runnable() {
         @Override
         public void run() {
@@ -53,16 +57,17 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
     private ScreenshotProvider() {
         DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(ContextProvider.getApplicationContext());
         mScale = SCREENSHOT_STANDARD_WIDTH / Math.min(metrics.widthPixels, metrics.heightPixels);
-        mHandler = new Handler(Looper.myLooper());
 
-// TODO: 2020/8/7 监听页面变化
-//        com.growingio.android.sdk.track.ListenerContainer.viewTreeStatusListeners().register(new IViewTreeStatus() {
-//            @Override
-//            public void onViewTreeStatusChanged(ViewTreeStatusChangeEvent action) {
-//                LogUtil.d(TAG, "onViewTreeStatusChanged: ");
-//                refreshScreenshot();
-//            }
-//        });
+        mHandlerThread = new HandlerThread("ScreenshotProvider");
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+
+        ViewTreeStatusProvider.get().register(new OnViewStateChangedListener() {
+            @Override
+            public void onViewStateChanged(ViewStateChangedEvent changedEvent) {
+                refreshScreenshot();
+            }
+        });
         HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
             @Override
             public void onDomChanged() {
@@ -99,6 +104,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
         return SingleInstance.INSTANCE;
     }
 
+    @Override
     protected void singleAction(OnScreenshotRefreshedListener listener, String action) {
         listener.onScreenshotRefreshed(action, mScale);
     }

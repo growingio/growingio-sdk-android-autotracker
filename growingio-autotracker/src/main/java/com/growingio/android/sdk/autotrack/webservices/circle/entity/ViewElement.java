@@ -34,6 +34,7 @@ class ViewElement {
     private final String mContent;
     private final String mPage;
     private final int mZLevel;
+    private final int mIndex;
     private final JSONObject mWebView;
 
     private ViewElement(Builder builder) {
@@ -48,6 +49,7 @@ class ViewElement {
         mContent = builder.mContent;
         mPage = builder.mPage;
         mZLevel = builder.mZLevel;
+        mIndex = builder.mIndex;
         mWebView = builder.mWebView;
     }
 
@@ -65,6 +67,7 @@ class ViewElement {
             json.put("content", mContent);
             json.put("page", mPage);
             json.put("zLevel", mZLevel);
+            json.put("index", mIndex);
             json.put("webView", mWebView);
         } catch (JSONException ignored) {
         }
@@ -83,6 +86,7 @@ class ViewElement {
         private String mContent;
         private String mPage;
         private int mZLevel;
+        private int mIndex;
         private JSONObject mWebView;
 
         public Builder setXpath(String xpath) {
@@ -137,6 +141,11 @@ class ViewElement {
 
         public Builder setZLevel(int zLevel) {
             mZLevel = zLevel;
+            return this;
+        }
+
+        public Builder setIndex(int index) {
+            mIndex = index;
             return this;
         }
 
