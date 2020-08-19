@@ -63,6 +63,11 @@ public class RecyclerViewImpActivity extends Activity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             holder.mLeft.setText("position: " + position);
+            holder.mLeft.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                }
+            });
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("position", position);

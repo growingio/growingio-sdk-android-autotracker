@@ -20,12 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.WebView;
-import android.widget.AdapterView;
 
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
+import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 public class ViewUtil {
     private ViewUtil() {
@@ -51,7 +51,7 @@ public class ViewUtil {
 
     public static boolean canCircle(View view) {
         return view instanceof WebView ||
-                view.getParent() instanceof AdapterView ||
+                ClassExistHelper.isListView(view.getParent()) ||
                 (view.isClickable() && view.hasOnClickListeners());
     }
 }

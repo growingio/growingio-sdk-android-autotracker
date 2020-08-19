@@ -97,6 +97,12 @@ public class ClassExistHelper {
                 || (ClassExistHelper.instanceOfSupportViewPager(view)));
     }
 
+    public static boolean isWebView(Object view) {
+        return view instanceof WebView
+                || ClassExistHelper.instanceOfX5WebView(view)
+                || ClassExistHelper.instanceOfUcWebView(view);
+    }
+
     public static boolean instanceOfSupportRecyclerView(Object view) {
         return sHasSupportRecyclerView && view instanceof RecyclerView;
     }

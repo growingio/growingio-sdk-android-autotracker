@@ -38,7 +38,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.models.ViewNode;
@@ -244,9 +243,9 @@ public class ViewHelper {
         } else if (ClassExistHelper.instanceOfSupportRecyclerView(parentView)) {
             // For low version RecyclerView
             try {
-                return ((RecyclerView) parentView).getChildAdapterPosition(childView);
+                return ((android.support.v7.widget.RecyclerView) parentView).getChildAdapterPosition(childView);
             } catch (Throwable e) {
-                return ((RecyclerView) parentView).getChildPosition(childView);
+                return ((android.support.v7.widget.RecyclerView) parentView).getChildPosition(childView);
             }
 
         }
