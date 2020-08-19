@@ -67,7 +67,9 @@ class ViewElement {
             json.put("content", mContent);
             json.put("page", mPage);
             json.put("zLevel", mZLevel);
-            json.put("index", mIndex);
+            if (mIndex > -1) {
+                json.put("index", mIndex);
+            }
             json.put("webView", mWebView);
         } catch (JSONException ignored) {
         }
