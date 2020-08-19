@@ -38,7 +38,7 @@ import com.growingio.android.sdk.track.variation.TrackEventJsonMarshaller;
  * GrowingIO主线程
  */
 public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKCallback, Void> {
-    private static final String TAG = "GIO.Main";
+    private static final String TAG = "TrackMainThread";
 
 
     private static final int MSG_INIT_SDK = 1;

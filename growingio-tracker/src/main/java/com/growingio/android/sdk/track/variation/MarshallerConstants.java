@@ -82,7 +82,7 @@ public class MarshallerConstants {
             public static final String PAGE_ATTRIBUTES = "pvar";
             public static final String CLICK = "clck";
             public static final String CHANG = "chng";
-            public static final String SUBMIT = "sbmt";
+            public static final String SUBMIT = "FORM_SUBMIT";
             public static final String CUSTOM = "cstm";
             public static final String CONVERSION_VARIABLES = "evar";
             public static final String LOGIN_USER_ATTRIBUTES = "ppl";

@@ -29,6 +29,7 @@ import android.widget.ListView;
 import com.gio.test.three.ModuleEntry;
 import com.gio.test.three.autotrack.activity.ClickTestActivity;
 import com.gio.test.three.autotrack.activity.DialogTestActivity;
+import com.gio.test.three.autotrack.activity.ExpandableListSubActivity;
 import com.gio.test.three.autotrack.activity.ExpandableListViewActivity;
 import com.gio.test.three.autotrack.activity.HideFragmentActivity;
 import com.gio.test.three.autotrack.activity.LambdaActivity;
@@ -62,6 +63,7 @@ public class AutotrackEntryActivity extends Activity {
     private static final String GO_TO_DIALOG_RECYCLER_VIEW_IMP_ACTIVITY = "Go To RecyclerViewImpActivity";
     private static final String GO_TO_CLICK_TEST_ACTIVITY = "Go To ClickTestActivity";
     private static final String GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY = "Go To ExpandableListViewActivity";
+    private static final String GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY = "Go To ExpandableListSubActivity";
 
 
     private static final String[] ITEMS = {
@@ -77,6 +79,7 @@ public class AutotrackEntryActivity extends Activity {
             GO_TO_DIALOG_RECYCLER_VIEW_IMP_ACTIVITY,
             GO_TO_CLICK_TEST_ACTIVITY,
             GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY,
+            GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY,
     };
 
     @Override
@@ -172,6 +175,9 @@ public class AutotrackEntryActivity extends Activity {
                 break;
             case GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY:
                 startActivity(new Intent(this, ExpandableListViewActivity.class));
+                break;
+            case GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY:
+                startActivity(new Intent(this, ExpandableListSubActivity.class));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

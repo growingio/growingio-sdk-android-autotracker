@@ -252,7 +252,7 @@ public final class VisitEvent extends BaseEventWithSequenceId {
             }
 
             mSdkVersion = SDKConfig.SDK_VERSION;
-            mLanguage = Locale.getDefault().toString();
+            mLanguage = Locale.getDefault().getLanguage();
 
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
             mImei = deviceInfo.getImei();
