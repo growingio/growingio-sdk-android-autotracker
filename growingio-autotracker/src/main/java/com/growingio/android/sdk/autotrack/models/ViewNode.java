@@ -49,7 +49,7 @@ public class ViewNode {
     @StringDef({
             INPUT,
             TEXT,
-            WEBVIEW,
+            WEB_VIEW,
             BUTTON,
             LIST
     })
@@ -57,7 +57,7 @@ public class ViewNode {
     }
     private static final String INPUT = "INPUT";
     private static final String TEXT = "TEXT";
-    private static final String WEBVIEW = "WEBVIEW";
+    private static final String WEB_VIEW = "WEB_VIEW";
     private static final String BUTTON = "BUTTON";
     private static final String LIST = "LIST";
 
@@ -98,7 +98,7 @@ public class ViewNode {
         }
 
         if (ClassExistHelper.isWebView(mView)) {
-            return WEBVIEW;
+            return WEB_VIEW;
         }
 
         return BUTTON;
