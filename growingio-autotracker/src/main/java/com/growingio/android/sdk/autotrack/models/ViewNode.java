@@ -20,6 +20,7 @@ import android.support.annotation.StringDef;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
@@ -89,7 +90,7 @@ public class ViewNode {
             return INPUT;
         }
 
-        if (mView instanceof TextView) {
+        if (mView instanceof TextView && !(mView instanceof Button)) {
             return TEXT;
         }
 
