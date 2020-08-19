@@ -16,10 +16,13 @@
 
 package com.growingio.android.sdk.autotrack.models;
 
+import android.support.annotation.StringDef;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
@@ -29,13 +32,34 @@ import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.autotrack.webservices.circle.ViewUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
+import java.lang.annotation.Retention;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 public class ViewNode {
     private View mView;
     private String mXPath;
     private String mOriginalXPath;
     private String mClickableParentXPath;
     private String mViewContent;
+    private boolean mHasListParent;
     private int mIndex;
+
+    @Retention(SOURCE)
+    @StringDef({
+            INPUT,
+            TEXT,
+            WEBVIEW,
+            BUTTON,
+            LIST
+    })
+    private @interface NodeType {
+    }
+    private static final String INPUT = "INPUT";
+    private static final String TEXT = "TEXT";
+    private static final String WEBVIEW = "WEBVIEW";
+    private static final String BUTTON = "BUTTON";
+    private static final String LIST = "LIST";
 
     private ViewNode() {
     }
@@ -46,10 +70,6 @@ public class ViewNode {
 
     public String getXPath() {
         return mXPath;
-    }
-
-    public String getOriginalXPath() {
-        return mOriginalXPath;
     }
 
     public String getClickableParentXPath() {
@@ -64,6 +84,26 @@ public class ViewNode {
         return mIndex;
     }
 
+    public String getNodeType() {
+        if (mView instanceof EditText) {
+            return INPUT;
+        }
+
+        if (mView instanceof TextView) {
+            return TEXT;
+        }
+
+        if (ClassExistHelper.isListView(mView.getParent())) {
+            return LIST;
+        }
+
+        if (ClassExistHelper.isWebView(mView)) {
+            return WEBVIEW;
+        }
+
+        return BUTTON;
+    }
+
     public ViewNode appendNode(View view) {
         if (mView instanceof ViewGroup) {
             return appendNode(view, ((ViewGroup) mView).indexOfChild(view));
@@ -73,12 +113,14 @@ public class ViewNode {
     }
 
     public ViewNode appendNode(View view, int index) {
+        boolean hasListParent = mHasListParent || ClassExistHelper.isListView(view);
         return ViewNodeBuilder.newViewNode()
                 .setView(view)
-                .setIndex(-1)
+                .setIndex(hasListParent ? mIndex : -1)
                 .setXPath(mXPath)
                 .setOriginalXPath(mOriginalXPath)
                 .setClickableParentXPath(ViewUtil.canCircle(mView) ? mXPath : mClickableParentXPath)
+                .setHasListParent(hasListParent)
                 .setViewPosition(index)
                 .needRecalculate(true)
                 .build();
@@ -90,6 +132,7 @@ public class ViewNode {
         private String mOriginalXPath;
         private String mClickableParentXPath;
         private String mViewContent;
+        private boolean mHasListParent;
         private int mIndex;
 
         private boolean mNeedRecalculate = false;
@@ -137,6 +180,11 @@ public class ViewNode {
             return this;
         }
 
+        public ViewNodeBuilder setHasListParent(boolean hasListParent) {
+            this.mHasListParent = hasListParent;
+            return this;
+        }
+
         public ViewNodeBuilder setIndex(int mIndex) {
             this.mIndex = mIndex;
             return this;
@@ -153,6 +201,7 @@ public class ViewNode {
             viewNode.mOriginalXPath = this.mOriginalXPath;
             viewNode.mClickableParentXPath = this.mClickableParentXPath;
             viewNode.mViewContent = this.mViewContent;
+            viewNode.mHasListParent = this.mHasListParent;
             viewNode.mIndex = this.mIndex;
             return viewNode;
         }

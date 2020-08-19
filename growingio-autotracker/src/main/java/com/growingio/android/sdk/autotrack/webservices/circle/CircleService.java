@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.webservices.circle;
 
-import android.os.Process;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -78,7 +77,7 @@ public class CircleService implements ScreenshotProvider.OnScreenshotRefreshedLi
             mCircleScreenshotDisposable = new CircleScreenshot.Builder()
                     .setScale(scale)
                     .setScreenshot(screenshotBase64)
-                    .setSnapshotKey(Process.myPid() + "-" + mSnapshotKey++)
+                    .setSnapshotKey(mSnapshotKey++)
                     .build(new Callback<CircleScreenshot>() {
                         @Override
                         public void onSuccess(CircleScreenshot result) {

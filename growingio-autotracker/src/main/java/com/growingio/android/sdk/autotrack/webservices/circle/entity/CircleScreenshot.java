@@ -57,7 +57,7 @@ public class CircleScreenshot {
     private final float mScale;
     private final String mScreenshot;
     private final String mMsgType;
-    private final String mSnapshotKey;
+    private final long mSnapshotKey;
     private final List<ViewElement> mElements;
     private final List<PageElement> mPages;
 
@@ -103,7 +103,7 @@ public class CircleScreenshot {
         private int mScreenHeight;
         private float mScale;
         private String mScreenshot;
-        private String mSnapshotKey;
+        private long mSnapshotKey;
         private final List<ViewElement> mViewElements = new ArrayList<>();
         private final List<PageElement> mPages = new ArrayList<>();
         private final AtomicInteger mWebViewCount = new AtomicInteger(0);
@@ -121,7 +121,7 @@ public class CircleScreenshot {
             return this;
         }
 
-        public Builder setSnapshotKey(String snapshotKey) {
+        public Builder setSnapshotKey(long snapshotKey) {
             mSnapshotKey = snapshotKey;
             return this;
         }
@@ -177,7 +177,7 @@ public class CircleScreenshot {
                     .setWidth(viewNode.getView().getWidth())
                     .setContent(viewNode.getViewContent())
                     .setContainer(true)
-                    .setNodeType("xxxx")
+                    .setNodeType(viewNode.getNodeType())
                     .setPage(PageProvider.get().findPage(viewNode.getView()).path())
                     .setParentXPath(viewNode.getClickableParentXPath())
                     .setXpath(viewNode.getXPath())
