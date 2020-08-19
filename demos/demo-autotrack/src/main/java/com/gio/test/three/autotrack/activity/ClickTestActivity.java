@@ -19,9 +19,19 @@ package com.gio.test.three.autotrack.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
+import android.widget.RatingBar;
+import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
+
+import androidx.annotation.NonNull;
 
 import com.gio.test.three.autotrack.R;
 
@@ -47,5 +57,54 @@ public class ClickTestActivity extends Activity {
                 Log.e(TAG, "onNothingSelected: ");
             }
         });
+
+        CheckBox checkBox1 = findViewById(R.id.check_box_android);
+        checkBox1.setOnCheckedChangeListener((buttonView, isChecked) -> Log.e(TAG, "checkBox1"));
+        CheckBox checkBox2 = findViewById(R.id.check_box_ios);
+        checkBox2.setOnCheckedChangeListener((buttonView, isChecked) -> Log.e(TAG, "checkBox2"));
+
+        RadioGroup radioGroup = findViewById(R.id.radio_group_gender);
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+
+        });
+
+        Switch switchBtn = findViewById(R.id.switch1);
+        switchBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+        });
+
+        SeekBar seekBar = findViewById(R.id.seek_bar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        RatingBar ratingBar = findViewById(R.id.rating_bar);
+        ratingBar.setOnRatingBarChangeListener((ratingBar1, rating, fromUser) -> {
+
+        });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.bottom_nav_menu, menu);
+        return true;
+    }
+
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        return super.onOptionsItemSelected(item);
+//    }
 }

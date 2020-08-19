@@ -47,13 +47,7 @@ class ViewClickProvider {
 
         ViewNode viewNode = ViewHelper.getClickViewNode(view);
         if (viewNode != null) {
-            ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder();
-            event.setEventType(EventType.CLICK);
-            Page<?> page = PageProvider.get().findPage(view);
-            event.addElementBuilders(viewNodeToElementBuilders(viewNode))
-                    .setPageName(page.path())
-                    .setPageShowTimestamp(page.getShowTimestamp());
-            TrackMainThread.trackMain().postEventToTrackMain(event);
+            sendClickEvent(viewNode);
         } else {
             LogUtil.e(TAG, "ViewNode is NULL");
         }
@@ -63,6 +57,22 @@ class ViewClickProvider {
         if (!GrowingAutotracker.initializedSuccessfully()) {
             LogUtil.e(TAG, "Autotracker do not initialized successfully");
         }
+        ViewNode viewNode = ViewHelper.getClickViewNode(menuItem);
+        if (viewNode != null) {
+            sendClickEvent(viewNode);
+        } else {
+            LogUtil.e(TAG, "MenuItem ViewNode is NULL");
+        }
+    }
+
+    private static void sendClickEvent(ViewNode viewNode) {
+        ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder();
+        event.setEventType(EventType.CLICK);
+        Page<?> page = PageProvider.get().findPage(viewNode.getView());
+        event.addElementBuilders(viewNodeToElementBuilders(viewNode))
+                .setPageName(page.path())
+                .setPageShowTimestamp(page.getShowTimestamp());
+        TrackMainThread.trackMain().postEventToTrackMain(event);
     }
 
     private static List<BaseViewElement.BaseElementBuilder<?>> viewNodeToElementBuilders(ViewNode viewNode) {

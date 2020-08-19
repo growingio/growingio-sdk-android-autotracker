@@ -78,13 +78,8 @@ public class ViewClickInjector {
         ViewClickProvider.viewOnClick(v);
     }
 
-    @BeforeSuper(clazz = ExpandableListActivity.class, method = "onGroupClick", parameterTypes = {ExpandableListView.class, View.class, int.class, long.class}, returnType = boolean.class)
-    public static void expandableListActivityOnGroupClick(ExpandableListView.OnGroupClickListener listener, ExpandableListView parent, View v, int groupPosition, long id) {
-        ViewClickProvider.viewOnClick(v);
-    }
-
-    @BeforeSuper(clazz = ExpandableListView.OnChildClickListener.class, method = "onChildClick", parameterTypes = {ExpandableListView.class, View.class, int.class, int.class, long.class}, returnType = boolean.class)
-    public static void expandableListActivityOnChildClick(ExpandableListView.OnChildClickListener listener, ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+    @BeforeSuper(clazz = ExpandableListActivity.class, method = "onChildClick", parameterTypes = {ExpandableListView.class, View.class, int.class, int.class, long.class}, returnType = boolean.class)
+    public static void expandableListActivityOnChildClick(ExpandableListActivity activity, ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
         ViewClickProvider.viewOnClick(v);
     }
 
@@ -115,27 +110,27 @@ public class ViewClickInjector {
         ViewClickProvider.viewOnClick(seekBar);
     }
 
-    @BeforeSuper(clazz = MenuItem.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class})
+    @BeforeSuper(clazz = MenuItem.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     public static void menuItemOnMenuItemClick(MenuItem.OnMenuItemClickListener listener, MenuItem item) {
         ViewClickProvider.menuItemOnClick(item);
     }
 
-    @BeforeSuper(clazz = Toolbar.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class})
+    @BeforeSuper(clazz = Toolbar.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     public static void toolbarOnMenuItemClick(Toolbar.OnMenuItemClickListener listener, MenuItem item) {
         ViewClickProvider.menuItemOnClick(item);
     }
 
-    @BeforeSuper(clazz = ActionMenuView.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class})
+    @BeforeSuper(clazz = ActionMenuView.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     public static void actionMenuViewOnMenuItemClick(ActionMenuView.OnMenuItemClickListener listener, MenuItem item) {
         ViewClickProvider.menuItemOnClick(item);
     }
 
-    @BeforeSuper(clazz = PopupMenu.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class})
+    @BeforeSuper(clazz = PopupMenu.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     public static void popupMenuOnMenuItemClick(PopupMenu.OnMenuItemClickListener listener, MenuItem item) {
         ViewClickProvider.menuItemOnClick(item);
     }
 
-    @BeforeSuper(clazz = Activity.class, method = "onOptionsItemSelected", parameterTypes = {MenuItem.class})
+    @BeforeSuper(clazz = Activity.class, method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     public static void menuItemOnOptionsItemSelected(Activity activity, MenuItem item) {
         ViewClickProvider.menuItemOnClick(item);
     }
