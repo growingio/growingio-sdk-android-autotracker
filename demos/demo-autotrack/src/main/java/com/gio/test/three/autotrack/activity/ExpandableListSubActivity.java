@@ -22,6 +22,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -67,6 +68,12 @@ public class ExpandableListSubActivity extends ExpandableListActivity {
 //        setContentView(R.layout.activity_expandable_list_sub);
         initData();
         setListAdapter(new MyAdapter(this, mGroupList, mItemSet));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.bottom_nav_menu, menu);
+        return true;
     }
 
     @SuppressLint("LongLogTag")

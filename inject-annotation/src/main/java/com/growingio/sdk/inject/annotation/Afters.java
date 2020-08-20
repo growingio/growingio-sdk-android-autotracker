@@ -17,20 +17,12 @@
 package com.growingio.sdk.inject.annotation;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-@Repeatable(Befores.class)
-public @interface Before {
-    Class<?> clazz();
-
-    String method();
-
-    Class<?>[] parameterTypes() default {};
-
-    Class<?> returnType() default void.class;
+public @interface Afters {
+    After[] value();
 }
