@@ -19,8 +19,12 @@ package com.growingio.sdk.inject.compiler;
 import com.google.auto.service.AutoService;
 import com.growingio.sdk.inject.annotation.After;
 import com.growingio.sdk.inject.annotation.AfterSuper;
+import com.growingio.sdk.inject.annotation.AfterSupers;
+import com.growingio.sdk.inject.annotation.Afters;
 import com.growingio.sdk.inject.annotation.Before;
 import com.growingio.sdk.inject.annotation.BeforeSuper;
+import com.growingio.sdk.inject.annotation.BeforeSupers;
+import com.growingio.sdk.inject.annotation.Befores;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -29,6 +33,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;
 
 import org.apache.commons.io.IOUtils;
@@ -54,6 +59,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -97,6 +103,11 @@ public class InjectProcessor extends AbstractProcessor {
         types.add(After.class.getCanonicalName());
         types.add(BeforeSuper.class.getCanonicalName());
         types.add(AfterSuper.class.getCanonicalName());
+
+        types.add(Befores.class.getCanonicalName());
+        types.add(Afters.class.getCanonicalName());
+        types.add(BeforeSupers.class.getCanonicalName());
+        types.add(AfterSupers.class.getCanonicalName());
         return types;
     }
 
@@ -107,7 +118,8 @@ public class InjectProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        Class<? extends Annotation>[] allAnnotations = new Class[]{Before.class, After.class, BeforeSuper.class, AfterSuper.class};
+        Class<? extends Annotation>[] allAnnotations = new Class[]{Before.class, After.class, BeforeSuper.class, AfterSuper.class,
+                Befores.class, Afters.class, BeforeSupers.class, AfterSupers.class};
         for (Class<? extends Annotation> annotation : allAnnotations) {
             analyzeAnnotation(annotation, roundEnvironment);
         }
@@ -119,34 +131,55 @@ public class InjectProcessor extends AbstractProcessor {
     private void analyzeAnnotation(Class<? extends Annotation> clazz, RoundEnvironment roundEnvironment) {
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(clazz);
         for (Element element : elements) {
-            String originalTargetClassName = AnnotationUtil.getClassValue(element, clazz, "clazz");
-            String targetClassName = TypeUtil.getInternalName(originalTargetClassName);
-
-            String targetMethodName = AnnotationUtil.getStringValue(element, clazz, "method");
-            List<String> targetParameters = AnnotationUtil.getClassesValue(element, clazz, "parameterTypes");
-            if (targetParameters == null) {
-                targetParameters = new ArrayList<>();
+            if (clazz == Befores.class || clazz == Afters.class || clazz == BeforeSupers.class || clazz == AfterSupers.class) {
+                AnnotationMirror mirror = AnnotationUtil.findAnnotationMirror(element, clazz);
+                if (mirror == null) {
+                    continue;
+                }
+                List<Attribute.Compound> annotations = AnnotationUtil.getAnnotations(mirror, "value");
+                if (annotations != null && !annotations.isEmpty()) {
+                    for (Attribute.Compound annotation : annotations) {
+                        stashHookClassesArgs(element, annotation);
+                    }
+                }
+            } else {
+                stashHookClassesArgs(element, AnnotationUtil.findAnnotationMirror(element, clazz));
             }
-            Type[] argumentTypes = new Type[targetParameters.size()];
-            for (int i = 0; i < targetParameters.size(); i++) {
-                argumentTypes[i] = TypeUtil.getType(targetParameters.get(i));
-            }
-            String targetReturnType = AnnotationUtil.getClassValue(element, clazz, "returnType");
-            if (targetReturnType == null) {
-                targetReturnType = void.class.getName();
-            }
-            Type returnType = TypeUtil.getType(targetReturnType);
-            String targetDesc = Type.getMethodDescriptor(returnType, argumentTypes);
+        }
+    }
 
-            Symbol.ClassSymbol enclosingElement = (Symbol.ClassSymbol) element.getEnclosingElement();
-            String originalInjectClass = enclosingElement.flatName().toString();
-            String injectClass = TypeUtil.getInternalName(originalInjectClass);
-            String injectMethod = element.getSimpleName().toString();
+    private void stashHookClassesArgs(Element element, AnnotationMirror annotationMirror) {
+        String originalTargetClassName = AnnotationUtil.getClassValue(annotationMirror, "clazz");
+        String targetClassName = TypeUtil.getInternalName(originalTargetClassName);
 
+        String targetMethodName = AnnotationUtil.getStringValue(annotationMirror, "method");
+        List<String> targetParameters = AnnotationUtil.getClassesValue(annotationMirror, "parameterTypes");
+        if (targetParameters == null) {
+            targetParameters = new ArrayList<>();
+        }
+        Type[] argumentTypes = new Type[targetParameters.size()];
+        for (int i = 0; i < targetParameters.size(); i++) {
+            argumentTypes[i] = TypeUtil.getType(targetParameters.get(i));
+        }
+        String targetReturnType = AnnotationUtil.getClassValue(annotationMirror, "returnType");
+        if (targetReturnType == null) {
+            targetReturnType = void.class.getName();
+        }
+        Type returnType = TypeUtil.getType(targetReturnType);
+        String targetDesc = Type.getMethodDescriptor(returnType, argumentTypes);
 
+        Symbol.ClassSymbol enclosingElement = (Symbol.ClassSymbol) element.getEnclosingElement();
+        String originalInjectClass = enclosingElement.flatName().toString();
+        String injectClass = TypeUtil.getInternalName(originalInjectClass);
+        String injectMethod = element.getSimpleName().toString();
+
+        if (element instanceof Symbol.MethodSymbol) {
             List<String> injectParameters = new ArrayList<>();
-            injectParameters.add(originalTargetClassName);
-            injectParameters.addAll(targetParameters);
+            Symbol.MethodSymbol methodSymbol = (Symbol.MethodSymbol) element;
+            List<Symbol.VarSymbol> parameters = methodSymbol.getParameters();
+            for (Symbol.VarSymbol parameter : parameters) {
+                injectParameters.add(parameter.asType().asElement().flatName().toString());
+            }
             argumentTypes = new Type[injectParameters.size()];
             for (int i = 0; i < injectParameters.size(); i++) {
                 argumentTypes[i] = TypeUtil.getType(injectParameters.get(i));
@@ -155,10 +188,11 @@ public class InjectProcessor extends AbstractProcessor {
             returnType = TypeUtil.getType(injectReturnType);
             String injectDesc = Type.getMethodDescriptor(returnType, argumentTypes);
 
-            boolean isAfter = clazz == After.class || clazz == AfterSuper.class;
+            String annotationClass = annotationMirror.getAnnotationType().toString();
+            boolean isAfter = After.class.getName().equals(annotationClass) || AfterSuper.class.getName().equals(annotationClass);
 
-            log(originalInjectClass + "#" + injectMethod + " ===" + clazz.getSimpleName() + "===> " + originalTargetClassName + "#" + targetMethodName);
-            if (clazz == Before.class || clazz == After.class) {
+            log(originalInjectClass + "#" + injectMethod + " ===" + annotationClass + "===> " + originalTargetClassName + "#" + targetMethodName);
+            if (Before.class.getName().equals(annotationClass) || After.class.getName().equals(annotationClass)) {
                 mAroundHookClassesArgs.add(Arrays.<Object>asList(targetClassName, targetMethodName, targetDesc, injectClass, injectMethod, injectDesc, isAfter));
             } else {
                 mSuperHookClassesArgs.add(Arrays.<Object>asList(targetClassName, targetMethodName, targetDesc, injectClass, injectMethod, injectDesc, isAfter));

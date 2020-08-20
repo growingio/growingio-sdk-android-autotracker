@@ -33,8 +33,8 @@ public final class AnnotationUtil {
     }
 
     @Nullable
-    public static String getClassValue(Element element, Class<?> annotationClazz, String key) {
-        AnnotationValue annotationValue = getAnnotationValue(element, annotationClazz, key);
+    public static String getClassValue(AnnotationMirror annotationMirror, String key) {
+        AnnotationValue annotationValue = getAnnotationValue(annotationMirror, key);
         if (annotationValue == null) {
             return null;
         }
@@ -46,8 +46,8 @@ public final class AnnotationUtil {
         return null;
     }
 
-    public static String getStringValue(Element element, Class<?> annotationClazz, String key) {
-        AnnotationValue annotationValue = getAnnotationValue(element, annotationClazz, key);
+    public static String getStringValue(AnnotationMirror annotationMirror, String key) {
+        AnnotationValue annotationValue = getAnnotationValue(annotationMirror, key);
         if (annotationValue == null) {
             return null;
         }
@@ -60,8 +60,8 @@ public final class AnnotationUtil {
     }
 
     @Nullable
-    public static List<String> getClassesValue(Element element, Class<?> annotationClazz, String key) {
-        AnnotationValue annotationValue = getAnnotationValue(element, annotationClazz, key);
+    public static List<String> getClassesValue(AnnotationMirror annotationMirror, String key) {
+        AnnotationValue annotationValue = getAnnotationValue(annotationMirror, key);
         if (annotationValue == null) {
             return null;
         }
@@ -82,15 +82,41 @@ public final class AnnotationUtil {
         return null;
     }
 
-    private static AnnotationValue getAnnotationValue(Element element, Class<?> annotationClazz, String key) {
+    @Nullable
+    public static List<Attribute.Compound> getAnnotations(AnnotationMirror annotationMirror, String key) {
+        AnnotationValue annotationValue = getAnnotationValue(annotationMirror, key);
+        if (annotationValue == null) {
+            return null;
+        }
+
+        if (annotationValue instanceof Attribute.Array) {
+            Attribute.Array arrayValue = (Attribute.Array) annotationValue;
+            List<Attribute.Compound> valueList = new ArrayList<>();
+            for (Attribute value : arrayValue.values) {
+                if (value instanceof Attribute.Compound) {
+                    valueList.add((Attribute.Compound) value);
+                }
+            }
+            return valueList;
+        }
+
+        return null;
+    }
+
+    public static AnnotationMirror findAnnotationMirror(Element element, Class<?> annotationClazz) {
         for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
             if (annotationClazz.getName().equals(annotationMirror.getAnnotationType().toString())) {
-                Map<? extends ExecutableElement, ? extends AnnotationValue> valueMap = annotationMirror.getElementValues();
-                for (ExecutableElement executableElement : valueMap.keySet()) {
-                    if (key.equals(executableElement.getSimpleName().toString())) {
-                        return valueMap.get(executableElement);
-                    }
-                }
+                return annotationMirror;
+            }
+        }
+        return null;
+    }
+
+    private static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String key) {
+        Map<? extends ExecutableElement, ? extends AnnotationValue> valueMap = annotationMirror.getElementValues();
+        for (ExecutableElement executableElement : valueMap.keySet()) {
+            if (key.equals(executableElement.getSimpleName().toString())) {
+                return valueMap.get(executableElement);
             }
         }
         return null;

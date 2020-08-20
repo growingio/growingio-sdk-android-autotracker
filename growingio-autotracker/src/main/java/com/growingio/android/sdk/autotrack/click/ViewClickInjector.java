@@ -16,11 +16,18 @@
 
 package com.growingio.android.sdk.autotrack.click;
 
+import android.accounts.AccountAuthenticatorActivity;
 import android.app.Activity;
+import android.app.ActivityGroup;
 import android.app.AlertDialog;
+import android.app.AliasActivity;
 import android.app.ExpandableListActivity;
+import android.app.LauncherActivity;
 import android.app.ListActivity;
+import android.app.NativeActivity;
+import android.app.TabActivity;
 import android.content.DialogInterface;
+import android.preference.PreferenceActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ActionMenuView;
@@ -130,7 +137,16 @@ public class ViewClickInjector {
         ViewClickProvider.menuItemOnClick(item);
     }
 
-    @BeforeSuper(clazz = Activity.class, method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = Activity.class,                     method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = AccountAuthenticatorActivity.class, method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = ActivityGroup.class,                method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = AliasActivity.class,                method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = ExpandableListActivity.class,       method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = LauncherActivity.class,             method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = ListActivity.class,                 method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = NativeActivity.class,               method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = TabActivity.class,                  method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
+    @BeforeSuper(clazz = PreferenceActivity.class,           method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     public static void menuItemOnOptionsItemSelected(Activity activity, MenuItem item) {
         ViewClickProvider.menuItemOnClick(item);
     }
