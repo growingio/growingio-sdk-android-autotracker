@@ -14,30 +14,12 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.events;
+package com.growingio.android.sdk.track.utils;
 
-public enum EventType {
-    VISIT("visit"),
-    PAGE("page"),
-    PAGE_ATTRIBUTES("pageAttributes"),
-    CLICK("click"),
-    SUBMIT("submit"),
-    CHANGE("change"),
-    CUSTOM("custom"),
-    CONVERSION_VARIABLES("conversionVariables"),
-    LOGIN_USER_ATTRIBUTES("loginUserAttributes"),
-    VISITOR_ATTRIBUTES("visitorAttributes"),
-    APP_CLOSE("appClose");
-
-    private final String mType;
-
-    EventType(String type) {
-        mType = type;
+public class ConstantPool {
+    private ConstantPool() {
     }
 
-
-    @Override
-    public String toString() {
-        return mType;
-    }
+    public static final String UNKNOWN = "UNKNOWN";
+    public static final String ANDROID = "Android";
 }

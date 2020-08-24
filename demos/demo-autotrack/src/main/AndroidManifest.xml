@@ -22,7 +22,10 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application>
-        <activity android:name=".activity.ExpandableListSubActivity"></activity>
+        <activity
+            android:name=".activity.ui.login.LoginActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activity.ExpandableListSubActivity" />
         <activity android:name=".activity.ExpandableListViewActivity" />
         <activity android:name=".activity.ClickTestActivity" />
         <activity android:name=".activity.RecyclerViewImpActivity" />

@@ -20,19 +20,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-import com.growingio.android.sdk.autotrack.events.ViewElement;
+import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
-import com.growingio.android.sdk.autotrack.events.base.BaseViewElement;
 import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.events.EventType;
 import com.growingio.android.sdk.track.utils.LogUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class ViewClickProvider {
     private static final String TAG = "ViewClickProvider";
@@ -67,22 +62,15 @@ class ViewClickProvider {
 
     private static void sendClickEvent(ViewNode viewNode) {
         ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder();
-        event.setEventType(EventType.CLICK);
         Page<?> page = PageProvider.get().findPage(viewNode.getView());
-        event.addElementBuilders(viewNodeToElementBuilders(viewNode))
-                .setPageName(page.path())
-                .setPageShowTimestamp(page.getShowTimestamp());
-        TrackMainThread.trackMain().postEventToTrackMain(event);
-    }
-
-    private static List<BaseViewElement.BaseElementBuilder<?>> viewNodeToElementBuilders(ViewNode viewNode) {
-        List<BaseViewElement.BaseElementBuilder<?>> elementBuilders = new ArrayList<>();
-        elementBuilders.add((new ViewElement.ElementBuilder())
-                .setXpath(viewNode.getXPath())
-                .setTimestamp(System.currentTimeMillis())
-                .setIndex(viewNode.getIndex())
-                .setTextValue(viewNode.getViewContent())
+        TrackMainThread.trackMain().postEventToTrackMain(
+                new ViewElementEvent.EventBuilder()
+                        .setEventType(AutotrackEventType.VIEW_CLICK)
+                        .setPageName(page.path())
+                        .setPageShowTimestamp(page.getShowTimestamp())
+                        .setXpath(viewNode.getXPath())
+                        .setIndex(viewNode.getIndex())
+                        .setTextValue(viewNode.getViewContent())
         );
-        return elementBuilders;
     }
 }

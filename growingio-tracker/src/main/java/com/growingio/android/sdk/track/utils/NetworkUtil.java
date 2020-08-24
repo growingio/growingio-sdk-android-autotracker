@@ -21,6 +21,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class NetworkUtil {
@@ -66,10 +67,11 @@ public class NetworkUtil {
         return null;
     }
 
+    @NonNull
     public static NetworkState getActiveNetworkState(Context context) {
         NetworkInfo networkInfo = getActiveNetworkInfo(context);
         if (networkInfo == null) {
-            return new NetworkState(false, false, false, "UNKNOWN");
+            return new NetworkState(false, false, false, ConstantPool.UNKNOWN);
         } else {
             return new NetworkState(networkInfo.isConnected(), networkInfo.isConnected() && networkInfo.getType() != ConnectivityManager.TYPE_WIFI,
                     networkInfo.isConnected() && networkInfo.getType() == ConnectivityManager.TYPE_WIFI, getNetworkName(networkInfo));

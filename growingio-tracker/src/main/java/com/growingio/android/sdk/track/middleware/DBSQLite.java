@@ -52,7 +52,7 @@ public class DBSQLite {
 
     public void insertEvent(GEvent gEvent) {
         try {
-            mDbHelper.insertEvents(Serializer.objectSerialize(gEvent), gEvent.getTag(), gEvent.getSendPolicy());
+            mDbHelper.insertEvents(Serializer.objectSerialize(gEvent), gEvent.getEventType(), gEvent.getSendPolicy());
         } catch (IOException e) {
             LogUtil.e(TAG, e, "insertEvent failed: %s", e.getMessage());
         }
@@ -127,7 +127,7 @@ public class DBSQLite {
             while (cursor.moveToNext()) {
                 if (cursor.isLast()) {
                     lastId = cursor.getLong(cursor.getColumnIndex(DBSQLiteOpenHelper.COLUMN_ID));
-                    tag = cursor.getString(cursor.getColumnIndex(DBSQLiteOpenHelper.COLUMN_TAG));
+                    tag = cursor.getString(cursor.getColumnIndex(DBSQLiteOpenHelper.COLUMN_EVENT_TYPE));
                 }
                 byte[] data = cursor.getBlob(cursor.getColumnIndex(DBSQLiteOpenHelper.COLUMN_DATA));
                 GEvent event = unpack(data);
@@ -186,7 +186,7 @@ public class DBSQLite {
         private static final String COLUMN_CREATE_TIME = "_created";
         private static final String COLUMN_LAST_MODIFIED = "_modified";
         private static final String COLUMN_DATA = "_data";
-        private static final String COLUMN_TAG = "_tag";
+        private static final String COLUMN_EVENT_TYPE = "_event_type";
         private static final String COLUMN_POLICY = "_policy";
 
         private static final String TABLE_STATISTICS = "statistics";
@@ -203,7 +203,7 @@ public class DBSQLite {
                         + COLUMN_CREATE_TIME + " INTEGER NOT NULL, \n"
                         + COLUMN_LAST_MODIFIED + " INTEGER NOT NULL, \n"
                         + COLUMN_DATA + " BLOB NOT NULL, \n"
-                        + COLUMN_TAG + " TEXT NOT NULL, \n"
+                        + COLUMN_EVENT_TYPE + " TEXT NOT NULL, \n"
                         + COLUMN_POLICY + " INTEGER NOT NULL \n"
                         + ");";
 
@@ -251,20 +251,20 @@ public class DBSQLite {
             contentValues.put(COLUMN_CREATE_TIME, current);
             contentValues.put(COLUMN_LAST_MODIFIED, current);
             contentValues.put(COLUMN_DATA, data);
-            contentValues.put(COLUMN_TAG, tag);
+            contentValues.put(COLUMN_EVENT_TYPE, tag);
             contentValues.put(COLUMN_POLICY, policy);
             getWritableDatabase().insert(TABLE_EVENTS, null, contentValues);
         }
 
         @SuppressLint("Recycle")
         public Cursor queryEvents(int policy, int num) {
-            String subSelect = "SELECT " + COLUMN_TAG
+            String subSelect = "SELECT " + COLUMN_EVENT_TYPE
                     + " FROM " + TABLE_EVENTS + " WHERE " + COLUMN_POLICY + "=" + policy
                     + " LIMIT 1";
             String sql = "SELECT " + COLUMN_ID + ", " + COLUMN_DATA + ", "
-                    + COLUMN_TAG
+                    + COLUMN_EVENT_TYPE
                     + " FROM " + TABLE_EVENTS
-                    + " WHERE " + COLUMN_TAG + "=(" + subSelect + ") AND " + COLUMN_POLICY + "=" + policy
+                    + " WHERE " + COLUMN_EVENT_TYPE + "=(" + subSelect + ") AND " + COLUMN_POLICY + "=" + policy
                     + " LIMIT " + num + ";";
             return getReadableDatabase().rawQuery(sql, null);
         }
@@ -286,7 +286,7 @@ public class DBSQLite {
 
         public void removeEvents(long id, int policy, String tag) {
             getWritableDatabase().delete(TABLE_EVENTS,
-                    COLUMN_ID + "<=? AND " + COLUMN_TAG + "=? AND " + COLUMN_POLICY + "=?",
+                    COLUMN_ID + "<=? AND " + COLUMN_EVENT_TYPE + "=? AND " + COLUMN_POLICY + "=?",
                     new String[]{String.valueOf(id), tag, String.valueOf(policy)});
         }
 

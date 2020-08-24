@@ -18,21 +18,20 @@ package com.growingio.android.sdk.autotrack.events.base;
 
 import android.app.Activity;
 
-import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.track.events.EventType;
-import com.growingio.android.sdk.track.events.base.BaseEventWithSequenceId;
+import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
+import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.utils.NetworkUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class BasePageEvent extends BaseEventWithSequenceId {
+public abstract class BasePageEvent extends BaseEvent {
+    private static final String ORIENTATION_PORTRAIT = "PORTRAIT";
+    private static final String ORIENTATION_LANDSCAPE = "LANDSCAPE";
 
     private final String mPageName;
     private final String mOrientation;
     private final String mTitle;
-    private final String mNetworkState;
     private final String mReferralPage;
 
     protected BasePageEvent(EventBuilder<?> eventBuilder) {
@@ -40,7 +39,6 @@ public abstract class BasePageEvent extends BaseEventWithSequenceId {
         mPageName = eventBuilder.mPageName;
         mOrientation = eventBuilder.mOrientation;
         mTitle = eventBuilder.mTitle;
-        mNetworkState = eventBuilder.mNetworkState;
         mReferralPage = eventBuilder.mReferralPage;
     }
 
@@ -56,10 +54,6 @@ public abstract class BasePageEvent extends BaseEventWithSequenceId {
         return mTitle;
     }
 
-    public String getNetworkState() {
-        return mNetworkState;
-    }
-
     public String getReferralPage() {
         return mReferralPage;
     }
@@ -68,21 +62,19 @@ public abstract class BasePageEvent extends BaseEventWithSequenceId {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("mPageName", mPageName);
-            json.put("mOrientation", mOrientation);
-            json.put("mTitle", mTitle);
-            json.put("mNetworkState", mNetworkState);
-            json.put("mReferralPage", mReferralPage);
+            json.put("pageName", mPageName);
+            json.put("orientation", mOrientation);
+            json.put("title", mTitle);
+            json.put("referralPage", mReferralPage);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
-    public abstract static class EventBuilder<T extends BasePageEvent> extends BaseEventWithSequenceId.EventBuilder<T> {
+    public abstract static class EventBuilder<T extends BasePageEvent> extends BaseEvent.BaseEventBuilder<T> {
         private String mPageName;
         private String mOrientation;
         private String mTitle;
-        private String mNetworkState;
         private String mReferralPage;
 
         public EventBuilder() {
@@ -91,14 +83,8 @@ public abstract class BasePageEvent extends BaseEventWithSequenceId {
             Activity activity = ActivityStateProvider.get().getResumedActivity();
             if (activity != null) {
                 mOrientation = activity.getResources().getConfiguration().orientation == 1
-                        ? "PORTRAIT" : "LANDSCAPE";
+                        ? ORIENTATION_PORTRAIT : ORIENTATION_LANDSCAPE;
             }
-        }
-
-        @Override
-        public void readPropertyInTrackThread() {
-            super.readPropertyInTrackThread();
-            mNetworkState = NetworkUtil.getNetworkName(ContextProvider.getApplicationContext());
         }
 
         public String getPageName() {
@@ -129,8 +115,8 @@ public abstract class BasePageEvent extends BaseEventWithSequenceId {
         }
 
         @Override
-        public EventType getEventType() {
-            return EventType.PAGE;
+        public String getEventType() {
+            return AutotrackEventType.PAGE;
         }
 
         public EventBuilder<T> setTimestamp(long timestamp) {

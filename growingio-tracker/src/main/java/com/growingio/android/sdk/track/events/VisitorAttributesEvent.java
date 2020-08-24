@@ -31,8 +31,8 @@ public final class VisitorAttributesEvent extends BaseAttributesEvent {
         }
 
         @Override
-        public EventType getEventType() {
-            return EventType.VISITOR_ATTRIBUTES;
+        public String getEventType() {
+            return TrackEventType.VISITOR_ATTRIBUTES;
         }
 
         @Override

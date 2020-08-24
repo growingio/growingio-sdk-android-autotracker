@@ -45,8 +45,8 @@ public class HybridPageEvent extends BasePageEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("mProtocolType", mProtocolType);
-            json.put("mQueryParameters", mQueryParameters);
+            json.put("protocolType", mProtocolType);
+            json.put("queryParameters", mQueryParameters);
         } catch (JSONException ignored) {
         }
         return json;

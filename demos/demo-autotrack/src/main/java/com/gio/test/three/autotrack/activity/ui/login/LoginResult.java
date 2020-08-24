@@ -14,29 +14,34 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.data;
+package com.gio.test.three.autotrack.activity.ui.login;
 
-import java.io.Serializable;
-import java.util.HashMap;
+import android.support.annotation.Nullable;
 
-public class EventSequenceIdMap implements Serializable {
+/**
+ * Authentication result : success (user details) or error message.
+ */
+class LoginResult {
+    @Nullable
+    private LoggedInUserView mSuccess;
+    @Nullable
+    private Integer mError;
 
-    private final HashMap<String, Long> mData = new HashMap<>();
-
-    public EventSequenceIdMap() {
+    LoginResult(@Nullable Integer error) {
+        this.mError = error;
     }
 
-    public long getSequenceId(String type) {
-        Long sid = mData.get(type);
-        if (sid == null) {
-            return 1;
-        } else {
-            return sid;
-        }
+    LoginResult(@Nullable LoggedInUserView success) {
+        this.mSuccess = success;
     }
 
-    public EventSequenceIdMap setSequenceId(String type, long sid) {
-        mData.put(type, sid);
-        return this;
+    @Nullable
+    LoggedInUserView getSuccess() {
+        return mSuccess;
+    }
+
+    @Nullable
+    Integer getError() {
+        return mError;
     }
 }

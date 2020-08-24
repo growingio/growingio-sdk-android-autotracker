@@ -18,7 +18,6 @@ package com.growingio.android.sdk.track.data;
 
 import android.content.Context;
 
-import com.growingio.android.sdk.track.events.EventType;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ProcessLock;
@@ -49,7 +48,7 @@ class EventSequenceIdPolicy {
     }
 
     @TrackThread
-    EventSequenceId getAndAdd(EventType eventType, int size) {
+    EventSequenceId getAndAdd(String eventType, int size) {
         try {
             mProcessLock.acquire(1000);
             return doGetAndAdd(eventType, size);
@@ -59,11 +58,11 @@ class EventSequenceIdPolicy {
     }
 
     @TrackThread
-    EventSequenceId getAndIncrement(EventType eventType) {
+    EventSequenceId getAndIncrement(String eventType) {
         return getAndAdd(eventType, 1);
     }
 
-    private EventSequenceId doGetAndAdd(EventType eventType, int size) {
+    private EventSequenceId doGetAndAdd(String eventType, int size) {
         ObjectInputStream inputStream = null;
         EventSequenceIdMap idMap = null;
         try {
@@ -86,10 +85,10 @@ class EventSequenceIdPolicy {
                 }
             }
         }
-        int eventTypeId = idMap.getSequenceId(eventType.toString());
-        int globalId = idMap.getSequenceId(TYPE_GLOBAL);
+        long eventTypeId = idMap.getSequenceId(eventType);
+        long globalId = idMap.getSequenceId(TYPE_GLOBAL);
 
-        idMap.setSequenceId(eventType.toString(), eventTypeId + size)
+        idMap.setSequenceId(eventType, eventTypeId + size)
                 .setSequenceId(TYPE_GLOBAL, globalId + size);
         ObjectOutputStream outputStream = null;
         try {

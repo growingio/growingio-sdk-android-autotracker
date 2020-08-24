@@ -16,57 +16,55 @@
 
 package com.growingio.android.sdk.track.events;
 
+import android.content.Context;
+
+import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.utils.NetworkUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Map;
+public class AppClosedEvent extends BaseEvent {
+    private final String mNetworkState;
 
-public final class ConversionVariablesEvent extends BaseEvent {
-    private static final long serialVersionUID = 1L;
-
-    private final Map<String, String> mVariables;
-
-    protected ConversionVariablesEvent(EventBuilder eventBuilder) {
+    protected AppClosedEvent(EventBuilder eventBuilder) {
         super(eventBuilder);
-        mVariables = eventBuilder.mVariables;
+        mNetworkState = eventBuilder.mNetworkState;
     }
 
     @Override
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("variables", mVariables);
+            json.put("networkState", mNetworkState);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
-    public Map<String, String> getVariables() {
-        return mVariables;
+    public String getNetworkState() {
+        return mNetworkState;
     }
 
-    public static final class EventBuilder extends BaseEventBuilder<ConversionVariablesEvent> {
-        private Map<String, String> mVariables;
-
-        public EventBuilder() {
-            super();
-        }
+    public static final class EventBuilder extends BaseEvent.BaseEventBuilder<AppClosedEvent> {
+        private String mNetworkState;
 
         @Override
         public String getEventType() {
-            return TrackEventType.CONVERSION_VARIABLES;
-        }
-
-        public EventBuilder setVariables(Map<String, String> variables) {
-            mVariables = variables;
-            return this;
+            return TrackEventType.APP_CLOSED;
         }
 
         @Override
-        public ConversionVariablesEvent build() {
-            return new ConversionVariablesEvent(this);
+        public AppClosedEvent build() {
+            return new AppClosedEvent(this);
+        }
+
+        @Override
+        public void readPropertyInTrackThread() {
+            super.readPropertyInTrackThread();
+            Context context = ContextProvider.getApplicationContext();
+            mNetworkState = NetworkUtil.getActiveNetworkState(context).getNetworkName();
         }
     }
 }

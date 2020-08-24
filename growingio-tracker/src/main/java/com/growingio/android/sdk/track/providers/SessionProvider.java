@@ -160,6 +160,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
                 TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
                     @Override
                     public void run() {
+                        TrackEventGenerator.generateAppClosedEvent();
                         mIPC.setLastPauseTime(System.currentTimeMillis());
                     }
                 });

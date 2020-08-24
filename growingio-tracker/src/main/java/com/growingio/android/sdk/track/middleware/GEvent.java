@@ -33,8 +33,7 @@ public abstract class GEvent implements Serializable {
     // WIFI情况下发送
     public static final byte SEND_POLICY_WIFI = 3;
 
-    // 给事件添加TAG，方便检索和标记
-    public abstract String getTag();
+    public abstract String getEventType();
 
     // 默认所有数据4G下批量发送
     @SendPolicy

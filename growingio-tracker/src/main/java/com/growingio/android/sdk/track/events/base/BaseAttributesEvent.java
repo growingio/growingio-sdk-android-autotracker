@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public abstract class BaseAttributesEvent extends BaseEventWithSequenceId {
+public abstract class BaseAttributesEvent extends BaseEvent {
     private final Map<String, String> mAttributes;
 
     protected BaseAttributesEvent(EventBuilder<?> eventBuilder) {
@@ -37,13 +37,13 @@ public abstract class BaseAttributesEvent extends BaseEventWithSequenceId {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("mAttributes", mAttributes);
+            json.put("attributes", mAttributes);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
-    public abstract static class EventBuilder<T extends BaseAttributesEvent> extends BaseEventWithSequenceId.EventBuilder<T> {
+    public abstract static class EventBuilder<T extends BaseAttributesEvent> extends BaseEventBuilder<T> {
         private Map<String, String> mAttributes;
 
         protected EventBuilder() {

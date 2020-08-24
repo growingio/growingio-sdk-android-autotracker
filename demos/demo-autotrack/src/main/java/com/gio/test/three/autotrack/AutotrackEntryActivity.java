@@ -39,6 +39,7 @@ import com.gio.test.three.autotrack.activity.RecyclerViewImpActivity;
 import com.gio.test.three.autotrack.activity.TabFragmentActivity;
 import com.gio.test.three.autotrack.activity.WebViewActivity;
 import com.gio.test.three.autotrack.activity.X5WebViewActivity;
+import com.gio.test.three.autotrack.activity.ui.login.LoginActivity;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
@@ -64,6 +65,7 @@ public class AutotrackEntryActivity extends Activity {
     private static final String GO_TO_CLICK_TEST_ACTIVITY = "Go To ClickTestActivity";
     private static final String GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY = "Go To ExpandableListViewActivity";
     private static final String GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY = "Go To ExpandableListSubActivity";
+    private static final String GO_TO_LOGIN_ACTIVITY = "Go To LoginActivity";
 
 
     private static final String[] ITEMS = {
@@ -80,6 +82,7 @@ public class AutotrackEntryActivity extends Activity {
             GO_TO_CLICK_TEST_ACTIVITY,
             GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY,
             GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY,
+            GO_TO_LOGIN_ACTIVITY,
     };
 
     @Override
@@ -178,6 +181,9 @@ public class AutotrackEntryActivity extends Activity {
                 break;
             case GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY:
                 startActivity(new Intent(this, ExpandableListSubActivity.class));
+                break;
+            case GO_TO_LOGIN_ACTIVITY:
+                startActivity(new Intent(this, LoginActivity.class));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

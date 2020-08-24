@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.hybrid;
 
-import com.growingio.android.sdk.autotrack.variation.HybridTransformerImp;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.TrackMainThread;
 
