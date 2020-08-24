@@ -31,8 +31,8 @@ public final class LoginUserAttributesEvent extends BaseAttributesEvent {
         }
 
         @Override
-        public EventType getEventType() {
-            return EventType.LOGIN_USER_ATTRIBUTES;
+        public String getEventType() {
+            return TrackEventType.LOGIN_USER_ATTRIBUTES;
         }
 
         @Override

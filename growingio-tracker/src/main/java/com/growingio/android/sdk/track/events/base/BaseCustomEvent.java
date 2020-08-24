@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.track.events.base;
 
-import com.growingio.android.sdk.track.events.EventType;
+import com.growingio.android.sdk.track.events.TrackEventType;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +50,7 @@ public abstract class BaseCustomEvent extends BaseAttributesEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("mEventName", mEventName);
+            json.put("eventName", mEventName);
         } catch (JSONException ignored) {
         }
         return json;
@@ -66,8 +66,8 @@ public abstract class BaseCustomEvent extends BaseAttributesEvent {
         }
 
         @Override
-        public EventType getEventType() {
-            return EventType.CUSTOM;
+        public String getEventType() {
+            return TrackEventType.CUSTOM;
         }
 
         public String getEventName() {

@@ -45,7 +45,7 @@ public class TrackEventGenerator {
     public static void generateConversionVariablesEvent(Map<String, String> variables) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ConversionVariablesEvent.EventBuilder()
-                        .setAttributes(variables)
+                        .setVariables(variables)
         );
     }
 
@@ -60,6 +60,12 @@ public class TrackEventGenerator {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new VisitorAttributesEvent.EventBuilder()
                         .setAttributes(attributes)
+        );
+    }
+
+    public static void generateAppClosedEvent() {
+        TrackMainThread.trackMain().postEventToTrackMain(
+                new AppClosedEvent.EventBuilder()
         );
     }
 }

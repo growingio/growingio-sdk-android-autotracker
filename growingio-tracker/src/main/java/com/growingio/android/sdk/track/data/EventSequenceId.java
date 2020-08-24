@@ -17,19 +17,19 @@
 package com.growingio.android.sdk.track.data;
 
 public class EventSequenceId {
-    private final int mGlobalId;
-    private final int mEventTypeId;
+    private final long mGlobalId;
+    private final long mEventTypeId;
 
-    public EventSequenceId(int globalId, int eventId) {
+    public EventSequenceId(long globalId, long eventId) {
         mGlobalId = globalId;
         mEventTypeId = eventId;
     }
 
-    public int getGlobalId() {
+    public long getGlobalId() {
         return mGlobalId;
     }
 
-    public int getEventTypeId() {
+    public long getEventTypeId() {
         return mEventTypeId;
     }
 }

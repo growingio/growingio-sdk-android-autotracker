@@ -16,26 +16,12 @@
 
 package com.growingio.android.sdk.autotrack.events;
 
-import com.growingio.android.sdk.autotrack.events.base.BaseViewElement;
-
-import org.json.JSONObject;
-
-public final class ViewElement extends BaseViewElement {
-    private static final long serialVersionUID = 1L;
-
-    ViewElement(ElementBuilder elementBuilder) {
-        super(elementBuilder);
+public class AutotrackEventType {
+    private AutotrackEventType() {
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        return super.toJSONObject();
-    }
-
-    public final static class ElementBuilder extends BaseViewElement.BaseElementBuilder<ViewElement> {
-        @Override
-        public ViewElement build() {
-            return new ViewElement(this);
-        }
-    }
+    public static final String PAGE = "PAGE";
+    public static final String PAGE_ATTRIBUTES = "PAGE_ATTRIBUTES";
+    public static final String VIEW_CLICK = "VIEW_CLICK";
+    public static final String VIEW_CHANGE = "VIEW_CHANGE";
 }

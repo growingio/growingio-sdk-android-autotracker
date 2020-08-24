@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.events;
 
 import com.growingio.android.sdk.autotrack.events.base.BaseViewElementEvent;
-import com.growingio.android.sdk.track.events.EventType;
 
 public final class ViewElementEvent extends BaseViewElementEvent {
     private static final long serialVersionUID = 1L;
@@ -32,11 +31,11 @@ public final class ViewElementEvent extends BaseViewElementEvent {
         }
 
         @Override
-        public EventType getEventType() {
+        public String getEventType() {
             return mEventType;
         }
 
-        public EventBuilder setEventType(EventType eventType) {
+        public EventBuilder setEventType(String eventType) {
             mEventType = eventType;
             return this;
         }

@@ -107,7 +107,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     @TrackThread
     public void saveEvent(GEvent gEvent) {
         if (gEvent instanceof BaseEvent) {
-            LogUtil.printJson(TAG, "save: event, type is " + ((BaseEvent) gEvent).getEventType(), ((BaseEvent) gEvent).toJSONObject().toString());
+            LogUtil.printJson(TAG, "save: event, type is " + gEvent.getEventType(), ((BaseEvent) gEvent).toJSONObject().toString());
         }
         mEventSaver.saveEvent(gEvent);
     }

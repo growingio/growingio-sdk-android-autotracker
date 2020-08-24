@@ -43,9 +43,6 @@ import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
-import com.growingio.android.sdk.track.GrowingTracker;
-import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
@@ -252,10 +249,6 @@ public class ViewHelper {
         return -1;
     }
 
-    public static void persistClickEvent(BaseEvent.BaseEventBuilder<?> click) {
-        TrackMainThread.trackMain().postEventToTrackMain(click);
-    }
-
     private static View findMenuItemView(View view, MenuItem item) throws InvocationTargetException, IllegalAccessException {
         if (WindowHelper.getMenuItemData(view) == item) {
             return view;
@@ -270,7 +263,7 @@ public class ViewHelper {
         return null;
     }
 
-    private static boolean shouldChangeOn(View view, ViewNode viewNode) {
+    private static boolean shouldChangeOn(View view) {
         if (view instanceof EditText) {
             String tag = ViewAttributeUtil.getMonitoringFocusKey(view);
             String lastText = tag == null ? "" : tag;
@@ -284,32 +277,17 @@ public class ViewHelper {
         return false;
     }
 
-    public static void changeOn(View view) {
-        if (!GrowingTracker.initializedSuccessfully()) {
-            return;
+    @Nullable
+    public static ViewNode getChangeViewNode(View view) {
+        if (view == null) {
+            return null;
         }
         Activity activity = ActivityUtil.findActivity(view.getContext());
-        if (activity == null || ViewHelper.isIgnoredView(view)) {
-            return;
+        if (activity == null || ViewHelper.isIgnoredView(view) || !shouldChangeOn(view)) {
+            return null;
         }
 
-        ViewNode viewNode = getViewNode(view);
-
-        if (viewNode == null) {
-            return;
-        }
-
-        if (!shouldChangeOn(view, viewNode)) {
-            return;
-        }
-
-//        ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder();
-//        Page<?> page = PageProvider.get().findPage(viewNode.mView);
-//        event.setEventType(EventType.CHANGE)
-//                .addElementBuilders(viewNodeToElementBuilders(viewNode))
-//                .setPageName(page.path())
-//                .setPageShowTimestamp(page.getShowTimestamp());
-//        TrackMainThread.trackMain().postEventToTrackMain(event);
+        return getViewNode(view);
     }
 
     public static boolean isIgnoredView(View view) {

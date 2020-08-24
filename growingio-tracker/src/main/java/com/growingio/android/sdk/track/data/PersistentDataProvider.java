@@ -19,7 +19,6 @@ package com.growingio.android.sdk.track.data;
 import android.content.Context;
 
 import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.track.events.EventType;
 import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
 
 public class PersistentDataProvider {
@@ -44,11 +43,7 @@ public class PersistentDataProvider {
         return mIPC;
     }
 
-    public EventSequenceId getAndAdd(EventType eventType, int size) {
-        return mEventSequenceIdPolicy.getAndAdd(eventType, size);
-    }
-
-    public EventSequenceId getAndIncrement(EventType eventType) {
+    public EventSequenceId getAndIncrement(String eventType) {
         return mEventSequenceIdPolicy.getAndIncrement(eventType);
     }
 }

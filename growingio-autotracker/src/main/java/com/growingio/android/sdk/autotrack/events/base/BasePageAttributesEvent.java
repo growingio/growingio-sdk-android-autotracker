@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.autotrack.events.base;
 
-import com.growingio.android.sdk.track.events.EventType;
+import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
 import org.json.JSONException;
@@ -44,8 +44,8 @@ public abstract class BasePageAttributesEvent extends BaseAttributesEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("mPageName", mPageName);
-            json.put("mPageShowTimestamp", mPageShowTimestamp);
+            json.put("pageName", mPageName);
+            json.put("pageShowTimestamp", mPageShowTimestamp);
         } catch (JSONException ignored) {
         }
         return json;
@@ -78,8 +78,8 @@ public abstract class BasePageAttributesEvent extends BaseAttributesEvent {
         }
 
         @Override
-        public EventType getEventType() {
-            return EventType.PAGE_ATTRIBUTES;
+        public String getEventType() {
+            return AutotrackEventType.PAGE_ATTRIBUTES;
         }
     }
 }

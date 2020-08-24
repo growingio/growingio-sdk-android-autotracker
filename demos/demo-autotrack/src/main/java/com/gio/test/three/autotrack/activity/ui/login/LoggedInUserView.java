@@ -14,29 +14,20 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.data;
+package com.gio.test.three.autotrack.activity.ui.login;
 
-import java.io.Serializable;
-import java.util.HashMap;
+/**
+ * Class exposing authenticated user details to the UI.
+ */
+class LoggedInUserView {
+    private String mDisplayName;
+    //... other data fields that may be accessible to the UI
 
-public class EventSequenceIdMap implements Serializable {
-
-    private final HashMap<String, Long> mData = new HashMap<>();
-
-    public EventSequenceIdMap() {
+    LoggedInUserView(String displayName) {
+        this.mDisplayName = displayName;
     }
 
-    public long getSequenceId(String type) {
-        Long sid = mData.get(type);
-        if (sid == null) {
-            return 1;
-        } else {
-            return sid;
-        }
-    }
-
-    public EventSequenceIdMap setSequenceId(String type, long sid) {
-        mData.put(type, sid);
-        return this;
+    String getDisplayName() {
+        return mDisplayName;
     }
 }

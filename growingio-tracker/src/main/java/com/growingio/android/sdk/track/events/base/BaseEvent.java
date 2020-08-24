@@ -19,7 +19,8 @@ package com.growingio.android.sdk.track.events.base;
 
 import android.support.annotation.CallSuper;
 
-import com.growingio.android.sdk.track.events.EventType;
+import com.growingio.android.sdk.track.data.EventSequenceId;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -32,86 +33,118 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class BaseEvent extends GEvent {
-    private final long mTimestamp;
-    private final EventType mEventType;
+    private static final String APP_STATE_FOREGROUND = "FOREGROUND";
+    private static final String APP_STATE_BACKGROUND = "BACKGROUND";
+
     private final String mDeviceId;
-    private final String mSessionId;
-    private final String mDomain;
     private final String mUserId;
-    private final boolean mIsInteractive;
+    private final String mSessionId;
+    private final String mEventType;
+    private final long mTimestamp;
+    private final String mDomain;
+    private final String mUrlScheme;
+    private final String mAppState;
+    private final long mGlobalSequenceId;
+    private final long mEventSequenceId;
 
     protected BaseEvent(BaseEventBuilder<?> eventBuilder) {
-        mTimestamp = eventBuilder.mTimestamp;
-        mEventType = eventBuilder.mEventType;
         mDeviceId = eventBuilder.mDeviceId;
-        mSessionId = eventBuilder.mSessionId;
-        mDomain = eventBuilder.mDomain;
         mUserId = eventBuilder.mUserId;
-        mIsInteractive = eventBuilder.mIsInteractive;
+        mSessionId = eventBuilder.mSessionId;
+        mEventType = eventBuilder.mEventType;
+        mTimestamp = eventBuilder.mTimestamp;
+        mDomain = eventBuilder.mDomain;
+        mUrlScheme = eventBuilder.mUrlScheme;
+        mAppState = eventBuilder.mAppState;
+        mGlobalSequenceId = eventBuilder.mGlobalSequenceId;
+        mEventSequenceId = eventBuilder.mEventSequenceId;
     }
 
-    @Override
-    public String getTag() {
-        return getEventType().toString();
+    public static String getAppStateForeground() {
+        return APP_STATE_FOREGROUND;
     }
 
-    public long getTimestamp() {
-        return mTimestamp;
-    }
-
-    public EventType getEventType() {
-        return mEventType;
+    public static String getAppStateBackground() {
+        return APP_STATE_BACKGROUND;
     }
 
     public String getDeviceId() {
         return mDeviceId;
     }
 
+    public String getUserId() {
+        return mUserId;
+    }
+
     public String getSessionId() {
         return mSessionId;
+    }
+
+    public long getTimestamp() {
+        return mTimestamp;
     }
 
     public String getDomain() {
         return mDomain;
     }
 
-    public String getUserId() {
-        return mUserId;
+    public String getUrlScheme() {
+        return mUrlScheme;
     }
 
-    public boolean isInteractive() {
-        return mIsInteractive;
+    public String getAppState() {
+        return mAppState;
+    }
+
+    public long getGlobalSequenceId() {
+        return mGlobalSequenceId;
+    }
+
+    public long getEventSequenceId() {
+        return mEventSequenceId;
+    }
+
+    @Override
+    public String getEventType() {
+        return mEventType;
     }
 
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
         try {
-            json.put("mTimestamp", mTimestamp);
-            json.put("mEventType", mEventType);
-            json.put("mDeviceId", mDeviceId);
-            json.put("mSessionId", mSessionId);
-            json.put("mDomain", mDomain);
-            json.put("mUserId", mUserId);
-            json.put("mIsInteractive", mIsInteractive);
+            json.put("deviceId", mDeviceId);
+            json.put("userId", mUserId);
+            json.put("sessionId", mSessionId);
+            json.put("eventType", mEventType);
+            json.put("timestamp", mTimestamp);
+            json.put("domain", mDomain);
+            json.put("urlScheme", mUrlScheme);
+            json.put("appState", mAppState);
+            json.put("globalSequenceId", mGlobalSequenceId);
+            json.put("eventSequenceId", mEventSequenceId);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
     public static abstract class BaseEventBuilder<T extends BaseEvent> {
-        protected EventType mEventType;
-        protected long mTimestamp;
-        protected String mSessionId;
-        protected String mDomain;
         private String mDeviceId;
         private String mUserId;
-        private boolean mIsInteractive;
+        protected String mSessionId;
+        protected String mEventType;
+        protected long mTimestamp;
+        protected String mDomain;
+        private final String mUrlScheme;
+        private final String mAppState;
+        private long mGlobalSequenceId;
+        private long mEventSequenceId;
 
         protected BaseEventBuilder() {
             mTimestamp = System.currentTimeMillis();
             mEventType = getEventType();
-            mIsInteractive =  ActivityStateProvider.get().getResumedActivity() != null;
+            mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
             mDomain = ConfigurationProvider.get().getPackageName();
+            mUrlScheme = ConfigurationProvider.get().getTrackConfiguration().getUrlScheme();
         }
 
         @TrackThread
@@ -120,33 +153,12 @@ public abstract class BaseEvent extends GEvent {
             mDeviceId = DeviceInfoProvider.get().getDeviceId();
             mSessionId = SessionProvider.get().getSessionId();
             mUserId = UserInfoProvider.get().getUserId();
+            EventSequenceId sequenceId = PersistentDataProvider.get().getAndIncrement(mEventType);
+            mGlobalSequenceId = sequenceId.getGlobalId();
+            mEventSequenceId = sequenceId.getEventTypeId();
         }
 
-        public long getTimestamp() {
-            return mTimestamp;
-        }
-
-        public String getSessionId() {
-            return mSessionId;
-        }
-
-        public String getDeviceId() {
-            return mDeviceId;
-        }
-
-        public String getDomain() {
-            return mDomain;
-        }
-
-        public String getUserId() {
-            return mUserId;
-        }
-
-        public boolean isInteractive() {
-            return mIsInteractive;
-        }
-
-        public abstract EventType getEventType();
+        public abstract String getEventType();
 
         public abstract T build();
     }

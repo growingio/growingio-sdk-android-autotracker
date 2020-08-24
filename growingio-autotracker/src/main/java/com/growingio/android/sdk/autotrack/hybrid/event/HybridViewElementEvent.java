@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
 import com.growingio.android.sdk.autotrack.events.base.BaseViewElementEvent;
-import com.growingio.android.sdk.track.events.EventType;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,21 +25,28 @@ public final class HybridViewElementEvent extends BaseViewElementEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mQueryParameters;
+    private final String mHyperlink;
 
     protected HybridViewElementEvent(EventBuilder eventBuilder) {
         super(eventBuilder);
         mQueryParameters = eventBuilder.mQueryParameters;
+        mHyperlink = eventBuilder.mHyperlink;
     }
 
     public String getQueryParameters() {
         return mQueryParameters;
     }
 
+    public String getHyperlink() {
+        return mHyperlink;
+    }
+
     @Override
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("mQueryParameters", mQueryParameters);
+            json.put("queryParameters", mQueryParameters);
+            json.put("hyperlink", mQueryParameters);
         } catch (JSONException ignored) {
         }
         return json;
@@ -48,17 +54,18 @@ public final class HybridViewElementEvent extends BaseViewElementEvent {
 
     public final static class EventBuilder extends BaseViewElementEvent.EventBuilder<HybridViewElementEvent> {
         private String mQueryParameters;
+        private String mHyperlink;
 
         public EventBuilder() {
             super();
         }
 
         @Override
-        public EventType getEventType() {
+        public String getEventType() {
             return mEventType;
         }
 
-        public EventBuilder setEventType(EventType eventType) {
+        public EventBuilder setEventType(String eventType) {
             mEventType = eventType;
             return this;
         }
@@ -68,12 +75,13 @@ public final class HybridViewElementEvent extends BaseViewElementEvent {
             return new HybridViewElementEvent(this);
         }
 
-        public String getQueryParameters() {
-            return mQueryParameters;
-        }
-
         public EventBuilder setQueryParameters(String queryParameters) {
             mQueryParameters = queryParameters;
+            return this;
+        }
+
+        public EventBuilder setHyperlink(String hyperlink) {
+            mHyperlink = hyperlink;
             return this;
         }
 

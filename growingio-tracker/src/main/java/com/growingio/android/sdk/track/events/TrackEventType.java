@@ -14,29 +14,16 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.data;
+package com.growingio.android.sdk.track.events;
 
-import java.io.Serializable;
-import java.util.HashMap;
-
-public class EventSequenceIdMap implements Serializable {
-
-    private final HashMap<String, Long> mData = new HashMap<>();
-
-    public EventSequenceIdMap() {
+public class TrackEventType {
+    private TrackEventType() {
     }
 
-    public long getSequenceId(String type) {
-        Long sid = mData.get(type);
-        if (sid == null) {
-            return 1;
-        } else {
-            return sid;
-        }
-    }
-
-    public EventSequenceIdMap setSequenceId(String type, long sid) {
-        mData.put(type, sid);
-        return this;
-    }
+    public static final String VISIT = "VISIT";
+    public static final String CUSTOM = "CUSTOM";
+    public static final String VISITOR_ATTRIBUTES = "VISITOR_ATTRIBUTES";
+    public static final String LOGIN_USER_ATTRIBUTES = "LOGIN_USER_ATTRIBUTES";
+    public static final String CONVERSION_VARIABLES = "CONVERSION_VARIABLES";
+    public static final String APP_CLOSED = "APP_CLOSED";
 }

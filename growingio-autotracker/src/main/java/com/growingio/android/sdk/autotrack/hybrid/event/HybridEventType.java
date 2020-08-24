@@ -14,29 +14,11 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.data;
+package com.growingio.android.sdk.autotrack.hybrid.event;
 
-import java.io.Serializable;
-import java.util.HashMap;
-
-public class EventSequenceIdMap implements Serializable {
-
-    private final HashMap<String, Long> mData = new HashMap<>();
-
-    public EventSequenceIdMap() {
+public class HybridEventType {
+    private HybridEventType() {
     }
 
-    public long getSequenceId(String type) {
-        Long sid = mData.get(type);
-        if (sid == null) {
-            return 1;
-        } else {
-            return sid;
-        }
-    }
-
-    public EventSequenceIdMap setSequenceId(String type, long sid) {
-        mData.put(type, sid);
-        return this;
-    }
+    public static final String FORM_SUBMIT = "FORM_SUBMIT";
 }

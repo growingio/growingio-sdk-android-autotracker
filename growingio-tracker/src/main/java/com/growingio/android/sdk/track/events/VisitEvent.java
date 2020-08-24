@@ -25,10 +25,12 @@ import android.util.DisplayMetrics;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.TrackConfiguration;
-import com.growingio.android.sdk.track.events.base.BaseEventWithSequenceId;
+import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
+import com.growingio.android.sdk.track.utils.NetworkUtil;
 import com.growingio.android.sdk.track.utils.rom.RomChecker;
 
 import org.json.JSONException;
@@ -37,55 +39,97 @@ import org.json.JSONObject;
 import java.util.Locale;
 import java.util.Map;
 
-public final class VisitEvent extends BaseEventWithSequenceId {
+public final class VisitEvent extends BaseEvent {
     private static final long serialVersionUID = 1L;
 
+    private static final String DEVICE_TYPE_PHONE = "PHONE";
+    private static final String DEVICE_TYPE_PAD = "PAD";
+
+    private final String mNetworkState;
     private final String mAppChannel;
     private final int mScreenHeight;
     private final int mScreenWidth;
     private final String mDeviceBrand;
     private final String mDeviceModel;
-    private final boolean mIsPhone;
+    private final String mDeviceType;
     private final String mOperatingSystem;
     private final String mOperatingSystemVersion;
-    private final String mSdkVersion;
     private final String mAppName;
     private final String mAppVersion;
-    private final String mUrlScheme;
     private final String mLanguage;
     private final double mLatitude;
     private final double mLongitude;
     private final String mImei;
     private final String mAndroidId;
+    private final String mOaid;
     private final String mGoogleAdvertisingId;
-    private final Map<String, String> mFeaturesVersion;
+    private final String mSdkVersion;
+    private final Map<String, String> mExtraSdk;
 
     protected VisitEvent(EventBuilder eventBuilder) {
         super(eventBuilder);
+        mNetworkState = eventBuilder.mNetworkState;
         mAppChannel = eventBuilder.mAppChannel;
         mScreenHeight = eventBuilder.mScreenHeight;
         mScreenWidth = eventBuilder.mScreenWidth;
         mDeviceBrand = eventBuilder.mDeviceBrand;
         mDeviceModel = eventBuilder.mDeviceModel;
-        mIsPhone = eventBuilder.mIsPhone;
+        mDeviceType = eventBuilder.mDeviceType;
         mOperatingSystem = eventBuilder.mOperatingSystem;
         mOperatingSystemVersion = eventBuilder.mOperatingSystemVersion;
-        mSdkVersion = eventBuilder.mSdkVersion;
         mAppName = eventBuilder.mAppName;
         mAppVersion = eventBuilder.mAppVersion;
-        mUrlScheme = eventBuilder.mUrlScheme;
         mLanguage = eventBuilder.mLanguage;
         mLatitude = eventBuilder.mLatitude;
         mLongitude = eventBuilder.mLongitude;
         mImei = eventBuilder.mImei;
         mAndroidId = eventBuilder.mAndroidId;
+        mOaid = eventBuilder.mOaid;
         mGoogleAdvertisingId = eventBuilder.mGoogleAdvertisingId;
-        mFeaturesVersion = eventBuilder.mFeaturesVersion;
+        mSdkVersion = eventBuilder.mSdkVersion;
+        mExtraSdk = eventBuilder.mExtraSdk;
     }
 
     @Override
     public int getSendPolicy() {
         return SEND_POLICY_INSTANT;
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        JSONObject json = super.toJSONObject();
+        try {
+            json.put("networkState", mNetworkState);
+            json.put("appChannel", mAppChannel);
+            json.put("screenHeight", mScreenHeight);
+            json.put("screenWidth", mScreenWidth);
+            json.put("deviceBrand", mDeviceBrand);
+            json.put("deviceModel", mDeviceModel);
+            json.put("deviceType", mDeviceType);
+            json.put("operatingSystem", mOperatingSystem);
+            json.put("operatingSystemVersion", mOperatingSystemVersion);
+            json.put("appName", mAppName);
+            json.put("appVersion", mAppVersion);
+            json.put("language", mLanguage);
+            json.put("latitude", mLatitude);
+            json.put("longitude", mLongitude);
+            json.put("imei", mImei);
+            json.put("androidId", mAndroidId);
+            json.put("oaid", mOaid);
+            json.put("googleAdvertisingId", mGoogleAdvertisingId);
+            json.put("sdkVersion", mSdkVersion);
+            json.put("extraSdk", mExtraSdk);
+        } catch (JSONException ignored) {
+        }
+        return json;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getNetworkState() {
+        return mNetworkState;
     }
 
     public String getAppChannel() {
@@ -108,8 +152,8 @@ public final class VisitEvent extends BaseEventWithSequenceId {
         return mDeviceModel;
     }
 
-    public boolean isPhone() {
-        return mIsPhone;
+    public String getDeviceType() {
+        return mDeviceType;
     }
 
     public String getOperatingSystem() {
@@ -120,20 +164,12 @@ public final class VisitEvent extends BaseEventWithSequenceId {
         return mOperatingSystemVersion;
     }
 
-    public String getSdkVersion() {
-        return mSdkVersion;
-    }
-
     public String getAppName() {
         return mAppName;
     }
 
     public String getAppVersion() {
         return mAppVersion;
-    }
-
-    public String getUrlScheme() {
-        return mUrlScheme;
     }
 
     public String getLanguage() {
@@ -156,70 +192,51 @@ public final class VisitEvent extends BaseEventWithSequenceId {
         return mAndroidId;
     }
 
+    public String getOaid() {
+        return mOaid;
+    }
+
     public String getGoogleAdvertisingId() {
         return mGoogleAdvertisingId;
     }
 
-    public Map<String, String> getFeaturesVersion() {
-        return mFeaturesVersion;
+    public String getSdkVersion() {
+        return mSdkVersion;
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("mAppChannel", mAppChannel);
-            json.put("mScreenHeight", mScreenHeight);
-            json.put("mScreenWidth", mScreenWidth);
-            json.put("mDeviceBrand", mDeviceBrand);
-            json.put("mDeviceModel", mDeviceModel);
-            json.put("mIsPhone", mIsPhone);
-            json.put("mOperatingSystem", mOperatingSystem);
-            json.put("mOperatingSystemVersion", mOperatingSystemVersion);
-            json.put("mSdkVersion", mSdkVersion);
-            json.put("mAppName", mAppName);
-            json.put("mAppVersion", mAppVersion);
-            json.put("mUrlScheme", mUrlScheme);
-            json.put("mLanguage", mLanguage);
-            json.put("mLatitude", mLatitude);
-            json.put("mLongitude", mLongitude);
-            json.put("mImei", mImei);
-            json.put("mAndroidId", mAndroidId);
-            json.put("mGoogleAdvertisingId", mGoogleAdvertisingId);
-            json.put("mFeaturesVersion", mFeaturesVersion);
-        } catch (JSONException ignored) {
-        }
-        return json;
+    public Map<String, String> getExtraSdk() {
+        return mExtraSdk;
     }
 
-    public static final class EventBuilder extends BaseEventWithSequenceId.EventBuilder<VisitEvent> {
+    public static final class EventBuilder extends BaseEvent.BaseEventBuilder<VisitEvent> {
+        private String mNetworkState;
         private String mAppChannel;
         private int mScreenHeight;
         private int mScreenWidth;
         private String mDeviceBrand;
         private String mDeviceModel;
-        private boolean mIsPhone;
+        private String mDeviceType;
         private String mOperatingSystem;
         private String mOperatingSystemVersion;
-        private String mSdkVersion;
         private String mAppName;
         private String mAppVersion;
-        private String mUrlScheme;
         private String mLanguage;
         private double mLatitude;
         private double mLongitude;
         private String mImei;
         private String mAndroidId;
+        private String mOaid;
         private String mGoogleAdvertisingId;
-        private Map<String, String> mFeaturesVersion;
+        private String mSdkVersion;
+        private Map<String, String> mExtraSdk;
 
         EventBuilder() {
             super();
         }
 
         @Override
-        public EventType getEventType() {
-            return EventType.VISIT;
+        public String getEventType() {
+            return TrackEventType.VISIT;
         }
 
         @Override
@@ -227,6 +244,8 @@ public final class VisitEvent extends BaseEventWithSequenceId {
             super.readPropertyInTrackThread();
 
             Context context = ContextProvider.getApplicationContext();
+            mNetworkState = NetworkUtil.getActiveNetworkState(context).getNetworkName();
+
             ConfigurationProvider configurationProvider = ConfigurationProvider.get();
             TrackConfiguration configuration = configurationProvider.getTrackConfiguration();
             mAppChannel = configuration.getChannel();
@@ -234,14 +253,13 @@ public final class VisitEvent extends BaseEventWithSequenceId {
             DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
             mScreenHeight = metrics.heightPixels;
             mScreenWidth = metrics.widthPixels;
-            mDeviceBrand = Build.BRAND == null ? "UNKNOWN" : Build.BRAND;
-            mDeviceModel = Build.MODEL == null ? "UNKNOWN" : Build.MODEL;
-            mIsPhone = RomChecker.isPhone(context);
-            mOperatingSystem = "Android";
-            mOperatingSystemVersion = Build.VERSION.RELEASE == null ? "UNKNOWN" : Build.VERSION.RELEASE;
+            mDeviceBrand = Build.BRAND == null ? ConstantPool.UNKNOWN : Build.BRAND;
+            mDeviceModel = Build.MODEL == null ? ConstantPool.UNKNOWN : Build.MODEL;
+            mDeviceType = RomChecker.isPhone(context) ? DEVICE_TYPE_PHONE : DEVICE_TYPE_PAD;
+            mOperatingSystem = ConstantPool.ANDROID;
+            mOperatingSystemVersion = Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE;
 
             mAppName = configurationProvider.getPackageName();
-            mUrlScheme = configuration.getUrlScheme();
 
             PackageManager packageManager = context.getPackageManager();
             try {
@@ -257,16 +275,12 @@ public final class VisitEvent extends BaseEventWithSequenceId {
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
             mImei = deviceInfo.getImei();
             mAndroidId = deviceInfo.getAndroidId();
-
+            mOaid = deviceInfo.getOaid();
             mGoogleAdvertisingId = "";
         }
 
-        public Map<String, String> getFeaturesVersion() {
-            return mFeaturesVersion;
-        }
-
-        public EventBuilder setFeaturesVersion(Map<String, String> featuresVersion) {
-            mFeaturesVersion = featuresVersion;
+        public EventBuilder setExtraSdk(Map<String, String> extraSdk) {
+            this.mExtraSdk = extraSdk;
             return this;
         }
 

@@ -24,6 +24,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.growingio.android.sdk.autotrack.change.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
@@ -102,6 +103,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         ConfigurationProvider.get().addConfiguration(autotrackConfiguration.clone());
         GrowingAutotracker autotrack = new GrowingAutotracker();
         PageProvider.get().start();
+        ViewChangeProvider.get().start();
 
         sInstance = autotrack;
         LogUtil.d(TAG, "Autotracker module init success in ui thread");

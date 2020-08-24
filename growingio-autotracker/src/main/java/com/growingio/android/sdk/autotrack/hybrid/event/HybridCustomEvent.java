@@ -39,7 +39,7 @@ public final class HybridCustomEvent extends BaseCustomEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("mQueryParameters", mQueryParameters);
+            json.put("queryParameters", mQueryParameters);
         } catch (JSONException ignored) {
         }
         return json;
