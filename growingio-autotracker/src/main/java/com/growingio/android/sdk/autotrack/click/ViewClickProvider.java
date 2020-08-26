@@ -61,10 +61,9 @@ class ViewClickProvider {
     }
 
     private static void sendClickEvent(ViewNode viewNode) {
-        ViewElementEvent.EventBuilder event = new ViewElementEvent.EventBuilder();
         Page<?> page = PageProvider.get().findPage(viewNode.getView());
         TrackMainThread.trackMain().postEventToTrackMain(
-                new ViewElementEvent.EventBuilder()
+                new ViewElementEvent.Builder()
                         .setEventType(AutotrackEventType.VIEW_CLICK)
                         .setPageName(page.path())
                         .setPageShowTimestamp(page.getShowTimestamp())

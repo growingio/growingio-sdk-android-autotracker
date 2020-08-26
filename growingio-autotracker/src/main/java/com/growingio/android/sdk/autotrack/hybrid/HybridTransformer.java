@@ -22,5 +22,5 @@ import com.growingio.android.sdk.track.events.base.BaseEvent;
 
 public interface HybridTransformer {
     @Nullable
-    BaseEvent.BaseEventBuilder<?> transform(String hybridEvent);
+    BaseEvent.BaseBuilder<?> transform(String hybridEvent);
 }

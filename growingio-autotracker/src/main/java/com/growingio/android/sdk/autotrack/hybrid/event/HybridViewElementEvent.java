@@ -16,18 +16,18 @@
 
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
-import com.growingio.android.sdk.autotrack.events.base.BaseViewElementEvent;
+import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class HybridViewElementEvent extends BaseViewElementEvent {
+public final class HybridViewElementEvent extends ViewElementEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mQueryParameters;
     private final String mHyperlink;
 
-    protected HybridViewElementEvent(EventBuilder eventBuilder) {
+    protected HybridViewElementEvent(Builder eventBuilder) {
         super(eventBuilder);
         mQueryParameters = eventBuilder.mQueryParameters;
         mHyperlink = eventBuilder.mHyperlink;
@@ -52,11 +52,11 @@ public final class HybridViewElementEvent extends BaseViewElementEvent {
         return json;
     }
 
-    public final static class EventBuilder extends BaseViewElementEvent.EventBuilder<HybridViewElementEvent> {
+    public final static class Builder extends ViewElementEvent.Builder {
         private String mQueryParameters;
         private String mHyperlink;
 
-        public EventBuilder() {
+        public Builder() {
             super();
         }
 
@@ -65,7 +65,7 @@ public final class HybridViewElementEvent extends BaseViewElementEvent {
             return mEventType;
         }
 
-        public EventBuilder setEventType(String eventType) {
+        public Builder setEventType(String eventType) {
             mEventType = eventType;
             return this;
         }
@@ -75,18 +75,48 @@ public final class HybridViewElementEvent extends BaseViewElementEvent {
             return new HybridViewElementEvent(this);
         }
 
-        public EventBuilder setQueryParameters(String queryParameters) {
+        public Builder setQueryParameters(String queryParameters) {
             mQueryParameters = queryParameters;
             return this;
         }
 
-        public EventBuilder setHyperlink(String hyperlink) {
+        public Builder setHyperlink(String hyperlink) {
             mHyperlink = hyperlink;
             return this;
         }
 
-        public EventBuilder setDomain(String domain) {
+        public Builder setDomain(String domain) {
             mDomain = domain;
+            return this;
+        }
+
+        @Override
+        public Builder setPageName(String pageName) {
+            super.setPageName(pageName);
+            return this;
+        }
+
+        @Override
+        public Builder setPageShowTimestamp(long pageShowTimestamp) {
+            super.setPageShowTimestamp(pageShowTimestamp);
+            return this;
+        }
+
+        @Override
+        public Builder setTextValue(String textValue) {
+            super.setTextValue(textValue);
+            return this;
+        }
+
+        @Override
+        public Builder setXpath(String xpath) {
+            super.setXpath(xpath);
+            return this;
+        }
+
+        @Override
+        public Builder setIndex(int index) {
+            super.setIndex(index);
             return this;
         }
     }

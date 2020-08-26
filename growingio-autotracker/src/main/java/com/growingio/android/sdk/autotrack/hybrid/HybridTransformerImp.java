@@ -40,12 +40,12 @@ public class HybridTransformerImp implements HybridTransformer {
 
     @Nullable
     @Override
-    public BaseEvent.BaseEventBuilder<?> transform(String hybridEvent) {
+    public BaseEvent.BaseBuilder<?> transform(String hybridEvent) {
         try {
             JSONObject evenJson = new JSONObject(hybridEvent);
             String type = evenJson.getString("eventType");
             if (AutotrackEventType.PAGE.equals(type)) {
-                return new HybridPageEvent.EventBuilder()
+                return new HybridPageEvent.Builder()
                         .setDomain(evenJson.getString("domain"))
                         .setProtocolType(evenJson.getString("protocolType"))
                         .setQueryParameters(evenJson.optString("queryParameters"))
@@ -55,7 +55,7 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setTimestamp(evenJson.getLong("timestamp"));
 
             } else if (AutotrackEventType.PAGE_ATTRIBUTES.equals(type)) {
-                return new HybridPageAttributesEvent.EventBuilder()
+                return new HybridPageAttributesEvent.Builder()
                         .setDomain(evenJson.getString("domain"))
                         .setQueryParameters(evenJson.optString("queryParameters"))
                         .setPageName(evenJson.getString("pageName"))
@@ -75,7 +75,7 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setEventType(type);
 
             } else if (TrackEventType.CUSTOM.equals(type)) {
-                return new HybridCustomEvent.EventBuilder()
+                return new HybridCustomEvent.Builder()
                         .setDomain(evenJson.getString("domain"))
                         .setQueryParameters(evenJson.optString("queryParameters"))
                         .setPageName(evenJson.getString("pageName"))
@@ -84,15 +84,15 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setAttributes(JsonUtil.copyToMap(evenJson.optJSONObject("attributes")));
 
             } else if (TrackEventType.LOGIN_USER_ATTRIBUTES.equals(type)) {
-                return new LoginUserAttributesEvent.EventBuilder()
+                return new LoginUserAttributesEvent.Builder()
                         .setAttributes(JsonUtil.copyToMap(evenJson.getJSONObject("attributes")));
 
             } else if (TrackEventType.VISITOR_ATTRIBUTES.equals(type)) {
-                return new VisitorAttributesEvent.EventBuilder()
+                return new VisitorAttributesEvent.Builder()
                         .setAttributes(JsonUtil.copyToMap(evenJson.getJSONObject("attributes")));
 
             } else if (TrackEventType.CONVERSION_VARIABLES.equals(type)) {
-                return new ConversionVariablesEvent.EventBuilder()
+                return new ConversionVariablesEvent.Builder()
                         .setVariables(JsonUtil.copyToMap(evenJson.getJSONObject("variables")));
             }
         } catch (JSONException e) {
@@ -103,8 +103,8 @@ public class HybridTransformerImp implements HybridTransformer {
         return null;
     }
 
-    private HybridViewElementEvent.EventBuilder transformViewElementEventBuilder(JSONObject json) throws JSONException {
-        return (HybridViewElementEvent.EventBuilder) new HybridViewElementEvent.EventBuilder()
+    private HybridViewElementEvent.Builder transformViewElementEventBuilder(JSONObject json) throws JSONException {
+        return new HybridViewElementEvent.Builder()
                 .setHyperlink(json.optString("hyperlink"))
                 .setDomain(json.getString("domain"))
                 .setQueryParameters(json.optString("queryParameters"))

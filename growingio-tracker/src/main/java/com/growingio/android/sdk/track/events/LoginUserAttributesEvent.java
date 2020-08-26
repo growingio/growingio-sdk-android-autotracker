@@ -18,15 +18,17 @@ package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
+import java.util.Map;
+
 public final class LoginUserAttributesEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
-    protected LoginUserAttributesEvent(EventBuilder eventBuilder) {
+    protected LoginUserAttributesEvent(Builder eventBuilder) {
         super(eventBuilder);
     }
 
-    public static final class EventBuilder extends BaseAttributesEvent.EventBuilder<LoginUserAttributesEvent> {
-        public EventBuilder() {
+    public static final class Builder extends BaseAttributesEvent.Builder<LoginUserAttributesEvent> {
+        public Builder() {
             super();
         }
 
@@ -38,6 +40,12 @@ public final class LoginUserAttributesEvent extends BaseAttributesEvent {
         @Override
         public LoginUserAttributesEvent build() {
             return new LoginUserAttributesEvent(this);
+        }
+
+        @Override
+        public Builder setAttributes(Map<String, String> attributes) {
+            super.setAttributes(attributes);
+            return this;
         }
     }
 }

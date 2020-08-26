@@ -47,7 +47,7 @@ public abstract class BaseEvent extends GEvent {
     private final long mGlobalSequenceId;
     private final long mEventSequenceId;
 
-    protected BaseEvent(BaseEventBuilder<?> eventBuilder) {
+    protected BaseEvent(BaseBuilder<?> eventBuilder) {
         mDeviceId = eventBuilder.mDeviceId;
         mUserId = eventBuilder.mUserId;
         mSessionId = eventBuilder.mSessionId;
@@ -127,7 +127,7 @@ public abstract class BaseEvent extends GEvent {
         return json;
     }
 
-    public static abstract class BaseEventBuilder<T extends BaseEvent> {
+    public static abstract class BaseBuilder<T extends BaseEvent> {
         private String mDeviceId;
         private String mUserId;
         protected String mSessionId;
@@ -139,7 +139,7 @@ public abstract class BaseEvent extends GEvent {
         private long mGlobalSequenceId;
         private long mEventSequenceId;
 
-        protected BaseEventBuilder() {
+        protected BaseBuilder() {
             mTimestamp = System.currentTimeMillis();
             mEventType = getEventType();
             mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;

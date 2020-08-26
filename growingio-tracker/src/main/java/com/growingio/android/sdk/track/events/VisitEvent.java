@@ -66,7 +66,7 @@ public final class VisitEvent extends BaseEvent {
     private final String mSdkVersion;
     private final Map<String, String> mExtraSdk;
 
-    protected VisitEvent(EventBuilder eventBuilder) {
+    protected VisitEvent(Builder eventBuilder) {
         super(eventBuilder);
         mNetworkState = eventBuilder.mNetworkState;
         mAppChannel = eventBuilder.mAppChannel;
@@ -208,7 +208,7 @@ public final class VisitEvent extends BaseEvent {
         return mExtraSdk;
     }
 
-    public static final class EventBuilder extends BaseEvent.BaseEventBuilder<VisitEvent> {
+    public static final class Builder extends BaseBuilder<VisitEvent> {
         private String mNetworkState;
         private String mAppChannel;
         private int mScreenHeight;
@@ -230,7 +230,7 @@ public final class VisitEvent extends BaseEvent {
         private String mSdkVersion;
         private Map<String, String> mExtraSdk;
 
-        EventBuilder() {
+        Builder() {
             super();
         }
 
@@ -279,27 +279,27 @@ public final class VisitEvent extends BaseEvent {
             mGoogleAdvertisingId = "";
         }
 
-        public EventBuilder setExtraSdk(Map<String, String> extraSdk) {
+        public Builder setExtraSdk(Map<String, String> extraSdk) {
             this.mExtraSdk = extraSdk;
             return this;
         }
 
-        public EventBuilder setTimestamp(long timestamp) {
+        public Builder setTimestamp(long timestamp) {
             mTimestamp = timestamp;
             return this;
         }
 
-        public EventBuilder setSessionId(String sessionId) {
+        public Builder setSessionId(String sessionId) {
             mSessionId = sessionId;
             return this;
         }
 
-        public EventBuilder setLatitude(double latitude) {
+        public Builder setLatitude(double latitude) {
             mLatitude = latitude;
             return this;
         }
 
-        public EventBuilder setLongitude(double longitude) {
+        public Builder setLongitude(double longitude) {
             mLongitude = longitude;
             return this;
         }

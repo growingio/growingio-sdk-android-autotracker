@@ -28,7 +28,7 @@ import org.json.JSONObject;
 public class AppClosedEvent extends BaseEvent {
     private final String mNetworkState;
 
-    protected AppClosedEvent(EventBuilder eventBuilder) {
+    protected AppClosedEvent(Builder eventBuilder) {
         super(eventBuilder);
         mNetworkState = eventBuilder.mNetworkState;
     }
@@ -43,11 +43,7 @@ public class AppClosedEvent extends BaseEvent {
         return json;
     }
 
-    public String getNetworkState() {
-        return mNetworkState;
-    }
-
-    public static final class EventBuilder extends BaseEvent.BaseEventBuilder<AppClosedEvent> {
+    public static final class Builder extends BaseBuilder<AppClosedEvent> {
         private String mNetworkState;
 
         @Override
