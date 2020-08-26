@@ -667,9 +667,9 @@ public class LogUtil {
 
     private static void printLine(String tag, boolean isTop) {
         if (isTop) {
-            Log.d(tag, "╔═══════════════════════════════════════════════════════════════════════════════════════");
+            d(tag, "╔═══════════════════════════════════════════════════════════════════════════════════════");
         } else {
-            Log.d(tag, "╚═══════════════════════════════════════════════════════════════════════════════════════");
+            d(tag, "╚═══════════════════════════════════════════════════════════════════════════════════════");
         }
     }
 
@@ -693,7 +693,7 @@ public class LogUtil {
         message = headString + LINE_SEPARATOR + message;
         String[] lines = message.split(LINE_SEPARATOR);
         for (String line : lines) {
-            Log.d(tag, "║ " + line);
+            d(tag, "║ " + line);
         }
         printLine(tag, false);
     }
