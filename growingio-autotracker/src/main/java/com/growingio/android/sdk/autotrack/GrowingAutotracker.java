@@ -29,6 +29,7 @@ import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
+import com.growingio.android.sdk.autotrack.webservices.WSLogCacheUtil;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
@@ -97,15 +98,15 @@ public class GrowingAutotracker implements IGrowingAutotracker {
                         return null;
                     }
                 });
+
     }
 
     private static void initAutotrackSDKInUI(AutotrackConfiguration autotrackConfiguration) {
+        LogUtil.add(WSLogCacheUtil.getInstance());
         ConfigurationProvider.get().addConfiguration(autotrackConfiguration.clone());
         GrowingAutotracker autotrack = new GrowingAutotracker();
         PageProvider.get().start();
         ViewChangeProvider.get().start();
-
-        sInstance = autotrack;
         LogUtil.d(TAG, "Autotracker module init success in ui thread");
     }
 
