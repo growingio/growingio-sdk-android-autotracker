@@ -107,6 +107,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         GrowingAutotracker autotrack = new GrowingAutotracker();
         PageProvider.get().start();
         ViewChangeProvider.get().start();
+        sInstance = autotrack;
         LogUtil.d(TAG, "Autotracker module init success in ui thread");
     }
 

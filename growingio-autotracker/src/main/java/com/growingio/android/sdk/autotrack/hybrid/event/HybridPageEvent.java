@@ -16,18 +16,18 @@
 
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
-import com.growingio.android.sdk.autotrack.events.base.BasePageEvent;
+import com.growingio.android.sdk.autotrack.events.PageEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class HybridPageEvent extends BasePageEvent {
+public class HybridPageEvent extends PageEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mProtocolType;
     private final String mQueryParameters;
 
-    protected HybridPageEvent(EventBuilder eventBuilder) {
+    protected HybridPageEvent(Builder eventBuilder) {
         super(eventBuilder);
         mProtocolType = eventBuilder.mProtocolType;
         mQueryParameters = eventBuilder.mQueryParameters;
@@ -52,11 +52,11 @@ public class HybridPageEvent extends BasePageEvent {
         return json;
     }
 
-    public static class EventBuilder extends BasePageEvent.EventBuilder<HybridPageEvent> {
+    public static class Builder extends PageEvent.Builder {
         private String mProtocolType;
         private String mQueryParameters;
 
-        public EventBuilder() {
+        public Builder() {
             super();
         }
 
@@ -64,7 +64,7 @@ public class HybridPageEvent extends BasePageEvent {
             return mProtocolType;
         }
 
-        public EventBuilder setProtocolType(String protocolType) {
+        public Builder setProtocolType(String protocolType) {
             mProtocolType = protocolType;
             return this;
         }
@@ -73,12 +73,12 @@ public class HybridPageEvent extends BasePageEvent {
             return mQueryParameters;
         }
 
-        public EventBuilder setQueryParameters(String queryParameters) {
+        public Builder setQueryParameters(String queryParameters) {
             mQueryParameters = queryParameters;
             return this;
         }
 
-        public EventBuilder setDomain(String domain) {
+        public Builder setDomain(String domain) {
             mDomain = domain;
             return this;
         }
@@ -86,6 +86,30 @@ public class HybridPageEvent extends BasePageEvent {
         @Override
         public HybridPageEvent build() {
             return new HybridPageEvent(this);
+        }
+
+        @Override
+        public Builder setPageName(String pageName) {
+            super.setPageName(pageName);
+            return this;
+        }
+
+        @Override
+        public Builder setTitle(String title) {
+            super.setTitle(title);
+            return this;
+        }
+
+        @Override
+        public Builder setReferralPage(String referralPage) {
+            super.setReferralPage(referralPage);
+            return this;
+        }
+
+        @Override
+        public Builder setTimestamp(long timestamp) {
+            super.setTimestamp(timestamp);
+            return this;
         }
     }
 }

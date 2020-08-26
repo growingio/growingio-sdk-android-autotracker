@@ -16,17 +16,19 @@
 
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
-import com.growingio.android.sdk.autotrack.events.base.BasePageAttributesEvent;
+import com.growingio.android.sdk.autotrack.events.PageAttributesEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class HybridPageAttributesEvent extends BasePageAttributesEvent {
+import java.util.Map;
+
+public final class HybridPageAttributesEvent extends PageAttributesEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mQueryParameters;
 
-    protected HybridPageAttributesEvent(EventBuilder eventBuilder) {
+    protected HybridPageAttributesEvent(Builder eventBuilder) {
         super(eventBuilder);
         mQueryParameters = eventBuilder.mQueryParameters;
     }
@@ -45,23 +47,19 @@ public final class HybridPageAttributesEvent extends BasePageAttributesEvent {
         return json;
     }
 
-    public static class EventBuilder extends BasePageAttributesEvent.EventBuilder<HybridPageAttributesEvent> {
+    public static class Builder extends PageAttributesEvent.Builder {
         private String mQueryParameters;
 
-        public EventBuilder() {
+        public Builder() {
             super();
         }
 
-        public String getQueryParameters() {
-            return mQueryParameters;
-        }
-
-        public EventBuilder setQueryParameters(String queryParameters) {
+        public Builder setQueryParameters(String queryParameters) {
             mQueryParameters = queryParameters;
             return this;
         }
 
-        public EventBuilder setDomain(String domain) {
+        public Builder setDomain(String domain) {
             mDomain = domain;
             return this;
         }
@@ -69,6 +67,24 @@ public final class HybridPageAttributesEvent extends BasePageAttributesEvent {
         @Override
         public HybridPageAttributesEvent build() {
             return new HybridPageAttributesEvent(this);
+        }
+
+        @Override
+        public Builder setPageName(String pageName) {
+            super.setPageName(pageName);
+            return this;
+        }
+
+        @Override
+        public Builder setPageShowTimestamp(long pageShowTimestamp) {
+            super.setPageShowTimestamp(pageShowTimestamp);
+            return this;
+        }
+
+        @Override
+        public Builder setAttributes(Map<String, String> attributes) {
+            super.setAttributes(attributes);
+            return this;
         }
     }
 }

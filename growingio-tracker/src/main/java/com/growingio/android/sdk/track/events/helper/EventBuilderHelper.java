@@ -20,5 +20,5 @@ package com.growingio.android.sdk.track.events.helper;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 
 public interface EventBuilderHelper {
-    void helpBuildingEvent(BaseEvent.BaseEventBuilder<?> eventBuilder);
+    void helpBuildingEvent(BaseEvent.BaseBuilder<?> eventBuilder);
 }

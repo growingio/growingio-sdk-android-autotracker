@@ -24,7 +24,7 @@ import java.util.Map;
 public abstract class BaseAttributesEvent extends BaseEvent {
     private final Map<String, String> mAttributes;
 
-    protected BaseAttributesEvent(EventBuilder<?> eventBuilder) {
+    protected BaseAttributesEvent(Builder<?> eventBuilder) {
         super(eventBuilder);
         mAttributes = eventBuilder.mAttributes;
     }
@@ -45,14 +45,14 @@ public abstract class BaseAttributesEvent extends BaseEvent {
         return json;
     }
 
-    public abstract static class EventBuilder<T extends BaseAttributesEvent> extends BaseEventBuilder<T> {
+    public abstract static class Builder<T extends BaseAttributesEvent> extends BaseBuilder<T> {
         private Map<String, String> mAttributes;
 
-        protected EventBuilder() {
+        protected Builder() {
             super();
         }
 
-        public EventBuilder<T> setAttributes(Map<String, String> attributes) {
+        public Builder<T> setAttributes(Map<String, String> attributes) {
             mAttributes = attributes;
             return this;
         }

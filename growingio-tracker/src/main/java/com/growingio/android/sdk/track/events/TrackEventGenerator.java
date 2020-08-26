@@ -26,7 +26,7 @@ public class TrackEventGenerator {
 
     public static void generateVisitEvent(String sessionId, long timestamp, double latitude, double longitude) {
         TrackMainThread.trackMain().postEventToTrackMain(
-                new VisitEvent.EventBuilder()
+                new VisitEvent.Builder()
                         .setSessionId(sessionId)
                         .setTimestamp(timestamp)
                         .setLatitude(latitude)
@@ -36,7 +36,7 @@ public class TrackEventGenerator {
 
     public static void generateCustomEvent(String name, Map<String, String> variables) {
         TrackMainThread.trackMain().postEventToTrackMain(
-                new CustomEvent.EventBuilder()
+                new CustomEvent.Builder()
                         .setEventName(name)
                         .setAttributes(variables)
         );
@@ -44,28 +44,28 @@ public class TrackEventGenerator {
 
     public static void generateConversionVariablesEvent(Map<String, String> variables) {
         TrackMainThread.trackMain().postEventToTrackMain(
-                new ConversionVariablesEvent.EventBuilder()
+                new ConversionVariablesEvent.Builder()
                         .setVariables(variables)
         );
     }
 
     public static void generateLoginUserAttributesEvent(Map<String, String> attributes) {
         TrackMainThread.trackMain().postEventToTrackMain(
-                new LoginUserAttributesEvent.EventBuilder()
+                new LoginUserAttributesEvent.Builder()
                         .setAttributes(attributes)
         );
     }
 
     public static void generateVisitorAttributesEvent(Map<String, String> attributes) {
         TrackMainThread.trackMain().postEventToTrackMain(
-                new VisitorAttributesEvent.EventBuilder()
+                new VisitorAttributesEvent.Builder()
                         .setAttributes(attributes)
         );
     }
 
     public static void generateAppClosedEvent() {
         TrackMainThread.trackMain().postEventToTrackMain(
-                new AppClosedEvent.EventBuilder()
+                new AppClosedEvent.Builder()
         );
     }
 }

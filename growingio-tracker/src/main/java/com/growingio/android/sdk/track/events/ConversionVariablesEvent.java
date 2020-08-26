@@ -28,7 +28,7 @@ public final class ConversionVariablesEvent extends BaseEvent {
 
     private final Map<String, String> mVariables;
 
-    protected ConversionVariablesEvent(EventBuilder eventBuilder) {
+    protected ConversionVariablesEvent(Builder eventBuilder) {
         super(eventBuilder);
         mVariables = eventBuilder.mVariables;
     }
@@ -49,10 +49,10 @@ public final class ConversionVariablesEvent extends BaseEvent {
         return mVariables;
     }
 
-    public static final class EventBuilder extends BaseEventBuilder<ConversionVariablesEvent> {
+    public static final class Builder extends BaseBuilder<ConversionVariablesEvent> {
         private Map<String, String> mVariables;
 
-        public EventBuilder() {
+        public Builder() {
             super();
         }
 
@@ -61,7 +61,7 @@ public final class ConversionVariablesEvent extends BaseEvent {
             return TrackEventType.CONVERSION_VARIABLES;
         }
 
-        public EventBuilder setVariables(Map<String, String> variables) {
+        public Builder setVariables(Map<String, String> variables) {
             mVariables = variables;
             return this;
         }

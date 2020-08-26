@@ -79,7 +79,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         dispatchActions(null);
     }
 
-    public void postEventToTrackMain(BaseEvent.BaseEventBuilder<?> eventBuilder) {
+    public void postEventToTrackMain(BaseEvent.BaseBuilder<?> eventBuilder) {
         if (eventBuilder == null) {
             return;
         }
@@ -99,7 +99,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     }
 
     @TrackThread
-    void onGenerateGEvent(BaseEvent.BaseEventBuilder<?> gEvent) {
+    void onGenerateGEvent(BaseEvent.BaseBuilder<?> gEvent) {
         gEvent.readPropertyInTrackThread();
         saveEvent(gEvent.build());
     }
@@ -124,7 +124,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                     initSDK();
                     break;
                 case MSG_POST_GEVENT: {
-                    BaseEvent.BaseEventBuilder<?> eventBuilder = (BaseEvent.BaseEventBuilder<?>) msg.obj;
+                    BaseEvent.BaseBuilder<?> eventBuilder = (BaseEvent.BaseBuilder<?>) msg.obj;
                     onGenerateGEvent(eventBuilder);
                     break;
                 }

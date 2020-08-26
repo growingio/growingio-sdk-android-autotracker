@@ -16,17 +16,19 @@
 
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
-import com.growingio.android.sdk.track.events.base.BaseCustomEvent;
+import com.growingio.android.sdk.autotrack.events.PageLevelCustomEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class HybridCustomEvent extends BaseCustomEvent {
+import java.util.Map;
+
+public final class HybridCustomEvent extends PageLevelCustomEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mQueryParameters;
 
-    protected HybridCustomEvent(EventBuilder eventBuilder) {
+    protected HybridCustomEvent(Builder eventBuilder) {
         super(eventBuilder);
         mQueryParameters = eventBuilder.mQueryParameters;
     }
@@ -45,10 +47,10 @@ public final class HybridCustomEvent extends BaseCustomEvent {
         return json;
     }
 
-    public static class EventBuilder extends BaseCustomEvent.EventBuilder<HybridCustomEvent> {
+    public static class Builder extends PageLevelCustomEvent.Builder {
         private String mQueryParameters;
 
-        public EventBuilder() {
+        public Builder() {
             super();
         }
 
@@ -56,13 +58,37 @@ public final class HybridCustomEvent extends BaseCustomEvent {
             return mQueryParameters;
         }
 
-        public EventBuilder setQueryParameters(String queryParameters) {
+        public Builder setQueryParameters(String queryParameters) {
             mQueryParameters = queryParameters;
             return this;
         }
 
-        public EventBuilder setDomain(String domain) {
+        public Builder setDomain(String domain) {
             mDomain = domain;
+            return this;
+        }
+
+        @Override
+        public Builder setPageName(String pageName) {
+            super.setPageName(pageName);
+            return this;
+        }
+
+        @Override
+        public Builder setPageShowTimestamp(long pageShowTimestamp) {
+            super.setPageShowTimestamp(pageShowTimestamp);
+            return this;
+        }
+
+        @Override
+        public Builder setEventName(String eventName) {
+            super.setEventName(eventName);
+            return this;
+        }
+
+        @Override
+        public Builder setAttributes(Map<String, String> attributes) {
+            super.setAttributes(attributes);
             return this;
         }
 

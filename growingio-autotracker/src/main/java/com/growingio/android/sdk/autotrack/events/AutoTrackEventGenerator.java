@@ -26,7 +26,7 @@ public class AutoTrackEventGenerator {
 
     public static void generatePageEvent(String pageName, String title, long timestamp) {
         TrackMainThread.trackMain().postEventToTrackMain(
-                new PageEvent.EventBuilder()
+                new PageEvent.Builder()
                         .setPageName(pageName)
                         .setTitle(title)
                         .setTimestamp(timestamp)
@@ -35,7 +35,7 @@ public class AutoTrackEventGenerator {
 
     public static void generatePageAttributesEvent(String pageName, long pageShowTimestamp, Map<String, String> attributes) {
         TrackMainThread.trackMain().postEventToTrackMain(
-                new PageAttributesEvent.EventBuilder()
+                new PageAttributesEvent.Builder()
                         .setPageName(pageName)
                         .setPageShowTimestamp(pageShowTimestamp)
                         .setAttributes(attributes));

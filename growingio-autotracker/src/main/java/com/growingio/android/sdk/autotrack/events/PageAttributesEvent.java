@@ -16,25 +16,76 @@
 
 package com.growingio.android.sdk.autotrack.events;
 
-import com.growingio.android.sdk.autotrack.events.base.BasePageAttributesEvent;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
-public class PageAttributesEvent extends BasePageAttributesEvent {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Map;
+
+public class PageAttributesEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
-    protected PageAttributesEvent(EventBuilder eventBuilder) {
+    private final String mPageName;
+    private final long mPageShowTimestamp;
+
+    protected PageAttributesEvent(Builder eventBuilder) {
         super(eventBuilder);
+        mPageName = eventBuilder.mPageName;
+        mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
     }
 
-    public static final class EventBuilder extends BasePageAttributesEvent.EventBuilder<PageAttributesEvent> {
+    public String getPageName() {
+        return mPageName;
+    }
 
-        EventBuilder() {
+    public long getPageShowTimestamp() {
+        return mPageShowTimestamp;
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        JSONObject json = super.toJSONObject();
+        try {
+            json.put("pageName", mPageName);
+            json.put("pageShowTimestamp", mPageShowTimestamp);
+        } catch (JSONException ignored) {
+        }
+        return json;
+    }
+
+    public static class Builder extends BaseAttributesEvent.Builder<PageAttributesEvent> {
+        private String mPageName;
+        private long mPageShowTimestamp;
+
+        public Builder() {
             super();
+        }
+
+        public Builder setPageName(String pageName) {
+            mPageName = pageName;
+            return this;
+        }
+
+        public Builder setPageShowTimestamp(long pageShowTimestamp) {
+            mPageShowTimestamp = pageShowTimestamp;
+            return this;
+        }
+
+        @Override
+        public Builder setAttributes(Map<String, String> attributes) {
+            super.setAttributes(attributes);
+            return this;
+        }
+
+        @Override
+        public String getEventType() {
+            return AutotrackEventType.PAGE_ATTRIBUTES;
         }
 
         @Override
         public PageAttributesEvent build() {
             return new PageAttributesEvent(this);
         }
-
     }
 }

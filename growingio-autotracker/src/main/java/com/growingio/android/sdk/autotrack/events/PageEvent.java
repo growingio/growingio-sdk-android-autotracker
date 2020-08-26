@@ -16,24 +16,106 @@
 
 package com.growingio.android.sdk.autotrack.events;
 
-import com.growingio.android.sdk.autotrack.events.base.BasePageEvent;
+import android.app.Activity;
 
-public class PageEvent extends BasePageEvent {
+import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class PageEvent extends BaseEvent {
     private static final long serialVersionUID = 1L;
 
-    protected PageEvent(EventBuilder eventBuilder) {
+    private static final String ORIENTATION_PORTRAIT = "PORTRAIT";
+    private static final String ORIENTATION_LANDSCAPE = "LANDSCAPE";
+
+    private final String mPageName;
+    private final String mOrientation;
+    private final String mTitle;
+    private final String mReferralPage;
+
+    protected PageEvent(Builder eventBuilder) {
         super(eventBuilder);
+        mPageName = eventBuilder.mPageName;
+        mOrientation = eventBuilder.mOrientation;
+        mTitle = eventBuilder.mTitle;
+        mReferralPage = eventBuilder.mReferralPage;
     }
 
-    public static class EventBuilder extends BasePageEvent.EventBuilder<PageEvent> {
+    public String getPageName() {
+        return mPageName;
+    }
 
-        EventBuilder() {
+    public String getOrientation() {
+        return mOrientation;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public String getReferralPage() {
+        return mReferralPage;
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        JSONObject json = super.toJSONObject();
+        try {
+            json.put("pageName", mPageName);
+            json.put("orientation", mOrientation);
+            json.put("title", mTitle);
+            json.put("referralPage", mReferralPage);
+        } catch (JSONException ignored) {
+        }
+        return json;
+    }
+
+    public static class Builder extends BaseBuilder<PageEvent> {
+        private String mPageName;
+        private String mOrientation;
+        private String mTitle;
+        private String mReferralPage;
+
+        public Builder() {
             super();
+            mReferralPage = "";
+            Activity activity = ActivityStateProvider.get().getResumedActivity();
+            if (activity != null) {
+                mOrientation = activity.getResources().getConfiguration().orientation == 1
+                        ? ORIENTATION_PORTRAIT : ORIENTATION_LANDSCAPE;
+            }
+        }
+
+        public Builder setPageName(String pageName) {
+            mPageName = pageName;
+            return this;
+        }
+
+        public Builder setTitle(String title) {
+            mTitle = title;
+            return this;
+        }
+
+        public Builder setReferralPage(String referralPage) {
+            mReferralPage = referralPage;
+            return this;
+        }
+
+        @Override
+        public String getEventType() {
+            return AutotrackEventType.PAGE;
         }
 
         @Override
         public PageEvent build() {
             return new PageEvent(this);
+        }
+
+        public Builder setTimestamp(long timestamp) {
+            mTimestamp = timestamp;
+            return this;
         }
     }
 }
