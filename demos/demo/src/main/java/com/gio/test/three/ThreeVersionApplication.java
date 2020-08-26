@@ -17,7 +17,9 @@
 package com.gio.test.three;
 
 import android.app.Application;
+import android.os.Build;
 import android.util.Log;
+import android.webkit.WebView;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
@@ -29,6 +31,9 @@ public class ThreeVersionApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
         QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
             @Override
             public void onCoreInitFinished() {

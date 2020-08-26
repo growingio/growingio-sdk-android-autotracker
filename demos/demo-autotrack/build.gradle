@@ -7,11 +7,6 @@ android {
         targetSdkVersion buildConfiguration.targetSdkVersion
     }
 
-    sourceSets.main {
-        jniLibs.srcDirs = ['libs']
-        assets.srcDirs = ['assets']
-    }
-
     lintOptions {
         abortOnError false
     }
