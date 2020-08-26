@@ -16,11 +16,13 @@
 
 package com.growingio.android.sdk.autotrack.hybrid;
 
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.TrackMainThread;
 
 class NativeBridge {
     private static final String TAG = "GIO.NativeBridge";
+
     private final HybridTransformer mHybridTransformer;
 
     NativeBridge() {
@@ -36,6 +38,6 @@ class NativeBridge {
     }
 
     void clearNativeUserId() {
-//        GrowingIOTrack.getInstance().setUserId();
+        GrowingAutotracker.getInstance().cleanLoginUserId();
     }
 }

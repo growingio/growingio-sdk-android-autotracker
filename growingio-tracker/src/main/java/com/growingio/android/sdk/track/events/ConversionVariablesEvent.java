@@ -37,7 +37,9 @@ public final class ConversionVariablesEvent extends BaseEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("variables", mVariables);
+            if (mVariables != null && !mVariables.isEmpty()) {
+                json.put("variables", new JSONObject(mVariables));
+            }
         } catch (JSONException ignored) {
         }
         return json;
