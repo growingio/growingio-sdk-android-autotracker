@@ -27,7 +27,7 @@ import org.json.JSONObject;
 import java.util.Iterator;
 
 public class ArgumentChecker {
-    private static final String TAG = "GIO.ArgumentChecker";
+    private static final String TAG = "ArgumentChecker";
     private static final int MAX_VALUE_SIZE = 1000;
 
     private ArgumentChecker() {

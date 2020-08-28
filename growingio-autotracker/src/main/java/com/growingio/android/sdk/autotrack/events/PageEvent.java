@@ -16,19 +16,26 @@
 
 package com.growingio.android.sdk.autotrack.events;
 
-import android.app.Activity;
+import androidx.annotation.StringDef;
 
 import com.growingio.android.sdk.track.events.base.BaseEvent;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 public class PageEvent extends BaseEvent {
     private static final long serialVersionUID = 1L;
 
-    private static final String ORIENTATION_PORTRAIT = "PORTRAIT";
-    private static final String ORIENTATION_LANDSCAPE = "LANDSCAPE";
+    public static final String ORIENTATION_PORTRAIT = "PORTRAIT";
+    public static final String ORIENTATION_LANDSCAPE = "LANDSCAPE";
+
+    @Retention(RetentionPolicy.SOURCE)
+    @StringDef({ORIENTATION_PORTRAIT, ORIENTATION_LANDSCAPE})
+    public @interface Orientation {
+    }
 
     private final String mPageName;
     private final String mOrientation;
@@ -74,18 +81,12 @@ public class PageEvent extends BaseEvent {
 
     public static class Builder extends BaseBuilder<PageEvent> {
         private String mPageName;
-        private String mOrientation;
+        private String mOrientation = ORIENTATION_PORTRAIT;
         private String mTitle;
-        private String mReferralPage;
+        private String mReferralPage = "";
 
         public Builder() {
             super();
-            mReferralPage = "";
-            Activity activity = ActivityStateProvider.get().getResumedActivity();
-            if (activity != null) {
-                mOrientation = activity.getResources().getConfiguration().orientation == 1
-                        ? ORIENTATION_PORTRAIT : ORIENTATION_LANDSCAPE;
-            }
         }
 
         public Builder setPageName(String pageName) {
@@ -100,6 +101,11 @@ public class PageEvent extends BaseEvent {
 
         public Builder setReferralPage(String referralPage) {
             mReferralPage = referralPage;
+            return this;
+        }
+
+        public Builder setOrientation(@Orientation String orientation) {
+            mOrientation = orientation;
             return this;
         }
 

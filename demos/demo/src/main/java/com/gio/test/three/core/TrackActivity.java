@@ -28,6 +28,9 @@ import com.gio.test.R;
 import com.gio.test.three.ModuleEntry;
 import com.growingio.android.sdk.track.GrowingTracker;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @ModuleEntry("埋点SDK测试")
 public class TrackActivity extends Activity {
     private static final String TAG = "TrackActivity";
@@ -65,15 +68,22 @@ public class TrackActivity extends Activity {
     private void handleItemClick(String itemString) {
         switch (itemString) {
             case TRACK_CUSTOM_EVENT:
+                GrowingTracker.get().trackCustomEvent("registerSuccess");
+
+                Map<String, String> map = new HashMap<>();
+                map.put("name", "June");
+                map.put("age", "12");
+                GrowingTracker.get().trackCustomEvent("registerSuccess", map);
+
                 break;
             case SET_USER_ID_ZHANGSAN:
-                GrowingTracker.getInstance().setLoginUserId("zhangsan");
+                GrowingTracker.get().setLoginUserId("zhangsan");
                 break;
             case SET_USER_ID_NULL:
-                GrowingTracker.getInstance().cleanLoginUserId();
+                GrowingTracker.get().cleanLoginUserId();
                 break;
             case SET_USER_ID_LISI:
-                GrowingTracker.getInstance().setLoginUserId("lisi");
+                GrowingTracker.get().setLoginUserId("lisi");
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

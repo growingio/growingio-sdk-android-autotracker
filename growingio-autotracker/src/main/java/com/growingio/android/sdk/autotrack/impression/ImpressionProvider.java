@@ -26,11 +26,14 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
-import com.growingio.android.sdk.autotrack.GrowingAutotracker;
+import com.growingio.android.sdk.autotrack.events.PageLevelCustomEvent;
+import com.growingio.android.sdk.autotrack.page.Page;
+import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.autotrack.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.autotrack.view.ViewTreeStatusProvider;
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
@@ -119,7 +122,24 @@ public class ImpressionProvider implements OnViewStateChangedListener {
     }
 
     private void sendViewImpressionEvent(ViewImpression impression) {
-        GrowingAutotracker.getInstance().trackCustomEvent(impression.getImpressionEventName(), impression.getEventAttributes());
+        TrackMainThread.trackMain().postEventToTrackMain(new PageLevelCustomEvent.Builder());
+        View trackedView = impression.getTrackedView();
+        if (trackedView == null) {
+            return;
+        }
+
+        Page<?> page = PageProvider.get().findPage(trackedView);
+        if (page == null) {
+            LogUtil.e(TAG, "sendViewImpressionEvent trackedView Activity is NULL");
+            return;
+        }
+        TrackMainThread.trackMain().postEventToTrackMain(
+                new PageLevelCustomEvent.Builder()
+                        .setEventName(impression.getImpressionEventName())
+                        .setAttributes(impression.getEventAttributes())
+                        .setPageName(page.path())
+                        .setPageShowTimestamp(page.getShowTimestamp())
+        );
     }
 
     private void start() {
@@ -186,7 +206,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
 
     @Nullable
     private Activity findViewActivity(View view) {
-        Activity activity = ActivityUtil.findActivity(view.getContext());
+        Activity activity = ActivityUtil.findActivity(view);
         if (activity == null) {
             LogUtil.e(TAG, "View context activity is NULL");
             activity = ActivityStateProvider.get().getResumedActivity();

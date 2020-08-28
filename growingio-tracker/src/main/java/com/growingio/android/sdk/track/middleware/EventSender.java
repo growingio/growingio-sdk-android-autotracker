@@ -35,7 +35,7 @@ import java.util.Date;
  * - EventSender为单线程模型
  */
 class EventSender {
-    private static final String TAG = "GIO.EventSender";
+    private static final String TAG = "EventSender";
 
     private static final int EVENTS_BULK_SIZE = 300;
 
@@ -45,11 +45,13 @@ class EventSender {
 
     private GIOSenderService mSenderService;
     private final SharedPreferences mSharedPreferences;
+    private final long mCellularDataLimit;
 
     EventSender(Context context, IEventSender sender) {
         mContext = context;
         mDbSQLite = new DBSQLite(context, sender);
         mSharedPreferences = context.getSharedPreferences("growing_sender", Context.MODE_PRIVATE);
+        mCellularDataLimit = ConfigurationProvider.get().getTrackConfiguration().getCellularDataLimit() * 1024 * 1024;
     }
 
     public void setSenderService(GIOSenderService senderService) {
@@ -97,7 +99,7 @@ class EventSender {
         String todayStr = mSharedPreferences.getString(dateKey, "");
 
         @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat dayFormat = new SimpleDateFormat("YYYYMMdd");
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyyMMdd");
         String realDayTime = dayFormat.format(new Date());
 
         long oldValue;
@@ -206,7 +208,7 @@ class EventSender {
             do {
                 if (policy != GEvent.SEND_POLICY_INSTANT
                         && networkState.isMobileData()
-                        && ConfigurationProvider.get().getTrackConfiguration().getCellularDataLimit() < todayBytes(0)) {
+                        && mCellularDataLimit < todayBytes(0)) {
                     LogUtil.d(TAG, "今日流量已耗尽");
                     break;
                 }

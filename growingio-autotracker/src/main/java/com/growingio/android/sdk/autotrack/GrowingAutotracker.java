@@ -18,6 +18,7 @@ package com.growingio.android.sdk.autotrack;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -37,23 +38,20 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Map;
 
 public class GrowingAutotracker implements IGrowingAutotracker {
-    private static final String TAG = "GIO.Autotrack";
+    private static final String TAG = "GrowingAutotracker";
 
     private static GrowingAutotracker sInstance;
     private static volatile boolean sInitializedSuccessfully = false;
 
     @NonNull
-    public static IGrowingAutotracker getInstance() {
+    public static IGrowingAutotracker get() {
         if (sInstance != null) {
             return sInstance;
         }
-        synchronized (GrowingTracker.class) {
+        synchronized (IGrowingAutotracker.class) {
             if (sInstance != null) {
                 return sInstance;
             }
@@ -65,7 +63,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         return sInitializedSuccessfully;
     }
 
-    public static IGrowingAutotracker startWithConfiguration(Application application, final AutotrackConfiguration autotrackConfiguration) {
+    public static void startWithConfiguration(Application application, final AutotrackConfiguration autotrackConfiguration) {
         GrowingTracker.startWithConfiguration(application, autotrackConfiguration, new InitExtraOperation() {
             @Override
             public void initializing() {
@@ -77,28 +75,11 @@ public class GrowingAutotracker implements IGrowingAutotracker {
                 sInitializedSuccessfully = true;
             }
         });
-        if (sInitializedSuccessfully) {
-            return sInstance;
-        } else {
-            return makeEmpty();
-        }
     }
 
     private static IGrowingAutotracker makeEmpty() {
-        return (IGrowingAutotracker) Proxy.newProxyInstance(GrowingAutotracker.class.getClassLoader(),
-                new Class[]{IGrowingAutotracker.class}, new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        if (method.getReturnType() == IGrowingAutotracker.class) {
-                            return proxy;
-                        }
-                        if (method.getReturnType() == boolean.class) {
-                            return false;
-                        }
-                        return null;
-                    }
-                });
-
+        LogUtil.e(TAG, "GrowingAutotracker is UNINITIALIZED, please initialized before use API");
+        return EmptyGrowingAutotracker.INSTANCE;
     }
 
     private static void initAutotrackSDKInUI(AutotrackConfiguration autotrackConfiguration) {
@@ -112,105 +93,133 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public IGrowingAutotracker trackCustomEvent(String eventName, Map<String, String> attributes) {
-        GrowingTracker.getInstance().trackCustomEvent(eventName, attributes);
-        return this;
+    public void trackCustomEvent(String eventName) {
+        GrowingTracker.get().trackCustomEvent(eventName);
     }
 
     @Override
-    public IGrowingAutotracker setConversionVariables(Map<String, String> variables) {
-        GrowingTracker.getInstance().setConversionVariables(variables);
-        return this;
+    public void trackCustomEvent(String eventName, Map<String, String> attributes) {
+        GrowingTracker.get().trackCustomEvent(eventName, attributes);
     }
 
     @Override
-    public IGrowingAutotracker setLoginUserAttributes(Map<String, String> attributes) {
-        GrowingTracker.getInstance().setLoginUserAttributes(attributes);
-        return this;
+    public void setConversionVariables(Map<String, String> variables) {
+        GrowingTracker.get().setConversionVariables(variables);
     }
 
     @Override
-    public IGrowingAutotracker setVisitorAttributes(Map<String, String> attributes) {
-        GrowingTracker.getInstance().setVisitorAttributes(attributes);
-        return this;
+    public void setLoginUserAttributes(Map<String, String> attributes) {
+        GrowingTracker.get().setLoginUserAttributes(attributes);
     }
 
     @Override
-    public IGrowingAutotracker getDeviceId(@Nullable ResultCallback<String> callback) {
-        GrowingTracker.getInstance().getDeviceId(callback);
-        return this;
+    public void setVisitorAttributes(Map<String, String> attributes) {
+        GrowingTracker.get().setVisitorAttributes(attributes);
     }
 
     @Override
-    public IGrowingAutotracker setDataCollectionEnabled(boolean enabled) {
-        GrowingTracker.getInstance().setDataCollectionEnabled(enabled);
-        return this;
+    public void getDeviceId(@Nullable ResultCallback<String> callback) {
+        GrowingTracker.get().getDeviceId(callback);
     }
 
     @Override
-    public IGrowingAutotracker setLoginUserId(String userId) {
-        GrowingTracker.getInstance().setLoginUserId(userId);
-        return this;
+    public void setDataCollectionEnabled(boolean enabled) {
+        GrowingTracker.get().setDataCollectionEnabled(enabled);
     }
 
     @Override
-    public IGrowingAutotracker cleanLoginUserId() {
-        GrowingTracker.getInstance().cleanLoginUserId();
-        return this;
+    public void setLoginUserId(String userId) {
+        GrowingTracker.get().setLoginUserId(userId);
     }
 
     @Override
-    public IGrowingAutotracker setLocation(double latitude, double longitude) {
-        GrowingTracker.getInstance().setLocation(latitude, longitude);
-        return this;
+    public void cleanLoginUserId() {
+        GrowingTracker.get().cleanLoginUserId();
     }
 
     @Override
-    public IGrowingAutotracker cleanLocation() {
-        GrowingTracker.getInstance().cleanLocation();
-        return this;
+    public void setLocation(double latitude, double longitude) {
+        GrowingTracker.get().setLocation(latitude, longitude);
     }
 
     @Override
-    public IGrowingAutotracker setUniqueTag(final View view, final String tag) {
-        return this;
+    public void cleanLocation() {
+        GrowingTracker.get().cleanLocation();
     }
 
     @Override
-    public IGrowingAutotracker setPageAttributes(final Activity activity, final Map<String, String> attributes) {
-        PageProvider.get().setPageAttributes(activity, attributes);
-        return this;
+    public void setUniqueTag(final View view, final String tag) {
     }
 
     @Override
-    public IGrowingAutotracker setPageAttributes(android.app.Fragment fragment, Map<String, String> attributes) {
-        PageProvider.get().setPageAttributes(SuperFragment.make(fragment), attributes);
-        return this;
+    public void trackCustomEvent(String eventName, Activity page) {
+
     }
 
     @Override
-    public IGrowingAutotracker setPageAttributes(final android.support.v4.app.Fragment fragment, final Map<String, String> attributes) {
-        PageProvider.get().setPageAttributes(SuperFragment.make(fragment), attributes);
-        return this;
+    public void trackCustomEvent(String eventName, Fragment page) {
+
     }
 
     @Override
-    public IGrowingAutotracker setPageAttributes(androidx.fragment.app.Fragment fragment, Map<String, String> attributes) {
-        PageProvider.get().setPageAttributes(SuperFragment.make(fragment), attributes);
-        return this;
+    public void trackCustomEvent(String eventName, android.support.v4.app.Fragment page) {
+
     }
 
     @Override
-    public IGrowingAutotracker trackViewImpression(View view, String impressionEventName) {
+    public void trackCustomEvent(String eventName, androidx.fragment.app.Fragment page) {
+
+    }
+
+    @Override
+    public void trackCustomEvent(String eventName, Map<String, String> attributes, Activity page) {
+
+    }
+
+    @Override
+    public void trackCustomEvent(String eventName, Map<String, String> attributes, Fragment page) {
+
+    }
+
+    @Override
+    public void trackCustomEvent(String eventName, Map<String, String> attributes, android.support.v4.app.Fragment page) {
+
+    }
+
+    @Override
+    public void trackCustomEvent(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page) {
+
+    }
+
+    @Override
+    public void setPageAttributes(final Activity page, final Map<String, String> attributes) {
+        PageProvider.get().setPageAttributes(page, attributes);
+    }
+
+    @Override
+    public void setPageAttributes(android.app.Fragment page, Map<String, String> attributes) {
+        PageProvider.get().setPageAttributes(SuperFragment.make(page), attributes);
+    }
+
+    @Override
+    public void setPageAttributes(final android.support.v4.app.Fragment page, final Map<String, String> attributes) {
+        PageProvider.get().setPageAttributes(SuperFragment.make(page), attributes);
+    }
+
+    @Override
+    public void setPageAttributes(androidx.fragment.app.Fragment page, Map<String, String> attributes) {
+        PageProvider.get().setPageAttributes(SuperFragment.make(page), attributes);
+    }
+
+    @Override
+    public void trackViewImpression(View view, String impressionEventName) {
         trackViewImpression(view, impressionEventName, null);
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker trackViewImpression(final View view, final String impressionEventName, final Map<String, String> attributes) {
+    public void trackViewImpression(final View view, final String impressionEventName, final Map<String, String> attributes) {
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
             LogUtil.e(TAG, "view or impressionEventName is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -218,14 +227,12 @@ public class GrowingAutotracker implements IGrowingAutotracker {
                 ImpressionProvider.get().trackViewImpression(view, impressionEventName, attributes);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker stopTrackViewImpression(final View trackedView) {
+    public void stopTrackViewImpression(final View trackedView) {
         if (trackedView == null) {
             LogUtil.e(TAG, "trackedView is NULL");
-            return this;
         }
 
         ThreadUtils.runOnUiThread(new Runnable() {
@@ -234,134 +241,116 @@ public class GrowingAutotracker implements IGrowingAutotracker {
                 ImpressionProvider.get().stopTrackViewImpression(trackedView);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker setPageAlias(final Activity activity, final String alias) {
-        if (activity == null || TextUtils.isEmpty(alias)) {
+    public void setPageAlias(final Activity page, final String alias) {
+        if (page == null || TextUtils.isEmpty(alias)) {
             LogUtil.e(TAG, "activity or alias is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().setActivityAlias(activity, alias);
+                PageProvider.get().setActivityAlias(page, alias);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker setPageAlias(final android.app.Fragment fragment, final String alias) {
-        if (fragment == null || TextUtils.isEmpty(alias)) {
+    public void setPageAlias(final android.app.Fragment page, final String alias) {
+        if (page == null || TextUtils.isEmpty(alias)) {
             LogUtil.e(TAG, "fragment or alias is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().setFragmentAlias(SuperFragment.make(fragment), alias);
+                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker setPageAlias(final android.support.v4.app.Fragment fragment, final String alias) {
-        if (fragment == null || TextUtils.isEmpty(alias)) {
+    public void setPageAlias(final android.support.v4.app.Fragment page, final String alias) {
+        if (page == null || TextUtils.isEmpty(alias)) {
             LogUtil.e(TAG, "fragment or alias is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().setFragmentAlias(SuperFragment.make(fragment), alias);
+                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker setPageAlias(final androidx.fragment.app.Fragment fragment, final String alias) {
-        if (fragment == null || TextUtils.isEmpty(alias)) {
+    public void setPageAlias(final androidx.fragment.app.Fragment page, final String alias) {
+        if (page == null || TextUtils.isEmpty(alias)) {
             LogUtil.e(TAG, "fragment or alias is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().setFragmentAlias(SuperFragment.make(fragment), alias);
+                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker ignorePage(final Activity activity, final IgnorePolicy policy) {
-        if (activity == null || policy == null) {
+    public void ignorePage(final Activity page, final IgnorePolicy policy) {
+        if (page == null || policy == null) {
             LogUtil.e(TAG, "activity or policy is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().addIgnoreActivity(activity, policy);
+                PageProvider.get().addIgnoreActivity(page, policy);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker ignorePage(final android.app.Fragment fragment, final IgnorePolicy policy) {
-        if (fragment == null || policy == null) {
+    public void ignorePage(final android.app.Fragment page, final IgnorePolicy policy) {
+        if (page == null || policy == null) {
             LogUtil.e(TAG, "fragment or policy is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().addIgnoreFragment(SuperFragment.make(fragment), policy);
+                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker ignorePage(final android.support.v4.app.Fragment fragment, final IgnorePolicy policy) {
-        if (fragment == null || policy == null) {
+    public void ignorePage(final android.support.v4.app.Fragment page, final IgnorePolicy policy) {
+        if (page == null || policy == null) {
             LogUtil.e(TAG, "fragment or policy is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().addIgnoreFragment(SuperFragment.make(fragment), policy);
+                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker ignorePage(final androidx.fragment.app.Fragment fragment, final IgnorePolicy policy) {
-        if (fragment == null || policy == null) {
+    public void ignorePage(final androidx.fragment.app.Fragment page, final IgnorePolicy policy) {
+        if (page == null || policy == null) {
             LogUtil.e(TAG, "fragment or policy is NULL");
-            return this;
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().addIgnoreFragment(SuperFragment.make(fragment), policy);
+                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
             }
         });
-        return this;
     }
 
     @Override
-    public IGrowingAutotracker ignoreView(final View view, final IgnorePolicy policy) {
+    public void ignoreView(final View view, final IgnorePolicy policy) {
         if (view == null || policy == null) {
             LogUtil.e(TAG, "view or policy is NULL");
-            return this;
         }
 
         ThreadUtils.runOnUiThread(new Runnable() {
@@ -370,7 +359,6 @@ public class GrowingAutotracker implements IGrowingAutotracker {
                 ViewAttributeUtil.setIgnorePolicy(view, policy);
             }
         });
-        return this;
     }
 
 }

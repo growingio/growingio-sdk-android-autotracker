@@ -18,14 +18,17 @@ package com.growingio.android.sdk.autotrack.page;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.autotrack.events.AutoTrackEventGenerator;
+import com.growingio.android.sdk.autotrack.events.PageAttributesEvent;
+import com.growingio.android.sdk.autotrack.events.PageEvent;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -116,11 +119,23 @@ public class PageProvider implements IActivityLifecycle {
 
         if (!page.isIgnored()) {
             LogUtil.d(TAG, "createOrResumePage: path = " + page.path());
-            AutoTrackEventGenerator.generatePageEvent(page.path(), page.getTitle(), page.getShowTimestamp());
+            generatePageEvent(activity, page);
             reissuePageAttributes(page);
         } else {
             Log.e(TAG, "createOrResumePage: path = " + page.path() + " is ignored");
         }
+    }
+
+    private void generatePageEvent(Context context, Page<?> page) {
+        String orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
+                ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
+        TrackMainThread.trackMain().postEventToTrackMain(
+                new PageEvent.Builder()
+                        .setPageName(page.path())
+                        .setTitle(page.getTitle())
+                        .setTimestamp(page.getShowTimestamp())
+                        .setOrientation(orientation)
+        );
     }
 
     public void setActivityAlias(Activity activity, String alias) {
@@ -225,7 +240,7 @@ public class PageProvider implements IActivityLifecycle {
         page.setIgnored(isIgnoreFragment(fragment));
         if (!page.isIgnored()) {
             Log.e(TAG, "createOrResumePage: path = " + page.path());
-            AutoTrackEventGenerator.generatePageEvent(page.path(), page.getTitle(), page.getShowTimestamp());
+            generatePageEvent(fragment.getActivity(), page);
             reissuePageAttributes(page);
         } else {
             Log.e(TAG, "createOrResumePage: path = " + page.path() + " is ignored");
@@ -349,7 +364,7 @@ public class PageProvider implements IActivityLifecycle {
 
         if (!page.isIgnored()) {
             Log.e(TAG, "setPageAttributes: page = " + page.path() + ", attributes = " + attributes.toString());
-            AutoTrackEventGenerator.generatePageAttributesEvent(page.path(), page.getShowTimestamp(), page.getAttributes());
+            generatePageAttributesEvent(page);
         }
 
         if (page instanceof PageGroup) {
@@ -362,6 +377,14 @@ public class PageProvider implements IActivityLifecycle {
                 }
             }
         }
+    }
+
+    private void generatePageAttributesEvent(Page<?> page) {
+        TrackMainThread.trackMain().postEventToTrackMain(
+                new PageAttributesEvent.Builder()
+                        .setPageName(page.path())
+                        .setPageShowTimestamp(page.getShowTimestamp())
+                        .setAttributes(page.getAttributes()));
     }
 
     public Page<?> findPage(View view) {

@@ -43,6 +43,7 @@ import com.gio.test.three.autotrack.activity.ui.login.LoginActivity;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
+import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 
 import java.util.HashMap;
@@ -108,24 +109,24 @@ public class AutotrackEntryActivity extends Activity {
     private void ignoreExample() {
         View view = getWindow().getDecorView();
 
-        GrowingAutotracker.getInstance().ignorePage(this, IgnorePolicy.IGNORE_ALL);
-        GrowingAutotracker.getInstance().ignoreView(view, IgnorePolicy.IGNORE_SELF);
+        GrowingAutotracker.get().ignorePage(this, IgnorePolicy.IGNORE_ALL);
+        GrowingAutotracker.get().ignoreView(view, IgnorePolicy.IGNORE_SELF);
     }
 
     private void autotrackExample() {
         View view = getWindow().getDecorView();
-        GrowingAutotracker.getInstance().setUniqueTag(view, "current_unique_tag");
+        GrowingAutotracker.get().setUniqueTag(view, "current_unique_tag");
         String uid = ViewAttributeUtil.getCustomId(view);
         Log.d(TAG, "unique id = " + uid);
 
-        GrowingAutotracker.getInstance().setPageAlias(this, "autotrack_entry_alias");
+        GrowingAutotracker.get().setPageAlias(this, "autotrack_entry_alias");
         HashMap<String, String> map = new HashMap<>();
         map.put("name", "hello");
         map.put("age", "18");
 
-        GrowingAutotracker.getInstance().setPageAttributes(this, map);
+        GrowingAutotracker.get().setPageAttributes(this, map);
 
-        GrowingAutotracker.getInstance().getDeviceId(new ResultCallback<String>() {
+        GrowingTracker.get().getDeviceId(new ResultCallback<String>() {
             @Override
             public void onResult(@Nullable String result) {
                 Log.d(TAG, "device id = " + result);

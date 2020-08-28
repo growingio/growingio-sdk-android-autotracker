@@ -75,14 +75,14 @@ public class RecyclerViewImpActivity extends Activity {
                 e.printStackTrace();
             }
             if (position == 0) {
-                GrowingAutotracker.getInstance().trackViewImpression(holder.itemView, "test_impression_0");
+                GrowingAutotracker.get().trackViewImpression(holder.itemView, "test_impression_0");
             }
 
             if (position == 99) {
                 Map<String, String> map = new HashMap<>();
                 map.put("key1", "value1");
                 map.put("key2", "value2");
-                GrowingAutotracker.getInstance().trackViewImpression(holder.itemView, "test_impression_99", map);
+                GrowingAutotracker.get().trackViewImpression(holder.itemView, "test_impression_99", map);
             }
         }
 

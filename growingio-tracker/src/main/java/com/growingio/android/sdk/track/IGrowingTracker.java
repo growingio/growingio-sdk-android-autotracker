@@ -30,40 +30,36 @@ import java.util.Map;
 @AnyThread
 public interface IGrowingTracker {
 
+    void trackCustomEvent(String eventName);
+
+    void trackCustomEvent(String eventName, Map<String, String> attributes);
+
+    void setLoginUserAttributes(Map<String, String> attributes);
+
+    void setVisitorAttributes(Map<String, String> attributes);
+
+    void setConversionVariables(Map<String, String> variables);
+
+    void setLoginUserId(String userId);
+
+    void cleanLoginUserId();
+
+    void setLocation(double latitude, double longitude);
+
+    void cleanLocation();
+
     /**
-     * 埋点事件， 产生一条自定义事件
+     * 打开或关闭数据采集
+     * 如果关闭，从代码调用开始, 后续所有事件不再采集, 但是之前采集生成的历史数据仍会发送
      *
-     * @param eventName  对应事件名
-     * @param attributes 对应事件的var, 支持Map与JSON两种格式
-     * @return this
+     * @param enabled true打开数据采集，false关闭数据采集
      */
-    IGrowingTracker trackCustomEvent(String eventName, Map<String, String> attributes);
-
-    IGrowingTracker setConversionVariables(Map<String, String> variables);
-
-    IGrowingTracker setLoginUserAttributes(Map<String, String> attributes);
-
-    IGrowingTracker setVisitorAttributes(Map<String, String> attributes);
+    void setDataCollectionEnabled(boolean enabled);
 
     /**
      * 异步获取deviceId
      *
-     * @param callback 对应回调,  回调线程为任意线程
-     * @return this
+     * @param callback 对应回调,  回调线程不确定
      */
-    IGrowingTracker getDeviceId(@Nullable ResultCallback<String> callback);
-
-    /**
-     * 禁止数据采集, 但不会禁止SDK相应功能
-     * 从代码调用开始, 后续所有事件不再采集, 但是之前采集生成的历史数据仍会发送
-     */
-    IGrowingTracker setDataCollectionEnabled(boolean enabled);
-
-    IGrowingTracker setLoginUserId(String userId);
-
-    IGrowingTracker cleanLoginUserId();
-
-    IGrowingTracker setLocation(double latitude, double longitude);
-
-    IGrowingTracker cleanLocation();
+    void getDeviceId(@Nullable ResultCallback<String> callback);
 }
