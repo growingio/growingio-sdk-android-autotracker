@@ -16,9 +16,13 @@
 
 package com.growingio.android.sdk.autotrack.page;
 
+import android.app.Activity;
+import android.app.Fragment;
+import android.telecom.InCallService;
 import android.text.TextUtils;
 import android.view.View;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +30,7 @@ import java.util.Map;
 public abstract class Page<T> {
     private final static int MAX_PAGE_LEVEL = 3;
 
-    private final T mCarrier;
+    private final WeakReference<T> mCarrier;
     private PageGroup<?> mParent;
     private long mShowTimestamp;
     private boolean mIsIgnored = false;
@@ -36,12 +40,12 @@ public abstract class Page<T> {
     private Map<String, String> mAttributes;
 
     Page(T carrier) {
-        mCarrier = carrier;
+        mCarrier = new WeakReference<>(carrier);
         mShowTimestamp = System.currentTimeMillis();
     }
 
     public T getCarrier() {
-        return mCarrier;
+        return mCarrier.get();
     }
 
     public void refreshShowTimestamp() {

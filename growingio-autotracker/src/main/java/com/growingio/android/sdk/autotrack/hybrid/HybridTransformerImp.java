@@ -16,9 +16,13 @@
 
 package com.growingio.android.sdk.autotrack.hybrid;
 
+import android.app.Activity;
+import android.content.res.Configuration;
+
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
+import com.growingio.android.sdk.autotrack.events.PageEvent;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridCustomEvent;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridEventType;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridPageAttributesEvent;
@@ -29,6 +33,7 @@ import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.JsonUtil;
 import com.growingio.android.sdk.track.utils.LogUtil;
 
@@ -45,6 +50,12 @@ public class HybridTransformerImp implements HybridTransformer {
             JSONObject evenJson = new JSONObject(hybridEvent);
             String type = evenJson.getString("eventType");
             if (AutotrackEventType.PAGE.equals(type)) {
+                String orientation = PageEvent.ORIENTATION_PORTRAIT;
+                Activity activity = ActivityStateProvider.get().getForegroundActivity();
+                if (activity != null) {
+                    orientation = activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
+                            ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
+                }
                 return new HybridPageEvent.Builder()
                         .setDomain(evenJson.getString("domain"))
                         .setProtocolType(evenJson.getString("protocolType"))
@@ -52,7 +63,8 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setPageName(evenJson.getString("pageName"))
                         .setReferralPage(evenJson.optString("referralPage"))
                         .setTitle(evenJson.optString("title"))
-                        .setTimestamp(evenJson.getLong("timestamp"));
+                        .setTimestamp(evenJson.getLong("timestamp"))
+                        .setOrientation(orientation);
 
             } else if (AutotrackEventType.PAGE_ATTRIBUTES.equals(type)) {
                 return new HybridPageAttributesEvent.Builder()

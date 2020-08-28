@@ -24,9 +24,9 @@ public class TrackConfiguration implements Cloneable, Configurable {
     private String mProjectId;
     private String mUrlScheme;
     private String mChannel;
-    private boolean mLogEnabled;
-    private int mCellularDataLimit;
-    private long mDataUploadInterval;
+    private boolean mDebugEnabled = false;
+    private int mCellularDataLimit = 10;
+    private long mDataUploadInterval = 15_000;
     private long mSessionInterval = 30_000;
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
@@ -76,12 +76,12 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return this;
     }
 
-    public boolean isLogEnabled() {
-        return mLogEnabled;
+    public boolean isDebugEnabled() {
+        return mDebugEnabled;
     }
 
-    public TrackConfiguration setLogEnabled(boolean enabled) {
-        this.mLogEnabled = enabled;
+    public TrackConfiguration setDebugEnabled(boolean enabled) {
+        this.mDebugEnabled = enabled;
         return this;
     }
 
@@ -119,7 +119,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         clone.mProjectId = this.mProjectId;
         clone.mUrlScheme = this.mUrlScheme;
         clone.mChannel = this.mChannel;
-        clone.mLogEnabled = this.mLogEnabled;
+        clone.mDebugEnabled = this.mDebugEnabled;
         clone.mCellularDataLimit = this.mCellularDataLimit;
         clone.mDataUploadInterval = this.mDataUploadInterval;
         clone.mSessionInterval = this.mSessionInterval;

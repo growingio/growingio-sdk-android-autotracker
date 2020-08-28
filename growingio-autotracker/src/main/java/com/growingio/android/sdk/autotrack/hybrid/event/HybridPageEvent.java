@@ -111,5 +111,11 @@ public class HybridPageEvent extends PageEvent {
             super.setTimestamp(timestamp);
             return this;
         }
+
+        @Override
+        public Builder setOrientation(String orientation) {
+            super.setOrientation(orientation);
+            return this;
+        }
     }
 }

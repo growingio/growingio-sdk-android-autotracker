@@ -24,42 +24,58 @@ import com.growingio.android.sdk.track.IGrowingTracker;
 import java.util.Map;
 
 /**
- * GrowingIO对外无埋点部分接口
+ * GrowingAutotracker 无埋点 SDK 对外 API
  */
 public interface IGrowingAutotracker extends IGrowingTracker {
 
-    IGrowingAutotracker setUniqueTag(View view, String tag);
+    void setPageAttributes(Activity page, Map<String, String> attributes);
 
-    IGrowingAutotracker setPageAttributes(Activity activity, Map<String, String> attributes);
+    void setPageAttributes(android.app.Fragment page, Map<String, String> attributes);
 
-    IGrowingAutotracker setPageAttributes(android.app.Fragment fragment, Map<String, String> attributes);
+    void setPageAttributes(android.support.v4.app.Fragment page, Map<String, String> attributes);
 
-    IGrowingAutotracker setPageAttributes(android.support.v4.app.Fragment fragment, Map<String, String> attributes);
+    void setPageAttributes(androidx.fragment.app.Fragment page, Map<String, String> attributes);
 
-    IGrowingAutotracker setPageAttributes(androidx.fragment.app.Fragment fragment, Map<String, String> attributes);
+    void setPageAlias(Activity page, String alias);
 
-    IGrowingAutotracker trackViewImpression(View view, String impressionEventName);
+    void setPageAlias(android.app.Fragment page, String alias);
 
-    IGrowingAutotracker trackViewImpression(View view, String impressionEventName, Map<String, String> attributes);
+    void setPageAlias(android.support.v4.app.Fragment page, String alias);
 
-    IGrowingAutotracker stopTrackViewImpression(View trackedView);
+    void setPageAlias(androidx.fragment.app.Fragment page, String alias);
 
-    IGrowingAutotracker setPageAlias(Activity activity, String alias);
+    void ignorePage(Activity page, IgnorePolicy policy);
 
-    IGrowingAutotracker setPageAlias(android.app.Fragment fragment, String alias);
+    void ignorePage(android.app.Fragment page, IgnorePolicy policy);
 
-    IGrowingAutotracker setPageAlias(android.support.v4.app.Fragment fragment, String alias);
+    void ignorePage(android.support.v4.app.Fragment page, IgnorePolicy policy);
 
-    IGrowingAutotracker setPageAlias(androidx.fragment.app.Fragment fragment, String alias);
+    void ignorePage(androidx.fragment.app.Fragment page, IgnorePolicy policy);
 
-    IGrowingAutotracker ignorePage(Activity activity, IgnorePolicy policy);
+    void trackViewImpression(View view, String impressionEventName);
 
-    IGrowingAutotracker ignorePage(android.app.Fragment fragment, IgnorePolicy policy);
+    void trackViewImpression(View view, String impressionEventName, Map<String, String> attributes);
 
-    IGrowingAutotracker ignorePage(android.support.v4.app.Fragment fragment, IgnorePolicy policy);
+    void stopTrackViewImpression(View trackedView);
 
-    IGrowingAutotracker ignorePage(androidx.fragment.app.Fragment fragment, IgnorePolicy policy);
+    void ignoreView(View view, IgnorePolicy policy);
 
-    IGrowingAutotracker ignoreView(View view, IgnorePolicy policy);
+    void setUniqueTag(View view, String tag);
+
+    void trackCustomEvent(String eventName, Activity page);
+
+    void trackCustomEvent(String eventName, android.app.Fragment page);
+
+    void trackCustomEvent(String eventName, android.support.v4.app.Fragment page);
+
+    void trackCustomEvent(String eventName, androidx.fragment.app.Fragment page);
+
+    void trackCustomEvent(String eventName, Map<String, String> attributes, Activity page);
+
+    void trackCustomEvent(String eventName, Map<String, String> attributes, android.app.Fragment page);
+
+    void trackCustomEvent(String eventName, Map<String, String> attributes, android.support.v4.app.Fragment page);
+
+    void trackCustomEvent(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page);
 
 }

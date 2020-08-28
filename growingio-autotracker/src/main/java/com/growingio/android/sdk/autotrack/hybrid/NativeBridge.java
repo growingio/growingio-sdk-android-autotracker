@@ -34,10 +34,10 @@ class NativeBridge {
     }
 
     void setNativeUserId(String userId) {
-        GrowingTracker.getInstance().setLoginUserId(userId);
+        GrowingTracker.get().setLoginUserId(userId);
     }
 
     void clearNativeUserId() {
-        GrowingAutotracker.getInstance().cleanLoginUserId();
+        GrowingAutotracker.get().cleanLoginUserId();
     }
 }
