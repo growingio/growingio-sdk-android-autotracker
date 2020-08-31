@@ -24,7 +24,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -41,7 +41,7 @@ public class CommonRomChecker extends RomPermissionChecker {
             try {
                 return Settings.canDrawOverlays(mContext);
             } catch (Exception e) {
-                LogUtil.i(TAG, Log.getStackTraceString(e));
+                Logger.i(TAG, Log.getStackTraceString(e));
             }
         }
         return true;

@@ -23,16 +23,16 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.growingio.android.sdk.track.crash.CrashManager;
-import com.growingio.android.sdk.track.crash.CrashUtil;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
+import com.growingio.android.sdk.track.log.DebugLogger;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
-import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.util.Map;
@@ -67,7 +67,7 @@ public class GrowingTracker implements IGrowingTracker {
 
     public static void startWithConfiguration(Application application, TrackConfiguration trackConfiguration, InitExtraOperation initExtraOperation) {
         if (sInstance != null) {
-            LogUtil.e(TAG, "GrowingTracker is running");
+            Logger.e(TAG, "GrowingTracker is running");
         }
         if (application == null) {
             throw new IllegalStateException("application is NULL");
@@ -93,14 +93,11 @@ public class GrowingTracker implements IGrowingTracker {
         ConfigurationProvider.get().setTrackConfiguration(trackConfiguration);
 
         if (trackConfiguration.isDebugEnabled()) {
-            LogUtil.add(LogUtil.DebugUtil.getInstance());
-        } else {
-            LogUtil.add(LogUtil.ReleaseUitl.getInstance());
+            Logger.addLogger(new DebugLogger());
         }
 
         if (trackConfiguration.isUploadExceptionEnabled()) {
             CrashManager.register(application);
-            LogUtil.add(CrashUtil.getInstance());
         }
 
         if (initExtraOperation == null) {
@@ -130,7 +127,7 @@ public class GrowingTracker implements IGrowingTracker {
             if (trackConfiguration.isDebugEnabled()) {
                 throw e;
             }
-            LogUtil.e(TAG, e, "初始化SDK失败");
+            Logger.e(TAG, e, "初始化SDK失败");
         }
         initExtraOperation.initSuccess();
         initCoreService();
@@ -147,7 +144,7 @@ public class GrowingTracker implements IGrowingTracker {
     }
 
     private static IGrowingTracker makeEmpty() {
-        LogUtil.e(TAG, "GrowingTracker is UNINITIALIZED, please initialized before use API");
+        Logger.e(TAG, "GrowingTracker is UNINITIALIZED, please initialized before use API");
         return EmptyGrowingTracker.INSTANCE;
     }
 
@@ -188,7 +185,7 @@ public class GrowingTracker implements IGrowingTracker {
     @Override
     public void setDataCollectionEnabled(boolean enabled) {
         if (enabled == ConfigurationProvider.get().isDataCollectionEnabled()) {
-            LogUtil.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
+            Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
         } else {
             ConfigurationProvider.get().setDataCollectionEnabled(true);
             if (enabled) {

@@ -14,37 +14,26 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.webservices;
+package com.growingio.android.sdk.track.webservices.log;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.growingio.android.sdk.autotrack.webservices.message.LoggerDataMessage;
-import com.growingio.android.sdk.track.crash.CrashUtil;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.BaseLogger;
 
-import org.json.JSONObject;
+public class WsLogger extends BaseLogger {
+    public static final String TYPE = "WsLogger";
 
-public class WSLogCacheUtil extends LogUtil.Util {
-    private CircularFifoQueue<LoggerDataMessage.LogItem> mCacheLogs;
-    private ActionCallback mActionCallback;
+    private final CircularFifoQueue<LoggerDataMessage.LogItem> mCacheLogs = new CircularFifoQueue<>(100);
+    private Callback mCallback;
 
-    private WSLogCacheUtil() {
-        mCacheLogs = new CircularFifoQueue<>(100);
-    }
-
-    public static WSLogCacheUtil getInstance() {
-        return SingleInstance.INSTANCE;
-    }
-
-    public void setmActionCallback(ActionCallback mActionCallback) {
-        this.mActionCallback = mActionCallback;
+    public void setCallback(Callback callback) {
+        mCallback = callback;
     }
 
     @Override
-    protected void log(int priority, @Nullable String tag, @NonNull String message, @Nullable Throwable t) {
-
+    protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
         String state;
         switch (priority) {
             case Log.VERBOSE:
@@ -62,24 +51,23 @@ public class WSLogCacheUtil extends LogUtil.Util {
             case Log.ERROR:
                 state = "ERROR";
                 break;
-            case CrashUtil.ALARM:
+            case Log.ASSERT:
                 state = "ALARM";
                 break;
             default:
                 state = "OTHER";
         }
 
-        if (mActionCallback != null) {
+        if (mCallback != null) {
             if (!mCacheLogs.isEmpty()) {
-                mActionCallback.disposeLog(LoggerDataMessage.createMessage(mCacheLogs).toJSONObject());
+                mCallback.disposeLog(LoggerDataMessage.createMessage(mCacheLogs));
                 mCacheLogs.clear();
             }
-            mActionCallback.disposeLog(LoggerDataMessage.
+            mCallback.disposeLog(LoggerDataMessage.
                     createMessage(state,
                             "xxx",
                             message,
-                            String.valueOf(System.currentTimeMillis()))
-                    .toJSONObject());
+                            String.valueOf(System.currentTimeMillis())));
         } else {
             mCacheLogs.add(LoggerDataMessage.createLogItem(state,
                     "xxx",
@@ -88,14 +76,12 @@ public class WSLogCacheUtil extends LogUtil.Util {
         }
     }
 
-    private static class SingleInstance {
-        private static final WSLogCacheUtil INSTANCE = new WSLogCacheUtil();
-
-        private SingleInstance() {
-        }
+    @Override
+    public String getType() {
+        return TYPE;
     }
 
-    public interface ActionCallback {
-        void disposeLog(JSONObject logMessage);
+    interface Callback {
+        void disposeLog(LoggerDataMessage logMessage);
     }
 }

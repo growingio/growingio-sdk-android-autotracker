@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.autotrack.hybrid;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +45,7 @@ class WebViewJavascriptBridgeConfiguration {
             jsonObject.put("nativeSdkVersionCode", mNativeSdkVersionCode);
             return jsonObject;
         } catch (JSONException e) {
-            LogUtil.e(TAG, e.getMessage(), e);
+            Logger.e(TAG, e.getMessage(), e);
         }
         return jsonObject;
     }

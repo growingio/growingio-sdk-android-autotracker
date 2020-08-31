@@ -20,7 +20,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -92,7 +92,7 @@ public class HttpRequest {
         try {
             return HTTP_CLIENT.newCall(mRequest).execute();
         } catch (IOException e) {
-            LogUtil.e(TAG, "execute ERROR", e);
+            Logger.e(TAG, "execute ERROR", e);
         }
         return null;
     }
@@ -103,7 +103,7 @@ public class HttpRequest {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                LogUtil.e(TAG, e);
+                Logger.e(TAG, e);
                 if (callback != null) {
                     onFailedInUiThread(callback, 0);
                 }
@@ -118,14 +118,14 @@ public class HttpRequest {
                             onSuccessInUiThread(callback, body.string(), response.headers().toMultimap());
                         }
                     } else {
-                        LogUtil.e(TAG, "call is ERROR, body is NULL");
+                        Logger.e(TAG, "call is ERROR, body is NULL");
                         if (callback != null) {
                             onFailedInUiThread(callback, response.code());
                         }
                     }
                 } else {
                     String bodyStr = response.body() == null ? "" : response.body().string();
-                    LogUtil.e(TAG, "call is ERROR, Code = " + response.code() + ", body = " + bodyStr);
+                    Logger.e(TAG, "call is ERROR, Code = " + response.code() + ", body = " + bodyStr);
                     if (callback != null) {
                         onFailedInUiThread(callback, response.code());
                     }

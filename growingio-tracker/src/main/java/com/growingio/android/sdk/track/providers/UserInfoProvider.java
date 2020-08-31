@@ -23,7 +23,7 @@ import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 
 public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener, String> {
@@ -55,14 +55,14 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
         }
 
         if (userId.length() > 1000) {
-            LogUtil.e(TAG, ErrorLog.USER_ID_TOO_LONG);
+            Logger.e(TAG, ErrorLog.USER_ID_TOO_LONG);
             return;
         }
 
         // to non-null
         String oldUserId = getUserId();
         if (ObjectUtils.equals(userId, oldUserId)) {
-            LogUtil.d(TAG, "setUserId, but the userId is same as the old userId, just return");
+            Logger.d(TAG, "setUserId, but the userId is same as the old userId, just return");
             return;
         }
         mGrowingIOIPC.setUserId(userId);

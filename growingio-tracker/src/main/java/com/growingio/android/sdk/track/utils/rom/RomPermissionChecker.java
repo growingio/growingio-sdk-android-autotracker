@@ -26,7 +26,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.util.Log;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.lang.reflect.Method;
 
@@ -53,10 +53,10 @@ public abstract class RomPermissionChecker {
                 Method method = clazz.getDeclaredMethod("checkOp", int.class, int.class, String.class);
                 return AppOpsManager.MODE_ALLOWED == (int) method.invoke(manager, op, Binder.getCallingUid(), mContext.getPackageName());
             } catch (Exception ignore) {
-                LogUtil.i(TAG, Log.getStackTraceString(ignore));
+                Logger.i(TAG, Log.getStackTraceString(ignore));
             }
         } else {
-            LogUtil.i(TAG, "Below API 19 cannot invoke!");
+            Logger.i(TAG, "Below API 19 cannot invoke!");
         }
         return false;
     }

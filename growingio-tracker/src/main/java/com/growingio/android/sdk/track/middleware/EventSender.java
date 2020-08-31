@@ -21,8 +21,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
@@ -70,7 +70,7 @@ class EventSender {
         } else {
             mCacheEventNum++;
             if (mCacheEventNum >= EVENTS_BULK_SIZE) {
-                LogUtil.d(TAG, "cacheEventNum >= 300, toggle one send action");
+                Logger.d(TAG, "cacheEventNum >= 300, toggle one send action");
                 sendEvents(false);
                 mCacheEventNum = 0;
             }
@@ -78,7 +78,7 @@ class EventSender {
     }
 
     void delAllMsg() {
-        LogUtil.d(TAG, "action: 清库");
+        Logger.d(TAG, "action: 清库");
         mDbSQLite.mDbHelper.delAllMsg();
     }
 
@@ -209,7 +209,7 @@ class EventSender {
                 if (policy != GEvent.SEND_POLICY_INSTANT
                         && networkState.isMobileData()
                         && mCellularDataLimit < todayBytes(0)) {
-                    LogUtil.d(TAG, "今日流量已耗尽");
+                    Logger.d(TAG, "今日流量已耗尽");
                     break;
                 }
                 result = mDbSQLite.uploadEvent(policy, numOfMaxEventsPerRequest());
@@ -223,7 +223,7 @@ class EventSender {
             mDbSQLite.uploadStaticEvent();
         }
         if (scheduleForNet != null) {
-            LogUtil.d(TAG, "upload event failed, and schedule for retry later");
+            Logger.d(TAG, "upload event failed, and schedule for retry later");
             scheduleForNet(scheduleForNet);
         } else {
             cancelScheduleForNet();

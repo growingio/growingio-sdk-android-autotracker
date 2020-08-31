@@ -24,7 +24,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 public class MiUiChecker extends RomPermissionChecker {
     private static final String TAG  = "MiUiChecker";
@@ -81,7 +81,7 @@ public class MiUiChecker extends RomPermissionChecker {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
         } else {
-            LogUtil.i(TAG, "this is a special MIUI rom version, its version code %d", versionCode);
+            Logger.i(TAG, "this is a special MIUI rom version, its version code %d", versionCode);
         }
         return intent;
     }

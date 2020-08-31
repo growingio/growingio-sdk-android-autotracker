@@ -16,9 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.page;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.telecom.InCallService;
 import android.text.TextUtils;
 import android.view.View;
 

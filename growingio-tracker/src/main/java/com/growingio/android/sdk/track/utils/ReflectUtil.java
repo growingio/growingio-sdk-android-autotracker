@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.track.utils;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -32,7 +34,7 @@ public abstract class ReflectUtil {
         try {
             return field == null ? null : (T) field.get(instance);
         } catch (IllegalAccessException e) {
-            LogUtil.e(TAG, e, e.getMessage());
+            Logger.e(TAG, e, e.getMessage());
             return null;
         }
     }
@@ -49,7 +51,7 @@ public abstract class ReflectUtil {
             try {
                 return method.invoke(instance, args);
             } catch (Exception e) {
-                LogUtil.e(TAG, e, e.getMessage());
+                Logger.e(TAG, e, e.getMessage());
             }
         }
         return null;
@@ -77,7 +79,7 @@ public abstract class ReflectUtil {
         try {
             return clazz.getMethod(methodName, params);
         } catch (NoSuchMethodException e) {
-            LogUtil.d(TAG, e);
+            Logger.d(TAG, e);
             return null;
         }
     }
@@ -88,7 +90,7 @@ public abstract class ReflectUtil {
             field.setAccessible(true);
             return field;
         } catch (NoSuchFieldException e) {
-            LogUtil.d(TAG, e);
+            Logger.d(TAG, e);
             return null;
         }
     }
@@ -101,7 +103,7 @@ public abstract class ReflectUtil {
         try {
             return (T) field.get(instance);
         } catch (IllegalAccessException e) {
-            LogUtil.d(TAG, e);
+            Logger.d(TAG, e);
             return null;
         }
     }
@@ -127,7 +129,7 @@ public abstract class ReflectUtil {
             try {
                 return (T) field.get(instance);
             } catch (IllegalAccessException e) {
-                LogUtil.d(TAG, e);
+                Logger.d(TAG, e);
             }
         }
         return null;

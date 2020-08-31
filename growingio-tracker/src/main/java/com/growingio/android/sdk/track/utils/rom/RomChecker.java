@@ -22,7 +22,7 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.lang.reflect.Method;
 import java.util.Locale;
@@ -68,7 +68,7 @@ public class RomChecker {
             try {
                 return Integer.parseInt(version.substring(1));
             } catch (Exception e) {
-                LogUtil.i(TAG, "get miui version code error, version : %s", version);
+                Logger.i(TAG, "get miui version code error, version : %s", version);
             }
         }
         return -1;
@@ -92,7 +92,7 @@ public class RomChecker {
                 return Double.parseDouble(matcher.group());
             }
         } catch (Exception e) {
-            LogUtil.e(TAG, e, e.getMessage());
+            Logger.e(TAG, e, e.getMessage());
         }
         return 4.0;
     }
@@ -111,7 +111,7 @@ public class RomChecker {
             Method get = clazz.getMethod("get", String.class, String.class);
             return (String) get.invoke(null, propName, null);
         } catch (Exception e) {
-            LogUtil.e(TAG, e, e.getMessage());
+            Logger.e(TAG, e, e.getMessage());
         }
         return null;
     }

@@ -24,32 +24,13 @@ import com.growingio.android.sdk.monitor.event.Event;
 import com.growingio.android.sdk.monitor.event.EventBuilder;
 import com.growingio.android.sdk.monitor.event.interfaces.ExceptionInterface;
 import com.growingio.android.sdk.monitor.log.MonitorLogger;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.BaseLogger;
 
-/**
- * Monitor的日志工具
- * VERBOSE, DEBUG, INFO, WARN, ERROR 仅记录到breadcrumbs中
- * ALARM直接上报sentry
- */
-public class CrashUtil extends LogUtil.Util {
-    /**
-     * alarm报警等级，直接上报sentry，不进行日志输出
-     */
-    public static final int ALARM = Log.ASSERT + 1;
-
-    private CrashUtil() {
-    }
-
-    public static CrashUtil getInstance() {
-        return SingleInstance.INSTANCE;
-    }
+class CrashLogger extends BaseLogger {
+    private static final String TYPE = "Monitor";
 
     @Override
-    protected void log(int priority, @Nullable String tag, @NonNull String message, @Nullable Throwable t) {
-        if (priority > CrashUtil.ALARM) {
-            return;
-        }
-
+    protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
         switch (priority) {
             case Log.VERBOSE:
                 MonitorLogger.v(CrashManager.ALIAS, tag, message);
@@ -64,7 +45,7 @@ public class CrashUtil extends LogUtil.Util {
             case Log.ERROR:
                 MonitorLogger.e(CrashManager.ALIAS, tag, message);
                 break;
-            case CrashUtil.ALARM:
+            case Log.ASSERT:
                 CrashManager.sendEvent(new EventBuilder()
                         .withMessage(message)
                         .withLevel(Event.Level.ERROR)
@@ -74,10 +55,8 @@ public class CrashUtil extends LogUtil.Util {
         }
     }
 
-    private static class SingleInstance {
-        private static final CrashUtil INSTANCE = new CrashUtil();
-
-        private SingleInstance() {
-        }
+    @Override
+    public String getType() {
+        return TYPE;
     }
 }

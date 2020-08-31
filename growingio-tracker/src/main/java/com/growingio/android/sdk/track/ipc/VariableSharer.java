@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -87,7 +87,7 @@ public class VariableSharer {
                 RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
                 mFileChannel = randomAccessFile.getChannel();
             } catch (FileNotFoundException e) {
-                LogUtil.e(TAG, e, "多进程共享初始化失败: ");
+                Logger.e(TAG, e, "多进程共享初始化失败: ");
                 this.mUsingMultiProcess = false;
             }
         }
@@ -98,7 +98,7 @@ public class VariableSharer {
             try {
                 mFileChannel.close();
             } catch (IOException e) {
-                LogUtil.e(TAG, "close failed");
+                Logger.e(TAG, "close failed");
             } finally {
                 mFileChannel = null;
                 mByteBuffer = null;
@@ -142,7 +142,7 @@ public class VariableSharer {
                     }
                 });
             } catch (IOException e) {
-                LogUtil.e(TAG, "多进程映射内存失败: ", e);
+                Logger.e(TAG, "多进程映射内存失败: ", e);
                 mUsingMultiProcess = false;
             }
         }
@@ -152,12 +152,12 @@ public class VariableSharer {
     void repairPid(Set<Integer> runningProcess) {
         List<Integer> alivePid = getAlivePidWithLock(new ArrayList<Integer>(), runningProcess);
         if (alivePid.size() >= 10) {
-            LogUtil.e(TAG, "alivePid num large than 10, failed");
+            Logger.e(TAG, "alivePid num large than 10, failed");
             mUsingMultiProcess = false;
             return;
         }
         if (alivePid.size() == 0) {
-            LogUtil.d(TAG, "find first init process, and reset variable");
+            Logger.d(TAG, "find first init process, and reset variable");
             mIsFirstInit = true;
         } else {
             mIsFirstInit = false;
@@ -206,10 +206,10 @@ public class VariableSharer {
         try {
             int magicNum = mByteBuffer.getShort();
             if (magicNum == 0) {
-                LogUtil.d(TAG, "first init multi process file");
+                Logger.d(TAG, "first init multi process file");
                 prepareMagic();
             } else if (magicNum != MAGIC_NUM) {
-                LogUtil.e(TAG, "文件校验失败, 多进程共享失败");
+                Logger.e(TAG, "文件校验失败, 多进程共享失败");
                 mUsingMultiProcess = false;
             }
         } catch (BufferUnderflowException e) {
@@ -419,7 +419,7 @@ public class VariableSharer {
             lock = mFileChannel.lock(position, entity.getMaxSize(), false);
             runnable.run();
         } catch (Exception e) {
-            LogUtil.e(TAG, "数据区加锁失败: ", e);
+            Logger.e(TAG, "数据区加锁失败: ", e);
         } finally {
             if (lock != null) {
                 try {
@@ -438,7 +438,7 @@ public class VariableSharer {
             lock = mFileChannel.lock(mMetaBaseAddress, mVariableBaseAddress - mMetaBaseAddress, false);
             runnable.run();
         } catch (Exception e) {
-            LogUtil.e(TAG, "文件原信息失败", e);
+            Logger.e(TAG, "文件原信息失败", e);
         } finally {
             if (lock != null) {
                 try {
@@ -456,7 +456,7 @@ public class VariableSharer {
             lock = mFileChannel.lock(0, mMetaBaseAddress, false);
             runnable.run();
         } catch (Exception e) {
-            LogUtil.e(TAG, "文件进程区加锁失败", e);
+            Logger.e(TAG, "文件进程区加锁失败", e);
         } finally {
             if (lock != null) {
                 try {
@@ -490,7 +490,7 @@ public class VariableSharer {
                 mTotalModCount = modCount;
             }
         } catch (Exception e) {
-            LogUtil.e(TAG, e, "check changed failed: ");
+            Logger.e(TAG, e, "check changed failed: ");
         }
     }
 
@@ -506,7 +506,7 @@ public class VariableSharer {
             }
         }
         builder.append(")");
-        LogUtil.d(TAG, builder.toString());
+        Logger.d(TAG, builder.toString());
     }
 
     @Override

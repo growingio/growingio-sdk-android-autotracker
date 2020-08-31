@@ -27,6 +27,7 @@ import com.growingio.android.sdk.monitor.analysis.Analyser;
 import com.growingio.android.sdk.monitor.analysis.GIOAnalyser;
 import com.growingio.android.sdk.monitor.event.EventBuilder;
 import com.growingio.android.sdk.track.base.BuildConfig;
+import com.growingio.android.sdk.track.log.Logger;
 
 /**
  * 异常捕获并上报
@@ -70,6 +71,7 @@ public class CrashManager {
                 }
             });
             client.setRelease(BuildConfig.VERSION_NAME);
+            Logger.addLogger(new CrashLogger());
 
             // TODO: 2020/8/5 添加设备信息
             sEnabled = true;

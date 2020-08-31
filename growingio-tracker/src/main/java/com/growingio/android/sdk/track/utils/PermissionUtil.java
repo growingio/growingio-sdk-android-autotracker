@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.log.Logger;
 
 public class PermissionUtil {
     private static final String TAG = "GIO.permission";
@@ -69,7 +70,7 @@ public class PermissionUtil {
             hasPermission = PackageManager.PERMISSION_GRANTED == sPackageManager.checkPermission(permissionName, sPackageName);
         } catch (Throwable e) {
             hasPermission = false;
-            LogUtil.d(TAG, e, "checkPermission failed");
+            Logger.d(TAG, e, "checkPermission failed");
         }
         if (hasPermission) {
             sPermissionFlags |= flag;

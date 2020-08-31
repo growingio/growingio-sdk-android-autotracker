@@ -31,9 +31,9 @@ import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
-import com.growingio.android.sdk.track.utils.LogUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +118,7 @@ public class PageProvider implements IActivityLifecycle {
         page.setIgnored(isIgnoreActivity(activity));
 
         if (!page.isIgnored()) {
-            LogUtil.d(TAG, "createOrResumePage: path = " + page.path());
+            Logger.d(TAG, "createOrResumePage: path = " + page.path());
             generatePageEvent(activity, page);
             reissuePageAttributes(page);
         } else {
@@ -201,27 +201,27 @@ public class PageProvider implements IActivityLifecycle {
     @UiThread
     public void createOrResumePage(SuperFragment<?> fragment) {
         if (fragment == null) {
-            LogUtil.e(TAG, "createOrResumePage: this fragment can not make superFragment");
+            Logger.e(TAG, "createOrResumePage: this fragment can not make superFragment");
             return;
         }
 
         if (fragment.getView() == null) {
-            LogUtil.e(TAG, "createOrResumePage: this fragment getView is NULL");
+            Logger.e(TAG, "createOrResumePage: this fragment getView is NULL");
             return;
         }
 
         if (!fragment.getUserVisibleHint()) {
-            LogUtil.e(TAG, "createOrResumePage: this fragment's UI is currently invisible to the user");
+            Logger.e(TAG, "createOrResumePage: this fragment's UI is currently invisible to the user");
             return;
         }
 
         if (fragment.getActivity() == null) {
-            LogUtil.e(TAG, "createOrResumePage: this fragment getActivity is NULL");
+            Logger.e(TAG, "createOrResumePage: this fragment getActivity is NULL");
             return;
         }
 
         if (!fragment.isResumed()) {
-            LogUtil.e(TAG, "createOrResumePage: this fragment not is resumed");
+            Logger.e(TAG, "createOrResumePage: this fragment not is resumed");
             return;
         }
 

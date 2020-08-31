@@ -33,9 +33,9 @@ import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.JsonUtil;
-import com.growingio.android.sdk.track.utils.LogUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -108,7 +108,7 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setVariables(JsonUtil.copyToMap(evenJson.getJSONObject("variables")));
             }
         } catch (JSONException e) {
-            LogUtil.e(TAG, e.getMessage(), e);
+            Logger.e(TAG, e.getMessage(), e);
         }
 
 

@@ -26,11 +26,11 @@ import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.EventSaver;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
-import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.variation.EventHttpSender;
 import com.growingio.android.sdk.track.variation.TrackEventJsonMarshaller;
 
@@ -107,7 +107,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     @TrackThread
     public void saveEvent(GEvent gEvent) {
         if (gEvent instanceof BaseEvent) {
-            LogUtil.printJson(TAG, "save: event, type is " + gEvent.getEventType(), ((BaseEvent) gEvent).toJSONObject().toString());
+            Logger.printJson(TAG, "save: event, type is " + gEvent.getEventType(), ((BaseEvent) gEvent).toJSONObject().toString());
         }
         mEventSaver.saveEvent(gEvent);
     }

@@ -19,7 +19,7 @@ package com.growingio.android.sdk.autotrack.hybrid;
 import android.text.TextUtils;
 import android.webkit.JavascriptInterface;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 class WebViewBridgeJavascriptInterface {
     static final String JAVASCRIPT_INTERFACE_NAME = "GrowingWebViewJavascriptBridge";
@@ -47,7 +47,7 @@ class WebViewBridgeJavascriptInterface {
     @JavascriptInterface
     @com.uc.webview.export.JavascriptInterface
     public void dispatchEvent(String event) {
-        LogUtil.printJson(TAG, "dispatchEvent: ", event);
+        Logger.printJson(TAG, "dispatchEvent: ", event);
         if (TextUtils.isEmpty(event)) {
             return;
         }
@@ -57,14 +57,14 @@ class WebViewBridgeJavascriptInterface {
     @JavascriptInterface
     @com.uc.webview.export.JavascriptInterface
     public void setNativeUserId(String userId) {
-        LogUtil.d(TAG, "setNativeUserId: " + userId);
+        Logger.d(TAG, "setNativeUserId: " + userId);
         mNativeBridge.setNativeUserId(userId);
     }
 
     @JavascriptInterface
     @com.uc.webview.export.JavascriptInterface
     public void clearNativeUserId() {
-        LogUtil.d(TAG, "clearNativeUserId: ");
+        Logger.d(TAG, "clearNativeUserId: ");
         mNativeBridge.clearNativeUserId();
     }
 

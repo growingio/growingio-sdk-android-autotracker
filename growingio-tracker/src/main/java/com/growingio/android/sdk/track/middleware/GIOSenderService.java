@@ -43,7 +43,7 @@ import android.support.annotation.UiThread;
 
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.variation.EventHttpSender;
 import com.growingio.android.sdk.track.variation.TrackEventJsonMarshaller;
@@ -80,10 +80,10 @@ public class GIOSenderService extends Service {
             context.startService(intent);
         } catch (IllegalStateException e) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LogUtil.d(TAG, "after Android O, only foreground app can startService, use JobScheduler");
+                Logger.d(TAG, "after Android O, only foreground app can startService, use JobScheduler");
                 enqueueWork(context, bundle);
             } else {
-                LogUtil.e(TAG, "startService, and IllegalStateException");
+                Logger.e(TAG, "startService, and IllegalStateException");
             }
         }
     }
@@ -93,7 +93,7 @@ public class GIOSenderService extends Service {
     private static void enqueueWork(Context context, Bundle bundle) {
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler == null) {
-            LogUtil.e(TAG, "enqueueWork, but jobScheduler is null, return");
+            Logger.e(TAG, "enqueueWork, but jobScheduler is null, return");
             return;
         }
         JobInfo job = new JobInfo.Builder(JOB_SCHEDULER_START_COMMAND,
@@ -108,7 +108,7 @@ public class GIOSenderService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        LogUtil.d(TAG, "onCreate");
+        Logger.d(TAG, "onCreate");
         HandlerThread thread = new HandlerThread(TAG);
         thread.start();
         mServiceLooper = thread.getLooper();
@@ -133,7 +133,7 @@ public class GIOSenderService extends Service {
     public void onStart(Intent intent, int startId) {
         WorkItem item = mServiceImpl.newWorkItem(intent);
         if (item == null) {
-            LogUtil.d(TAG, "onStartCommand, but WorkItem is null, skip this work");
+            Logger.d(TAG, "onStartCommand, but WorkItem is null, skip this work");
             return;
         }
         Message message = Message.obtain(mServiceHandler, ServiceHandler.MSG_WORK);
@@ -146,10 +146,10 @@ public class GIOSenderService extends Service {
             @Override
             public void run() {
                 if (mServiceHandler.hasMoreWork()) {
-                    LogUtil.d(TAG, "delayStop, but has more message");
+                    Logger.d(TAG, "delayStop, but has more message");
                     delayStop();
                 } else {
-                    LogUtil.d(TAG, "no message in a long time, and stop service");
+                    Logger.d(TAG, "no message in a long time, and stop service");
                     stopSelf();
                 }
             }
@@ -189,7 +189,7 @@ public class GIOSenderService extends Service {
                 break;
             }
             default:
-                LogUtil.d(TAG, "unknown action: %s", action);
+                Logger.d(TAG, "unknown action: %s", action);
         }
     }
 
@@ -205,7 +205,7 @@ public class GIOSenderService extends Service {
 
     @Override
     public void onDestroy() {
-        LogUtil.d(TAG, "onDestroy");
+        Logger.d(TAG, "onDestroy");
         super.onDestroy();
         if (mServiceHandler.hasMoreWork()) {
             delayRestartWhenDestroy();
@@ -220,7 +220,7 @@ public class GIOSenderService extends Service {
     }
 
     private void delayRestartWhenDestroy() {
-        LogUtil.d(TAG, "serviceHandler has more work, and restart service");
+        Logger.d(TAG, "serviceHandler has more work, and restart service");
         ThreadUtils.postOnUiThreadDelayed(new Runnable() {
             @Override
             public void run() {
@@ -498,7 +498,7 @@ public class GIOSenderService extends Service {
                     break;
                 }
                 default:
-                    LogUtil.e(TAG, "ServiceHandler unknown msg: %s", msg);
+                    Logger.e(TAG, "ServiceHandler unknown msg: %s", msg);
             }
         }
     }
