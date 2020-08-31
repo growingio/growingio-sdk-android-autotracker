@@ -24,7 +24,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.File;
 import java.util.HashSet;
@@ -56,7 +56,7 @@ public class GrowingIOIPC {
         mVariableSharer = new VariableSharer(ipcFile, true, Process.myPid());
         long startTime = System.currentTimeMillis();
         initVariableVersion1(context);
-        LogUtil.e(TAG, "variableSharer init time: %d", (System.currentTimeMillis() - startTime));
+        Logger.e(TAG, "variableSharer init time: %d", (System.currentTimeMillis() - startTime));
     }
 
     private void initVariableVersion1(Context context) {
@@ -92,7 +92,7 @@ public class GrowingIOIPC {
             }
         } catch (Throwable e) {
             // for System Service Died exception
-            LogUtil.e(TAG, e, e.getMessage());
+            Logger.e(TAG, e, e.getMessage());
         }
         return myRunningProcess;
     }

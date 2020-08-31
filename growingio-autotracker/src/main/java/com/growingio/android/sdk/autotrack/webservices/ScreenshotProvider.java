@@ -29,8 +29,8 @@ import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
-import com.growingio.android.sdk.track.utils.LogUtil;
 
 import java.io.IOException;
 
@@ -71,7 +71,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
         HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
             @Override
             public void onDomChanged() {
-                LogUtil.d(TAG, "onDomChanged: ");
+                Logger.d(TAG, "onDomChanged: ");
                 refreshScreenshot();
             }
         });
@@ -89,7 +89,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
                     String screenshotBase64 = ScreenshotUtil.getScreenshotBase64(mScale);
                     dispatchActions(screenshotBase64);
                 } catch (IOException e) {
-                    LogUtil.e(TAG, e);
+                    Logger.e(TAG, e);
                 }
             }
         });

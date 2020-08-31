@@ -17,7 +17,7 @@
 package com.growingio.android.sdk.track.http;
 
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class RetryInterceptor implements Interceptor {
             int retryNum = 0;
             while (!response.isSuccessful() && retryNum <= extra.getRetryTimes()) {
                 retryNum++;
-                LogUtil.e(TAG, "HTTP request retry " + retryNum + " times");
+                Logger.e(TAG, "HTTP request retry " + retryNum + " times");
                 response = chain.proceed(request);
             }
         }

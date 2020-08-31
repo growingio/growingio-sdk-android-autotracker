@@ -23,7 +23,7 @@ import android.view.View;
 
 import com.gio.test.three.autotrack.R;
 import com.gio.test.three.autotrack.utils.DialogUtil;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +32,7 @@ public class LambdaActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "Lambda";
 
     private void beforeClick(View view) {
-        LogUtil.d(TAG, "This is beforeClick");
+        Logger.d(TAG, "This is beforeClick");
     }
 
     @Override
@@ -41,7 +41,7 @@ public class LambdaActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_lambda);
 
         findViewById(R.id.btn_simple_lambda).setOnClickListener(v -> {
-            LogUtil.d(TAG, "This is Simple Lambda");
+            Logger.d(TAG, "This is Simple Lambda");
         });
         String otherArgs = "This is other args";
         String otherArgs2 = "This is otherArgs2";
@@ -76,18 +76,18 @@ public class LambdaActivity extends Activity implements View.OnClickListener {
     }
 
     private void afterClick(View view) {
-        LogUtil.d(TAG, "This is afterClick");
+        Logger.d(TAG, "This is afterClick");
     }
 
     @Override
     public void onClick(View v) {
-        LogUtil.d(TAG, "onClick: The OnClickListener's implement ");
+        Logger.d(TAG, "onClick: The OnClickListener's implement ");
     }
 
     private static class AnotherClass {
 
         public void anotherClick(View view) {
-            LogUtil.d(TAG, "This is anotherClick");
+            Logger.d(TAG, "This is anotherClick");
         }
     }
 }

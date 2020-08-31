@@ -27,7 +27,7 @@ import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 class ViewClickProvider {
     private static final String TAG = "ViewClickProvider";
@@ -37,26 +37,28 @@ class ViewClickProvider {
 
     public static void viewOnClick(View view) {
         if (!GrowingAutotracker.initializedSuccessfully()) {
-            LogUtil.e(TAG, "Autotracker do not initialized successfully");
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
         }
 
         ViewNode viewNode = ViewHelper.getClickViewNode(view);
         if (viewNode != null) {
             sendClickEvent(viewNode);
         } else {
-            LogUtil.e(TAG, "ViewNode is NULL");
+            Logger.e(TAG, "ViewNode is NULL");
         }
     }
 
     public static void menuItemOnClick(MenuItem menuItem) {
         if (!GrowingAutotracker.initializedSuccessfully()) {
-            LogUtil.e(TAG, "Autotracker do not initialized successfully");
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
         }
         ViewNode viewNode = ViewHelper.getClickViewNode(menuItem);
         if (viewNode != null) {
             sendClickEvent(viewNode);
         } else {
-            LogUtil.e(TAG, "MenuItem ViewNode is NULL");
+            Logger.e(TAG, "MenuItem ViewNode is NULL");
         }
     }
 

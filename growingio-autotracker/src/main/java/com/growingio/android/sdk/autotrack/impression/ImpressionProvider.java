@@ -37,7 +37,7 @@ import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +89,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         Activity activity = ActivityStateProvider.get().getResumedActivity();
         List<ViewImpression> viewImpressions = ACTIVITY_SCOPE.get(activity);
         if (activity == null || viewImpressions == null || viewImpressions.isEmpty()) {
-            LogUtil.e(TAG, "ResumedActivity is NULL or This activity has nothing impression");
+            Logger.e(TAG, "ResumedActivity is NULL or This activity has nothing impression");
             return;
         }
 
@@ -130,7 +130,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
 
         Page<?> page = PageProvider.get().findPage(trackedView);
         if (page == null) {
-            LogUtil.e(TAG, "sendViewImpressionEvent trackedView Activity is NULL");
+            Logger.e(TAG, "sendViewImpressionEvent trackedView Activity is NULL");
             return;
         }
         TrackMainThread.trackMain().postEventToTrackMain(
@@ -144,7 +144,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
 
     private void start() {
         if (mStarted) {
-            LogUtil.e(TAG, "ImpressionProvider is running");
+            Logger.e(TAG, "ImpressionProvider is running");
             return;
         }
         mStarted = true;
@@ -160,7 +160,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         }
         Activity activity = findViewActivity(view);
         if (activity == null) {
-            LogUtil.e(TAG, "View context activity is NULL");
+            Logger.e(TAG, "View context activity is NULL");
             return;
         }
 
@@ -186,13 +186,13 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         }
         Activity activity = findViewActivity(trackedView);
         if (activity == null) {
-            LogUtil.e(TAG, "TrackedView context activity is NULL");
+            Logger.e(TAG, "TrackedView context activity is NULL");
             return;
         }
 
         List<ViewImpression> viewImpressions = ACTIVITY_SCOPE.get(activity);
         if (viewImpressions == null || viewImpressions.isEmpty()) {
-            LogUtil.e(TAG, "ViewImpressions is NULL");
+            Logger.e(TAG, "ViewImpressions is NULL");
             return;
         }
         for (int i = 0; i < viewImpressions.size(); i++) {
@@ -208,7 +208,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
     private Activity findViewActivity(View view) {
         Activity activity = ActivityUtil.findActivity(view);
         if (activity == null) {
-            LogUtil.e(TAG, "View context activity is NULL");
+            Logger.e(TAG, "View context activity is NULL");
             activity = ActivityStateProvider.get().getResumedActivity();
         }
         return activity;

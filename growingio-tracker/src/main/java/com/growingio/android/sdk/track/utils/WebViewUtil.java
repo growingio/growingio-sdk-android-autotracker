@@ -18,6 +18,8 @@ package com.growingio.android.sdk.track.utils;
 
 import android.webkit.WebView;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -48,7 +50,7 @@ public class WebViewUtil {
             }
         } catch (Exception e) {
             // 有部分Chromium 代码被混淆, 反射必定报错, 另外在新版的WebView中, 内部有isDestroyed判断， 不会触发Bug， 可以安全忽略该异常
-            LogUtil.d(TAG, "isDestroyed() should ignore: %s", e.getMessage());
+            Logger.d(TAG, "isDestroyed() should ignore: %s", e.getMessage());
         }
 
         return false;

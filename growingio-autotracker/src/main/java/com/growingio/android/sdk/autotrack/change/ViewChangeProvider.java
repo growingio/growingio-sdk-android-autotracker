@@ -33,8 +33,8 @@ import com.growingio.android.sdk.autotrack.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.utils.LogUtil;
 
 public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChangedListener {
     private static final String TAG = "ViewChangeProvider";
@@ -65,7 +65,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             }
             View focusView = activity.getWindow().getDecorView().findFocus();
             if (focusView instanceof EditText) {
-                LogUtil.d(TAG, "onActivityPaused, and focus view is EditText");
+                Logger.d(TAG, "onActivityPaused, and focus view is EditText");
                 viewOnChange(focusView);
             }
         }
@@ -76,7 +76,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
         if (changedEvent.getStateType() == ViewStateChangedEvent.StateType.FOCUS_CHANGED) {
             View oldFocus = changedEvent.getOldFocus();
             if (oldFocus instanceof EditText) {
-                LogUtil.d(TAG, "onViewStateChanged, and oldFocus view is EditText");
+                Logger.d(TAG, "onViewStateChanged, and oldFocus view is EditText");
                 viewOnChange(oldFocus);
             }
         }
@@ -84,14 +84,14 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
 
     public static void viewOnChange(View view) {
         if (!GrowingAutotracker.initializedSuccessfully()) {
-            LogUtil.e(TAG, "Autotracker do not initialized successfully");
+            Logger.e(TAG, "Autotracker do not initialized successfully");
         }
 
         ViewNode viewNode = ViewHelper.getChangeViewNode(view);
         if (viewNode != null) {
             sendChangeEvent(viewNode);
         } else {
-            LogUtil.e(TAG, "ViewNode is NULL");
+            Logger.e(TAG, "ViewNode is NULL");
         }
     }
 

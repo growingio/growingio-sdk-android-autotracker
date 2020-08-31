@@ -49,7 +49,7 @@ public class EventHttpSender implements IEventSender {
         }
 //        for (GEvent event : events) {
 //            if (event instanceof BaseEvent) {
-//                LogUtil.printJson(TAG, "send: event, type is " + ((BaseEvent) event).getEventType(), ((BaseEvent) event).toJSONObject().toString());
+//                Logger.printJson(TAG, "send: event, type is " + ((BaseEvent) event).getEventType(), ((BaseEvent) event).toJSONObject().toString());
 //            }
 //        }
 
@@ -64,7 +64,7 @@ public class EventHttpSender implements IEventSender {
 //        String projectId = infoProvider.getProjectId();
 //        String url = EventUrlProvider.EventUrlPolicy.get().getUrl(projectId, event.getEventType());
         String data = mEventMarshaller.marshall(events).toString();
-//        LogUtil.printJson(TAG + "Marshaller", "send: event marshall", data);
+//        Logger.printJson(TAG + "Marshaller", "send: event marshall", data);
         byte[] compressData = Snappy.compress(data.getBytes(Charset.forName("UTF-8")));
 
 //        Response response = HttpRequest.postData("https://demo6984138.mockable.io/trackApi")

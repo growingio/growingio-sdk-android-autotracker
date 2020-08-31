@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.rom.RomChecker;
 
 import java.util.List;
@@ -51,10 +52,10 @@ public final class ContextUtil {
                     && RomChecker.isHuaweiRom()) {
                 boolean addWhiteListOk = eMUIAddWhiteList(context);
                 if (addWhiteListOk) {
-                    LogUtil.d(TAG, "华为: add to WhiteList Success");
+                    Logger.d(TAG, "华为: add to WhiteList Success");
                     registerReceiver(context, receiver, filter, false);
                 } else {
-                    LogUtil.e(TAG, "华为: add to WhiteList Failed");
+                    Logger.e(TAG, "华为: add to WhiteList Failed");
                 }
             }
         }

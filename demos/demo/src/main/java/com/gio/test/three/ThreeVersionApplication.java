@@ -51,6 +51,7 @@ public class ThreeVersionApplication extends Application {
                         .setUploadExceptionEnabled(false)
                         .setProjectId("testProjectId")
                         .setUrlScheme("testUrlScheme")
-                        .setLogEnabled(true));
+                        .setDebugEnabled(true)
+        );
     }
 }

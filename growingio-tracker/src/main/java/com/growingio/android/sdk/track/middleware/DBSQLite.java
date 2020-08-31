@@ -24,7 +24,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -54,7 +54,7 @@ public class DBSQLite {
         try {
             mDbHelper.insertEvents(Serializer.objectSerialize(gEvent), gEvent.getEventType(), gEvent.getSendPolicy());
         } catch (IOException e) {
-            LogUtil.e(TAG, e, "insertEvent failed: %s", e.getMessage());
+            Logger.e(TAG, e, "insertEvent failed: %s", e.getMessage());
         }
     }
 
@@ -67,7 +67,7 @@ public class DBSQLite {
             }
             mDbHelper.updateStatics(generateNum, sentSuccessNum, bytesSent, failedNum, invalidNum);
         } catch (Exception e) {
-            LogUtil.e(TAG, e, "updateStatics failed: %s", e.getMessage());
+            Logger.e(TAG, e, "updateStatics failed: %s", e.getMessage());
         }
     }
 
@@ -94,7 +94,7 @@ public class DBSQLite {
                 staticsEvents.add(event);
             }
         } catch (Exception e) {
-            LogUtil.e(TAG, e, e.getMessage());
+            Logger.e(TAG, e, e.getMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -102,7 +102,7 @@ public class DBSQLite {
         }
         if (staticsEvents.size() > 0) {
             if (SDKStaticsEvent.sendEvents(staticsEvents)) {
-                LogUtil.d(TAG, "uploadStaticEvent completely, and delete record");
+                Logger.d(TAG, "uploadStaticEvent completely, and delete record");
                 mDbHelper.removeStatics(staticsEvents.get(staticsEvents.size() - 1).getId());
             }
         }
@@ -142,13 +142,13 @@ public class DBSQLite {
             if (lastId != -1) {
                 if (!mSender.send(gEvents)) {
                     // 上传失败, 下一个发送再尝试周期
-                    LogUtil.d(TAG, "send failed, and will retry later");
+                    Logger.d(TAG, "send failed, and will retry later");
                     return UPLOAD_FAILED;
                 }
                 updateStatics(0, gEvents.size(), 0, 0, 0);
             }
         } catch (Throwable t) {
-            LogUtil.e(TAG, t, t.getMessage());
+            Logger.e(TAG, t, t.getMessage());
             hasException = true;
         } finally {
             if (cursor != null) {
@@ -171,9 +171,9 @@ public class DBSQLite {
         try {
             return Serializer.objectDeserialization(data);
         } catch (IOException e) {
-            LogUtil.e(TAG, e, e.getMessage());
+            Logger.e(TAG, e, e.getMessage());
         } catch (ClassNotFoundException e) {
-            LogUtil.e(TAG, e, e.getMessage());
+            Logger.e(TAG, e, e.getMessage());
         }
         return null;
     }
@@ -303,13 +303,13 @@ public class DBSQLite {
         public void removeOldLog(long time) {
             int deleteNum = getWritableDatabase().delete(TABLE_EVENTS,
                     COLUMN_CREATE_TIME + "<=" + time, null);
-            LogUtil.e(TAG, "remove OldLog: deleteNum: %d", deleteNum);
+            Logger.e(TAG, "remove OldLog: deleteNum: %d", deleteNum);
             if (deleteNum > 0) {
                 updateStatics(0, 0, 0, 0, deleteNum);
             }
 
             deleteNum = getWritableDatabase().delete(TABLE_STATISTICS, COLUMN_CREATE_TIME + "<=" + time, null);
-            LogUtil.e(TAG, "removeOldLog, and remove statistics num: %d", deleteNum);
+            Logger.e(TAG, "removeOldLog, and remove statistics num: %d", deleteNum);
         }
 
         // 清库
@@ -344,7 +344,7 @@ public class DBSQLite {
             try {
                 statement = getWritableDatabase().compileStatement(updateSQLBuilder.toString());
                 if (statement.executeUpdateDelete() > 0) {
-                    LogUtil.d(TAG, "updateStatics successfully: g=%d, s=%d, f=%d, i=%d",
+                    Logger.d(TAG, "updateStatics successfully: g=%d, s=%d, f=%d, i=%d",
                             generateNum, sentSuccessNum, failedNum, invalidNum);
                     return;
                 }
@@ -362,9 +362,9 @@ public class DBSQLite {
             try {
                 statement = getWritableDatabase().compileStatement(updateSQLBuilder.toString());
                 if (statement.executeUpdateDelete() > 0) {
-                    LogUtil.d(TAG, "reupdate statics successfully");
+                    Logger.d(TAG, "reupdate statics successfully");
                 } else {
-                    LogUtil.e(TAG, "reupdate statics failedly");
+                    Logger.e(TAG, "reupdate statics failedly");
                 }
             } finally {
                 if (statement != null) {

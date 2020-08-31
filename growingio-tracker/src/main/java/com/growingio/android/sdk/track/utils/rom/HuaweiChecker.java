@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 public class HuaweiChecker extends RomPermissionChecker {
     private static final String TAG  = "HuaweiChecker";
@@ -67,7 +67,7 @@ public class HuaweiChecker extends RomPermissionChecker {
             intent.setComponent(comp);
         } catch (Exception e) {
             intent = null;
-            LogUtil.i(TAG, Log.getStackTraceString(e));
+            Logger.i(TAG, Log.getStackTraceString(e));
         }
         return intent;
     }

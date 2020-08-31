@@ -19,7 +19,7 @@ package com.growingio.android.sdk.track.data;
 import android.content.Context;
 
 import com.growingio.android.sdk.track.interfaces.TrackThread;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ProcessLock;
 
 import java.io.IOException;
@@ -70,7 +70,7 @@ class EventSequenceIdPolicy {
             try {
                 idMap = (EventSequenceIdMap) inputStream.readObject();
             } catch (ClassNotFoundException e) {
-                LogUtil.e(TAG, e);
+                Logger.e(TAG, e);
             }
         } catch (Exception ignored) {
         } finally {

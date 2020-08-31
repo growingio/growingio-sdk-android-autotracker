@@ -19,7 +19,7 @@ package com.growingio.android.sdk.track.middleware;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 /**
  * 用于将事件入库
@@ -40,7 +40,7 @@ public class EventSaver {
         try {
             return saveDBEventLocked(gEvent);
         } catch (Exception e) {
-            LogUtil.e(TAG, e, "unknown exception, and reject to write DB:");
+            Logger.e(TAG, e, "unknown exception, and reject to write DB:");
             return false;
         }
     }

@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.track.http;
 
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.IOException;
 
@@ -36,7 +36,7 @@ public class SecurityExceptionInterceptor implements Interceptor {
         try {
             return chain.proceed(chain.request());
         } catch (Exception e) {
-            LogUtil.e(TAG, "HTTP FAILED: " + e.getMessage());
+            Logger.e(TAG, "HTTP FAILED: " + e.getMessage());
             throw new IOException("Failed due to an Exception: " + e.getMessage());
         }
     }

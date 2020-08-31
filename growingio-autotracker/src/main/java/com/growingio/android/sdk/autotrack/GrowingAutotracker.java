@@ -30,12 +30,11 @@ import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
-import com.growingio.android.sdk.autotrack.webservices.WSLogCacheUtil;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.utils.LogUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.util.Map;
@@ -78,18 +77,18 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     private static IGrowingAutotracker makeEmpty() {
-        LogUtil.e(TAG, "GrowingAutotracker is UNINITIALIZED, please initialized before use API");
+        Logger.e(TAG, "GrowingAutotracker is UNINITIALIZED, please initialized before use API");
         return EmptyGrowingAutotracker.INSTANCE;
     }
 
     private static void initAutotrackSDKInUI(AutotrackConfiguration autotrackConfiguration) {
-        LogUtil.add(WSLogCacheUtil.getInstance());
+//        Logger.add(WSLogCacheUtil.getInstance());
         ConfigurationProvider.get().addConfiguration(autotrackConfiguration.clone());
         GrowingAutotracker autotrack = new GrowingAutotracker();
         PageProvider.get().start();
         ViewChangeProvider.get().start();
         sInstance = autotrack;
-        LogUtil.d(TAG, "Autotracker module init success in ui thread");
+        Logger.d(TAG, "Autotracker module init success in ui thread");
     }
 
     @Override
@@ -219,7 +218,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void trackViewImpression(final View view, final String impressionEventName, final Map<String, String> attributes) {
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
-            LogUtil.e(TAG, "view or impressionEventName is NULL");
+            Logger.e(TAG, "view or impressionEventName is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -232,7 +231,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void stopTrackViewImpression(final View trackedView) {
         if (trackedView == null) {
-            LogUtil.e(TAG, "trackedView is NULL");
+            Logger.e(TAG, "trackedView is NULL");
         }
 
         ThreadUtils.runOnUiThread(new Runnable() {
@@ -246,7 +245,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void setPageAlias(final Activity page, final String alias) {
         if (page == null || TextUtils.isEmpty(alias)) {
-            LogUtil.e(TAG, "activity or alias is NULL");
+            Logger.e(TAG, "activity or alias is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -259,7 +258,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void setPageAlias(final android.app.Fragment page, final String alias) {
         if (page == null || TextUtils.isEmpty(alias)) {
-            LogUtil.e(TAG, "fragment or alias is NULL");
+            Logger.e(TAG, "fragment or alias is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -272,7 +271,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void setPageAlias(final android.support.v4.app.Fragment page, final String alias) {
         if (page == null || TextUtils.isEmpty(alias)) {
-            LogUtil.e(TAG, "fragment or alias is NULL");
+            Logger.e(TAG, "fragment or alias is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -285,7 +284,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void setPageAlias(final androidx.fragment.app.Fragment page, final String alias) {
         if (page == null || TextUtils.isEmpty(alias)) {
-            LogUtil.e(TAG, "fragment or alias is NULL");
+            Logger.e(TAG, "fragment or alias is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -298,7 +297,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void ignorePage(final Activity page, final IgnorePolicy policy) {
         if (page == null || policy == null) {
-            LogUtil.e(TAG, "activity or policy is NULL");
+            Logger.e(TAG, "activity or policy is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -311,7 +310,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void ignorePage(final android.app.Fragment page, final IgnorePolicy policy) {
         if (page == null || policy == null) {
-            LogUtil.e(TAG, "fragment or policy is NULL");
+            Logger.e(TAG, "fragment or policy is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -324,7 +323,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void ignorePage(final android.support.v4.app.Fragment page, final IgnorePolicy policy) {
         if (page == null || policy == null) {
-            LogUtil.e(TAG, "fragment or policy is NULL");
+            Logger.e(TAG, "fragment or policy is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -337,7 +336,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void ignorePage(final androidx.fragment.app.Fragment page, final IgnorePolicy policy) {
         if (page == null || policy == null) {
-            LogUtil.e(TAG, "fragment or policy is NULL");
+            Logger.e(TAG, "fragment or policy is NULL");
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -350,7 +349,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     @Override
     public void ignoreView(final View view, final IgnorePolicy policy) {
         if (view == null || policy == null) {
-            LogUtil.e(TAG, "view or policy is NULL");
+            Logger.e(TAG, "view or policy is NULL");
         }
 
         ThreadUtils.runOnUiThread(new Runnable() {

@@ -46,7 +46,7 @@ import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -105,7 +105,7 @@ public class ViewHelper {
             if (isViewSelfVisible((View) viewParent)) {
                 viewParent = viewParent.getParent();
                 if (viewParent == null) {
-                    LogUtil.d(TAG, "Hit detached view: ", viewParent);
+                    Logger.d(TAG, "Hit detached view: ", viewParent);
                     return false;
                 }
             } else {
@@ -169,7 +169,7 @@ public class ViewHelper {
             }
             return view.getContext().getResources().getResourceEntryName(viewId);
         } catch (Resources.NotFoundException e) {
-            LogUtil.e(TAG, e);
+            Logger.e(TAG, e);
         }
         return null;
     }

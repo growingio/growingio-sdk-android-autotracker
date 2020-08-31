@@ -26,8 +26,8 @@ import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.async.HandlerDisposable;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.utils.LogUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,14 +77,14 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
     }
 
     public Disposable getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
-        LogUtil.e(TAG, "getWebViewDomTree");
+        Logger.e(TAG, "getWebViewDomTree");
         if (callback == null) {
             return Disposable.EMPTY_DISPOSABLE;
         }
         final Disposable disposable = new HandlerDisposable().schedule(new Runnable() {
             @Override
             public void run() {
-                LogUtil.e(TAG, "getWebViewDomTree timeout");
+                Logger.e(TAG, "getWebViewDomTree timeout");
                 callback.onFailed();
             }
         }, EVALUATE_JAVASCRIPT_TIMEOUT);
@@ -102,7 +102,7 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
                             }
                             disposable.dispose();
                             if (TextUtils.isEmpty(value) || "null".equals(value)) {
-                                LogUtil.e(TAG, "getWebViewDomTree ValueCallback is NULL");
+                                Logger.e(TAG, "getWebViewDomTree ValueCallback is NULL");
                                 callback.onFailed();
                                 return;
                             }
@@ -110,13 +110,13 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
                                 JSONObject domTree = new JSONObject(value);
                                 callback.onSuccess(domTree);
                             } catch (JSONException e) {
-                                LogUtil.e(TAG, e);
+                                Logger.e(TAG, e);
                                 callback.onFailed();
                             }
                         }
                     });
         } else {
-            LogUtil.e(TAG, "You need use after Android 4.4 to getWebViewDomTree");
+            Logger.e(TAG, "You need use after Android 4.4 to getWebViewDomTree");
             if (!disposable.isDisposed()) {
                 disposable.dispose();
                 callback.onFailed();

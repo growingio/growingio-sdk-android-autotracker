@@ -28,7 +28,7 @@ import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
 import java.nio.charset.Charset;
@@ -69,7 +69,7 @@ public class DeviceInfoProvider {
                     TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
                     mImei = tm.getDeviceId();
                 } catch (Throwable e) {
-                    LogUtil.d(TAG, "don't have permission android.permission.READ_PHONE_STATE,initIMEI failed ");
+                    Logger.d(TAG, "don't have permission android.permission.READ_PHONE_STATE,initIMEI failed ");
                 }
             }
         }
@@ -119,7 +119,7 @@ public class DeviceInfoProvider {
     }
 
     private String calculateDeviceId() {
-        LogUtil.d(TAG, "first time calculate deviceId");
+        Logger.d(TAG, "first time calculate deviceId");
         String adId = getAndroidId();
         String result = null;
         if (!TextUtils.isEmpty(adId) && !MAGIC_ANDROID_ID.equals(adId)) {

@@ -31,10 +31,10 @@ import android.widget.Toast;
 import androidx.appcompat.view.menu.ListMenuItemView;
 
 import com.growingio.android.sdk.autotrack.page.Page;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
-import com.growingio.android.sdk.track.utils.LogUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 public class WindowHelper {
+    private static final String TAG = "WindowHelper";
 
     public static final String PAGE_PREFIX = "/Page";
     private static final String MAIN_WINDOW_PREFIX = "/MainWindow";
@@ -103,11 +104,11 @@ public class WindowHelper {
             sWindowManger = instanceField.get(null);
 
         } catch (NoSuchFieldException e) {
-            LogUtil.d(e);
+            Logger.d(TAG, e);
         } catch (IllegalAccessException e) {
-            LogUtil.d(e);
+            Logger.d(TAG, e);
         } catch (ClassNotFoundException e) {
-            LogUtil.d(e);
+            Logger.d(TAG, e);
         }
 
         try {
@@ -115,9 +116,9 @@ public class WindowHelper {
             Class itemViewInterface = Class.forName("com.android.internal.view.menu.MenuView$ItemView");
             sItemViewGetDataMethod = itemViewInterface.getDeclaredMethod("getItemData");
         } catch (ClassNotFoundException e) {
-            LogUtil.d(e);
+            Logger.d(TAG, e);
         } catch (NoSuchMethodException e) {
-            LogUtil.d(e);
+            Logger.d(TAG, e);
         }
 
         try {
@@ -132,7 +133,7 @@ public class WindowHelper {
                 sPhoneWindowClazz = Class.forName("com.android.internal.policy.impl.PhoneWindow$DecorView");
             }
         } catch (ClassNotFoundException e) {
-            LogUtil.d(e);
+            Logger.d(TAG, e);
         }
         try {
             if (Build.VERSION.SDK_INT >= 23) {
@@ -141,7 +142,7 @@ public class WindowHelper {
                 sPopupWindowClazz = Class.forName("android.widget.PopupWindow$PopupViewContainer");
             }
         } catch (ClassNotFoundException e) {
-            LogUtil.d(e);
+            Logger.d(TAG, e);
         }
         sIsInitialized = true;
     }
@@ -287,7 +288,7 @@ public class WindowHelper {
                 result = views;
             }
         } catch (Exception e) {
-            LogUtil.d(e);
+            Logger.d(TAG, e);
         }
         return filterNullAndDismissToastView(result);
     }
@@ -303,7 +304,7 @@ public class WindowHelper {
             duration = Math.max(8000, duration);
             sShowingToast.put(nextView, duration + System.currentTimeMillis());
         } catch (Exception e) {
-            LogUtil.d("GIO.Window", "onToastShow, failed: ", e);
+            Logger.d("GIO.Window", "onToastShow, failed: ", e);
         }
     }
 

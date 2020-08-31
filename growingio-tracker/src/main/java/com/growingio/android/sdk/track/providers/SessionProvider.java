@@ -28,7 +28,7 @@ import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
-import com.growingio.android.sdk.track.utils.LogUtil;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.util.UUID;
 
@@ -118,7 +118,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     public void setLocation(double latitude, double longitude) {
         double eps = 1e-5;
         if (Math.abs(latitude) < eps && Math.abs(longitude) < eps) {
-            LogUtil.d(TAG, "found invalid latitude and longitude, and return: ", latitude, ", ", longitude);
+            Logger.d(TAG, "found invalid latitude and longitude, and return: ", latitude, ", ", longitude);
             return;
         }
 
@@ -177,7 +177,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     @Override
     public void onUserIdChanged(@Nullable String newUserId) {
-        LogUtil.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
+        Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
 
         if (!TextUtils.isEmpty(newUserId)
                 && !TextUtils.isEmpty(mLatestNonNullUserId)
