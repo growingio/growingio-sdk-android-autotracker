@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Before script
+        run: |
+          chmod +x gradlew
+          chmod +x checkstyle/checkstyle.sh
+          chmod +x publishAutotrackerPluginToMavenLocal.sh
+
+      - name: Run Gradle command
+        run: |
+          bash ./publishAutotrackerPluginToMavenLocal.sh
+          bash ./checkstyle/checkstyle.sh
+          ./gradlew test
+          ./gradlew assemble
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: ./gradlew :demo:jacocoTestReport
+

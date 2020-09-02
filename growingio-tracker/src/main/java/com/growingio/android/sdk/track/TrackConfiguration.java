@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.track;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 
 import com.growingio.android.sdk.track.base.Configurable;
@@ -30,6 +32,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
     private long mSessionInterval = 30_000;
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
+    private String mDataCollectionServerHost = "http://api.growingio.com";
 
     public String getProjectId() {
         return mProjectId;
@@ -112,6 +115,17 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return this;
     }
 
+    public String getDataCollectionServerHost() {
+        return mDataCollectionServerHost;
+    }
+
+    public TrackConfiguration setDataCollectionServerHost(String dataCollectionServerHost) {
+        if (!TextUtils.isEmpty(dataCollectionServerHost)) {
+            mDataCollectionServerHost = dataCollectionServerHost;
+        }
+        return this;
+    }
+
     @NonNull
     @Override
     public TrackConfiguration clone() {
@@ -124,6 +138,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         clone.mDataUploadInterval = this.mDataUploadInterval;
         clone.mSessionInterval = this.mSessionInterval;
         clone.mUploadExceptionEnabled = this.mUploadExceptionEnabled;
+        clone.mDataCollectionServerHost = this.mDataCollectionServerHost;
         return clone;
     }
 }

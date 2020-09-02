@@ -1,4 +1,5 @@
 apply plugin: 'java-gradle-plugin'
+apply plugin: 'jacoco'
 
 jar {
     manifest {
@@ -7,6 +8,10 @@ jar {
                 "Gradle-Plugin-Version": releaseConfiguration.releaseVersion
         )
     }
+}
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 dependencies {
