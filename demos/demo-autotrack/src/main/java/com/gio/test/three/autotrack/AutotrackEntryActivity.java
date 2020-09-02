@@ -20,10 +20,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.gio.test.three.ModuleEntry;
@@ -46,7 +49,10 @@ import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 @ModuleEntry("无埋点SDK测试")
 public class AutotrackEntryActivity extends Activity {
@@ -86,6 +92,9 @@ public class AutotrackEntryActivity extends Activity {
             GO_TO_LOGIN_ACTIVITY,
     };
 
+    private ListView mListView;
+    private ArrayAdapter<String> mArrayAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,17 +102,49 @@ public class AutotrackEntryActivity extends Activity {
         ignoreExample();
 
         setContentView(R.layout.activity_autotrck_entry);
-        ListView listView = findViewById(R.id.content);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, ITEMS);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        EditText search = findViewById(R.id.et_search);
+
+        mListView = findViewById(R.id.content);
+        List<String> items = new ArrayList<>(Arrays.asList(ITEMS));
+        mArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        mListView.setAdapter(mArrayAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = adapter.getItem(position);
+                String item = mArrayAdapter.getItem(position);
                 Log.e(TAG, "onItemClick: " + item);
                 handleItemClick(item);
             }
         });
+
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchChanged(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+    private void searchChanged(String text) {
+        List<String> newItems = new ArrayList<>();
+        for (String item : ITEMS) {
+            if (item.toLowerCase().contains(text.toLowerCase())) {
+                newItems.add(item);
+            }
+        }
+        mArrayAdapter.clear();
+        mArrayAdapter.addAll(newItems);
+        mArrayAdapter.notifyDataSetChanged();
     }
 
     private void ignoreExample() {

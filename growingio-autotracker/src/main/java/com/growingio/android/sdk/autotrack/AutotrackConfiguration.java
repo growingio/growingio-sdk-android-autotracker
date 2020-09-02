@@ -81,6 +81,18 @@ public class AutotrackConfiguration extends TrackConfiguration {
         return this;
     }
 
+    @Override
+    public AutotrackConfiguration setDataCollectionEnabled(boolean dataCollectionEnabled) {
+        super.setDataCollectionEnabled(dataCollectionEnabled);
+        return this;
+    }
+
+    @Override
+    public AutotrackConfiguration setDataCollectionServerHost(String dataCollectionServerHost) {
+        super.setDataCollectionServerHost(dataCollectionServerHost);
+        return this;
+    }
+
     @NonNull
     @Override
     public AutotrackConfiguration clone() {
@@ -93,6 +105,7 @@ public class AutotrackConfiguration extends TrackConfiguration {
                 .setDataUploadInterval(getDataUploadInterval())
                 .setSessionInterval(getSessionInterval())
                 .setUploadExceptionEnabled(isUploadExceptionEnabled())
-                .setImpressionScale(getImpressionScale());
+                .setImpressionScale(getImpressionScale())
+                .setDataCollectionServerHost(getDataCollectionServerHost());
     }
 }

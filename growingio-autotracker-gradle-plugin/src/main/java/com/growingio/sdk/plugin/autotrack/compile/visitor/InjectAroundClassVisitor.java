@@ -147,7 +147,7 @@ public class InjectAroundClassVisitor extends ClassVisitor {
             Class<?> subClass = mContext.getClassLoader().loadClass(subClassName);
             Class<?> superClass = mContext.getClassLoader().loadClass(superClassName);
             return superClass.isAssignableFrom(subClass);
-        } catch (ClassNotFoundException ignored) {
+        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {
         }
         return false;
     }
