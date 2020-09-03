@@ -23,11 +23,15 @@ android {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    api project(':growingio-tracker')
+    debugApi project(':growingio-tracker')
+    releaseApi "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
     implementation project(':inject-annotation')
     annotationProcessor project(':inject-compiler')
 

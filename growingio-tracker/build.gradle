@@ -29,6 +29,9 @@ android {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
