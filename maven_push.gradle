@@ -55,10 +55,6 @@ afterEvaluate {
 
         repositories {
             maven {
-                name = "build"
-                url = "file://${rootProject.buildDir}/localMaven"
-            }
-            maven {
                 name = "nexus"
                 url = "https://nexus.growingio.com/repository/maven-android/"
                 credentials {
