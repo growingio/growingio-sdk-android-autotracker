@@ -18,8 +18,11 @@ android {
 }
 
 dependencies {
-    implementation project(':growingio-tracker')
-    api project(':growingio-autotracker')
+    debugImplementation project(':growingio-tracker')
+    releaseImplementation "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
+    debugApi project(':growingio-autotracker')
+    releaseApi "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion"
+
     implementation project(':demo-core')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
