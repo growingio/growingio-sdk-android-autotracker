@@ -109,7 +109,8 @@ dependencies {
         exclude group: 'org.hamcrest', module: 'hamcrest'
     }
 
-    implementation project(':growingio-tracker')
+    debugImplementation project(':growingio-tracker')
+    releaseImplementation "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
     implementation project(':demo-core')
     if (withAutotrack) {
         implementation project(":demo-autotrack")

@@ -1,14 +1,52 @@
 apply plugin: 'maven-publish'
+apply plugin: 'com.novoda.bintray-release'
+
+void writePom(node) {
+    def allDependencies = new HashSet<DependencySet>()
+    allDependencies.addAll(configurations.api.allDependencies)
+    allDependencies.addAll(configurations.releaseApi.allDependencies)
+    allDependencies.addAll(configurations.releaseImplementation.allDependencies)
+    allDependencies.addAll(configurations.implementation.allDependencies)
+    def iterator = allDependencies.iterator()
+    while (iterator.hasNext()) {
+        def dep = iterator.next()
+        if (dep.name == "unspecified" || dep.version == "unspecified") {
+            iterator.remove()
+        }
+    }
+
+    def depsNode = node.appendNode('dependencies')
+    allDependencies.each { dep ->
+        def depNode = depsNode.appendNode('dependency')
+        depNode.appendNode('groupId', dep.group)
+        depNode.appendNode('artifactId', dep.name)
+        depNode.appendNode('version', dep.version)
+    }
+}
+
+publish {
+    userOrg = BINTRAY_USER_ORG
+    repoName = BINTARY_REPO_NAME
+    groupId = GROUP_ID
+    artifactId = ARTIFACT_ID
+    publishVersion = releaseConfiguration.releaseVersion
+    desc = BINTARY_DESC
+    dryRun = false
+    publications = ['official']
+}
 
 afterEvaluate {
     publishing {
         publications {
-            release(MavenPublication) {
+            official(MavenPublication) {
                 groupId GROUP_ID
                 artifactId ARTIFACT_ID
                 version releaseConfiguration.releaseVersion
                 if (project.getPlugins().hasPlugin('com.android.library')) {
                     artifact bundleReleaseAar
+                    pom.withXml {
+                        writePom(asNode())
+                    }
                 } else {
                     from components.java
                 }
@@ -17,7 +55,12 @@ afterEvaluate {
 
         repositories {
             maven {
-                url = "file://${rootProject.buildDir}/localMaven"
+                name = "nexus"
+                url = "https://nexus.growingio.com/repository/maven-android/"
+                credentials {
+                    username = project.hasProperty('bintrayUser') ? project.getProperty('bintrayUser') : ''
+                    password = project.hasProperty('bintrayKey') ? project.getProperty('bintrayKey') : ''
+                }
             }
         }
     }

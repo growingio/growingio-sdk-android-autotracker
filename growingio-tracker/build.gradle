@@ -23,11 +23,15 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'consumer-proguard-rules.pro'
         }
     }
     compileOptions {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 
