@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RomChecker {
-    private static final String TAG = "GIO.RomChecker";
+    private static final String TAG = "RomChecker";
 
     private RomChecker() {
     }

@@ -17,6 +17,7 @@
 package com.growingio.autotest.tracker;
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -25,6 +26,7 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.three.core.TrackActivity;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.events.TrackEventType;
+import com.growingio.autotest.help.MockNetwork;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +42,6 @@ import java.util.concurrent.Callable;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -52,12 +53,12 @@ public class TrackEventsTest {
     private static final String TAG = "TrackEventsTest";
     private static final String CUSTOM_EVENT_NAME = "testCustomEvent";
 
+    private volatile boolean mSendVisitEvent = false;
     private volatile boolean mSendCustomEvent = false;
 
-    private final MockWebServer mMockWebServer = new MockWebServer();
-    private final Dispatcher mDispatcher = new Dispatcher() {
+    private final MockNetwork mMockNetwork = new MockNetwork(new Dispatcher() {
         @Override
-        public MockResponse dispatch(RecordedRequest request) {
+        public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
             Uri uri = Uri.parse(request.getRequestUrl().toString());
             String json = request.getBody().readUtf8();
             try {
@@ -70,17 +71,16 @@ public class TrackEventsTest {
             }
             return new MockResponse().setResponseCode(200);
         }
-    };
+    });
 
     @Before
     public void setUp() throws IOException {
-        mMockWebServer.setDispatcher(mDispatcher);
-        mMockWebServer.start(8910);
+        mMockNetwork.start();
     }
 
     @After
     public void teardown() throws IOException {
-        mMockWebServer.shutdown();
+        mMockNetwork.shutdown();
     }
 
     @Rule
@@ -89,11 +89,6 @@ public class TrackEventsTest {
     @Test
     public void trackCustomEventTest() {
         GrowingTracker.get().trackCustomEvent(CUSTOM_EVENT_NAME);
-        await().atMost(5, SECONDS).until(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return mSendCustomEvent;
-            }
-        });
+        await().atMost(5, SECONDS).until(() -> mSendCustomEvent);
     }
 }

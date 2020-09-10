@@ -24,7 +24,7 @@ import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.log.Logger;
 
 public class PermissionUtil {
-    private static final String TAG = "GIO.permission";
+    private static final String TAG = "permission";
 
     private static final int FLAG_INTERNET = 1;
     private static final int FLAG_ACCESS_NETWORK_STATE = 1 << 1;

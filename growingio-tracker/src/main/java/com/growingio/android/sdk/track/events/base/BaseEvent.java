@@ -152,7 +152,7 @@ public abstract class BaseEvent extends GEvent {
         public void readPropertyInTrackThread() {
             mDeviceId = DeviceInfoProvider.get().getDeviceId();
             mSessionId = SessionProvider.get().getSessionId();
-            mUserId = UserInfoProvider.get().getUserId();
+            mUserId = UserInfoProvider.get().getLoginUserId();
             EventSequenceId sequenceId = PersistentDataProvider.get().getAndIncrement(mEventType);
             mGlobalSequenceId = sequenceId.getGlobalId();
             mEventSequenceId = sequenceId.getEventTypeId();

@@ -27,7 +27,7 @@ import android.support.annotation.Nullable;
  * 2.对intent做检查，防止intent无效导致崩溃
  */
 public class FloatPermissionChecker {
-    public static final String TAG = "GIO.FloatPermissionChecker";
+    public static final String TAG = "FloatPermissionChecker";
 
     private RomPermissionChecker mCurrentRomChecker;
     private RomPermissionChecker mCommonRomChecker;

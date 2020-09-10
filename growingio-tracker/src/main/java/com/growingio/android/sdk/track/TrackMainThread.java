@@ -27,7 +27,7 @@ import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.EventSaver;
+import com.growingio.android.sdk.track.middleware.EventSender;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
@@ -40,21 +40,23 @@ import com.growingio.android.sdk.track.variation.TrackEventJsonMarshaller;
 public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKCallback, Void> {
     private static final String TAG = "TrackMainThread";
 
-
     private static final int MSG_INIT_SDK = 1;
-    private static final int MSG_POST_GEVENT = 2;
+    private static final int MSG_POST_EVENT = 2;
     private final Looper mMainLooper;
     private final Handler mMainHandler;
-    private final EventSaver mEventSaver;
+    private final EventSender mEventSender;
 
     private TrackMainThread() {
+        TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
+        int uploadInterval = configuration.isDebugEnabled() ? 0 : configuration.getDataUploadInterval();
+        mEventSender = new EventSender(ContextProvider.getApplicationContext(), new EventHttpSender(new TrackEventJsonMarshaller()), uploadInterval, configuration.getCellularDataLimit());
+
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
         mMainLooper = handlerThread.getLooper();
         mMainHandler = new H(mMainLooper);
         mMainHandler.sendEmptyMessage(MSG_INIT_SDK);
 
-        mEventSaver = new EventSaver(ContextProvider.getApplicationContext(), new EventHttpSender(new TrackEventJsonMarshaller()));
     }
 
     @Override
@@ -76,6 +78,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
 
     @TrackThread
     void initSDK() {
+        mEventSender.removeOverdueEvents();
         dispatchActions(null);
     }
 
@@ -88,7 +91,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                 SessionProvider.get().forceReissueVisit();
             }
 
-            Message msg = mMainHandler.obtainMessage(MSG_POST_GEVENT);
+            Message msg = mMainHandler.obtainMessage(MSG_POST_EVENT);
             msg.obj = eventBuilder;
             mMainHandler.sendMessage(msg);
         }
@@ -105,11 +108,11 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     }
 
     @TrackThread
-    public void saveEvent(GEvent gEvent) {
-        if (gEvent instanceof BaseEvent) {
-            Logger.printJson(TAG, "save: event, type is " + gEvent.getEventType(), ((BaseEvent) gEvent).toJSONObject().toString());
+    public void saveEvent(GEvent event) {
+        if (event instanceof BaseEvent) {
+            Logger.printJson(TAG, "save: event, type is " + event.getEventType(), ((BaseEvent) event).toJSONObject().toString());
         }
-        mEventSaver.saveEvent(gEvent);
+        mEventSender.sendEvent(event);
     }
 
     private class H extends Handler {
@@ -123,7 +126,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                 case MSG_INIT_SDK:
                     initSDK();
                     break;
-                case MSG_POST_GEVENT: {
+                case MSG_POST_EVENT: {
                     BaseEvent.BaseBuilder<?> eventBuilder = (BaseEvent.BaseBuilder<?>) msg.obj;
                     onGenerateGEvent(eventBuilder);
                     break;

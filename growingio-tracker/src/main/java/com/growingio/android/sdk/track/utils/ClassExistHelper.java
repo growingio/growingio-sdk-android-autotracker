@@ -30,8 +30,6 @@ import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebView;
 
 public class ClassExistHelper {
-    private static final String TAG = "GIO.ClassExist";
-
     public static boolean sHasSupportViewPager;
     public static boolean sHasSupportListMenuItemView;
     public static boolean sHasAndroidXViewPager;
@@ -50,7 +48,6 @@ public class ClassExistHelper {
     private static boolean sHasAndroidXAlertDialog;
 
     static {
-        // Don't Edit This Directly, use Unit Test to generate this.
         sHasX5WebView = hasClass("com.tencent.smtt.sdk.WebView");
         sHasUcWebView = hasClass("com.uc.webview.export.WebView");
         sHasSupportRecyclerView = hasClass("android.support.v7.widget.RecyclerView");

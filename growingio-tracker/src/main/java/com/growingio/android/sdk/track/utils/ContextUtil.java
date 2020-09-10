@@ -30,7 +30,7 @@ import java.util.Map;
 
 public final class ContextUtil {
 
-    private static final String TAG = "GIO.ContextUtil";
+    private static final String TAG = "ContextUtil";
 
     private ContextUtil() {
     }

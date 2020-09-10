@@ -19,8 +19,10 @@ package com.growingio.android.sdk.track.variation;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.marshaller.EventMarshaller;
 import com.growingio.android.sdk.track.http.HttpRequest;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
-import com.growingio.android.sdk.track.middleware.IEventSender;
+import com.growingio.android.sdk.track.middleware.IEventNetSender;
+import com.growingio.android.sdk.track.middleware.SendResponse;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.json.JSONArray;
@@ -30,7 +32,7 @@ import java.util.List;
 
 import okhttp3.Response;
 
-public class EventHttpSender implements IEventSender {
+public class EventHttpSender implements IEventNetSender {
     private static final String TAG = "EventHttpSender";
 
     private final EventMarshaller<JSONObject, JSONArray> mEventMarshaller;
@@ -46,17 +48,18 @@ public class EventHttpSender implements IEventSender {
      * https://codes.growingio.com/w/api_v3_interface/
      */
     @Override
-    public boolean send(List<GEvent> events) {
+    public SendResponse send(List<GEvent> events) {
         if (events == null || events.isEmpty()) {
-            return true;
+            return new SendResponse(true, 0);
         }
 
         BaseEvent event;
         if (events.get(0) instanceof BaseEvent) {
             event = (BaseEvent) events.get(0);
         } else {
-            return false;
+            return new SendResponse(true, 0);
         }
+        Logger.e(TAG, "Send events, type is " + event.getEventType());
 
         String data = mEventMarshaller.marshall(events).toString();
         Response response = HttpRequest.postJson(mServerHost)
@@ -64,7 +67,7 @@ public class EventHttpSender implements IEventSender {
                 .setBody(data)
                 .build()
                 .execute();
-//        return response.isSuccessful();
-        return true;
+
+        return new SendResponse(true, 0);
     }
 }

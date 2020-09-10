@@ -29,7 +29,7 @@ import static java.lang.annotation.ElementType.TYPE;
 
 
 /**
- * 表明该方法仅在GIO Main Thread执行
+ * 表明该方法仅在TrackThread执行
  */
 @Documented
 @Retention(RetentionPolicy.SOURCE)

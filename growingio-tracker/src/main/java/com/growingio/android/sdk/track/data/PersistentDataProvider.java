@@ -17,13 +17,24 @@
 package com.growingio.android.sdk.track.data;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
+import com.growingio.android.sdk.track.ipc.IDataSharer;
+import com.growingio.android.sdk.track.ipc.MultiProcessDataSharer;
 
 public class PersistentDataProvider {
-    private final GrowingIOIPC mIPC;
-    private final EventSequenceIdPolicy mEventSequenceIdPolicy;
+    private static final String SHARER_NAME = "PersistentSharerDataProvider";
+    private static final int SHARER_MAX_SIZE = 50;
+
+    private static final String KEY_TYPE_GLOBAL = "TYPE_GLOBAL";
+    private static final String KEY_LOGIN_USER_ID = "LOGIN_USER_ID";
+    private static final String KEY_DEVICE_ID = "DEVICE_ID";
+    private static final String KEY_SESSION_ID = "SESSION_ID";
+
+    private final IDataSharer mDataSharer;
 
     private static class SingleInstance {
         private static final PersistentDataProvider INSTANCE = new PersistentDataProvider();
@@ -31,19 +42,43 @@ public class PersistentDataProvider {
 
     private PersistentDataProvider() {
         Context context = ContextProvider.getApplicationContext();
-        mIPC = new GrowingIOIPC(context);
-        mEventSequenceIdPolicy = new EventSequenceIdPolicy(context);
+        mDataSharer = new MultiProcessDataSharer(context, SHARER_NAME, SHARER_MAX_SIZE);
     }
 
     public static PersistentDataProvider get() {
         return SingleInstance.INSTANCE;
     }
 
-    public GrowingIOIPC getIPC() {
-        return mIPC;
+    public EventSequenceId getAndIncrement(String eventType) {
+        long globalId = mDataSharer.getAndIncrement(KEY_TYPE_GLOBAL, 1);
+        long eventTypeId = mDataSharer.getAndIncrement(eventType, 1);
+        return new EventSequenceId(globalId, eventTypeId);
     }
 
-    public EventSequenceId getAndIncrement(String eventType) {
-        return mEventSequenceIdPolicy.getAndIncrement(eventType);
+    public String getSessionId() {
+        return mDataSharer.getString(KEY_SESSION_ID, "");
+    }
+
+    public void setSessionId(String sessionId) {
+        mDataSharer.putString(KEY_SESSION_ID, sessionId);
+    }
+
+    public String getDeviceId() {
+        return mDataSharer.getString(KEY_DEVICE_ID, "");
+    }
+
+    public void setDeviceId(@NonNull String deviceId) {
+        if (TextUtils.isEmpty(deviceId)) {
+            return;
+        }
+        mDataSharer.putString(KEY_DEVICE_ID, deviceId);
+    }
+
+    public String getLoginUserId() {
+        return mDataSharer.getString(KEY_LOGIN_USER_ID, "");
+    }
+
+    public void setLoginUserId(@Nullable String userId) {
+        mDataSharer.putString(KEY_LOGIN_USER_ID, userId);
     }
 }

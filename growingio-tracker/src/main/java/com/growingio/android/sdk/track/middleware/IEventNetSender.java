@@ -19,6 +19,6 @@ package com.growingio.android.sdk.track.middleware;
 
 import java.util.List;
 
-public interface IEventSender {
-    boolean send(List<GEvent> events);
+public interface IEventNetSender {
+    SendResponse send(List<GEvent> events);
 }

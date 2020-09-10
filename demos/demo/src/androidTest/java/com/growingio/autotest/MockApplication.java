@@ -21,8 +21,9 @@ import android.app.Application;
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 
+import static com.growingio.autotest.help.MockNetwork.MOCK_SERVER_HOST;
+
 public class MockApplication extends Application {
-    public static final String MOCK_SERVER_HOST = "http://localhost:8910";
 
     @Override
     public void onCreate() {

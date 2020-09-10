@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.data;
+package com.gio.test.three;
 
-import java.io.Serializable;
-import java.util.HashMap;
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.util.Log;
 
-public class EventSequenceIdMap implements Serializable {
+import com.growingio.android.sdk.track.GrowingTracker;
 
-    private final HashMap<String, Long> mData = new HashMap<>();
+public class OtherProcessService extends Service {
+    private static final String TAG = "OtherProcessService";
 
-    public EventSequenceIdMap() {
+    public OtherProcessService() {
     }
 
-    public long getSequenceId(String type) {
-        Long sid = mData.get(type);
-        if (sid == null) {
-            return 1;
-        } else {
-            return sid;
-        }
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
-    public EventSequenceIdMap setSequenceId(String type, long sid) {
-        mData.put(type, sid);
-        return this;
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.e(TAG, "onCreate: ");
+        GrowingTracker.get().trackCustomEvent("OtherProcess");
     }
 }
