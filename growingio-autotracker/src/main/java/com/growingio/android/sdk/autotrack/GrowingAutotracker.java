@@ -42,7 +42,7 @@ import java.util.Map;
 public class GrowingAutotracker implements IGrowingAutotracker {
     private static final String TAG = "GrowingAutotracker";
 
-    private static GrowingAutotracker sInstance;
+    private static volatile GrowingAutotracker sInstance;
     private static volatile boolean sInitializedSuccessfully = false;
 
     @NonNull

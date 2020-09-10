@@ -22,9 +22,6 @@ import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-/**
- * 代表GIO事件的基类
- */
 public abstract class GEvent implements Serializable {
     // 即时发送策略
     public static final byte SEND_POLICY_INSTANT = 1;

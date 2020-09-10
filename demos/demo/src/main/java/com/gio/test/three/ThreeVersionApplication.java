@@ -16,35 +16,49 @@
 
 package com.gio.test.three;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
+import android.os.Process;
 import android.util.Log;
 import android.webkit.WebView;
 
+import androidx.annotation.RequiresApi;
+
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
+import com.growingio.android.sdk.track.log.Logger;
 import com.tencent.smtt.sdk.QbSdk;
+
+import java.util.List;
 
 public class ThreeVersionApplication extends Application {
     private static final String TAG = "ThreeVersionApplication";
 
+    @RequiresApi(api = Build.VERSION_CODES.O_MR1)
     @Override
     public void onCreate() {
         super.onCreate();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WebView.setWebContentsDebuggingEnabled(true);
-        }
-        QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
-            @Override
-            public void onCoreInitFinished() {
-                Log.e(TAG, "onCoreInitFinished: ");
-            }
 
-            @Override
-            public void onViewInitFinished(boolean b) {
-                Log.e(TAG, "onViewInitFinished: " + b);
+        if (isMainProcess()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                WebView.setWebContentsDebuggingEnabled(true);
             }
-        });
+            QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
+                @Override
+                public void onCoreInitFinished() {
+                    Log.e(TAG, "onCoreInitFinished: ");
+                }
+
+                @Override
+                public void onViewInitFinished(boolean b) {
+                    Log.e(TAG, "onViewInitFinished: " + b);
+                }
+            });
+            startService(new Intent(this, OtherProcessService.class));
+        }
 
         GrowingAutotracker.startWithConfiguration(this,
                 new AutotrackConfiguration()
@@ -53,5 +67,23 @@ public class ThreeVersionApplication extends Application {
                         .setUrlScheme("testUrlScheme")
                         .setDebugEnabled(true)
         );
+    }
+
+    private boolean isMainProcess() {
+        ActivityManager am = ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE));
+        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+
+        if (processInfos == null) {
+            Logger.e(TAG, "isMainProcess: RunningAppProcessInfo list is NULL");
+            return false;
+        }
+        String mainProcessName = getPackageName();
+        int myPid = Process.myPid();
+        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
+            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

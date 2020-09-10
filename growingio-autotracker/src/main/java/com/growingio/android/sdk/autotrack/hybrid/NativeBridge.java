@@ -21,8 +21,6 @@ import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.TrackMainThread;
 
 class NativeBridge {
-    private static final String TAG = "GIO.NativeBridge";
-
     private final HybridTransformer mHybridTransformer;
 
     NativeBridge() {

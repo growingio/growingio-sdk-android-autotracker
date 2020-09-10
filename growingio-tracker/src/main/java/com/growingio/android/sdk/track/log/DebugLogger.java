@@ -23,6 +23,8 @@ import android.util.Log;
 public class DebugLogger extends BaseLogger {
     private static final String TYPE = "Logcat";
 
+    private static final String TAG_PREFIX = "TRACK.";
+
     private static final int MAX_LOG_LENGTH = 4000;
 
     @Override
@@ -30,6 +32,7 @@ public class DebugLogger extends BaseLogger {
         if (priority > Log.ASSERT) {
             return;
         }
+        tag = TAG_PREFIX + tag;
 
         if (message.length() < MAX_LOG_LENGTH) {
             if (priority == Log.ASSERT) {

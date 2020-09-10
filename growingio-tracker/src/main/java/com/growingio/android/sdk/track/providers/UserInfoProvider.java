@@ -20,7 +20,6 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.ErrorLog;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
-import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.log.Logger;
@@ -28,28 +27,26 @@ import com.growingio.android.sdk.track.utils.ObjectUtils;
 
 public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener, String> {
     private static final String TAG = "UserInfoPolicy";
-    private final GrowingIOIPC mGrowingIOIPC;
 
     private static class SingleInstance {
         private static final UserInfoProvider INSTANCE = new UserInfoProvider();
     }
 
     private UserInfoProvider() {
-        mGrowingIOIPC = PersistentDataProvider.get().getIPC();
     }
 
     public static UserInfoProvider get() {
         return SingleInstance.INSTANCE;
     }
 
-    public String getUserId() {
-        return mGrowingIOIPC.getUserId();
+    public String getLoginUserId() {
+        return PersistentDataProvider.get().getLoginUserId();
     }
 
-    public void setUserId(String userId) {
+    public void setLoginUserId(String userId) {
         if (TextUtils.isEmpty(userId)) {
             // to null, never send visit, just return
-            mGrowingIOIPC.setUserId(null);
+            PersistentDataProvider.get().setLoginUserId(null);
             dispatchActions(null);
             return;
         }
@@ -60,12 +57,12 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
         }
 
         // to non-null
-        String oldUserId = getUserId();
+        String oldUserId = getLoginUserId();
         if (ObjectUtils.equals(userId, oldUserId)) {
             Logger.d(TAG, "setUserId, but the userId is same as the old userId, just return");
             return;
         }
-        mGrowingIOIPC.setUserId(userId);
+        PersistentDataProvider.get().setLoginUserId(userId);
         dispatchActions(userId);
     }
 

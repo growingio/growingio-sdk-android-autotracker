@@ -26,7 +26,6 @@ import android.support.annotation.VisibleForTesting;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import androidx.appcompat.view.menu.ListMenuItemView;
 
@@ -291,21 +290,6 @@ public class WindowHelper {
             Logger.d(TAG, e);
         }
         return filterNullAndDismissToastView(result);
-    }
-
-    public static void onToastShow(@NonNull Toast toast) {
-        try {
-            View nextView = toast.getView();
-            int duration = toast.getDuration();
-            if (nextView == null) {
-                return;
-            }
-            // 不需要知道精确时间, 大致给个LONG_DURATION + 10000 = 8000
-            duration = Math.max(8000, duration);
-            sShowingToast.put(nextView, duration + System.currentTimeMillis());
-        } catch (Exception e) {
-            Logger.d("GIO.Window", "onToastShow, failed: ", e);
-        }
     }
 
     public static View[] filterNullAndDismissToastView(View[] array) {

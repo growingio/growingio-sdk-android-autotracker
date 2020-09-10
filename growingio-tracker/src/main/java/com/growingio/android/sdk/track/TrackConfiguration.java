@@ -28,8 +28,8 @@ public class TrackConfiguration implements Cloneable, Configurable {
     private String mChannel;
     private boolean mDebugEnabled = false;
     private int mCellularDataLimit = 10;
-    private long mDataUploadInterval = 15_000;
-    private long mSessionInterval = 30_000;
+    private int mDataUploadInterval = 15;
+    private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
@@ -97,20 +97,20 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return this;
     }
 
-    public long getDataUploadInterval() {
+    public int getDataUploadInterval() {
         return mDataUploadInterval;
     }
 
-    public TrackConfiguration setDataUploadInterval(long dataUploadInterval) {
+    public TrackConfiguration setDataUploadInterval(int dataUploadInterval) {
         this.mDataUploadInterval = dataUploadInterval;
         return this;
     }
 
-    public long getSessionInterval() {
+    public int getSessionInterval() {
         return mSessionInterval;
     }
 
-    public TrackConfiguration setSessionInterval(long sessionInterval) {
+    public TrackConfiguration setSessionInterval(int sessionInterval) {
         this.mSessionInterval = sessionInterval;
         return this;
     }

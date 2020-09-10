@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.utils;
+package com.growingio.android.sdk.track.middleware;
 
-public class CustomerInterface {
-    public interface Encryption {
-        /**
-         * 加密
-         *
-         * @param source 被加密的String
-         * @return 加密之后的值
-         */
-        String encrypt(String source);
+public class SendResponse {
+    private final boolean mSucceeded;
+    private final long mUsedBytes;
+
+    public SendResponse(boolean succeeded, long usedBytes) {
+        mSucceeded = succeeded;
+        mUsedBytes = usedBytes;
+    }
+
+    public boolean isSucceeded() {
+        return mSucceeded;
+    }
+
+    public long getUsedBytes() {
+        return mUsedBytes;
     }
 }

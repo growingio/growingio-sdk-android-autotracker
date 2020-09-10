@@ -15,5 +15,10 @@ dependencies {
     implementation libraries.squareup.javapoet
     implementation libraries.android.gradle_plugin
     implementation project(':inject-annotation')
-    compileOnly files(Jvm.current().getToolsJar())
+
+    def toolsJar = Jvm.current().getToolsJar()
+    if (!toolsJar)
+        throw new GradleException("tools.jar not found at your JAVA_HOME dir ${Jvm.current().getJavaHome().getAbsolutePath()}.\n" +
+                "Building with a JRE or JDK9 is currently not supported.")
+    compileOnly files(toolsJar)
 }

@@ -26,6 +26,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AppClosedEvent extends BaseEvent {
+    private static final long serialVersionUID = 1L;
+
     private final String mNetworkState;
 
     protected AppClosedEvent(Builder eventBuilder) {

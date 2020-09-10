@@ -70,13 +70,13 @@ public class AutotrackConfiguration extends TrackConfiguration {
     }
 
     @Override
-    public AutotrackConfiguration setDataUploadInterval(long dataUploadInterval) {
+    public AutotrackConfiguration setDataUploadInterval(int dataUploadInterval) {
         super.setDataUploadInterval(dataUploadInterval);
         return this;
     }
 
     @Override
-    public AutotrackConfiguration setSessionInterval(long sessionInterval) {
+    public AutotrackConfiguration setSessionInterval(int sessionInterval) {
         super.setSessionInterval(sessionInterval);
         return this;
     }

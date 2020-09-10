@@ -16,8 +16,6 @@
 
 package com.growingio.android.sdk.track;
 
-import com.growingio.android.sdk.track.base.BuildConfig;
-
 public class SDKConfig {
     private SDKConfig() {
     }

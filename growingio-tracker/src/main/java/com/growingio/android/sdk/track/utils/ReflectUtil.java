@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
  */
 public abstract class ReflectUtil {
 
-    private static final String TAG = "GIO.ReflectUtil";
+    private static final String TAG = "ReflectUtil";
 
     @SuppressWarnings("unchecked")
     public static <T> T getFiledValue(Field field, Object instance) {

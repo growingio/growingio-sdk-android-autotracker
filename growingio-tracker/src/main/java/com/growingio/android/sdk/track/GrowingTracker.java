@@ -40,7 +40,7 @@ import java.util.Map;
 public class GrowingTracker implements IGrowingTracker {
     static final String TAG = "GrowingTracker";
 
-    private static IGrowingTracker sInstance;
+    private static volatile IGrowingTracker sInstance;
     private static volatile boolean sInitializedSuccessfully = false;
 
     private TrackMainThread mTrackMainThread;
@@ -199,7 +199,7 @@ public class GrowingTracker implements IGrowingTracker {
         mTrackMainThread.postActionToTrackMain(new Runnable() {
             @Override
             public void run() {
-                UserInfoProvider.get().setUserId(userId);
+                UserInfoProvider.get().setLoginUserId(userId);
             }
         });
     }
@@ -209,7 +209,7 @@ public class GrowingTracker implements IGrowingTracker {
         mTrackMainThread.postActionToTrackMain(new Runnable() {
             @Override
             public void run() {
-                UserInfoProvider.get().setUserId(null);
+                UserInfoProvider.get().setLoginUserId(null);
             }
         });
     }

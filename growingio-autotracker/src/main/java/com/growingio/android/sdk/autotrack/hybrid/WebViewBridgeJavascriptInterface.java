@@ -24,7 +24,7 @@ import com.growingio.android.sdk.track.log.Logger;
 class WebViewBridgeJavascriptInterface {
     static final String JAVASCRIPT_INTERFACE_NAME = "GrowingWebViewJavascriptBridge";
     static final String JAVASCRIPT_GET_DOM_TREE_METHOD = "window.GrowingWebViewJavascriptBridge.getDomTree";
-    private static final String TAG = "GIO.WebViewBridge";
+    private static final String TAG = "WebViewBridge";
     private final WebViewJavascriptBridgeConfiguration mConfiguration;
     private final NativeBridge mNativeBridge = new NativeBridge();
 

@@ -27,7 +27,6 @@ import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
-import com.growingio.android.sdk.track.ipc.GrowingIOIPC;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
@@ -40,7 +39,6 @@ public class DeviceInfoProvider {
     private static final String MAGIC_ANDROID_ID = "9774d56d682e549c";
 
     private final Context mContext;
-    private final GrowingIOIPC mIPC;
 
     private String mAndroidId;
     private String mImei;
@@ -54,7 +52,6 @@ public class DeviceInfoProvider {
 
     private DeviceInfoProvider() {
         mContext = ContextProvider.getApplicationContext();
-        mIPC = PersistentDataProvider.get().getIPC();
     }
 
     public static DeviceInfoProvider get() {
@@ -93,7 +90,7 @@ public class DeviceInfoProvider {
 
     public String getDeviceId() {
         if (TextUtils.isEmpty(mDeviceId) && ConfigurationProvider.get().isDataCollectionEnabled()) {
-            mDeviceId = mIPC.getDeviceId();
+            mDeviceId = PersistentDataProvider.get().getDeviceId();
             if (TextUtils.isEmpty(mDeviceId)) {
                 mDeviceId = calculateDeviceId();
             }
@@ -134,7 +131,7 @@ public class DeviceInfoProvider {
         if (TextUtils.isEmpty(result)) {
             result = UUID.randomUUID().toString();
         }
-        mIPC.setDeviceId(result);
+        PersistentDataProvider.get().setDeviceId(result);
         return result;
     }
 }
