@@ -44,6 +44,7 @@ public class ViewNode {
     private String mClickableParentXPath;
     private String mViewContent;
     private boolean mHasListParent;
+    private String mPrefixPage;
     private int mIndex;
 
     @Retention(SOURCE)
@@ -79,6 +80,10 @@ public class ViewNode {
 
     public String getViewContent() {
         return mViewContent;
+    }
+
+    public String getPrefix() {
+        return mPrefixPage;
     }
 
     public int getIndex() {
@@ -122,6 +127,7 @@ public class ViewNode {
                 .setOriginalXPath(mOriginalXPath)
                 .setClickableParentXPath(ViewUtil.canCircle(mView) ? mXPath : mClickableParentXPath)
                 .setHasListParent(hasListParent)
+                .setPrefixPage(mPrefixPage)
                 .setViewPosition(index)
                 .needRecalculate(true)
                 .build();
@@ -134,6 +140,7 @@ public class ViewNode {
         private String mClickableParentXPath;
         private String mViewContent;
         private boolean mHasListParent;
+        private String mPrefixPage;
         private int mIndex;
 
         private boolean mNeedRecalculate = false;
@@ -183,6 +190,11 @@ public class ViewNode {
 
         public ViewNodeBuilder setHasListParent(boolean hasListParent) {
             this.mHasListParent = hasListParent;
+            return this;
+        }
+
+        public ViewNodeBuilder setPrefixPage(String prefixPage) {
+            this.mPrefixPage = prefixPage;
             return this;
         }
 
@@ -245,8 +257,9 @@ public class ViewNode {
                 mXPath = mOriginalXPath;
                 return;
             } else if (page != null && !page.isIgnored()) {
-                mOriginalXPath = WindowHelper.getWindowPrefix(mView);
+                mOriginalXPath = mPrefixPage + "/" + page.getName();
                 mXPath = mOriginalXPath;
+                mPrefixPage = mOriginalXPath;
                 return;
             }
 

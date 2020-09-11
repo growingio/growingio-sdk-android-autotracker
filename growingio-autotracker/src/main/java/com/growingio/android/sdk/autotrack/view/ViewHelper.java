@@ -192,19 +192,22 @@ public class ViewHelper {
         ViewParent parent = view.getParent();
         viewTreeList.add(view);
         Page<?> page = ViewAttributeUtil.getViewPage(view);
-        boolean needTraverse = (page == null || page.isIgnored()) && ViewAttributeUtil.getCustomId(view) == null;
-        if (needTraverse) {
-            while (parent instanceof ViewGroup) {
+        boolean hasPage = false;
+        while (parent instanceof ViewGroup) {
+            if (!hasPage) {
                 viewTreeList.add((View) parent);
-                if (ViewAttributeUtil.getCustomId((View) parent) != null) {
-                    break;
-                }
-                page = ViewAttributeUtil.getViewPage((View) parent);
-                if (page != null && !page.isIgnored()) {
-                    break;
-                }
-                parent = parent.getParent();
             }
+            if (ViewAttributeUtil.getCustomId((View) parent) != null) {
+                break;
+            }
+            page = ViewAttributeUtil.getViewPage((View) parent);
+            if (page != null && !page.isIgnored()) {
+                if (hasPage) {
+                    viewTreeList.add((View)parent);
+                }
+                hasPage = true;
+            }
+            parent = parent.getParent();
         }
 
         View rootView = viewTreeList.get(viewTreeList.size() - 1);
@@ -213,12 +216,13 @@ public class ViewHelper {
         String xpath;
         String originalXpath;
 
+        Page<?> rootPage = ViewAttributeUtil.getViewPage(rootView);
         if (ViewAttributeUtil.getCustomId(rootView) != null) {
             originalXpath = "/" + ViewAttributeUtil.getCustomId(rootView);
             xpath = originalXpath;
-        } else if (ViewAttributeUtil.getViewPage(rootView) != null) {
-            originalXpath = PAGE_PREFIX;
-            xpath = PAGE_PREFIX;
+        } else if (rootPage != null) {
+            originalXpath = "/" + rootPage.getName();
+            xpath = "/" + rootPage.getName();
         } else {
             String prefix = WindowHelper.getWindowPrefix(rootView);
             xpath = prefix + "/" + ClassUtil.getSimpleClassName(rootView.getClass());
