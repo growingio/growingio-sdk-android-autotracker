@@ -235,6 +235,7 @@ public class ViewHelper {
                 .setViewContent(getViewContent(rootView))
                 .setXPath(xpath)
                 .setOriginalXPath(originalXpath)
+                .setPrefixPage(rootPage == null ? "" : originalXpath)
                 .build();
     }
 
