@@ -29,11 +29,11 @@ public class WsLogger extends BaseLogger {
     public static final String TYPE = "WsLogger";
 
     private final CircularFifoQueue<LoggerDataMessage.LogItem> mCacheLogs = new CircularFifoQueue<>(100);
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService mExecutorService = Executors.newSingleThreadExecutor();
     private Callback mCallback;
 
     public void setCallback(Callback callback) {
-        executorService.submit(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 mCallback = callback;
@@ -43,7 +43,7 @@ public class WsLogger extends BaseLogger {
 
     @Override
     protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
-        executorService.submit(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 String state;
