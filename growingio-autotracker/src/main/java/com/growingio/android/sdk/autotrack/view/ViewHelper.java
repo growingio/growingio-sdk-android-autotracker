@@ -203,7 +203,7 @@ public class ViewHelper {
             page = ViewAttributeUtil.getViewPage((View) parent);
             if (page != null && !page.isIgnored()) {
                 if (hasPage) {
-                    viewTreeList.add((View)parent);
+                    viewTreeList.add((View) parent);
                 }
                 hasPage = true;
             }
