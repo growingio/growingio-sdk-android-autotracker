@@ -215,6 +215,7 @@ public class ViewNode {
             viewNode.mClickableParentXPath = this.mClickableParentXPath;
             viewNode.mViewContent = this.mViewContent;
             viewNode.mHasListParent = this.mHasListParent;
+            viewNode.mPrefixPage = this.mPrefixPage;
             viewNode.mIndex = this.mIndex;
             return viewNode;
         }
