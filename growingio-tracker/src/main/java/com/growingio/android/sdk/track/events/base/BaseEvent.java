@@ -18,6 +18,7 @@ package com.growingio.android.sdk.track.events.base;
 
 
 import android.support.annotation.CallSuper;
+import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.data.EventSequenceId;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
@@ -113,7 +114,9 @@ public abstract class BaseEvent extends GEvent {
         JSONObject json = new JSONObject();
         try {
             json.put("deviceId", mDeviceId);
-            json.put("userId", mUserId);
+            if (!TextUtils.isEmpty(mUserId)) {
+                json.put("userId", mUserId);
+            }
             json.put("sessionId", mSessionId);
             json.put("eventType", mEventType);
             json.put("timestamp", mTimestamp);

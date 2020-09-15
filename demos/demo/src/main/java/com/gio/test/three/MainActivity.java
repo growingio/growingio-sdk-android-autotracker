@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,13 +34,27 @@ import android.widget.TextView;
 import java.util.List;
 
 public class MainActivity extends ListActivity {
+    private static final String TAG  = "MainActivity";
 
     private List<ResolveInfo> mInfos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         new LoadTask().execute();
+    }
+
+    @Override
+    protected void onStart() {
+        Log.e(TAG, "onStart: ");
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.e(TAG, "onStop: ");
+        super.onStop();
     }
 
     @Override

@@ -16,27 +16,17 @@
 
 package com.growingio.autotest.help;
 
-import java.io.IOException;
+import androidx.test.core.app.ApplicationProvider;
 
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockWebServer;
-
-public class MockNetwork {
-    public static final String MOCK_SERVER_HOST = "http://localhost:8910";
-    private final MockWebServer mMockWebServer = new MockWebServer();
-
-    private final Dispatcher mDispatcher;
-
-    public MockNetwork(Dispatcher realDispatcher) {
-        mDispatcher = realDispatcher;
+public class DataHelper {
+    private DataHelper() {
     }
 
-    public void start() throws IOException {
-        mMockWebServer.setDispatcher(mDispatcher);
-        mMockWebServer.start(8910);
+    public static void deleteEventsDatabase() {
+        ApplicationProvider.getApplicationContext().deleteDatabase("growing3.db");
     }
 
-    public void shutdown() throws IOException {
-        mMockWebServer.shutdown();
+    public static void deletePersistentSharedData() {
+        ApplicationProvider.getApplicationContext().deleteFile("PersistentSharerDataProvider.shared");
     }
 }

@@ -43,10 +43,10 @@ import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
-import com.growingio.android.sdk.track.log.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -191,7 +191,7 @@ public class ViewHelper {
         }
         ViewParent parent = view.getParent();
         viewTreeList.add(view);
-        Page<?> page = ViewAttributeUtil.getViewPage(view);
+        Page<?> page;
         boolean hasPage = false;
         while (parent instanceof ViewGroup) {
             if (!hasPage) {
@@ -221,8 +221,8 @@ public class ViewHelper {
             originalXpath = "/" + ViewAttributeUtil.getCustomId(rootView);
             xpath = originalXpath;
         } else if (rootPage != null) {
-            originalXpath = "/" + rootPage.getName();
-            xpath = "/" + rootPage.getName();
+            originalXpath = WindowHelper.getWindowPrefix(rootView);
+            xpath = originalXpath;
         } else {
             String prefix = WindowHelper.getWindowPrefix(rootView);
             xpath = prefix + "/" + ClassUtil.getSimpleClassName(rootView.getClass());

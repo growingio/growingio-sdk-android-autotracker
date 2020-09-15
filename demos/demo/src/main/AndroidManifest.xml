@@ -23,7 +23,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:name=".three.ThreeVersionApplication"
+        android:name=".three.DemoApplication"
         android:label="demos"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">

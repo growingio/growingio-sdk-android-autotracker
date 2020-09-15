@@ -16,79 +16,162 @@
 
 package com.growingio.autotest.tracker;
 
-import android.net.Uri;
-import android.util.Log;
-
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
+import com.gio.test.three.DemoApplication;
 import com.gio.test.three.core.TrackActivity;
 import com.growingio.android.sdk.track.GrowingTracker;
-import com.growingio.android.sdk.track.events.TrackEventType;
-import com.growingio.autotest.help.MockNetwork;
+import com.growingio.autotest.EventsTest;
+import com.growingio.autotest.TestTrackConfiguration;
+import com.growingio.autotest.help.BeforeAppOnCreate;
+import com.growingio.autotest.help.MockEventsApiServer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
-import java.util.concurrent.Callable;
-
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.RecordedRequest;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class TrackEventsTest {
+public class TrackEventsTest extends EventsTest {
     private static final String TAG = "TrackEventsTest";
-    private static final String CUSTOM_EVENT_NAME = "testCustomEvent";
 
-    private volatile boolean mSendVisitEvent = false;
-    private volatile boolean mSendCustomEvent = false;
-
-    private final MockNetwork mMockNetwork = new MockNetwork(new Dispatcher() {
-        @Override
-        public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
-            Uri uri = Uri.parse(request.getRequestUrl().toString());
-            String json = request.getBody().readUtf8();
-            try {
-                JSONArray jsonArray = new JSONArray(json);
-                JSONObject jsonObject = jsonArray.getJSONObject(0);
-                mSendCustomEvent = TrackEventType.CUSTOM.equals(jsonObject.getString("eventType"))
-                        && CUSTOM_EVENT_NAME.equals(jsonObject.optString("eventName"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return new MockResponse().setResponseCode(200);
-        }
-    });
-
-    @Before
-    public void setUp() throws IOException {
-        mMockNetwork.start();
-    }
-
-    @After
-    public void teardown() throws IOException {
-        mMockNetwork.shutdown();
+    @BeforeAppOnCreate
+    public static void setConfiguration() {
+        DemoApplication.setConfiguration(new TestTrackConfiguration());
     }
 
     @Rule
-    public ActivityScenarioRule<TrackActivity> mRule = new ActivityScenarioRule<>(TrackActivity.class);
+    public ActivityScenarioRule<TrackActivity> scenarioRule = new ActivityScenarioRule<>(TrackActivity.class);
 
     @Test
     public void trackCustomEventTest() {
-        GrowingTracker.get().trackCustomEvent(CUSTOM_EVENT_NAME);
-        await().atMost(5, SECONDS).until(() -> mSendCustomEvent);
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        final String testCustomEvent = "testCustomEvent";
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedCustomEvents(JSONArray jsonArray) throws JSONException {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                if (jsonObject.getString("eventName").equals(testCustomEvent)) {
+                    receivedEvent.set(true);
+                }
+            }
+        });
+        GrowingTracker.get().trackCustomEvent(testCustomEvent);
+        await().atMost(5, SECONDS).until(receivedEvent::get);
+    }
+
+    @Test
+    public void trackAttributesCustomEventTest() {
+        final String testCustomEvent = "testAttributeCustomEvent";
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put("key1", "value1");
+        attributes.put("key2", "value2");
+        attributes.put("key3", "");
+        attributes.put("key4", null);
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        GrowingTracker.get().trackCustomEvent(testCustomEvent, attributes);
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedCustomEvents(JSONArray jsonArray) throws JSONException {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                if (jsonObject.getString("eventName").equals(testCustomEvent)) {
+                    JSONObject attrs = jsonObject.getJSONObject("attributes");
+                    if (attrs.getString("key1").equals("value1")
+                            && attrs.getString("key2").equals("value2")
+                            && attrs.getString("key3").equals("")
+                            && attrs.isNull("key4")) {
+                        receivedEvent.set(true);
+                    }
+                }
+            }
+        });
+        await().atMost(500, SECONDS).until(receivedEvent::get);
+    }
+
+    @Test
+    public void trackVisitorAttributesEventTest() {
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put("key1", "value1");
+        attributes.put("key2", "value2");
+        attributes.put("key3", "");
+        attributes.put("key4", null);
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        GrowingTracker.get().setVisitorAttributes(attributes);
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedVisitorAttributesEvents(JSONArray jsonArray) throws JSONException {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                JSONObject attrs = jsonObject.getJSONObject("attributes");
+                if (attrs.getString("key1").equals("value1")
+                        && attrs.getString("key2").equals("value2")
+                        && attrs.getString("key3").equals("")
+                        && attrs.isNull("key4")) {
+                    receivedEvent.set(true);
+                }
+            }
+        });
+        await().atMost(5, SECONDS).until(receivedEvent::get);
+    }
+
+    @Test
+    public void trackLoginUserAttributesEventTest() {
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put("key1", "value1");
+        attributes.put("key2", "value2");
+        attributes.put("key3", "");
+        attributes.put("key4", null);
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        GrowingTracker.get().setLoginUserAttributes(attributes);
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedLoginUserAttributesEvents(JSONArray jsonArray) throws JSONException {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                JSONObject attrs = jsonObject.getJSONObject("attributes");
+                if (attrs.getString("key1").equals("value1")
+                        && attrs.getString("key2").equals("value2")
+                        && attrs.getString("key3").equals("")
+                        && attrs.isNull("key4")) {
+                    receivedEvent.set(true);
+                }
+            }
+        });
+        await().atMost(5, SECONDS).until(receivedEvent::get);
+    }
+
+    @Test
+    public void trackConversionVariablesEventTest() {
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put("key1", "value1");
+        attributes.put("key2", "value2");
+        attributes.put("key3", "");
+        attributes.put("key4", null);
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        GrowingTracker.get().setConversionVariables(attributes);
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedConversionVariablesEvents(JSONArray jsonArray) throws JSONException {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                JSONObject attrs = jsonObject.getJSONObject("variables");
+                if (attrs.getString("key1").equals("value1")
+                        && attrs.getString("key2").equals("value2")
+                        && attrs.getString("key3").equals("")
+                        && attrs.isNull("key4")) {
+                    receivedEvent.set(true);
+                }
+            }
+        });
+        await().atMost(5, SECONDS).until(receivedEvent::get);
     }
 }

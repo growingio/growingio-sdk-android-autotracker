@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.growingio.sdk.plugin.autotrack.tmp;
+package com.growingio.autotest;
 
-public class SubExample extends SuperExample {
-//    @Override
-//    public void onExecute() {
-//        super.onExecute();
-//    }
+import com.growingio.autotest.tracker.SessionEventsTest;
+import com.growingio.autotest.tracker.TrackEventsTest;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses({SessionEventsTest.class, TrackEventsTest.class})
+public class UnitTestSuite {
 }

@@ -249,6 +249,16 @@ public class PageProvider implements IActivityLifecycle {
 
     @UiThread
     public void removePage(SuperFragment<?> fragment) {
+        if (fragment == null) {
+            Logger.e(TAG, "removePage: this fragment can not make superFragment");
+            return;
+        }
+
+        if (fragment.getView() == null) {
+            Logger.e(TAG, "removePage: this fragment getView is NULL");
+            return;
+        }
+
         Log.e(TAG, "removePage: fragment is " + fragment.getRealFragment());
         PAGE_ATTRIBUTES_CACHE.remove(fragment);
 

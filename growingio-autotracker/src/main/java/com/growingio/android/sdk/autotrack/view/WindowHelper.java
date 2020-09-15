@@ -46,6 +46,7 @@ public class WindowHelper {
     private static final String TAG = "WindowHelper";
 
     public static final String PAGE_PREFIX = "/Page";
+    public static final String IGNORE_PAGE_PREFIX = "/IgnorePage";
     private static final String MAIN_WINDOW_PREFIX = "/MainWindow";
     private static final String DIALOG_WINDOW_PREFIX = "/DialogWindow";
     private static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
@@ -171,17 +172,21 @@ public class WindowHelper {
     }
 
     public static String getWindowPrefix(View root) {
+        String windowPrefix;
         Page<?> page = ViewAttributeUtil.getViewPage(root);
         if (page != null) {
-            return PAGE_PREFIX;
+            if (page.isIgnored()) {
+                windowPrefix = IGNORE_PAGE_PREFIX;
+            } else {
+                windowPrefix = PAGE_PREFIX;
+            }
+        } else if (root.hashCode() == ActivityStateProvider.get().getCurrentRootWindowsHashCode()) {
+            windowPrefix = getMainWindowPrefix();
+        } else {
+            windowPrefix = getSubWindowPrefix(root);
         }
 
-
-        if (root.hashCode() == ActivityStateProvider.get().getCurrentRootWindowsHashCode()) {
-            return getMainWindowPrefix();
-        }
-
-        return getSubWindowPrefix(root);
+        return windowPrefix;
     }
 
     public static String getSubWindowPrefix(View root) {
