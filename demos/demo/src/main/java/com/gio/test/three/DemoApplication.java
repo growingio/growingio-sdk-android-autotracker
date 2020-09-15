@@ -19,7 +19,6 @@ package com.gio.test.three;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Process;
 import android.util.Log;
@@ -34,12 +33,19 @@ import com.tencent.smtt.sdk.QbSdk;
 
 import java.util.List;
 
-public class ThreeVersionApplication extends Application {
-    private static final String TAG = "ThreeVersionApplication";
+public class DemoApplication extends Application {
+    private static final String TAG = "DemoApplication";
+
+    private static AutotrackConfiguration sConfiguration;
+
+    public static void setConfiguration(AutotrackConfiguration configuration) {
+        sConfiguration = configuration;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O_MR1)
     @Override
     public void onCreate() {
+        Log.e(TAG, "onCreate: ");
         super.onCreate();
 
         if (isMainProcess()) {
@@ -57,16 +63,18 @@ public class ThreeVersionApplication extends Application {
                     Log.e(TAG, "onViewInitFinished: " + b);
                 }
             });
-            startService(new Intent(this, OtherProcessService.class));
+//            startService(new Intent(this, OtherProcessService.class));
         }
 
-        GrowingAutotracker.startWithConfiguration(this,
-                new AutotrackConfiguration()
-                        .setUploadExceptionEnabled(false)
-                        .setProjectId("testProjectId")
-                        .setUrlScheme("testUrlScheme")
-                        .setDebugEnabled(true)
-        );
+        if (sConfiguration == null) {
+            sConfiguration = new AutotrackConfiguration()
+                    .setUploadExceptionEnabled(false)
+                    .setProjectId("demoProjectId")
+                    .setUrlScheme("demoUrlScheme")
+                    .setDebugEnabled(true);
+        }
+
+        GrowingAutotracker.startWithConfiguration(this, sConfiguration);
     }
 
     private boolean isMainProcess() {

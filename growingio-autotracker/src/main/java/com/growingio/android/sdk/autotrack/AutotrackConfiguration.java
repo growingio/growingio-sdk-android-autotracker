@@ -105,6 +105,7 @@ public class AutotrackConfiguration extends TrackConfiguration {
                 .setDataUploadInterval(getDataUploadInterval())
                 .setSessionInterval(getSessionInterval())
                 .setUploadExceptionEnabled(isUploadExceptionEnabled())
+                .setDataCollectionEnabled(isDataCollectionEnabled())
                 .setImpressionScale(getImpressionScale())
                 .setDataCollectionServerHost(getDataCollectionServerHost());
     }

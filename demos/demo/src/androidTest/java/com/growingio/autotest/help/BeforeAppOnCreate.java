@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.snappy;
+package com.growingio.autotest.help;
 
-interface Memory {
-    boolean fastAccessSupported();
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    int lookupShort(short[] data, int index);
-
-    int loadByte(byte[] data, int index);
-
-    int loadInt(byte[] data, int index);
-
-    void copyLong(byte[] src, int srcIndex, byte[] dest, int destIndex);
-
-    long loadLong(byte[] data, int index);
-
-    void copyMemory(byte[] input, int inputIndex, byte[] output, int outputIndex, int length);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface BeforeAppOnCreate {
 }

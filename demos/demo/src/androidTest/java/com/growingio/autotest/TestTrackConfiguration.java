@@ -16,25 +16,16 @@
 
 package com.growingio.autotest;
 
-import android.app.Application;
-
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
-import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 
-import static com.growingio.autotest.help.MockNetwork.MOCK_SERVER_HOST;
+import static com.growingio.autotest.help.MockServer.MOCK_SERVER_HOST;
 
-public class MockApplication extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        GrowingAutotracker.startWithConfiguration(this,
-                new AutotrackConfiguration()
-                        .setUploadExceptionEnabled(false)
-                        .setProjectId("mockProjectId")
-                        .setUrlScheme("mockUrlScheme")
-                        .setDataCollectionServerHost(MOCK_SERVER_HOST)
-                        .setDebugEnabled(true)
-        );
+public class TestTrackConfiguration extends AutotrackConfiguration {
+    public TestTrackConfiguration() {
+        this.setUploadExceptionEnabled(false)
+                .setProjectId("testProjectId")
+                .setUrlScheme("testUrlScheme")
+                .setDataCollectionServerHost(MOCK_SERVER_HOST)
+                .setDebugEnabled(true);
     }
 }

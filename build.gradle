@@ -90,7 +90,7 @@ subprojects { project ->
     task checkstyle(type: Checkstyle, group: 'check') {
         configFile rootProject.file('checkstyle/checkstyle.xml')
         configProperties.checkstyleJavaHeader = rootProject.file('checkstyle/java.header')
-        source 'src/main/java'
+        source 'src/main/java', 'src/test/java', 'src/androidTest/java'
         ignoreFailures false
         showViolations true
         include '**/*.java'

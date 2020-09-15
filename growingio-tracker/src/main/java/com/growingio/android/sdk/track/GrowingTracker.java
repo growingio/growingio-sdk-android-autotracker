@@ -68,6 +68,7 @@ public class GrowingTracker implements IGrowingTracker {
     public static void startWithConfiguration(Application application, TrackConfiguration trackConfiguration, InitExtraOperation initExtraOperation) {
         if (sInstance != null) {
             Logger.e(TAG, "GrowingTracker is running");
+            return;
         }
         if (application == null) {
             throw new IllegalStateException("application is NULL");

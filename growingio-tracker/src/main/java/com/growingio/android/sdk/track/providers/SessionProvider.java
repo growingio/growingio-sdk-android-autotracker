@@ -31,16 +31,6 @@ import com.growingio.android.sdk.track.log.Logger;
 
 import java.util.UUID;
 
-/**
- * 1. LoginUserId设置从空到非空，visit不发送，sessionId不变
- * 2. LoginUserId设置从非空到空，visit不发送，sessionId不变
- * 3. LoginUserId设置从"A"到"B", visit发送，sessionId改变
- * 4. LoginUserId设置从"A"到空再到"B", visit发送，sessionId改变
- * 5. LoginUserId设置从"A"到"A"，visit不发送，sessionId不变
- * 6. location任意精度从null到非null，重新发visit事件，sessionId不变
- * <p>
- * 总结出一句话，一个sessionId不能有两个用户ID
- */
 public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListener, OnTrackMainInitSDKCallback {
     private static final String TAG = "SessionProvider";
 
@@ -92,9 +82,6 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     }
 
     private void generateVisit(String sessionId, long timestamp) {
-        if (mAlreadySendVisit) {
-            return;
-        }
         mAlreadySendVisit = true;
         TrackEventGenerator.generateVisitEvent(sessionId, timestamp, mLatitude, mLongitude);
     }
@@ -178,17 +165,17 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     @Override
     public void onUserIdChanged(@Nullable String newUserId) {
         Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
-
-        if (!TextUtils.isEmpty(newUserId)
-                && !TextUtils.isEmpty(mLatestNonNullUserId)
-                && !newUserId.equals(mLatestNonNullUserId)) {
-            String sessionId = refreshSessionId();
-            long eventTime = System.currentTimeMillis();
-            mLatestVisitTime = eventTime;
-            generateVisit(sessionId, eventTime);
-        }
-
         if (!TextUtils.isEmpty(newUserId)) {
+            if (TextUtils.isEmpty(mLatestNonNullUserId)) {
+                resendVisit();
+            } else {
+                if (!newUserId.equals(mLatestNonNullUserId)) {
+                    String sessionId = refreshSessionId();
+                    long eventTime = System.currentTimeMillis();
+                    mLatestVisitTime = eventTime;
+                    generateVisit(sessionId, eventTime);
+                }
+            }
             mLatestNonNullUserId = newUserId;
         }
     }

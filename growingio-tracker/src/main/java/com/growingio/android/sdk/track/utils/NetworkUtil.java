@@ -78,39 +78,6 @@ public class NetworkUtil {
         }
     }
 
-    /**
-     * @return true -- 是否有网络连接
-     */
-    public static boolean isConnected(Context context) {
-        NetworkInfo networkInfo = getActiveNetworkInfo(context);
-        return networkInfo != null && networkInfo.isConnected();
-    }
-
-    /**
-     * @return true -- 表示移动网络情况下
-     */
-    public static boolean isMobileData(Context context) {
-        NetworkInfo networkInfo = getActiveNetworkInfo(context);
-        return networkInfo != null && networkInfo.isConnected() && networkInfo.getType() != ConnectivityManager.TYPE_WIFI;
-    }
-
-    /**
-     * @return true -- 表示wifi连接的情况下
-     */
-    public static boolean isWifi(Context context) {
-        NetworkInfo networkInfo = getActiveNetworkInfo(context);
-        return networkInfo != null && networkInfo.isConnected() && networkInfo.getType() == ConnectivityManager.TYPE_WIFI;
-    }
-
-    /**
-     * 返回对应的网络名称:
-     * - WIFI, UNKNOWN, 2G, 3G, 4G
-     */
-    public static String getNetworkName(Context context) {
-        NetworkInfo networkInfo = getActiveNetworkInfo(context);
-        return getNetworkName(networkInfo);
-    }
-
     public static String getNetworkName(NetworkInfo networkInfo) {
         if (networkInfo != null && networkInfo.isConnected()) {
             if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
