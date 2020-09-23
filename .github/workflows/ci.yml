@@ -17,11 +17,11 @@ jobs:
         run: |
           chmod +x gradlew
           chmod +x checkstyle/checkstyle.sh
-          chmod +x publishAutotrackerPluginToMavenLocal.sh
+          chmod +x publishAllToMavenLocal.sh
 
       - name: Run Gradle command
         run: |
-          bash ./publishAutotrackerPluginToMavenLocal.sh
+          bash ./publishAllToMavenLocal.sh
           bash ./checkstyle/checkstyle.sh
           ./gradlew test
           ./gradlew assemble
