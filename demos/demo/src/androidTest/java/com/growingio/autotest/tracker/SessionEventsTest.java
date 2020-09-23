@@ -60,8 +60,7 @@ public class SessionEventsTest extends EventsTest {
 
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
-        DataHelper.deletePersistentSharedData();
-
+        DataHelper.deleteAllData();
         DemoApplication.setConfiguration(new TestTrackConfiguration()
                 .setSessionInterval(10)
         );

@@ -189,27 +189,33 @@ public class ViewHelper {
         if (viewTreeList == null) {
             viewTreeList = new ArrayList<>(8);
         }
-        ViewParent parent = view.getParent();
-        viewTreeList.add(view);
-        Page<?> page;
-        boolean hasPage = false;
-        while (parent instanceof ViewGroup) {
-            if (!hasPage) {
-                viewTreeList.add((View) parent);
-            }
-            if (ViewAttributeUtil.getCustomId((View) parent) != null) {
+        View parent = view;
+        boolean findPage = false;
+        do {
+            if (ViewAttributeUtil.getCustomId(parent) != null) {
+                viewTreeList.add(parent);
                 break;
-            }
-            page = ViewAttributeUtil.getViewPage((View) parent);
-            if (page != null && !page.isIgnored()) {
-                if (hasPage) {
-                    viewTreeList.add((View) parent);
+            } else {
+                Page<?> page = ViewAttributeUtil.getViewPage(parent);
+                if (page != null) {
+                    findPage = true;
+                    viewTreeList.add(parent);
+                    if (!page.isIgnored()) {
+                        break;
+                    }
+                } else {
+                    if (!findPage) {
+                        viewTreeList.add(parent);
+                    }
                 }
-                hasPage = true;
-            }
-            parent = parent.getParent();
-        }
 
+                if (parent.getParent() instanceof View) {
+                    parent = (View) parent.getParent();
+                } else {
+                    break;
+                }
+            }
+        } while (parent instanceof ViewGroup);
         View rootView = viewTreeList.get(viewTreeList.size() - 1);
         WindowHelper.init();
 
@@ -270,13 +276,13 @@ public class ViewHelper {
 
     private static boolean shouldChangeOn(View view) {
         if (view instanceof EditText) {
-            String tag = ViewAttributeUtil.getMonitoringFocusKey(view);
+            String tag = ViewAttributeUtil.getMonitoringFocusContent(view);
             String lastText = tag == null ? "" : tag;
             String nowText = ((EditText) view).getText().toString();
             if ((TextUtils.isEmpty(nowText) && TextUtils.isEmpty(lastText)) || lastText.equals(nowText)) {
                 return false;
             }
-            ViewAttributeUtil.setMonitoringFocusKey(view, nowText);
+            ViewAttributeUtil.setMonitoringFocusContent(view, nowText);
             return true;
         }
         return false;

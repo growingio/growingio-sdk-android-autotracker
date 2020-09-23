@@ -26,7 +26,9 @@ import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.BeforeAppOnCreate;
+import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.MockEventsApiServer;
+import com.growingio.autotest.help.TrackHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,10 +47,10 @@ import static org.awaitility.Awaitility.await;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class TrackEventsTest extends EventsTest {
-    private static final String TAG = "TrackEventsTest";
 
     @BeforeAppOnCreate
-    public static void setConfiguration() {
+    public static void beforeAppOnCreate() {
+        DataHelper.deleteEventsDatabase();
         DemoApplication.setConfiguration(new TestTrackConfiguration());
     }
 
@@ -173,5 +175,26 @@ public class TrackEventsTest extends EventsTest {
             }
         });
         await().atMost(5, SECONDS).until(receivedEvent::get);
+    }
+
+    @Test
+    public void invalidArgumentsTest() {
+        GrowingTracker.get().trackCustomEvent(null);
+        GrowingTracker.get().trackCustomEvent(null, null);
+        GrowingTracker.get().trackCustomEvent(null, new HashMap<>());
+        GrowingTracker.get().trackCustomEvent("");
+        GrowingTracker.get().trackCustomEvent("", null);
+        GrowingTracker.get().trackCustomEvent("", new HashMap<>());
+
+        GrowingTracker.get().setVisitorAttributes(null);
+        GrowingTracker.get().setVisitorAttributes(new HashMap<>());
+
+        GrowingTracker.get().setLoginUserAttributes(null);
+        GrowingTracker.get().setLoginUserAttributes(new HashMap<>());
+
+        GrowingTracker.get().setConversionVariables(null);
+        GrowingTracker.get().setConversionVariables(new HashMap<>());
+
+        TrackHelper.waitForIdleSync();
     }
 }

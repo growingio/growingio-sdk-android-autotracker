@@ -14,27 +14,17 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.page;
+package com.growingio.autotest.autotracker.impression;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.truth.Truth;
+import com.growingio.autotest.help.MockEventsApiServer;
 
-public abstract class PageGroup<T> extends Page<T> {
-    private List<Page<?>> mChildren = new ArrayList<>();
+import org.json.JSONArray;
+import org.json.JSONException;
 
-    PageGroup(T carrier) {
-        super(carrier);
-    }
-
-    public void addChildren(Page<?> page) {
-        mChildren.add(page);
-    }
-
-    public List<Page<?>> getAllChildren() {
-        return mChildren;
-    }
-
-    void removeChildren(Page<?> child) {
-        mChildren.remove(child);
+final class StopReceivedViewImpressionEventsListener extends MockEventsApiServer.OnReceivedEventListener {
+    @Override
+    protected void onReceivedCustomEvents(JSONArray jsonArray) throws JSONException {
+        Truth.assertWithMessage("Received View Impression Events").fail();
     }
 }

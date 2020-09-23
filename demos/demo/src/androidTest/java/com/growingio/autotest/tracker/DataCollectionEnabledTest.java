@@ -52,7 +52,6 @@ public class DataCollectionEnabledTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-
         DemoApplication.setConfiguration(new TestTrackConfiguration()
                 .setDataCollectionEnabled(false)
         );

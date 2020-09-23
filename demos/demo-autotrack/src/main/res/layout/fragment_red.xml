@@ -7,10 +7,11 @@
     tools:context=".fragments.RedFragment">
 
     <TextView
-        android:gravity="center"
+        android:id="@+id/fragment_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="@android:color/white"
-        android:text="RedFragment" />
+        android:gravity="center"
+        android:text="RedFragment"
+        android:textColor="@android:color/white" />
 
 </FrameLayout>

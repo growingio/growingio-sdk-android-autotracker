@@ -24,13 +24,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gio.test.three.autotrack.R;
+import com.gio.test.three.autotrack.fragments.base.BaseFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link GreenFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GreenFragment extends Fragment {
+public class GreenFragment extends BaseFragment {
     private static final String TAG = "GreenFragment";
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

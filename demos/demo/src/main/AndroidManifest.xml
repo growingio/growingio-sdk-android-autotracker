@@ -27,6 +27,9 @@
         android:label="demos"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+        <activity android:name="com.growingio.autotest.MainActivity"></activity>
+        <activity android:name=".MainActivity" />
+
         <service
             android:name=".three.OtherProcessService"
             android:enabled="true"

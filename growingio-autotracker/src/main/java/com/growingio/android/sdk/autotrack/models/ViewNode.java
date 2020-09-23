@@ -257,7 +257,7 @@ public class ViewNode {
                 mOriginalXPath = "/" + customId;
                 mXPath = mOriginalXPath;
                 return;
-            } else if (page != null && !page.isIgnored()) {
+            } else if (page != null) {
                 mOriginalXPath = mPrefixPage + "/" + page.getName();
                 mXPath = mOriginalXPath;
                 mPrefixPage = mOriginalXPath;

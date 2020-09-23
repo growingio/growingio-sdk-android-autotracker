@@ -37,6 +37,7 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class GrowingAutotracker implements IGrowingAutotracker {
@@ -148,6 +149,16 @@ public class GrowingAutotracker implements IGrowingAutotracker {
 
     @Override
     public void setUniqueTag(final View view, final String tag) {
+        if (view == null || TextUtils.isEmpty(tag)) {
+            Logger.e(TAG, "setUniqueTag: view or tag is NULL");
+            return;
+        }
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ViewAttributeUtil.setCustomId(view, tag);
+            }
+        });
     }
 
     @Override
@@ -192,22 +203,22 @@ public class GrowingAutotracker implements IGrowingAutotracker {
 
     @Override
     public void setPageAttributes(final Activity page, final Map<String, String> attributes) {
-        PageProvider.get().setPageAttributes(page, attributes);
+        PageProvider.get().setPageAttributes(page, new HashMap<>(attributes));
     }
 
     @Override
     public void setPageAttributes(android.app.Fragment page, Map<String, String> attributes) {
-        PageProvider.get().setPageAttributes(SuperFragment.make(page), attributes);
+        PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
     }
 
     @Override
     public void setPageAttributes(final android.support.v4.app.Fragment page, final Map<String, String> attributes) {
-        PageProvider.get().setPageAttributes(SuperFragment.make(page), attributes);
+        PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
     }
 
     @Override
     public void setPageAttributes(androidx.fragment.app.Fragment page, Map<String, String> attributes) {
-        PageProvider.get().setPageAttributes(SuperFragment.make(page), attributes);
+        PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
     }
 
     @Override
@@ -220,10 +231,16 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
             Logger.e(TAG, "view or impressionEventName is NULL");
         }
+        HashMap<String, String> attributesCopy;
+        if (attributes == null) {
+            attributesCopy = null;
+        } else {
+            attributesCopy = new HashMap<>(attributes);
+        }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ImpressionProvider.get().trackViewImpression(view, impressionEventName, attributes);
+                ImpressionProvider.get().trackViewImpression(view, impressionEventName, attributesCopy);
             }
         });
     }

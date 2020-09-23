@@ -71,18 +71,26 @@ public class ExpandableListViewActivity extends Activity {
         LayoutInflater lif = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View headerView1 = lif.inflate(R.layout.list_header, null);
+        TextView textView1 = headerView1.findViewById(R.id.tv_title);
+        textView1.setText("headerView1");
         headerView1.setOnClickListener(v -> Log.e(TAG, "headerView1 Click: "));
         expandableListView.addHeaderView(headerView1);
 
         View headerView2 = lif.inflate(R.layout.list_header, null);
+        TextView textView2 = headerView2.findViewById(R.id.tv_title);
+        textView2.setText("headerView2");
         headerView2.setOnClickListener(v -> Log.e(TAG, "headerView2 Click: "));
         expandableListView.addHeaderView(headerView2);
 
         View footerView1 = lif.inflate(R.layout.list_footer, null);
+        TextView textView3 = footerView1.findViewById(R.id.tv_title);
+        textView3.setText("footerView1");
         footerView1.setOnClickListener(v -> Log.e(TAG, "footerView1 Click: "));
         expandableListView.addFooterView(footerView1);
 
         View footerView2 = lif.inflate(R.layout.list_footer, null);
+        TextView textView4 = footerView2.findViewById(R.id.tv_title);
+        textView4.setText("footerView2");
         footerView2.setOnClickListener(v -> Log.e(TAG, "footerView2 Click: "));
         expandableListView.addFooterView(footerView2);
 
@@ -175,6 +183,7 @@ public class ExpandableListViewActivity extends Activity {
                 convertView = mInflater.inflate(R.layout.item_item, parent, false);
             }
             TextView tvChild = convertView.findViewById(R.id.tv_name);
+            TextView tvRemark = convertView.findViewById(R.id.tv_remark);
             tvChild.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -182,6 +191,7 @@ public class ExpandableListViewActivity extends Activity {
                 }
             });
             tvChild.setText(child);
+            tvRemark.setText(child + " Remark");
             return convertView;
         }
 

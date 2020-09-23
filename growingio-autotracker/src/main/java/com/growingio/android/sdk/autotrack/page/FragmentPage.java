@@ -20,7 +20,7 @@ import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
 
-public class FragmentPage extends PageGroup<SuperFragment<?>> {
+public class FragmentPage extends Page<SuperFragment<?>> {
     public FragmentPage(SuperFragment<?> carrier) {
         super(carrier);
     }
@@ -65,9 +65,6 @@ public class FragmentPage extends PageGroup<SuperFragment<?>> {
      * 如果是ViewPager + Fragment的形式，Fragment的Tag形式是 android:switcher:ViewPagerViewId:Index
      * 例如 android:switcher:2131230945:4
      * 可读性和唯一性比较差
-     *
-     * @param tag
-     * @return
      */
     private String transformSwitcherTag(String tag) {
         String[] e = tag.split(":");

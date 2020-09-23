@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <item name="growing_tracker_view_custom_id" type="id" />
+    <item name="growing_tracker_view_content" type="id" />
+    <item name="growing_tracker_track_text" type="id" />
+    <item name="growing_tracker_ignore_policy" type="id" />
+    <item name="growing_tracker_monitoring_view_tree_enabled" type="id" />
+    <item name="growing_tracker_monitoring_focus_content" type="id" />
+    <item name="growing_tracker_view_page" type="id" />
+</resources>

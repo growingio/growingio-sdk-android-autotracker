@@ -24,13 +24,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gio.test.three.autotrack.R;
+import com.gio.test.three.autotrack.fragments.base.BaseFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link OrangeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OrangeFragment extends Fragment {
+public class OrangeFragment extends BaseFragment {
     private static final String TAG = "OrangeFragment";
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -81,19 +82,14 @@ public class OrangeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_orange, container, false);
-        getChildFragmentManager().beginTransaction().replace(R.id.fragment_connect, new RedFragment(), "small").commit();
-        root.findViewById(R.id.txt_orange_fragment).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.e(TAG, "txt onClick: ");
-            }
-        });
+        getChildFragmentManager().beginTransaction().replace(R.id.fragment_connect, RedFragment.newInstance("small RedFragment", null), "small").commit();
         root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.e(TAG, "root onClick: ");
             }
         });
+        root.setTag(R.layout.fragment_orange, new Object());
         return root;
     }
 

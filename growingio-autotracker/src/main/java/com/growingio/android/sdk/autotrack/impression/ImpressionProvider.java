@@ -34,10 +34,10 @@ import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.autotrack.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.autotrack.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
-import com.growingio.android.sdk.track.log.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +122,6 @@ public class ImpressionProvider implements OnViewStateChangedListener {
     }
 
     private void sendViewImpressionEvent(ViewImpression impression) {
-        TrackMainThread.trackMain().postEventToTrackMain(new PageLevelCustomEvent.Builder());
         View trackedView = impression.getTrackedView();
         if (trackedView == null) {
             return;
@@ -149,6 +148,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         }
         mStarted = true;
         ViewTreeStatusProvider.get().register(this);
+        Logger.d(TAG, "ImpressionProvider started");
     }
 
     public void trackViewImpression(View view, String impressionEventName, Map<String, String> attributes) {

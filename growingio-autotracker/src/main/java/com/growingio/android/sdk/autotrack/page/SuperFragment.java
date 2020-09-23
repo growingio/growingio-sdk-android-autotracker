@@ -89,6 +89,8 @@ public abstract class SuperFragment<T> {
         return mRealFragment != null ? mRealFragment.hashCode() : 0;
     }
 
+    public abstract boolean isHidden();
+
     private static class SystemFragment extends SuperFragment<Fragment> {
 
         protected SystemFragment(Fragment realFragment) {
@@ -133,6 +135,11 @@ public abstract class SuperFragment<T> {
         @Override
         public boolean isResumed() {
             return getRealFragment().isResumed();
+        }
+
+        @Override
+        public boolean isHidden() {
+            return getRealFragment().isHidden();
         }
     }
 
@@ -180,6 +187,11 @@ public abstract class SuperFragment<T> {
         public boolean isResumed() {
             return getRealFragment().isResumed();
         }
+
+        @Override
+        public boolean isHidden() {
+            return getRealFragment().isHidden();
+        }
     }
 
     private static class AndroidXFragment extends SuperFragment<androidx.fragment.app.Fragment> {
@@ -226,6 +238,11 @@ public abstract class SuperFragment<T> {
         @Override
         public boolean isResumed() {
             return getRealFragment().isResumed();
+        }
+
+        @Override
+        public boolean isHidden() {
+            return getRealFragment().isHidden();
         }
     }
 }

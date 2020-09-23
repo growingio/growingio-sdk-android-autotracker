@@ -157,6 +157,7 @@ public class ExpandableListSubActivity extends ExpandableListActivity {
                 convertView = mInflater.inflate(R.layout.item_item, parent, false);
             }
             TextView tvChild = convertView.findViewById(R.id.tv_name);
+            TextView tvRemark = convertView.findViewById(R.id.tv_remark);
             tvChild.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -164,6 +165,7 @@ public class ExpandableListSubActivity extends ExpandableListActivity {
                 }
             });
             tvChild.setText(child);
+            tvRemark.setText(child + " Remark");
             return convertView;
         }
 

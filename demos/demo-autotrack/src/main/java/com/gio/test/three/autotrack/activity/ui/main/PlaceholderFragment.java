@@ -22,7 +22,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,11 +29,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gio.test.three.autotrack.R;
+import com.gio.test.three.autotrack.fragments.base.BaseFragment;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlaceholderFragment extends Fragment {
+public class PlaceholderFragment extends BaseFragment {
     private static final String TAG = "PlaceholderFragment";
 
     private static final String ARG_SECTION_NUMBER = "section_number";

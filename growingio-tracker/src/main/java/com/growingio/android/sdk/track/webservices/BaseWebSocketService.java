@@ -75,7 +75,7 @@ public abstract class BaseWebSocketService {
 
     }
 
-    public void sendMessage(String msg) {
+    protected void sendMessage(String msg) {
         if (mWebSocket != null) {
             mWebSocket.send(msg);
         }

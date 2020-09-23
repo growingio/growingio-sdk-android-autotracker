@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.autotrack.events;
 
+import android.text.TextUtils;
+
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 
 import org.json.JSONException;
@@ -65,7 +67,9 @@ public class ViewElementEvent extends BaseEvent {
         try {
             json.put("pageName", mPageName);
             json.put("pageShowTimestamp", mPageShowTimestamp);
-            json.put("textValue", mTextValue);
+            if (!TextUtils.isEmpty(mTextValue)) {
+                json.put("textValue", mTextValue);
+            }
             json.put("xpath", mXpath);
             json.put("index", mIndex);
         } catch (JSONException ignored) {
@@ -78,7 +82,7 @@ public class ViewElementEvent extends BaseEvent {
         private long mPageShowTimestamp;
         private String mTextValue;
         private String mXpath;
-        private int mIndex;
+        private int mIndex = -1;
 
         public Builder() {
             super();

@@ -28,7 +28,7 @@ import com.gio.test.three.autotrack.fragments.RedFragment;
 import java.util.Stack;
 
 public class HideFragmentActivity extends FragmentActivity {
-    private Stack<Fragment> mAllFragments = new Stack<>();
+    private final Stack<Fragment> mAllFragments = new Stack<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +44,9 @@ public class HideFragmentActivity extends FragmentActivity {
         findViewById(R.id.remove).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mAllFragments.isEmpty()) {
+                    return;
+                }
                 getSupportFragmentManager().beginTransaction().remove(mAllFragments.pop()).commit();
             }
         });
@@ -51,6 +54,9 @@ public class HideFragmentActivity extends FragmentActivity {
         findViewById(R.id.hide).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mAllFragments.empty()) {
+                    return;
+                }
                 getSupportFragmentManager().beginTransaction().hide(mAllFragments.peek()).commit();
             }
         });
@@ -58,6 +64,9 @@ public class HideFragmentActivity extends FragmentActivity {
         findViewById(R.id.show).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mAllFragments.empty()) {
+                    return;
+                }
                 getSupportFragmentManager().beginTransaction().show(mAllFragments.peek()).commit();
             }
         });

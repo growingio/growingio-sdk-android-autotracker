@@ -32,10 +32,6 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
 
     private static final String SERVICE_TYPE = "CircleService";
 
-    private static final String LOGGER_OPEN = "logger_open";
-
-    private static final String LOGGER_HOST = "wss://gta1.growingio.com/app/";
-
     private long mSnapshotKey = 0;
     private Disposable mCircleScreenshotDisposable;
 

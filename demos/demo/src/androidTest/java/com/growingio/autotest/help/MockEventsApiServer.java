@@ -96,9 +96,19 @@ public class MockEventsApiServer extends MockServer {
                         mOnReceivedEventListener.onReceivedViewClickEvents(jsonArray);
                     }
                     break;
+                case AutotrackEventType.VIEW_CHANGE:
+                    if (mOnReceivedEventListener != null) {
+                        mOnReceivedEventListener.onReceivedViewChangeEvents(jsonArray);
+                    }
+                    break;
                 case AutotrackEventType.PAGE:
                     if (mOnReceivedEventListener != null) {
                         mOnReceivedEventListener.onReceivedPageEvents(jsonArray);
+                    }
+                    break;
+                case AutotrackEventType.PAGE_ATTRIBUTES:
+                    if (mOnReceivedEventListener != null) {
+                        mOnReceivedEventListener.onReceivedPageAttributesEvents(jsonArray);
                     }
                     break;
                 default:
@@ -142,7 +152,15 @@ public class MockEventsApiServer extends MockServer {
 
         }
 
+        protected void onReceivedViewChangeEvents(JSONArray jsonArray) throws JSONException {
+
+        }
+
         protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
+
+        }
+
+        protected void onReceivedPageAttributesEvents(JSONArray jsonArray) throws JSONException {
 
         }
     }

@@ -35,6 +35,7 @@ import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class GrowingTracker implements IGrowingTracker {
@@ -156,22 +157,42 @@ public class GrowingTracker implements IGrowingTracker {
 
     @Override
     public void trackCustomEvent(String eventName, Map<String, String> attributes) {
+        if (TextUtils.isEmpty(eventName)) {
+            Logger.e(TAG, "trackCustomEvent: eventName is NULL");
+            return;
+        }
+
+        if (attributes != null) {
+            attributes = new HashMap<>(attributes);
+        }
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
     @Override
     public void setConversionVariables(Map<String, String> variables) {
-        TrackEventGenerator.generateConversionVariablesEvent(variables);
+        if (variables == null || variables.isEmpty()) {
+            Logger.e(TAG, "setConversionVariables: variables is NULL");
+            return;
+        }
+        TrackEventGenerator.generateConversionVariablesEvent(new HashMap<>(variables));
     }
 
     @Override
     public void setLoginUserAttributes(Map<String, String> attributes) {
-        TrackEventGenerator.generateLoginUserAttributesEvent(attributes);
+        if (attributes == null || attributes.isEmpty()) {
+            Logger.e(TAG, "setLoginUserAttributes: attributes is NULL");
+            return;
+        }
+        TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
     }
 
     @Override
     public void setVisitorAttributes(Map<String, String> attributes) {
-        TrackEventGenerator.generateVisitorAttributesEvent(attributes);
+        if (attributes == null || attributes.isEmpty()) {
+            Logger.e(TAG, "setVisitorAttributes: attributes is NULL");
+            return;
+        }
+        TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>(attributes));
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.growingio.sdk.plugin.autotrack.compile.visitor;
 
 import com.google.common.truth.Truth;
+import com.growingio.sdk.plugin.autotrack.ByteCodeClassLoader;
 import com.growingio.sdk.plugin.autotrack.ClassUtils;
 import com.growingio.sdk.plugin.autotrack.compile.Context;
 import com.growingio.sdk.plugin.autotrack.compile.SystemLog;
