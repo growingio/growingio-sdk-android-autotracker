@@ -22,6 +22,11 @@ public class DataHelper {
     private DataHelper() {
     }
 
+    public static void deleteAllData() {
+        deleteEventsDatabase();
+        deletePersistentSharedData();
+    }
+
     public static void deleteEventsDatabase() {
         ApplicationProvider.getApplicationContext().deleteDatabase("growing3.db");
     }

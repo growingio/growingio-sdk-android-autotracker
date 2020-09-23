@@ -19,40 +19,20 @@ package com.growingio.android.sdk.autotrack.view;
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
+import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.page.Page;
 
 public class ViewAttributeUtil {
-
-    private static final int GROWING_TAG_KEY = 0x5042b06; //16进制的北京易数科技有限公司电话号码
-    private static final int GROWING_WEB_CLIENT_KEY = GROWING_TAG_KEY + 1;
-    private static final int GROWING_WEB_BRIDGE_KEY = GROWING_WEB_CLIENT_KEY + 1;
-    private static final int GROWING_VIEW_NAME_KEY = GROWING_WEB_BRIDGE_KEY + 1;
-    private static final int GROWING_VIEW_ID_KEY = GROWING_VIEW_NAME_KEY + 1;
-    private static final int GROWING_INHERIT_INFO_KEY = GROWING_VIEW_ID_KEY + 1; // 原e中obj的tag, 目前废弃
-    private static final int GROWING_CONTENT_KEY = GROWING_INHERIT_INFO_KEY + 1;
-    private static final int GROWING_MONITORING_VIEWTREE_KEY = GROWING_CONTENT_KEY + 1;
-    private static final int GROWING_MONITORING_FOCUS_KEY = GROWING_MONITORING_VIEWTREE_KEY + 1;
-    private static final int GROWING_BANNER_KEY = GROWING_MONITORING_FOCUS_KEY + 1;
-    private static final int GROWING_IGNORE_VIEW_KEY = GROWING_BANNER_KEY + 1;
-    private static final int GROWING_HEAT_MAP_KEY = GROWING_IGNORE_VIEW_KEY + 1;
-    private static final int GROWING_HOOK_LISTENTER = GROWING_HEAT_MAP_KEY + 1;
-    private static final int GROWING_TRACK_TEXT = GROWING_HOOK_LISTENTER + 1;      // 记录改EditText的文本值信息
-    private static final int GROWING_RN_PAGE_KEY = GROWING_TRACK_TEXT + 1;
-    private static final int GROWING_IGNORE_VIEW_IMP_KEY = GROWING_RN_PAGE_KEY + 1;
-    private static final int GROWING_WEB_VIEW_URL = GROWING_IGNORE_VIEW_IMP_KEY + 1;
-    private static final int GROWING_IMP_TAG_MARKED = GROWING_WEB_VIEW_URL + 1;
-    private static final int GROWING_VIEW_CUSTOM_ID = GROWING_IMP_TAG_MARKED + 1;
-    private static final int GROWING_VIEW_PAGE_KEY = GROWING_VIEW_CUSTOM_ID + 1;
 
     private ViewAttributeUtil() {
     }
 
     public static void setCustomId(View view, String cid) {
-        view.setTag(GROWING_VIEW_CUSTOM_ID, cid);
+        view.setTag(R.id.growing_tracker_view_custom_id, cid);
     }
 
     public static String getCustomId(View view) {
-        Object customId = view.getTag(GROWING_VIEW_CUSTOM_ID);
+        Object customId = view.getTag(R.id.growing_tracker_view_custom_id);
         if (customId instanceof String) {
             return (String) customId;
         }
@@ -64,11 +44,11 @@ public class ViewAttributeUtil {
      * 是否采集EditText中text
      */
     public static void setTrackText(View view, Boolean trackText) {
-        view.setTag(GROWING_TRACK_TEXT, trackText);
+        view.setTag(R.id.growing_tracker_track_text, trackText);
     }
 
     public static Boolean getTrackText(View view) {
-        Object trackText = view.getTag(GROWING_TRACK_TEXT);
+        Object trackText = view.getTag(R.id.growing_tracker_track_text);
         if (trackText instanceof Boolean) {
             return (Boolean) trackText;
         }
@@ -76,25 +56,12 @@ public class ViewAttributeUtil {
         return null;
     }
 
-    public static void setWebViewUrl(View view, String url) {
-        view.setTag(GROWING_WEB_VIEW_URL, url);
-    }
-
-    public static String getWebViewUrl(View view) {
-        Object url = view.getTag(GROWING_WEB_VIEW_URL);
-        if (url instanceof String) {
-            return (String) url;
-        }
-
-        return null;
-    }
-
     public static void setContent(View view, String content) {
-        view.setTag(GROWING_CONTENT_KEY, content);
+        view.setTag(R.id.growing_tracker_view_content, content);
     }
 
     public static String getContent(View view) {
-        Object content = view.getTag(GROWING_CONTENT_KEY);
+        Object content = view.getTag(R.id.growing_tracker_view_content);
         if (content instanceof String) {
             return (String) content;
         }
@@ -103,11 +70,11 @@ public class ViewAttributeUtil {
     }
 
     public static void setIgnorePolicy(View view, IgnorePolicy policy) {
-        view.setTag(GROWING_IGNORE_VIEW_KEY, policy);
+        view.setTag(R.id.growing_tracker_ignore_policy, policy);
     }
 
     public static IgnorePolicy getIgnorePolicy(View view) {
-        Object ignorePolicy = view.getTag(GROWING_IGNORE_VIEW_KEY);
+        Object ignorePolicy = view.getTag(R.id.growing_tracker_ignore_policy);
         if (ignorePolicy instanceof IgnorePolicy) {
             return (IgnorePolicy) ignorePolicy;
         }
@@ -117,23 +84,23 @@ public class ViewAttributeUtil {
 
     public static void setMonitoringViewTreeEnabled(View view, boolean monitoring) {
         if (monitoring) {
-            view.setTag(GROWING_MONITORING_VIEWTREE_KEY, new Object());
+            view.setTag(R.id.growing_tracker_monitoring_view_tree_enabled, new Object());
         } else {
-            view.setTag(GROWING_MONITORING_VIEWTREE_KEY, null);
+            view.setTag(R.id.growing_tracker_monitoring_view_tree_enabled, null);
         }
     }
 
     public static boolean isMonitoringViewTree(View view) {
-        Object monitoring = view.getTag(GROWING_MONITORING_VIEWTREE_KEY);
+        Object monitoring = view.getTag(R.id.growing_tracker_monitoring_view_tree_enabled);
         return monitoring != null;
     }
 
-    public static void setMonitoringFocusKey(View view, String text) {
-        view.setTag(GROWING_MONITORING_FOCUS_KEY, text);
+    public static void setMonitoringFocusContent(View view, String text) {
+        view.setTag(R.id.growing_tracker_monitoring_focus_content, text);
     }
 
-    public static String getMonitoringFocusKey(View view) {
-        Object text = view.getTag(GROWING_MONITORING_FOCUS_KEY);
+    public static String getMonitoringFocusContent(View view) {
+        Object text = view.getTag(R.id.growing_tracker_monitoring_focus_content);
         if (text instanceof String) {
             return (String) text;
         }
@@ -142,11 +109,11 @@ public class ViewAttributeUtil {
     }
 
     public static void setViewPage(View view, Page<?> page) {
-        view.setTag(GROWING_VIEW_PAGE_KEY, page);
+        view.setTag(R.id.growing_tracker_view_page, page);
     }
 
     public static Page<?> getViewPage(View view) {
-        Object page = view.getTag(GROWING_VIEW_PAGE_KEY);
+        Object page = view.getTag(R.id.growing_tracker_view_page);
         if (page instanceof Page) {
             return (Page<?>) page;
         }

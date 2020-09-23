@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.growingio.autotest;
+package com.gio.test.three.autotrack.fragments;
 
-import com.growingio.autotest.tracker.SessionEventsTest;
-import com.growingio.autotest.tracker.TrackEventsTest;
+import android.support.v4.app.Fragment;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+public interface FragmentLifecycleCallback {
+    void onFragmentLifecycleChanged(Fragment fragment, Stage stage);
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({SessionEventsTest.class, TrackEventsTest.class})
-public class UnitTestSuite {
+    enum Stage {
+        CREATED,
+        VIEW_CREATED,
+        STARTED,
+        RESUMED,
+        PAUSED,
+        STOPPED,
+        DESTROYED_VIEW,
+        DESTROYED
+    }
 }

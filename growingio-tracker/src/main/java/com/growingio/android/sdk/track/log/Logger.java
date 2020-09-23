@@ -204,27 +204,39 @@ public class Logger {
         }
     }
 
+    private static String getLine(boolean isTop) {
+        if (isTop) {
+            return "╔═══════════════════════════════════════════════════════════════════════════════════════";
+        } else {
+            return "╚═══════════════════════════════════════════════════════════════════════════════════════";
+        }
+    }
+
     public static void printJson(String tag, String headString, String jsonStr) {
         String message;
         try {
             if (jsonStr.startsWith("{")) {
                 JSONObject jsonObject = new JSONObject(jsonStr);
                 message = jsonObject.toString(2);
+                message = message.replace("\\/", "/");
             } else if (jsonStr.startsWith("[")) {
                 JSONArray jsonArray = new JSONArray(jsonStr);
                 message = jsonArray.toString(2);
+                message = message.replace("\\/", "/");
             } else {
                 message = jsonStr;
             }
         } catch (JSONException e) {
             message = jsonStr;
         }
-        printLine(tag, true);
-        message = headString + LINE_SEPARATOR + message;
+        StringBuilder beautifulMsg = new StringBuilder(getLine(true)).append(LINE_SEPARATOR);
         String[] lines = message.split(LINE_SEPARATOR);
         for (String line : lines) {
-            d(tag, "║ " + line);
+            beautifulMsg.append("║ ").append(line).append(LINE_SEPARATOR);
         }
-        printLine(tag, false);
+        beautifulMsg.append(getLine(false));
+
+        message = headString + LINE_SEPARATOR + beautifulMsg.toString();
+        d(tag, message);
     }
 }

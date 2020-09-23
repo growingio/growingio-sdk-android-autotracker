@@ -21,6 +21,9 @@ import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import static com.growingio.autotest.help.MockServer.MOCK_SERVER_HOST;
 
 public class TestTrackConfiguration extends AutotrackConfiguration {
+    public static final String TEST_PROJECT_ID = "testProjectId";
+    public static final String TEST_URL_SCHEME = "testUrlScheme";
+
     public TestTrackConfiguration() {
         this.setUploadExceptionEnabled(false)
                 .setProjectId("testProjectId")

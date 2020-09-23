@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package com.growingio.sdk.plugin.autotrack.compile.visitor;
+package com.growingio.sdk.plugin.autotrack;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class ByteCodeClassLoader extends ClassLoader {
+public class ByteCodeClassLoader extends ClassLoader {
     private static final String TAG = "ByteCodeClassLoader";
     private final ClassLoader mRealClassloader;
 
-    ByteCodeClassLoader(ClassLoader classLoader) {
+    public ByteCodeClassLoader(ClassLoader classLoader) {
         super(getSystemClassLoader().getParent());
         mRealClassloader = classLoader;
     }
 
     @Override
     protected Class<?> findClass(String s) throws ClassNotFoundException {
-        System.out.println("xxxxx ClassNotFoundException findClass " + s);
-
         try {
             return super.findClass(s);
         } catch (ClassNotFoundException e) {

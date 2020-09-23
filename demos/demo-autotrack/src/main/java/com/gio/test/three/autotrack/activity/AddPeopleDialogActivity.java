@@ -16,14 +16,14 @@
 
 package com.gio.test.three.autotrack.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.gio.test.three.autotrack.R;
 
-public class AddPeopleDialogActivity extends AppCompatActivity {
-    private static final String TAG  = "AddPeopleDialogActivity";
+public class AddPeopleDialogActivity extends Activity {
+    private static final String TAG = "AddPeopleDialogActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

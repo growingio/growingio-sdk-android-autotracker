@@ -108,7 +108,11 @@ public final class JsonUtil {
         while (keys.hasNext()) {
             String key = keys.next();
             try {
-                map.put(key, String.valueOf(jsonObject.get(key)));
+                if (jsonObject.get(key) == JSONObject.NULL) {
+                    map.put(key, null);
+                } else {
+                    map.put(key, String.valueOf(jsonObject.get(key)));
+                }
             } catch (JSONException e) {
                 // ignore
             }

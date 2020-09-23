@@ -25,6 +25,11 @@ public class AutotrackConfiguration extends TrackConfiguration {
     private float mImpressionScale = 0;
 
     public AutotrackConfiguration setImpressionScale(float scale) {
+        if (scale < 0) {
+            scale = 0;
+        } else if (scale > 1) {
+            scale = 1;
+        }
         this.mImpressionScale = scale;
         return this;
     }

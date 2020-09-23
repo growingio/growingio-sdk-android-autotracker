@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
@@ -85,20 +84,8 @@ public class PageProvider implements IActivityLifecycle {
         }
     }
 
-    public void addIgnoreActivityClass(Class<? extends Activity> activityClazz, IgnorePolicy policy) {
-        IGNORE_PAGE_CLASSES.put(activityClazz, policy);
-    }
-
-    public void addIgnoreSystemFragmentClass(Class<? extends android.app.Fragment> fragmentClazz, IgnorePolicy policy) {
-        IGNORE_PAGE_CLASSES.put(fragmentClazz, policy);
-    }
-
-    public void addIgnoreV4FragmentClass(Class<? extends android.support.v4.app.Fragment> fragmentClazz, IgnorePolicy policy) {
-        IGNORE_PAGE_CLASSES.put(fragmentClazz, policy);
-    }
-
-    public void addIgnoreXFragmentClass(Class<? extends androidx.fragment.app.Fragment> fragmentClazz, IgnorePolicy policy) {
-        IGNORE_PAGE_CLASSES.put(fragmentClazz, policy);
+    public void addIgnorePageClass(Class<?> pageClazz, IgnorePolicy policy) {
+        IGNORE_PAGE_CLASSES.put(pageClazz, policy);
     }
 
     @UiThread
@@ -115,14 +102,31 @@ public class PageProvider implements IActivityLifecycle {
         } else {
             page.refreshShowTimestamp();
         }
-        page.setIgnored(isIgnoreActivity(activity));
+        sendPage(activity, page);
+    }
 
+    private void refreshPages(Context context, Page<?> page) {
+        page.refreshShowTimestamp();
+        sendPage(context, page);
+        if (!page.getAllChildren().isEmpty()) {
+            for (Page<?> child : page.getAllChildren()) {
+                refreshPages(context, child);
+            }
+        }
+    }
+
+    private void sendPage(Context context, Page<?> page) {
+        if (page.getCarrier() instanceof Activity) {
+            page.setIgnored(isIgnoreActivity((Activity) page.getCarrier()));
+        } else if (page.getCarrier() instanceof SuperFragment) {
+            page.setIgnored(isIgnoreFragment((SuperFragment<?>) page.getCarrier()));
+        }
         if (!page.isIgnored()) {
-            Logger.d(TAG, "createOrResumePage: path = " + page.path());
-            generatePageEvent(activity, page);
+            Logger.d(TAG, "sendPage: path = " + page.path());
+            generatePageEvent(context, page);
             reissuePageAttributes(page);
         } else {
-            Log.e(TAG, "createOrResumePage: path = " + page.path() + " is ignored");
+            Logger.e(TAG, "sendPage: path = " + page.path() + " is ignored");
         }
     }
 
@@ -193,9 +197,36 @@ public class PageProvider implements IActivityLifecycle {
 
     @UiThread
     private void removePage(Activity activity) {
-        Log.e(TAG, "removePage: activity is " + activity);
+        Logger.d(TAG, "removePage: activity is " + activity);
         ALL_PAGE_TREE.remove(activity);
         PAGE_ATTRIBUTES_CACHE.remove(activity);
+    }
+
+    private boolean isHidden(SuperFragment<?> fragment) {
+        if (fragment.isHidden()) {
+            return true;
+        }
+        SuperFragment<?> parentFragment = fragment.getParentFragment();
+        while (parentFragment != null) {
+            if (parentFragment.isHidden()) {
+                return true;
+            }
+            parentFragment = parentFragment.getParentFragment();
+        }
+
+        return false;
+    }
+
+    @UiThread
+    public void fragmentOnHiddenChanged(SuperFragment<?> fragment, boolean hidden) {
+        if (!hidden) {
+            Page<?> page = findPage(fragment);
+            if (page == null) {
+                Logger.e(TAG, "fragmentOnHiddenChanged: fragment is NULL");
+            } else {
+                refreshPages(fragment.getActivity(), page);
+            }
+        }
     }
 
     @UiThread
@@ -207,6 +238,11 @@ public class PageProvider implements IActivityLifecycle {
 
         if (fragment.getView() == null) {
             Logger.e(TAG, "createOrResumePage: this fragment getView is NULL");
+            return;
+        }
+
+        if (isHidden(fragment)) {
+            Logger.e(TAG, "createOrResumePage: this fragment is hidden");
             return;
         }
 
@@ -225,26 +261,18 @@ public class PageProvider implements IActivityLifecycle {
             return;
         }
 
-        PageGroup<?> page = findPage(fragment);
+        Page<?> page = findPage(fragment);
         if (page == null) {
             page = new FragmentPage(fragment);
-            PageGroup<?> pageGroup = findPageParent(fragment);
-            page.assignParent(pageGroup);
-            pageGroup.addChildren(page);
+            Page<?> pageParent = findPageParent(fragment);
+            page.assignParent(pageParent);
+            pageParent.addChildren(page);
             addPageAlias(page);
             ViewAttributeUtil.setViewPage(fragment.getView(), page);
         } else {
             page.refreshShowTimestamp();
         }
-
-        page.setIgnored(isIgnoreFragment(fragment));
-        if (!page.isIgnored()) {
-            Log.e(TAG, "createOrResumePage: path = " + page.path());
-            generatePageEvent(fragment.getActivity(), page);
-            reissuePageAttributes(page);
-        } else {
-            Log.e(TAG, "createOrResumePage: path = " + page.path() + " is ignored");
-        }
+        sendPage(fragment.getActivity(), page);
     }
 
     @UiThread
@@ -259,33 +287,31 @@ public class PageProvider implements IActivityLifecycle {
             return;
         }
 
-        Log.e(TAG, "removePage: fragment is " + fragment.getRealFragment());
+        Logger.e(TAG, "removePage: fragment is " + fragment.getRealFragment());
         PAGE_ATTRIBUTES_CACHE.remove(fragment);
 
-        PageGroup<?> pageGroup = ALL_PAGE_TREE.get(fragment.getActivity());
-        if (pageGroup == null) {
+        Page<?> page = ALL_PAGE_TREE.get(fragment.getActivity());
+        if (page == null) {
             return;
         }
-        removePage(fragment, pageGroup);
+        removePage(fragment, page);
     }
 
-    private void removePage(SuperFragment<?> carrier, PageGroup<?> pageGroup) {
-        List<Page<?>> pages = pageGroup.getAllChildren();
+    private void removePage(SuperFragment<?> carrier, Page<?> page) {
+        List<Page<?>> pages = page.getAllChildren();
         for (int i = pages.size() - 1; i >= 0; i--) {
-            Page<?> page = pages.get(i);
-            if (page.getCarrier().equals(carrier)) {
+            Page<?> onePage = pages.get(i);
+            if (carrier.equals(onePage.getCarrier())) {
                 pages.remove(i);
                 return;
             } else {
-                if (page instanceof PageGroup) {
-                    removePage(carrier, (PageGroup<?>) page);
-                }
+                removePage(carrier, onePage);
             }
         }
     }
 
-    private PageGroup<?> findPageParent(SuperFragment<?> fragment) {
-        PageGroup<?> pageParent;
+    private Page<?> findPageParent(SuperFragment<?> fragment) {
+        Page<?> pageParent;
         SuperFragment<?> parentFragment = fragment.getParentFragment();
         ActivityPage activityPage = ALL_PAGE_TREE.get(fragment.getActivity());
         if (parentFragment == null) {
@@ -300,24 +326,24 @@ public class PageProvider implements IActivityLifecycle {
         return pageParent;
     }
 
-    private PageGroup<?> findPage(SuperFragment<?> carrier) {
+    private Page<?> findPage(SuperFragment<?> carrier) {
         Activity activity = carrier.getActivity();
-        PageGroup<?> pageGroup = ALL_PAGE_TREE.get(activity);
-        if (pageGroup == null) {
+        Page<?> page = ALL_PAGE_TREE.get(activity);
+        if (page == null) {
             return null;
         }
-        return findPage(carrier, pageGroup);
+        return findPage(carrier, page);
     }
 
-    private PageGroup<?> findPage(SuperFragment<?> carrier, PageGroup<?> pageGroup) {
-        if (pageGroup.getCarrier().equals(carrier)) {
-            return pageGroup;
+    private Page<?> findPage(SuperFragment<?> carrier, Page<?> page) {
+        if (carrier.equals(page.getCarrier())) {
+            return page;
         }
 
-        List<Page<?>> pages = pageGroup.getAllChildren();
-        for (Page<?> page : pages) {
-            if (page instanceof PageGroup) {
-                PageGroup<?> p = findPage(carrier, (PageGroup<?>) page);
+        List<Page<?>> pages = page.getAllChildren();
+        for (Page<?> onePage : pages) {
+            if (onePage != null) {
+                Page<?> p = findPage(carrier, onePage);
                 if (p != null) {
                     return p;
                 }
@@ -327,24 +353,23 @@ public class PageProvider implements IActivityLifecycle {
         return null;
     }
 
-    private void reissuePageAttributes(PageGroup<?> pageGroup) {
-        Map<String, String> attributes = PAGE_ATTRIBUTES_CACHE.get(pageGroup.getCarrier());
+    private void reissuePageAttributes(Page<?> page) {
+        Map<String, String> attributes = PAGE_ATTRIBUTES_CACHE.remove(page.getCarrier());
         if (attributes != null) {
-            PAGE_ATTRIBUTES_CACHE.remove(pageGroup.getCarrier());
-            setPageAttributes(pageGroup, attributes);
+            setPageAttributes(page, attributes, false);
             return;
         }
 
-        attributes = pageGroup.getAttributes();
+        attributes = page.getAttributes();
         if (attributes != null) {
-            setPageAttributes(pageGroup, attributes);
+            setPageAttributes(page, attributes, false);
             return;
         }
 
-        if (pageGroup.getParent() != null) {
-            attributes = pageGroup.getParent().getAttributes();
+        if (page.getParent() != null) {
+            attributes = page.getParent().getAttributes();
             if (attributes != null) {
-                setPageAttributes(pageGroup, attributes);
+                setPageAttributes(page, attributes, false);
             }
         }
     }
@@ -352,38 +377,40 @@ public class PageProvider implements IActivityLifecycle {
     public void setPageAttributes(Activity activity, Map<String, String> attributes) {
         ActivityPage page = ALL_PAGE_TREE.get(activity);
         if (page != null) {
-            setPageAttributes(page, attributes);
+            setPageAttributes(page, attributes, true);
         } else {
-            Log.e(TAG, "setPageAttributes: can't find Activity " + activity);
+            Logger.e(TAG, "setPageAttributes: can't find Activity " + activity);
             PAGE_ATTRIBUTES_CACHE.put(activity, attributes);
         }
     }
 
     public void setPageAttributes(SuperFragment<?> fragment, Map<String, String> attributes) {
-        PageGroup<?> page = findPage(fragment);
+        Page<?> page = findPage(fragment);
         if (page != null) {
-            setPageAttributes(page, attributes);
+            setPageAttributes(page, attributes, true);
         } else {
-            Log.e(TAG, "setPageAttributes: can't find Fragment " + fragment.getRealFragment());
+            Logger.e(TAG, "setPageAttributes: can't find Fragment " + fragment.getRealFragment());
             PAGE_ATTRIBUTES_CACHE.put(fragment, attributes);
         }
     }
 
-    private void setPageAttributes(Page<?> page, Map<String, String> attributes) {
+    private void setPageAttributes(Page<?> page, Map<String, String> attributes, boolean checkEquals) {
+        if (checkEquals && attributes.equals(page.getAttributes())) {
+            Logger.e(TAG, "setPageAttributes is equals page.getAttributes");
+            return;
+        }
+
         page.setAttributes(attributes);
 
         if (!page.isIgnored()) {
-            Log.e(TAG, "setPageAttributes: page = " + page.path() + ", attributes = " + attributes.toString());
+            Logger.d(TAG, "setPageAttributes: page = " + page.path() + ", attributes = " + attributes.toString());
             generatePageAttributesEvent(page);
         }
 
-        if (page instanceof PageGroup) {
-            PageGroup<?> pageGroup = (PageGroup<?>) page;
-            if (!pageGroup.getAllChildren().isEmpty()) {
-                for (Page<?> child : pageGroup.getAllChildren()) {
-                    if (child.getShowTimestamp() >= pageGroup.getShowTimestamp()) {
-                        setPageAttributes(child, attributes);
-                    }
+        if (!page.getAllChildren().isEmpty()) {
+            for (Page<?> child : page.getAllChildren()) {
+                if (child.getShowTimestamp() >= page.getShowTimestamp()) {
+                    setPageAttributes(child, attributes, checkEquals);
                 }
             }
         }

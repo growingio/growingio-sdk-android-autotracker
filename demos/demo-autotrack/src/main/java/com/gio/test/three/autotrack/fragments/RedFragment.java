@@ -18,19 +18,22 @@ package com.gio.test.three.autotrack.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.gio.test.three.autotrack.R;
+import com.gio.test.three.autotrack.fragments.base.BaseFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RedFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RedFragment extends Fragment {
+public class RedFragment extends BaseFragment {
     private static final String TAG = "RedFragment";
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -76,7 +79,13 @@ public class RedFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView: ");
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_red, container, false);
+        View inflate = inflater.inflate(R.layout.fragment_red, container, false);
+        TextView title = inflate.findViewById(R.id.fragment_title);
+        if (!TextUtils.isEmpty(mParam1)) {
+            title.setText(mParam1);
+            title.setOnClickListener(v -> Log.e(TAG, "title clicked: "));
+        }
+        return inflate;
     }
 
     @Override

@@ -34,11 +34,11 @@ public class TrackEventGenerator {
         );
     }
 
-    public static void generateCustomEvent(String name, Map<String, String> variables) {
+    public static void generateCustomEvent(String name, Map<String, String> attributes) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new CustomEvent.Builder()
                         .setEventName(name)
-                        .setAttributes(variables)
+                        .setAttributes(attributes)
         );
     }
 

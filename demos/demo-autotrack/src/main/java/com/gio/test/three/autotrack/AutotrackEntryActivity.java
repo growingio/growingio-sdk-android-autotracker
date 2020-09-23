@@ -19,7 +19,6 @@ package com.gio.test.three.autotrack;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -43,15 +42,9 @@ import com.gio.test.three.autotrack.activity.TabFragmentActivity;
 import com.gio.test.three.autotrack.activity.WebViewActivity;
 import com.gio.test.three.autotrack.activity.X5WebViewActivity;
 import com.gio.test.three.autotrack.activity.ui.login.LoginActivity;
-import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
-import com.growingio.android.sdk.track.GrowingTracker;
-import com.growingio.android.sdk.track.interfaces.ResultCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 @ModuleEntry("无埋点SDK测试")
@@ -99,8 +92,6 @@ public class AutotrackEntryActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ignoreExample();
-
         setContentView(R.layout.activity_autotrck_entry);
         EditText search = findViewById(R.id.et_search);
 
@@ -147,41 +138,7 @@ public class AutotrackEntryActivity extends Activity {
         mArrayAdapter.notifyDataSetChanged();
     }
 
-    private void ignoreExample() {
-        View view = getWindow().getDecorView();
-
-        GrowingAutotracker.get().ignorePage(this, IgnorePolicy.IGNORE_ALL);
-        GrowingAutotracker.get().ignoreView(view, IgnorePolicy.IGNORE_SELF);
-    }
-
-    private void autotrackExample() {
-        View view = getWindow().getDecorView();
-        GrowingAutotracker.get().setUniqueTag(view, "current_unique_tag");
-        String uid = ViewAttributeUtil.getCustomId(view);
-        Log.d(TAG, "unique id = " + uid);
-
-        GrowingAutotracker.get().setPageAlias(this, "autotrack_entry_alias");
-        HashMap<String, String> map = new HashMap<>();
-        map.put("name", "hello");
-        map.put("age", "18");
-
-        GrowingAutotracker.get().setPageAttributes(this, map);
-
-        GrowingTracker.get().getDeviceId(new ResultCallback<String>() {
-            @Override
-            public void onResult(@Nullable String result) {
-                Log.d(TAG, "device id = " + result);
-            }
-        });
-
-        HashMap<String, String> impAttrs = new HashMap<>();
-        impAttrs.put("name", "hello");
-        impAttrs.put("age", "18");
-    }
-
     private void handleItemClick(String itemString) {
-        autotrackExample();
-
         switch (itemString) {
             case GO_TO_NESTED_FRAGMENT_ACTIVITY:
                 startActivity(new Intent(this, NestedFragmentActivity.class));

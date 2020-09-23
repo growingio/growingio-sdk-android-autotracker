@@ -20,7 +20,7 @@ import android.app.Activity;
 import android.text.TextUtils;
 import android.view.View;
 
-public class ActivityPage extends PageGroup<Activity> {
+public class ActivityPage extends Page<Activity> {
     public ActivityPage(Activity carrier) {
         super(carrier);
     }
