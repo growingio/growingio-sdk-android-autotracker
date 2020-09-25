@@ -79,7 +79,7 @@ public class ViewChangeEventsTest extends EventsTest {
                         .build()
 
         ));
-        ActivityScenario<LoginActivity> scenario = ActivityScenario.launch(LoginActivity.class);
+        ActivityScenario.launch(LoginActivity.class);
         onView(withId(R.id.username)).perform(typeText("sdk@growing.io"));
         onView(withId(R.id.password)).perform(typeText("password123456"));
         onView(withId(R.id.login)).perform(click());

@@ -20,6 +20,12 @@
         android:text="显示PopupWindow" />
 
     <Button
+        android:id="@+id/btn_show_popup_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="显示PopupMenu" />
+
+    <Button
         android:id="@+id/btn_show_activity_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

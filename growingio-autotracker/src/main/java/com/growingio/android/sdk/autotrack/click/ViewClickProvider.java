@@ -16,18 +16,20 @@
 
 package com.growingio.android.sdk.autotrack.click;
 
+import android.app.Activity;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
-import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
+import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
 class ViewClickProvider {
     private static final String TAG = "ViewClickProvider";
@@ -43,9 +45,29 @@ class ViewClickProvider {
 
         ViewNode viewNode = ViewHelper.getClickViewNode(view);
         if (viewNode != null) {
-            sendClickEvent(viewNode);
+            Page<?> page = PageProvider.get().findPage(view);
+            sendClickEvent(page, viewNode);
         } else {
             Logger.e(TAG, "ViewNode is NULL");
+        }
+    }
+
+    public static void menuItemOnClick(Activity activity, MenuItem menuItem) {
+        if (!GrowingAutotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+        if (activity == null || menuItem == null) {
+            Logger.e(TAG, "menuItemOnClick: activity or menuItem is NULL");
+            return;
+        }
+
+        Page<?> page = PageProvider.get().findPage(activity);
+        ViewNode viewNode = ViewHelper.getMenuItemViewNode(page, menuItem);
+        if (viewNode != null) {
+            sendClickEvent(page, viewNode);
+        } else {
+            Logger.e(TAG, "MenuItem ViewNode is NULL");
         }
     }
 
@@ -54,16 +76,12 @@ class ViewClickProvider {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
-        ViewNode viewNode = ViewHelper.getClickViewNode(menuItem);
-        if (viewNode != null) {
-            sendClickEvent(viewNode);
-        } else {
-            Logger.e(TAG, "MenuItem ViewNode is NULL");
-        }
+
+        Activity activity = ActivityStateProvider.get().getForegroundActivity();
+        menuItemOnClick(activity, menuItem);
     }
 
-    private static void sendClickEvent(ViewNode viewNode) {
-        Page<?> page = PageProvider.get().findPage(viewNode.getView());
+    private static void sendClickEvent(Page<?> page, ViewNode viewNode) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ViewElementEvent.Builder()
                         .setEventType(AutotrackEventType.VIEW_CLICK)

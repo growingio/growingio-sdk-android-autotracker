@@ -16,162 +16,67 @@
 
 package com.growingio.android.sdk.autotrack.view;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContextWrapper;
 import android.graphics.Rect;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import androidx.appcompat.view.menu.ListMenuItemView;
-
 import com.growingio.android.sdk.autotrack.page.Page;
+import com.growingio.android.sdk.autotrack.shadow.WindowManagerShadow;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
-import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
 
 public class WindowHelper {
     private static final String TAG = "WindowHelper";
 
     public static final String PAGE_PREFIX = "/Page";
     public static final String IGNORE_PAGE_PREFIX = "/IgnorePage";
+
     private static final String MAIN_WINDOW_PREFIX = "/MainWindow";
     private static final String DIALOG_WINDOW_PREFIX = "/DialogWindow";
     private static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
     private static final String CUSTOM_WINDOW_PREFIX = "/CustomWindow";
-    static Object sWindowManger;
-    static Field sViewsField;
-    static Field sWindowField;
-    static Class sPhoneWindowClazz;
-    static Class sPopupWindowClazz;
-    static boolean sArrayListWindowViews = false;
-    static boolean sViewArrayWindowViews = false;
-    @VisibleForTesting
-    static WeakHashMap<View, Long> sShowingToast = new WeakHashMap<>();
-    private static Class<?> sListMenuItemViewClazz;
-    private static Method sItemViewGetDataMethod;
-    private static boolean sIsInitialized = false;
+
+    private final WindowManagerShadow mWindowManager;
 
     private WindowHelper() {
-    }
-
-    public static void init() {
-        if (sIsInitialized) {
-            return;
-        }
-        String windowManagerClassName;
-        if (Build.VERSION.SDK_INT >= 17) {
-            windowManagerClassName = "android.view.WindowManagerGlobal";
-        } else {
-            windowManagerClassName = "android.view.WindowManagerImpl";
-        }
-
-        Class<?> windowManager = null;
+        WindowManagerShadow managerShadow = null;
         try {
-            windowManager = Class.forName(windowManagerClassName);
-
-            String windowManagerString;
-            if (Build.VERSION.SDK_INT >= 17) {
-                windowManagerString = "sDefaultWindowManager";
-            } else if (Build.VERSION.SDK_INT >= 13) {
-                windowManagerString = "sWindowManager";
-            } else {
-                windowManagerString = "mWindowManager";
-            }
-
-            sViewsField = windowManager.getDeclaredField("mViews");
-
-            Field instanceField = windowManager.getDeclaredField(windowManagerString);
-            sViewsField.setAccessible(true);
-            if (sViewsField.getType() == ArrayList.class) {
-                sArrayListWindowViews = true;
-            } else if (sViewsField.getType() == View[].class) {
-                sViewArrayWindowViews = true;
-            }
-            instanceField.setAccessible(true);
-            sWindowManger = instanceField.get(null);
-
+            managerShadow = new WindowManagerShadow();
+        } catch (ClassNotFoundException e) {
+            Logger.e(TAG, e);
         } catch (NoSuchFieldException e) {
-            Logger.d(TAG, e);
+            Logger.e(TAG, e);
         } catch (IllegalAccessException e) {
-            Logger.d(TAG, e);
-        } catch (ClassNotFoundException e) {
-            Logger.d(TAG, e);
+            Logger.e(TAG, e);
         }
-
-        try {
-            sListMenuItemViewClazz = Class.forName("com.android.internal.view.menu.ListMenuItemView");
-            Class itemViewInterface = Class.forName("com.android.internal.view.menu.MenuView$ItemView");
-            sItemViewGetDataMethod = itemViewInterface.getDeclaredMethod("getItemData");
-        } catch (ClassNotFoundException e) {
-            Logger.d(TAG, e);
-        } catch (NoSuchMethodException e) {
-            Logger.d(TAG, e);
-        }
-
-        try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                try {
-                    sPhoneWindowClazz = Class.forName("com.android.internal.policy.PhoneWindow$DecorView");
-                } catch (ClassNotFoundException exception) {
-                    // for Android N
-                    sPhoneWindowClazz = Class.forName("com.android.internal.policy.DecorView");
-                }
-            } else {
-                sPhoneWindowClazz = Class.forName("com.android.internal.policy.impl.PhoneWindow$DecorView");
-            }
-        } catch (ClassNotFoundException e) {
-            Logger.d(TAG, e);
-        }
-        try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                sPopupWindowClazz = Class.forName("android.widget.PopupWindow$PopupDecorView");
-            } else {
-                sPopupWindowClazz = Class.forName("android.widget.PopupWindow$PopupViewContainer");
-            }
-        } catch (ClassNotFoundException e) {
-            Logger.d(TAG, e);
-        }
-        sIsInitialized = true;
+        mWindowManager = managerShadow;
     }
 
-    public static boolean isDecorView(View rootView) {
-        if (!sIsInitialized) {
-            init();
-        }
-        Class rootClass = rootView.getClass();
-        return rootClass == sPhoneWindowClazz || rootClass == sPopupWindowClazz;
+    private static class SingleInstance {
+        private static final WindowHelper INSTANCE = new WindowHelper();
     }
 
-    @SuppressLint("RestrictedApi")
-    public static Object getMenuItemData(View view) throws InvocationTargetException, IllegalAccessException {
-        if (view.getClass() == sListMenuItemViewClazz) {
-            return sItemViewGetDataMethod.invoke(view);
-        } else if (ClassExistHelper.instanceOfAndroidXListMenuItemView(view)) {
-            return ((ListMenuItemView) view).getItemData();
-        } else if (ClassExistHelper.instanceOfSupportListMenuItemView(view)) {
-            return ((android.support.v7.view.menu.ListMenuItemView) view).getItemData();
-        }
-        return null;
+    public static WindowHelper get() {
+        return SingleInstance.INSTANCE;
     }
 
-    public static String getMainWindowPrefix() {
+    public boolean isDecorView(View rootView) {
+        return !(rootView.getParent() instanceof View);
+    }
+
+    public String getMainWindowPrefix() {
         return MAIN_WINDOW_PREFIX;
     }
 
-    public static String getWindowPrefix(View root) {
+    public String getWindowPrefix(View root) {
         String windowPrefix;
         Page<?> page = ViewAttributeUtil.getViewPage(root);
         if (page != null) {
@@ -189,34 +94,24 @@ public class WindowHelper {
         return windowPrefix;
     }
 
-    public static String getSubWindowPrefix(View root) {
+    public String getSubWindowPrefix(View root) {
         ViewGroup.LayoutParams params = root.getLayoutParams();
-        if (params != null && params instanceof WindowManager.LayoutParams) {
+        if (params instanceof WindowManager.LayoutParams) {
             WindowManager.LayoutParams windowParams = (WindowManager.LayoutParams) params;
             int type = windowParams.type;
             if (type == WindowManager.LayoutParams.TYPE_BASE_APPLICATION) {
                 return MAIN_WINDOW_PREFIX;
-            } else if (type < WindowManager.LayoutParams.LAST_APPLICATION_WINDOW && root.getClass() == sPhoneWindowClazz) {
+            } else if (type < WindowManager.LayoutParams.LAST_APPLICATION_WINDOW) {
                 return DIALOG_WINDOW_PREFIX;
-            } else if (type < WindowManager.LayoutParams.LAST_SUB_WINDOW && root.getClass() == sPopupWindowClazz) {
+            } else if (type < WindowManager.LayoutParams.LAST_SUB_WINDOW) {
                 return POPUP_WINDOW_PREFIX;
-            } else if (type < WindowManager.LayoutParams.LAST_SYSTEM_WINDOW) {
-                return CUSTOM_WINDOW_PREFIX;
             }
         }
-        // if get WindowManager.LayoutParams failed, use Class type as fallback.
-        Class rootClazz = root.getClass();
-        if (rootClazz == sPhoneWindowClazz) {
-            return DIALOG_WINDOW_PREFIX;
-        } else if (rootClazz == sPopupWindowClazz) {
-            return POPUP_WINDOW_PREFIX;
-        } else {
-            return CUSTOM_WINDOW_PREFIX;
-        }
+        return CUSTOM_WINDOW_PREFIX;
     }
 
     @NonNull
-    public static DecorView[] getTopActivityViews() {
+    public DecorView[] getTopActivityViews() {
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null) {
             return new DecorView[0];
@@ -234,26 +129,27 @@ public class WindowHelper {
         return topViews.toArray(new DecorView[0]);
     }
 
-    public static DecorView[] getTopWindowViews() {
+    public DecorView[] getTopWindowViews() {
         List<DecorView> topViews = new ArrayList<>();
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
         DecorView[] decorViews = getAllWindowDecorViews();
+        boolean findTopActivity = false;
         for (DecorView decorView : decorViews) {
             View view = decorView.getView();
             if (view == activity.getWindow().getDecorView()
                     || view.getContext() == activity) {
                 topViews.add(decorView);
-            } else if ((view.getContext() instanceof ContextWrapper && ((ContextWrapper) view.getContext()).getBaseContext() == activity)) {
-                topViews.clear();
+                findTopActivity = true;
+            } else if (findTopActivity) {
                 topViews.add(decorView);
             }
         }
         return topViews.toArray(new DecorView[0]);
     }
 
-    public static DecorView[] getAllWindowDecorViews() {
+    public DecorView[] getAllWindowDecorViews() {
         List<DecorView> decorViews = new ArrayList<>();
-        View[] allViews = WindowHelper.getWindowViews();
+        View[] allViews = WindowHelper.get().getWindowViews();
         for (View view : allViews) {
             int[] location = new int[2];
             view.getLocationOnScreen(location);
@@ -269,51 +165,35 @@ public class WindowHelper {
         return decorViews.toArray(new DecorView[0]);
     }
 
-    public static View[] getWindowViews() {
-        init();
-        View[] result = new View[0];
-        if (sWindowManger == null) {
-            // 如果无法获取WindowManager就只遍历当前Activity的内容
-            Activity current = ActivityStateProvider.get().getForegroundActivity();
-            if (current != null) {
-                return new View[]{current.getWindow().getDecorView()};
+    @Nullable
+    public View getTopActivityDecorView() {
+        Activity current = ActivityStateProvider.get().getForegroundActivity();
+        if (current != null) {
+            try {
+                return current.getWindow().getDecorView();
+            } catch (Exception e) {
+                // Unable to resume activity {xxxActivity}: java.lang.RuntimeException: Window couldn't find content container view
+                Logger.e(TAG, e);
             }
-            return result;
         }
-        try {
-            View[] views = null;
-            if (sArrayListWindowViews) {
-                views = ((ArrayList<View>) sViewsField.get(sWindowManger)).toArray(result);
-            } else if (sViewArrayWindowViews) {
-                views = (View[]) sViewsField.get(sWindowManger);
-            }
-            if (views != null) {
-                // views可能会得到空值,可以考虑不从WindowManager反射获取所有Window
-                result = views;
-            }
-        } catch (Exception e) {
-            Logger.d(TAG, e);
-        }
-        return filterNullAndDismissToastView(result);
+        return null;
     }
 
-    public static View[] filterNullAndDismissToastView(View[] array) {
-        List<View> list = new ArrayList<>(array.length);
-        long currentTime = System.currentTimeMillis();
-        for (View view : array) {
-            if (view == null) {
-                continue;
+    public View[] getWindowViews() {
+        if (mWindowManager != null) {
+            try {
+                return mWindowManager.getAllWindowViews();
+            } catch (IllegalAccessException e) {
+                Logger.e(TAG, e);
             }
-            if (!sShowingToast.isEmpty()) {
-                Long deadline = sShowingToast.get(view);
-                if (deadline != null && currentTime > deadline) {
-                    continue;
-                }
-            }
-            list.add(view);
         }
-        View[] result = new View[list.size()];
-        list.toArray(result);
-        return result;
+
+        // 如果无法获取WindowManager就只遍历当前Activity的内容
+        View decorView = getTopActivityDecorView();
+        if (decorView != null) {
+            return new View[]{decorView};
+        }
+
+        return new View[0];
     }
 }

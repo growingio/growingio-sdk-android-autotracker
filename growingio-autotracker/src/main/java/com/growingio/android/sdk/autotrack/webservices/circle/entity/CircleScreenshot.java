@@ -23,7 +23,7 @@ import android.webkit.WebView;
 
 import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider;
 import com.growingio.android.sdk.autotrack.hybrid.SuperWebView;
-import com.growingio.android.sdk.autotrack.models.ViewNode;
+import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
@@ -137,7 +137,7 @@ public class CircleScreenshot {
             mScreenWidth = displayMetrics.widthPixels;
             mScreenHeight = displayMetrics.heightPixels;
 
-            DecorView[] decorViews = WindowHelper.getTopWindowViews();
+            DecorView[] decorViews = WindowHelper.get().getTopWindowViews();
             for (DecorView decorView : decorViews) {
                 checkView2PageElement(decorView.getView());
                 checkView2ViewElement(decorView.getView());
@@ -206,7 +206,7 @@ public class CircleScreenshot {
 
         private void checkView2ViewElement(View view) {
             ViewNode topViewNode = ViewHelper.getTopViewNode(view, null);
-            if (disposeWebView(topViewNode) && ViewUtil.canCircle(view)) {
+            if (disposeWebView(topViewNode)) {
                 return;
             }
 

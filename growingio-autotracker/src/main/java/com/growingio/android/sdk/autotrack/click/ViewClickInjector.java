@@ -117,11 +117,6 @@ public class ViewClickInjector {
         ViewClickProvider.viewOnClick(seekBar);
     }
 
-    @BeforeSuper(clazz = MenuItem.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class}, returnType = boolean.class)
-    public static void menuItemOnMenuItemClick(MenuItem.OnMenuItemClickListener listener, MenuItem item) {
-        ViewClickProvider.menuItemOnClick(item);
-    }
-
     @BeforeSuper(clazz = Toolbar.OnMenuItemClickListener.class, method = "onMenuItemClick", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     public static void toolbarOnMenuItemClick(Toolbar.OnMenuItemClickListener listener, MenuItem item) {
         ViewClickProvider.menuItemOnClick(item);
@@ -148,6 +143,6 @@ public class ViewClickInjector {
     @BeforeSuper(clazz = TabActivity.class,                  method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     @BeforeSuper(clazz = PreferenceActivity.class,           method = "onOptionsItemSelected", parameterTypes = {MenuItem.class}, returnType = boolean.class)
     public static void menuItemOnOptionsItemSelected(Activity activity, MenuItem item) {
-        ViewClickProvider.menuItemOnClick(item);
+        ViewClickProvider.menuItemOnClick(activity, item);
     }
 }

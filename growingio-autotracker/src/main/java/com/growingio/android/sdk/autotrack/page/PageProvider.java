@@ -424,6 +424,10 @@ public class PageProvider implements IActivityLifecycle {
                         .setAttributes(page.getAttributes()));
     }
 
+    public Page<?> findPage(Activity activity) {
+        return ALL_PAGE_TREE.get(activity);
+    }
+
     public Page<?> findPage(View view) {
         Page<?> page = ViewAttributeUtil.getViewPage(view);
         if (page != null && (!page.isIgnored() || page instanceof ActivityPage)) {
@@ -434,9 +438,12 @@ public class PageProvider implements IActivityLifecycle {
             return findPage((View) view.getParent());
         }
 
-        //需要考虑Dialog的上面的View
+        //需要考虑其他Window的上面的View
         Context viewContext = view.getContext();
         Activity activity = ActivityUtil.findActivity(viewContext);
+        if (activity == null) {
+            activity = ActivityStateProvider.get().getForegroundActivity();
+        }
         if (activity != null) {
             return ALL_PAGE_TREE.get(activity);
         }

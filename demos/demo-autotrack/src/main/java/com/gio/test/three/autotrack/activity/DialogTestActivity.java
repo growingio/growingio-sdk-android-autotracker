@@ -22,9 +22,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 
 import com.gio.test.three.autotrack.R;
@@ -54,6 +56,22 @@ public class DialogTestActivity extends Activity {
                     @Override
                     public void onClick(View v) {
                         showDialog();
+                    }
+                });
+            }
+        });
+
+        findViewById(R.id.btn_show_popup_menu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popupMenu = new PopupMenu(DialogTestActivity.this, v);
+                // 获取布局文件
+                popupMenu.getMenuInflater().inflate(R.menu.bottom_nav_menu, popupMenu.getMenu());
+                popupMenu.show();
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return true;
                     }
                 });
             }
