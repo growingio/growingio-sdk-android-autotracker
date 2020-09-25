@@ -17,41 +17,24 @@
 package com.growingio.android.sdk.autotrack.webservices.circle;
 
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.webkit.WebView;
+import android.widget.AbsSeekBar;
+import android.widget.CompoundButton;
 
-import androidx.annotation.Nullable;
-
-import com.growingio.android.sdk.autotrack.models.ViewNode;
-import com.growingio.android.sdk.autotrack.view.ViewHelper;
+import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 public class ViewUtil {
+
     private ViewUtil() {
     }
 
-    @Nullable
-    public static ViewNode getClickableParentViewNode(View view) {
-        if (view == null) {
-            return null;
-        }
-        ViewParent parent = view.getParent();
-        if (parent == null) {
-            return null;
-        }
-        while (parent instanceof ViewGroup) {
-            if (canCircle((View) parent)) {
-                return ViewHelper.getViewNode((View) parent);
-            }
-            parent = parent.getParent();
-        }
-        return null;
-    }
-
     public static boolean canCircle(View view) {
-        return view instanceof WebView ||
-                ClassExistHelper.isListView(view.getParent()) ||
-                (view.isClickable() && view.hasOnClickListeners());
+        return view instanceof WebView
+                || view instanceof CompoundButton
+                || view instanceof AbsSeekBar
+                || (view.isClickable() && view.hasOnClickListeners())
+                || ClassExistHelper.isListView(view.getParent())
+                || ListMenuItemViewShadow.isListMenuItemView(view);
     }
 }

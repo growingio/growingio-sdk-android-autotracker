@@ -19,14 +19,15 @@ package com.growingio.android.sdk.autotrack.webservices;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.DisplayMetrics;
+import android.view.View;
 
 import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider;
 import com.growingio.android.sdk.autotrack.hybrid.OnDomChangedListener;
+import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.autotrack.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.autotrack.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.autotrack.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.autotrack.view.WindowHelper;
-import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
@@ -65,6 +66,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
         ViewTreeStatusProvider.get().register(new OnViewStateChangedListener() {
             @Override
             public void onViewStateChanged(ViewStateChangedEvent changedEvent) {
+                Logger.d(TAG, "onViewStateChanged: " + changedEvent.getStateType());
                 refreshScreenshot();
             }
         });
@@ -78,11 +80,24 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
     }
 
     private void dispatchScreenshot() {
-        DecorView[] decorViews = WindowHelper.getTopActivityViews();
+        DecorView[] decorViews = WindowHelper.get().getTopActivityViews();
         if (decorViews.length == 0) {
             return;
         }
-        decorViews[decorViews.length - 1].getView().post(new Runnable() {
+        View topView = decorViews[decorViews.length - 1].getView();
+        topView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                Logger.d(TAG, "Top view onViewDetachedFromWindow: ");
+                refreshScreenshot();
+            }
+        });
+
+        topView.post(new Runnable() {
             @Override
             public void run() {
                 try {

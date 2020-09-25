@@ -99,7 +99,7 @@ public class TrackEventsTest extends EventsTest {
                 }
             }
         });
-        await().atMost(500, SECONDS).until(receivedEvent::get);
+        await().atMost(5, SECONDS).until(receivedEvent::get);
     }
 
     @Test

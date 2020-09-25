@@ -22,7 +22,13 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application>
-        <activity android:name=".activity.ViewImpressionActivity"></activity>
+        <activity
+            android:name=".activity.ActionMenuViewActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".activity.ToolBarActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activity.ViewImpressionActivity" />
         <activity
             android:name=".activity.ui.login.LoginActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />

@@ -59,7 +59,7 @@ public class ScreenshotUtil {
     }
 
     public static Bitmap getScreenshotBitmap() {
-        DecorView[] decorViews = WindowHelper.getTopActivityViews();
+        DecorView[] decorViews = WindowHelper.get().getTopActivityViews();
         DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(ContextProvider.getApplicationContext());
         Bitmap bitmap = Bitmap.createBitmap(metrics.widthPixels, metrics.heightPixels, Bitmap.Config.ARGB_8888);
         drawDecorViewsToBitmap(decorViews, bitmap);

@@ -34,7 +34,7 @@ import android.widget.TextView;
 import java.util.List;
 
 public class MainActivity extends ListActivity {
-    private static final String TAG  = "MainActivity";
+    private static final String TAG = "MainActivity";
 
     private List<ResolveInfo> mInfos;
 

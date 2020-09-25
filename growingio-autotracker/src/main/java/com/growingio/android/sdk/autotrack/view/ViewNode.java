@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.models;
+package com.growingio.android.sdk.autotrack.view;
 
 import android.support.annotation.StringDef;
 import android.view.View;
@@ -27,9 +27,6 @@ import android.widget.TextView;
 
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
-import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
-import com.growingio.android.sdk.autotrack.view.ViewHelper;
-import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.autotrack.webservices.circle.ViewUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
@@ -247,7 +244,7 @@ public class ViewNode {
 
         private void calculateViewXPath() {
             Object parentObject = mView.getParent();
-            if (parentObject == null || (WindowHelper.isDecorView(mView) && !(parentObject instanceof View))) {
+            if (parentObject == null || (WindowHelper.get().isDecorView(mView) && !(parentObject instanceof View))) {
                 return;
             }
 

@@ -23,7 +23,7 @@ import android.widget.EditText;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
-import com.growingio.android.sdk.autotrack.models.ViewNode;
+import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.view.OnViewStateChangedListener;

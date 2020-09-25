@@ -18,6 +18,7 @@ package com.growingio.android.sdk.autotrack.view;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Build;
@@ -27,8 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsSeekBar;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -40,22 +39,21 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.autotrack.models.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
+import com.growingio.android.sdk.autotrack.page.PageProvider;
+import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
+import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ViewHelper {
     private final static String TAG = "ViewHelper";
-
-    public static final String PAGE_PREFIX = "/Page";
 
     private static final int MAX_CONTENT_LENGTH = 100;
     private static final int PACKAGE_ID_START = 0x7f000000;
@@ -69,7 +67,7 @@ public class ViewHelper {
         }
 
         // home键back后, DecorView的visibility是 INVISIBLE, 即onResume时Window并不可见, 对GIO而言此时是可见的
-        if (WindowHelper.isDecorView(mView)) {
+        if (WindowHelper.get().isDecorView(mView)) {
             return true;
         }
 
@@ -115,36 +113,24 @@ public class ViewHelper {
         return true;
     }
 
-    public static ViewNode getClickViewNode(MenuItem menuItem) {
-        if (menuItem == null) {
-            return null;
+    public static ViewNode getMenuItemViewNode(Page<?> page, MenuItem menuItem) {
+        StringBuilder xpath = new StringBuilder();
+        if (page.isIgnored()) {
+            xpath.append(WindowHelper.IGNORE_PAGE_PREFIX);
+        } else {
+            xpath.append(WindowHelper.PAGE_PREFIX);
         }
-        WindowHelper.init();
-        View[] windows = WindowHelper.getWindowViews();
-        try {
-            for (View window : windows) {
-                if (window.getClass() == WindowHelper.sPopupWindowClazz) {
-                    View menuView = findMenuItemView(window, menuItem);
-                    if (menuView != null) {
-                        return getClickViewNode(menuView);
-                    }
-                }
-            }
-            for (View window : windows) {
-                if (window.getClass() != WindowHelper.sPopupWindowClazz) {
-                    View menuView = findMenuItemView(window, menuItem);
-                    if (menuView != null) {
-                        return getClickViewNode(menuView);
-                    }
-                }
-            }
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        Context context = ContextProvider.getApplicationContext();
+        xpath.append("/MenuView/MenuItem#").append(getPackageId(context, menuItem.getItemId()));
 
-        return null;
+        return ViewNode.ViewNodeBuilder.newViewNode()
+                .needRecalculate(false)
+                .setIndex(-1)
+                .setViewContent(menuItem.getTitle().toString())
+                .setXPath(xpath.toString())
+                .setOriginalXPath(xpath.toString())
+                .setPrefixPage(xpath.toString())
+                .build();
     }
 
     @Nullable
@@ -162,12 +148,16 @@ public class ViewHelper {
 
     @Nullable
     public static String getViewPackageId(View view) {
+        return getPackageId(view.getContext(), view.getId());
+    }
+
+
+    public static String getPackageId(Context context, int id) {
         try {
-            int viewId = view.getId();
-            if (viewId <= PACKAGE_ID_START) {
+            if (id <= PACKAGE_ID_START) {
                 return null;
             }
-            return view.getContext().getResources().getResourceEntryName(viewId);
+            return context.getResources().getResourceEntryName(id);
         } catch (Resources.NotFoundException e) {
             Logger.e(TAG, e);
         }
@@ -175,6 +165,14 @@ public class ViewHelper {
     }
 
     public static ViewNode getViewNode(View view) {
+        if (ListMenuItemViewShadow.isListMenuItemView(view)) {
+            MenuItem menuItem = new ListMenuItemViewShadow(view).getMenuItem();
+            if (menuItem != null) {
+                Activity activity = ActivityStateProvider.get().getForegroundActivity();
+                Page<?> page = PageProvider.get().findPage(activity);
+                return getMenuItemViewNode(page, menuItem);
+            }
+        }
         ArrayList<View> viewTreeList = new ArrayList<>(8);
         ViewNode viewNode = getTopViewNode(view, viewTreeList);
 
@@ -217,8 +215,6 @@ public class ViewHelper {
             }
         } while (parent instanceof ViewGroup);
         View rootView = viewTreeList.get(viewTreeList.size() - 1);
-        WindowHelper.init();
-
         String xpath;
         String originalXpath;
 
@@ -227,10 +223,10 @@ public class ViewHelper {
             originalXpath = "/" + ViewAttributeUtil.getCustomId(rootView);
             xpath = originalXpath;
         } else if (rootPage != null) {
-            originalXpath = WindowHelper.getWindowPrefix(rootView);
+            originalXpath = WindowHelper.get().getWindowPrefix(rootView);
             xpath = originalXpath;
         } else {
-            String prefix = WindowHelper.getWindowPrefix(rootView);
+            String prefix = WindowHelper.get().getWindowPrefix(rootView);
             xpath = prefix + "/" + ClassUtil.getSimpleClassName(rootView.getClass());
             originalXpath = xpath;
         }
@@ -258,20 +254,6 @@ public class ViewHelper {
 
         }
         return -1;
-    }
-
-    private static View findMenuItemView(View view, MenuItem item) throws InvocationTargetException, IllegalAccessException {
-        if (WindowHelper.getMenuItemData(view) == item) {
-            return view;
-        } else if (view instanceof ViewGroup) {
-            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-                View menuView = findMenuItemView(((ViewGroup) view).getChildAt(i), item);
-                if (menuView != null) {
-                    return menuView;
-                }
-            }
-        }
-        return null;
     }
 
     private static boolean shouldChangeOn(View view) {
@@ -380,13 +362,6 @@ public class ViewHelper {
             }
         }
         return value;
-    }
-
-
-    public static boolean isClickableView(View view) {
-        return view.isClickable() || view instanceof RadioGroup || view instanceof Spinner || view instanceof AbsSeekBar
-                || (view.getParent() != null && view.getParent() instanceof AdapterView
-                && ((AdapterView) view.getParent()).isClickable());
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

@@ -16,23 +16,27 @@
 
 package com.growingio.autotest.autotracker;
 
+import android.os.Build;
 import android.view.View;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.filters.SdkSuppress;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
 
 import com.gio.test.R;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.autotrack.AutotrackEntryActivity;
+import com.gio.test.three.autotrack.activity.ActionMenuViewActivity;
 import com.gio.test.three.autotrack.activity.ClickTestActivity;
 import com.gio.test.three.autotrack.activity.DialogTestActivity;
 import com.gio.test.three.autotrack.activity.ExpandableListSubActivity;
 import com.gio.test.three.autotrack.activity.ExpandableListViewActivity;
 import com.gio.test.three.autotrack.activity.NestedFragmentActivity;
+import com.gio.test.three.autotrack.activity.ToolBarActivity;
 import com.gio.test.three.autotrack.fragments.FragmentLifecycleCallback;
 import com.gio.test.three.autotrack.fragments.FragmentLifecycleMonitor;
 import com.gio.test.three.autotrack.fragments.GreenFragment;
@@ -266,7 +270,7 @@ public class ViewClickEventsTest extends EventsTest {
 
         ));
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
-        onView(withId(R.id.content_parent)).perform(click());
+        onView(withId(R.id.tv_click_placeholder)).perform(click());
         await().atMost(5, SECONDS).untilTrue(receivedEvent);
         scenario.close();
     }
@@ -414,26 +418,25 @@ public class ViewClickEventsTest extends EventsTest {
     @Test
     public void optionsMenuClickEventTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
-        final String xpath = "/PopupWindow/PopupDecorView/PopupBackgroundView[0]/MenuDropDownListView[0]/ListMenuItemView[-]";
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPageName("/ClickTestActivity")
-                        .setXpath(xpath)
-                        .setTextValue("")
-                        .setIndex(0)
+                        .setXpath("/Page/MenuView/MenuItem#navigation_home")
+                        .setTextValue("Home")
+                        .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
                         .setPageName("/ClickTestActivity")
-                        .setXpath(xpath)
-                        .setTextValue("")
-                        .setIndex(1)
+                        .setXpath("/Page/MenuView/MenuItem#navigation_dashboard")
+                        .setTextValue("Dashboard")
+                        .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
                         .setPageName("/ClickTestActivity")
-                        .setXpath(xpath)
-                        .setTextValue("")
-                        .setIndex(2)
+                        .setXpath("/Page/MenuView/MenuItem#navigation_notifications")
+                        .setTextValue("Notifications")
+                        .setIndex(-1)
                         .build()
 
         ));
@@ -723,6 +726,119 @@ public class ViewClickEventsTest extends EventsTest {
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         onView(withText("small RedFragment")).perform(click());
         TrackHelper.waitForIdleSync();
+        scenario.close();
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.LOLLIPOP)
+    public void toolBarClickTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPageName("/ToolBarActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_home")
+                        .setTextValue("Home")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPageName("/ToolBarActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_dashboard")
+                        .setTextValue("Dashboard")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPageName("/ToolBarActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_notifications")
+                        .setTextValue("Notifications")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<ToolBarActivity> scenario = ActivityScenario.launch(ToolBarActivity.class);
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText("Home")).perform(click());
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText("Dashboard")).perform(click());
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText("Notifications")).perform(click());
+        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+
+        scenario.close();
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.LOLLIPOP)
+    public void actionMenuViewClickTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPageName("/ActionMenuViewActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_home")
+                        .setTextValue("Home")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPageName("/ActionMenuViewActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_dashboard")
+                        .setTextValue("Dashboard")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPageName("/ActionMenuViewActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_notifications")
+                        .setTextValue("Notifications")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<ActionMenuViewActivity> scenario = ActivityScenario.launch(ActionMenuViewActivity.class);
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText("Home")).perform(click());
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText("Dashboard")).perform(click());
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText("Notifications")).perform(click());
+        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+
+        scenario.close();
+    }
+
+    @Test
+    public void popupMenuClickTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPageName("/DialogTestActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_home")
+                        .setTextValue("Home")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPageName("/DialogTestActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_dashboard")
+                        .setTextValue("Dashboard")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPageName("/DialogTestActivity")
+                        .setXpath("/Page/MenuView/MenuItem#navigation_notifications")
+                        .setTextValue("Notifications")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<DialogTestActivity> scenario = ActivityScenario.launch(DialogTestActivity.class);
+        onView(withId(R.id.btn_show_popup_menu)).perform(click());
+        onView(withText("Home")).perform(click());
+        onView(withId(R.id.btn_show_popup_menu)).perform(click());
+        onView(withText("Dashboard")).perform(click());
+        onView(withId(R.id.btn_show_popup_menu)).perform(click());
+        onView(withText("Notifications")).perform(click());
+        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+
         scenario.close();
     }
 
