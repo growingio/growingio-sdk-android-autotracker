@@ -25,7 +25,6 @@ import androidx.annotation.Nullable;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
 public class ListMenuItemViewShadow {
@@ -33,7 +32,7 @@ public class ListMenuItemViewShadow {
 
     private static Class<?> sListMenuItemViewClazz;
     private static Method sItemViewGetDataMethod;
-    private final WeakReference<View> mView;
+    private final View mView;
 
     static {
         try {
@@ -46,7 +45,7 @@ public class ListMenuItemViewShadow {
     }
 
     public ListMenuItemViewShadow(View view) {
-        mView = new WeakReference<>(view);
+        mView = view;
     }
 
     public static boolean isListMenuItemView(View view) {
@@ -58,7 +57,7 @@ public class ListMenuItemViewShadow {
     @SuppressLint("RestrictedApi")
     @Nullable
     public MenuItem getMenuItem() {
-        View view = mView.get();
+        View view = mView;
         if (view == null) {
             return null;
         }

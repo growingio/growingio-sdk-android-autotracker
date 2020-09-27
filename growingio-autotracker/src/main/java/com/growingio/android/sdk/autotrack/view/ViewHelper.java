@@ -164,7 +164,7 @@ public class ViewHelper {
         return null;
     }
 
-    public static ViewNode getViewNode(View view) {
+    private static ViewNode getViewNode(View view) {
         if (ListMenuItemViewShadow.isListMenuItemView(view)) {
             MenuItem menuItem = new ListMenuItemViewShadow(view).getMenuItem();
             if (menuItem != null) {
