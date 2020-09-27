@@ -20,6 +20,8 @@ import android.annotation.SuppressLint;
 import android.view.View;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -28,29 +30,26 @@ import java.util.ArrayList;
  * private static IWindowManager sWindowManagerService;
  * private View[] mViews;
  * .
- * .
- * .
  * Android 4.4
  * private static WindowManagerGlobal sDefaultWindowManager;
  * private static IWindowManager sWindowManagerService;
  * private final ArrayList<View> mViews = new ArrayList<View>();
+ * .
+ * Android 11 bate1版本 RPB1.200504.018 删除了 sDefaultWindowManager, RC又恢复了，不敢再用
  */
 public class WindowManagerShadow {
     private static final String TAG = "WindowManagerShadow";
-
-    private static final String WINDOW_MANAGER_CLASS = "android.view.WindowManagerGlobal";
-    private static final String WINDOW_MANAGER_FIELD = "sDefaultWindowManager";
 
     private final Object mRealWindowManager;
     private final Field mViews;
     private final boolean mIsArrayList;
 
     @SuppressLint("PrivateApi")
-    public WindowManagerShadow() throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
-        Class<?> windowManager = Class.forName(WINDOW_MANAGER_CLASS);
-        Field managerField = windowManager.getField(WINDOW_MANAGER_FIELD);
-        managerField.setAccessible(true);
-        mRealWindowManager = managerField.get(null);
+    public WindowManagerShadow() throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Class<?> windowManager = Class.forName("android.view.WindowManagerGlobal");
+        Method method = windowManager.getMethod("getInstance");
+        method.setAccessible(true);
+        mRealWindowManager = method.invoke(null);
 
         mViews = windowManager.getDeclaredField("mViews");
         mViews.setAccessible(true);
@@ -58,7 +57,7 @@ public class WindowManagerShadow {
     }
 
     public View[] getAllWindowViews() throws IllegalAccessException {
-        View[] views = null;
+        View[] views;
         if (mIsArrayList) {
             views = ((ArrayList<View>) mViews.get(mRealWindowManager)).toArray(new View[0]);
         } else {
