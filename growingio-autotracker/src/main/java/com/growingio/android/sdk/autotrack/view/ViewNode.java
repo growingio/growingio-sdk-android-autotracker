@@ -16,7 +16,9 @@
 
 package com.growingio.android.sdk.autotrack.view;
 
+import android.app.Activity;
 import android.support.annotation.StringDef;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,8 +28,11 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.growingio.android.sdk.autotrack.page.Page;
+import com.growingio.android.sdk.autotrack.page.PageProvider;
+import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.autotrack.webservices.circle.ViewUtil;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.lang.annotation.Retention;
@@ -50,15 +55,18 @@ public class ViewNode {
             TEXT,
             WEB_VIEW,
             BUTTON,
-            LIST
+            LIST,
+            MENU_ITEM
     })
     private @interface NodeType {
     }
+
     private static final String INPUT = "INPUT";
     private static final String TEXT = "TEXT";
     private static final String WEB_VIEW = "WEB_VIEW";
     private static final String BUTTON = "BUTTON";
     private static final String LIST = "LIST";
+    private static final String MENU_ITEM = "MENU_ITEM";
 
     private ViewNode() {
     }
@@ -264,6 +272,22 @@ public class ViewNode {
             StringBuilder originalXPath = new StringBuilder(mOriginalXPath);
             StringBuilder xPath = new StringBuilder(mXPath);
             String viewName = ClassUtil.getSimpleClassName(mView.getClass());
+
+            //针对菜单栏处理
+            if (ListMenuItemViewShadow.isListMenuItemView(mView)) {
+                MenuItem menuItem = new ListMenuItemViewShadow(mView).getMenuItem();
+                if (menuItem != null) {
+                    Activity activity = ActivityStateProvider.get().getForegroundActivity();
+                    Page<?> itemPage = PageProvider.get().findPage(activity);
+                    ViewNode itemViewNode = ViewHelper.getMenuItemViewNode(itemPage, menuItem);
+                    mXPath = itemViewNode.mXPath;
+                    mIndex = itemViewNode.mIndex;
+                    mViewContent = itemViewNode.mViewContent;
+                    mOriginalXPath = itemViewNode.mOriginalXPath;
+                    mPrefixPage = itemViewNode.mOriginalXPath;
+                    return;
+                }
+            }
 
             if (parentObject instanceof ViewGroup) {
                 ViewGroup parent = (ViewGroup) parentObject;

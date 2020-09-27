@@ -114,6 +114,6 @@ public abstract class WebServicesTest {
     }
 
     public interface OnReceivedMessageListener {
-        void onReceivedRefreshScreenshotMessage(JSONObject message);
+        void onReceivedRefreshScreenshotMessage(JSONObject message) throws JSONException;
     }
 }
