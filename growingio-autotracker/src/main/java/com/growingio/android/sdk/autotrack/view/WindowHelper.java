@@ -30,6 +30,7 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +56,10 @@ public class WindowHelper {
         } catch (NoSuchFieldException e) {
             Logger.e(TAG, e);
         } catch (IllegalAccessException e) {
+            Logger.e(TAG, e);
+        } catch (NoSuchMethodException e) {
+            Logger.e(TAG, e);
+        } catch (InvocationTargetException e) {
             Logger.e(TAG, e);
         }
         mWindowManager = managerShadow;
