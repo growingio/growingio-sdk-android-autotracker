@@ -42,6 +42,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toolbar;
 
+import com.growingio.sdk.inject.annotation.After;
 import com.growingio.sdk.inject.annotation.BeforeSuper;
 
 public class ViewClickInjector {
@@ -55,10 +56,15 @@ public class ViewClickInjector {
         ViewClickProvider.viewOnClick(view);
     }
 
+    @After(clazz = AlertDialog.class, method = "show")
+    public static void alertDialogShow(AlertDialog alertDialog) {
+        ViewClickProvider.alertDialogShow(alertDialog);
+    }
+
     @BeforeSuper(clazz = DialogInterface.OnClickListener.class, method = "onClick", parameterTypes = {DialogInterface.class, int.class})
     public static void dialogOnClick(DialogInterface.OnClickListener listener, DialogInterface dialogInterface, int which) {
         if (dialogInterface instanceof AlertDialog) {
-            ViewClickProvider.viewOnClick(((AlertDialog) dialogInterface).getButton(which));
+            ViewClickProvider.alertDialogOnClick((AlertDialog) dialogInterface, which);
         }
     }
 

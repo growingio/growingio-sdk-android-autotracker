@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import com.gio.test.three.autotrack.R;
 
@@ -44,6 +45,21 @@ public class DialogTestActivity extends Activity {
                 showDialog();
             }
         });
+
+        findViewById(R.id.btn_show_no_title_alert_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                showNoTitleDialog();
+            }
+        });
+
+        findViewById(R.id.btn_show_list_alert_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                showListDialog();
+            }
+        });
+
         Button showPopupWindow = findViewById(R.id.btn_show_popup_window);
         showPopupWindow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +103,7 @@ public class DialogTestActivity extends Activity {
 
     private void showDialog() {
         AlertDialog dialog = new AlertDialog.Builder(DialogTestActivity.this)
+                .setTitle("AlertDialog Title")
                 .setMessage("测试AlertDialog")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
@@ -101,6 +118,38 @@ public class DialogTestActivity extends Activity {
                     }
                 }).create();
         dialog.show();
+    }
+
+    private void showNoTitleDialog() {
+        new AlertDialog.Builder(DialogTestActivity.this)
+                .setMessage("这是一个没有标题的AlertDialog")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    private void showListDialog() {
+        new AlertDialog
+                .Builder(this)
+                .setItems(new String[]{"科目一", "科目二", "科目三"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(DialogTestActivity.this, "选择了第" + which + "个", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .create()
+                .show();
     }
 
     @Override

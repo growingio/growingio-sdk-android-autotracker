@@ -26,6 +26,7 @@ import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
+import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.MockEventsApiServer;
@@ -41,7 +42,7 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
+
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -96,10 +97,10 @@ public class DataCollectionEnabledTest extends EventsTest {
             }
         });
         GrowingTracker.get().setDataCollectionEnabled(true);
-        await().atMost(5, SECONDS).untilTrue(receivedVisit);
+        Awaiter.untilTrue(receivedVisit);
 
         GrowingTracker.get().trackCustomEvent("test");
-        await().atMost(5, SECONDS).untilTrue(receivedCustom);
+        Awaiter.untilTrue(receivedCustom);
     }
 
     private void dataCollectionSecondEnabled() {
@@ -122,6 +123,6 @@ public class DataCollectionEnabledTest extends EventsTest {
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
 
         GrowingTracker.get().trackCustomEvent("test");
-        await().atMost(5, SECONDS).untilTrue(receivedCustom);
+        Awaiter.untilTrue(receivedCustom);
     }
 }

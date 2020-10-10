@@ -39,6 +39,7 @@ import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
+import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.MockEventsApiServer;
@@ -60,8 +61,6 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -89,10 +88,10 @@ public class PageEventsTest extends EventsTest {
             }
         });
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         receivedEvent.set(false);
         scenario.moveToState(Lifecycle.State.CREATED).moveToState(Lifecycle.State.RESUMED);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -108,7 +107,7 @@ public class PageEventsTest extends EventsTest {
         ));
 
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/NestedFragmentActivity",
@@ -119,7 +118,7 @@ public class PageEventsTest extends EventsTest {
         ));
         scenario.moveToState(Lifecycle.State.CREATED);
         scenario.moveToState(Lifecycle.State.RESUMED);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -146,7 +145,7 @@ public class PageEventsTest extends EventsTest {
         FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);
 
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         ActivityLifecycleMonitorRegistry.getInstance().removeLifecycleCallback(activityLifecycleCallback);
         FragmentLifecycleMonitor.get().removeLifecycleCallback(fragmentLifecycleCallback);
         scenario.close();
@@ -166,7 +165,7 @@ public class PageEventsTest extends EventsTest {
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback(activityLifecycleCallback);
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         TrackHelper.waitForIdleSync();
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         ActivityLifecycleMonitorRegistry.getInstance().removeLifecycleCallback(activityLifecycleCallback);
         scenario.close();
     }
@@ -188,7 +187,7 @@ public class PageEventsTest extends EventsTest {
         FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);
 
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         FragmentLifecycleMonitor.get().removeLifecycleCallback(fragmentLifecycleCallback);
         scenario.close();
     }
@@ -224,7 +223,7 @@ public class PageEventsTest extends EventsTest {
         FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);
 
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         FragmentLifecycleMonitor.get().removeLifecycleCallback(fragmentLifecycleCallback);
         scenario.close();
     }
@@ -250,7 +249,7 @@ public class PageEventsTest extends EventsTest {
         };
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback(activityLifecycleCallback);
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         ActivityLifecycleMonitorRegistry.getInstance().removeLifecycleCallback(activityLifecycleCallback);
         scenario.close();
     }
@@ -281,7 +280,7 @@ public class PageEventsTest extends EventsTest {
         FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);
 
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         ActivityLifecycleMonitorRegistry.getInstance().removeLifecycleCallback(activityLifecycleCallback);
         FragmentLifecycleMonitor.get().removeLifecycleCallback(fragmentLifecycleCallback);
         scenario.close();
@@ -294,13 +293,13 @@ public class PageEventsTest extends EventsTest {
                 "/HideFragmentActivity"
         ));
         ActivityScenario<HideFragmentActivity> scenario = ActivityScenario.launch(HideFragmentActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/HideFragmentActivity/RedFragment[frame_content]"
         ));
         onView(withId(R.id.add)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new StopReceivedPageEventsListener());
         onView(withId(R.id.hide)).perform(click());
@@ -310,7 +309,7 @@ public class PageEventsTest extends EventsTest {
                 "/HideFragmentActivity/RedFragment[frame_content]"
         ));
         onView(withId(R.id.show)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/HideFragmentActivity/GreenFragment[frame_content]",
@@ -318,7 +317,7 @@ public class PageEventsTest extends EventsTest {
                 "*/GreenFragment[frame_content]/OrangeFragment[TestTag]/RedFragment[small]"
         ));
         onView(withId(R.id.add)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new StopReceivedPageEventsListener());
         onView(withId(R.id.hide)).perform(click());
@@ -330,7 +329,7 @@ public class PageEventsTest extends EventsTest {
                 "*/GreenFragment[frame_content]/OrangeFragment[TestTag]/RedFragment[small]"
         ));
         onView(withId(R.id.show)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
@@ -348,7 +347,7 @@ public class PageEventsTest extends EventsTest {
                 "/HideFragmentActivity"
         ));
         TrackHelper.waitForIdleSync();
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -366,7 +365,7 @@ public class PageEventsTest extends EventsTest {
                 "/HideFragmentActivity/RedFragment[frame_content]"
         ));
         TrackHelper.waitForIdleSync();
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -379,25 +378,25 @@ public class PageEventsTest extends EventsTest {
                 "/NavFragmentActivity/NavHostFragment[nav_host_fragment]/HomeFragment[nav_host_fragment]"));
 
         ActivityScenario<NavFragmentActivity> scenario = ActivityScenario.launch(NavFragmentActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/NavFragmentActivity/NavHostFragment[nav_host_fragment]/DashboardFragment[nav_host_fragment]"
         ));
         onView(withId(R.id.navigation_dashboard)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/NavFragmentActivity/NavHostFragment[nav_host_fragment]/NotificationsFragment[nav_host_fragment]"
         ));
         onView(withId(R.id.navigation_notifications)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/NavFragmentActivity/NavHostFragment[nav_host_fragment]/HomeFragment[nav_host_fragment]"
         ));
         onView(withId(R.id.navigation_home)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -410,14 +409,14 @@ public class PageEventsTest extends EventsTest {
         ));
 
         ActivityScenario<TabFragmentActivity> scenario = ActivityScenario.launch(TabFragmentActivity.class);
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         for (int i = 2; i <= 5; i++) {
             getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                     "/TabFragmentActivity/PlaceholderFragment[android:switcher:view_pager:" + (i - 1) + "]"
             ));
             onView(withText("TAB " + i)).perform(click());
-            await().atMost(5, SECONDS).untilTrue(receivedEvent);
+            Awaiter.untilTrue(receivedEvent);
         }
 
         for (int i = 4; i >= 1; i--) {
@@ -425,7 +424,7 @@ public class PageEventsTest extends EventsTest {
                     "/TabFragmentActivity/PlaceholderFragment[android:switcher:view_pager:" + (i - 1) + "]"
             ));
             onView(withText("TAB " + i)).perform(click());
-            await().atMost(5, SECONDS).untilTrue(receivedEvent);
+            Awaiter.untilTrue(receivedEvent);
         }
 
         scenario.close();
