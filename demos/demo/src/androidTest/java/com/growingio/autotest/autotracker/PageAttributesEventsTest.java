@@ -49,6 +49,7 @@ import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -293,7 +294,7 @@ public class PageAttributesEventsTest extends EventsTest {
 
 
         private final Map<String, Long> mReceivedPages = new HashMap<>();
-        private final Map<String, PagesAttributesParams> mReceivedPagesAttributes = new HashMap<>();
+        private final Map<String, PagesAttributesParams> mReceivedPagesAttributes = new ConcurrentHashMap<>();
         private final HashMap<String, HashMap<String, String>> mExpectPagesAttributes;
 
         OnReceivedPageAttributesEventsListener(HashMap<String, HashMap<String, String>> expectPagesAttributes) {

@@ -58,6 +58,8 @@ public class ViewHelper {
     private static final int MAX_CONTENT_LENGTH = 100;
     private static final int PACKAGE_ID_START = 0x7f000000;
 
+    private static final String POPUP_DECOR_VIEW_CLASS_NAME = "PopupDecorView";
+
     private ViewHelper() {
     }
 
@@ -227,7 +229,15 @@ public class ViewHelper {
             xpath = originalXpath;
         } else {
             String prefix = WindowHelper.get().getWindowPrefix(rootView);
-            xpath = prefix + "/" + ClassUtil.getSimpleClassName(rootView.getClass());
+
+            // PopupDecorView 这个class是在Android 6.0的时候才引入的，为了兼容6.0以下的版本，需要手动添加这个class层级
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                    && prefix.equals(WindowHelper.POPUP_WINDOW_PREFIX)
+                    && !POPUP_DECOR_VIEW_CLASS_NAME.equals(ClassUtil.getSimpleClassName(rootView.getClass()))) {
+                xpath = prefix + "/" + POPUP_DECOR_VIEW_CLASS_NAME + "/" + ClassUtil.getSimpleClassName(rootView.getClass()) + "[0]";
+            } else {
+                xpath = prefix + "/" + ClassUtil.getSimpleClassName(rootView.getClass());
+            }
             originalXpath = xpath;
         }
 

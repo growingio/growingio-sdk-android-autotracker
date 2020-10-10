@@ -30,6 +30,7 @@ import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
+import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.MockEventsApiServer;
@@ -42,10 +43,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
+
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -72,7 +74,7 @@ public class SessionEventsTest extends EventsTest {
      * 3. APP退到后台时间 ≥ SessionInterval，sessionId改变
      */
     @Test
-    public void sessionEventsTest() throws InterruptedException {
+    public void sessionEventsTest() {
         final AtomicBoolean receivedVisit = new AtomicBoolean(false);
         final AtomicBoolean receivedAppClosed = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
@@ -91,11 +93,11 @@ public class SessionEventsTest extends EventsTest {
                 }
             }
         });
-        await().atMost(5, SECONDS).until(receivedVisit::get);
+        Awaiter.untilTrue(receivedVisit);
 
         //To State STOP
         scenarioRule.getScenario().moveToState(Lifecycle.State.CREATED);
-        await().atMost(5, SECONDS).until(receivedAppClosed::get);
+        Awaiter.untilTrue(receivedAppClosed);
 
         receivedAppClosed.set(false);
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
@@ -116,7 +118,7 @@ public class SessionEventsTest extends EventsTest {
         scenarioRule.getScenario().moveToState(Lifecycle.State.RESUMED);
         //To State STOP
         scenarioRule.getScenario().moveToState(Lifecycle.State.CREATED);
-        await().atMost(5, SECONDS).until(receivedAppClosed::get);
+        Awaiter.untilTrue(receivedAppClosed);
 
         receivedVisit.set(false);
         receivedAppClosed.set(false);
@@ -141,15 +143,14 @@ public class SessionEventsTest extends EventsTest {
         });
 
         long delayTime = ConfigurationProvider.get().getTrackConfiguration().getSessionInterval();
-        Thread.sleep(delayTime * 1000 + 1);
-        await().atMost(5, SECONDS);
+        Uninterruptibles.sleepUninterruptibly(delayTime * 1000 + 1, TimeUnit.MILLISECONDS);
 
         //To State RESUMED
         scenarioRule.getScenario().moveToState(Lifecycle.State.RESUMED);
-        await().atMost(5, SECONDS).until(receivedVisit::get);
+        Awaiter.untilTrue(receivedVisit);
         //To State DESTROYED
         scenarioRule.getScenario().moveToState(Lifecycle.State.DESTROYED);
-        await().atMost(5, SECONDS).until(receivedAppClosed::get);
+        Awaiter.untilTrue(receivedAppClosed);
     }
 
     /**
@@ -176,7 +177,7 @@ public class SessionEventsTest extends EventsTest {
                 }
             }
         });
-        await().atMost(5, SECONDS).untilTrue(receivedVisit);
+        Awaiter.untilTrue(receivedVisit);
 
         resendVisitEventLoginUserIdFirstFromNull2NotNull();
         resendVisitEventLoginUserIdFromNotNull2Null();
@@ -202,7 +203,7 @@ public class SessionEventsTest extends EventsTest {
             }
         });
         GrowingTracker.get().setLoginUserId("New" + mLoginUserId);
-        await().atMost(5, SECONDS).untilTrue(receivedVisit);
+        Awaiter.untilTrue(receivedVisit);
     }
 
     private void resendVisitEventLoginUserIdFromNotNull2Same() {
@@ -236,7 +237,7 @@ public class SessionEventsTest extends EventsTest {
             }
         });
         GrowingTracker.get().setLoginUserId("New" + mLoginUserId);
-        await().atMost(5, SECONDS).untilTrue(receivedVisit);
+        Awaiter.untilTrue(receivedVisit);
     }
 
     private void resendVisitEventLoginUserIdSecondFromNull2OldNotNull() {
@@ -266,7 +267,7 @@ public class SessionEventsTest extends EventsTest {
             }
         });
         GrowingTracker.get().setLoginUserId("TestMockedName");
-        await().atMost(5, SECONDS).untilTrue(receivedVisit);
+        Awaiter.untilTrue(receivedVisit);
 
     }
 
@@ -293,7 +294,7 @@ public class SessionEventsTest extends EventsTest {
                 receivedVisit.set(true);
             }
         });
-        await().atMost(5, SECONDS).untilTrue(receivedVisit);
+        Awaiter.untilTrue(receivedVisit);
 
         resendVisitEventLocationFromNull2NotNull();
         resendVisitEventLocationFromNotNull2NotNull();
@@ -315,7 +316,7 @@ public class SessionEventsTest extends EventsTest {
             }
         });
         GrowingTracker.get().setLocation(99, 99);
-        await().atMost(5, SECONDS).untilTrue(receivedVisit);
+        Awaiter.untilTrue(receivedVisit);
     }
 
     private void resendVisitEventLocationFromNotNull2NotNull() {

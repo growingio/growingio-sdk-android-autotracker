@@ -16,6 +16,8 @@
 
 package com.growingio.autotest.autotracker.webservices;
 
+import android.util.Log;
+
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -27,6 +29,7 @@ import com.growingio.android.sdk.autotrack.webservices.circle.CircleService;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.WebServicesTest;
+import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.TrackHelper;
@@ -39,8 +42,6 @@ import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -79,8 +80,16 @@ public class CircleServiceTest extends WebServicesTest {
             for (int i = 0; i < jsonArray.length(); i++) {
                 receivedElements.add(jsonArray.getJSONObject(i).getString("xpath"));
             }
-            if (receivedElements.equals(allElements)) {
+            if (receivedElements.containsAll(allElements)) {
                 receivedMessage.set(true);
+            } else {
+                HashSet<String> result = new HashSet<>(allElements);
+                result.removeAll(allElements);
+                Log.e(TAG, "circleServiceTest: allElements has more " + result);
+
+                result = new HashSet<>(receivedElements);
+                result.removeAll(allElements);
+                Log.e(TAG, "circleServiceTest: receivedElements has more " + result);
             }
         });
 
@@ -88,7 +97,7 @@ public class CircleServiceTest extends WebServicesTest {
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
         TrackHelper.waitUiThreadForIdleSync();
         new CircleService(getWsUrl()).start();
-        await().atMost(5, SECONDS).untilTrue(receivedMessage);
+        Awaiter.untilTrue(receivedMessage);
         scenario.close();
     }
 }

@@ -93,8 +93,7 @@ public class AutotrackPlugin implements Plugin<Project> {
                 }
             }
         }
-        // TODO: 2020/7/8 完善提示信息
-        throw new RuntimeException("未发现autotrack依赖，请参考文档添加依赖");
+        throw new RuntimeException("未发现autotrack依赖，请参考官方文档添加依赖");
     }
 
     private boolean findAutotrackDependency(DependencyResult dependency) {

@@ -38,6 +38,7 @@ jobs:
 
       - name: Upload logcat
         uses: actions/upload-artifact@v2
+        if: failure()
         with:
           name: uiTestLog
           path: ./uiTest.log

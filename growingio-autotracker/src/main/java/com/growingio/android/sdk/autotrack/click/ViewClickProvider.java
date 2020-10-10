@@ -17,14 +17,22 @@
 package com.growingio.android.sdk.autotrack.click;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
 
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
+import com.growingio.android.sdk.autotrack.shadow.AlertControllerShadow;
+import com.growingio.android.sdk.autotrack.util.ClassUtil;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -33,8 +41,72 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
 class ViewClickProvider {
     private static final String TAG = "ViewClickProvider";
+    private static final int[] DIALOG_BUTTON_IDS = new int[]{DialogInterface.BUTTON_NEUTRAL, DialogInterface.BUTTON_NEGATIVE, DialogInterface.BUTTON_POSITIVE};
+    private static final String[] DIALOG_BUTTON_NAMES = new String[]{"BUTTON_NEUTRAL", "BUTTON_NEGATIVE", "BUTTON_POSITIVE"};
 
     private ViewClickProvider() {
+    }
+
+    public static void alertDialogOnClick(AlertDialog dialog, int which) {
+        Logger.d(TAG, "alertDialogOnClick: which = " + which);
+        if (which < 0) {
+            Button button = dialog.getButton(which);
+            if (button != null) {
+                viewOnClick(button);
+            }
+        } else {
+            ListView listView = dialog.getListView();
+            if (listView != null) {
+                viewOnClick(listView.getChildAt(which - listView.getFirstVisiblePosition()));
+            }
+        }
+    }
+
+    /**
+     * 由于Android的不同版本的AlertDialog实现机制不一样，导致view xpath也不一样，如
+     * Android 7.0之前     /DialogWindow/DecorView/FrameLayout[0]/FrameLayout[0]/LinearLayout[0]/LinearLayout[2]/LinearLayout[0]/Button[2]
+     * Android 7，0及其之后 /DialogWindow/DecorView/FrameLayout[0]/FrameLayout[0]/AlertDialogLayout[0]/ScrollView[0]/ButtonBarLayout[0]/Button[2]
+     * 所以这里人为的给view定义一个id
+     */
+    public static void alertDialogShow(AlertDialog dialog) {
+        if (!GrowingAutotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        if (dialog == null) {
+            Logger.d(TAG, "alertDialogShow: dialog is NULL");
+            return;
+        }
+
+        Logger.d(TAG, "alertDialogShow: " + dialog);
+        for (int i = 0; i < DIALOG_BUTTON_IDS.length; i++) {
+            Button button = dialog.getButton(DIALOG_BUTTON_IDS[i]);
+            if (button != null && TextUtils.isEmpty(ViewAttributeUtil.getCustomId(button))) {
+                GrowingAutotracker.get().setUniqueTag(button, getAlertDialogName(dialog) + "/" + DIALOG_BUTTON_NAMES[i]);
+            }
+        }
+
+        // TODO: 2020/10/10 list dialog等也要处理
+    }
+
+    private static String getAlertDialogName(AlertDialog dialog) {
+        String className = ClassUtil.getSimpleClassName(dialog.getClass());
+        try {
+            AlertControllerShadow alertControllerShadow = new AlertControllerShadow(dialog);
+            CharSequence title = alertControllerShadow.getTitle();
+            if (!TextUtils.isEmpty(title)) {
+                return className + "/" + title;
+            }
+
+            CharSequence message = alertControllerShadow.getMessage();
+            if (!TextUtils.isEmpty(message)) {
+                return className + "/" + message;
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+        return className;
     }
 
     public static void viewOnClick(View view) {

@@ -39,10 +39,10 @@ public class WindowHelper {
     public static final String PAGE_PREFIX = "/Page";
     public static final String IGNORE_PAGE_PREFIX = "/IgnorePage";
 
-    private static final String MAIN_WINDOW_PREFIX = "/MainWindow";
-    private static final String DIALOG_WINDOW_PREFIX = "/DialogWindow";
-    private static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
-    private static final String CUSTOM_WINDOW_PREFIX = "/CustomWindow";
+    public static final String MAIN_WINDOW_PREFIX = "/MainWindow";
+    public static final String DIALOG_WINDOW_PREFIX = "/DialogWindow";
+    public static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
+    public static final String CUSTOM_WINDOW_PREFIX = "/CustomWindow";
 
     private final WindowManagerShadow mWindowManager;
 
@@ -90,7 +90,7 @@ public class WindowHelper {
         return windowPrefix;
     }
 
-    public String getSubWindowPrefix(View root) {
+    private String getSubWindowPrefix(View root) {
         ViewGroup.LayoutParams params = root.getLayoutParams();
         if (params instanceof WindowManager.LayoutParams) {
             WindowManager.LayoutParams windowParams = (WindowManager.LayoutParams) params;

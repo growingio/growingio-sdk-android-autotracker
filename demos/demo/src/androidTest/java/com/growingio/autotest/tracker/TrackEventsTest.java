@@ -25,6 +25,7 @@ import com.gio.test.three.core.TrackActivity;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
+import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.MockEventsApiServer;
@@ -41,8 +42,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -71,7 +70,7 @@ public class TrackEventsTest extends EventsTest {
             }
         });
         GrowingTracker.get().trackCustomEvent(testCustomEvent);
-        await().atMost(5, SECONDS).until(receivedEvent::get);
+        Awaiter.untilTrue(receivedEvent);
     }
 
     @Test
@@ -99,7 +98,7 @@ public class TrackEventsTest extends EventsTest {
                 }
             }
         });
-        await().atMost(5, SECONDS).until(receivedEvent::get);
+        Awaiter.untilTrue(receivedEvent);
     }
 
     @Test
@@ -124,7 +123,7 @@ public class TrackEventsTest extends EventsTest {
                 }
             }
         });
-        await().atMost(5, SECONDS).until(receivedEvent::get);
+        Awaiter.untilTrue(receivedEvent);
     }
 
     @Test
@@ -149,7 +148,7 @@ public class TrackEventsTest extends EventsTest {
                 }
             }
         });
-        await().atMost(5, SECONDS).until(receivedEvent::get);
+        Awaiter.untilTrue(receivedEvent);
     }
 
     @Test
@@ -174,7 +173,7 @@ public class TrackEventsTest extends EventsTest {
                 }
             }
         });
-        await().atMost(5, SECONDS).until(receivedEvent::get);
+        Awaiter.untilTrue(receivedEvent);
     }
 
     @Test

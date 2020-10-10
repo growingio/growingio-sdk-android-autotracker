@@ -115,9 +115,6 @@ dependencies {
     androidTestImplementation libraries.test.mockito_core
     androidTestImplementation libraries.test.truth
     androidTestImplementation libraries.test.okhttp3_mockwebserver
-    androidTestImplementation(libraries.test.awaitility) {
-        exclude group: 'org.hamcrest', module: 'hamcrest'
-    }
     androidTestImplementation libraries.test.powermock_reflect
     androidTestImplementation libraries.androidx.appcompat
     androidTestImplementation libraries.android.appcompat

@@ -183,16 +183,17 @@ public class PageProvider implements IActivityLifecycle {
 
     private boolean isIgnoreByParent(SuperFragment<?> fragment) {
         SuperFragment<?> parentFragment = fragment.getParentFragment();
-        if (parentFragment != null) {
+        while (parentFragment != null) {
             IgnorePolicy ignorePolicy = IGNORE_PAGES.get(parentFragment);
             if ((ignorePolicy == IgnorePolicy.IGNORE_ALL || ignorePolicy == IgnorePolicy.IGNORE_CHILD)) {
                 return true;
+            } else {
+                parentFragment = parentFragment.getParentFragment();
             }
-            return isIgnoreByParent(parentFragment);
-        } else {
-            IgnorePolicy ignorePolicy = IGNORE_PAGES.get(fragment.getActivity());
-            return ignorePolicy == IgnorePolicy.IGNORE_ALL || ignorePolicy == IgnorePolicy.IGNORE_CHILD;
         }
+
+        IgnorePolicy ignorePolicy = IGNORE_PAGES.get(fragment.getActivity());
+        return ignorePolicy == IgnorePolicy.IGNORE_ALL || ignorePolicy == IgnorePolicy.IGNORE_CHILD;
     }
 
     @UiThread

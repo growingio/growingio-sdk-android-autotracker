@@ -26,6 +26,7 @@ import com.gio.test.three.autotrack.activity.ui.login.LoginActivity;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
+import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.MockEventsApiServer;
@@ -48,8 +49,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
+
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -84,7 +84,7 @@ public class ViewChangeEventsTest extends EventsTest {
         onView(withId(R.id.password)).perform(typeText("password123456"));
         onView(withId(R.id.login)).perform(click());
         TrackHelper.waitForIdleSync();
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
     }
 
     private static final class OnReceivedViewChangeEventsListener extends MockEventsApiServer.OnReceivedEventListener {

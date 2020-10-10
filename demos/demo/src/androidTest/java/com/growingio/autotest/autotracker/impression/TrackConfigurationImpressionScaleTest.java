@@ -34,6 +34,7 @@ import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.events.PageLevelCustomEvent;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
+import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.TrackHelper;
@@ -48,8 +49,6 @@ import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -73,7 +72,7 @@ public class TrackConfigurationImpressionScaleTest extends EventsTest {
         ActivityScenario<ViewImpressionActivity> scenario = ActivityScenario.launch(ViewImpressionActivity.class);
         onView(withId(R.id.blank_view_impression)).check(matches((isDisplayed())));
         TrackHelper.waitForIdleSync();
-        await().atMost(5, SECONDS).untilFalse(receivedEvent);
+        Awaiter.untilFalse(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
@@ -84,7 +83,7 @@ public class TrackConfigurationImpressionScaleTest extends EventsTest {
         ));
         scenario.moveToState(Lifecycle.State.CREATED).moveToState(Lifecycle.State.RESUMED);
         onView(withId(R.id.tv_impression)).perform(scrollTo());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 

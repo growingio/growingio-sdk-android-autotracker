@@ -21,6 +21,10 @@ import android.view.View;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.action.GeneralClickAction;
+import androidx.test.espresso.action.GeneralLocation;
+import androidx.test.espresso.action.Press;
+import androidx.test.espresso.action.Tap;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.filters.SdkSuppress;
@@ -47,6 +51,7 @@ import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
+import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.MockEventsApiServer;
@@ -71,8 +76,6 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagKey;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -98,7 +101,7 @@ public class ViewClickEventsTest extends EventsTest {
         ));
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
         onView(withId(R.id.btn_test_click)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -132,7 +135,7 @@ public class ViewClickEventsTest extends EventsTest {
         onView(withText("java")).perform(click());
         onView(withId(R.id.spinner_test)).perform(click());
         onView(withText("xml")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
@@ -159,7 +162,7 @@ public class ViewClickEventsTest extends EventsTest {
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
         onView(withId(R.id.check_box_android)).perform(click());
         onView(withId(R.id.check_box_ios)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
@@ -186,7 +189,7 @@ public class ViewClickEventsTest extends EventsTest {
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
         onView(withText("male")).perform(click());
         onView(withText("female")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
@@ -213,7 +216,7 @@ public class ViewClickEventsTest extends EventsTest {
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
         onView(withId(R.id.switch1)).perform(click());
         onView(withId(R.id.switch1)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
@@ -226,14 +229,14 @@ public class ViewClickEventsTest extends EventsTest {
                 new ViewElementEvent.Builder()
                         .setPageName("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/SeekBar[0]#seek_bar")
-                        .setTextValue("50")
+                        .setTextValue("100")
                         .setIndex(-1)
                         .build()
 
         ));
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
-        onView(withId(R.id.seek_bar)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        onView(withId(R.id.seek_bar)).perform(new GeneralClickAction(Tap.SINGLE, GeneralLocation.BOTTOM_RIGHT, Press.FINGER));
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -252,7 +255,7 @@ public class ViewClickEventsTest extends EventsTest {
         ));
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
         onView(withId(R.id.rating_bar)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -271,7 +274,7 @@ public class ViewClickEventsTest extends EventsTest {
         ));
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
         onView(withId(R.id.tv_click_placeholder)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -290,7 +293,7 @@ public class ViewClickEventsTest extends EventsTest {
         ));
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         onView(withTagKey(R.layout.fragment_orange)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -309,7 +312,7 @@ public class ViewClickEventsTest extends EventsTest {
         ));
         ActivityScenario<AutotrackEntryActivity> scenario = ActivityScenario.launch(AutotrackEntryActivity.class);
         onView(withText("Go To HideFragmentActivity")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -384,7 +387,7 @@ public class ViewClickEventsTest extends EventsTest {
 
         onView(withText("黑名单")).perform(click());
 
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -411,7 +414,7 @@ public class ViewClickEventsTest extends EventsTest {
         onView(withText("我的家人")).perform(click());
         onView(withText("二妹 Remark")).perform(click());
         onView(withText("三妹")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -447,7 +450,7 @@ public class ViewClickEventsTest extends EventsTest {
         onView(withText("Dashboard")).perform(click());
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
         onView(withText("Notifications")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
@@ -473,7 +476,7 @@ public class ViewClickEventsTest extends EventsTest {
         });
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
         onView(withId(R.id.btn_test_click)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -492,7 +495,7 @@ public class ViewClickEventsTest extends EventsTest {
         ));
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         onView(withText("small RedFragment")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -516,7 +519,7 @@ public class ViewClickEventsTest extends EventsTest {
         });
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         onView(withText("small RedFragment")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -540,7 +543,7 @@ public class ViewClickEventsTest extends EventsTest {
         });
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         onView(withText("small RedFragment")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -564,7 +567,7 @@ public class ViewClickEventsTest extends EventsTest {
         });
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         onView(withText("small RedFragment")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -588,7 +591,7 @@ public class ViewClickEventsTest extends EventsTest {
         });
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
         onView(withId(R.id.btn_test_click)).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -612,18 +615,18 @@ public class ViewClickEventsTest extends EventsTest {
         });
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         onView(withText("small RedFragment")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
     @Test
-    public void dialogClickEventTest() {
+    public void alertDialogClickEventTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPageName("/DialogTestActivity")
-                        .setXpath("/DialogWindow/DecorView/FrameLayout[0]/FrameLayout[0]/AlertDialogLayout[0]/ScrollView[0]/ButtonBarLayout[0]/Button[2]")
+                        .setXpath("/AlertDialog/AlertDialog Title/BUTTON_POSITIVE")
                         .setTextValue("OK")
                         .setIndex(-1)
                         .build()
@@ -632,7 +635,27 @@ public class ViewClickEventsTest extends EventsTest {
         ActivityScenario<DialogTestActivity> scenario = ActivityScenario.launch(DialogTestActivity.class);
         onView(withId(R.id.btn_show_alert_dialog)).perform(click());
         onView(withText("OK")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
+        scenario.close();
+    }
+
+    @Test
+    public void noTitleAlertDialogClickEventTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPageName("/DialogTestActivity")
+                        .setXpath("/AlertDialog/这是一个没有标题的AlertDialog/BUTTON_NEGATIVE")
+                        .setTextValue("Cancel")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<DialogTestActivity> scenario = ActivityScenario.launch(DialogTestActivity.class);
+        onView(withId(R.id.btn_show_no_title_alert_dialog)).perform(click());
+        onView(withText("Cancel")).perform(click());
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -649,7 +672,7 @@ public class ViewClickEventsTest extends EventsTest {
                         .build(),
                 new ViewElementEvent.Builder()
                         .setPageName("/DialogTestActivity")
-                        .setXpath("/DialogWindow/DecorView/FrameLayout[0]/FrameLayout[0]/AlertDialogLayout[0]/ScrollView[0]/ButtonBarLayout[0]/Button[2]")
+                        .setXpath("/AlertDialog/AlertDialog Title/BUTTON_POSITIVE")
                         .setTextValue("OK")
                         .setIndex(-1)
                         .build()
@@ -659,7 +682,7 @@ public class ViewClickEventsTest extends EventsTest {
         onView(withId(R.id.btn_show_popup_window)).perform(click());
         onView(withText("测试预览")).perform(click());
         onView(withText("OK")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -683,7 +706,7 @@ public class ViewClickEventsTest extends EventsTest {
         });
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         onView(withText("small RedFragment")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
         scenario.close();
     }
 
@@ -762,7 +785,7 @@ public class ViewClickEventsTest extends EventsTest {
         onView(withText("Dashboard")).perform(click());
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
         onView(withText("Notifications")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
@@ -800,7 +823,7 @@ public class ViewClickEventsTest extends EventsTest {
         onView(withText("Dashboard")).perform(click());
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
         onView(withText("Notifications")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
@@ -837,7 +860,7 @@ public class ViewClickEventsTest extends EventsTest {
         onView(withText("Dashboard")).perform(click());
         onView(withId(R.id.btn_show_popup_menu)).perform(click());
         onView(withText("Notifications")).perform(click());
-        await().atMost(5, SECONDS).untilTrue(receivedEvent);
+        Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
     }
