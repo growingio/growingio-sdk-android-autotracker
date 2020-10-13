@@ -30,12 +30,14 @@ import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
+import com.growingio.android.sdk.autotrack.webservices.circle.CircleService;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
+import com.growingio.android.sdk.track.webservices.WebServicesProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,6 +89,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         GrowingAutotracker autotrack = new GrowingAutotracker();
         PageProvider.get().start();
         ViewChangeProvider.get().start();
+        WebServicesProvider.get().registerService(CircleService.SERVICE_TYPE, CircleService.class);
         sInstance = autotrack;
         Logger.d(TAG, "Autotracker module init success in ui thread");
     }

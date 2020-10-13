@@ -16,36 +16,64 @@
 
 package com.growingio.android.sdk.track.listener;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public abstract class ListenerContainer<L, A> {
+    private static final String TAG = "ListenerContainer";
 
-    private Set<L> mListeners = new HashSet<>();
+    private final List<L> mListeners = new ArrayList<>();
 
     public synchronized void register(L listener) {
-        mListeners.add(listener);
+        synchronized (mListeners) {
+            boolean needsAdd = true;
+            Iterator<L> refIter = mListeners.iterator();
+            while (refIter.hasNext()) {
+                L storedListener = refIter.next();
+                if (null == storedListener) {
+                    refIter.remove();
+                } else if (storedListener == listener) {
+                    needsAdd = false;
+                }
+            }
+            if (needsAdd) {
+                mListeners.add(listener);
+            }
+        }
     }
 
     public synchronized void unregister(L listener) {
-        mListeners.remove(listener);
-    }
-
-    private synchronized List<L> copyListener() {
-        if (mListeners.size() == 0) {
-            return Collections.emptyList();
-        } else {
-            return new ArrayList<>(mListeners);
+        synchronized (mListeners) {
+            Iterator<L> refIter = mListeners.iterator();
+            while (refIter.hasNext()) {
+                L storedListener = refIter.next();
+                if (null == storedListener) {
+                    refIter.remove();
+                } else if (storedListener == listener) {
+                    refIter.remove();
+                }
+            }
         }
     }
 
     protected void dispatchActions(A action) {
-        List<L> listeners = copyListener();
-        for (L listener : listeners) {
-            singleAction(listener, action);
+        synchronized (mListeners) {
+            Iterator<L> refIter = mListeners.iterator();
+            while (refIter.hasNext()) {
+                L listener = refIter.next();
+                if (null == listener) {
+                    refIter.remove();
+                } else {
+                    try {
+                        singleAction(listener, action);
+                    } catch (Exception e) {
+                        Logger.e(TAG, e);
+                    }
+                }
+            }
         }
     }
 

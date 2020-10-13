@@ -23,11 +23,13 @@ import android.util.Log;
 import android.view.View;
 
 public class DialogUtil {
+    private static final String TAG  = "DialogUtil";
+
     private DialogUtil() {
     }
 
     public static void cancelDialog(View view) {
-        Log.e("xxxx", "cancelDialog: ");
+        Log.e(TAG, "cancelDialog: ");
     }
 
     public static void showDialog(Context context, String title, String okText, View.OnClickListener okListener, String cancelText, View.OnClickListener cancelListener) {

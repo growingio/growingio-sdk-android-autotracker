@@ -16,16 +16,20 @@
 
 package com.growingio.android.sdk.track.webservices;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.growingio.android.sdk.track.R;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.webservices.message.ReadyMessage;
+import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -33,38 +37,49 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 
-public abstract class BaseWebSocketService {
+public abstract class BaseWebSocketService implements IWebService {
     private static final String TAG = "BaseWebSocketService";
+    private static final String WS_URL = "wsUrl";
 
-    private final String mWsUrl;
     private WebSocket mWebSocket;
+    protected TipView mTipView;
 
-    public BaseWebSocketService(String wsUrl) {
-        mWsUrl = wsUrl;
+    @CallSuper
+    @Override
+    public void start(Map<String, String> params, TipView tipView) {
+        mTipView = tipView;
+        mTipView.setContent(R.string.growing_tracker_connecting_to_web);
+        String wsUrl = params.get(WS_URL);
+        start(wsUrl);
     }
 
-    public void start() {
+    public void start(String wsUrl) {
+        if (TextUtils.isEmpty(wsUrl)) {
+            Logger.e(TAG, "wsUrl is NULL, can't start WebSocketService");
+            return;
+        }
+
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .readTimeout(5, TimeUnit.SECONDS)
                 .writeTimeout(5, TimeUnit.SECONDS)
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .build();
 
-        Request request = new Request.Builder().url(mWsUrl).build();
+        Request request = new Request.Builder().url(wsUrl).build();
         WebSocketListener socketListener = new WebSocketListener();
 
         httpClient.newWebSocket(request, socketListener);
         httpClient.dispatcher().executorService().shutdown();
     }
 
-    public abstract String getServiceType();
-
     protected void onReady() {
-
     }
 
+    @CallSuper
     protected void onFailed() {
-
+        if (mTipView != null) {
+            mTipView.setErrorMessage(R.string.growing_tracker_connected_to_web_failed);
+        }
     }
 
     protected void onQuited() {
@@ -81,6 +96,10 @@ public abstract class BaseWebSocketService {
         }
     }
 
+    @Override
+    public void end() {
+
+    }
 
     private final class WebSocketListener extends okhttp3.WebSocketListener {
 

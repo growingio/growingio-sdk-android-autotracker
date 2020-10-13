@@ -70,7 +70,7 @@ public class DemoApplication extends Application {
             sConfiguration = new AutotrackConfiguration()
                     .setUploadExceptionEnabled(false)
                     .setProjectId("demoProjectId")
-                    .setUrlScheme("demoUrlScheme")
+                    .setUrlScheme("growing.b6e4218d94f2bffc")
                     .setDebugEnabled(true);
         }
 

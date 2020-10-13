@@ -36,7 +36,7 @@ import com.growingio.android.sdk.track.utils.DeviceUtil;
 import java.io.IOException;
 
 public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnScreenshotRefreshedListener, String> {
-    private static final String TAG = "ScreenshotPolicy";
+    private static final String TAG = "ScreenshotProvider";
 
     private static final float SCREENSHOT_STANDARD_WIDTH = 720F;
     private static final long MIN_REFRESH_INTERVAL = 200L;

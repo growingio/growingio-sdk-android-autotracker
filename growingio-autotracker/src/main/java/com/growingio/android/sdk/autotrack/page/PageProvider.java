@@ -107,6 +107,7 @@ public class PageProvider implements IActivityLifecycle {
 
     private void refreshPages(Context context, Page<?> page) {
         page.refreshShowTimestamp();
+        Logger.d(TAG, "refreshPages: " + page.path());
         sendPage(context, page);
         if (!page.getAllChildren().isEmpty()) {
             for (Page<?> child : page.getAllChildren()) {

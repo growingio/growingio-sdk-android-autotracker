@@ -31,7 +31,6 @@ import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
-import com.growingio.android.sdk.track.utils.rom.RomChecker;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -255,7 +254,7 @@ public final class VisitEvent extends BaseEvent {
             mScreenWidth = metrics.widthPixels;
             mDeviceBrand = Build.BRAND == null ? ConstantPool.UNKNOWN : Build.BRAND;
             mDeviceModel = Build.MODEL == null ? ConstantPool.UNKNOWN : Build.MODEL;
-            mDeviceType = RomChecker.isPhone(context) ? DEVICE_TYPE_PHONE : DEVICE_TYPE_PAD;
+            mDeviceType = DeviceUtil.isPhone(context) ? DEVICE_TYPE_PHONE : DEVICE_TYPE_PAD;
             mOperatingSystem = ConstantPool.ANDROID;
             mOperatingSystemVersion = Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE;
 

@@ -16,11 +16,21 @@
 
 package com.growingio.android.sdk.autotrack.webservices.circle;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.view.View;
+
+import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
 import com.growingio.android.sdk.autotrack.webservices.circle.entity.CircleScreenshot;
+import com.growingio.android.sdk.autotrack.webservices.message.QuitMessage;
+import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.utils.SystemUtil;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
 import com.growingio.android.sdk.track.webservices.log.MobileLogService;
 
@@ -30,33 +40,58 @@ import org.json.JSONObject;
 public class CircleService extends BaseWebSocketService implements ScreenshotProvider.OnScreenshotRefreshedListener {
     private static final String TAG = "CircleService";
 
-    private static final String SERVICE_TYPE = "CircleService";
+    public static final String SERVICE_TYPE = "circle";
 
     private long mSnapshotKey = 0;
     private Disposable mCircleScreenshotDisposable;
-
-    public CircleService(String wsUrl) {
-        super(wsUrl);
-    }
-
-    @Override
-    public String getServiceType() {
-        return SERVICE_TYPE;
-    }
+    private MobileLogService mMobileLogService;
 
     @Override
     protected void onReady() {
+        mTipView.setContent(R.string.growing_tracker_is_circling);
         registerScreenshotRefreshedListener();
+        mTipView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showExitDialog();
+            }
+        });
+    }
+
+    private void showExitDialog() {
+        Activity activity = ActivityStateProvider.get().getForegroundActivity();
+        if (activity == null) {
+            Logger.e(TAG, "showExitDialog: ForegroundActivity is NULL");
+            return;
+        }
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.growing_autotracker_circle)
+                .setMessage(R.string.growing_autotracker_exit_circle)
+                .setPositiveButton(R.string.growing_autotracker_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        exit();
+                    }
+                })
+                .setNegativeButton(R.string.growing_autotracker_cancel, null)
+                .create()
+                .show();
+    }
+
+    private void exit() {
+        sendMessage(new QuitMessage().toJSONObject().toString());
+        SystemUtil.killAppProcess(ContextProvider.getApplicationContext());
     }
 
     @Override
     protected void onFailed() {
+        super.onFailed();
         Logger.e(TAG, "Start CircleService Failed");
     }
 
     @Override
     protected void onQuited() {
-        destroy();
+        end();
     }
 
     @Override
@@ -65,7 +100,9 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");
             if (MobileLogService.SERVICE_TYPE.equals(msgType)) {
-                // TODO: 2020/8/31  启动MobileLog
+                mMobileLogService = new MobileLogService();
+                // TODO: 2020/10/13 在圈选中启动mobileLog
+                mMobileLogService.start("xxx");
             }
         } catch (JSONException e) {
             Logger.e(TAG, e);
@@ -74,10 +111,6 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
 
     private void registerScreenshotRefreshedListener() {
         ScreenshotProvider.get().registerScreenshotRefreshedListener(this);
-    }
-
-    public void destroy() {
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
     }
 
     @Override
@@ -102,5 +135,13 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
                         Logger.e(TAG, "Create circle screenshot failed");
                     }
                 });
+    }
+
+    @Override
+    public void end() {
+        if (mMobileLogService != null) {
+            mMobileLogService.end();
+        }
+        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
     }
 }
