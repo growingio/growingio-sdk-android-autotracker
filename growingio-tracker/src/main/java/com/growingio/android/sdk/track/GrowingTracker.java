@@ -34,6 +34,7 @@ import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
+import com.growingio.android.sdk.track.webservices.WebServicesProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -136,6 +137,7 @@ public class GrowingTracker implements IGrowingTracker {
         tracker.mTrackMainThread = TrackMainThread.trackMain();
         sInstance = tracker;
 
+        initOtherService();
         sInitializedSuccessfully = true;
         Log.i(TAG, "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!");
         Log.i(TAG, "!!! GrowingIO Tracker version: " + SDKConfig.SDK_VERSION + " !!!");
@@ -143,6 +145,10 @@ public class GrowingTracker implements IGrowingTracker {
 
     private static void initCoreService() {
         TrackMainThread.trackMain().register(SessionProvider.get());
+    }
+
+    private static void initOtherService() {
+        WebServicesProvider.get().start();
     }
 
     private static IGrowingTracker makeEmpty() {

@@ -29,7 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LambdaActivity extends Activity implements View.OnClickListener {
-    private static final String TAG = "Lambda";
+    private static final String TAG = "LambdaActivity";
 
     private void beforeClick(View view) {
         Logger.d(TAG, "This is beforeClick");
@@ -69,7 +69,7 @@ public class LambdaActivity extends Activity implements View.OnClickListener {
             @Override
             public void onClick(View v) {
                 DialogUtil.showDialog(LambdaActivity.this, "title", "确定", v1 -> {
-                    Log.e("xxxx", "onClick: ");
+                    Log.e(TAG, "onClick: ");
                 }, "取消", DialogUtil::cancelDialog);
             }
         });

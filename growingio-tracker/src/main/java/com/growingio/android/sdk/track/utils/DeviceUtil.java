@@ -18,6 +18,7 @@ package com.growingio.android.sdk.track.utils;
 
 import android.content.Context;
 import android.os.Build;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -35,5 +36,21 @@ public class DeviceUtil {
             display.getMetrics(metrics);
         }
         return metrics;
+    }
+
+    public static boolean isPhone(Context context) {
+        TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        int type = telephony.getPhoneType();
+        return type != TelephonyManager.PHONE_TYPE_NONE;
+    }
+
+    public static int dp2Px(Context context, float dp) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
+
+    public static int sp2Px(Context context, float sp) {
+        final float scale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (sp * scale + 0.5f);
     }
 }

@@ -41,6 +41,8 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.e(TAG, "onCreate: ");
+        Intent intent = getIntent();
+        Log.e(TAG, "onCreate: intent.getData() = " + intent.getData());
         super.onCreate(savedInstanceState);
         new LoadTask().execute();
     }
@@ -55,6 +57,12 @@ public class MainActivity extends ListActivity {
     protected void onStop() {
         Log.e(TAG, "onStop: ");
         super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.e(TAG, "onResume: ");
+        super.onResume();
     }
 
     @Override

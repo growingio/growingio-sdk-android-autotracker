@@ -34,9 +34,7 @@ public class PermissionUtil {
     private static String sPackageName;
     private static int sPermissionFlags = 0;
 
-    private PermissionUtil(PackageManager packageManager, String packageName) {
-        sPackageManager = packageManager;
-        sPackageName = packageName;
+    private PermissionUtil() {
     }
 
     public static boolean hasInternetPermission() {

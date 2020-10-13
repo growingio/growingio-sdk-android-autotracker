@@ -21,18 +21,9 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
 
 public class MobileLogService extends BaseWebSocketService {
-    public static final String SERVICE_TYPE = "logger_open";
+    public static final String SERVICE_TYPE = "loggerOpen";
 
     private WsLogger mWsLogger;
-
-    public MobileLogService(String wsUrl) {
-        super(wsUrl);
-    }
-
-    @Override
-    public String getServiceType() {
-        return SERVICE_TYPE;
-    }
 
     @Override
     protected void onReady() {
@@ -49,7 +40,8 @@ public class MobileLogService extends BaseWebSocketService {
     }
 
     @Override
-    protected void onQuited() {
+    public void end() {
+        super.end();
         if (mWsLogger != null) {
             mWsLogger.setCallback(null);
         }

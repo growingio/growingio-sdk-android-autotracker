@@ -65,6 +65,10 @@ public class TrackActivity extends Activity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     private void handleItemClick(String itemString) {
         switch (itemString) {

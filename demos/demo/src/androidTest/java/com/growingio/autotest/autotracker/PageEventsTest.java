@@ -16,6 +16,8 @@
 
 package com.growingio.autotest.autotracker;
 
+import android.util.Log;
+
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -288,6 +290,7 @@ public class PageEventsTest extends EventsTest {
 
     @Test
     public void fragmentOnHiddenChangedTest() {
+        Log.e(TAG, "fragmentOnHiddenChangedTest: Case 1");
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/HideFragmentActivity"
@@ -295,22 +298,26 @@ public class PageEventsTest extends EventsTest {
         ActivityScenario<HideFragmentActivity> scenario = ActivityScenario.launch(HideFragmentActivity.class);
         Awaiter.untilTrue(receivedEvent);
 
+        Log.e(TAG, "fragmentOnHiddenChangedTest: Case 2");
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/HideFragmentActivity/RedFragment[frame_content]"
         ));
         onView(withId(R.id.add)).perform(click());
         Awaiter.untilTrue(receivedEvent);
 
+        Log.e(TAG, "fragmentOnHiddenChangedTest: Case 3");
         getEventsApiServer().setOnReceivedEventListener(new StopReceivedPageEventsListener());
         onView(withId(R.id.hide)).perform(click());
         TrackHelper.waitForIdleSync();
 
+        Log.e(TAG, "fragmentOnHiddenChangedTest: Case 4");
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/HideFragmentActivity/RedFragment[frame_content]"
         ));
         onView(withId(R.id.show)).perform(click());
         Awaiter.untilTrue(receivedEvent);
 
+        Log.e(TAG, "fragmentOnHiddenChangedTest: Case 5");
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/HideFragmentActivity/GreenFragment[frame_content]",
                 "/HideFragmentActivity/GreenFragment[frame_content]/OrangeFragment[TestTag]",
@@ -319,10 +326,12 @@ public class PageEventsTest extends EventsTest {
         onView(withId(R.id.add)).perform(click());
         Awaiter.untilTrue(receivedEvent);
 
+        Log.e(TAG, "fragmentOnHiddenChangedTest: Case 6");
         getEventsApiServer().setOnReceivedEventListener(new StopReceivedPageEventsListener());
         onView(withId(R.id.hide)).perform(click());
         TrackHelper.waitForIdleSync();
 
+        Log.e(TAG, "fragmentOnHiddenChangedTest: Case 7");
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/HideFragmentActivity/GreenFragment[frame_content]",
                 "/HideFragmentActivity/GreenFragment[frame_content]/OrangeFragment[TestTag]",
@@ -468,6 +477,8 @@ public class PageEventsTest extends EventsTest {
                     if (receivedPages.get(page) >= timestamp) {
                         timestamp = receivedPages.get(page);
                     } else {
+                        Log.e(TAG, "receivedAllPageEvent: expectedPages = " + expectedPages);
+                        Log.e(TAG, "receivedAllPageEvent: receivedPages = " + receivedPages);
                         Truth.assertWithMessage("Received Page timestamp is " + receivedPages.get(page) + " < " + timestamp).fail();
                     }
                 }
