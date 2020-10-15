@@ -24,17 +24,17 @@ import org.json.JSONObject;
 public final class HybridViewElementEvent extends ViewElementEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mQueryParameters;
+    private final String mQuery;
     private final String mHyperlink;
 
     protected HybridViewElementEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mQueryParameters = eventBuilder.mQueryParameters;
+        mQuery = eventBuilder.mQuery;
         mHyperlink = eventBuilder.mHyperlink;
     }
 
-    public String getQueryParameters() {
-        return mQueryParameters;
+    public String getQuery() {
+        return mQuery;
     }
 
     public String getHyperlink() {
@@ -45,15 +45,15 @@ public final class HybridViewElementEvent extends ViewElementEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("queryParameters", mQueryParameters);
-            json.put("hyperlink", mQueryParameters);
+            json.put("query", mQuery);
+            json.put("hyperlink", mHyperlink);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
     public final static class Builder extends ViewElementEvent.Builder {
-        private String mQueryParameters;
+        private String mQuery;
         private String mHyperlink;
 
         public Builder() {
@@ -75,8 +75,8 @@ public final class HybridViewElementEvent extends ViewElementEvent {
             return new HybridViewElementEvent(this);
         }
 
-        public Builder setQueryParameters(String queryParameters) {
-            mQueryParameters = queryParameters;
+        public Builder setQuery(String query) {
+            mQuery = query;
             return this;
         }
 

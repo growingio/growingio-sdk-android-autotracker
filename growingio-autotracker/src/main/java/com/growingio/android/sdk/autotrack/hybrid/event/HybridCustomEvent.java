@@ -26,40 +26,40 @@ import java.util.Map;
 public final class HybridCustomEvent extends PageLevelCustomEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mQueryParameters;
+    private final String mQuery;
 
     protected HybridCustomEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mQueryParameters = eventBuilder.mQueryParameters;
+        mQuery = eventBuilder.mQuery;
     }
 
-    public String getQueryParameters() {
-        return mQueryParameters;
+    public String getQuery() {
+        return mQuery;
     }
 
     @Override
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("queryParameters", mQueryParameters);
+            json.put("query", mQuery);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
     public static class Builder extends PageLevelCustomEvent.Builder {
-        private String mQueryParameters;
+        private String mQuery;
 
         public Builder() {
             super();
         }
 
-        public String getQueryParameters() {
-            return mQueryParameters;
+        public String getQuery() {
+            return mQuery;
         }
 
-        public Builder setQueryParameters(String queryParameters) {
-            mQueryParameters = queryParameters;
+        public Builder setQuery(String query) {
+            mQuery = query;
             return this;
         }
 

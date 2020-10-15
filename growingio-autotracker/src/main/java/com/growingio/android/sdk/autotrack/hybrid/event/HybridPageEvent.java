@@ -25,16 +25,16 @@ public class HybridPageEvent extends PageEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mProtocolType;
-    private final String mQueryParameters;
+    private final String mQuery;
 
     protected HybridPageEvent(Builder eventBuilder) {
         super(eventBuilder);
         mProtocolType = eventBuilder.mProtocolType;
-        mQueryParameters = eventBuilder.mQueryParameters;
+        mQuery = eventBuilder.mQuery;
     }
 
-    public String getQueryParameters() {
-        return mQueryParameters;
+    public String getQuery() {
+        return mQuery;
     }
 
     public String getProtocolType() {
@@ -46,7 +46,7 @@ public class HybridPageEvent extends PageEvent {
         JSONObject json = super.toJSONObject();
         try {
             json.put("protocolType", mProtocolType);
-            json.put("queryParameters", mQueryParameters);
+            json.put("query", mQuery);
         } catch (JSONException ignored) {
         }
         return json;
@@ -54,7 +54,7 @@ public class HybridPageEvent extends PageEvent {
 
     public static class Builder extends PageEvent.Builder {
         private String mProtocolType;
-        private String mQueryParameters;
+        private String mQuery;
 
         public Builder() {
             super();
@@ -69,12 +69,12 @@ public class HybridPageEvent extends PageEvent {
             return this;
         }
 
-        public String getQueryParameters() {
-            return mQueryParameters;
+        public String getQuery() {
+            return mQuery;
         }
 
-        public Builder setQueryParameters(String queryParameters) {
-            mQueryParameters = queryParameters;
+        public Builder setQuery(String query) {
+            mQuery = query;
             return this;
         }
 

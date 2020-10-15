@@ -18,6 +18,7 @@ package com.growingio.android.sdk.autotrack.hybrid;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
+import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.webkit.ValueCallback;
 
@@ -76,8 +77,9 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
         webView.addJavascriptInterface(new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration()), WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
     }
 
+    @UiThread
     public Disposable getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
-        Logger.e(TAG, "getWebViewDomTree");
+        Logger.d(TAG, "getWebViewDomTree");
         if (callback == null) {
             return Disposable.EMPTY_DISPOSABLE;
         }

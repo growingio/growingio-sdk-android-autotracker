@@ -96,6 +96,10 @@ public abstract class BaseWebSocketService implements IWebService {
         }
     }
 
+    protected void sendQuitMessage() {
+        sendMessage(new QuitMessage().toJSONObject().toString());
+    }
+
     @Override
     public void end() {
 

@@ -25,37 +25,57 @@ public class Awaiter {
     private Awaiter() {
     }
 
+    public static void untilTrue(Condition condition) {
+        untilTrue(condition, DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    public static void untilFalse(Condition condition) {
+        untilFalse(condition, DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    public static void untilTrue(Condition condition, long timeout, TimeUnit unit) {
+        long remainingNanos = unit.toNanos(timeout);
+        long end = System.nanoTime() + remainingNanos;
+
+        while (!condition.await()) {
+            if (condition.await()) {
+                break;
+            }
+            if (System.nanoTime() > end) {
+                throw new ConditionTimeoutException("expected <true> but was <false> within " + timeout + " " + unit.name());
+            }
+            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    public static void untilFalse(Condition condition, long timeout, TimeUnit unit) {
+        long remainingNanos = unit.toNanos(timeout);
+        long end = System.nanoTime() + remainingNanos;
+
+        while (condition.await()) {
+            if (!condition.await()) {
+                break;
+            }
+            if (System.nanoTime() > end) {
+                throw new ConditionTimeoutException("expected <false> but was <true> within " + timeout + " " + unit.name());
+            }
+            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
+        }
+    }
+
     public static void untilTrue(AtomicBoolean atomic) {
         untilTrue(atomic, DEFAULT_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public static void untilTrue(AtomicBoolean atomic, long timeout, TimeUnit unit) {
-        long remainingNanos = unit.toNanos(timeout);
-        long end = System.nanoTime() + remainingNanos;
-
-        while (!atomic.get()) {
-            if (atomic.get()) {
-                break;
-            }
-            if (System.nanoTime() > end) {
-                throw new ConditionTimeoutException("expected <true> but was <false> within 5 seconds.");
-            }
-            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
-        }
+        untilTrue(atomic::get, timeout, unit);
     }
 
     public static void untilFalse(AtomicBoolean atomic) {
-        long remainingNanos = TimeUnit.SECONDS.toNanos(DEFAULT_TIMEOUT);
-        long end = System.nanoTime() + remainingNanos;
+        untilFalse(atomic, DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+    }
 
-        while (atomic.get()) {
-            if (!atomic.get()) {
-                break;
-            }
-            if (System.nanoTime() > end) {
-                throw new ConditionTimeoutException("expected <false> but was <true> within 5 seconds.");
-            }
-            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
-        }
+    public static void untilFalse(AtomicBoolean atomic, long timeout, TimeUnit unit) {
+        untilFalse(atomic::get, timeout, unit);
     }
 }
