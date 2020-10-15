@@ -26,7 +26,7 @@ import android.webkit.WebViewClient;
 import com.gio.test.three.autotrack.R;
 
 public class WebViewActivity extends Activity {
-    private static final String LOAD_URL = "http://10.20.50.26:8081/";
+    private static String sLoadUrl = "http://10.20.50.26:8081/";
 
     private WebView mWebView;
 
@@ -36,7 +36,15 @@ public class WebViewActivity extends Activity {
         setContentView(R.layout.activity_web_view);
         mWebView = findViewById(R.id.web_view);
         initWebView();
-        mWebView.loadUrl(LOAD_URL);
+        mWebView.loadUrl(sLoadUrl);
+    }
+
+    public static void setLoadUrl(String loadUrl) {
+        sLoadUrl = loadUrl;
+    }
+
+    public WebView getWebView() {
+        return mWebView;
     }
 
     private void initWebView() {

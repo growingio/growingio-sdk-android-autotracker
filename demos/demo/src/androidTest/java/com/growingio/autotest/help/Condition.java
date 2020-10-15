@@ -14,27 +14,8 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.webservices.message;
+package com.growingio.autotest.help;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-public class QuitMessage {
-    private static final String TAG = "QuitMessage";
-
-    public static final String MSG_TYPE = "quit";
-    private final String mMsgType;
-
-    public QuitMessage() {
-        mMsgType = MSG_TYPE;
-    }
-
-    public JSONObject toJSONObject() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("msgType", mMsgType);
-        } catch (JSONException ignored) {
-        }
-        return json;
-    }
+public interface Condition {
+    boolean await();
 }

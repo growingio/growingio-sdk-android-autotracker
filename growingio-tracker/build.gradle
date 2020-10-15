@@ -45,6 +45,7 @@ dependencies {
     compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
     compileOnly libraries.android.recyclerview
+    compileOnly libraries.others.x5_webview
 }
 
 apply from: "${project.rootProject.file('maven_push.gradle')}"

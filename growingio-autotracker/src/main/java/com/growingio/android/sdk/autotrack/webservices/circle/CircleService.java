@@ -24,7 +24,6 @@ import android.view.View;
 import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
 import com.growingio.android.sdk.autotrack.webservices.circle.entity.CircleScreenshot;
-import com.growingio.android.sdk.autotrack.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
@@ -79,7 +78,7 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
     }
 
     private void exit() {
-        sendMessage(new QuitMessage().toJSONObject().toString());
+        sendQuitMessage();
         SystemUtil.killAppProcess(ContextProvider.getApplicationContext());
     }
 

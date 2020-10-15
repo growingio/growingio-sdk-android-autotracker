@@ -19,6 +19,7 @@ package com.growingio.autotest.help;
 import android.net.Uri;
 
 import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
+import com.growingio.android.sdk.autotrack.hybrid.event.HybridEventType;
 import com.growingio.android.sdk.track.events.TrackEventType;
 
 import org.json.JSONArray;
@@ -111,6 +112,11 @@ public class MockEventsApiServer extends MockServer {
                         mOnReceivedEventListener.onReceivedPageAttributesEvents(jsonArray);
                     }
                     break;
+                case HybridEventType.FORM_SUBMIT:
+                    if (mOnReceivedEventListener != null) {
+                        mOnReceivedEventListener.onReceivedHybridFormSubmitEvents(jsonArray);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -161,6 +167,10 @@ public class MockEventsApiServer extends MockServer {
         }
 
         protected void onReceivedPageAttributesEvents(JSONArray jsonArray) throws JSONException {
+
+        }
+
+        protected void onReceivedHybridFormSubmitEvents(JSONArray jsonArray) throws JSONException {
 
         }
     }

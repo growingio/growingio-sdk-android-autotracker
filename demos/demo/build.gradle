@@ -34,7 +34,7 @@ android {
         ndk {
             abiFilters "armeabi", "armeabi-v7a", "x86"
         }
-        multiDexEnabled false
+        multiDexEnabled true
     }
 
     lintOptions {
@@ -105,12 +105,12 @@ task jacocoTestReport(type: JacocoReport, group: 'Reporting', dependsOn: 'connec
 }
 
 dependencies {
-    implementation libraries.android.appcompat
-    implementation libraries.android.constraint
     androidTestUtil libraries.test.orchestrator
+    androidTestImplementation fileTree(dir: '../../thirdLibs', include: ['*.jar'])
     androidTestImplementation libraries.test.androidx_junit
     androidTestImplementation libraries.test.androidx_runner
     androidTestImplementation libraries.test.espresso_core
+    androidTestImplementation libraries.test.espresso_web
     androidTestImplementation libraries.test.androidx_rules
     androidTestImplementation libraries.test.mockito_core
     androidTestImplementation libraries.test.truth
@@ -118,7 +118,12 @@ dependencies {
     androidTestImplementation libraries.test.powermock_reflect
     androidTestImplementation libraries.androidx.appcompat
     androidTestImplementation libraries.android.appcompat
+    androidTestImplementation libraries.others.x5_webview
 
+    implementation libraries.android.appcompat
+    implementation libraries.android.constraint
+    implementation libraries.android.multidex
+    implementation libraries.others.x5_webview
     debugImplementation project(':growingio-tracker')
     releaseImplementation "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
     implementation project(':demo-core')

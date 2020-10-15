@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="data:image/ico;base64,aWNv">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
+    <title>GrowingIO Hybrid In App</title>
+    <script>
+        function getWebViewJavascriptBridgeConfiguration() {
+            return GrowingWebViewJavascriptBridge.configuration = JSON.parse(window.GrowingWebViewJavascriptBridge.getConfiguration());
+        }
+
+        function sendMockCustomEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "CUSTOM",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "eventName": "test_name",
+                "pageShowTimestamp": 1602485626878
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockCustomEventWithAttributes() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "CUSTOM",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "eventName": "test_name",
+                "pageShowTimestamp": 1602485626878,
+                "attributes": {
+                    "key1": "value1",
+                    "key2": "value2",
+                    "key3": "",
+                    "key4": null,
+                    "key5": undefined
+                }
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockVisitorAttributesEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "VISITOR_ATTRIBUTES",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "pageShowTimestamp": 1602485626878,
+                "attributes": {
+                    "key1": "value1",
+                    "key2": "value2",
+                    "key3": "",
+                    "key4": null,
+                    "key5": undefined
+                }
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockLoginUserAttributesEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "LOGIN_USER_ATTRIBUTES",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "pageShowTimestamp": 1602485626878,
+                "attributes": {
+                    "key1": "value1",
+                    "key2": "value2",
+                    "key3": "",
+                    "key4": null,
+                    "key5": undefined
+                }
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockConversionVariablesEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "CONVERSION_VARIABLES",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "pageShowTimestamp": 1602485626878,
+                "variables": {
+                    "key1": "value1",
+                    "key2": "value2",
+                    "key3": "",
+                    "key4": null,
+                    "key5": undefined
+                }
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockPageEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "PAGE",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "protocolType": "https",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockPageEventWithQuery() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "PAGE",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "protocolType": "https",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockFilePageEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "PAGE",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "path": "/push/web.html",
+                "title": "Hybrid测试页面",
+                "protocolType": "file",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockPageAttributesEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "PAGE_ATTRIBUTES",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "pageShowTimestamp": 1602485626878,
+                "attributes": {
+                    "key1": "value1",
+                    "key2": "value2",
+                    "key3": "",
+                    "key4": null,
+                    "key5": undefined
+                }
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockViewClickEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "VIEW_CLICK",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "pageShowTimestamp": 1602485626878,
+                "textValue": "登录",
+                "xpath": "/div/button#abc",
+                "index": 1,
+                "hyperlink": "https://www.growingio.com"
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockViewChangeEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "VIEW_CHANGE",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "pageShowTimestamp": 1602485626878,
+                "textValue": "输入内容",
+                "xpath": "/div/form/input",
+                "index": 1
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockFormSubmitEvent() {
+            let event = {
+                "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
+                "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
+                "eventType": "FORM_SUBMIT",
+                "platform": "Web",
+                "timestamp": 1602485628504,
+                "domain": "test-browser.growingio.com",
+                "path": "/push/web.html",
+                "query": "a=1&b=2",
+                "title": "Hybrid测试页面",
+                "referralPage": "http://test-browser.growingio.com/push",
+                "globalSequenceId": 99,
+                "eventSequenceId": 3,
+                "pageShowTimestamp": 1602485626878,
+                "xpath": "/div/form/input",
+                "index": 1
+            };
+            sendMockEvent(event);
+        }
+
+        function sendMockEvent(event) {
+            GrowingWebViewJavascriptBridge.dispatchEvent(JSON.stringify(event));
+        }
+
+        function setUserId(name) {
+            GrowingWebViewJavascriptBridge.setNativeUserId(name);
+        }
+
+        function clearUserId() {
+            GrowingWebViewJavascriptBridge.clearNativeUserId();
+        }
+
+        function mockDomChanged() {
+            GrowingWebViewJavascriptBridge.onDomChanged();
+        }
+
+        window.GrowingWebViewJavascriptBridge.getDomTree = function (left, top, width, height, zLevel) {
+            console.log("left = " + left + ", top = " + top + ", width = " + width + ", height = " + height + ", zLevel = " + zLevel);
+            return {
+                domtree: "mock"
+            };
+        }
+
+    </script>
+</head>
+
+<body>
+    <div class='main'>
+        <div class='title' id="mark">
+            <h2>autotrack hybrid</h2>
+            <div>
+                <div class='title'>
+                    <h3>这仅仅是一个测试页面</h3>
+                </div>
+            </div>
+</body>
+<footer>
+</footer>
+
+</html>
