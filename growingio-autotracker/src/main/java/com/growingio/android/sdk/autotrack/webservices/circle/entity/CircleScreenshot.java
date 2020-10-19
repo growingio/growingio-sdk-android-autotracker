@@ -23,20 +23,21 @@ import android.webkit.WebView;
 
 import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider;
 import com.growingio.android.sdk.autotrack.hybrid.SuperWebView;
-import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
-import com.growingio.android.sdk.track.utils.DeviceUtil;
+import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
+import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.autotrack.webservices.circle.ViewUtil;
-import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.async.UnsubscribedDisposable;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
+import com.growingio.android.sdk.track.utils.DeviceUtil;
+import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -137,8 +138,11 @@ public class CircleScreenshot {
             mScreenWidth = displayMetrics.widthPixels;
             mScreenHeight = displayMetrics.heightPixels;
 
-            DecorView[] decorViews = WindowHelper.get().getTopWindowViews();
+            List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
             for (DecorView decorView : decorViews) {
+                if (decorView.getView() instanceof TipView) {
+                    continue;
+                }
                 checkView2PageElement(decorView.getView());
                 checkView2ViewElement(decorView.getView());
             }

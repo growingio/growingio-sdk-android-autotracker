@@ -16,7 +16,6 @@
 
 package com.growingio.autotest.autotracker.webservices;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -33,7 +32,6 @@ import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.WebServicesTest;
@@ -48,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -55,6 +54,8 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 @RunWith(AndroidJUnit4.class)
@@ -70,6 +71,19 @@ public class CircleServiceTest extends WebServicesTest {
 
     @Test
     public void circleServiceTest() {
+        String uri = "growing.b6e4218d94f2bffc://growingio/webservice?serviceType=circle&wsUrl=" + Uri.encode(getWsUrl());
+        Intent intent = new Intent();
+        intent.setData(Uri.parse(uri));
+        ActivityScenario.launch(intent);
+
+        ActivityScenario.launch(ClickTestActivity.class);
+        TrackHelper.waitUiThreadForIdleSync();
+        List<DecorView> decorViews = WindowHelper.get().getAllWindowDecorViews();
+        View topView = decorViews.get(decorViews.size() - 1).getView();
+        Truth.assertThat(topView instanceof TipView).isTrue();
+        TrackHelper.postToUiThread(() -> topView.setVisibility(View.GONE)); //隐藏悬浮窗，防止遮挡其他view
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+
         HashSet<String> allElements = new HashSet<String>() {{
             add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent");
             add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Button[0]#btn_test_click");
@@ -107,29 +121,19 @@ public class CircleServiceTest extends WebServicesTest {
             }
         });
 
-        String uri = "growing.b6e4218d94f2bffc://growingio/webservice?serviceType=circle&wsUrl=" + Uri.encode(getWsUrl());
-        Intent intent = new Intent();
-        intent.setData(Uri.parse(uri));
-        ActivityScenario.launch(intent);
-        TrackHelper.waitUiThreadForIdleSync();
-        Activity foregroundActivity = ActivityStateProvider.get().getForegroundActivity();
-        foregroundActivity.startActivity(new Intent(foregroundActivity, ClickTestActivity.class));
-        TrackHelper.waitUiThreadForIdleSync();
-
-        DecorView[] decorViews = WindowHelper.get().getAllWindowDecorViews();
-        View topView = decorViews[decorViews.length - 1].getView();
-        Truth.assertThat(topView instanceof TipView).isTrue();
-        TrackHelper.postToUiThread(() -> topView.setVisibility(View.GONE)); //隐藏悬浮窗，防止遮挡其他view
-        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
         Awaiter.untilTrue(receivedMessage);
+        setOnReceivedMessageListener(null);
 
         pressBack();
         TrackHelper.postToUiThread(() -> {
             topView.setVisibility(View.VISIBLE);
             topView.callOnClick();
         });
+        TrackHelper.waitUiThreadForIdleSync();
+
+        onView(withText("圈选")).check(matches(isDisplayed()));
+        onView(withText("您是否要退出圈选？")).check(matches(isDisplayed()));
         onView(withText("取消")).perform(click());
     }
 }

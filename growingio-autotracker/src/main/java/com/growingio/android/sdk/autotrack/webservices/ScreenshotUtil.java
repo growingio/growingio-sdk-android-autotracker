@@ -23,13 +23,15 @@ import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-import com.growingio.android.sdk.track.utils.DeviceUtil;
+import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.autotrack.view.DecorView;
+import com.growingio.android.sdk.track.utils.DeviceUtil;
+import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class ScreenshotUtil {
     private ScreenshotUtil() {
@@ -59,14 +61,21 @@ public class ScreenshotUtil {
     }
 
     public static Bitmap getScreenshotBitmap() {
-        DecorView[] decorViews = WindowHelper.get().getTopActivityViews();
+        List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
+        for (int i = decorViews.size() - 1; i >= 0; i--) {
+            if (decorViews.get(i).getView() instanceof TipView) {
+                decorViews.remove(i);
+                break;
+            }
+        }
+
         DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(ContextProvider.getApplicationContext());
         Bitmap bitmap = Bitmap.createBitmap(metrics.widthPixels, metrics.heightPixels, Bitmap.Config.ARGB_8888);
         drawDecorViewsToBitmap(decorViews, bitmap);
         return bitmap;
     }
 
-    private static void drawDecorViewsToBitmap(DecorView[] decorViews, Bitmap bitmap) {
+    private static void drawDecorViewsToBitmap(List<DecorView> decorViews, Bitmap bitmap) {
         if (null != decorViews) {
             for (DecorView decorView : decorViews) {
                 drawDecorViewToBitmap(decorView, bitmap);

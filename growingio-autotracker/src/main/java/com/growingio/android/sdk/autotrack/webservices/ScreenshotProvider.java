@@ -32,8 +32,10 @@ import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
+import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import java.io.IOException;
+import java.util.List;
 
 public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnScreenshotRefreshedListener, String> {
     private static final String TAG = "ScreenshotProvider";
@@ -80,11 +82,17 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
     }
 
     private void dispatchScreenshot() {
-        DecorView[] decorViews = WindowHelper.get().getTopActivityViews();
-        if (decorViews.length == 0) {
+        List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
+        if (decorViews.isEmpty()) {
             return;
         }
-        View topView = decorViews[decorViews.length - 1].getView();
+        for (int i = decorViews.size() - 1; i >= 0; i--) {
+            if (decorViews.get(i).getView() instanceof TipView) {
+                decorViews.remove(i);
+                break;
+            }
+        }
+        View topView = decorViews.get(decorViews.size() - 1).getView();
         topView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) {

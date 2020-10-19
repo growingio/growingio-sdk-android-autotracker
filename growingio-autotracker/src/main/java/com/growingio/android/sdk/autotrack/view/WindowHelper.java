@@ -28,7 +28,6 @@ import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.shadow.WindowManagerShadow;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.utils.ActivityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,28 +106,10 @@ public class WindowHelper {
     }
 
     @NonNull
-    public DecorView[] getTopActivityViews() {
-        Activity activity = ActivityStateProvider.get().getForegroundActivity();
-        if (activity == null) {
-            return new DecorView[0];
-        }
-
-        List<DecorView> topViews = new ArrayList<>();
-        for (DecorView decorView : getAllWindowDecorViews()) {
-            View view = decorView.getView();
-            if (view == activity.getWindow().getDecorView()
-                    || view.getContext() == activity
-                    || ActivityUtil.findActivity(view.getContext()) == activity) {
-                topViews.add(decorView);
-            }
-        }
-        return topViews.toArray(new DecorView[0]);
-    }
-
-    public DecorView[] getTopWindowViews() {
+    public List<DecorView> getTopActivityViews() {
         List<DecorView> topViews = new ArrayList<>();
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
-        DecorView[] decorViews = getAllWindowDecorViews();
+        List<DecorView> decorViews = getAllWindowDecorViews();
         boolean findTopActivity = false;
         for (DecorView decorView : decorViews) {
             View view = decorView.getView();
@@ -140,10 +121,10 @@ public class WindowHelper {
                 topViews.add(decorView);
             }
         }
-        return topViews.toArray(new DecorView[0]);
+        return topViews;
     }
 
-    public DecorView[] getAllWindowDecorViews() {
+    public List<DecorView> getAllWindowDecorViews() {
         List<DecorView> decorViews = new ArrayList<>();
         View[] allViews = WindowHelper.get().getWindowViews();
         for (View view : allViews) {
@@ -158,7 +139,7 @@ public class WindowHelper {
                 decorViews.add(new DecorView(view, area, windowParams));
             }
         }
-        return decorViews.toArray(new DecorView[0]);
+        return decorViews;
     }
 
     @Nullable
