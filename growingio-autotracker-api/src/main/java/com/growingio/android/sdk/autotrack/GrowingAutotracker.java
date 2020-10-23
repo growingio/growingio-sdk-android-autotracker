@@ -46,7 +46,6 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     private static final String TAG = "GrowingAutotracker";
 
     private static volatile GrowingAutotracker sInstance;
-    private static volatile boolean sInitializedSuccessfully = false;
 
     @NonNull
     public static IGrowingAutotracker get() {
@@ -61,10 +60,6 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         }
     }
 
-    public static boolean initializedSuccessfully() {
-        return sInitializedSuccessfully;
-    }
-
     public static void startWithConfiguration(Application application, final AutotrackConfiguration autotrackConfiguration) {
         GrowingTracker.startWithConfiguration(application, autotrackConfiguration, new InitExtraOperation() {
             @Override
@@ -74,7 +69,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
 
             @Override
             public void initSuccess() {
-                sInitializedSuccessfully = true;
+                AutotrackConfiguration.setInitializedSuccessfully(true);
             }
         });
     }
@@ -220,7 +215,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public void setPageAttributes(android.app.Fragment page, Map<String, String> attributes) {
+    public void setPageAttributes(final android.app.Fragment page, final Map<String, String> attributes) {
         if (page == null || attributes == null || attributes.isEmpty()) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
@@ -250,7 +245,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
     }
 
     @Override
-    public void setPageAttributes(androidx.fragment.app.Fragment page, Map<String, String> attributes) {
+    public void setPageAttributes(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
         if (page == null || attributes == null || attributes.isEmpty()) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
@@ -275,7 +270,7 @@ public class GrowingAutotracker implements IGrowingAutotracker {
             Logger.e(TAG, "view or impressionEventName is NULL");
             return;
         }
-        HashMap<String, String> attributesCopy;
+        final HashMap<String, String> attributesCopy;
         if (attributes == null) {
             attributesCopy = null;
         } else {

@@ -30,17 +30,13 @@ android {
 }
 
 dependencies {
-    compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    debugApi project(':growingio-tracker-api')
-    releaseApi "com.growingio.android:tracker-api:$releaseConfiguration.releaseVersion"
-    implementation project(':inject-annotation')
-    annotationProcessor project(':inject-compiler')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    debugApi project(':growingio-autotracker')
+    releaseApi "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion"
 
     compileOnly libraries.androidx.appcompat
-    compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
-    compileOnly libraries.android.recyclerview
-    compileOnly libraries.others.x5_webview
 }
 
 apply from: "${project.rootProject.file('maven_push.gradle')}"

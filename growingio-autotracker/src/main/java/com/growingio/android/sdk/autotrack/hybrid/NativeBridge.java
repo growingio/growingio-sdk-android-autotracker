@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.hybrid;
 
-import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.TrackMainThread;
 
@@ -36,6 +35,6 @@ class NativeBridge {
     }
 
     void clearNativeUserId() {
-        GrowingAutotracker.get().cleanLoginUserId();
+        GrowingTracker.get().cleanLoginUserId();
     }
 }
