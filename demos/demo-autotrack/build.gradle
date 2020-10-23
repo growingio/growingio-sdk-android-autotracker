@@ -28,10 +28,10 @@ dependencies {
     implementation libraries.others.x5_webview
 
 
-    debugImplementation project(':growingio-tracker')
-    releaseImplementation "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
-    debugApi project(':growingio-autotracker')
-    releaseApi "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion"
+    debugImplementation project(':growingio-tracker-api')
+    releaseImplementation "com.growingio.android:tracker-api:$releaseConfiguration.releaseVersion"
+    debugApi project(':growingio-autotracker-api')
+    releaseApi "com.growingio.android:autotracker-api:$releaseConfiguration.releaseVersion"
 
     implementation project(':demo-core')
 

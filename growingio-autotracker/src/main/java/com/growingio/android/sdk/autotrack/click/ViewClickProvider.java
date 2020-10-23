@@ -25,7 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.growingio.android.sdk.autotrack.GrowingAutotracker;
+import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
@@ -38,6 +38,7 @@ import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 class ViewClickProvider {
     private static final String TAG = "ViewClickProvider";
@@ -69,7 +70,7 @@ class ViewClickProvider {
      * 所以这里人为的给view定义一个id
      */
     public static void alertDialogShow(AlertDialog dialog) {
-        if (!GrowingAutotracker.initializedSuccessfully()) {
+        if (!AutotrackConfiguration.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
@@ -83,7 +84,13 @@ class ViewClickProvider {
         for (int i = 0; i < DIALOG_BUTTON_IDS.length; i++) {
             Button button = dialog.getButton(DIALOG_BUTTON_IDS[i]);
             if (button != null && TextUtils.isEmpty(ViewAttributeUtil.getCustomId(button))) {
-                GrowingAutotracker.get().setUniqueTag(button, getAlertDialogName(dialog) + "/" + DIALOG_BUTTON_NAMES[i]);
+                String dialogButtonName = DIALOG_BUTTON_NAMES[i];
+                ThreadUtils.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ViewAttributeUtil.setCustomId(button, getAlertDialogName(dialog) + "/" + dialogButtonName);
+                    }
+                });
             }
         }
 
@@ -110,7 +117,7 @@ class ViewClickProvider {
     }
 
     public static void viewOnClick(View view) {
-        if (!GrowingAutotracker.initializedSuccessfully()) {
+        if (!AutotrackConfiguration.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
@@ -125,7 +132,7 @@ class ViewClickProvider {
     }
 
     public static void menuItemOnClick(Activity activity, MenuItem menuItem) {
-        if (!GrowingAutotracker.initializedSuccessfully()) {
+        if (!AutotrackConfiguration.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
@@ -144,7 +151,7 @@ class ViewClickProvider {
     }
 
     public static void menuItemOnClick(MenuItem menuItem) {
-        if (!GrowingAutotracker.initializedSuccessfully()) {
+        if (!AutotrackConfiguration.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
