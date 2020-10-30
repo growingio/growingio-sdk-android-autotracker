@@ -32,8 +32,8 @@ android {
 dependencies {
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
-    debugApi project(':growingio-tracker')
-    releaseApi "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
+    debugApi project(':growingio-tracker-core')
+    releaseApi "com.growingio.android:tracker-core:$releaseConfiguration.releaseVersion"
 
     compileOnly libraries.android.appcompat
 }

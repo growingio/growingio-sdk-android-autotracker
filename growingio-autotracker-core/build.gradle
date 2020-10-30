@@ -32,7 +32,7 @@ android {
 dependencies {
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
     debugApi project(':growingio-tracker-api')
-    releaseApi "com.growingio.android:tracker-api:$releaseConfiguration.releaseVersion"
+    releaseApi "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
     implementation project(':inject-annotation')
     annotationProcessor project(':inject-compiler')
 
