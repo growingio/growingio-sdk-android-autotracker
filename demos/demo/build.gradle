@@ -64,14 +64,18 @@ growingAutotracker {
 def rootDir = project.rootProject.rootDir
 
 def coverageSourceDirs = [
-        "$rootDir/growingio-tracker/src/main/java",
-        "$rootDir/growingio-autotracker/src/main/java",
+        "$rootDir/growingio-tracker-api/src/main/java",
+        "$rootDir/growingio-tracker-core/src/main/java",
+        "$rootDir/growingio-autotracker-api/src/main/java",
+        "$rootDir/growingio-autotracker-core/src/main/java",
         "$rootDir/growingio-autotracker-gradle-plugin/src/main/java"
 ]
 
 def coverageClassDirs = [
-        "$rootDir/growingio-tracker/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-autotracker/build/intermediates/javac/debug/classes",
+        "$rootDir/growingio-tracker-api/build/intermediates/javac/debug/classes",
+        "$rootDir/growingio-tracker-core/build/intermediates/javac/debug/classes",
+        "$rootDir/growingio-autotracker-api/build/intermediates/javac/debug/classes",
+        "$rootDir/growingio-autotracker-core/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-autotracker-gradle-plugin/build/classes/java/main"
 ]
 
