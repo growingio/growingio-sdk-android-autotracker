@@ -32,7 +32,6 @@ publish {
     publishVersion = releaseConfiguration.releaseVersion
     desc = BINTARY_DESC
     dryRun = false
-    publications = ['official']
 }
 
 afterEvaluate {
@@ -46,6 +45,27 @@ afterEvaluate {
                     password = project.hasProperty('bintrayKey') ? project.getProperty('bintrayKey') : ''
                 }
             }
+        }
+    }
+}
+
+if (project.name != 'growingio-autotracker-gradle-plugin') {
+    apply plugin: 'maven'
+    gradle.taskGraph.whenReady { taskGraph ->
+        taskGraph.getAllTasks().find {
+            it.path == ":$project.name:generatePomFileForReleasePublication"
+        }?.doLast {
+            file("build/publications/release/pom-default.xml").delete()
+            pom {
+                project {
+                    groupId GROUP_ID
+                    artifactId ARTIFACT_ID
+                    version releaseConfiguration.releaseVersion
+                    packaging 'aar'
+                }.withXml {
+                    writePom(asNode())
+                }
+            }.writeTo("build/publications/release/pom-default.xml")
         }
     }
 }
