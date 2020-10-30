@@ -37,22 +37,6 @@ publish {
 
 afterEvaluate {
     publishing {
-        publications {
-            official(MavenPublication) {
-                groupId GROUP_ID
-                artifactId ARTIFACT_ID
-                version releaseConfiguration.releaseVersion
-                if (project.getPlugins().hasPlugin('com.android.library')) {
-                    artifact bundleReleaseAar
-                    pom.withXml {
-                        writePom(asNode())
-                    }
-                } else {
-                    from components.java
-                }
-            }
-        }
-
         repositories {
             maven {
                 name = "nexus"

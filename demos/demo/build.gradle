@@ -125,7 +125,7 @@ dependencies {
     implementation libraries.android.multidex
     implementation libraries.others.x5_webview
     debugImplementation project(':growingio-tracker-api')
-    releaseImplementation "com.growingio.android:tracker-api:$releaseConfiguration.releaseVersion"
+    releaseImplementation "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
     implementation project(':demo-core')
     if (withAutotrack) {
         implementation project(":demo-autotrack")
