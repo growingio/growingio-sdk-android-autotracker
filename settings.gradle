@@ -4,10 +4,12 @@ if (!isExcludeDemos()) {
     apply from: 'demos/settings-parent.gradle'
 }
 
-include ':growingio-tracker-core'
-include ':growingio-autotracker-core'
-include ':growingio-autotracker-gradle-plugin'
-include ':inject-compiler'
 include ':inject-annotation'
-include ':growingio-tracker-api'
-include ':growingio-autotracker-api'
+include ':inject-compiler'
+
+include ':growingio-tracker-core'
+include ':growingio-tracker'
+
+include ':growingio-autotracker-gradle-plugin'
+include ':growingio-autotracker-core'
+include ':growingio-autotracker'
