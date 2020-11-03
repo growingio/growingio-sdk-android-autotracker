@@ -16,10 +16,14 @@
 
 package com.growingio.android.sdk.autotrack.hybrid;
 
-import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 class NativeBridge {
+    private static final String TAG = "NativeBridge";
+
     private final HybridTransformer mHybridTransformer;
 
     NativeBridge() {
@@ -27,14 +31,39 @@ class NativeBridge {
     }
 
     void dispatchEvent(String event) {
+        if (!Autotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
         TrackMainThread.trackMain().postEventToTrackMain(mHybridTransformer.transform(event));
     }
 
     void setNativeUserId(String userId) {
-        GrowingTracker.get().setLoginUserId(userId);
+        if (!Autotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                UserInfoProvider.get().setLoginUserId(userId);
+            }
+        });
     }
 
     void clearNativeUserId() {
-        GrowingTracker.get().cleanLoginUserId();
+        if (!Autotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                UserInfoProvider.get().setLoginUserId(null);
+            }
+        });
     }
 }

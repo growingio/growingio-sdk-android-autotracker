@@ -79,7 +79,7 @@ def coverageClassDirs = [
         "$rootDir/growingio-autotracker-gradle-plugin/build/classes/java/main"
 ]
 
-task jacocoTestReport(type: JacocoReport, group: 'Reporting') {
+task jacocoTestReport(type: JacocoReport, group: 'Reporting', dependsOn: 'connectedCheck') {
     reports {
         xml.enabled = true
         html.enabled = true
@@ -128,8 +128,8 @@ dependencies {
     implementation libraries.android.constraint
     implementation libraries.android.multidex
     implementation libraries.others.x5_webview
-    debugImplementation project(':growingio-tracker')
-    releaseImplementation "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
+    debugApi project(':growingio-tracker')
+    releaseApi libraries.growingio.tracker
     implementation project(':demo-core')
     if (withAutotrack) {
         implementation project(":demo-autotrack")

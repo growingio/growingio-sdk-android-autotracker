@@ -63,6 +63,7 @@ public class SessionEventsTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteAllData();
+        DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration()
                 .setSessionInterval(10)
         );

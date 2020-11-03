@@ -21,12 +21,10 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.track.TrackConfiguration;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.webservices.log.MobileLogService;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
@@ -51,22 +49,10 @@ public class WebServicesProvider implements IActivityLifecycle {
     private TipView mTipView;
     private final String mUrlScheme;
 
-    private static class SingleInstance {
-        private static final WebServicesProvider INSTANCE = new WebServicesProvider();
-    }
-
-    private WebServicesProvider() {
-        TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
-        mUrlScheme = configuration.getUrlScheme();
+    public WebServicesProvider(String urlScheme, ActivityStateProvider activityStateProvider) {
+        mUrlScheme = urlScheme;
         registerService(MobileLogService.SERVICE_TYPE, MobileLogService.class);
-    }
-
-    public static WebServicesProvider get() {
-        return SingleInstance.INSTANCE;
-    }
-
-    public void start() {
-        ActivityStateProvider.get().registerActivityLifecycleListener(this);
+        activityStateProvider.registerActivityLifecycleListener(this);
     }
 
     public void registerService(String type, Class<? extends IWebService> service) {

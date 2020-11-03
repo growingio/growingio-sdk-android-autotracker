@@ -21,16 +21,7 @@ import androidx.annotation.NonNull;
 import com.growingio.android.sdk.track.TrackConfiguration;
 
 public class AutotrackConfiguration extends TrackConfiguration {
-
     private float mImpressionScale = 0;
-    private static volatile boolean sInitializedSuccessfully = false;
-
-    public static boolean initializedSuccessfully() {
-        return sInitializedSuccessfully;
-    }
-    public static void setInitializedSuccessfully(boolean initializedSuccessfully) {
-        sInitializedSuccessfully = initializedSuccessfully;
-    }
 
     public AutotrackConfiguration setImpressionScale(float scale) {
         if (scale < 0) {

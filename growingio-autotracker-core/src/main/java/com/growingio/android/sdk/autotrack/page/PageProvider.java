@@ -23,6 +23,7 @@ import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.events.PageAttributesEvent;
 import com.growingio.android.sdk.autotrack.events.PageEvent;
@@ -221,6 +222,11 @@ public class PageProvider implements IActivityLifecycle {
 
     @UiThread
     public void fragmentOnHiddenChanged(SuperFragment<?> fragment, boolean hidden) {
+        if (!Autotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
         if (!hidden) {
             Page<?> page = findPage(fragment);
             if (page == null) {
@@ -233,6 +239,11 @@ public class PageProvider implements IActivityLifecycle {
 
     @UiThread
     public void createOrResumePage(SuperFragment<?> fragment) {
+        if (!Autotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
         if (fragment == null) {
             Logger.e(TAG, "createOrResumePage: this fragment can not make superFragment");
             return;
@@ -279,6 +290,11 @@ public class PageProvider implements IActivityLifecycle {
 
     @UiThread
     public void removePage(SuperFragment<?> fragment) {
+        if (!Autotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
         if (fragment == null) {
             Logger.e(TAG, "removePage: this fragment can not make superFragment");
             return;
