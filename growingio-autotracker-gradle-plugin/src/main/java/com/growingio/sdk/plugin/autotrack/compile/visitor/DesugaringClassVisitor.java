@@ -97,7 +97,7 @@ public class DesugaringClassVisitor extends ClassVisitor {
                         adapter.loadArgs(1, arguments.length - 1);
                     }
                 }
-                adapter.invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                adapter.invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
             }
         }
 
@@ -130,7 +130,7 @@ public class DesugaringClassVisitor extends ClassVisitor {
                         adapter.loadArgs(1, arguments.length - 1);
                     }
                 }
-                adapter.invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                adapter.invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
             }
         }
 

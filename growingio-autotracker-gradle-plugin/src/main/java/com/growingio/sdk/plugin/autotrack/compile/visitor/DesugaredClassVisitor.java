@@ -87,7 +87,7 @@ public class DesugaredClassVisitor extends ClassVisitor {
                     if (injectArgsLen != 0) {
                         loadArgs(originArgsLen - injectArgsLen, injectArgsLen);
                     }
-                    invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                    invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
                 }
             }
             mContext.markModified();
@@ -107,7 +107,7 @@ public class DesugaredClassVisitor extends ClassVisitor {
                     if (injectArgsLen != 0) {
                         loadArgs(originArgsLen - injectArgsLen, injectArgsLen);
                     }
-                    invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                    invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
                 }
             }
             mNeedInjectTargetMethods.remove(targetMethod);

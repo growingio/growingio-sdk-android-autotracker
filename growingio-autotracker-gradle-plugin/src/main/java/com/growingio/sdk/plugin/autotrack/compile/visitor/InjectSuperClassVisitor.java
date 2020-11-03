@@ -95,18 +95,18 @@ public class InjectSuperClassVisitor extends ClassVisitor {
                         if (!injectMethod.isAfter()) {
                             mg.loadThis();
                             mg.loadArgs();
-                            mg.invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                            mg.invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
                             mLog.debug("Method Add: " + injectMethod.getClassName() + "#" + injectMethod.getMethodName() + injectMethod.getMethodDesc() + " ===SuperBefore===> " + mCurrentClass + "#" + targetMethod.getName() + targetMethod.getDesc());
                         }
                     }
                     mg.loadThis();
                     mg.loadArgs();
-                    mg.invokeConstructor(Type.getType(targetClass.getName()), new Method(targetMethod.getName(), targetMethod.getDesc()));
+                    mg.invokeConstructor(Type.getObjectType(targetClass.getName()), new Method(targetMethod.getName(), targetMethod.getDesc()));
                     for (InjectMethod injectMethod : injectMethods) {
                         if (injectMethod.isAfter()) {
                             mg.loadThis();
                             mg.loadArgs();
-                            mg.invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                            mg.invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
                             mLog.debug("Method Add: " + injectMethod.getClassName() + "#" + injectMethod.getMethodName() + injectMethod.getMethodDesc() + " ===SuperAfter===> " + mCurrentClass + "#" + targetMethod.getName() + targetMethod.getDesc());
                         }
                     }
@@ -137,7 +137,7 @@ public class InjectSuperClassVisitor extends ClassVisitor {
                 if (!injectMethod.isAfter()) {
                     loadThis();
                     loadArgs();
-                    invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                    invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
                     mLog.debug("Method Insert: " + injectMethod.getClassName() + "#" + injectMethod.getMethodName() + injectMethod.getMethodDesc() + " ===SuperBefore===> " + mCurrentClass + "#" + mTargetMethodName + mTargetMethodDesc);
                 }
             }
@@ -149,7 +149,7 @@ public class InjectSuperClassVisitor extends ClassVisitor {
                 if (injectMethod.isAfter()) {
                     loadThis();
                     loadArgs();
-                    invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                    invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
                 }
                 mLog.debug("Method Insert: " + injectMethod.getClassName() + "#" + injectMethod.getMethodName() + injectMethod.getMethodDesc() + " ===SuperAfter===> " + mCurrentClass + "#" + mTargetMethodName + mTargetMethodDesc);
             }
