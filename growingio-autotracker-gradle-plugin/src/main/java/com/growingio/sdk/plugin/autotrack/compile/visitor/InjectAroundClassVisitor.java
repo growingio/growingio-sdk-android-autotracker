@@ -85,7 +85,7 @@ public class InjectAroundClassVisitor extends ClassVisitor {
                         for (int tmpLocal : locals) {
                             loadLocal(tmpLocal);
                         }
-                        invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                        invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
                         mLog.debug(mCurrentClass + ": " + injectMethod.getClassName() + "#" + injectMethod.getMethodName() + injectMethod.getMethodDesc() + " ===Before===> " + owner + "#" + name + desc);
                     }
                 }
@@ -107,7 +107,7 @@ public class InjectAroundClassVisitor extends ClassVisitor {
                         for (int tmpLocal : locals) {
                             loadLocal(tmpLocal);
                         }
-                        invokeStatic(Type.getType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
+                        invokeStatic(Type.getObjectType(injectMethod.getClassName()), new Method(injectMethod.getMethodName(), injectMethod.getMethodDesc()));
                         mLog.debug(mCurrentClass + ": " + injectMethod.getClassName() + "#" + injectMethod.getMethodName() + injectMethod.getMethodDesc() + " ===After===> " + owner + "#" + name + desc);
                     }
                 }
