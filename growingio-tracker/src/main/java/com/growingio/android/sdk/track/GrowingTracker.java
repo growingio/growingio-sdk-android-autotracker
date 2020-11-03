@@ -22,30 +22,18 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.growingio.android.sdk.track.crash.CrashManager;
-import com.growingio.android.sdk.track.events.TrackEventGenerator;
-import com.growingio.android.sdk.track.interfaces.InitExtraOperation;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
-import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
-import com.growingio.android.sdk.track.providers.SessionProvider;
-import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
-import com.growingio.android.sdk.track.webservices.WebServicesProvider;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class GrowingTracker implements IGrowingTracker {
-    static final String TAG = "GrowingTracker";
+    private static final String TAG = "GrowingTracker";
+
+    private final Tracker mTracker;
 
     private static volatile IGrowingTracker sInstance;
-    private static volatile boolean sInitializedSuccessfully = false;
-
-    private TrackMainThread mTrackMainThread;
 
     public static IGrowingTracker get() {
         if (sInstance != null) {
@@ -59,15 +47,11 @@ public class GrowingTracker implements IGrowingTracker {
         }
     }
 
-    public static boolean initializedSuccessfully() {
-        return sInitializedSuccessfully;
+    private GrowingTracker(Tracker tracker) {
+        mTracker = tracker;
     }
 
     public static void startWithConfiguration(Application application, TrackConfiguration trackConfiguration) {
-        startWithConfiguration(application, trackConfiguration, null);
-    }
-
-    public static void startWithConfiguration(Application application, TrackConfiguration trackConfiguration, InitExtraOperation initExtraOperation) {
         if (sInstance != null) {
             Logger.e(TAG, "GrowingTracker is running");
             return;
@@ -91,64 +75,13 @@ public class GrowingTracker implements IGrowingTracker {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
             Log.e(TAG, "GrowingTracker 暂不支持Android 4.2以下版本");
+            return;
         }
 
-        ConfigurationProvider.get().setTrackConfiguration(trackConfiguration);
+        sInstance = new GrowingTracker(new Tracker(application, trackConfiguration));
 
-        if (trackConfiguration.isDebugEnabled()) {
-            Logger.addLogger(new DebugLogger());
-        }
-
-        if (trackConfiguration.isUploadExceptionEnabled()) {
-            CrashManager.register(application);
-        }
-
-        if (initExtraOperation == null) {
-            initExtraOperation = new InitExtraOperation() {
-                @Override
-                public void initializing() {
-                }
-
-                @Override
-                public void initSuccess() {
-                }
-            };
-        }
-/*
-        if (configuration.isUploadExceptionEnable()){
-            CrashManager.register(application);
-        }*/
-
-        GrowingTracker tracker = new GrowingTracker();
-
-        // ActivityState优先级最高
-        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
-
-        try {
-            initExtraOperation.initializing();
-        } catch (Throwable e) {
-            if (trackConfiguration.isDebugEnabled()) {
-                throw e;
-            }
-            Logger.e(TAG, e, "初始化SDK失败");
-        }
-        initExtraOperation.initSuccess();
-        initCoreService();
-        tracker.mTrackMainThread = TrackMainThread.trackMain();
-        sInstance = tracker;
-
-        initOtherService();
-        sInitializedSuccessfully = true;
         Log.i(TAG, "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!");
         Log.i(TAG, "!!! GrowingIO Tracker version: " + SDKConfig.SDK_VERSION + " !!!");
-    }
-
-    private static void initCoreService() {
-        TrackMainThread.trackMain().register(SessionProvider.get());
-    }
-
-    private static void initOtherService() {
-        WebServicesProvider.get().start();
     }
 
     private static IGrowingTracker makeEmpty() {
@@ -158,107 +91,56 @@ public class GrowingTracker implements IGrowingTracker {
 
     @Override
     public void trackCustomEvent(String eventName) {
-        trackCustomEvent(eventName, null);
+        mTracker.trackCustomEvent(eventName);
     }
 
     @Override
     public void trackCustomEvent(String eventName, Map<String, String> attributes) {
-        if (TextUtils.isEmpty(eventName)) {
-            Logger.e(TAG, "trackCustomEvent: eventName is NULL");
-            return;
-        }
-
-        if (attributes != null) {
-            attributes = new HashMap<>(attributes);
-        }
-        TrackEventGenerator.generateCustomEvent(eventName, attributes);
+        mTracker.trackCustomEvent(eventName, attributes);
     }
 
     @Override
     public void setConversionVariables(Map<String, String> variables) {
-        if (variables == null || variables.isEmpty()) {
-            Logger.e(TAG, "setConversionVariables: variables is NULL");
-            return;
-        }
-        TrackEventGenerator.generateConversionVariablesEvent(new HashMap<>(variables));
+        mTracker.setConversionVariables(variables);
     }
 
     @Override
     public void setLoginUserAttributes(Map<String, String> attributes) {
-        if (attributes == null || attributes.isEmpty()) {
-            Logger.e(TAG, "setLoginUserAttributes: attributes is NULL");
-            return;
-        }
-        TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
+        mTracker.setLoginUserAttributes(attributes);
     }
 
     @Override
     public void setVisitorAttributes(Map<String, String> attributes) {
-        if (attributes == null || attributes.isEmpty()) {
-            Logger.e(TAG, "setVisitorAttributes: attributes is NULL");
-            return;
-        }
-        TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>(attributes));
+        mTracker.setVisitorAttributes(attributes);
     }
 
     @Override
     public void getDeviceId(@NonNull ResultCallback<String> callback) {
-        if (callback != null) {
-            DeviceInfoProvider.get().getDeviceId(callback);
-        } else {
-            Log.e(TAG, "getDeviceId was called, but callback is null, return");
-        }
+        mTracker.getDeviceId(callback);
     }
 
     @Override
     public void setDataCollectionEnabled(boolean enabled) {
-        if (enabled == ConfigurationProvider.get().isDataCollectionEnabled()) {
-            Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
-        } else {
-            ConfigurationProvider.get().setDataCollectionEnabled(true);
-            if (enabled) {
-                SessionProvider.get().forceReissueVisit();
-            }
-        }
+        mTracker.setDataCollectionEnabled(enabled);
     }
 
     @Override
-    public void setLoginUserId(final String userId) {
-        mTrackMainThread.postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                UserInfoProvider.get().setLoginUserId(userId);
-            }
-        });
+    public void setLoginUserId(String userId) {
+        mTracker.setLoginUserId(userId);
     }
 
     @Override
     public void cleanLoginUserId() {
-        mTrackMainThread.postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                UserInfoProvider.get().setLoginUserId(null);
-            }
-        });
+        mTracker.cleanLoginUserId();
     }
 
     @Override
-    public void setLocation(final double latitude, final double longitude) {
-        mTrackMainThread.postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                SessionProvider.get().setLocation(latitude, longitude);
-            }
-        });
+    public void setLocation(double latitude, double longitude) {
+        mTracker.setLocation(latitude, longitude);
     }
 
     @Override
     public void cleanLocation() {
-        mTrackMainThread.postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                SessionProvider.get().cleanLocation();
-            }
-        });
+        mTracker.cleanLocation();
     }
 }

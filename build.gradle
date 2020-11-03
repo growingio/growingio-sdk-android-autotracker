@@ -39,7 +39,11 @@ buildscript {
                 ],
 
                 'growingio': [
-                        'gmonitor': 'com.growingio.android:gmonitor:1.4.0',
+                        'gmonitor'        : 'com.growingio.android:gmonitor:1.4.0',
+                        'tracker_core'    : "com.growingio.android:tracker-core:$releaseConfiguration.releaseVersion",
+                        'tracker'         : "com.growingio.android:tracker:$releaseConfiguration.releaseVersion",
+                        'autotracker_core': "com.growingio.android:autotracker-core:$releaseConfiguration.releaseVersion",
+                        'autotracker'     : "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion",
                 ],
 
                 'google'   : [

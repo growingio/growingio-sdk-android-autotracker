@@ -20,14 +20,14 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.EditText;
 
-import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
 import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
-import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
+import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.autotrack.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.autotrack.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -39,16 +39,8 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChangedListener {
     private static final String TAG = "ViewChangeProvider";
 
-    private static class SingleInstance {
-        private static final ViewChangeProvider INSTANCE = new ViewChangeProvider();
-    }
 
-    private ViewChangeProvider() {
-
-    }
-
-    public static ViewChangeProvider get() {
-        return SingleInstance.INSTANCE;
+    public ViewChangeProvider() {
     }
 
     public void start() {
@@ -83,7 +75,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
     }
 
     public static void viewOnChange(View view) {
-        if (!AutotrackConfiguration.initializedSuccessfully()) {
+        if (!Autotracker.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
         }
 

@@ -28,7 +28,7 @@ public class ContextProvider {
         return sApplicationContext;
     }
 
-    static void setContext(Context context) {
+    public static void setContext(Context context) {
         sApplicationContext = context.getApplicationContext();
     }
 }

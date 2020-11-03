@@ -50,6 +50,7 @@ public class TrackEventsTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
+        DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration());
     }
 
