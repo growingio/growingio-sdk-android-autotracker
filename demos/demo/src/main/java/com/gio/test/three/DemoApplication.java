@@ -26,6 +26,7 @@ import android.webkit.WebView;
 
 import androidx.annotation.RequiresApi;
 
+//import com.bun.miitmdid.core.JLibrary;
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.log.Logger;
@@ -40,6 +41,17 @@ public class DemoApplication extends Application {
 
     public static void setConfiguration(AutotrackConfiguration configuration) {
         sConfiguration = configuration;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        // 1.0.22版本后删除, 无需调用该初始化方法, 也不再提供该类
+//        try {
+//            JLibrary.InitEntry(base);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O_MR1)

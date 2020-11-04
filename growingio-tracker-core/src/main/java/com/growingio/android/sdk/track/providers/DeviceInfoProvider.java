@@ -28,6 +28,10 @@ import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.utils.ClassExistHelper;
+import com.growingio.android.sdk.track.utils.OaidHelper1010;
+import com.growingio.android.sdk.track.utils.OaidHelper1013;
+import com.growingio.android.sdk.track.utils.OaidHelper1022;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
 import java.nio.charset.Charset;
@@ -81,6 +85,15 @@ public class DeviceInfoProvider {
     }
 
     public String getOaid() {
+        if (TextUtils.isEmpty(mOaid) && ConfigurationProvider.get().isDataCollectionEnabled()) {
+            if (ClassExistHelper.isHasMSA1022()) {
+                mOaid = new OaidHelper1022().getOaid(mContext);
+            } else if (ClassExistHelper.isHasMSA1013()) {
+                mOaid = new OaidHelper1013().getOaid(mContext);
+            } else if (ClassExistHelper.isHasMSA1010()) {
+                mOaid = new OaidHelper1010().getOaid(mContext);
+            }
+        }
         return mOaid;
     }
 

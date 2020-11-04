@@ -46,6 +46,9 @@ public class ClassExistHelper {
     private static boolean sHasAndroidXFragment;
     private static boolean sHasAndroidXFragmentActivity;
     private static boolean sHasAndroidXAlertDialog;
+    private static boolean sHasMSA1010;
+    private static boolean sHasMSA1013;
+    private static boolean sHasMSA1022;
 
     static {
         sHasX5WebView = hasClass("com.tencent.smtt.sdk.WebView");
@@ -64,6 +67,9 @@ public class ClassExistHelper {
         sHasAndroidXFragmentActivity = hasClass("androidx.fragment.app.FragmentActivity");
         sHasAndroidXAlertDialog = hasClass("androidx.appcompat.app.AlertDialog");
         sHasAndroidXListMenuItemView = hasClass("androidx.appcompat.view.menu.ListMenuItemView");
+        sHasMSA1010 = hasClass("com.bun.miitmdid.core.IIdentifierListener");
+        sHasMSA1013 = hasClass("com.bun.supplier.IIdentifierListener");
+        sHasMSA1022 = hasClass("com.bun.miitmdid.interfaces.IIdentifierListener");
     }
 
     private ClassExistHelper() {
@@ -76,6 +82,18 @@ public class ClassExistHelper {
         } catch (Throwable e) {
             return false;
         }
+    }
+
+    public static boolean isHasMSA1010() {
+        return sHasMSA1010;
+    }
+
+    public static boolean isHasMSA1013() {
+        return sHasMSA1013;
+    }
+
+    public static boolean isHasMSA1022() {
+        return sHasMSA1022;
     }
 
     /**

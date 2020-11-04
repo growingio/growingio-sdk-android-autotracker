@@ -37,6 +37,12 @@ android {
         multiDexEnabled true
     }
 
+    repositories {
+        flatDir {
+            dirs '../../thirdLibs'
+        }
+    }
+
     lintOptions {
         abortOnError false
     }
@@ -128,6 +134,9 @@ dependencies {
     implementation libraries.android.constraint
     implementation libraries.android.multidex
     implementation libraries.others.x5_webview
+    implementation (name: 'oaid_sdk_1.0.22', ext: 'aar')
+//    implementation (name: 'msa_mdid_1.0.13', ext: 'aar')
+//    implementation (name: 'miit_mdid_1.0.10', ext: 'aar')
     debugImplementation project(':growingio-tracker-api')
     releaseImplementation "com.growingio.android:tracker:$releaseConfiguration.releaseVersion"
     implementation project(':demo-core')
