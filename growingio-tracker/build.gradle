@@ -38,4 +38,4 @@ dependencies {
     compileOnly libraries.android.appcompat
 }
 
-apply from: "${project.rootProject.file('maven_push.gradle')}"
+apply from: "${project.rootProject.file('mavenPush.gradle')}"
