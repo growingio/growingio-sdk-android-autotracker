@@ -22,6 +22,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 
+import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
@@ -34,6 +35,10 @@ import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.variation.EventHttpSender;
 import com.growingio.android.sdk.track.variation.TrackEventJsonMarshaller;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * GrowingIO主线程
  */
@@ -45,6 +50,8 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     private final Looper mMainLooper;
     private final Handler mMainHandler;
     private final EventSender mEventSender;
+
+    private final List<EventBuildInterceptor> mEventBuildInterceptors = new ArrayList<>();
 
     private TrackMainThread() {
         TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
@@ -104,11 +111,68 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     @TrackThread
     void onGenerateGEvent(BaseEvent.BaseBuilder<?> gEvent) {
         gEvent.readPropertyInTrackThread();
-        saveEvent(gEvent.build());
+        dispatchEventWillBuild(gEvent);
+        BaseEvent event = gEvent.build();
+        dispatchEventDidBuild(event);
+        saveEvent(event);
+    }
+
+    public void addEventBuildInterceptor(EventBuildInterceptor interceptor) {
+        synchronized (mEventBuildInterceptors) {
+            boolean needsAdd = true;
+            Iterator<EventBuildInterceptor> refIter = mEventBuildInterceptors.iterator();
+            while (refIter.hasNext()) {
+                EventBuildInterceptor storedInterceptor = refIter.next();
+                if (null == storedInterceptor) {
+                    refIter.remove();
+                } else if (storedInterceptor == interceptor) {
+                    needsAdd = false;
+                }
+            }
+            if (needsAdd) {
+                mEventBuildInterceptors.add(interceptor);
+            }
+        }
+    }
+
+    private void dispatchEventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
+        synchronized (mEventBuildInterceptors) {
+            Iterator<EventBuildInterceptor> refIter = mEventBuildInterceptors.iterator();
+            while (refIter.hasNext()) {
+                EventBuildInterceptor interceptor = refIter.next();
+                if (null == interceptor) {
+                    refIter.remove();
+                } else {
+                    try {
+                        interceptor.eventWillBuild(eventBuilder);
+                    } catch (Exception e) {
+                        Logger.e(TAG, e);
+                    }
+                }
+            }
+        }
+    }
+
+    private void dispatchEventDidBuild(GEvent event) {
+        synchronized (mEventBuildInterceptors) {
+            Iterator<EventBuildInterceptor> refIter = mEventBuildInterceptors.iterator();
+            while (refIter.hasNext()) {
+                EventBuildInterceptor interceptor = refIter.next();
+                if (null == interceptor) {
+                    refIter.remove();
+                } else {
+                    try {
+                        interceptor.eventDidBuild(event);
+                    } catch (Exception e) {
+                        Logger.e(TAG, e);
+                    }
+                }
+            }
+        }
     }
 
     @TrackThread
-    public void saveEvent(GEvent event) {
+    private void saveEvent(GEvent event) {
         if (event instanceof BaseEvent) {
             Logger.printJson(TAG, "save: event, type is " + event.getEventType(), ((BaseEvent) event).toJSONObject().toString());
         }

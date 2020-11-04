@@ -33,6 +33,9 @@ import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class BaseEvent extends GEvent {
     private static final String APP_STATE_FOREGROUND = "FOREGROUND";
     private static final String APP_STATE_BACKGROUND = "BACKGROUND";
@@ -47,6 +50,7 @@ public abstract class BaseEvent extends GEvent {
     private final String mAppState;
     private final long mGlobalSequenceId;
     private final long mEventSequenceId;
+    private final Map<String, String> mExtraParams;
 
     protected BaseEvent(BaseBuilder<?> eventBuilder) {
         mDeviceId = eventBuilder.mDeviceId;
@@ -59,6 +63,7 @@ public abstract class BaseEvent extends GEvent {
         mAppState = eventBuilder.mAppState;
         mGlobalSequenceId = eventBuilder.mGlobalSequenceId;
         mEventSequenceId = eventBuilder.mEventSequenceId;
+        mExtraParams = eventBuilder.mExtraParams;
     }
 
     public static String getAppStateForeground() {
@@ -111,7 +116,12 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public JSONObject toJSONObject() {
-        JSONObject json = new JSONObject();
+        JSONObject json;
+        if (!mExtraParams.isEmpty()) {
+            json = new JSONObject(mExtraParams);
+        } else {
+            json = new JSONObject();
+        }
         try {
             json.put("deviceId", mDeviceId);
             if (!TextUtils.isEmpty(mUserId)) {
@@ -141,6 +151,7 @@ public abstract class BaseEvent extends GEvent {
         private final String mAppState;
         private long mGlobalSequenceId;
         private long mEventSequenceId;
+        private final Map<String, String> mExtraParams = new HashMap<>();
 
         protected BaseBuilder() {
             mTimestamp = System.currentTimeMillis();
@@ -159,6 +170,11 @@ public abstract class BaseEvent extends GEvent {
             EventSequenceId sequenceId = PersistentDataProvider.get().getAndIncrement(mEventType);
             mGlobalSequenceId = sequenceId.getGlobalId();
             mEventSequenceId = sequenceId.getEventTypeId();
+        }
+
+        public BaseBuilder<?> addExtraParam(String key, String value) {
+            mExtraParams.put(key, value);
+            return this;
         }
 
         public abstract String getEventType();
