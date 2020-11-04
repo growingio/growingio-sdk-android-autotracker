@@ -1,2 +1,2 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.growingio.growingio_autotracker_api" />
+    package="com.growingio.android.sdk.autotrack.api" />

@@ -27,7 +27,7 @@ public abstract class ListenerContainer<L, A> {
 
     private final List<L> mListeners = new ArrayList<>();
 
-    public synchronized void register(L listener) {
+    public void register(L listener) {
         synchronized (mListeners) {
             boolean needsAdd = true;
             Iterator<L> refIter = mListeners.iterator();
@@ -45,7 +45,7 @@ public abstract class ListenerContainer<L, A> {
         }
     }
 
-    public synchronized void unregister(L listener) {
+    public void unregister(L listener) {
         synchronized (mListeners) {
             Iterator<L> refIter = mListeners.iterator();
             while (refIter.hasNext()) {

@@ -81,4 +81,13 @@ public class PersistentDataProvider {
     public void setLoginUserId(@Nullable String userId) {
         mDataSharer.putString(KEY_LOGIN_USER_ID, userId);
     }
+
+    public void putString(String key, @Nullable String value) {
+        mDataSharer.putString(key, value);
+    }
+
+    @Nullable
+    public String getString(String key, String defValue) {
+        return mDataSharer.getString(key, defValue);
+    }
 }

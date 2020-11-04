@@ -97,7 +97,7 @@ public class AutotrackPlugin implements Plugin<Project> {
     }
 
     private boolean findAutotrackDependency(DependencyResult dependency) {
-        String autotrackDependency = "com.growingio.android:autotracker:";
+        String autotrackDependency = "com.growingio.android:autotracker-core:";
         if (dependency.getRequested().getDisplayName().startsWith(autotrackDependency)) {
             String sdkVersion = dependency.getRequested().getDisplayName().split(":")[2];
             String pluginVersion = getPluginVersion();
@@ -110,7 +110,9 @@ public class AutotrackPlugin implements Plugin<Project> {
 
         if (dependency instanceof ResolvedDependencyResult) {
             for (DependencyResult result : ((ResolvedDependencyResult) dependency).getSelected().getDependencies()) {
-                findAutotrackDependency(result);
+                if (findAutotrackDependency(result)) {
+                    return true;
+                }
             }
         }
         return false;
