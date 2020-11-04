@@ -105,7 +105,7 @@ public abstract class WebServicesTest {
         Truth.assertThat(message.getString("projectId")).isEqualTo(TestTrackConfiguration.TEST_PROJECT_ID);
         Truth.assertThat(message.getLong("timestamp") > 0).isTrue();
         Truth.assertThat(message.getString("domain")).isEqualTo("com.gio.test.three");
-        Truth.assertThat(message.getString("sdkVersion").contains("3.")).isTrue();
+        Truth.assertThat(message.getString("sdkVersion")).isNotEmpty();
         Truth.assertThat(message.getInt("sdkVersionCode") > 0).isTrue();
         Truth.assertThat(message.getString("os")).isEqualTo("Android");
         Truth.assertThat(message.getInt("screenWidth") > 0).isTrue();
