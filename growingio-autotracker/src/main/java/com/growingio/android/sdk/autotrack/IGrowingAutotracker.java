@@ -17,16 +17,39 @@
 package com.growingio.android.sdk.autotrack;
 
 import android.app.Activity;
+import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.growingio.android.sdk.track.IGrowingTracker;
+import com.growingio.android.sdk.track.interfaces.ResultCallback;
 
 import java.util.Map;
 
 /**
  * GrowingAutotracker 无埋点 SDK 对外 API
  */
-public interface IGrowingAutotracker extends IGrowingTracker {
+public interface IGrowingAutotracker {
+
+    void trackCustomEvent(String eventName);
+
+    void trackCustomEvent(String eventName, Map<String, String> attributes);
+
+    void setLoginUserAttributes(Map<String, String> attributes);
+
+    void setVisitorAttributes(Map<String, String> attributes);
+
+    void setConversionVariables(Map<String, String> variables);
+
+    void setLoginUserId(String userId);
+
+    void cleanLoginUserId();
+
+    void setLocation(double latitude, double longitude);
+
+    void cleanLocation();
+
+    void setDataCollectionEnabled(boolean enabled);
+
+    void getDeviceId(@Nullable ResultCallback<String> callback);
 
     void setPageAttributes(Activity page, Map<String, String> attributes);
 
