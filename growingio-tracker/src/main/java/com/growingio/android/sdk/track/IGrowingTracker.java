@@ -48,18 +48,7 @@ public interface IGrowingTracker {
 
     void cleanLocation();
 
-    /**
-     * 打开或关闭数据采集
-     * 如果关闭，从代码调用开始, 后续所有事件不再采集, 但是之前采集生成的历史数据仍会发送
-     *
-     * @param enabled true打开数据采集，false关闭数据采集
-     */
     void setDataCollectionEnabled(boolean enabled);
 
-    /**
-     * 异步获取deviceId
-     *
-     * @param callback 对应回调,  回调线程不确定
-     */
     void getDeviceId(@Nullable ResultCallback<String> callback);
 }
