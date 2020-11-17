@@ -33,6 +33,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
+    private boolean mOaidEnabled = false;
 
     public String getProjectId() {
         return mProjectId;
@@ -126,6 +127,15 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return this;
     }
 
+    public boolean isOaidEnabled() {
+        return mOaidEnabled;
+    }
+
+    public TrackConfiguration setOaidEnabled(boolean enabled) {
+        this.mOaidEnabled = enabled;
+        return this;
+    }
+
     @NonNull
     @Override
     public TrackConfiguration clone() {
@@ -139,6 +149,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         clone.mSessionInterval = this.mSessionInterval;
         clone.mUploadExceptionEnabled = this.mUploadExceptionEnabled;
         clone.mDataCollectionServerHost = this.mDataCollectionServerHost;
+        clone.mOaidEnabled = this.mOaidEnabled;
         return clone;
     }
 }

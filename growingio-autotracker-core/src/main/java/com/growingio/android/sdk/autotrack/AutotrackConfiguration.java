@@ -97,6 +97,12 @@ public class AutotrackConfiguration extends TrackConfiguration {
         return this;
     }
 
+    @Override
+    public AutotrackConfiguration setOaidEnabled(boolean enabled) {
+        super.setOaidEnabled(enabled);
+        return this;
+    }
+
     @NonNull
     @Override
     public AutotrackConfiguration clone() {
@@ -111,6 +117,7 @@ public class AutotrackConfiguration extends TrackConfiguration {
                 .setUploadExceptionEnabled(isUploadExceptionEnabled())
                 .setDataCollectionEnabled(isDataCollectionEnabled())
                 .setImpressionScale(getImpressionScale())
-                .setDataCollectionServerHost(getDataCollectionServerHost());
+                .setDataCollectionServerHost(getDataCollectionServerHost())
+                .setOaidEnabled(isOaidEnabled());
     }
 }
