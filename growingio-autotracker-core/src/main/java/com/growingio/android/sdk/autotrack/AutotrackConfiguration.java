@@ -23,6 +23,10 @@ import com.growingio.android.sdk.track.TrackConfiguration;
 public class AutotrackConfiguration extends TrackConfiguration {
     private float mImpressionScale = 0;
 
+    public AutotrackConfiguration(String projectId, String urlScheme) {
+        super(projectId, urlScheme);
+    }
+
     public AutotrackConfiguration setImpressionScale(float scale) {
         if (scale < 0) {
             scale = 0;
@@ -35,18 +39,6 @@ public class AutotrackConfiguration extends TrackConfiguration {
 
     public float getImpressionScale() {
         return mImpressionScale;
-    }
-
-    @Override
-    public AutotrackConfiguration setProjectId(String projectId) {
-        super.setProjectId(projectId);
-        return this;
-    }
-
-    @Override
-    public AutotrackConfiguration setUrlScheme(String urlScheme) {
-        super.setUrlScheme(urlScheme);
-        return this;
     }
 
     @Override
@@ -106,9 +98,7 @@ public class AutotrackConfiguration extends TrackConfiguration {
     @NonNull
     @Override
     public AutotrackConfiguration clone() {
-        return new AutotrackConfiguration()
-                .setProjectId(getProjectId())
-                .setUrlScheme(getUrlScheme())
+        return new AutotrackConfiguration(getProjectId(), getUrlScheme())
                 .setChannel(getChannel())
                 .setDebugEnabled(isDebugEnabled())
                 .setCellularDataLimit(getCellularDataLimit())

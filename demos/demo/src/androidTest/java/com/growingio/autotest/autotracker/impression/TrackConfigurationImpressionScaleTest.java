@@ -90,7 +90,7 @@ public class TrackConfigurationImpressionScaleTest extends EventsTest {
     @Test
     public void invalidArgumentsTest() {
         ActivityScenario<ViewImpressionActivity> scenario = ActivityScenario.launch(ViewImpressionActivity.class);
-        AutotrackConfiguration configuration = new AutotrackConfiguration();
+        AutotrackConfiguration configuration = new AutotrackConfiguration("xxx", "xxx");
         configuration.setImpressionScale(-1);
         Truth.assertThat(configuration.getImpressionScale()).isEqualTo(0);
         configuration.setImpressionScale(1.12F);

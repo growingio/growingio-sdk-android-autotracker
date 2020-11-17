@@ -23,8 +23,9 @@ import androidx.annotation.NonNull;
 import com.growingio.android.sdk.track.base.Configurable;
 
 public class TrackConfiguration implements Cloneable, Configurable {
-    private String mProjectId;
-    private String mUrlScheme;
+    private final String mProjectId;
+    private final String mUrlScheme;
+
     private String mChannel;
     private boolean mDebugEnabled = false;
     private int mCellularDataLimit = 10;
@@ -35,13 +36,13 @@ public class TrackConfiguration implements Cloneable, Configurable {
     private String mDataCollectionServerHost = "http://api.growingio.com";
     private boolean mOaidEnabled = false;
 
-    public String getProjectId() {
-        return mProjectId;
+    public TrackConfiguration(String projectId, String urlScheme) {
+        mProjectId = projectId;
+        mUrlScheme = urlScheme;
     }
 
-    public TrackConfiguration setProjectId(String projectId) {
-        this.mProjectId = projectId;
-        return this;
+    public String getProjectId() {
+        return mProjectId;
     }
 
     public boolean isDataCollectionEnabled() {
@@ -55,11 +56,6 @@ public class TrackConfiguration implements Cloneable, Configurable {
 
     public String getUrlScheme() {
         return mUrlScheme;
-    }
-
-    public TrackConfiguration setUrlScheme(String urlScheme) {
-        this.mUrlScheme = urlScheme;
-        return this;
     }
 
     public String getChannel() {
@@ -139,9 +135,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
     @NonNull
     @Override
     public TrackConfiguration clone() {
-        TrackConfiguration clone = new TrackConfiguration();
-        clone.mProjectId = this.mProjectId;
-        clone.mUrlScheme = this.mUrlScheme;
+        TrackConfiguration clone = new TrackConfiguration(this.mProjectId, this.mUrlScheme);
         clone.mChannel = this.mChannel;
         clone.mDebugEnabled = this.mDebugEnabled;
         clone.mCellularDataLimit = this.mCellularDataLimit;
