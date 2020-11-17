@@ -155,6 +155,10 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
             return;
         }
+        if (ViewHelper.isIgnoredView(view)) {
+            Logger.e(TAG, "Current view is set to ignore");
+            return;
+        }
         if (!mStarted) {
             start();
         }

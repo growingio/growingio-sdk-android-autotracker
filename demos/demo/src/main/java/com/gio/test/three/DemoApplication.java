@@ -77,7 +77,8 @@ public class DemoApplication extends Application {
                     .setUploadExceptionEnabled(false)
                     .setProjectId("demoProjectId")
                     .setUrlScheme("growing.b6e4218d94f2bffc")
-                    .setDebugEnabled(true);
+                    .setDebugEnabled(true)
+                    .setOaidEnabled(false);
         }
         if (sIsAutotracker) {
             GrowingAutotracker.startWithConfiguration(this, sConfiguration);
