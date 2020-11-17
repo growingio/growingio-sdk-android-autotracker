@@ -25,9 +25,8 @@ public class TestTrackConfiguration extends AutotrackConfiguration {
     public static final String TEST_URL_SCHEME = "testUrlScheme";
 
     public TestTrackConfiguration() {
-        this.setUploadExceptionEnabled(false)
-                .setProjectId("testProjectId")
-                .setUrlScheme("testUrlScheme")
+        super(TEST_PROJECT_ID, TEST_URL_SCHEME);
+        setUploadExceptionEnabled(false)
                 .setDataCollectionServerHost(MOCK_SERVER_HOST)
                 .setDebugEnabled(true);
     }
