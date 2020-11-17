@@ -32,9 +32,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    debugApi project(':growingio-tracker')
-    releaseApi libraries.growingio.tracker
-
     debugApi project(':growingio-tracker-core')
     releaseApi libraries.growingio.tracker_core
 
