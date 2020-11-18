@@ -1,5 +1,6 @@
 apply plugin: 'maven-publish'
 apply plugin: 'com.novoda.bintray-release'
+apply plugin: "com.jfrog.artifactory"
 
 void writePom(node) {
     def allDependencies = new HashSet<DependencySet>()
@@ -45,6 +46,29 @@ publish {
     website = "https://github.com/growingio/growingio-sdk-android-autotracker"
     publications = ['releaseAgent']
 }
+
+artifactory {
+    contextUrl = 'http://oss.jfrog.org/artifactory'
+    resolve {
+        repository {
+            repoKey = 'libs-release'
+        }
+    }
+
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = bintrayUserName
+            password = bintrayApiKey
+            maven = true
+        }
+        defaults {
+            publications('releaseAgent')
+            publishArtifacts = true
+        }
+    }
+}
+
 
 afterEvaluate { project ->
     if (project.getPlugins().hasPlugin('com.android.library')) {

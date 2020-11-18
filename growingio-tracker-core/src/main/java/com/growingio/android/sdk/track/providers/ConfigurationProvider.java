@@ -60,7 +60,7 @@ public class ConfigurationProvider {
         if (mTrackConfiguration != null) {
             return mTrackConfiguration.clone();
         }
-        return new TrackConfiguration();
+        return new TrackConfiguration("NULL", "NULL");
     }
 
     public void setDataCollectionEnabled(boolean enabled) {

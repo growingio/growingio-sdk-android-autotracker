@@ -30,4 +30,11 @@ public class TestTrackConfiguration extends AutotrackConfiguration {
                 .setDataCollectionServerHost(MOCK_SERVER_HOST)
                 .setDebugEnabled(true);
     }
+
+    public TestTrackConfiguration(String urlScheme) {
+        super(TEST_PROJECT_ID, urlScheme);
+        setUploadExceptionEnabled(false)
+                .setDataCollectionServerHost(MOCK_SERVER_HOST)
+                .setDebugEnabled(true);
+    }
 }
