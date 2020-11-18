@@ -17,7 +17,10 @@
 package com.growingio.android.sdk.track;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.AnyThread;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
@@ -51,4 +54,6 @@ public interface IGrowingTracker {
     void setDataCollectionEnabled(boolean enabled);
 
     void getDeviceId(@Nullable ResultCallback<String> callback);
+
+    void onActivityNewIntent(@NonNull Activity activity, Intent intent);
 }

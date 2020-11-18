@@ -18,6 +18,7 @@ package com.growingio.android.sdk.track.providers;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -145,6 +146,10 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnDestroyedEvent(activity));
+    }
+
+    public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
+        dispatchActivityLifecycle(ActivityLifecycleEvent.createOnNewIntentEvent(activity, intent));
     }
 
     @Override
