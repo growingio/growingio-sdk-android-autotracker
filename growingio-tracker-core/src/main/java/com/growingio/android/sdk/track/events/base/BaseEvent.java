@@ -25,10 +25,12 @@ import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
+import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +42,8 @@ public abstract class BaseEvent extends GEvent {
     private static final String APP_STATE_FOREGROUND = "FOREGROUND";
     private static final String APP_STATE_BACKGROUND = "BACKGROUND";
 
+    private final String mPlatform;
+    private final String mPlatformVersion;
     private final String mDeviceId;
     private final String mUserId;
     private final String mSessionId;
@@ -53,6 +57,8 @@ public abstract class BaseEvent extends GEvent {
     private final Map<String, String> mExtraParams;
 
     protected BaseEvent(BaseBuilder<?> eventBuilder) {
+        mPlatform = eventBuilder.mPlatform;
+        mPlatformVersion = eventBuilder.mPlatformVersion;
         mDeviceId = eventBuilder.mDeviceId;
         mUserId = eventBuilder.mUserId;
         mSessionId = eventBuilder.mSessionId;
@@ -123,6 +129,8 @@ public abstract class BaseEvent extends GEvent {
             json = new JSONObject();
         }
         try {
+            json.put("platform", mPlatform);
+            json.put("platformVersion", mPlatformVersion);
             json.put("deviceId", mDeviceId);
             if (!TextUtils.isEmpty(mUserId)) {
                 json.put("userId", mUserId);
@@ -141,6 +149,8 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public static abstract class BaseBuilder<T extends BaseEvent> {
+        private String mPlatform;
+        private String mPlatformVersion;
         private String mDeviceId;
         private String mUserId;
         protected String mSessionId;
@@ -154,10 +164,12 @@ public abstract class BaseEvent extends GEvent {
         private final Map<String, String> mExtraParams = new HashMap<>();
 
         protected BaseBuilder() {
+            mPlatform = ConstantPool.ANDROID;
+            mPlatformVersion = DeviceInfoProvider.get().getOperatingSystemVersion();
             mTimestamp = System.currentTimeMillis();
             mEventType = getEventType();
             mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
-            mDomain = ConfigurationProvider.get().getPackageName();
+            mDomain = AppInfoProvider.get().getPackageName();
             mUrlScheme = ConfigurationProvider.get().getTrackConfiguration().getUrlScheme();
         }
 

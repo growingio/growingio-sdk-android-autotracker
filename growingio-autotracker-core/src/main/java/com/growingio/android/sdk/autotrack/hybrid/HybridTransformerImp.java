@@ -36,7 +36,7 @@ import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.JsonUtil;
 
 import org.json.JSONException;
@@ -137,7 +137,7 @@ public class HybridTransformerImp implements HybridTransformer {
     private String getDomain(JSONObject event) {
         String domain = event.optString(KEY_DOMAIN);
         if (TextUtils.isEmpty(domain)) {
-            domain = ConfigurationProvider.get().getPackageName();
+            domain = AppInfoProvider.get().getPackageName();
         }
         return domain;
     }

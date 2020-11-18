@@ -28,6 +28,7 @@ import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.async.HandlerDisposable;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.json.JSONException;
@@ -54,9 +55,10 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
     private WebViewJavascriptBridgeConfiguration getJavascriptBridgeConfiguration() {
         String projectId = ConfigurationProvider.get().getTrackConfiguration().getProjectId();
         String appId = ConfigurationProvider.get().getTrackConfiguration().getUrlScheme();
+        String appPackage = AppInfoProvider.get().getPackageName();
         String nativeSdkVersion = SDKConfig.SDK_VERSION;
         int nativeSdkVersionCode = SDKConfig.SDK_VERSION_CODE;
-        return new WebViewJavascriptBridgeConfiguration(projectId, appId, nativeSdkVersion, nativeSdkVersionCode);
+        return new WebViewJavascriptBridgeConfiguration(projectId, appId, appPackage, nativeSdkVersion, nativeSdkVersionCode);
     }
 
     public void onDomChanged() {

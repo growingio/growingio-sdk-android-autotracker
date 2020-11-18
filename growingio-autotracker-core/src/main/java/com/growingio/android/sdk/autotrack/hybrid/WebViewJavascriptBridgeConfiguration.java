@@ -26,12 +26,14 @@ class WebViewJavascriptBridgeConfiguration {
 
     private final String mProjectId;
     private final String mAppId;
+    private final String mAppPackage;
     private final String mNativeSdkVersion;
     private final int mNativeSdkVersionCode;
 
-    WebViewJavascriptBridgeConfiguration(String projectId, String appId, String nativeSdkVersion, int nativeSdkVersionCode) {
+    WebViewJavascriptBridgeConfiguration(String projectId, String appId, String appPackage, String nativeSdkVersion, int nativeSdkVersionCode) {
         mProjectId = projectId;
         mAppId = appId;
+        mAppPackage = appPackage;
         mNativeSdkVersion = nativeSdkVersion;
         mNativeSdkVersionCode = nativeSdkVersionCode;
     }
@@ -41,6 +43,7 @@ class WebViewJavascriptBridgeConfiguration {
         try {
             jsonObject.put("projectId", mProjectId);
             jsonObject.put("appId", mAppId);
+            jsonObject.put("appPackage", mAppPackage);
             jsonObject.put("nativeSdkVersion", mNativeSdkVersion);
             jsonObject.put("nativeSdkVersionCode", mNativeSdkVersionCode);
             return jsonObject;
