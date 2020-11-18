@@ -22,4 +22,6 @@ public class SDKConfig {
 
     public static final String SDK_VERSION = BuildConfig.VERSION_NAME;
     public static final int SDK_VERSION_CODE = BuildConfig.VERSION_CODE;
+    public static final String SDK_BUILD_TIME = BuildConfig.BUILD_TIME;
+    public static final String SDK_BUILD_GIT_SHA = BuildConfig.GIT_SHA;
 }

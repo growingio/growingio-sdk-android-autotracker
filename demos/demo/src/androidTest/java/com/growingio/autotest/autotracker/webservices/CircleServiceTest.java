@@ -66,7 +66,7 @@ public class CircleServiceTest extends WebServicesTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setConfiguration(new TestTrackConfiguration().setUrlScheme("growing.b6e4218d94f2bffc"));
+        DemoApplication.setConfiguration(new TestTrackConfiguration("growing.b6e4218d94f2bffc"));
     }
 
     @Test
