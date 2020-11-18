@@ -16,7 +16,9 @@
 
 package com.growingio.android.sdk.track;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -161,6 +163,14 @@ public class Tracker {
                 SessionProvider.get().cleanLocation();
             }
         });
+    }
+
+    public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
+        if (activity == null) {
+            Logger.e(TAG, "activity is NULL");
+            return;
+        }
+        ActivityStateProvider.get().onActivityNewIntent(activity, intent);
     }
 
 }

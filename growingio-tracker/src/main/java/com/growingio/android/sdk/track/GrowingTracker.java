@@ -16,7 +16,9 @@
 
 package com.growingio.android.sdk.track;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -117,6 +119,11 @@ public class GrowingTracker implements IGrowingTracker {
     @Override
     public void getDeviceId(@NonNull ResultCallback<String> callback) {
         mTracker.getDeviceId(callback);
+    }
+
+    @Override
+    public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
+        mTracker.onActivityNewIntent(activity, intent);
     }
 
     @Override
