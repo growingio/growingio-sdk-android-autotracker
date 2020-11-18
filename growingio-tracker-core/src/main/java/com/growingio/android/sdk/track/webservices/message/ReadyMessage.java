@@ -21,6 +21,7 @@ import android.util.DisplayMetrics;
 
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.SDKConfig;
+import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 
@@ -56,7 +57,7 @@ public class ReadyMessage {
     public static ReadyMessage createMessage() {
         Context context = ContextProvider.getApplicationContext();
         String projectId = ConfigurationProvider.get().getTrackConfiguration().getProjectId();
-        String domain = ConfigurationProvider.get().getPackageName();
+        String domain = AppInfoProvider.get().getPackageName();
         String sdkVersion = SDKConfig.SDK_VERSION;
         int sdkVersionCode = SDKConfig.SDK_VERSION_CODE;
 

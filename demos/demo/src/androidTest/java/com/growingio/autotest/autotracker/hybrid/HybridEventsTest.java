@@ -97,6 +97,7 @@ public class HybridEventsTest extends EventsTest {
                     try {
                         JSONObject config = new JSONObject(value);
                         Truth.assertThat(config.getString("appId")).isEqualTo("testUrlScheme");
+                        Truth.assertThat(config.getString("appPackage")).isEqualTo("com.gio.test.three");
                         Truth.assertThat(config.getString("projectId")).isEqualTo("testProjectId");
                         Truth.assertThat(config.getString("nativeSdkVersion")).isEqualTo(SDKConfig.SDK_VERSION);
                         Truth.assertThat(config.getInt("nativeSdkVersionCode")).isEqualTo(SDKConfig.SDK_VERSION_CODE);

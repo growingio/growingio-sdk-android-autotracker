@@ -18,10 +18,12 @@ package com.growingio.android.sdk.track.providers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -29,6 +31,8 @@ import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
+import com.growingio.android.sdk.track.utils.ConstantPool;
+import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.utils.OaidHelper;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
@@ -38,9 +42,19 @@ import java.util.UUID;
 public class DeviceInfoProvider {
     private static final String TAG = "DeviceInfoProvider";
 
+    private static final String DEVICE_TYPE_PHONE = "PHONE";
+    private static final String DEVICE_TYPE_PAD = "PAD";
+
     private static final String MAGIC_ANDROID_ID = "9774d56d682e549c";
 
     private final Context mContext;
+
+    private String mOperatingSystemVersion;
+    private String mDeviceBrand;
+    private String mDeviceModel;
+    private String mDeviceType;
+    private int mScreenHeight;
+    private int mScreenWidth;
 
     private String mAndroidId;
     private String mImei;
@@ -58,6 +72,50 @@ public class DeviceInfoProvider {
 
     public static DeviceInfoProvider get() {
         return SingleInstance.INSTANCE;
+    }
+
+    public String getOperatingSystemVersion() {
+        if (TextUtils.isEmpty(mOperatingSystemVersion)) {
+            mOperatingSystemVersion = Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE;
+        }
+        return mOperatingSystemVersion;
+    }
+
+    public String getDeviceBrand() {
+        if (TextUtils.isEmpty(mDeviceBrand)) {
+            mDeviceBrand = Build.BRAND == null ? ConstantPool.UNKNOWN : Build.BRAND;
+        }
+        return mDeviceBrand;
+    }
+
+    public String getDeviceModel() {
+        if (TextUtils.isEmpty(mDeviceModel)) {
+            mDeviceModel = Build.MODEL == null ? ConstantPool.UNKNOWN : Build.MODEL;
+        }
+        return mDeviceModel;
+    }
+
+    public String getDeviceType() {
+        if (TextUtils.isEmpty(mDeviceType)) {
+            mDeviceType = DeviceUtil.isPhone(mContext) ? DEVICE_TYPE_PHONE : DEVICE_TYPE_PAD;
+        }
+        return mDeviceType;
+    }
+
+    public int getScreenHeight() {
+        if (mScreenHeight <= 0) {
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(mContext);
+            mScreenHeight = metrics.heightPixels;
+        }
+        return mScreenHeight;
+    }
+
+    public int getScreenWidth() {
+        if (mScreenWidth <= 0) {
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(mContext);
+            mScreenWidth = metrics.widthPixels;
+        }
+        return mScreenWidth;
     }
 
     @SuppressLint({"MissingPermission", "HardwareIds"})

@@ -18,15 +18,15 @@ package com.growingio.android.sdk.track.providers;
 
 import androidx.annotation.NonNull;
 
-import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.TrackConfiguration;
 import com.growingio.android.sdk.track.base.Configurable;
+import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationProvider {
-    private TrackConfiguration mTrackConfiguration;
+    private volatile TrackConfiguration mTrackConfiguration;
     private static final Map<Class<? extends Configurable>, Configurable> OTHER_CONFIGURATIONS = new HashMap();
 
     private static class SingleInstance {
@@ -60,7 +60,7 @@ public class ConfigurationProvider {
         if (mTrackConfiguration != null) {
             return mTrackConfiguration.clone();
         }
-        return new TrackConfiguration("NULL", "NULL");
+        return new TrackConfiguration(ConstantPool.UNKNOWN, ConstantPool.UNKNOWN);
     }
 
     public void setDataCollectionEnabled(boolean enabled) {
@@ -73,9 +73,5 @@ public class ConfigurationProvider {
         if (mTrackConfiguration == null) {
             mTrackConfiguration = configuration.clone();
         }
-    }
-
-    public String getPackageName() {
-        return ContextProvider.getApplicationContext().getPackageName();
     }
 }
