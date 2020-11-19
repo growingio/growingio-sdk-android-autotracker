@@ -16,9 +16,15 @@
 
 package com.growingio.autotest.tracker;
 
+import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
 import androidx.lifecycle.Lifecycle;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -26,6 +32,7 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.MainActivity;
 import com.google.common.truth.Truth;
+import com.growingio.android.sdk.track.BuildConfig;
 import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.autotest.EventsTest;
@@ -43,6 +50,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -52,6 +60,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class SessionEventsTest extends EventsTest {
+    private static final String APP_CHANNEL = "AutoTest";
+
     private String mSessionId;
     private String mNewSessionId;
     private String mLoginUserId;
@@ -66,7 +76,51 @@ public class SessionEventsTest extends EventsTest {
         DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration()
                 .setSessionInterval(10)
+                .setChannel(APP_CHANNEL)
         );
+    }
+
+    private void checkVisitEvent(JSONArray jsonArray) throws JSONException {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            Truth.assertThat(jsonObject.getString("networkState")).isIn(Arrays.asList("2G", "3G", "4G", "5G", "WIFI", "UNKNOWN"));
+            Truth.assertThat(jsonObject.getString("appChannel")).isEqualTo(APP_CHANNEL);
+
+            DisplayMetrics metrics = new DisplayMetrics();
+            Display display = ((WindowManager) ApplicationProvider.getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                display.getRealMetrics(metrics);
+            } else {
+                display.getMetrics(metrics);
+            }
+            Truth.assertThat(jsonObject.getInt("screenHeight")).isEqualTo(metrics.heightPixels);
+            Truth.assertThat(jsonObject.getInt("screenWidth")).isEqualTo(metrics.widthPixels);
+
+            Truth.assertThat(jsonObject.getString("deviceBrand")).isEqualTo(Build.BRAND == null ? "UNKNOWN" : Build.BRAND);
+            Truth.assertThat(jsonObject.getString("deviceModel")).isEqualTo(Build.MODEL == null ? "UNKNOWN" : Build.MODEL);
+            Truth.assertThat(jsonObject.getString("deviceType")).isEqualTo("PHONE");
+            Truth.assertThat(jsonObject.getString("appName")).isEqualTo("demos");
+            Truth.assertThat(jsonObject.getString("appVersion")).isEqualTo("3.2");
+            Truth.assertThat(jsonObject.getString("language")).isNotEmpty();
+
+            if (jsonObject.has("latitude")) {
+                Truth.assertThat(jsonObject.getDouble("latitude")).isGreaterThan(0);
+                Truth.assertThat(jsonObject.getDouble("longitude")).isGreaterThan(0);
+            }
+            if (jsonObject.has("imei")) {
+                Truth.assertThat(jsonObject.getString("imei")).isNotEmpty();
+            }
+            if (jsonObject.has("androidId")) {
+                Truth.assertThat(jsonObject.getString("androidId")).isNotEmpty();
+            }
+            if (jsonObject.has("oaid")) {
+                Truth.assertThat(jsonObject.getString("oaid")).isNotEmpty();
+            }
+            if (jsonObject.has("googleAdvertisingId")) {
+                Truth.assertThat(jsonObject.getString("googleAdvertisingId")).isNotEmpty();
+            }
+            Truth.assertThat(jsonObject.getString("sdkVersion")).isEqualTo(BuildConfig.VERSION_NAME);
+        }
     }
 
     /**
@@ -81,6 +135,7 @@ public class SessionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 mSessionId = visit.getString("sessionId");
                 receivedVisit.set(true);
@@ -123,9 +178,12 @@ public class SessionEventsTest extends EventsTest {
 
         receivedVisit.set(false);
         receivedAppClosed.set(false);
+        getEventsApiServer().setCheckSessionId(false);
+
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 mNewSessionId = visit.getString("sessionId");
                 if (!mNewSessionId.equals(mSessionId)) {
@@ -165,10 +223,13 @@ public class SessionEventsTest extends EventsTest {
      */
     @Test
     public void resendVisitEventByLoginUserIdChangedTest() {
+        getEventsApiServer().setCheckSessionId(false);
+        getEventsApiServer().setCheckUserId(false);
         final AtomicBoolean receivedVisit = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 mSessionId = visit.getString("sessionId");
                 mLoginUserId = visit.optString("userId");
@@ -194,6 +255,7 @@ public class SessionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 if (!visit.getString("sessionId").equals(mSessionId)
                         && visit.getString("userId").equals("New" + mLoginUserId)
@@ -229,6 +291,7 @@ public class SessionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 if (!visit.getString("sessionId").equals(mSessionId)
                         && visit.getString("userId").equals("New" + mLoginUserId)
@@ -258,6 +321,7 @@ public class SessionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 if (visit.getString("sessionId").equals(mSessionId)
                         && visit.getString("userId").equals("TestMockedName")
@@ -289,6 +353,7 @@ public class SessionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 mSessionId = visit.getString("sessionId");
                 mVisitTimestamp = visit.getLong("timestamp");
@@ -309,6 +374,7 @@ public class SessionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 if (visit.getString("sessionId").equals(mSessionId)
                         && visit.getLong("timestamp") == mVisitTimestamp) {

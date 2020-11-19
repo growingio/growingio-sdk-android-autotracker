@@ -38,10 +38,12 @@ import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.TrackHelper;
+import com.growingio.autotest.help.Uninterruptibles;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -72,6 +74,7 @@ public class TrackConfigurationImpressionScaleTest extends EventsTest {
         ActivityScenario<ViewImpressionActivity> scenario = ActivityScenario.launch(ViewImpressionActivity.class);
         onView(withId(R.id.blank_view_impression)).check(matches((isDisplayed())));
         TrackHelper.waitForIdleSync();
+        Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
         Awaiter.untilFalse(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(

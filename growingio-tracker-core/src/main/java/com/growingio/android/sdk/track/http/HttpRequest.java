@@ -61,6 +61,10 @@ public class HttpRequest {
         mUiHandler = new Handler(Looper.getMainLooper());
     }
 
+    public Request getRequest() {
+        return mRequest;
+    }
+
     public static GetRequestBuilder get(String url) {
         return new GetRequestBuilder(url);
     }

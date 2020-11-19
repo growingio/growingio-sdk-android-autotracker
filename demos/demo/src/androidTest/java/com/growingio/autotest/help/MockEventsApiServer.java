@@ -17,44 +17,129 @@
 package com.growingio.autotest.help;
 
 import android.net.Uri;
+import android.os.Build;
+import android.text.TextUtils;
 
+import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridEventType;
 import com.growingio.android.sdk.track.events.TrackEventType;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Arrays;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 
 public class MockEventsApiServer extends MockServer {
-
-    private final Dispatcher mDispatcher = new Dispatcher() {
-        @Override
-        public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
-            Uri uri = Uri.parse(request.getRequestUrl().toString());
-            String json = request.getBody().readUtf8();
-            dispatchReceivedEvents(json);
-            return new MockResponse().setResponseCode(200);
-        }
-    };
-
     private OnReceivedEventListener mOnReceivedEventListener;
+    private volatile boolean mIsCheckUserId = true;
+    private volatile boolean mIsCheckSessionId = true;
+    private volatile boolean mIsCheckDomain = true;
+    private volatile boolean mIsCheckTimestamp = true;
+    private volatile String mSessionId;
+
+    public void setCheckUserId(boolean checkUserId) {
+        mIsCheckUserId = checkUserId;
+    }
+
+    public void setCheckSessionId(boolean checkSessionId) {
+        mIsCheckSessionId = checkSessionId;
+    }
+
+    public void setCheckDomain(boolean checkDomain) {
+        mIsCheckDomain = checkDomain;
+    }
+
+    public void setCheckTimestamp(boolean checkTimestamp) {
+        mIsCheckTimestamp = checkTimestamp;
+    }
 
     public void setOnReceivedEventListener(OnReceivedEventListener onReceivedEventListener) {
         mOnReceivedEventListener = onReceivedEventListener;
     }
 
     public MockEventsApiServer() {
-        setDispatcher(mDispatcher);
+        Dispatcher dispatcher = new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+                Uri uri = Uri.parse(request.getRequestUrl().toString());
+                checkPath(uri);
+
+                String json = request.getBody().readUtf8();
+                dispatchReceivedEvents(json);
+                return new MockResponse().setResponseCode(200);
+            }
+        };
+        setDispatcher(dispatcher);
+    }
+
+    private void checkPath(Uri uri) {
+        String expectedPath = "/v3/projects/testProjectId/collect";
+        Truth.assertThat(uri.getPath()).isEqualTo(expectedPath);
+
+        long stm = Long.parseLong(uri.getQueryParameter("stm"));
+        Truth.assertThat(System.currentTimeMillis() - stm).isAtMost(3000);
+    }
+
+    private void checkBaseEventBody(JSONArray jsonArray) throws JSONException {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            Truth.assertThat(jsonObject.getString("platform")).isEqualTo("Android");
+            Truth.assertThat(jsonObject.getString("platformVersion")).isEqualTo(Build.VERSION.RELEASE == null ? "UNKNOWN" : Build.VERSION.RELEASE);
+
+            String deviceId = jsonObject.getString("deviceId");
+            Truth.assertThat(deviceId).isNotEmpty();
+            if (TextUtils.isEmpty(EventsTestDataHelper.INSTANCE.getDeviceId())) {
+                EventsTestDataHelper.INSTANCE.saveDeviceId(deviceId);
+            } else {
+                Truth.assertThat(deviceId).isEqualTo(EventsTestDataHelper.INSTANCE.getDeviceId());
+            }
+
+            if (mIsCheckUserId) {
+                String userId = jsonObject.optString("userId");
+                if (!TextUtils.isEmpty(userId)) {
+                    if (TextUtils.isEmpty(EventsTestDataHelper.INSTANCE.getUserId())) {
+                        EventsTestDataHelper.INSTANCE.saveUserId(userId);
+                    } else {
+                        Truth.assertThat(userId).isEqualTo(EventsTestDataHelper.INSTANCE.getUserId());
+                    }
+                }
+            }
+
+            String sessionId = jsonObject.getString("sessionId");
+            Truth.assertThat(sessionId).isNotEmpty();
+            if (mIsCheckSessionId) {
+                if (TextUtils.isEmpty(mSessionId)) {
+                    mSessionId = sessionId;
+                } else {
+                    Truth.assertThat(sessionId).isEqualTo(mSessionId);
+                }
+            }
+
+            Truth.assertThat(jsonObject.getString("eventType")).isNotEmpty();
+            if (mIsCheckTimestamp) {
+                Truth.assertThat(System.currentTimeMillis() - jsonObject.getLong("timestamp")).isAtMost(60 * 1000);
+            }
+            if (mIsCheckDomain) {
+                Truth.assertThat(jsonObject.getString("domain")).isEqualTo("com.gio.test.three");
+            }
+            Truth.assertThat(jsonObject.getString("urlScheme")).isEqualTo(ConfigurationProvider.get().getTrackConfiguration().getUrlScheme());
+            Truth.assertThat(jsonObject.getString("appState")).isIn(Arrays.asList("FOREGROUND", "BACKGROUND"));
+            Truth.assertThat(jsonObject.getLong("globalSequenceId")).isGreaterThan(0);
+            Truth.assertThat(jsonObject.getLong("eventSequenceId")).isGreaterThan(0);
+        }
     }
 
     private void dispatchReceivedEvents(String json) {
         try {
             JSONArray jsonArray = new JSONArray(json);
+            checkBaseEventBody(jsonArray);
             if (mOnReceivedEventListener != null) {
                 mOnReceivedEventListener.onReceivedEvents(jsonArray);
             }
@@ -118,6 +203,7 @@ public class MockEventsApiServer extends MockServer {
                     }
                     break;
                 default:
+                    Truth.assertWithMessage("Undefined eventType " + eventType).fail();
                     break;
             }
         } catch (JSONException e) {
