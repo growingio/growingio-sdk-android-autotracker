@@ -38,11 +38,13 @@ import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.TrackHelper;
+import com.growingio.autotest.help.Uninterruptibles;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -118,6 +120,7 @@ public class ImpressionEventsTest extends EventsTest {
         scenario.moveToState(Lifecycle.State.CREATED).moveToState(Lifecycle.State.RESUMED);
         onView(withId(R.id.btn_impression)).check(matches((isDisplayed())));
         TrackHelper.waitForIdleSync();
+        Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
         scenario.close();
     }
 
@@ -248,6 +251,7 @@ public class ImpressionEventsTest extends EventsTest {
         onView(withId(R.id.tv_impression)).check(matches(not((isDisplayed()))));
         Truth.assertThat(textView.get() != null).isTrue();
         TrackHelper.waitForIdleSync();
+        Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
         Awaiter.untilFalse(receivedEvent);
 
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
@@ -277,6 +281,7 @@ public class ImpressionEventsTest extends EventsTest {
         ActivityScenario<ViewImpressionActivity> scenario = ActivityScenario.launch(ViewImpressionActivity.class);
         onView(withId(R.id.btn_impression)).check(matches((isDisplayed())));
         TrackHelper.waitForIdleSync();
+        Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
         scenario.close();
     }
 

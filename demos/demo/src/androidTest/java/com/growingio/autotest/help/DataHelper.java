@@ -33,5 +33,6 @@ public class DataHelper {
 
     public static void deletePersistentSharedData() {
         ApplicationProvider.getApplicationContext().deleteFile("PersistentSharerDataProvider.shared");
+        ApplicationProvider.getApplicationContext().deleteSharedPreferences(EventsTestDataHelper.SHARED_PREFERENCES_NAME);
     }
 }

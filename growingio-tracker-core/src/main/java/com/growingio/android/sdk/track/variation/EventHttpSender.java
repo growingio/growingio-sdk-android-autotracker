@@ -16,6 +16,7 @@
 
 package com.growingio.android.sdk.track.variation;
 
+import com.growingio.android.sdk.track.TrackConfiguration;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.marshaller.EventMarshaller;
 import com.growingio.android.sdk.track.http.HttpRequest;
@@ -36,15 +37,18 @@ public class EventHttpSender implements IEventNetSender {
     private static final String TAG = "EventHttpSender";
 
     private final EventMarshaller<JSONObject, JSONArray> mEventMarshaller;
+    private final String mProjectId;
     private final String mServerHost;
 
     public EventHttpSender(EventMarshaller<JSONObject, JSONArray> eventMarshaller) {
         mEventMarshaller = eventMarshaller;
-        mServerHost = ConfigurationProvider.get().getTrackConfiguration().getDataCollectionServerHost();
+        TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
+        mProjectId = configuration.getProjectId();
+        mServerHost = configuration.getDataCollectionServerHost();
     }
 
     /**
-     * 数据需要压缩+加密才可以上传
+     * 数据可以选择压缩+加密
      * https://codes.growingio.com/w/api_v3_interface/
      */
     @Override
@@ -59,15 +63,27 @@ public class EventHttpSender implements IEventNetSender {
         } else {
             return new SendResponse(true, 0);
         }
-        Logger.e(TAG, "Send events, type is " + event.getEventType());
+        Logger.d(TAG, "Send events, type is " + event.getEventType());
 
         String data = mEventMarshaller.marshall(events).toString();
-        Response response = HttpRequest.postJson(mServerHost)
-                .addPath("track-api")
+        HttpRequest httpRequest = HttpRequest.postJson(mServerHost)
+                .addPath("v3")
+                .addPath("projects")
+                .addPath(mProjectId)
+                .addPath("collect")
+                .addParam("stm", String.valueOf(System.currentTimeMillis()))
                 .setBody(data)
-                .build()
-                .execute();
+                .build();
+        Logger.printJson(TAG, "POST: " + httpRequest.getRequest().url().toString(), data);
+        Response response = httpRequest.execute();
 
-        return new SendResponse(true, 0);
+        boolean successful = response != null && response.isSuccessful();
+        if (successful) {
+            Logger.d(TAG, "Send events successfully");
+        } else {
+            Logger.d(TAG, "Send events failed, response = " + response);
+        }
+
+        return new SendResponse(successful, data.getBytes().length);
     }
 }

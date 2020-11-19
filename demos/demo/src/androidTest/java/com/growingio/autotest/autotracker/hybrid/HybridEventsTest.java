@@ -46,9 +46,11 @@ import com.growingio.autotest.help.TrackHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -75,6 +77,14 @@ public class HybridEventsTest extends EventsTest {
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
         DemoApplication.setConfiguration(new TestTrackConfiguration());
+    }
+
+    @Override
+    @Before
+    public void setUp() throws IOException {
+        super.setUp();
+        getEventsApiServer().setCheckDomain(false);
+        getEventsApiServer().setCheckTimestamp(false);
     }
 
     private WebView launchMockWebView() {
