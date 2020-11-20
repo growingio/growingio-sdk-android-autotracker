@@ -43,6 +43,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     private long mLatestPauseTime = 0;
     private long mLatestVisitTime = 0;
+    private volatile String mSessionId;
 
     private static class SingleInstance {
         private static final SessionProvider INSTANCE = new SessionProvider();
@@ -61,19 +62,27 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     void checkAndSendVisit(long resumeTime) {
         if (resumeTime - mLatestPauseTime >= mSessionInterval) {
             String sessionId = refreshSessionId();
-            mLatestVisitTime = resumeTime;
             generateVisit(sessionId, resumeTime);
         }
     }
 
     public String getSessionId() {
-        return PersistentDataProvider.get().getSessionId();
+        if (mSessionId != null) {
+            return mSessionId;
+        } else {
+            return PersistentDataProvider.get().getSessionId();
+        }
     }
 
     private String refreshSessionId() {
-        String sessionId = UUID.randomUUID().toString();
-        PersistentDataProvider.get().setSessionId(sessionId);
-        return sessionId;
+        mSessionId = UUID.randomUUID().toString();
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                PersistentDataProvider.get().setSessionId(mSessionId);
+            }
+        });
+        return mSessionId;
     }
 
     @TrackThread
@@ -83,6 +92,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     private void generateVisit(String sessionId, long timestamp) {
         mAlreadySendVisit = true;
+        mLatestVisitTime = timestamp;
         TrackEventGenerator.generateVisitEvent(sessionId, timestamp, mLatitude, mLongitude);
     }
 
@@ -94,14 +104,9 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         if (mAlreadySendVisit || ActivityStateProvider.get().getForegroundActivity() == null) {
             return;
         }
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                String sessionId = refreshSessionId();
-                long eventTime = System.currentTimeMillis();
-                generateVisit(sessionId, eventTime);
-            }
-        });
+        String sessionId = refreshSessionId();
+        long eventTime = System.currentTimeMillis();
+        generateVisit(sessionId, eventTime);
     }
 
     public void setLocation(double latitude, double longitude) {
@@ -133,24 +138,14 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
             if (mActivityStartCount == 0) {
-                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-                    @Override
-                    public void run() {
-                        checkAndSendVisit(System.currentTimeMillis());
-                    }
-                });
+                checkAndSendVisit(System.currentTimeMillis());
             }
             mActivityStartCount++;
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
             mActivityStartCount--;
             if (mActivityStartCount == 0) {
-                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-                    @Override
-                    public void run() {
-                        TrackEventGenerator.generateAppClosedEvent();
-                        mLatestPauseTime = System.currentTimeMillis();
-                    }
-                });
+                TrackEventGenerator.generateAppClosedEvent();
+                mLatestPauseTime = System.currentTimeMillis();
             }
         }
     }
@@ -172,7 +167,6 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
                 if (!newUserId.equals(mLatestNonNullUserId)) {
                     String sessionId = refreshSessionId();
                     long eventTime = System.currentTimeMillis();
-                    mLatestVisitTime = eventTime;
                     generateVisit(sessionId, eventTime);
                 }
             }
