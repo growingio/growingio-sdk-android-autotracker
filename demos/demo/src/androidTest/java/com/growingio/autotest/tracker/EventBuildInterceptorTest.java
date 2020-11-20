@@ -16,7 +16,7 @@
 
 package com.growingio.autotest.tracker;
 
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
@@ -37,7 +37,6 @@ import com.growingio.autotest.help.MockEventsApiServer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -53,9 +52,6 @@ public class EventBuildInterceptorTest extends EventsTest {
         DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration());
     }
-
-    @Rule
-    public ActivityScenarioRule<TrackActivity> scenarioRule = new ActivityScenarioRule<>(TrackActivity.class);
 
     @Test
     public void eventBuildInterceptorTest() {
@@ -92,6 +88,7 @@ public class EventBuildInterceptorTest extends EventsTest {
                 }
             }
         });
+        ActivityScenario.launch(TrackActivity.class);
         GrowingTracker.get().trackCustomEvent(testCustomEvent);
         Awaiter.untilTrue(receivedEvent);
     }
