@@ -368,11 +368,12 @@ public class PageEventsTest extends EventsTest {
         onView(withId(R.id.add)).perform(click());
         onView(withId(R.id.hide)).perform(click());
 
-        scenario.moveToState(Lifecycle.State.CREATED).moveToState(Lifecycle.State.RESUMED);
+        scenario.moveToState(Lifecycle.State.CREATED);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
                 "/HideFragmentActivity",
                 "/HideFragmentActivity/RedFragment[frame_content]"
         ));
+        scenario.moveToState(Lifecycle.State.RESUMED);
         TrackHelper.waitForIdleSync();
         Awaiter.untilTrue(receivedEvent);
         scenario.close();
