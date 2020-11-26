@@ -45,9 +45,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CircleScreenshot {
@@ -214,20 +212,19 @@ public class CircleScreenshot {
                 return;
             }
 
-            Queue<ViewNode> queue = new LinkedList<>();
-            queue.add(topViewNode);
-            while (!queue.isEmpty()) {
-                ViewNode viewNode = queue.poll();
-                if (!disposeWebView(viewNode) && ViewUtil.canCircle(viewNode.getView())) {
-                    mViewElements.add(createViewElementBuilder(viewNode).build());
-                }
-                if (viewNode.getView() instanceof ViewGroup) {
-                    ViewGroup viewGroup = (ViewGroup) viewNode.getView();
-                    if (viewGroup.getChildCount() > 0) {
-                        for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                            ViewNode childViewNode = viewNode.appendNode(viewGroup.getChildAt(index), index);
-                            queue.add(childViewNode);
-                        }
+            traverseViewNode(topViewNode);
+        }
+
+        private void traverseViewNode(ViewNode viewNode) {
+            if (!disposeWebView(viewNode) && ViewUtil.canCircle(viewNode.getView())) {
+                mViewElements.add(createViewElementBuilder(viewNode).build());
+            }
+            if (viewNode.getView() instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) viewNode.getView();
+                if (viewGroup.getChildCount() > 0) {
+                    for (int index = 0; index < viewGroup.getChildCount(); index++) {
+                        ViewNode childViewNode = viewNode.appendNode(viewGroup.getChildAt(index), index);
+                        traverseViewNode(childViewNode);
                     }
                 }
             }
