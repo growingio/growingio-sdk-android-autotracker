@@ -45,7 +45,7 @@ public class TrackEventGenerator {
     public static void generateConversionVariablesEvent(Map<String, String> variables) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ConversionVariablesEvent.Builder()
-                        .setVariables(variables)
+                        .setAttributes(variables)
         );
     }
 
