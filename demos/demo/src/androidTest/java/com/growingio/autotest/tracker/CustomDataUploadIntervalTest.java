@@ -16,35 +16,43 @@
 
 package com.growingio.autotest.tracker;
 
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import android.app.Activity;
+
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.runner.lifecycle.ActivityLifecycleCallback;
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import androidx.test.runner.lifecycle.Stage;
 
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.MainActivity;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.track.log.DebugLogger;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
 import com.growingio.autotest.help.MockEventsApiServer;
-import com.growingio.autotest.help.Uninterruptibles;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class CustomDataUploadIntervalTest extends EventsTest {
+    private static volatile long sStartedTime = 0;
+
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
@@ -53,39 +61,61 @@ public class CustomDataUploadIntervalTest extends EventsTest {
                 .setDebugEnabled(false)
                 .setDataUploadInterval(10)
         );
+        sStartedTime = System.currentTimeMillis();
     }
 
-    @Rule
-    public ActivityScenarioRule<MainActivity> scenarioRule = new ActivityScenarioRule<>(MainActivity.class);
+    @Override
+    public void setUp() throws IOException {
+        super.setUp();
+        Logger.addLogger(new DebugLogger());
+    }
 
     @Test
     public void customDelayDataUploadTest() {
-        final AtomicBoolean receivedVisitEvent = new AtomicBoolean(false);
-        final AtomicBoolean receivedTrackEvent = new AtomicBoolean(false);
+        Truth.assertThat(sStartedTime > 0).isTrue();
+
+        final AtomicLong receivedVisitEventTime = new AtomicLong(0);
+        final AtomicLong receivedTrackEventTime = new AtomicLong(0);
         final String testCustomEvent = "testCustomEvent";
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
-                receivedVisitEvent.set(true);
+                receivedVisitEventTime.set(System.currentTimeMillis());
             }
 
             @Override
             protected void onReceivedCustomEvents(JSONArray jsonArray) throws JSONException {
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
                 if (jsonObject.getString("eventName").equals(testCustomEvent)) {
-                    receivedTrackEvent.set(true);
+                    receivedTrackEventTime.set(System.currentTimeMillis());
                 }
             }
         });
-        Awaiter.untilTrue(receivedVisitEvent, 2, TimeUnit.SECONDS);
+
+        AtomicLong activityStartedTime = new AtomicLong(0);
+        ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback(new ActivityLifecycleCallback() {
+            @Override
+            public void onActivityLifecycleChanged(Activity activity, Stage stage) {
+                if (stage == Stage.STARTED) {
+                    activityStartedTime.set(System.currentTimeMillis());
+                }
+            }
+        });
+        ActivityScenario.launch(MainActivity.class);
+        Awaiter.untilTrue(() -> activityStartedTime.get() > 0);
+        Awaiter.untilTrue(() -> receivedVisitEventTime.get() > 0 && (receivedVisitEventTime.get() - activityStartedTime.get()) < 1000);
 
         GrowingTracker.get().trackCustomEvent(testCustomEvent);
-        Uninterruptibles.sleepUninterruptibly(7, TimeUnit.SECONDS);
-        Truth.assertThat(receivedTrackEvent.get()).isFalse();
-        Awaiter.untilTrue(receivedTrackEvent, 3, TimeUnit.SECONDS);
+        Awaiter.untilTrue(() -> receivedTrackEventTime.get() > 0
+                        && (receivedTrackEventTime.get() - sStartedTime) > 9000
+                        && (receivedTrackEventTime.get() - sStartedTime) < 11000,
+                11, TimeUnit.SECONDS);
 
-        receivedTrackEvent.set(false);
+        receivedTrackEventTime.set(0);
         GrowingTracker.get().trackCustomEvent(testCustomEvent);
-        Awaiter.untilTrue(receivedTrackEvent, 11, TimeUnit.SECONDS);
+        Awaiter.untilTrue(() -> receivedTrackEventTime.get() > 0
+                        && (receivedTrackEventTime.get() - sStartedTime) > 19000
+                        && (receivedTrackEventTime.get() - sStartedTime) < 21000,
+                11, TimeUnit.SECONDS);
     }
 }
