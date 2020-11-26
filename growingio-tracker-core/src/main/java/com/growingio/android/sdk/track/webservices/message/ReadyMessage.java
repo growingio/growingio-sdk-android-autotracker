@@ -40,9 +40,10 @@ public class ReadyMessage {
     private final String mOs;
     private final int mScreenWidth;
     private final int mScreenHeight;
+    private final String mUrlScheme;
 
 
-    private ReadyMessage(String projectId, String domain, String sdkVersion, int sdkVersionCode, int screenWidth, int screenHeight) {
+    private ReadyMessage(String projectId, String domain, String sdkVersion, int sdkVersionCode, int screenWidth, int screenHeight, String urlScheme) {
         mMsgType = MSG_TYPE;
         mOs = "Android";
         mTimestamp = System.currentTimeMillis();
@@ -52,6 +53,7 @@ public class ReadyMessage {
         mSdkVersionCode = sdkVersionCode;
         mScreenWidth = screenWidth;
         mScreenHeight = screenHeight;
+        mUrlScheme = urlScheme;
     }
 
     public static ReadyMessage createMessage() {
@@ -62,7 +64,8 @@ public class ReadyMessage {
         int sdkVersionCode = SDKConfig.SDK_VERSION_CODE;
 
         DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
-        return new ReadyMessage(projectId, domain, sdkVersion, sdkVersionCode, metrics.widthPixels, metrics.heightPixels);
+        String urlScheme = ConfigurationProvider.get().getTrackConfiguration().getUrlScheme();
+        return new ReadyMessage(projectId, domain, sdkVersion, sdkVersionCode, metrics.widthPixels, metrics.heightPixels, urlScheme);
     }
 
     public JSONObject toJSONObject() {
@@ -77,6 +80,7 @@ public class ReadyMessage {
             json.put("os", mOs);
             json.put("screenWidth", mScreenWidth);
             json.put("screenHeight", mScreenHeight);
+            json.put("urlScheme", mUrlScheme);
         } catch (JSONException ignored) {
         }
         return json;

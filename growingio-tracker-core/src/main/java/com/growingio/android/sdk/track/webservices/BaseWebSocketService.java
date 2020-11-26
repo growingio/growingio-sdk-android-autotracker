@@ -22,6 +22,7 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.R;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.webservices.message.ReadyMessage;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
@@ -48,9 +49,14 @@ public abstract class BaseWebSocketService implements IWebService {
     @Override
     public void start(Map<String, String> params, TipView tipView) {
         mTipView = tipView;
-        mTipView.setContent(R.string.growing_tracker_connecting_to_web);
         String wsUrl = params.get(WS_URL);
         start(wsUrl);
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mTipView.setContent(R.string.growing_tracker_connecting_to_web);
+            }
+        });
     }
 
     public void start(String wsUrl) {
@@ -77,9 +83,14 @@ public abstract class BaseWebSocketService implements IWebService {
 
     @CallSuper
     protected void onFailed() {
-        if (mTipView != null) {
-            mTipView.setErrorMessage(R.string.growing_tracker_connected_to_web_failed);
-        }
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mTipView != null) {
+                    mTipView.setErrorMessage(R.string.growing_tracker_connected_to_web_failed);
+                }
+            }
+        });
     }
 
     protected void onQuited() {

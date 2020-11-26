@@ -30,6 +30,7 @@ import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.SystemUtil;
+import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
 import com.growingio.android.sdk.track.webservices.log.MobileLogService;
 
@@ -47,12 +48,17 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
 
     @Override
     protected void onReady() {
-        mTipView.setContent(R.string.growing_tracker_is_circling);
         registerScreenshotRefreshedListener();
-        mTipView.setOnClickListener(new View.OnClickListener() {
+        ThreadUtils.runOnUiThread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                showExitDialog();
+            public void run() {
+                mTipView.setContent(R.string.growing_tracker_is_circling);
+                mTipView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showExitDialog();
+                    }
+                });
             }
         });
     }
