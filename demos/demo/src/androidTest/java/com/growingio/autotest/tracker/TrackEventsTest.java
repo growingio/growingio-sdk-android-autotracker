@@ -165,7 +165,7 @@ public class TrackEventsTest extends EventsTest {
             @Override
             protected void onReceivedConversionVariablesEvents(JSONArray jsonArray) throws JSONException {
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
-                JSONObject attrs = jsonObject.getJSONObject("variables");
+                JSONObject attrs = jsonObject.getJSONObject("attributes");
                 if (attrs.getString("key1").equals("value1")
                         && attrs.getString("key2").equals("value2")
                         && attrs.getString("key3").equals("")

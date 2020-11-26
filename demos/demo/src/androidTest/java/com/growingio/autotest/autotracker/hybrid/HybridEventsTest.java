@@ -226,7 +226,7 @@ public class HybridEventsTest extends EventsTest {
             protected void onReceivedConversionVariablesEvents(JSONArray jsonArray) throws JSONException {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    HashMap<String, String> attributes = (HashMap<String, String>) JsonUtil.copyToMap(jsonObject.getJSONObject("variables"));
+                    HashMap<String, String> attributes = (HashMap<String, String>) JsonUtil.copyToMap(jsonObject.getJSONObject("attributes"));
                     if (attributes.equals(TEST_ATTRIBUTES)) {
                         receivedEvent.set(true);
                     }

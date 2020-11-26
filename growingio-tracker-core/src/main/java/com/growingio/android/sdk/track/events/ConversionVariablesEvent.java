@@ -16,42 +16,18 @@
 
 package com.growingio.android.sdk.track.events;
 
-import com.growingio.android.sdk.track.events.base.BaseEvent;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
 import java.util.Map;
 
-public final class ConversionVariablesEvent extends BaseEvent {
+public final class ConversionVariablesEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
-
-    private final Map<String, String> mVariables;
 
     protected ConversionVariablesEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mVariables = eventBuilder.mVariables;
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            if (mVariables != null && !mVariables.isEmpty()) {
-                json.put("variables", new JSONObject(mVariables));
-            }
-        } catch (JSONException ignored) {
-        }
-        return json;
-    }
-
-    public Map<String, String> getVariables() {
-        return mVariables;
-    }
-
-    public static final class Builder extends BaseBuilder<ConversionVariablesEvent> {
-        private Map<String, String> mVariables;
-
+    public static final class Builder extends BaseAttributesEvent.Builder<ConversionVariablesEvent> {
         public Builder() {
             super();
         }
@@ -61,8 +37,9 @@ public final class ConversionVariablesEvent extends BaseEvent {
             return TrackEventType.CONVERSION_VARIABLES;
         }
 
-        public Builder setVariables(Map<String, String> variables) {
-            mVariables = variables;
+        @Override
+        public Builder setAttributes(Map<String, String> attributes) {
+            super.setAttributes(attributes);
             return this;
         }
 

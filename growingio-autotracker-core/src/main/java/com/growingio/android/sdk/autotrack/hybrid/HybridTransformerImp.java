@@ -55,7 +55,6 @@ public class HybridTransformerImp implements HybridTransformer {
     private static final String KEY_TIMESTAMP = "timestamp";
     private static final String KEY_PAGE_SHOW_TIMESTAMP = "pageShowTimestamp";
     private static final String KEY_ATTRIBUTES = "attributes";
-    private static final String KEY_VARIABLES = "variables";
     private static final String KEY_EVENT_NAME = "eventName";
     private static final String KEY_HYPERLINK = "hyperlink";
     private static final String KEY_INDEX = "index";
@@ -124,7 +123,7 @@ public class HybridTransformerImp implements HybridTransformer {
 
             } else if (TrackEventType.CONVERSION_VARIABLES.equals(type)) {
                 return new ConversionVariablesEvent.Builder()
-                        .setVariables(JsonUtil.copyToMap(eventJson.getJSONObject(KEY_VARIABLES)));
+                        .setAttributes(JsonUtil.copyToMap(eventJson.getJSONObject(KEY_ATTRIBUTES)));
             }
         } catch (JSONException e) {
             Logger.e(TAG, e.getMessage(), e);
