@@ -21,13 +21,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.view.menu.ListMenuItemView;
 import android.support.v7.widget.RecyclerView;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-
-import com.tencent.smtt.sdk.WebChromeClient;
-import com.tencent.smtt.sdk.WebView;
 
 public class ClassExistHelper {
     public static boolean sHasSupportViewPager;
@@ -131,15 +129,11 @@ public class ClassExistHelper {
     }
 
     public static boolean instanceOfX5WebView(Object view) {
-        return sHasX5WebView && view instanceof WebView;
+        return sHasX5WebView && view instanceof com.tencent.smtt.sdk.WebView;
     }
 
     public static boolean instanceOfUcWebView(Object view) {
         return sHasUcWebView && view instanceof com.uc.webview.export.WebView;
-    }
-
-    public static boolean instanceOfX5ChromeClient(Object client) {
-        return sHasX5WebView && client instanceof WebChromeClient;
     }
 
     public static boolean instanceOfSupportAlertDialog(Object dialog) {
