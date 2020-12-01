@@ -164,7 +164,7 @@ class ViewClickProvider {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ViewElementEvent.Builder()
                         .setEventType(AutotrackEventType.VIEW_CLICK)
-                        .setPageName(page.path())
+                        .setPath(page.path())
                         .setPageShowTimestamp(page.getShowTimestamp())
                         .setXpath(viewNode.getXPath())
                         .setIndex(viewNode.getIndex())

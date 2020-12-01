@@ -137,7 +137,7 @@ public class PageProvider implements IActivityLifecycle {
                 ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
         TrackMainThread.trackMain().postEventToTrackMain(
                 new PageEvent.Builder()
-                        .setPageName(page.path())
+                        .setPath(page.path())
                         .setTitle(page.getTitle())
                         .setTimestamp(page.getShowTimestamp())
                         .setOrientation(orientation)
@@ -437,7 +437,7 @@ public class PageProvider implements IActivityLifecycle {
     private void generatePageAttributesEvent(Page<?> page) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new PageAttributesEvent.Builder()
-                        .setPageName(page.path())
+                        .setPath(page.path())
                         .setPageShowTimestamp(page.getShowTimestamp())
                         .setAttributes(page.getAttributes()));
     }

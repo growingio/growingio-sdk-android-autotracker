@@ -80,7 +80,7 @@ public class TrackConfigurationImpressionScaleTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("blankViewImpressionEvent")
                         .build()
         ));

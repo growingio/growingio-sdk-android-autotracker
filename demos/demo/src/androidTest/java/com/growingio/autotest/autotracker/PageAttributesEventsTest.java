@@ -305,8 +305,8 @@ public class PageAttributesEventsTest extends EventsTest {
         protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String pageName = jsonObject.getString("pageName");
-                mReceivedPages.put(pageName, jsonObject.getLong("timestamp"));
+                String path = jsonObject.getString("path");
+                mReceivedPages.put(path, jsonObject.getLong("timestamp"));
             }
         }
 
@@ -314,10 +314,10 @@ public class PageAttributesEventsTest extends EventsTest {
         protected void onReceivedPageAttributesEvents(JSONArray jsonArray) throws JSONException {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String pageName = jsonObject.getString("pageName");
+                String path = jsonObject.getString("path");
                 long pageShowTimestamp = jsonObject.getLong("pageShowTimestamp");
                 HashMap<String, String> attributes = (HashMap<String, String>) JsonUtil.copyToMap(jsonObject.getJSONObject("attributes"));
-                mReceivedPagesAttributes.put(pageName, new PagesAttributesParams(pageShowTimestamp, attributes));
+                mReceivedPagesAttributes.put(path, new PagesAttributesParams(pageShowTimestamp, attributes));
             }
         }
 
@@ -328,17 +328,17 @@ public class PageAttributesEventsTest extends EventsTest {
 
         public boolean checkEvents() {
             for (Map.Entry<String, HashMap<String, String>> entry : mExpectPagesAttributes.entrySet()) {
-                String pageName = entry.getKey();
-                PagesAttributesParams receivedAttributesParams = mReceivedPagesAttributes.get(pageName);
-                long expectPageTimestamp = mReceivedPages.get(pageName);
+                String path = entry.getKey();
+                PagesAttributesParams receivedAttributesParams = mReceivedPagesAttributes.get(path);
+                long expectPageTimestamp = mReceivedPages.get(path);
                 long actualPageTimestamp = receivedAttributesParams.pageShowTimestamp;
                 if (actualPageTimestamp != expectPageTimestamp) {
-                    Truth.assertWithMessage(pageName + " Page show timestamp is " + expectPageTimestamp
+                    Truth.assertWithMessage(path + " Page show timestamp is " + expectPageTimestamp
                             + ", but PageAttributesEvent pageShowTimestamp is " + actualPageTimestamp).fail();
                 }
                 HashMap<String, String> expectAttributes = entry.getValue();
                 if (!expectAttributes.equals(receivedAttributesParams.attributes)) {
-                    Truth.assertWithMessage(pageName + " Page attributes is " + receivedAttributesParams.attributes + "not equals expect attributes " + expectAttributes).fail();
+                    Truth.assertWithMessage(path + " Page attributes is " + receivedAttributesParams.attributes + "not equals expect attributes " + expectAttributes).fail();
                 }
             }
             return true;

@@ -26,17 +26,17 @@ import java.util.Map;
 public class PageAttributesEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mPageName;
+    private final String mPath;
     private final long mPageShowTimestamp;
 
     protected PageAttributesEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mPageName = eventBuilder.mPageName;
+        mPath = eventBuilder.mPath;
         mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
     }
 
-    public String getPageName() {
-        return mPageName;
+    public String getPath() {
+        return mPath;
     }
 
     public long getPageShowTimestamp() {
@@ -47,7 +47,7 @@ public class PageAttributesEvent extends BaseAttributesEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("pageName", mPageName);
+            json.put("path", mPath);
             json.put("pageShowTimestamp", mPageShowTimestamp);
         } catch (JSONException ignored) {
         }
@@ -55,15 +55,15 @@ public class PageAttributesEvent extends BaseAttributesEvent {
     }
 
     public static class Builder extends BaseAttributesEvent.Builder<PageAttributesEvent> {
-        private String mPageName;
+        private String mPath;
         private long mPageShowTimestamp;
 
         public Builder() {
             super();
         }
 
-        public Builder setPageName(String pageName) {
-            mPageName = pageName;
+        public Builder setPath(String path) {
+            mPath = path;
             return this;
         }
 

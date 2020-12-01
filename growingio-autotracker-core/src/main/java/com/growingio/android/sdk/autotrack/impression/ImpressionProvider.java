@@ -136,7 +136,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
                 new PageLevelCustomEvent.Builder()
                         .setEventName(impression.getImpressionEventName())
                         .setAttributes(impression.getEventAttributes())
-                        .setPageName(page.path())
+                        .setPath(page.path())
                         .setPageShowTimestamp(page.getShowTimestamp())
         );
     }

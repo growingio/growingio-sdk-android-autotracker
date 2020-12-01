@@ -92,7 +92,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Button[0]#btn_test_click")
                         .setTextValue("测试Button点击")
                         .setIndex(-1)
@@ -111,19 +111,19 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Spinner[0]#spinner_test/TextView[-]")
                         .setTextValue("c语言")
                         .setIndex(0)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Spinner[0]#spinner_test/TextView[-]")
                         .setTextValue("java")
                         .setIndex(1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Spinner[0]#spinner_test/TextView[-]")
                         .setTextValue("xml")
                         .setIndex(3)
@@ -146,13 +146,13 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/CheckBox[0]#check_box_android")
                         .setTextValue("Android")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/CheckBox[1]#check_box_ios")
                         .setTextValue("iOS")
                         .setIndex(-1)
@@ -173,13 +173,13 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[0]")
                         .setTextValue("male")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[1]")
                         .setTextValue("female")
                         .setIndex(-1)
@@ -200,13 +200,13 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Switch[0]#switch1")
                         .setTextValue("Switch")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Switch[0]#switch1")
                         .setTextValue("Switch")
                         .setIndex(-1)
@@ -227,7 +227,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/SeekBar[0]#seek_bar")
                         .setTextValue("100")
                         .setIndex(-1)
@@ -246,7 +246,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RatingBar[0]#rating_bar")
                         .setTextValue("3.0")
                         .setIndex(-1)
@@ -265,7 +265,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent")
                         .setTextValue("")
                         .setIndex(-1)
@@ -284,7 +284,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/NestedFragmentActivity/GreenFragment[fragment1]/OrangeFragment[TestTag]")
+                        .setPath("/NestedFragmentActivity/GreenFragment[fragment1]/OrangeFragment[TestTag]")
                         .setXpath("/Page")
                         .setTextValue("")
                         .setIndex(-1)
@@ -303,7 +303,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/AutotrackEntryActivity")
+                        .setPath("/AutotrackEntryActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ListView[0]#content/TextView[-]")
                         .setTextValue("Go To HideFragmentActivity")
                         .setIndex(1)
@@ -322,52 +322,52 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListViewActivity")
+                        .setPath("/ExpandableListViewActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ExpandableListView[0]#expand_lv/ELH[0]/LinearLayout[0]")
                         .setTextValue("")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListViewActivity")
+                        .setPath("/ExpandableListViewActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ExpandableListView[0]#expand_lv/ELH[1]/LinearLayout[0]")
                         .setTextValue("")
                         .setIndex(-1)
                         .build(),
 
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListViewActivity")
+                        .setPath("/ExpandableListViewActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ExpandableListView[0]#expand_lv/ELF[0]/LinearLayout[0]")
                         .setTextValue("")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListViewActivity")
+                        .setPath("/ExpandableListViewActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ExpandableListView[0]#expand_lv/ELF[1]/LinearLayout[0]")
                         .setTextValue("")
                         .setIndex(-1)
                         .build(),
 
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListViewActivity")
+                        .setPath("/ExpandableListViewActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ExpandableListView[0]#expand_lv/ELVG[-]/RelativeLayout[0]")
                         .setTextValue("")
                         .setIndex(0)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListViewActivity")
+                        .setPath("/ExpandableListViewActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ExpandableListView[0]#expand_lv/ELVG[0]/ELVC[-]/LinearLayout[0]")
                         .setTextValue("")
                         .setIndex(1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListViewActivity")
+                        .setPath("/ExpandableListViewActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ExpandableListView[0]#expand_lv/ELVG[0]/ELVC[-]/LinearLayout[0]/LinearLayout[0]/TextView[0]#tv_name")
                         .setTextValue("三妹")
                         .setIndex(2)
                         .build(),
 
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListViewActivity")
+                        .setPath("/ExpandableListViewActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/ExpandableListView[0]#expand_lv/ELVG[-]/RelativeLayout[0]")
                         .setTextValue("")
                         .setIndex(2)
@@ -397,13 +397,13 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListSubActivity")
+                        .setPath("/ExpandableListSubActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/ExpandableListView[0]/ELVG[0]/ELVC[-]/LinearLayout[0]")
                         .setTextValue("")
                         .setIndex(1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ExpandableListSubActivity")
+                        .setPath("/ExpandableListSubActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/ExpandableListView[0]/ELVG[0]/ELVC[-]/LinearLayout[0]/LinearLayout[0]/TextView[0]#tv_name")
                         .setTextValue("三妹")
                         .setIndex(2)
@@ -424,19 +424,19 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_home")
                         .setTextValue("Home")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_dashboard")
                         .setTextValue("Dashboard")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_notifications")
                         .setTextValue("Notifications")
                         .setIndex(-1)
@@ -461,7 +461,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/testCustomId")
                         .setTextValue("测试Button点击")
                         .setIndex(-1)
@@ -486,7 +486,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("*/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]")
+                        .setPath("*/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]")
                         .setXpath("/Page/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
@@ -505,7 +505,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/NestedFragmentActivity/GreenFragment[fragment1]/OrangeFragment[TestTag]")
+                        .setPath("/NestedFragmentActivity/GreenFragment[fragment1]/OrangeFragment[TestTag]")
                         .setXpath("/Page/RedFragment[small]/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
@@ -529,7 +529,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/NestedFragmentActivity/GreenFragment[fragment1]")
+                        .setPath("/NestedFragmentActivity/GreenFragment[fragment1]")
                         .setXpath("/Page/OrangeFragment[TestTag]/RedFragment[small]/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
@@ -553,7 +553,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/NestedFragmentActivity")
+                        .setPath("/NestedFragmentActivity")
                         .setXpath("/Page/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
@@ -577,7 +577,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ClickTestActivity")
+                        .setPath("/ClickTestActivity")
                         .setXpath("/IgnorePage/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Button[0]#btn_test_click")
                         .setTextValue("测试Button点击")
                         .setIndex(-1)
@@ -601,7 +601,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("*/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]")
+                        .setPath("*/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]")
                         .setXpath("/testRedFragmentView/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
@@ -625,7 +625,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/DialogTestActivity")
+                        .setPath("/DialogTestActivity")
                         .setXpath("/AlertDialog/AlertDialog Title/BUTTON_POSITIVE")
                         .setTextValue("OK")
                         .setIndex(-1)
@@ -645,7 +645,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/DialogTestActivity")
+                        .setPath("/DialogTestActivity")
                         .setXpath("/AlertDialog/这是一个没有标题的AlertDialog/BUTTON_NEGATIVE")
                         .setTextValue("Cancel")
                         .setIndex(-1)
@@ -665,13 +665,13 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/DialogTestActivity")
+                        .setPath("/DialogTestActivity")
                         .setXpath("/PopupWindow/PopupDecorView/LinearLayout[0]/Button[0]#btn_preview")
                         .setTextValue("测试预览")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/DialogTestActivity")
+                        .setPath("/DialogTestActivity")
                         .setXpath("/AlertDialog/AlertDialog Title/BUTTON_POSITIVE")
                         .setTextValue("OK")
                         .setIndex(-1)
@@ -692,7 +692,7 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("*/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]")
+                        .setPath("*/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]")
                         .setXpath("/Page/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
@@ -759,19 +759,19 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ToolBarActivity")
+                        .setPath("/ToolBarActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_home")
                         .setTextValue("Home")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ToolBarActivity")
+                        .setPath("/ToolBarActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_dashboard")
                         .setTextValue("Dashboard")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ToolBarActivity")
+                        .setPath("/ToolBarActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_notifications")
                         .setTextValue("Notifications")
                         .setIndex(-1)
@@ -797,19 +797,19 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/ActionMenuViewActivity")
+                        .setPath("/ActionMenuViewActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_home")
                         .setTextValue("Home")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ActionMenuViewActivity")
+                        .setPath("/ActionMenuViewActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_dashboard")
                         .setTextValue("Dashboard")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/ActionMenuViewActivity")
+                        .setPath("/ActionMenuViewActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_notifications")
                         .setTextValue("Notifications")
                         .setIndex(-1)
@@ -834,19 +834,19 @@ public class ViewClickEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/DialogTestActivity")
+                        .setPath("/DialogTestActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_home")
                         .setTextValue("Home")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/DialogTestActivity")
+                        .setPath("/DialogTestActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_dashboard")
                         .setTextValue("Dashboard")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/DialogTestActivity")
+                        .setPath("/DialogTestActivity")
                         .setXpath("/Page/MenuView/MenuItem#navigation_notifications")
                         .setTextValue("Notifications")
                         .setIndex(-1)
@@ -887,8 +887,8 @@ public class ViewClickEventsTest extends EventsTest {
         protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String pageName = jsonObject.getString("pageName");
-                mReceivedPages.put(pageName, jsonObject.getLong("timestamp"));
+                String path = jsonObject.getString("path");
+                mReceivedPages.put(path, jsonObject.getLong("timestamp"));
             }
         }
 
@@ -897,13 +897,13 @@ public class ViewClickEventsTest extends EventsTest {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 for (int j = 0; j < mExpectReceivedClicks.size(); j++) {
-                    String pageName = jsonObject.getString("pageName");
+                    String path = jsonObject.getString("path");
                     ViewElementEvent viewElementEvent = mExpectReceivedClicks.get(j);
-                    if (pageName.equals(viewElementEvent.getPageName())
+                    if (path.equals(viewElementEvent.getPath())
                             && jsonObject.getString("xpath").equals(viewElementEvent.getXpath())
                             && jsonObject.optString("textValue").equals(viewElementEvent.getTextValue())
                             && jsonObject.getInt("index") == viewElementEvent.getIndex()
-                            && (viewElementEvent.getXpath().startsWith("/IgnorePage/") || jsonObject.getLong("pageShowTimestamp") == mReceivedPages.get(pageName))) {
+                            && (viewElementEvent.getXpath().startsWith("/IgnorePage/") || jsonObject.getLong("pageShowTimestamp") == mReceivedPages.get(path))) {
                         mExpectReceivedClicks.remove(j);
                         break;
                     }

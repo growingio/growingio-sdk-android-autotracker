@@ -77,7 +77,7 @@ public class ImpressionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("buttonImpressionEvent")
                         .build()
         ));
@@ -98,7 +98,7 @@ public class ImpressionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("buttonImpressionEvent")
                         .setAttributes(TEST_ATTRIBUTES)
                         .build()
@@ -130,7 +130,7 @@ public class ImpressionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("buttonImpressionEvent")
                         .setAttributes(TEST_ATTRIBUTES)
                         .build()
@@ -152,16 +152,16 @@ public class ImpressionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("buttonImpressionEvent")
                         .setAttributes(TEST_ATTRIBUTES)
                         .build(),
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("imageViewImpressionEvent")
                         .build(),
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("blankViewImpressionEvent")
                         .build()
         ));
@@ -188,7 +188,7 @@ public class ImpressionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("buttonImpressionEvent")
                         .setAttributes(TEST_ATTRIBUTES)
                         .build()
@@ -215,7 +215,7 @@ public class ImpressionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("buttonImpressionEvent")
                         .setAttributes(TEST_ATTRIBUTES)
                         .build()
@@ -257,7 +257,7 @@ public class ImpressionEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
                 new PageLevelCustomEvent.Builder()
-                        .setPageName("/ViewImpressionActivity")
+                        .setPath("/ViewImpressionActivity")
                         .setEventName("textViewImpressionEvent")
                         .setAttributes(TEST_ATTRIBUTES)
                         .build()

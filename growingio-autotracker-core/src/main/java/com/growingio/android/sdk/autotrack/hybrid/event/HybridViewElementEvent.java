@@ -91,8 +91,8 @@ public final class HybridViewElementEvent extends ViewElementEvent {
         }
 
         @Override
-        public Builder setPageName(String pageName) {
-            super.setPageName(pageName);
+        public Builder setPath(String path) {
+            super.setPath(path);
             return this;
         }
 

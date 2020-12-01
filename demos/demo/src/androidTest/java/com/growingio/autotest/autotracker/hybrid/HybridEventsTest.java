@@ -132,7 +132,7 @@ public class HybridEventsTest extends EventsTest {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     if (jsonObject.getString("eventName").equals("test_name")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
-                        Truth.assertThat(jsonObject.getString("pageName")).isEqualTo("/push/web.html");
+                        Truth.assertThat(jsonObject.getString("path")).isEqualTo("/push/web.html");
                         Truth.assertThat(jsonObject.getLong("pageShowTimestamp")).isEqualTo(1602485626878L);
                         Truth.assertThat(jsonObject.getString("query")).isEqualTo("a=1&b=2");
                         receivedEvent.set(true);
@@ -157,7 +157,7 @@ public class HybridEventsTest extends EventsTest {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     if (jsonObject.getString("eventName").equals("test_name")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
-                        Truth.assertThat(jsonObject.getString("pageName")).isEqualTo("/push/web.html");
+                        Truth.assertThat(jsonObject.getString("path")).isEqualTo("/push/web.html");
                         Truth.assertThat(jsonObject.getLong("pageShowTimestamp")).isEqualTo(1602485626878L);
                         Truth.assertThat(jsonObject.getString("query")).isEqualTo("a=1&b=2");
                         HashMap<String, String> attributes = (HashMap<String, String>) JsonUtil.copyToMap(jsonObject.getJSONObject("attributes"));
@@ -248,7 +248,7 @@ public class HybridEventsTest extends EventsTest {
             protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    if (jsonObject.getString("pageName").equals("/push/web.html")) {
+                    if (jsonObject.getString("path").equals("/push/web.html")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
                         Truth.assertThat(jsonObject.getString("title")).isEqualTo("Hybrid测试页面");
                         Truth.assertThat(jsonObject.getString("referralPage")).isEqualTo("http://test-browser.growingio.com/push");
@@ -274,7 +274,7 @@ public class HybridEventsTest extends EventsTest {
             protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    if (jsonObject.getString("pageName").equals("/push/web.html")) {
+                    if (jsonObject.getString("path").equals("/push/web.html")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
                         Truth.assertThat(jsonObject.getString("title")).isEqualTo("Hybrid测试页面");
                         Truth.assertThat(jsonObject.getString("query")).isEqualTo("a=1&b=2");
@@ -301,7 +301,7 @@ public class HybridEventsTest extends EventsTest {
             protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    if (jsonObject.getString("pageName").equals("/push/web.html")) {
+                    if (jsonObject.getString("path").equals("/push/web.html")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("com.gio.test.three");
                         Truth.assertThat(jsonObject.getString("title")).isEqualTo("Hybrid测试页面");
                         Truth.assertThat(jsonObject.getString("protocolType")).isEqualTo("file");
@@ -326,7 +326,7 @@ public class HybridEventsTest extends EventsTest {
             protected void onReceivedPageAttributesEvents(JSONArray jsonArray) throws JSONException {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    if (jsonObject.getString("pageName").equals("/push/web.html")) {
+                    if (jsonObject.getString("path").equals("/push/web.html")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
                         Truth.assertThat(jsonObject.getLong("pageShowTimestamp")).isEqualTo(1602485626878L);
                         HashMap<String, String> attributes = (HashMap<String, String>) JsonUtil.copyToMap(jsonObject.getJSONObject("attributes"));
@@ -351,7 +351,7 @@ public class HybridEventsTest extends EventsTest {
             protected void onReceivedViewClickEvents(JSONArray jsonArray) throws JSONException {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    if (jsonObject.getString("pageName").equals("/push/web.html")) {
+                    if (jsonObject.getString("path").equals("/push/web.html")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
                         Truth.assertThat(jsonObject.getString("textValue")).isEqualTo("登录");
                         Truth.assertThat(jsonObject.getString("xpath")).isEqualTo("/div/button#abc");
@@ -378,7 +378,7 @@ public class HybridEventsTest extends EventsTest {
             protected void onReceivedViewChangeEvents(JSONArray jsonArray) throws JSONException {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    if (jsonObject.getString("pageName").equals("/push/web.html")) {
+                    if (jsonObject.getString("path").equals("/push/web.html")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
                         Truth.assertThat(jsonObject.getString("textValue")).isEqualTo("输入内容");
                         Truth.assertThat(jsonObject.getString("xpath")).isEqualTo("/div/form/input");
@@ -405,7 +405,7 @@ public class HybridEventsTest extends EventsTest {
             protected void onReceivedHybridFormSubmitEvents(JSONArray jsonArray) throws JSONException {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    if (jsonObject.getString("pageName").equals("/push/web.html")) {
+                    if (jsonObject.getString("path").equals("/push/web.html")) {
                         Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
                         Truth.assertThat(jsonObject.getString("xpath")).isEqualTo("/div/form/input");
                         Truth.assertThat(jsonObject.optString("hyperlink", "")).isEqualTo("");

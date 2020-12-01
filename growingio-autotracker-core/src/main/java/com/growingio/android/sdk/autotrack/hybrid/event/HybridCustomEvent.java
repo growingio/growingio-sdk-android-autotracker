@@ -69,8 +69,8 @@ public final class HybridCustomEvent extends PageLevelCustomEvent {
         }
 
         @Override
-        public Builder setPageName(String pageName) {
-            super.setPageName(pageName);
+        public Builder setPath(String path) {
+            super.setPath(path);
             return this;
         }
 

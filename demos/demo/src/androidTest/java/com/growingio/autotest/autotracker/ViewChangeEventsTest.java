@@ -66,13 +66,13 @@ public class ViewChangeEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewChangeEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
-                        .setPageName("/LoginActivity")
+                        .setPath("/LoginActivity")
                         .setXpath("/Page/LinearLayout[0]/FrameLayout[0]/FitWindowsLinearLayout[0]#action_bar_root/ContentFrameLayout[0]/ConstraintLayout[0]#container/AppCompatEditText[0]#username")
                         .setTextValue("")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
-                        .setPageName("/LoginActivity")
+                        .setPath("/LoginActivity")
                         .setXpath("/Page/LinearLayout[0]/FrameLayout[0]/FitWindowsLinearLayout[0]#action_bar_root/ContentFrameLayout[0]/ConstraintLayout[0]#container/AppCompatEditText[1]#password")
                         .setTextValue("")
                         .setIndex(-1)
@@ -102,8 +102,8 @@ public class ViewChangeEventsTest extends EventsTest {
         protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String pageName = jsonObject.getString("pageName");
-                mReceivedPages.put(pageName, jsonObject.getLong("timestamp"));
+                String path = jsonObject.getString("path");
+                mReceivedPages.put(path, jsonObject.getLong("timestamp"));
             }
         }
 
@@ -112,13 +112,13 @@ public class ViewChangeEventsTest extends EventsTest {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 for (int j = 0; j < mExpectReceivedChanges.size(); j++) {
-                    String pageName = jsonObject.getString("pageName");
+                    String path = jsonObject.getString("path");
                     ViewElementEvent viewElementEvent = mExpectReceivedChanges.get(j);
-                    if (pageName.equals(viewElementEvent.getPageName())
+                    if (path.equals(viewElementEvent.getPath())
                             && jsonObject.getString("xpath").equals(viewElementEvent.getXpath())
                             && jsonObject.optString("textValue").equals(viewElementEvent.getTextValue())
                             && jsonObject.getInt("index") == viewElementEvent.getIndex()
-                            && jsonObject.getLong("pageShowTimestamp") == mReceivedPages.get(pageName)) {
+                            && jsonObject.getLong("pageShowTimestamp") == mReceivedPages.get(path)) {
                         mExpectReceivedChanges.remove(j);
                         break;
                     }
