@@ -82,7 +82,7 @@ public class PageEventsTest extends EventsTest {
             @Override
             protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
-                if (jsonObject.getString("pageName").equals("/MainActivity")
+                if (jsonObject.getString("path").equals("/MainActivity")
                         && jsonObject.getString("orientation").equals("PORTRAIT")
                         && jsonObject.getString("title").equals("demos")) {
                     receivedEvent.set(true);
@@ -237,7 +237,7 @@ public class PageEventsTest extends EventsTest {
             @Override
             protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
-                if (jsonObject.getString("pageName").equals("/TestActivityPage")
+                if (jsonObject.getString("path").equals("/TestActivityPage")
                         && jsonObject.getString("orientation").equals("PORTRAIT")
                         && jsonObject.getString("title").equals("demos")) {
                     receivedEvent.set(true);
@@ -446,21 +446,21 @@ public class PageEventsTest extends EventsTest {
 
         private final Map<String, Long> mReceivedPages = new HashMap<>();
 
-        OnReceivedPageEventsListener(AtomicBoolean receivedAllEvents, String... pageNames) {
+        OnReceivedPageEventsListener(AtomicBoolean receivedAllEvents, String... paths) {
             mReceivedAllEvents = receivedAllEvents;
             mReceivedAllEvents.set(false);
-            mPages = Arrays.asList(pageNames);
+            mPages = Arrays.asList(paths);
         }
 
         @Override
         protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String pageName = jsonObject.getString("pageName");
-                if (mPages.contains(pageName) && jsonObject.getString("orientation").equals("PORTRAIT")) {
-                    mReceivedPages.put(pageName, jsonObject.getLong("timestamp"));
+                String path = jsonObject.getString("path");
+                if (mPages.contains(path) && jsonObject.getString("orientation").equals("PORTRAIT")) {
+                    mReceivedPages.put(path, jsonObject.getLong("timestamp"));
                 } else {
-                    Truth.assertWithMessage("Received " + pageName + " Page Event").fail();
+                    Truth.assertWithMessage("Received " + path + " Page Event").fail();
                 }
             }
 
@@ -494,8 +494,8 @@ public class PageEventsTest extends EventsTest {
         protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String pageName = jsonObject.getString("pageName");
-                Truth.assertWithMessage("Received " + pageName + " Page Event").fail();
+                String path = jsonObject.getString("path");
+                Truth.assertWithMessage("Received " + path + " Page Event").fail();
             }
         }
     }

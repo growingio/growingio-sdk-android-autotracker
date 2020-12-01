@@ -26,17 +26,17 @@ import java.util.Map;
 public class PageLevelCustomEvent extends CustomEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mPageName;
+    private final String mPath;
     private final long mPageShowTimestamp;
 
     protected PageLevelCustomEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mPageName = eventBuilder.mPageName;
+        mPath = eventBuilder.mPath;
         mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
     }
 
-    public String getPageName() {
-        return mPageName;
+    public String getPath() {
+        return mPath;
     }
 
     public long getPageShowTimestamp() {
@@ -47,7 +47,7 @@ public class PageLevelCustomEvent extends CustomEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("pageName", mPageName);
+            json.put("path", mPath);
             json.put("pageShowTimestamp", mPageShowTimestamp);
         } catch (JSONException ignored) {
         }
@@ -55,14 +55,14 @@ public class PageLevelCustomEvent extends CustomEvent {
     }
 
     public static class Builder extends CustomEvent.Builder {
-        private String mPageName;
+        private String mPath;
         private long mPageShowTimestamp;
 
         public Builder() {
         }
 
-        public Builder setPageName(String pageName) {
-            mPageName = pageName;
+        public Builder setPath(String path) {
+            mPath = path;
             return this;
         }
 

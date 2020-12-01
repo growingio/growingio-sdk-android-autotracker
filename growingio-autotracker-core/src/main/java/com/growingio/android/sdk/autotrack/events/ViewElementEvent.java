@@ -26,7 +26,7 @@ import org.json.JSONObject;
 public class ViewElementEvent extends BaseEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mPageName;
+    private final String mPath;
     private final long mPageShowTimestamp;
     private final String mTextValue;
     private final String mXpath;
@@ -34,15 +34,15 @@ public class ViewElementEvent extends BaseEvent {
 
     protected ViewElementEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mPageName = eventBuilder.mPageName;
+        mPath = eventBuilder.mPath;
         mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
         mTextValue = eventBuilder.mTextValue;
         mXpath = eventBuilder.mXpath;
         mIndex = eventBuilder.mIndex;
     }
 
-    public String getPageName() {
-        return mPageName;
+    public String getPath() {
+        return mPath;
     }
 
     public long getPageShowTimestamp() {
@@ -65,7 +65,7 @@ public class ViewElementEvent extends BaseEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("pageName", mPageName);
+            json.put("path", mPath);
             json.put("pageShowTimestamp", mPageShowTimestamp);
             if (!TextUtils.isEmpty(mTextValue)) {
                 json.put("textValue", mTextValue);
@@ -78,7 +78,7 @@ public class ViewElementEvent extends BaseEvent {
     }
 
     public static class Builder extends BaseBuilder<ViewElementEvent> {
-        private String mPageName;
+        private String mPath;
         private long mPageShowTimestamp;
         private String mTextValue;
         private String mXpath;
@@ -98,8 +98,8 @@ public class ViewElementEvent extends BaseEvent {
             return this;
         }
 
-        public Builder setPageName(String pageName) {
-            mPageName = pageName;
+        public Builder setPath(String path) {
+            mPath = path;
             return this;
         }
 

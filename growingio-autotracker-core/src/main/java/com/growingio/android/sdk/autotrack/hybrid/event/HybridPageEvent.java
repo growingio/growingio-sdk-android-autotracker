@@ -89,8 +89,8 @@ public class HybridPageEvent extends PageEvent {
         }
 
         @Override
-        public Builder setPageName(String pageName) {
-            super.setPageName(pageName);
+        public Builder setPath(String path) {
+            super.setPath(path);
             return this;
         }
 

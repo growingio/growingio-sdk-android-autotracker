@@ -16,9 +16,7 @@ dependencies {
     implementation libraries.android.gradle_plugin
     implementation project(':inject-annotation')
 
-    def toolsJar = Jvm.current().getToolsJar()
-    if (!toolsJar)
-        throw new GradleException("tools.jar not found at your JAVA_HOME dir ${Jvm.current().getJavaHome().getAbsolutePath()}.\n" +
-                "Building with a JRE or JDK9 is currently not supported.")
-    compileOnly files(toolsJar)
+    if (!Jvm.current().getJavaVersion().java9Compatible) {
+        compileOnly files(Jvm.current().getToolsJar())
+    }
 }

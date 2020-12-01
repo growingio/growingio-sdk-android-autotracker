@@ -78,7 +78,7 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setDomain(getDomain(eventJson))
                         .setProtocolType(eventJson.getString(KEY_PROTOCOL_TYPE))
                         .setQuery(eventJson.optString(KEY_QUERY))
-                        .setPageName(eventJson.getString(KEY_PATH))
+                        .setPath(eventJson.getString(KEY_PATH))
                         .setReferralPage(eventJson.optString(KEY_REFERRAL_PAGE))
                         .setTitle(eventJson.optString(KEY_TITLE))
                         .setTimestamp(eventJson.getLong(KEY_TIMESTAMP))
@@ -88,7 +88,7 @@ public class HybridTransformerImp implements HybridTransformer {
                 return new HybridPageAttributesEvent.Builder()
                         .setDomain(getDomain(eventJson))
                         .setQuery(eventJson.optString(KEY_QUERY))
-                        .setPageName(eventJson.getString(KEY_PATH))
+                        .setPath(eventJson.getString(KEY_PATH))
                         .setPageShowTimestamp(eventJson.getLong(KEY_PAGE_SHOW_TIMESTAMP))
                         .setAttributes(JsonUtil.copyToMap(eventJson.getJSONObject(KEY_ATTRIBUTES)));
 
@@ -108,7 +108,7 @@ public class HybridTransformerImp implements HybridTransformer {
                 return new HybridCustomEvent.Builder()
                         .setDomain(getDomain(eventJson))
                         .setQuery(eventJson.optString(KEY_QUERY))
-                        .setPageName(eventJson.getString(KEY_PATH))
+                        .setPath(eventJson.getString(KEY_PATH))
                         .setPageShowTimestamp(eventJson.getLong(KEY_PAGE_SHOW_TIMESTAMP))
                         .setEventName(eventJson.getString(KEY_EVENT_NAME))
                         .setAttributes(JsonUtil.copyToMap(eventJson.optJSONObject(KEY_ATTRIBUTES)));
@@ -149,7 +149,7 @@ public class HybridTransformerImp implements HybridTransformer {
                 .setIndex(eventJson.optInt(KEY_INDEX, -1))
                 .setTextValue(eventJson.optString(KEY_TEXT_VALUE))
                 .setXpath(eventJson.getString(KEY_XPATH))
-                .setPageName(eventJson.getString(KEY_PATH))
+                .setPath(eventJson.getString(KEY_PATH))
                 .setPageShowTimestamp(eventJson.getLong(KEY_PAGE_SHOW_TIMESTAMP));
     }
 }

@@ -47,8 +47,8 @@ final class OnReceivedViewImpressionEventsListener extends MockEventsApiServer.O
     protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String pageName = jsonObject.getString("pageName");
-            mReceivedPages.put(pageName, jsonObject.getLong("timestamp"));
+            String path = jsonObject.getString("path");
+            mReceivedPages.put(path, jsonObject.getLong("timestamp"));
         }
     }
 
@@ -57,13 +57,13 @@ final class OnReceivedViewImpressionEventsListener extends MockEventsApiServer.O
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             for (int j = 0; j < mExpectReceivedImpressions.size(); j++) {
-                String pageName = jsonObject.getString("pageName");
+                String path = jsonObject.getString("path");
                 Map<String, String> attributes = JsonUtil.copyToMap(jsonObject.optJSONObject("attributes"));
                 PageLevelCustomEvent customEvent = mExpectReceivedImpressions.get(j);
-                if (pageName.equals(customEvent.getPageName())
+                if (path.equals(customEvent.getPath())
                         && jsonObject.getString("eventName").equals(customEvent.getEventName())
                         && ObjectUtils.equals(attributes, customEvent.getAttributes())
-                        && jsonObject.getLong("pageShowTimestamp") == mReceivedPages.get(pageName)) {
+                        && jsonObject.getLong("pageShowTimestamp") == mReceivedPages.get(path)) {
                     mExpectReceivedImpressions.remove(j);
                     break;
                 }

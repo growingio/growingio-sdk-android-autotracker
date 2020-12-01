@@ -37,21 +37,21 @@ public class PageEvent extends BaseEvent {
     public @interface Orientation {
     }
 
-    private final String mPageName;
+    private final String mPath;
     private final String mOrientation;
     private final String mTitle;
     private final String mReferralPage;
 
     protected PageEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mPageName = eventBuilder.mPageName;
+        mPath = eventBuilder.mPath;
         mOrientation = eventBuilder.mOrientation;
         mTitle = eventBuilder.mTitle;
         mReferralPage = eventBuilder.mReferralPage;
     }
 
-    public String getPageName() {
-        return mPageName;
+    public String getPath() {
+        return mPath;
     }
 
     public String getOrientation() {
@@ -70,7 +70,7 @@ public class PageEvent extends BaseEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("pageName", mPageName);
+            json.put("path", mPath);
             json.put("orientation", mOrientation);
             json.put("title", mTitle);
             json.put("referralPage", mReferralPage);
@@ -80,7 +80,7 @@ public class PageEvent extends BaseEvent {
     }
 
     public static class Builder extends BaseBuilder<PageEvent> {
-        private String mPageName;
+        private String mPath;
         private String mOrientation = ORIENTATION_PORTRAIT;
         private String mTitle;
         private String mReferralPage = "";
@@ -89,8 +89,8 @@ public class PageEvent extends BaseEvent {
             super();
         }
 
-        public Builder setPageName(String pageName) {
-            mPageName = pageName;
+        public Builder setPath(String path) {
+            mPath = path;
             return this;
         }
 
