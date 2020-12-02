@@ -116,7 +116,6 @@ task jacocoTestReport(type: JacocoReport, group: 'Reporting', dependsOn: 'connec
 
 dependencies {
     androidTestUtil libraries.test.orchestrator
-    androidTestImplementation fileTree(dir: '../../thirdLibs', include: ['*.jar'])
     androidTestImplementation libraries.test.androidx_junit
     androidTestImplementation libraries.test.androidx_runner
     androidTestImplementation libraries.test.espresso_core

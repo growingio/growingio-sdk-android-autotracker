@@ -66,12 +66,12 @@ public class CircleServiceTest extends WebServicesTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setConfiguration(new TestTrackConfiguration("growing.b6e4218d94f2bffc"));
+        DemoApplication.setConfiguration(new TestTrackConfiguration("growing.d80871b41ef40518"));
     }
 
     @Test
     public void circleServiceTest() {
-        String uri = "growing.b6e4218d94f2bffc://growingio/webservice?serviceType=circle&wsUrl=" + Uri.encode(getWsUrl());
+        String uri = "growing.d80871b41ef40518://growingio/webservice?serviceType=circle&wsUrl=" + Uri.encode(getWsUrl());
         Intent intent = new Intent();
         intent.setData(Uri.parse(uri));
         ActivityScenario.launch(intent);
@@ -132,8 +132,7 @@ public class CircleServiceTest extends WebServicesTest {
         });
         TrackHelper.waitUiThreadForIdleSync();
 
-        onView(withText("圈选")).check(matches(isDisplayed()));
-        onView(withText("您是否要退出圈选？")).check(matches(isDisplayed()));
-        onView(withText("取消")).perform(click());
+        onView(withText("正在进行圈选")).check(matches(isDisplayed()));
+        onView(withText("继续圈选")).perform(click());
     }
 }

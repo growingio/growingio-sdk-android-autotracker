@@ -25,10 +25,12 @@ import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
 import com.growingio.android.sdk.autotrack.webservices.circle.entity.CircleScreenshot;
 import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.SystemUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
@@ -52,7 +54,7 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mTipView.setContent(R.string.growing_tracker_is_circling);
+                mTipView.setContent(R.string.growing_autotracker_is_circling);
                 mTipView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -69,16 +71,19 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
             Logger.e(TAG, "showExitDialog: ForegroundActivity is NULL");
             return;
         }
+
+        String message = activity.getString(R.string.growing_autotracker_app_version) + AppInfoProvider.get().getAppVersion() + "\n"
+                + activity.getString(R.string.growing_autotracker_sdk_version) + SDKConfig.SDK_VERSION;
         new AlertDialog.Builder(activity)
-                .setTitle(R.string.growing_autotracker_circle)
-                .setMessage(R.string.growing_autotracker_exit_circle)
-                .setPositiveButton(R.string.growing_autotracker_ok, new DialogInterface.OnClickListener() {
+                .setTitle(R.string.growing_autotracker_is_circling)
+                .setMessage(message)
+                .setPositiveButton(R.string.growing_autotracker_exit_circle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         exit();
                     }
                 })
-                .setNegativeButton(R.string.growing_autotracker_cancel, null)
+                .setNegativeButton(R.string.growing_autotracker_continue_circle, null)
                 .create()
                 .show();
     }
@@ -92,11 +97,44 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
     protected void onFailed() {
         super.onFailed();
         Logger.e(TAG, "Start CircleService Failed");
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showQuitedDialog();
+            }
+        });
     }
 
     @Override
     protected void onQuited() {
         end();
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showQuitedDialog();
+            }
+        });
+    }
+
+    private void showQuitedDialog() {
+        Activity activity = ActivityStateProvider.get().getForegroundActivity();
+        if (activity == null) {
+            Logger.e(TAG, "showQuitedDialog: ForegroundActivity is NULL");
+            return;
+        }
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.growing_tracker_device_unconnected)
+                .setMessage(R.string.growing_autotracker_circle_unconnected)
+                .setPositiveButton(R.string.growing_autotracker_exit_circle, null)
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        SystemUtil.killAppProcess(ContextProvider.getApplicationContext());
+                    }
+                })
+                .setCancelable(false)
+                .create()
+                .show();
     }
 
     @Override
