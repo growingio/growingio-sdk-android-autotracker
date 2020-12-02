@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -42,8 +43,13 @@ public abstract class BaseWebSocketService implements IWebService {
     private static final String TAG = "BaseWebSocketService";
     private static final String WS_URL = "wsUrl";
 
+    public static final int SOCKET_STATE_INITIALIZE = 0;
+    public static final int SOCKET_STATE_READIED = 1;
+    public static final int SOCKET_STATE_CLOSED = 2;
+
     private WebSocket mWebSocket;
     protected TipView mTipView;
+    private final AtomicInteger mSocketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
 
     @CallSuper
     @Override
@@ -57,6 +63,15 @@ public abstract class BaseWebSocketService implements IWebService {
                 mTipView.setContent(R.string.growing_tracker_connecting_to_web);
             }
         });
+        ThreadUtils.postOnUiThreadDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mSocketState.get() < SOCKET_STATE_READIED) {
+                    Logger.e(TAG, "start WebSocketService timeout");
+                    onFailed();
+                }
+            }
+        }, 5000);
     }
 
     public void start(String wsUrl) {
@@ -78,11 +93,14 @@ public abstract class BaseWebSocketService implements IWebService {
         httpClient.dispatcher().executorService().shutdown();
     }
 
+    @CallSuper
     protected void onReady() {
+        mSocketState.set(SOCKET_STATE_READIED);
     }
 
     @CallSuper
     protected void onFailed() {
+        mSocketState.set(SOCKET_STATE_CLOSED);
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -93,8 +111,13 @@ public abstract class BaseWebSocketService implements IWebService {
         });
     }
 
+    @CallSuper
     protected void onQuited() {
+        mSocketState.set(SOCKET_STATE_CLOSED);
+    }
 
+    protected int getSocketState() {
+        return mSocketState.get();
     }
 
     protected void onMessage(String text) {
@@ -112,8 +135,9 @@ public abstract class BaseWebSocketService implements IWebService {
     }
 
     @Override
+    @CallSuper
     public void end() {
-
+        mSocketState.set(SOCKET_STATE_CLOSED);
     }
 
     private final class WebSocketListener extends okhttp3.WebSocketListener {
