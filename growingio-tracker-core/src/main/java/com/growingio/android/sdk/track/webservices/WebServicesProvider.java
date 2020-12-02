@@ -106,9 +106,7 @@ public class WebServicesProvider implements IActivityLifecycle {
         if (serviceClass != null) {
             try {
                 mRunningWebService = serviceClass.newInstance();
-                if (mTipView == null) {
-                    mTipView = new TipView(ContextProvider.getApplicationContext());
-                }
+                mTipView = new TipView(ContextProvider.getApplicationContext());
                 mRunningWebService.start(params, mTipView);
             } catch (Exception e) {
                 Logger.e(TAG, e);

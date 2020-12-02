@@ -24,14 +24,12 @@ import android.view.View;
 import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
 import com.growingio.android.sdk.autotrack.webservices.circle.entity.CircleScreenshot;
-import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
-import com.growingio.android.sdk.track.utils.SystemUtil;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
 import com.growingio.android.sdk.track.webservices.log.MobileLogService;
@@ -50,6 +48,7 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
 
     @Override
     protected void onReady() {
+        super.onReady();
         registerScreenshotRefreshedListener();
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -80,7 +79,7 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
                 .setPositiveButton(R.string.growing_autotracker_exit_circle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        exit();
+                        exitCircle();
                     }
                 })
                 .setNegativeButton(R.string.growing_autotracker_continue_circle, null)
@@ -88,13 +87,16 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
                 .show();
     }
 
-    private void exit() {
+    private void exitCircle() {
+        end();
         sendQuitMessage();
-        SystemUtil.killAppProcess(ContextProvider.getApplicationContext());
     }
 
     @Override
     protected void onFailed() {
+        if (getSocketState() >= SOCKET_STATE_CLOSED) {
+            return;
+        }
         super.onFailed();
         Logger.e(TAG, "Start CircleService Failed");
         ThreadUtils.runOnUiThread(new Runnable() {
@@ -107,7 +109,12 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
 
     @Override
     protected void onQuited() {
+        if (getSocketState() >= SOCKET_STATE_CLOSED) {
+            return;
+        }
+
         end();
+        super.onQuited();
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -129,7 +136,7 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        SystemUtil.killAppProcess(ContextProvider.getApplicationContext());
+                        exitCircle();
                     }
                 })
                 .setCancelable(false)
@@ -182,9 +189,15 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
 
     @Override
     public void end() {
+        if (getSocketState() >= SOCKET_STATE_CLOSED) {
+            return;
+        }
+
+        super.end();
         if (mMobileLogService != null) {
             mMobileLogService.end();
         }
+        mTipView.dismiss();
         ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
     }
 }
