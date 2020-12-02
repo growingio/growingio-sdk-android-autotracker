@@ -49,6 +49,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.reflect.Whitebox;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -438,14 +439,15 @@ public class HybridEventsTest extends EventsTest {
     }
 
     @Test
-    public void hybridDomChangedTest() {
+    public void hybridDomChangedTest() throws Exception {
         AtomicBoolean receivedEvent = new AtomicBoolean(false);
         WebView webView = launchMockWebView();
+        SuperWebView<WebView> superWebView = Whitebox.invokeMethod(SuperWebView.class, "make", webView);
         HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
             @Override
             public void onDomChanged() {
                 TrackHelper.postToUiThread(() ->
-                        HybridBridgeProvider.get().getWebViewDomTree(SuperWebView.make(webView), new Callback<JSONObject>() {
+                        HybridBridgeProvider.get().getWebViewDomTree(superWebView, new Callback<JSONObject>() {
                             @Override
                             public void onSuccess(JSONObject result) {
                                 receivedEvent.set(result != null);
