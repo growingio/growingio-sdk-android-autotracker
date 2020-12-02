@@ -184,7 +184,9 @@ public class AutotrackTransform extends Transform {
                 while ((entry = jar.getNextEntry()) != null) {
                     ZipEntry outEntry = copyEntry(entry);
                     outJar.putNextEntry(outEntry);
-                    if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                    if (!entry.isDirectory()
+                            && !entry.getName().equals("module-info.class")
+                            && entry.getName().endsWith(".class")) {
                         if (mClassRewriter.transformClass(jar, outJar)) {
                             log("transforming jar entry: " + entry.getName());
                         }

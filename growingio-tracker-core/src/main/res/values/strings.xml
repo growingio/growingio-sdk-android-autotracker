@@ -4,5 +4,5 @@
     <string name="growing_tracker_drag_tip">如有遮挡请拖动此条</string>
     <string name="growing_tracker_connecting_to_web">正在和Web端建立连接....</string>
     <string name="growing_tracker_connected_to_web_failed">和Web端建立连接失败，请重新尝试</string>
-    <string name="growing_tracker_device_unconnected">设备以断开连接</string>
+    <string name="growing_tracker_device_unconnected">设备已断开连接</string>
 </resources>
