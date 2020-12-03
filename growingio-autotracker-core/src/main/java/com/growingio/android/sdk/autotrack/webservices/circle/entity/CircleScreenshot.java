@@ -178,7 +178,6 @@ public class CircleScreenshot {
                     .setHeight(viewNode.getView().getHeight())
                     .setWidth(viewNode.getView().getWidth())
                     .setContent(viewNode.getViewContent())
-                    .setContainer(true)
                     .setNodeType(viewNode.getNodeType())
                     .setPage(PageProvider.get().findPage(viewNode.getView()).path())
                     .setParentXPath(viewNode.getClickableParentXPath())

@@ -20,6 +20,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.AbsSeekBar;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
@@ -33,6 +34,7 @@ public class ViewUtil {
         return view instanceof WebView
                 || view instanceof CompoundButton
                 || view instanceof AbsSeekBar
+                || view instanceof EditText
                 || (view.isClickable() && view.hasOnClickListeners())
                 || ClassExistHelper.isListView(view.getParent())
                 || ListMenuItemViewShadow.isListMenuItemView(view);
