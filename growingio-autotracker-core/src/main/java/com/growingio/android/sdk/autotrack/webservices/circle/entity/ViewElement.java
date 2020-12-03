@@ -29,7 +29,6 @@ class ViewElement {
     private final int mTop;
     private final int mWidth;
     private final int mHeight;
-    private final boolean mIsContainer;
     private final String mNodeType;
     private final String mContent;
     private final String mPage;
@@ -44,7 +43,6 @@ class ViewElement {
         mTop = builder.mTop;
         mWidth = builder.mWidth;
         mHeight = builder.mHeight;
-        mIsContainer = builder.mIsContainer;
         mNodeType = builder.mNodeType;
         mContent = builder.mContent;
         mPage = builder.mPage;
@@ -62,7 +60,6 @@ class ViewElement {
             json.put("top", mTop);
             json.put("width", mWidth);
             json.put("height", mHeight);
-            json.put("isContainer", mIsContainer);
             json.put("nodeType", mNodeType);
             json.put("content", mContent);
             json.put("page", mPage);
@@ -83,7 +80,6 @@ class ViewElement {
         private int mTop;
         private int mWidth;
         private int mHeight;
-        private boolean mIsContainer;
         private String mNodeType;
         private String mContent;
         private String mPage;
@@ -118,11 +114,6 @@ class ViewElement {
 
         public Builder setHeight(int height) {
             mHeight = height;
-            return this;
-        }
-
-        public Builder setContainer(boolean container) {
-            mIsContainer = container;
             return this;
         }
 
