@@ -20,15 +20,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.growingio.android.sdk.track.ContextProvider;
-import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
-import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 import com.growingio.android.sdk.track.utils.ConstantPool;
@@ -154,9 +151,9 @@ public class DeviceInfoProvider {
     }
 
     public String getDeviceId() {
-        if (TextUtils.isEmpty(mDeviceId) && ConfigurationProvider.get().isDataCollectionEnabled()) {
+        if (TextUtils.isEmpty(mDeviceId)) {
             mDeviceId = PersistentDataProvider.get().getDeviceId();
-            if (TextUtils.isEmpty(mDeviceId)) {
+            if (TextUtils.isEmpty(mDeviceId) && ConfigurationProvider.get().isDataCollectionEnabled()) {
                 mDeviceId = calculateDeviceId();
             }
         }
@@ -166,19 +163,6 @@ public class DeviceInfoProvider {
 //    public void setDeviceId(String deviceId) {
 //        this.mDeviceId = deviceId;
 //    }
-
-    public void getDeviceId(@NonNull final ResultCallback<String> callback) {
-        if (!TextUtils.isEmpty(mDeviceId)) {
-            callback.onResult(mDeviceId);
-            return;
-        }
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                callback.onResult(getDeviceId());
-            }
-        });
-    }
 
     private String calculateDeviceId() {
         Logger.d(TAG, "first time calculate deviceId");

@@ -20,11 +20,10 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
-import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -110,12 +109,9 @@ public class Tracker {
         TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>(attributes));
     }
 
-    public void getDeviceId(@NonNull ResultCallback<String> callback) {
-        if (callback != null) {
-            DeviceInfoProvider.get().getDeviceId(callback);
-        } else {
-            Log.e(TAG, "getDeviceId was called, but callback is null, return");
-        }
+    @Nullable
+    public String getDeviceId() {
+        return DeviceInfoProvider.get().getDeviceId();
     }
 
     public void setDataCollectionEnabled(boolean enabled) {
