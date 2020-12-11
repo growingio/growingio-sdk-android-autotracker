@@ -20,8 +20,6 @@ import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.growingio.android.sdk.track.interfaces.ResultCallback;
-
 import java.util.Map;
 
 /**
@@ -49,7 +47,8 @@ public interface IGrowingAutotracker {
 
     void setDataCollectionEnabled(boolean enabled);
 
-    void getDeviceId(@Nullable ResultCallback<String> callback);
+    @Nullable
+    String getDeviceId();
 
     void setPageAttributes(Activity page, Map<String, String> attributes);
 

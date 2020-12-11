@@ -21,8 +21,6 @@ import android.app.Fragment;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.growingio.android.sdk.track.interfaces.ResultCallback;
-
 import java.util.Map;
 
 enum EmptyGrowingAutotracker implements IGrowingAutotracker {
@@ -204,8 +202,9 @@ enum EmptyGrowingAutotracker implements IGrowingAutotracker {
 
     }
 
+    @Nullable
     @Override
-    public void getDeviceId(@Nullable ResultCallback<String> callback) {
-
+    public String getDeviceId() {
+        return null;
     }
 }

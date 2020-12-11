@@ -21,10 +21,10 @@ import android.app.Application;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.growingio.android.sdk.track.interfaces.ResultCallback;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
@@ -117,11 +117,6 @@ public class GrowingTracker implements IGrowingTracker {
     }
 
     @Override
-    public void getDeviceId(@NonNull ResultCallback<String> callback) {
-        mTracker.getDeviceId(callback);
-    }
-
-    @Override
     public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
         mTracker.onActivityNewIntent(activity, intent);
     }
@@ -129,6 +124,12 @@ public class GrowingTracker implements IGrowingTracker {
     @Override
     public void setDataCollectionEnabled(boolean enabled) {
         mTracker.setDataCollectionEnabled(enabled);
+    }
+
+    @Nullable
+    @Override
+    public String getDeviceId() {
+        return mTracker.getDeviceId();
     }
 
     @Override
