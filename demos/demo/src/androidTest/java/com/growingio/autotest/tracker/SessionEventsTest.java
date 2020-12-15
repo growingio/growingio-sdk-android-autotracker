@@ -24,8 +24,8 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import androidx.lifecycle.Lifecycle;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
@@ -34,6 +34,7 @@ import com.gio.test.three.MainActivity;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.BuildConfig;
 import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
@@ -46,7 +47,6 @@ import com.growingio.autotest.help.Uninterruptibles;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -66,9 +66,6 @@ public class SessionEventsTest extends EventsTest {
     private String mNewSessionId;
     private String mLoginUserId;
     private long mVisitTimestamp;
-
-    @Rule
-    public ActivityScenarioRule<MainActivity> scenarioRule = new ActivityScenarioRule<>(MainActivity.class);
 
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
@@ -149,10 +146,11 @@ public class SessionEventsTest extends EventsTest {
                 }
             }
         });
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
         Awaiter.untilTrue(receivedVisit);
 
         //To State STOP
-        scenarioRule.getScenario().moveToState(Lifecycle.State.CREATED);
+        scenario.moveToState(Lifecycle.State.CREATED);
         Awaiter.untilTrue(receivedAppClosed);
 
         receivedAppClosed.set(false);
@@ -171,9 +169,9 @@ public class SessionEventsTest extends EventsTest {
             }
         });
         //To State RESUMED
-        scenarioRule.getScenario().moveToState(Lifecycle.State.RESUMED);
+        scenario.moveToState(Lifecycle.State.RESUMED);
         //To State STOP
-        scenarioRule.getScenario().moveToState(Lifecycle.State.CREATED);
+        scenario.moveToState(Lifecycle.State.CREATED);
         Awaiter.untilTrue(receivedAppClosed);
 
         receivedVisit.set(false);
@@ -205,10 +203,10 @@ public class SessionEventsTest extends EventsTest {
         Uninterruptibles.sleepUninterruptibly(delayTime * 1000 + 1, TimeUnit.MILLISECONDS);
 
         //To State RESUMED
-        scenarioRule.getScenario().moveToState(Lifecycle.State.RESUMED);
+        scenario.moveToState(Lifecycle.State.RESUMED);
         Awaiter.untilTrue(receivedVisit);
         //To State DESTROYED
-        scenarioRule.getScenario().moveToState(Lifecycle.State.DESTROYED);
+        scenario.moveToState(Lifecycle.State.DESTROYED);
         Awaiter.untilTrue(receivedAppClosed);
     }
 
@@ -239,6 +237,7 @@ public class SessionEventsTest extends EventsTest {
                 }
             }
         });
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
         Awaiter.untilTrue(receivedVisit);
 
         resendVisitEventLoginUserIdFirstFromNull2NotNull();
@@ -248,6 +247,7 @@ public class SessionEventsTest extends EventsTest {
         resendVisitEventLoginUserIdFromNull2New();
         resendVisitEventLoginUserIdFromNotNull2Same();
         resendVisitEventLoginUserIdFromNotNull2New();
+        scenario.close();
     }
 
     private void resendVisitEventLoginUserIdFromNull2New() {
@@ -360,6 +360,7 @@ public class SessionEventsTest extends EventsTest {
                 receivedVisit.set(true);
             }
         });
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
         Awaiter.untilTrue(receivedVisit);
 
         resendVisitEventLocationFromNull2NotNull();
@@ -367,6 +368,7 @@ public class SessionEventsTest extends EventsTest {
 
         GrowingTracker.get().cleanLocation();
         resendVisitEventLocationFromNull2NotNull();
+        scenario.close();
     }
 
     private void resendVisitEventLocationFromNull2NotNull() {
@@ -395,6 +397,62 @@ public class SessionEventsTest extends EventsTest {
         });
         GrowingTracker.get().setLocation(100, 100);
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
+    }
+
+    /**
+     * 如果在visit事件前触发埋点事件，需要强制补发visit事件后再发送custom事件，
+     * 且后续Activity生命周期不在触发visit事件
+     */
+    @Test
+    public void forceReissueVisitEventTest() {
+        final AtomicBoolean receivedVisit = new AtomicBoolean(false);
+        final AtomicBoolean receivedCustom = new AtomicBoolean(false);
+        String oldSessionId = PersistentDataProvider.get().getSessionId();
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                checkVisitEvent(jsonArray);
+                JSONObject visit = jsonArray.getJSONObject(0);
+                mSessionId = visit.getString("sessionId");
+                Truth.assertThat(mSessionId).isNotEmpty();
+                Truth.assertThat(oldSessionId).isNotEqualTo(mSessionId);
+                receivedVisit.set(true);
+            }
+
+            @Override
+            protected void onReceivedCustomEvents(JSONArray jsonArray) throws JSONException {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                if ("beforeVisitEvent".equals(jsonObject.getString("eventName"))
+                        && mSessionId.equals(jsonObject.getString("sessionId"))) {
+                    receivedCustom.set(true);
+                }
+            }
+        });
+
+        GrowingTracker.get().trackCustomEvent("beforeVisitEvent");
+        Awaiter.untilTrue(receivedVisit);
+        Awaiter.untilTrue(receivedCustom);
+
+        receivedCustom.set(false);
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
+                Truth.assertWithMessage("Received Visit Event").fail();
+            }
+
+            @Override
+            protected void onReceivedCustomEvents(JSONArray jsonArray) throws JSONException {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                if ("beforeVisitEvent".equals(jsonObject.getString("eventName"))
+                        && mSessionId.equals(jsonObject.getString("sessionId"))) {
+                    receivedCustom.set(true);
+                }
+            }
+        });
+
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+        GrowingTracker.get().trackCustomEvent("beforeVisitEvent");
+        scenario.close();
     }
 
 }

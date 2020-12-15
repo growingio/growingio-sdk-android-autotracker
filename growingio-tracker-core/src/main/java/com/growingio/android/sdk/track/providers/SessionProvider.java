@@ -16,9 +16,11 @@
 
 package com.growingio.android.sdk.track.providers;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
@@ -28,6 +30,7 @@ import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.utils.SystemUtil;
 
 import java.util.UUID;
 
@@ -44,12 +47,14 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     private long mLatestPauseTime = 0;
     private long mLatestVisitTime = 0;
     private volatile String mSessionId;
+    private final Context mContext;
 
     private static class SingleInstance {
         private static final SessionProvider INSTANCE = new SessionProvider();
     }
 
     private SessionProvider() {
+        mContext = ContextProvider.getApplicationContext();
         mSessionInterval = ConfigurationProvider.get().getTrackConfiguration().getSessionInterval() * 1000;
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
     }
@@ -58,8 +63,12 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         return SingleInstance.INSTANCE;
     }
 
-    @TrackThread
     void checkAndSendVisit(long resumeTime) {
+        if (mAlreadySendVisit && mLatestPauseTime == 0) {
+            Logger.w(TAG, "Visit event already send by force reissue");
+            return;
+        }
+
         if (resumeTime - mLatestPauseTime >= mSessionInterval) {
             String sessionId = refreshSessionId();
             generateVisit(sessionId, resumeTime);
@@ -101,7 +110,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     }
 
     public void forceReissueVisit() {
-        if (mAlreadySendVisit || ActivityStateProvider.get().getForegroundActivity() == null) {
+        if (mAlreadySendVisit || !SystemUtil.isMainProcess(mContext)) {
             return;
         }
         String sessionId = refreshSessionId();
@@ -155,7 +164,6 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         mLatestNonNullUserId = UserInfoProvider.get().getLoginUserId();
         UserInfoProvider.get().registerUserIdChangedListener(this);
     }
-
 
     @Override
     public void onUserIdChanged(@Nullable String newUserId) {

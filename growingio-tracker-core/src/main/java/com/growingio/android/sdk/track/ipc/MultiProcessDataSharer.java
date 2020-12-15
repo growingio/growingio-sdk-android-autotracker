@@ -286,6 +286,7 @@ public class MultiProcessDataSharer implements IDataSharer {
     @Override
     public long getAndAdd(String key, long delta, long startValue) {
         synchronized (this) {
+            Logger.d(TAG, "getAndAdd: key = " + key + ", delta = " + delta + ", startValue = " + startValue);
             awaitLoadedLocked();
             final long[] result = new long[1];
             SharedEntry entry = mSharedEntries.get(key);
@@ -293,13 +294,15 @@ public class MultiProcessDataSharer implements IDataSharer {
                 lockedRun(new Runnable() {
                     @Override
                     public void run() {
-                        result[0] = (long) entry.getValue(mMappedByteBuffer);
-                        entry.putLong(mMappedByteBuffer, result[0] + delta);
+                        result[0] = (long) entry.getValue(mMappedByteBuffer) + delta;
+                        entry.putLong(mMappedByteBuffer, result[0]);
                     }
                 }, entry.getPosition(), SharedEntry.MAX_SIZE);
+                Logger.d(TAG, "getAndAdd: result = " + result[0]);
                 return result[0];
             } else {
                 putValue(key, SharedEntry.VALUE_TYPE_LONG, startValue);
+                Logger.d(TAG, "getAndAdd: return startValue");
                 return startValue;
             }
         }
