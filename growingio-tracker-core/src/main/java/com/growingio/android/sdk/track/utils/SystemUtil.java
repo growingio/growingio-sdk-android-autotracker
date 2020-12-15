@@ -19,10 +19,18 @@ package com.growingio.android.sdk.track.utils;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Process;
+import android.text.TextUtils;
 
+import com.growingio.android.sdk.track.log.Logger;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.List;
 
 public class SystemUtil {
+    private static final String TAG = "SystemUtil";
+
     private SystemUtil() {
     }
 
@@ -40,5 +48,23 @@ public class SystemUtil {
 
         Process.killProcess(Process.myPid());
         System.exit(0);
+    }
+
+    public static String getProcessName() {
+        try {
+            File file = new File("/proc/" + android.os.Process.myPid() + "/" + "cmdline");
+            BufferedReader mBufferedReader = new BufferedReader(new FileReader(file));
+            String processName = mBufferedReader.readLine().trim();
+            mBufferedReader.close();
+            return processName;
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+            return null;
+        }
+    }
+
+    public static boolean isMainProcess(Context context) {
+        String processName = getProcessName();
+        return !TextUtils.isEmpty(processName) && processName.equals(context.getPackageName());
     }
 }
