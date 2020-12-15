@@ -18,8 +18,6 @@ package com.growingio.android.sdk.track.log;
 
 import android.support.annotation.Nullable;
 
-import com.growingio.android.sdk.track.webservices.log.WsLogger;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +33,7 @@ public class Logger {
 
     static {
         addLogger(new ErrorLogger());
-        addLogger(new WsLogger());
+        addLogger(new CacheLogger());
     }
 
     private Logger() {

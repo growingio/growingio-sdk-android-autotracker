@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.webservices.log;
+package com.growingio.android.sdk.track.log;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

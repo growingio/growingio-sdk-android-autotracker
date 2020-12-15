@@ -20,15 +20,29 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class DebugLogger extends BaseLogger {
     private static final String TYPE = "Logcat";
-
     private static final String TAG_PREFIX = "TRACK.";
-
     private static final int MAX_LOG_LENGTH = 4000;
+
+    private AtomicBoolean mFirstInit = new AtomicBoolean(true);
 
     @Override
     protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
+        if (mFirstInit.compareAndSet(true, false)) {
+            ILogger cacheLogger = Logger.getLogger(CacheLogger.TYPE);
+            if (cacheLogger instanceof CacheLogger) {
+                for (LogItem item : ((CacheLogger) cacheLogger).getCacheLogs()) {
+                    printWithoutCache(item.getPriority(), item.getTag(), item.getMessage(), item.getThrowable());
+                }
+            }
+        }
+        printWithoutCache(priority, tag, message, t);
+    }
+
+    protected void printWithoutCache(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
         if (priority > Log.ASSERT) {
             return;
         }
