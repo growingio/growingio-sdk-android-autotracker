@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.track.webservices.log;
 
-import com.growingio.android.sdk.track.log.ILogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
 
@@ -27,16 +26,18 @@ public class MobileLogService extends BaseWebSocketService {
 
     @Override
     protected void onReady() {
-        ILogger logger = Logger.getLogger(WsLogger.TYPE);
-        if (logger instanceof WsLogger) {
-            mWsLogger = (WsLogger) logger;
-            mWsLogger.setCallback(new WsLogger.Callback() {
-                @Override
-                public void disposeLog(LoggerDataMessage logMessage) {
-                    sendMessage(logMessage.toJSONObject().toString());
-                }
-            });
+        super.onReady();
+        if (mWsLogger == null) {
+            mWsLogger = new WsLogger();
+            Logger.addLogger(mWsLogger);
         }
+
+        mWsLogger.setCallback(new WsLogger.Callback() {
+            @Override
+            public void disposeLog(LoggerDataMessage logMessage) {
+                sendMessage(logMessage.toJSONObject().toString());
+            }
+        });
     }
 
     @Override

@@ -21,77 +21,75 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.growingio.android.sdk.track.log.BaseLogger;
+import com.growingio.android.sdk.track.log.CacheLogger;
+import com.growingio.android.sdk.track.log.ILogger;
+import com.growingio.android.sdk.track.log.LogItem;
+import com.growingio.android.sdk.track.log.Logger;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WsLogger extends BaseLogger {
     public static final String TYPE = "WsLogger";
 
-    private final CircularFifoQueue<LoggerDataMessage.LogItem> mCacheLogs = new CircularFifoQueue<>(100);
-    private final ExecutorService mExecutorService = Executors.newSingleThreadExecutor();
-    private Callback mCallback;
+    private volatile Callback mCallback;
+    private AtomicBoolean mFirstInit = new AtomicBoolean(true);
 
     public void setCallback(Callback callback) {
-        mExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                mCallback = callback;
-            }
-        });
+        mCallback = callback;
     }
 
     @Override
     protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
-        mExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                String state;
-                switch (priority) {
-                    case Log.VERBOSE:
-                        state = "VERBOSE";
-                        break;
-                    case Log.DEBUG:
-                        state = "DEBUG";
-                        break;
-                    case Log.INFO:
-                        state = "INFO";
-                        break;
-                    case Log.WARN:
-                        state = "WARN";
-                        break;
-                    case Log.ERROR:
-                        state = "ERROR";
-                        break;
-                    case Log.ASSERT:
-                        state = "ALARM";
-                        break;
-                    default:
-                        state = "OTHER";
-                }
-                if (mCallback != null) {
-                    if (!mCacheLogs.isEmpty()) {
-                        mCallback.disposeLog(LoggerDataMessage.createMessage(mCacheLogs));
-                        mCacheLogs.clear();
-                    }
-                    mCallback.disposeLog(LoggerDataMessage.
-                            createMessage(state,
-                                    "xxx",
-                                    message,
-                                    String.valueOf(System.currentTimeMillis())));
-                } else {
-                    mCacheLogs.add(LoggerDataMessage.createLogItem(state,
-                            "xxx",
-                            message,
-                            String.valueOf(System.currentTimeMillis())));
-                }
-            }
-        });
+          String state = priorityToState(priority);
+          if (mCallback != null) {
+              if (mFirstInit.compareAndSet(true, false)) {
+                  ILogger cacheLogger = Logger.getLogger(CacheLogger.TYPE);
+                  if (cacheLogger instanceof CacheLogger) {
+                      List<LogItem> cacheLogs = ((CacheLogger) cacheLogger).getCacheLogs();
+                      Queue<LoggerDataMessage.LogItem> queue = new ArrayDeque<>(cacheLogs.size());
+                      for (LogItem item : cacheLogs) {
+                          queue.add(LoggerDataMessage.createLogItem(
+                                  priorityToState(item.getPriority()),
+                                  "subType",
+                                  item.getMessage(),
+                                  String.valueOf(item.getTimeStamp())));
+                      }
+                      mCallback.disposeLog(LoggerDataMessage.createMessage(queue));
+                  }
+              }
+              mCallback.disposeLog(LoggerDataMessage.
+                      createMessage(state,
+                              "subType",
+                              message,
+                              String.valueOf(System.currentTimeMillis())));
+          }
     }
 
     @Override
     public String getType() {
         return TYPE;
+    }
+
+    private String priorityToState(int priority) {
+        switch (priority) {
+            case Log.VERBOSE:
+                return "VERBOSE";
+            case Log.DEBUG:
+                return "DEBUG";
+            case Log.INFO:
+                return "INFO";
+            case Log.WARN:
+                return "WARN";
+            case Log.ERROR:
+                return "ERROR";
+            case Log.ASSERT:
+                return "ALARM";
+            default:
+                return "OTHER";
+        }
     }
 
     interface Callback {

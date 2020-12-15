@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.webservices.log.MobileLogService;
@@ -83,6 +84,12 @@ public class WebServicesProvider implements IActivityLifecycle {
                         params.put(parameterName, data.getQueryParameter(parameterName));
                     }
                     startWebService(serviceType, params);
+                }
+                String openConsole = data.getQueryParameter("openConsoleLog");
+                if (!TextUtils.isEmpty(openConsole)) {
+                    if ("YES".equalsIgnoreCase(openConsole)) {
+                        Logger.addLogger(new DebugLogger());
+                    }
                 }
 //                intent.setData(null);
             }
