@@ -380,11 +380,13 @@ public class SessionEventsTest extends EventsTest {
                 JSONObject visit = jsonArray.getJSONObject(0);
                 if (visit.getString("sessionId").equals(mSessionId)
                         && visit.getLong("timestamp") == mVisitTimestamp) {
+                    Truth.assertThat(visit.optLong("latitude")).isEqualTo(66);
+                    Truth.assertThat(visit.optLong("longitude")).isEqualTo(99);
                     receivedVisit.set(true);
                 }
             }
         });
-        GrowingTracker.get().setLocation(99, 99);
+        GrowingTracker.get().setLocation(66, 99);
         Awaiter.untilTrue(receivedVisit);
     }
 
