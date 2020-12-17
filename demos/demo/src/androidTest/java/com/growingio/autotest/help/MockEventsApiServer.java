@@ -84,7 +84,7 @@ public class MockEventsApiServer extends MockServer {
         Truth.assertThat(uri.getPath()).isEqualTo(expectedPath);
 
         long stm = Long.parseLong(uri.getQueryParameter("stm"));
-        Truth.assertThat(System.currentTimeMillis() - stm).isAtMost(3000);
+        Truth.assertThat(System.currentTimeMillis() - stm).isAtMost(5000);
     }
 
     private void checkBaseEventBody(JSONArray jsonArray) throws JSONException {
