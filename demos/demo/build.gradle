@@ -85,7 +85,7 @@ def coverageClassDirs = [
         "$rootDir/growingio-autotracker-gradle-plugin/build/classes/java/main"
 ]
 
-task jacocoTestReport(type: JacocoReport, group: 'Reporting', dependsOn: 'connectedCheck') {
+task jacocoTestReport(type: JacocoReport, group: 'Reporting') {
     reports {
         xml.enabled = true
         html.enabled = true
@@ -109,6 +109,7 @@ task jacocoTestReport(type: JacocoReport, group: 'Reporting', dependsOn: 'connec
                     '**/R.class',
                     '**/R$*.class',
                     '**/BuildConfig.*',
+                    '**/HookClassesConfig.*',
             ])
         })
     }

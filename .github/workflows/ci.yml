@@ -25,21 +25,27 @@ jobs:
           bash ./checkstyle/checkstyle.sh
           ./gradlew test
           ./gradlew assemble
+          ./gradlew :demo:jacocoTestReport
 
-      - name: Run tests
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: Setup .NET Core # Required to execute ReportGenerator
+        uses: actions/setup-dotnet@v1
         with:
-          api-level: 29
-          profile: Nexus 6
-          script: |
-            adb shell logcat -c
-            adb shell logcat > ./uiTest.log &
-            ./gradlew :demo:jacocoTestReport
+          dotnet-version: 5.0.101
 
-      - name: Upload logcat
-        uses: actions/upload-artifact@v2
-        if: failure()
+      - name: ReportGenerator
+        uses: danielpalme/ReportGenerator-GitHub-Action@4.8.4
         with:
-          name: uiTestLog
-          path: ./uiTest.log
+          reports: './demos/demo/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
+          targetdir: './demos/demo/build/reports'
+          reporttypes: 'lcov'
+          sourcedirs: './growingio-autotracker-gradle-plugin/src/main/java'
+
+      - name: Look up reports
+        run: ls -al ./demos/demo/build/reports
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./demos/demo/build/reports/lcov.info
 
