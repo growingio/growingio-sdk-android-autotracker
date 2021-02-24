@@ -162,7 +162,6 @@ public class EventSender {
      * @param onlyInstant true -- 仅发送实时消息
      */
     void sendEvents(boolean onlyInstant) {
-        Logger.d(TAG, "sendEvents: onlyInstant = " + onlyInstant);
         boolean locked = true;
         try {
             locked = mProcessLock.tryLock();
@@ -209,9 +208,7 @@ public class EventSender {
                             todayBytes(sendResponse.getUsedBytes());
                         }
                     }
-                    Logger.d(TAG, "upload event succeeded is " + succeeded);
                 } else {
-                    Logger.d(TAG, "SQLite has NO events");
                     break;
                 }
             } while (succeeded);

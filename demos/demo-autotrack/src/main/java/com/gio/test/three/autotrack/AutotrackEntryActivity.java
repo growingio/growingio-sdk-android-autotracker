@@ -82,7 +82,7 @@ public class AutotrackEntryActivity extends Activity {
             GO_TO_CLICK_TEST_ACTIVITY,
             GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY,
             GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY,
-            GO_TO_LOGIN_ACTIVITY,
+            GO_TO_LOGIN_ACTIVITY
     };
 
     private ListView mListView;
