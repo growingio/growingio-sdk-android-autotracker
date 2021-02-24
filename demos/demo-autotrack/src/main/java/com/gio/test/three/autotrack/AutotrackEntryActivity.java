@@ -18,6 +18,7 @@ package com.gio.test.three.autotrack;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -66,6 +67,7 @@ public class AutotrackEntryActivity extends Activity {
     private static final String GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY = "Go To ExpandableListViewActivity";
     private static final String GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY = "Go To ExpandableListSubActivity";
     private static final String GO_TO_LOGIN_ACTIVITY = "Go To LoginActivity";
+    private static final String START_DEBUGGER = "START DEBUGGER";
 
 
     private static final String[] ITEMS = {
@@ -83,6 +85,7 @@ public class AutotrackEntryActivity extends Activity {
             GO_TO_EXPANDABLE_LIST_VIEW_ACTIVITY,
             GO_TO_EXPANDABLE_LIST_SUB_ACTIVITY,
             GO_TO_LOGIN_ACTIVITY,
+            START_DEBUGGER
     };
 
     private ListView mListView;
@@ -183,6 +186,14 @@ public class AutotrackEntryActivity extends Activity {
                 break;
             case GO_TO_LOGIN_ACTIVITY:
                 startActivity(new Intent(this, LoginActivity.class));
+                break;
+            case START_DEBUGGER:
+                Intent dIntent = new Intent();
+                dIntent.setAction("android.intent.action.VIEW");
+                Uri CONTENT_URI_DEBUGGER = Uri.parse("growing.d80871b41ef40518://growingio/webservice?serviceType=debugger&wsUrl=wss://echo.wss-websocket.net");
+                dIntent.setData(CONTENT_URI_DEBUGGER);
+                dIntent.setClass(this, AutotrackEntryActivity.class);
+                startActivity(dIntent);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

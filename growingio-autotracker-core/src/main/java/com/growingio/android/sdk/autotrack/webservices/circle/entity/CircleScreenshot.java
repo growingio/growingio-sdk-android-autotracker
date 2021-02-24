@@ -48,6 +48,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * create screenshot server date from app's screenshot  for circle and debugger
+ */
 public class CircleScreenshot {
     private static final String MSG_TYPE = "refreshScreenshot";
 
