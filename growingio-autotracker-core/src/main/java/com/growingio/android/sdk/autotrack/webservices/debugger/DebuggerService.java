@@ -18,7 +18,6 @@ package com.growingio.android.sdk.autotrack.webservices.debugger;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 
 import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
@@ -77,12 +76,7 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
         new AlertDialog.Builder(activity)
                 .setTitle(R.string.growing_autotracker_is_circling)
                 .setMessage(message)
-                .setPositiveButton(R.string.growing_autotracker_exit_debugger, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        exitDebugger();
-                    }
-                })
+                .setPositiveButton(R.string.growing_autotracker_exit_debugger, (dialog, which) -> exitDebugger())
                 .setNegativeButton(R.string.growing_autotracker_continue_debugger, null)
                 .create()
                 .show();
@@ -94,9 +88,9 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");
             if (DebuggerEventWrapper.SERVICE_LOGGER_OPEN.equals(msgType)) {
-                eventWrapper.openLogger();
+                getEventWrapper().openLogger();
             } else if (DebuggerEventWrapper.SERVICE_LOGGER_CLOSE.equals(msgType)) {
-                eventWrapper.closeLogger();
+                getEventWrapper().closeLogger();
             }
         } catch (JSONException e) {
             Logger.e(TAG, e);
@@ -116,12 +110,7 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
         }
         super.onFailed();
         Logger.e(TAG, "Start DebuggerService Failed");
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                showQuitedDialog();
-            }
-        });
+        ThreadUtils.runOnUiThread(this::showQuitedDialog);
     }
 
     @Override
@@ -132,12 +121,7 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
 
         end();
         super.onQuited();
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                showQuitedDialog();
-            }
-        });
+        ThreadUtils.runOnUiThread(this::showQuitedDialog);
     }
 
     private void registerScreenshotRefreshedListener() {
@@ -154,12 +138,7 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
                 .setTitle(R.string.growing_tracker_device_unconnected)
                 .setMessage(R.string.growing_autotracker_debugger_unconnected)
                 .setPositiveButton(R.string.growing_autotracker_exit_debugger, null)
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        exitDebugger();
-                    }
-                })
+                .setOnDismissListener(dialog -> exitDebugger())
                 .setCancelable(false)
                 .create()
                 .show();
