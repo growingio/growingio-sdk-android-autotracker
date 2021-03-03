@@ -16,15 +16,18 @@
 
 package com.growingio.android.sdk.autotrack.webservices.debugger;
 
+import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
+import com.growingio.android.sdk.track.webservices.log.LoggerDataMessage;
+import com.growingio.android.sdk.track.webservices.log.WsLogger;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Locale;
 
 /**
  * <p>
@@ -34,7 +37,12 @@ import java.util.Locale;
  */
 public class DebuggerEventWrapper implements EventBuildInterceptor {
 
-    private OnDebuggerEventListener onDebuggerEventListener;
+    public static final String SERVICE_LOGGER_OPEN = "logger_open";
+    public static final String SERVICE_LOGGER_CLOSE = "logger_close";
+    public static final String SERVICE_DEBUGGER_TYPE = "debugger_data";
+
+    private final OnDebuggerEventListener onDebuggerEventListener;
+    private WsLogger mWsLogger;
 
     public DebuggerEventWrapper(OnDebuggerEventListener listener) {
         this.onDebuggerEventListener = listener;
@@ -42,23 +50,47 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
 
     @Override
     public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
-        eventBuilder.build().toJSONObject();
     }
 
     @Override
     public void eventDidBuild(GEvent event) {
         if (event instanceof BaseEvent) {
             BaseEvent baseEvent = (BaseEvent) event;
-            //TODO 修饰event
-            JSONObject eventJson = baseEvent.toJSONObject();
+            try {
+                JSONObject eventJson = baseEvent.toJSONObject();
+                JSONObject json = new JSONObject();
+                json.put("msgType", SERVICE_DEBUGGER_TYPE);
+                json.put("sdkVersion", SDKConfig.SDK_VERSION);
+                json.put("data", eventJson);
 
-            if (onDebuggerEventListener != null) {
-                onDebuggerEventListener.onDebuggerEvent(eventJson.toString());
+                if (onDebuggerEventListener != null) {
+                    onDebuggerEventListener.onDebuggerEvent(json.toString());
+                }
+            } catch (JSONException ignored) {
             }
         }
     }
 
+    public void openLogger() {
+        if (mWsLogger == null) {
+            mWsLogger = new WsLogger();
+            Logger.addLogger(mWsLogger);
+        }
+        mWsLogger.setCallback(logMessage -> {
+            if (onDebuggerEventListener != null) {
+                onDebuggerEventListener.onDebuggerEvent(logMessage.toJSONObject().toString());
+            }
+        });
+    }
 
+    public void closeLogger() {
+        if (mWsLogger == null) {
+            return;
+        }
+        mWsLogger.setCallback(null);
+        Logger.removeLogger(mWsLogger);
+        mWsLogger = null;
+    }
 
     public void ready() {
         TrackMainThread.trackMain().addEventBuildInterceptor(this);
@@ -66,6 +98,7 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
 
     public void end() {
         TrackMainThread.trackMain().removeEventBuildInterceptor(this);
+        closeLogger();
     }
 
     public interface OnDebuggerEventListener {

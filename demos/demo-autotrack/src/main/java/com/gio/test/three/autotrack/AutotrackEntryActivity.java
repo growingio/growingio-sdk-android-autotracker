@@ -190,7 +190,7 @@ public class AutotrackEntryActivity extends Activity {
             case START_DEBUGGER:
                 Intent dIntent = new Intent();
                 dIntent.setAction("android.intent.action.VIEW");
-                Uri CONTENT_URI_DEBUGGER = Uri.parse("growing.d80871b41ef40518://growingio/webservice?serviceType=debugger&wsUrl=wss://echo.wss-websocket.net");
+                Uri CONTENT_URI_DEBUGGER = Uri.parse("growing.d80871b41ef40518://growingio/webservice?serviceType=debugger&wsUrl=wss://gta1.growingio.com/app/0a1b4118dd954ec3bcc69da5138bdb96/circle/BrsrVmRZHXATlIhg");
                 dIntent.setData(CONTENT_URI_DEBUGGER);
                 dIntent.setClass(this, AutotrackEntryActivity.class);
                 startActivity(dIntent);

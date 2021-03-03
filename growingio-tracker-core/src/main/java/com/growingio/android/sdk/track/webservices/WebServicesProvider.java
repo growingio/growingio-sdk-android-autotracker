@@ -26,7 +26,6 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.webservices.log.MobileLogService;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import java.util.HashMap;
@@ -52,7 +51,6 @@ public class WebServicesProvider implements IActivityLifecycle {
 
     public WebServicesProvider(String urlScheme, ActivityStateProvider activityStateProvider) {
         mUrlScheme = urlScheme;
-        registerService(MobileLogService.SERVICE_TYPE, MobileLogService.class);
         activityStateProvider.registerActivityLifecycleListener(this);
     }
 

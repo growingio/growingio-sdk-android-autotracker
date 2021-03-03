@@ -92,7 +92,7 @@ public class WsLogger extends BaseLogger {
         }
     }
 
-    interface Callback {
+    public interface Callback {
         void disposeLog(LoggerDataMessage logMessage);
     }
 }

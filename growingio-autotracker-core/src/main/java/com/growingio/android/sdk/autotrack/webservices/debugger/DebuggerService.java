@@ -19,7 +19,6 @@ package com.growingio.android.sdk.autotrack.webservices.debugger;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.view.View;
 
 import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
@@ -32,7 +31,6 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
-import com.growingio.android.sdk.track.webservices.log.MobileLogService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,17 +45,11 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
     private long mSnapshotKey = 0;
 
     private Disposable mDebuggerScreenshotDisposable;
-    private MobileLogService mMobileLogService;
     private DebuggerEventWrapper eventWrapper;
 
     private DebuggerEventWrapper getEventWrapper() {
         if (eventWrapper == null) {
-            eventWrapper = new DebuggerEventWrapper(new DebuggerEventWrapper.OnDebuggerEventListener() {
-                @Override
-                public void onDebuggerEvent(String eventJson) {
-                    sendMessage(eventJson);
-                }
-            });
+            eventWrapper = new DebuggerEventWrapper(this::sendMessage);
         }
         return eventWrapper;
     }
@@ -67,17 +59,9 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
         super.onReady();
         registerScreenshotRefreshedListener();
         getEventWrapper().ready();
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mTipView.setContent(R.string.growing_autotracker_is_debugger);
-                mTipView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showExitDialog();
-                    }
-                });
-            }
+        ThreadUtils.runOnUiThread(() -> {
+            mTipView.setContent(R.string.growing_autotracker_is_debugger);
+            mTipView.setOnClickListener(v -> showExitDialog());
         });
     }
 
@@ -109,9 +93,10 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
         try {
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");
-            if (MobileLogService.SERVICE_TYPE.equals(msgType)) {
-                mMobileLogService = new MobileLogService();
-                mMobileLogService.start("xxx");
+            if (DebuggerEventWrapper.SERVICE_LOGGER_OPEN.equals(msgType)) {
+                eventWrapper.openLogger();
+            } else if (DebuggerEventWrapper.SERVICE_LOGGER_CLOSE.equals(msgType)) {
+                eventWrapper.closeLogger();
             }
         } catch (JSONException e) {
             Logger.e(TAG, e);
@@ -207,9 +192,6 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
     @Override
     public void end() {
         super.end();
-        if (mMobileLogService != null) {
-            mMobileLogService.end();
-        }
         mTipView.dismiss();
         ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
         getEventWrapper().end();

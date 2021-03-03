@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.track.webservices.log;
 
+import com.growingio.android.sdk.track.SDKConfig;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,11 +55,12 @@ public class LoggerDataMessage {
         JSONObject json = new JSONObject();
         try {
             json.put("msgType", mMsgType);
+            json.put("sdkVersion", SDKConfig.SDK_VERSION);
             JSONArray logs = new JSONArray();
             for (LogItem logItem : mLogs) {
                 logs.put(logItem.toJSONObject());
             }
-            json.put("logs", logs);
+            json.put("data", logs);
         } catch (JSONException ignored) {
         }
         return json;
