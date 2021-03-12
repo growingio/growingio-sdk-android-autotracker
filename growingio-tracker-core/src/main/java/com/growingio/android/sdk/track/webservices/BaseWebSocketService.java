@@ -47,7 +47,7 @@ public abstract class BaseWebSocketService implements IWebService {
     public static final int SOCKET_STATE_READIED = 1;
     public static final int SOCKET_STATE_CLOSED = 2;
 
-    protected WebSocket mWebSocket;
+    private WebSocket mWebSocket;
     protected TipView mTipView;
     private final AtomicInteger mSocketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
 
@@ -72,10 +72,6 @@ public abstract class BaseWebSocketService implements IWebService {
                 }
             }
         }, 5000);
-    }
-
-    public WebSocket getWebSocket() {
-        return mWebSocket;
     }
 
     public void start(String wsUrl) {
@@ -143,7 +139,7 @@ public abstract class BaseWebSocketService implements IWebService {
     public void end() {
         mSocketState.set(SOCKET_STATE_CLOSED);
         if (mWebSocket != null) {
-            mWebSocket.close(200, "close");
+            mWebSocket.cancel();
         }
     }
 
@@ -154,7 +150,6 @@ public abstract class BaseWebSocketService implements IWebService {
             Logger.d(TAG, "Created webSocket successfully");
             if (webSocket.send(ReadyMessage.createMessage().toJSONObject().toString())) {
                 Logger.d(TAG, "send ready message successfully");
-                Logger.d(TAG, ReadyMessage.createMessage().toJSONObject().toString());
                 mWebSocket = webSocket;
             } else {
                 Logger.e(TAG, "send ready message failed");

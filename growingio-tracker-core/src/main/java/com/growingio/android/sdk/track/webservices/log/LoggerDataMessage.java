@@ -37,7 +37,7 @@ public class LoggerDataMessage {
         mLogs = logs;
     }
 
-    public static LogItem createLogItem(String type, String subType, String message, String time) {
+    public static LogItem createLogItem(String type, String subType, String message, long time) {
         return LogItem.create(type, subType, message, time);
     }
 
@@ -45,7 +45,7 @@ public class LoggerDataMessage {
         return new LoggerDataMessage(logs);
     }
 
-    public static LoggerDataMessage createMessage(String type, String subType, String message, String time) {
+    public static LoggerDataMessage createMessage(String type, String subType, String message, long time) {
         Queue<LogItem> logs = new ArrayDeque<>(1);
         logs.add(createLogItem(type, subType, message, time));
         return new LoggerDataMessage(logs);
@@ -71,16 +71,16 @@ public class LoggerDataMessage {
         private final String mType;
         private final String mSubType;
         private final String mMessage;
-        private final String mTime;
+        private final long mTime;
 
-        public LogItem(String type, String subType, String message, String time) {
+        public LogItem(String type, String subType, String message, long time) {
             mType = type;
             mSubType = subType;
             mMessage = message;
             mTime = time;
         }
 
-        public static LogItem create(String type, String subType, String message, String time) {
+        public static LogItem create(String type, String subType, String message, long time) {
             return new LogItem(type, subType, message, time);
         }
 

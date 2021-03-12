@@ -22,10 +22,9 @@ import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
-import com.growingio.android.sdk.track.webservices.log.LoggerDataMessage;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.webservices.log.WsLogger;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,9 +57,12 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
             BaseEvent baseEvent = (BaseEvent) event;
             try {
                 JSONObject eventJson = baseEvent.toJSONObject();
+                //添加额外的url,以便debugger显示请求地址
+                eventJson.put("url", getUrl());
                 JSONObject json = new JSONObject();
                 json.put("msgType", SERVICE_DEBUGGER_TYPE);
                 json.put("sdkVersion", SDKConfig.SDK_VERSION);
+
                 json.put("data", eventJson);
 
                 if (onDebuggerEventListener != null) {
@@ -69,6 +71,19 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
             } catch (JSONException ignored) {
             }
         }
+    }
+
+    private String getUrl() {
+        StringBuilder url = new StringBuilder(ConfigurationProvider.get().getTrackConfiguration().getDataCollectionServerHost());
+        if (url.length() > 0 && url.charAt(url.length() - 1) != '/') {
+            url.append("/");
+        }
+        url.append("v3/projects/");
+        String projectId = ConfigurationProvider.get().getTrackConfiguration().getProjectId();
+        url.append(projectId);
+        url.append("/collect?stm=");
+        url.append(System.currentTimeMillis());
+        return url.toString();
     }
 
     public void openLogger() {

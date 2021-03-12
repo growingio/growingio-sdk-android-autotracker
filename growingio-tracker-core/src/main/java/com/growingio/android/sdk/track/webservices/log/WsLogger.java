@@ -55,7 +55,7 @@ public class WsLogger extends BaseLogger {
                                   priorityToState(item.getPriority()),
                                   "subType",
                                   item.getMessage(),
-                                  String.valueOf(item.getTimeStamp())));
+                                  item.getTimeStamp()));
                       }
                       mCallback.disposeLog(LoggerDataMessage.createMessage(queue));
                   }
@@ -64,7 +64,7 @@ public class WsLogger extends BaseLogger {
                       createMessage(state,
                               "subType",
                               message,
-                              String.valueOf(System.currentTimeMillis())));
+                              System.currentTimeMillis()));
           }
     }
 
