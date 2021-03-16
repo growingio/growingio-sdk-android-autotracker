@@ -86,14 +86,20 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
         return url.toString();
     }
 
+    public void printLog() {
+        if (mWsLogger != null) {
+            mWsLogger.printOut();
+        }
+    }
+
     public void openLogger() {
         if (mWsLogger == null) {
             mWsLogger = new WsLogger();
-            Logger.addLogger(mWsLogger);
+            mWsLogger.openLog();
         }
         mWsLogger.setCallback(logMessage -> {
             if (onDebuggerEventListener != null) {
-                onDebuggerEventListener.onDebuggerEvent(logMessage.toJSONObject().toString());
+                onDebuggerEventListener.onDebuggerEvent(logMessage);
             }
         });
     }
@@ -102,8 +108,8 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
         if (mWsLogger == null) {
             return;
         }
+        mWsLogger.closeLog();
         mWsLogger.setCallback(null);
-        Logger.removeLogger(mWsLogger);
         mWsLogger = null;
     }
 

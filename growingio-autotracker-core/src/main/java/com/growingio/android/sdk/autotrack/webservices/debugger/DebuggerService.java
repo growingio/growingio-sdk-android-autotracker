@@ -157,8 +157,8 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
                 .build(new Callback<CircleScreenshot>() {
                     @Override
                     public void onSuccess(CircleScreenshot result) {
-                        Logger.d(TAG, "Create debugger screenshot successfully");
                         sendMessage(result.toJSONObject().toString());
+                        getEventWrapper().printLog();
                     }
 
                     @Override
