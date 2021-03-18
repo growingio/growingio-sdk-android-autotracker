@@ -73,7 +73,7 @@ public class DemoApplication extends Application {
         }
 
         if (sConfiguration == null) {
-            sConfiguration = new AutotrackConfiguration("bfc5d6a3693a110d", "growing.98ea5d6021ea4d58")
+            sConfiguration = new AutotrackConfiguration("bfc5d6a3693a110d", "growing.d80871b41ef40518")
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setOaidEnabled(false);

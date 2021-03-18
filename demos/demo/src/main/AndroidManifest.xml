@@ -46,7 +46,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <data android:scheme="growing.98ea5d6021ea4d58" />
+                <data android:scheme="growing.d80871b41ef40518" />
 
                 <action android:name="android.intent.action.VIEW" />
 

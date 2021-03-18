@@ -63,7 +63,6 @@ public class EventHttpSender implements IEventNetSender {
         } else {
             return new SendResponse(true, 0);
         }
-        Logger.d(TAG, "Send events, type is " + event.getEventType());
 
         String data = mEventMarshaller.marshall(events).toString();
         HttpRequest httpRequest = HttpRequest.postJson(mServerHost)
