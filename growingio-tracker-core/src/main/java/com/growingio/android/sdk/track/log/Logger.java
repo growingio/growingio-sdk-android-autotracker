@@ -44,7 +44,7 @@ public class Logger {
         LOGGERS.put(logger.getType(), logger);
     }
 
-    public static void removeLogger(ILogger logger){
+    public static void removeLogger(ILogger logger) {
         LOGGERS.remove(logger.getType());
     }
 

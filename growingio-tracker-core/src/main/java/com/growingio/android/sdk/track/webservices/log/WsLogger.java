@@ -35,7 +35,7 @@ public class WsLogger extends BaseLogger {
     private volatile Callback mCallback;
 
     private final CircularFifoQueue<LoggerDataMessage.LogItem> mCacheLogs = new CircularFifoQueue<>(100);
-    private static Handler logHandler;
+    private static Handler mLogHandler;
 
     public WsLogger() {
     }
@@ -45,24 +45,24 @@ public class WsLogger extends BaseLogger {
     }
 
     public void openLog() {
-        if (logHandler == null) {
+        if (mLogHandler == null) {
             HandlerThread logHt = new HandlerThread("WsLogger");
             logHt.start();
-            logHandler = new Handler(logHt.getLooper());
+            mLogHandler = new Handler(logHt.getLooper());
         }
         //send log 2 times per 1 second
-        logHandler.postDelayed(logRunnable, 500);
+        mLogHandler.postDelayed(mLogRunnable, 500);
         Logger.addLogger(this);
     }
 
     public void closeLog() {
-        if (logHandler != null) {
-            logHandler.removeCallbacks(logRunnable);
+        if (mLogHandler != null) {
+            mLogHandler.removeCallbacks(mLogRunnable);
         }
         Logger.removeLogger(this);
     }
 
-    private final Runnable logRunnable = this::printOut;
+    private final Runnable mLogRunnable = this::printOut;
 
     @Override
     protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
@@ -77,8 +77,8 @@ public class WsLogger extends BaseLogger {
             mCacheLogs.clear();
             mCallback.disposeLog(loggerData);
         }
-        logHandler.removeCallbacks(logRunnable);
-        logHandler.postDelayed(logRunnable, 500);
+        mLogHandler.removeCallbacks(mLogRunnable);
+        mLogHandler.postDelayed(mLogRunnable, 500);
     }
 
     @Override

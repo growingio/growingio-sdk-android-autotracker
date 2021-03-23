@@ -126,7 +126,7 @@ public abstract class BaseWebSocketService implements IWebService {
     }
 
     protected void sendMessage(String msg) {
-        Log.d("WebSocket",msg);
+        Log.d("WebSocket", msg);
         if (mWebSocket != null) {
             mWebSocket.send(msg);
         }
