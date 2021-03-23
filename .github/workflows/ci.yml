@@ -53,12 +53,12 @@ jobs:
           name: uiTestLog
           path: ./uiTest.log
 
-      - name: Publish Test Results
-        uses: scacap/action-surefire-report@v1
-        if: always()
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          report_paths: '**/build/**/TEST-*.xml'
+      #- name: Publish Test Results
+      #  uses: scacap/action-surefire-report@v1
+      #  if: always()
+      #  with:
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    report_paths: '**/build/**/TEST-*.xml'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
