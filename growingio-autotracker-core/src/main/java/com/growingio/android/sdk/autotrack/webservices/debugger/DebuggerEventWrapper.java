@@ -20,7 +20,6 @@ import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.webservices.log.WsLogger;
@@ -40,11 +39,11 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
     public static final String SERVICE_LOGGER_CLOSE = "logger_close";
     public static final String SERVICE_DEBUGGER_TYPE = "debugger_data";
 
-    private final OnDebuggerEventListener onDebuggerEventListener;
+    private final OnDebuggerEventListener mOnDebuggerEventListener;
     private WsLogger mWsLogger;
 
     public DebuggerEventWrapper(OnDebuggerEventListener listener) {
-        this.onDebuggerEventListener = listener;
+        this.mOnDebuggerEventListener = listener;
     }
 
     @Override
@@ -65,8 +64,8 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
 
                 json.put("data", eventJson);
 
-                if (onDebuggerEventListener != null) {
-                    onDebuggerEventListener.onDebuggerEvent(json.toString());
+                if (mOnDebuggerEventListener != null) {
+                    mOnDebuggerEventListener.onDebuggerEvent(json.toString());
                 }
             } catch (JSONException ignored) {
             }
@@ -98,8 +97,8 @@ public class DebuggerEventWrapper implements EventBuildInterceptor {
             mWsLogger.openLog();
         }
         mWsLogger.setCallback(logMessage -> {
-            if (onDebuggerEventListener != null) {
-                onDebuggerEventListener.onDebuggerEvent(logMessage);
+            if (mOnDebuggerEventListener != null) {
+                mOnDebuggerEventListener.onDebuggerEvent(logMessage);
             }
         });
     }

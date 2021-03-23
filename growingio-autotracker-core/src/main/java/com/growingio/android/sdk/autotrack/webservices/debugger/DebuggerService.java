@@ -44,13 +44,13 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
     private long mSnapshotKey = 0;
 
     private Disposable mDebuggerScreenshotDisposable;
-    private DebuggerEventWrapper eventWrapper;
+    private DebuggerEventWrapper mEventWrapper;
 
     private DebuggerEventWrapper getEventWrapper() {
-        if (eventWrapper == null) {
-            eventWrapper = new DebuggerEventWrapper(this::sendMessage);
+        if (mEventWrapper == null) {
+            mEventWrapper = new DebuggerEventWrapper(this::sendMessage);
         }
-        return eventWrapper;
+        return mEventWrapper;
     }
 
     @Override
