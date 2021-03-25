@@ -20,11 +20,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 
 import com.growingio.android.sdk.autotrack.R;
-import com.growingio.android.sdk.autotrack.webservices.ScreenshotProvider;
-import com.growingio.android.sdk.autotrack.webservices.circle.entity.CircleScreenshot;
 import com.growingio.android.sdk.track.SDKConfig;
-import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
@@ -38,13 +34,15 @@ import org.json.JSONObject;
  * <p>
  * debugger service
  */
-public class DebuggerService extends BaseWebSocketService implements ScreenshotProvider.OnScreenshotRefreshedListener {
+public class DebuggerService extends BaseWebSocketService {
     private static final String TAG = "DebuggerService";
     public static final String SERVICE_TYPE = "debugger";
-    private long mSnapshotKey = 0;
 
-    private Disposable mDebuggerScreenshotDisposable;
     private DebuggerEventWrapper mEventWrapper;
+
+    public DebuggerService() {
+        mEventWrapper = new DebuggerEventWrapper(this::sendMessage);
+    }
 
     private DebuggerEventWrapper getEventWrapper() {
         if (mEventWrapper == null) {
@@ -56,7 +54,6 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
     @Override
     protected void onReady() {
         super.onReady();
-        registerScreenshotRefreshedListener();
         getEventWrapper().ready();
         ThreadUtils.runOnUiThread(() -> {
             mTipView.setContent(R.string.growing_autotracker_is_debugger);
@@ -99,8 +96,8 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
 
 
     private void exitDebugger() {
-        end();
         sendQuitMessage();
+        end();
     }
 
     @Override
@@ -118,14 +115,9 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
         if (getSocketState() >= SOCKET_STATE_CLOSED) {
             return;
         }
-
         end();
         super.onQuited();
         ThreadUtils.runOnUiThread(this::showQuitedDialog);
-    }
-
-    private void registerScreenshotRefreshedListener() {
-        ScreenshotProvider.get().registerScreenshotRefreshedListener(this);
     }
 
     private void showQuitedDialog() {
@@ -145,34 +137,9 @@ public class DebuggerService extends BaseWebSocketService implements ScreenshotP
     }
 
     @Override
-    public void onScreenshotRefreshed(String screenshotBase64, float scale) {
-        if (mDebuggerScreenshotDisposable != null) {
-            mDebuggerScreenshotDisposable.dispose();
-        }
-
-        mDebuggerScreenshotDisposable = new CircleScreenshot.Builder()
-                .setScale(scale)
-                .setScreenshot(screenshotBase64)
-                .setSnapshotKey(mSnapshotKey++)
-                .build(new Callback<CircleScreenshot>() {
-                    @Override
-                    public void onSuccess(CircleScreenshot result) {
-                        sendMessage(result.toJSONObject().toString());
-                        getEventWrapper().printLog();
-                    }
-
-                    @Override
-                    public void onFailed() {
-                        Logger.e(TAG, "Create debugger screenshot failed");
-                    }
-                });
-    }
-
-    @Override
     public void end() {
         super.end();
         mTipView.dismiss();
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
         getEventWrapper().end();
     }
 }
