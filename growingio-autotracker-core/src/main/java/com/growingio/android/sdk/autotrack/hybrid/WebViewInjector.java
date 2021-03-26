@@ -81,19 +81,19 @@ public class WebViewInjector {
     }
 
     @Before(clazz = WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
-    public void webkitWebViewLoadDataWithBaseURL(WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+    public static void webkitWebViewLoadDataWithBaseURL(WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         Logger.d(TAG, "webkitWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
         HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
     }
 
     @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
-    public void x5WebViewLoadDataWithBaseURL(com.tencent.smtt.sdk.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+    public static void x5WebViewLoadDataWithBaseURL(com.tencent.smtt.sdk.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         Logger.d(TAG, "x5WebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
         HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
     }
 
     @Before(clazz = com.uc.webview.export.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
-    public void ucWebViewLoadDataWithBaseURL(com.uc.webview.export.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+    public static void ucWebViewLoadDataWithBaseURL(com.uc.webview.export.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         Logger.d(TAG, "ucWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
         HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
     }

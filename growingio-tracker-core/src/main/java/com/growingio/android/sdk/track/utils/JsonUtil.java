@@ -56,6 +56,7 @@ public final class JsonUtil {
         return true;
     }
 
+    // TODO: 优化 JSONArray继承 JSONObject 永远执行不到
     private static boolean jsonEqual(Object left, Object right) {
         if (ObjectUtils.equals(left, right)) {
             return true;

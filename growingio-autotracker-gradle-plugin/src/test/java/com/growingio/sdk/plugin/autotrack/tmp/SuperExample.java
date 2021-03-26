@@ -26,4 +26,18 @@ public class SuperExample {
     public void onExecute() {
         mIsExecuted = true;
     }
+
+    public void preOriginExecute() {}
+
+    public void originExecute() {}
+
+    public void originExecuteWithArg(String arg) {}
+
+    public void postOriginExecute() {}
+
+    public void preLambdaExecute() {}
+
+    public void lambdaExecute() {}
+
+    public void postLambdaExecute() {}
 }

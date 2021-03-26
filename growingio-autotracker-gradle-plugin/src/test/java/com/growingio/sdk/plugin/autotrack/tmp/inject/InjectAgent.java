@@ -17,6 +17,7 @@
 package com.growingio.sdk.plugin.autotrack.tmp.inject;
 
 import com.growingio.sdk.plugin.autotrack.tmp.Callback;
+import com.growingio.sdk.plugin.autotrack.tmp.LambdaInterface;
 import com.growingio.sdk.plugin.autotrack.tmp.SuperExample;
 
 public class InjectAgent {
@@ -25,8 +26,13 @@ public class InjectAgent {
     private InjectAgent() {
     }
 
-    public static void setsCallback(Callback sCallback) {
+    public static void setCallback(Callback sCallback) {
         InjectAgent.sCallback = sCallback;
+    }
+
+    public static void onExecute(SuperExample example, String arg) {
+        System.out.println("InjectAgent = " + example + ", " + arg);
+        onExecute(example);
     }
 
     public static void onExecute(SuperExample example) {
@@ -34,5 +40,9 @@ public class InjectAgent {
         if (sCallback != null) {
             sCallback.onCallback(example);
         }
+    }
+
+    public static void onExecute(LambdaInterface lambdaInterface) {
+        System.out.println("InjectAgent = " + lambdaInterface);
     }
 }

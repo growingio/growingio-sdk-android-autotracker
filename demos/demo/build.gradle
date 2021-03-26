@@ -12,6 +12,7 @@ buildscript {
         google()
         jcenter()
         mavenLocal()
+        maven { url'http://oss.jfrog.org/artifactory/oss-snapshot-local'}
     }
     dependencies {
         classpath "com.growingio.android:autotracker-gradle-plugin:${releaseConfiguration.releaseVersion}"

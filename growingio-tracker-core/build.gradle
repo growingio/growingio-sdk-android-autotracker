@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'jacoco'
 
 def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim() as String
 def buildTime = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+8"))
@@ -33,9 +34,54 @@ android {
     lintOptions {
         abortOnError false
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+afterEvaluate { project ->
+    android.libraryVariants.each { variant ->
+        tasks.getByName("test${variant.name.capitalize()}UnitTest") {
+            finalizedBy "jacocoTestReport"
+        }
+    }
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class',
+                      '**/R$*.class',
+                      '**/BuildConfig.*',
+                      '**/Manifest*.*',
+                      '**/*Test*.*',
+                      'android/**/*.*',
+                      '**/data/models/*']
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: "$buildDir", includes: [
+            "jacoco/testDebugUnitTest.exec",
+            "outputs/code-coverage/connected/*coverage.ec"
+    ])
+
 }
 
 dependencies {
+    testImplementation libraries.test.junit
+    testImplementation libraries.test.mockito_core
+    testImplementation libraries.test.powermock_api_mockito2
+    testImplementation libraries.test.powermock_module_junit4
+    testImplementation libraries.test.powermock_module_junit4_rule
+    testImplementation libraries.test.truth
+    testImplementation libraries.test.json
+    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
+
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
     api libraries.squareup.okhttp3
