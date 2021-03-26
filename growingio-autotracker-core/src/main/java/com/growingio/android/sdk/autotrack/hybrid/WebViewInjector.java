@@ -26,6 +26,9 @@ import java.util.Map;
 public class WebViewInjector {
     private static final String TAG = "WebViewInjector";
 
+    private WebViewInjector() {
+    }
+
     @Before(clazz = WebView.class, method = "loadUrl", parameterTypes = {String.class})
     public static void webkitWebViewLoadUrl(WebView webView, String url) {
         Logger.d(TAG, "webkitWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);

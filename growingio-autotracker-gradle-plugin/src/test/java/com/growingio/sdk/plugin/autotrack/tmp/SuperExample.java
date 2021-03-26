@@ -27,17 +27,17 @@ public class SuperExample {
         mIsExecuted = true;
     }
 
-    public void preOriginExecute() {}
+    public void preOriginExecute() { }
 
-    public void originExecute() {}
+    public void originExecute() { }
 
-    public void originExecuteWithArg(String arg) {}
+    public void originExecuteWithArg(String arg) { }
 
-    public void postOriginExecute() {}
+    public void postOriginExecute() { }
 
-    public void preLambdaExecute() {}
+    public void preLambdaExecute() { }
 
-    public void lambdaExecute() {}
+    public void lambdaExecute() { }
 
-    public void postLambdaExecute() {}
+    public void postLambdaExecute() { }
 }
