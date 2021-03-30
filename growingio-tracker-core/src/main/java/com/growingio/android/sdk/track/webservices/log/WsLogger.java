@@ -34,12 +34,12 @@ public class WsLogger {
 
     private volatile Callback mCallback;
     private static Handler sLogHandler;
-    private CacheLogger cacheLogger;
+    private CacheLogger mCacheLogger;
 
     public WsLogger() {
         ILogger cacheLogger = Logger.getLogger(CacheLogger.TYPE);
         if (cacheLogger instanceof CacheLogger) {
-            this.cacheLogger = ((CacheLogger) cacheLogger);
+            this.mCacheLogger = ((CacheLogger) cacheLogger);
         }
     }
 
@@ -67,8 +67,8 @@ public class WsLogger {
 
 
     public void printOut() {
-        if (cacheLogger != null) {
-            List<LogItem> mLoggers = cacheLogger.getCacheLogsAndClear();
+        if (mCacheLogger != null) {
+            List<LogItem> mLoggers = mCacheLogger.getCacheLogsAndClear();
             if (mLoggers == null || mLoggers.size() == 0) return;
             if (mCallback != null) {
                 String loggerData = LoggerDataMessage.createTrackMessage(mLoggers).toJSONObject().toString();
