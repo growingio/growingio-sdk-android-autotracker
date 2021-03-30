@@ -44,6 +44,18 @@ public class CacheLogger extends BaseLogger {
         return TYPE;
     }
 
+    public synchronized List<LogItem> getCacheLogsAndClear() {
+        if (mCacheLogs.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<LogItem> copyList = new ArrayList<>(mCacheLogs.size());
+        copyList.addAll(mCacheLogs);
+        mCacheLogs.clear();
+
+        return copyList;
+    }
+
     public synchronized List<LogItem> getCacheLogs() {
         if (mCacheLogs.isEmpty()) {
             return Collections.emptyList();

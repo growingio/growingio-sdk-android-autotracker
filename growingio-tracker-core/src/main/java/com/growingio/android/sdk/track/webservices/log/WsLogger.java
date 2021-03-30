@@ -18,26 +18,29 @@ package com.growingio.android.sdk.track.webservices.log;
 
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.growingio.android.sdk.track.log.BaseLogger;
-import com.growingio.android.sdk.track.log.CircularFifoQueue;
+import com.growingio.android.sdk.track.log.CacheLogger;
+import com.growingio.android.sdk.track.log.ILogger;
+import com.growingio.android.sdk.track.log.LogItem;
 import com.growingio.android.sdk.track.log.Logger;
 
+import java.util.List;
+
 /**
- * 设置缓存机制，防止socket在同一时间发送过多log导致关键性信息（pagerefresh和 debuggerevent）无法被服务器及时收到
+ * 利用CacheLog缓存机制，防止socket在同一时间发送过多log导致关键性信息（pagerefresh和 debuggerevent）无法被服务器及时收到
  */
-public class WsLogger extends BaseLogger {
+public class WsLogger {
     public static final String TYPE = "WsLogger";
 
     private volatile Callback mCallback;
-
-    private final CircularFifoQueue<LoggerDataMessage.LogItem> mCacheLogs = new CircularFifoQueue<>(100);
     private static Handler sLogHandler;
+    private CacheLogger cacheLogger;
 
     public WsLogger() {
+        ILogger cacheLogger = Logger.getLogger(CacheLogger.TYPE);
+        if (cacheLogger instanceof CacheLogger) {
+            this.cacheLogger = ((CacheLogger) cacheLogger);
+        }
     }
 
     public void setCallback(Callback callback) {
@@ -52,57 +55,28 @@ public class WsLogger extends BaseLogger {
         }
         //send log 2 times per 1 second
         sLogHandler.postDelayed(mLogRunnable, 500);
-        Logger.addLogger(this);
     }
 
     public void closeLog() {
         if (sLogHandler != null) {
             sLogHandler.removeCallbacks(mLogRunnable);
         }
-        Logger.removeLogger(this);
     }
 
     private final Runnable mLogRunnable = this::printOut;
 
-    @Override
-    protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
-        String state = priorityToState(priority);
-        mCacheLogs.add(LoggerDataMessage.createLogItem(state, "subType", message, System.currentTimeMillis()));
-    }
 
     public void printOut() {
-        if (mCacheLogs.size() == 0) return;
-        if (mCallback != null) {
-            String loggerData = LoggerDataMessage.createMessage(mCacheLogs).toJSONObject().toString();
-            mCacheLogs.clear();
-            mCallback.disposeLog(loggerData);
+        if (cacheLogger != null) {
+            List<LogItem> mLoggers = cacheLogger.getCacheLogsAndClear();
+            if (mLoggers == null || mLoggers.size() == 0) return;
+            if (mCallback != null) {
+                String loggerData = LoggerDataMessage.createTrackMessage(mLoggers).toJSONObject().toString();
+                mCallback.disposeLog(loggerData);
+            }
         }
         sLogHandler.removeCallbacks(mLogRunnable);
         sLogHandler.postDelayed(mLogRunnable, 500);
-    }
-
-    @Override
-    public String getType() {
-        return TYPE;
-    }
-
-    private String priorityToState(int priority) {
-        switch (priority) {
-            case Log.VERBOSE:
-                return "VERBOSE";
-            case Log.DEBUG:
-                return "DEBUG";
-            case Log.INFO:
-                return "INFO";
-            case Log.WARN:
-                return "WARN";
-            case Log.ERROR:
-                return "ERROR";
-            case Log.ASSERT:
-                return "ALARM";
-            default:
-                return "OTHER";
-        }
     }
 
     public interface Callback {
