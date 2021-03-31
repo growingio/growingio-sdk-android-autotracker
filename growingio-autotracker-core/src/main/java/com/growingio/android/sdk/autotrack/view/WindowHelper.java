@@ -109,6 +109,7 @@ public class WindowHelper {
     public List<DecorView> getTopActivityViews() {
         List<DecorView> topViews = new ArrayList<>();
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
+        if (activity == null) return topViews;
         List<DecorView> decorViews = getAllWindowDecorViews();
         boolean findTopActivity = false;
         for (DecorView decorView : decorViews) {
