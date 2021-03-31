@@ -204,12 +204,12 @@ public class AutotrackTransform extends Transform {
         Map<File, Status> changedFiles = mDirectoryInput.getChangedFiles();
         for (File file : changedFiles.keySet()) {
             Status status = changedFiles.get(file);
-            actionOnFile(file, status != Status.REMOVED);
+            actionOnFile(file, status);
         }
     }
 
     // 5. 处理directoryInput中的文件, 可以单个在子线程中处理
-    private void actionOnFile(final File file, final boolean added) {
+    private void actionOnFile(final File file, final Status added) {
         File outDir = mOutputProvider.getContentLocation(mDirectoryInput.getName(),
                 mDirectoryInput.getContentTypes(), mDirectoryInput.getScopes(), Format.DIRECTORY);
         outDir.mkdirs();
@@ -218,9 +218,11 @@ public class AutotrackTransform extends Transform {
         final String relativeClassPath = file.getAbsolutePath().substring(inputDirPath.length());
         mExecutor.execute(() -> {
             File outFile = new File(outDirPath, relativeClassPath);
-            if (!added) {
+            if (added==Status.REMOVED) {
                 FileUtils.deleteQuietly(outFile);
-            } else {
+            } else if(added == Status.NOTCHANGED){
+                log("class file no change" + file);
+            }else { // ADDED or CHANGED
                 if (relativeClassPath.endsWith(".class")) {
                     if (mClassRewriter.transformClassFile(file, outFile)) {
                         log("transformed class file " + file + " to " + outFile);
@@ -238,7 +240,7 @@ public class AutotrackTransform extends Transform {
 
     private void transformInputDirectoryNoIncrement() {
         for (File classFile : com.android.utils.FileUtils.getAllFiles(mDirectoryInput.getFile())) {
-            actionOnFile(classFile, true);
+            actionOnFile(classFile, Status.ADDED);
         }
     }
 
