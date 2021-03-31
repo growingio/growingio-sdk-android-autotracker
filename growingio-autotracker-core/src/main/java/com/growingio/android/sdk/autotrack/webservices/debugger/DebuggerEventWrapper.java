@@ -24,8 +24,10 @@ import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.log.CircularFifoQueue;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
+import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.webservices.log.WsLogger;
 
@@ -48,10 +50,24 @@ public class DebuggerEventWrapper implements EventBuildInterceptor, ScreenshotPr
     public static final String SERVICE_LOGGER_CLOSE = "logger_close";
     public static final String SERVICE_DEBUGGER_TYPE = "debugger_data";
 
-    private final OnDebuggerEventListener mOnDebuggerEventListener;
+    private OnDebuggerEventListener mOnDebuggerEventListener;
 
-    public DebuggerEventWrapper(OnDebuggerEventListener listener) {
+    private static class SingleInstance {
+        private static final DebuggerEventWrapper INSTANCE = new DebuggerEventWrapper();
+    }
+
+    public static DebuggerEventWrapper get() {
+        return DebuggerEventWrapper.SingleInstance.INSTANCE;
+    }
+
+    public void registerDebuggerEventListener(OnDebuggerEventListener listener) {
         this.mOnDebuggerEventListener = listener;
+    }
+
+    private DebuggerEventWrapper() {
+    }
+
+    public void observeEventBuild() {
         TrackMainThread.trackMain().addEventBuildInterceptor(this);
     }
 
@@ -70,7 +86,7 @@ public class DebuggerEventWrapper implements EventBuildInterceptor, ScreenshotPr
 
     /***************** Base Event *******************/
     private volatile boolean mIsConnected = false;
-    private final Queue<String> mCollectionMessage = new ConcurrentLinkedQueue<>();
+    private final Queue<String> mCollectionMessage = new CircularFifoQueue<>(50);
 
     private void sendCacheMessage() {
         for (String message : mCollectionMessage) {

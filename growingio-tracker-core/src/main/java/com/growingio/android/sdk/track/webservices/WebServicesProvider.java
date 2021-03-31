@@ -103,12 +103,12 @@ public class WebServicesProvider implements IActivityLifecycle {
     }
 
     private void startWebService(String type, Map<String, String> params) {
-        if (mRunningWebService != null) {
-            mRunningWebService.end();
-        }
-
         Class<? extends IWebService> serviceClass = mRegisteredServices.get(type);
         if (serviceClass != null) {
+            if (mRunningWebService != null && mRunningWebService.getClass() == serviceClass) {
+                mRunningWebService.restart();
+                return;
+            }
             try {
                 mRunningWebService = serviceClass.newInstance();
                 mTipView = new TipView(ContextProvider.getApplicationContext());

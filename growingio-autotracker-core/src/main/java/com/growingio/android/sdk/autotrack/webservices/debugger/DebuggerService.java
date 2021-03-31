@@ -26,6 +26,7 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
+import com.growingio.android.sdk.track.webservices.WebServicesProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,23 +39,16 @@ public class DebuggerService extends BaseWebSocketService {
     private static final String TAG = "DebuggerService";
     public static final String SERVICE_TYPE = "debugger";
 
-    private DebuggerEventWrapper mEventWrapper;
 
     public DebuggerService() {
-        mEventWrapper = new DebuggerEventWrapper(this::sendMessage);
+        DebuggerEventWrapper.get().registerDebuggerEventListener(this::sendMessage);
     }
 
-    private DebuggerEventWrapper getEventWrapper() {
-        if (mEventWrapper == null) {
-            mEventWrapper = new DebuggerEventWrapper(this::sendMessage);
-        }
-        return mEventWrapper;
-    }
 
     @Override
     protected void onReady() {
         super.onReady();
-        getEventWrapper().ready();
+        DebuggerEventWrapper.get().ready();
         ThreadUtils.runOnUiThread(() -> {
             mTipView.setContent(R.string.growing_autotracker_is_debugger);
             mTipView.setOnClickListener(v -> showExitDialog());
@@ -85,9 +79,9 @@ public class DebuggerService extends BaseWebSocketService {
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");
             if (DebuggerEventWrapper.SERVICE_LOGGER_OPEN.equals(msgType)) {
-                getEventWrapper().openLogger();
+                DebuggerEventWrapper.get().openLogger();
             } else if (DebuggerEventWrapper.SERVICE_LOGGER_CLOSE.equals(msgType)) {
-                getEventWrapper().closeLogger();
+                DebuggerEventWrapper.get().closeLogger();
             }
         } catch (JSONException e) {
             Logger.e(TAG, e);
@@ -140,6 +134,6 @@ public class DebuggerService extends BaseWebSocketService {
     public void end() {
         super.end();
         mTipView.dismiss();
-        getEventWrapper().end();
+        DebuggerEventWrapper.get().end();
     }
 }

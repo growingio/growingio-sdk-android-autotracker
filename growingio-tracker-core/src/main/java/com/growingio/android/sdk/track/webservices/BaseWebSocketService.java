@@ -50,12 +50,21 @@ public abstract class BaseWebSocketService implements IWebService {
 
     private WebSocket mWebSocket;
     protected TipView mTipView;
+    protected Map<String, String> mParams;
     private final AtomicInteger mSocketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
+
+    @Override
+    public void restart() {
+        if (mSocketState.get() == SOCKET_STATE_READIED) return;
+        if (mWebSocket != null) mWebSocket.cancel();
+        start(mParams, mTipView);
+    }
 
     @CallSuper
     @Override
     public void start(Map<String, String> params, TipView tipView) {
         mTipView = tipView;
+        mParams = params;
         String wsUrl = params.get(WS_URL);
         start(wsUrl);
         ThreadUtils.runOnUiThread(new Runnable() {
