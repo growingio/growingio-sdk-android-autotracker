@@ -31,6 +31,8 @@ public interface HttpDataFetcher<T> {
 
     void loadData(DataCallback<? super T> callback);
 
+    T executeData();
+
     void cleanup();
 
     void cancel();

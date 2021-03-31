@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.track.http;
 
-import android.util.Log;
+import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.IOException;
 import java.util.Map;
@@ -32,12 +32,13 @@ import okhttp3.ResponseBody;
  *
  * @author cpacm 2021/3/31
  */
-public class OkHttpDataFetcher implements HttpDataFetcher<String>, Callback {
+public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callback {
     private static final String TAG = "OkHttpDataFetcher";
 
     private final Call.Factory client;
     private final HttpUrl httpUrl;
-    private DataCallback<? super String> callback;
+    private DataCallback<? super EventResponse> callback;
+    private ResponseBody responseBody;
 
     public OkHttpDataFetcher(Call.Factory client, HttpUrl httpUrl) {
         this.client = client;
@@ -45,7 +46,7 @@ public class OkHttpDataFetcher implements HttpDataFetcher<String>, Callback {
     }
 
     @Override
-    public void loadData(DataCallback<? super String> callback) {
+    public void loadData(DataCallback<? super EventResponse> callback) {
         Request.Builder requestBuilder = new Request.Builder().url(httpUrl.toUrl());
         for (Map.Entry<String, String> headerEntry : httpUrl.getHeaders().entrySet()) {
             String key = headerEntry.getKey();
@@ -54,6 +55,30 @@ public class OkHttpDataFetcher implements HttpDataFetcher<String>, Callback {
         this.callback = callback;
         Request request = requestBuilder.build();
         client.newCall(request).enqueue(this);
+    }
+
+    @Override
+    public EventResponse executeData() {
+        Request.Builder requestBuilder = new Request.Builder().url(httpUrl.toUrl());
+        for (Map.Entry<String, String> headerEntry : httpUrl.getHeaders().entrySet()) {
+            String key = headerEntry.getKey();
+            requestBuilder.addHeader(key, headerEntry.getValue());
+        }
+        Request request = requestBuilder.build();
+        try {
+            Response response = client.newCall(request).execute();
+            responseBody = response.body();
+            if (response.isSuccessful()) {
+                boolean successed = true;
+                long contentLength = responseBody.contentLength();
+                return new EventResponse(successed, contentLength);
+            } else {
+                return new EventResponse(false, 0L);
+            }
+        } catch (IOException e) {
+            Logger.e(TAG, e);
+            return new EventResponse(false, 0L);
+        }
     }
 
     @Override
@@ -67,28 +92,26 @@ public class OkHttpDataFetcher implements HttpDataFetcher<String>, Callback {
     }
 
     @Override
-    public Class<String> getDataClass() {
-        return null;
+    public Class<EventResponse> getDataClass() {
+        return EventResponse.class;
     }
 
     @Override
-    public void onFailure(Call call,  IOException e) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "OkHttp failed to obtain result", e);
-        }
-
+    public void onFailure(Call call, IOException e) {
         callback.onLoadFailed(e);
+        Logger.e(TAG, e);
     }
 
     @Override
     public void onResponse(Call call, Response response) {
-        ResponseBody responseBody = response.body();
-//        if (response.isSuccessful()) {
-//            long contentLength = Preconditions.checkNotNull(responseBody).contentLength();
-//            stream = ContentLengthInputStream.obtain(responseBody.byteStream(), contentLength);
-//            callback.onDataReady(stream);
-//        } else {
-//            callback.onLoadFailed(new HttpException(response.message(), response.code()));
-//        }
+        responseBody = response.body();
+        if (response.isSuccessful()) {
+            boolean successed = true;
+            long contentLength = responseBody.contentLength();
+            EventResponse eventResponse = new EventResponse(successed, contentLength);
+            callback.onDataReady(eventResponse);
+        } else {
+            callback.onLoadFailed(new Exception(response.message()));
+        }
     }
 }
