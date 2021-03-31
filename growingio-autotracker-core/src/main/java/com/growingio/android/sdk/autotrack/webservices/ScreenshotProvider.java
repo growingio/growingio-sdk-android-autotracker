@@ -68,14 +68,12 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
         ViewTreeStatusProvider.get().register(new OnViewStateChangedListener() {
             @Override
             public void onViewStateChanged(ViewStateChangedEvent changedEvent) {
-                Logger.d(TAG, "onViewStateChanged: " + changedEvent.getStateType());
                 refreshScreenshot();
             }
         });
         HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
             @Override
             public void onDomChanged() {
-                Logger.d(TAG, "onDomChanged: ");
                 refreshScreenshot();
             }
         });
@@ -100,7 +98,6 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
             @Override
             public void onViewDetachedFromWindow(View v) {
-                Logger.d(TAG, "Top view onViewDetachedFromWindow: ");
                 refreshScreenshot();
             }
         });

@@ -24,4 +24,6 @@ public interface IWebService {
     void start(Map<String, String> params, TipView tipView);
 
     void end();
+
+    void restart();
 }

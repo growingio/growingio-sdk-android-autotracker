@@ -19,6 +19,7 @@ package com.growingio.android.sdk.track.webservices;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.growingio.android.sdk.track.R;
 import com.growingio.android.sdk.track.log.Logger;
@@ -49,12 +50,21 @@ public abstract class BaseWebSocketService implements IWebService {
 
     private WebSocket mWebSocket;
     protected TipView mTipView;
+    protected Map<String, String> mParams;
     private final AtomicInteger mSocketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
+
+    @Override
+    public void restart() {
+        if (mSocketState.get() == SOCKET_STATE_READIED) return;
+        if (mWebSocket != null) mWebSocket.cancel();
+        start(mParams, mTipView);
+    }
 
     @CallSuper
     @Override
     public void start(Map<String, String> params, TipView tipView) {
         mTipView = tipView;
+        mParams = params;
         String wsUrl = params.get(WS_URL);
         start(wsUrl);
         ThreadUtils.runOnUiThread(new Runnable() {
@@ -125,6 +135,7 @@ public abstract class BaseWebSocketService implements IWebService {
     }
 
     protected void sendMessage(String msg) {
+        Log.d("WebSocket", msg);
         if (mWebSocket != null) {
             mWebSocket.send(msg);
         }
@@ -138,6 +149,9 @@ public abstract class BaseWebSocketService implements IWebService {
     @CallSuper
     public void end() {
         mSocketState.set(SOCKET_STATE_CLOSED);
+        if (mWebSocket != null) {
+            mWebSocket.cancel();
+        }
     }
 
     private final class WebSocketListener extends okhttp3.WebSocketListener {
@@ -146,7 +160,6 @@ public abstract class BaseWebSocketService implements IWebService {
         public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
             Logger.d(TAG, "Created webSocket successfully");
             if (webSocket.send(ReadyMessage.createMessage().toJSONObject().toString())) {
-                Logger.d(TAG, "send ready message successfully");
                 mWebSocket = webSocket;
             } else {
                 Logger.e(TAG, "send ready message failed");
@@ -156,12 +169,10 @@ public abstract class BaseWebSocketService implements IWebService {
 
         @Override
         public void onMessage(@NonNull WebSocket webSocket, String text) {
-            Logger.d(TAG, "Received message is " + text);
             if (TextUtils.isEmpty(text) || TextUtils.isEmpty(text.trim())) {
-                Logger.e(TAG, "onMessage: message is NULL");
                 return;
             }
-
+            Logger.d(TAG, "Received message is " + text);
             try {
                 JSONObject message = new JSONObject(text);
                 String msgType = message.optString("msgType");

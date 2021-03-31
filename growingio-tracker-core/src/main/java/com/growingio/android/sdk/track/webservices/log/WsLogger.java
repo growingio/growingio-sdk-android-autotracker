@@ -16,83 +16,70 @@
 
 package com.growingio.android.sdk.track.webservices.log;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
+import android.os.Handler;
+import android.os.HandlerThread;
 
-import com.growingio.android.sdk.track.log.BaseLogger;
 import com.growingio.android.sdk.track.log.CacheLogger;
 import com.growingio.android.sdk.track.log.ILogger;
 import com.growingio.android.sdk.track.log.LogItem;
 import com.growingio.android.sdk.track.log.Logger;
 
-import java.util.ArrayDeque;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class WsLogger extends BaseLogger {
+/**
+ * 利用CacheLog缓存机制，防止socket在同一时间发送过多log导致关键性信息（pagerefresh和 debuggerevent）无法被服务器及时收到
+ */
+public class WsLogger {
     public static final String TYPE = "WsLogger";
 
     private volatile Callback mCallback;
-    private AtomicBoolean mFirstInit = new AtomicBoolean(true);
+    private static Handler sLogHandler;
+    private CacheLogger mCacheLogger;
+
+    public WsLogger() {
+        ILogger cacheLogger = Logger.getLogger(CacheLogger.TYPE);
+        if (cacheLogger instanceof CacheLogger) {
+            this.mCacheLogger = ((CacheLogger) cacheLogger);
+        }
+    }
 
     public void setCallback(Callback callback) {
         mCallback = callback;
     }
 
-    @Override
-    protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
-          String state = priorityToState(priority);
-          if (mCallback != null) {
-              if (mFirstInit.compareAndSet(true, false)) {
-                  ILogger cacheLogger = Logger.getLogger(CacheLogger.TYPE);
-                  if (cacheLogger instanceof CacheLogger) {
-                      List<LogItem> cacheLogs = ((CacheLogger) cacheLogger).getCacheLogs();
-                      Queue<LoggerDataMessage.LogItem> queue = new ArrayDeque<>(cacheLogs.size());
-                      for (LogItem item : cacheLogs) {
-                          queue.add(LoggerDataMessage.createLogItem(
-                                  priorityToState(item.getPriority()),
-                                  "subType",
-                                  item.getMessage(),
-                                  String.valueOf(item.getTimeStamp())));
-                      }
-                      mCallback.disposeLog(LoggerDataMessage.createMessage(queue));
-                  }
-              }
-              mCallback.disposeLog(LoggerDataMessage.
-                      createMessage(state,
-                              "subType",
-                              message,
-                              String.valueOf(System.currentTimeMillis())));
-          }
+    public void openLog() {
+        if (sLogHandler == null) {
+            HandlerThread logHt = new HandlerThread("WsLogger");
+            logHt.start();
+            sLogHandler = new Handler(logHt.getLooper());
+        }
+        //send log 2 times per 1 second
+        sLogHandler.postDelayed(mLogRunnable, 500);
     }
 
-    @Override
-    public String getType() {
-        return TYPE;
-    }
-
-    private String priorityToState(int priority) {
-        switch (priority) {
-            case Log.VERBOSE:
-                return "VERBOSE";
-            case Log.DEBUG:
-                return "DEBUG";
-            case Log.INFO:
-                return "INFO";
-            case Log.WARN:
-                return "WARN";
-            case Log.ERROR:
-                return "ERROR";
-            case Log.ASSERT:
-                return "ALARM";
-            default:
-                return "OTHER";
+    public void closeLog() {
+        if (sLogHandler != null) {
+            sLogHandler.removeCallbacks(mLogRunnable);
         }
     }
 
-    interface Callback {
-        void disposeLog(LoggerDataMessage logMessage);
+    private final Runnable mLogRunnable = this::printOut;
+
+
+    public void printOut() {
+        if (mCacheLogger != null) {
+            List<LogItem> mLoggers = mCacheLogger.getCacheLogsAndClear();
+            if (mLoggers == null || mLoggers.size() == 0) return;
+            if (mCallback != null) {
+                String loggerData = LoggerDataMessage.createTrackMessage(mLoggers).toJSONObject().toString();
+                mCallback.disposeLog(loggerData);
+            }
+        }
+        sLogHandler.removeCallbacks(mLogRunnable);
+        sLogHandler.postDelayed(mLogRunnable, 500);
+    }
+
+    public interface Callback {
+        void disposeLog(String logMessage);
     }
 }

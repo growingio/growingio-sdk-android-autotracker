@@ -28,6 +28,8 @@ import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.autotrack.webservices.circle.CircleService;
+import com.growingio.android.sdk.autotrack.webservices.debugger.DebuggerEventWrapper;
+import com.growingio.android.sdk.autotrack.webservices.debugger.DebuggerService;
 import com.growingio.android.sdk.track.Tracker;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
@@ -56,6 +58,9 @@ public class Autotracker extends Tracker {
         mViewChangeProvider.start();
 
         mWebServicesProvider.registerService(CircleService.SERVICE_TYPE, CircleService.class);
+        mWebServicesProvider.registerService(DebuggerService.SERVICE_TYPE, DebuggerService.class);
+        DebuggerEventWrapper.get().observeEventBuild();
+
         sInitializedSuccessfully = true;
     }
 

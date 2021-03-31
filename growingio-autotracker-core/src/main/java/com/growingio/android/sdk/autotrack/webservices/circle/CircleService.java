@@ -32,10 +32,6 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
-import com.growingio.android.sdk.track.webservices.log.MobileLogService;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class CircleService extends BaseWebSocketService implements ScreenshotProvider.OnScreenshotRefreshedListener {
     private static final String TAG = "CircleService";
@@ -44,7 +40,6 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
 
     private long mSnapshotKey = 0;
     private Disposable mCircleScreenshotDisposable;
-    private MobileLogService mMobileLogService;
 
     @Override
     protected void onReady() {
@@ -144,21 +139,6 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
                 .show();
     }
 
-    @Override
-    protected void onMessage(String text) {
-        try {
-            JSONObject message = new JSONObject(text);
-            String msgType = message.optString("msgType");
-            if (MobileLogService.SERVICE_TYPE.equals(msgType)) {
-                mMobileLogService = new MobileLogService();
-                // TODO: 2020/10/13 在圈选中启动mobileLog
-                mMobileLogService.start("xxx");
-            }
-        } catch (JSONException e) {
-            Logger.e(TAG, e);
-        }
-    }
-
     private void registerScreenshotRefreshedListener() {
         ScreenshotProvider.get().registerScreenshotRefreshedListener(this);
     }
@@ -189,14 +169,7 @@ public class CircleService extends BaseWebSocketService implements ScreenshotPro
 
     @Override
     public void end() {
-        if (getSocketState() >= SOCKET_STATE_CLOSED) {
-            return;
-        }
-
         super.end();
-        if (mMobileLogService != null) {
-            mMobileLogService.end();
-        }
         mTipView.dismiss();
         ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
     }

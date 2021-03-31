@@ -16,35 +16,48 @@
 
 package com.growingio.android.sdk.track.webservices.log;
 
+import android.util.Log;
+
+import com.growingio.android.sdk.track.SDKConfig;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoggerDataMessage {
 
     public static final String MSG_TYPE = "logger_data";
 
-    private Queue<LogItem> mLogs;
+    private List<LogItem> mLogs;
     private final String mMsgType;
 
-    private LoggerDataMessage(Queue<LogItem> logs) {
+    private LoggerDataMessage(List<LogItem> logs) {
         mMsgType = MSG_TYPE;
         mLogs = logs;
     }
 
-    public static LogItem createLogItem(String type, String subType, String message, String time) {
+    public static LogItem createLogItem(String type, String subType, String message, long time) {
         return LogItem.create(type, subType, message, time);
     }
 
-    public static LoggerDataMessage createMessage(Queue<LogItem> logs) {
+    public static LoggerDataMessage createMessage(List<LogItem> logs) {
         return new LoggerDataMessage(logs);
     }
 
-    public static LoggerDataMessage createMessage(String type, String subType, String message, String time) {
-        Queue<LogItem> logs = new ArrayDeque<>(1);
+    public static LoggerDataMessage createTrackMessage(List<com.growingio.android.sdk.track.log.LogItem> logs) {
+        List<LogItem> list = new ArrayList<>(logs.size());
+        for (int i = 0; i < logs.size(); i++) {
+            com.growingio.android.sdk.track.log.LogItem logItem = logs.get(i);
+            list.add(LogItem.create(priorityToState(logItem.getPriority()), "subType", logItem.getMessage(), logItem.getTimeStamp()));
+        }
+        return new LoggerDataMessage(list);
+    }
+
+    public static LoggerDataMessage createMessage(String type, String subType, String message, long time) {
+        List<LogItem> logs = new ArrayList<>(1);
         logs.add(createLogItem(type, subType, message, time));
         return new LoggerDataMessage(logs);
     }
@@ -53,14 +66,34 @@ public class LoggerDataMessage {
         JSONObject json = new JSONObject();
         try {
             json.put("msgType", mMsgType);
+            json.put("sdkVersion", SDKConfig.SDK_VERSION);
             JSONArray logs = new JSONArray();
             for (LogItem logItem : mLogs) {
                 logs.put(logItem.toJSONObject());
             }
-            json.put("logs", logs);
+            json.put("data", logs);
         } catch (JSONException ignored) {
         }
         return json;
+    }
+
+    private static String priorityToState(int priority) {
+        switch (priority) {
+            case Log.VERBOSE:
+                return "VERBOSE";
+            case Log.DEBUG:
+                return "DEBUG";
+            case Log.INFO:
+                return "INFO";
+            case Log.WARN:
+                return "WARN";
+            case Log.ERROR:
+                return "ERROR";
+            case Log.ASSERT:
+                return "ALARM";
+            default:
+                return "OTHER";
+        }
     }
 
     public static class LogItem {
@@ -68,16 +101,16 @@ public class LoggerDataMessage {
         private final String mType;
         private final String mSubType;
         private final String mMessage;
-        private final String mTime;
+        private final long mTime;
 
-        public LogItem(String type, String subType, String message, String time) {
+        public LogItem(String type, String subType, String message, long time) {
             mType = type;
             mSubType = subType;
             mMessage = message;
             mTime = time;
         }
 
-        public static LogItem create(String type, String subType, String message, String time) {
+        public static LogItem create(String type, String subType, String message, long time) {
             return new LogItem(type, subType, message, time);
         }
 

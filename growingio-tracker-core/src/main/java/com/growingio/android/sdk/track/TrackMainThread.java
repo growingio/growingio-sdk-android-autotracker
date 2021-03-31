@@ -117,6 +117,14 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         saveEvent(event);
     }
 
+    public void removeEventBuildInterceptor(EventBuildInterceptor interceptor) {
+        synchronized (mEventBuildInterceptors) {
+            if (interceptor != null) {
+                mEventBuildInterceptors.remove(interceptor);
+            }
+        }
+    }
+
     public void addEventBuildInterceptor(EventBuildInterceptor interceptor) {
         synchronized (mEventBuildInterceptors) {
             boolean needsAdd = true;
