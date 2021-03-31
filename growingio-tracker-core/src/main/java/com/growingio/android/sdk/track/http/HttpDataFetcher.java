@@ -19,8 +19,21 @@ package com.growingio.android.sdk.track.http;
 /**
  * <p>
  *
- * @author cpacm 2021/3/30
+ * @author cpacm 2021/3/31
  */
-public interface HttpModelLoader {
+public interface HttpDataFetcher<T> {
 
+    interface DataCallback<T> {
+        void onDataReady(T data);
+
+        void onLoadFailed(Exception e);
+    }
+
+    void loadData(DataCallback<? super T> callback);
+
+    void cleanup();
+
+    void cancel();
+
+    Class<T> getDataClass();
 }
