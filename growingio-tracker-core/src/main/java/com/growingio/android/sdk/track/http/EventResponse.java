@@ -16,26 +16,20 @@
 
 package com.growingio.android.sdk.track.http;
 
-/**
- * <p>
- *
- * @author cpacm 2021/3/31
- */
-public interface HttpDataFetcher<T> {
+public class EventResponse {
+    private final boolean mSucceeded;
+    private final long mUsedBytes;
 
-    interface DataCallback<T> {
-        void onDataReady(T data);
-
-        void onLoadFailed(Exception e);
+    public EventResponse(boolean succeeded, long usedBytes) {
+        mSucceeded = succeeded;
+        mUsedBytes = usedBytes;
     }
 
-    void loadData(DataCallback<? super T> callback);
+    public boolean isSucceeded() {
+        return mSucceeded;
+    }
 
-    T executeData();
-
-    void cleanup();
-
-    void cancel();
-
-    Class<T> getDataClass();
+    public long getUsedBytes() {
+        return mUsedBytes;
+    }
 }
