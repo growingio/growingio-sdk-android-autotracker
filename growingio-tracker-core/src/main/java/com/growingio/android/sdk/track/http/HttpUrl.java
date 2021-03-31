@@ -21,23 +21,53 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Url {
+public class HttpUrl {
     private final String mHost;
+    private final Map<String, String> mHeaders = new HashMap<>();
     private final List<String> mPaths = new ArrayList<>();
     private final Map<String, String> mParams = new HashMap<>();
 
-    Url(String host) {
+    HttpUrl(String host) {
         mHost = host;
     }
 
-    Url addPath(String path) {
+    HttpUrl addPath(String path) {
         mPaths.add(path);
         return this;
     }
 
-    Url addParam(String key, String param) {
+    HttpUrl addParam(String key, String param) {
         mParams.put(key, param);
         return this;
+    }
+
+    HttpUrl addHeader(String key, String value) {
+        mHeaders.put(key, value);
+        return this;
+    }
+
+    public Map<String, String> getHeaders(){
+        return mHeaders;
+    }
+
+    public String toUrl(){
+        StringBuilder urlBuilder = new StringBuilder(mHost);
+        for (String path : mPaths) {
+            if (urlBuilder.charAt(urlBuilder.length() - 1) != '/') {
+                urlBuilder.append("/");
+            }
+            urlBuilder.append(path);
+        }
+
+        if (!mParams.isEmpty()) {
+            urlBuilder.append("?");
+            for (String key : mParams.keySet()) {
+                urlBuilder.append(key).append("=").append(mParams.get(key)).append("&");
+            }
+            urlBuilder.deleteCharAt(urlBuilder.length() - 1);
+        }
+
+        return urlBuilder.toString();
     }
 
     @Override
