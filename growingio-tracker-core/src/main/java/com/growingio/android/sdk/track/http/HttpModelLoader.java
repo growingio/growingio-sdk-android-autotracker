@@ -21,6 +21,6 @@ package com.growingio.android.sdk.track.http;
  *
  * @author cpacm 2021/3/30
  */
-public interface HttpLoader {
+public interface HttpModelLoader {
 
 }
