@@ -26,7 +26,6 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.BaseWebSocketService;
-import com.growingio.android.sdk.track.webservices.WebServicesProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
