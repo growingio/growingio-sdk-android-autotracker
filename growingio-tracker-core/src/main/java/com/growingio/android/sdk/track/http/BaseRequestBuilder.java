@@ -25,13 +25,13 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public abstract class BaseRequestBuilder<T extends BaseRequestBuilder> {
-    private Url mUrl;
+    private HttpUrl mUrl;
     private Map<String, String> mHeaders = new HashMap<>();
     private int mRetryTimes = 0;
     private boolean mEnableGzip = false;
 
     public BaseRequestBuilder(String url) {
-        mUrl = new Url(url);
+        mUrl = new HttpUrl(url);
     }
 
     public T addPath(String path) {
@@ -59,7 +59,7 @@ public abstract class BaseRequestBuilder<T extends BaseRequestBuilder> {
         return (T) this;
     }
 
-    public Url getUrl() {
+    public HttpUrl getUrl() {
         return mUrl;
     }
 
