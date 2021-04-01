@@ -44,6 +44,7 @@ buildscript {
                         'tracker'         : "com.growingio.android:tracker:$releaseConfiguration.releaseVersion",
                         'autotracker_core': "com.growingio.android:autotracker-core:$releaseConfiguration.releaseVersion",
                         'autotracker'     : "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion",
+                        'okhttp3'         : "com.growingio.android:okhttp3-integration:$releaseConfiguration.releaseVersion",
                 ],
 
                 'google'   : [

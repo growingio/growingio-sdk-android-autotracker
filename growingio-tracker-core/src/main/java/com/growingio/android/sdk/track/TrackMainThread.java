@@ -56,7 +56,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     private TrackMainThread() {
         TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
         int uploadInterval = configuration.isDebugEnabled() ? 0 : configuration.getDataUploadInterval();
-        mEventSender = new EventSender(ContextProvider.getApplicationContext(), new EventHttpSender(new TrackEventJsonMarshaller()), uploadInterval, configuration.getCellularDataLimit());
+        mEventSender = new EventSender(TrackerContext.get().getApplicationContext(), new EventHttpSender(new TrackEventJsonMarshaller()), uploadInterval, configuration.getCellularDataLimit());
 
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();

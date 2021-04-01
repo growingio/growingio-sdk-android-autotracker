@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.http;
+package com.growingio.android.sdk.track.modelloader;
 
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-
-public class JsonPostRequestBuilder extends BaseRequestBuilder<JsonPostRequestBuilder> {
-    private static final MediaType CONTENT_TYPE = MediaType.get("application/json");
-
-    private String mBody = "";
-
-    JsonPostRequestBuilder(String url) {
-        super(url);
-    }
-
-    @Override
-    protected RequestBody getRequestBody() {
-        return RequestBody.create(CONTENT_TYPE, mBody);
-    }
-
-    public JsonPostRequestBuilder setBody(String json) {
-        mBody = json;
-        return this;
-    }
+/**
+ * <p>
+ *
+ * @author cpacm 2021/4/1
+ */
+public interface ModelLoaderFactory<T,Y> {
+    ModelLoader<T,Y> build();
 }

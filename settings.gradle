@@ -13,3 +13,5 @@ include ':growingio-tracker'
 include ':growingio-autotracker-gradle-plugin'
 include ':growingio-autotracker-core'
 include ':growingio-autotracker'
+
+include ':integration:okhttp3'

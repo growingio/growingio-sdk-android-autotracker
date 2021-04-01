@@ -19,7 +19,7 @@ package com.growingio.android.sdk.track.webservices.message;
 import android.content.Context;
 import android.util.DisplayMetrics;
 
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
@@ -57,7 +57,7 @@ public class ReadyMessage {
     }
 
     public static ReadyMessage createMessage() {
-        Context context = ContextProvider.getApplicationContext();
+        Context context = TrackerContext.get().getApplicationContext();
         String projectId = ConfigurationProvider.get().getTrackConfiguration().getProjectId();
         String domain = AppInfoProvider.get().getPackageName();
         String sdkVersion = SDKConfig.SDK_VERSION;

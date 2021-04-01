@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.growingio.android.sdk.track.base.Configurable;
+import com.growingio.android.sdk.track.modelloader.OnTrackerRegistry;
 
 public class TrackConfiguration implements Cloneable, Configurable {
     private final String mProjectId;
@@ -35,6 +36,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
     private boolean mOaidEnabled = false;
+    private OnTrackerRegistry mRegistryCallback;
 
     public TrackConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -132,6 +134,15 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return this;
     }
 
+    public TrackConfiguration registerComponents(OnTrackerRegistry registry) {
+        this.mRegistryCallback = registry;
+        return this;
+    }
+
+    public OnTrackerRegistry getRegistryCallback() {
+        return mRegistryCallback;
+    }
+
     @NonNull
     @Override
     public TrackConfiguration clone() {
@@ -144,6 +155,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         clone.mUploadExceptionEnabled = this.mUploadExceptionEnabled;
         clone.mDataCollectionServerHost = this.mDataCollectionServerHost;
         clone.mOaidEnabled = this.mOaidEnabled;
+        clone.mRegistryCallback = this.mRegistryCallback;
         return clone;
     }
 }

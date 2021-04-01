@@ -14,17 +14,28 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.http;
+package com.growingio.android.sdk.track.modelloader;
 
+/**
+ * <p>
+ *
+ * @author cpacm 2021/3/31
+ */
+public interface DataFetcher<T> {
 
-public class HttpRequestTask {
-    private final HttpRequest mHttpRequest;
+    interface DataCallback<T> {
+        void onDataReady(T data);
 
-    HttpRequestTask(HttpRequest request) {
-        mHttpRequest = request;
+        void onLoadFailed(Exception e);
     }
 
-    public void cancel() {
-        mHttpRequest.cancel();
-    }
+    void loadData(DataCallback<? super T> callback);
+
+    T executeData();
+
+    void cleanup();
+
+    void cancel();
+
+    Class<T> getDataClass();
 }

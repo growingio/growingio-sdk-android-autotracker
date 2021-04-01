@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.http;
+package com.growingio.android.sdk.track.modelloader;
 
-import okhttp3.RequestBody;
-
-public class GetRequestBuilder extends BaseRequestBuilder<GetRequestBuilder> {
-    GetRequestBuilder(String url) {
-        super(url);
-    }
-
-    @Override
-    protected RequestBody getRequestBody() {
-        return null;
-    }
-
+/**
+ * <p>
+ * user can use this callback register components
+ * //TODO we can auto register use apt
+ *
+ * @author cpacm 2021/4/1
+ */
+public interface OnTrackerRegistry {
+    void register(TrackerRegistry registry);
 }

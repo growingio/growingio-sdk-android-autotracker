@@ -38,6 +38,9 @@ dependencies {
     debugApi project(':growingio-autotracker-core')
     releaseApi libraries.growingio.autotracker_core
 
+    debugApi project(':integration:okhttp3')
+    releaseApi libraries.growingio.okhttp3
+
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.android.appcompat
 }
