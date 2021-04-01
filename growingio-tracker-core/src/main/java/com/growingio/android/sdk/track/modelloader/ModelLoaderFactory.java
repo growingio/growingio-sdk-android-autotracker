@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.http;
+package com.growingio.android.sdk.track.modelloader;
 
 /**
  * <p>
  *
- * @author cpacm 2021/3/30
+ * @author cpacm 2021/4/1
  */
-public interface HttpModelLoader {
-
+public interface ModelLoaderFactory<T,Y> {
+    ModelLoader<T,Y> build();
 }
