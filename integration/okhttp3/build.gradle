@@ -1,0 +1,31 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdkVersion buildConfiguration.compileVersion
+    defaultConfig {
+        minSdkVersion buildConfiguration.minSdkVersion
+        targetSdkVersion buildConfiguration.targetSdkVersion
+        versionName releaseConfiguration.releaseVersion
+        versionCode releaseConfiguration.releaseVersionCode
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility buildConfiguration.sourceCompatibility
+        targetCompatibility buildConfiguration.targetCompatibility
+    }
+}
+
+dependencies {
+    implementation project(':growingio-tracker-core')
+
+    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
+}

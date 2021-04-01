@@ -31,7 +31,7 @@ import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.autotrack.view.WindowHelper;
 import com.growingio.android.sdk.autotrack.webservices.circle.ViewUtil;
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.async.UnsubscribedDisposable;
@@ -135,7 +135,7 @@ public class CircleScreenshot {
             mBuildDisposable = new UnsubscribedDisposable();
             mScreenshotResultCallback = callback;
 
-            DisplayMetrics displayMetrics = DeviceUtil.getDisplayMetrics(ContextProvider.getApplicationContext());
+            DisplayMetrics displayMetrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
             mScreenWidth = displayMetrics.widthPixels;
             mScreenHeight = displayMetrics.heightPixels;
 

@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.http;
+package com.growingio.android.okhttp3;
 
+import com.growingio.android.sdk.track.http.EventResponse;
+import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
 import java.io.IOException;
 import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -32,41 +37,50 @@ import okhttp3.ResponseBody;
  *
  * @author cpacm 2021/3/31
  */
-public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callback {
+public class OkHttpDataFetcher implements DataFetcher<EventResponse>, Callback {
     private static final String TAG = "OkHttpDataFetcher";
 
     private final Call.Factory client;
-    private final HttpUrl httpUrl;
+    private final EventUrl eventUrl;
     private DataCallback<? super EventResponse> callback;
     private ResponseBody responseBody;
+    private volatile Call call;
 
-    public OkHttpDataFetcher(Call.Factory client, HttpUrl httpUrl) {
+    public OkHttpDataFetcher(Call.Factory client, EventUrl eventUrl) {
         this.client = client;
-        this.httpUrl = httpUrl;
+        this.eventUrl = eventUrl;
     }
 
     @Override
     public void loadData(DataCallback<? super EventResponse> callback) {
-        Request.Builder requestBuilder = new Request.Builder().url(httpUrl.toUrl());
-        for (Map.Entry<String, String> headerEntry : httpUrl.getHeaders().entrySet()) {
+        Request.Builder requestBuilder = new Request.Builder().url(eventUrl.toUrl());
+        if (!eventUrl.getRequestBody().isEmpty()) {
+            requestBuilder.post(RequestBody.create(MediaType.parse("application/json"), eventUrl.getRequestBody()));
+        }
+        for (Map.Entry<String, String> headerEntry : eventUrl.getHeaders().entrySet()) {
             String key = headerEntry.getKey();
             requestBuilder.addHeader(key, headerEntry.getValue());
         }
         this.callback = callback;
         Request request = requestBuilder.build();
-        client.newCall(request).enqueue(this);
+        call = client.newCall(request);
+        call.enqueue(this);
     }
 
     @Override
     public EventResponse executeData() {
-        Request.Builder requestBuilder = new Request.Builder().url(httpUrl.toUrl());
-        for (Map.Entry<String, String> headerEntry : httpUrl.getHeaders().entrySet()) {
+        Request.Builder requestBuilder = new Request.Builder().url(eventUrl.toUrl());
+        for (Map.Entry<String, String> headerEntry : eventUrl.getHeaders().entrySet()) {
             String key = headerEntry.getKey();
             requestBuilder.addHeader(key, headerEntry.getValue());
         }
+        if (!eventUrl.getRequestBody().isEmpty()) {
+            requestBuilder.post(RequestBody.create(MediaType.parse(eventUrl.getMediaType()), eventUrl.getRequestBody()));
+        }
         Request request = requestBuilder.build();
         try {
-            Response response = client.newCall(request).execute();
+            call = client.newCall(request);
+            Response response = call.execute();
             responseBody = response.body();
             if (response.isSuccessful()) {
                 boolean successed = true;
@@ -83,12 +97,18 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
 
     @Override
     public void cleanup() {
-
+        if (responseBody != null) {
+            responseBody.close();
+        }
+        callback = null;
     }
 
     @Override
     public void cancel() {
-
+        Call local = call;
+        if (local != null) {
+            local.cancel();
+        }
     }
 
     @Override
@@ -106,9 +126,11 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
     public void onResponse(Call call, Response response) {
         responseBody = response.body();
         if (response.isSuccessful()) {
-            boolean successed = true;
+            if (responseBody == null) {
+                throw new IllegalArgumentException("Must not be null or empty");
+            }
             long contentLength = responseBody.contentLength();
-            EventResponse eventResponse = new EventResponse(successed, contentLength);
+            EventResponse eventResponse = new EventResponse(true, contentLength);
             callback.onDataReady(eventResponse);
         } else {
             callback.onLoadFailed(new Exception(response.message()));

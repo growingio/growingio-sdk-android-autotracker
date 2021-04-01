@@ -27,8 +27,11 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.okhttp3.OkHttpDataLoader;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.SDKConfig;
+import com.growingio.android.sdk.track.http.EventResponse;
+import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
@@ -66,7 +69,9 @@ public class GrowingAutotracker implements IGrowingAutotracker {
         if (application == null) {
             throw new IllegalStateException("application is NULL");
         }
-        ContextProvider.setContext(application);
+        //register default component
+        TrackerContext.init(application);
+        TrackerContext.get().getRegistry().register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory());
 
         if (TextUtils.isEmpty(trackConfiguration.getProjectId())) {
             throw new IllegalStateException("ProjectId is NULL");

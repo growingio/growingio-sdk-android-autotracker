@@ -19,7 +19,7 @@ package com.growingio.android.sdk.track.events;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
@@ -233,7 +233,7 @@ public final class VisitEvent extends BaseEvent {
         public void readPropertyInTrackThread() {
             super.readPropertyInTrackThread();
 
-            Context context = ContextProvider.getApplicationContext();
+            Context context = TrackerContext.get().getApplicationContext();
             mNetworkState = NetworkUtil.getActiveNetworkState(context).getNetworkName();
 
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();

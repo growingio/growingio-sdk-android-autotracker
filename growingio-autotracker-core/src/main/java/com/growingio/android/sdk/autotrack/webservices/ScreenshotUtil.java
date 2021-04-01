@@ -25,7 +25,7 @@ import android.view.WindowManager;
 
 import com.growingio.android.sdk.autotrack.view.DecorView;
 import com.growingio.android.sdk.autotrack.view.WindowHelper;
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
@@ -69,7 +69,7 @@ public class ScreenshotUtil {
             }
         }
 
-        DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(ContextProvider.getApplicationContext());
+        DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
         Bitmap bitmap = Bitmap.createBitmap(metrics.widthPixels, metrics.heightPixels, Bitmap.Config.ARGB_8888);
         drawDecorViewsToBitmap(decorViews, bitmap);
         return bitmap;

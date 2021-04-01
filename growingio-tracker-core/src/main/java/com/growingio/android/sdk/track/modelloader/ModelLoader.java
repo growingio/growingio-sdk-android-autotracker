@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.http;
+package com.growingio.android.sdk.track.modelloader;
 
-public class RequestExtra {
-    private final int mRetryTimes;
-    private final boolean mEnableGzip;
+/**
+ * <p>
+ *
+ * @author cpacm 2021/4/1
+ */
+public interface ModelLoader<Model, Data> {
 
-    public RequestExtra(int retryTimes, boolean enableGzip) {
-        mRetryTimes = retryTimes;
-        mEnableGzip = enableGzip;
+    class LoadData<Data> {
+        public final DataFetcher<Data> fetcher;
+        public LoadData(DataFetcher<Data> fetcher) {
+            this.fetcher = fetcher;
+        }
     }
 
-    int getRetryTimes() {
-        return mRetryTimes;
-    }
-
-    boolean isEnableGzip() {
-        return mEnableGzip;
-    }
+    LoadData<Data> buildLoadData(Model model);
 }

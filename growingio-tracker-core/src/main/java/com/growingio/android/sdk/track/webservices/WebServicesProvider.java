@@ -20,7 +20,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.DebugLogger;
@@ -111,7 +111,7 @@ public class WebServicesProvider implements IActivityLifecycle {
         if (serviceClass != null) {
             try {
                 mRunningWebService = serviceClass.newInstance();
-                mTipView = new TipView(ContextProvider.getApplicationContext());
+                mTipView = new TipView(TrackerContext.get().getApplicationContext());
                 mRunningWebService.start(params, mTipView);
             } catch (Exception e) {
                 Logger.e(TAG, e);

@@ -38,8 +38,9 @@ android {
 dependencies {
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
-    api libraries.squareup.okhttp3
     implementation libraries.growingio.gmonitor
+
+    api libraries.squareup.okhttp3
 
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.androidx.recyclerview

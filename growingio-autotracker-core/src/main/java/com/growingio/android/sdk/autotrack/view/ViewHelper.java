@@ -43,7 +43,7 @@ import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
@@ -122,7 +122,7 @@ public class ViewHelper {
         } else {
             xpath.append(WindowHelper.PAGE_PREFIX);
         }
-        Context context = ContextProvider.getApplicationContext();
+        Context context = TrackerContext.get().getApplicationContext();
         xpath.append("/MenuView/MenuItem#").append(getPackageId(context, menuItem.getItemId()));
 
         return ViewNode.ViewNodeBuilder.newViewNode()

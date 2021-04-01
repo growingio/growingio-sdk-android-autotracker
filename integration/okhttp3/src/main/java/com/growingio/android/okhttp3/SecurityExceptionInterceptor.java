@@ -14,37 +14,30 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.http;
-
+package com.growingio.android.okhttp3;
 
 import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.IOException;
 
 import okhttp3.Interceptor;
-import okhttp3.Request;
 import okhttp3.Response;
 
-public class RetryInterceptor implements Interceptor {
-    private static final String TAG = "RetryInterceptor";
+/**
+ * 1.用于OkHttp防止部分机型关闭网络权限导致崩溃（特定Rom对permission的管理问题或Root后关闭权限),转为IO异常回调失败
+ * 2.避免Monitor进行上传时调用Monitor#capture循环抛出异常（MonitorUncaughtExceptionHandler是多线程）
+ * 3.加强保护，将所有异常转为io异常回调失败，避免部分okhttp内部错误导致异常
+ */
+public class SecurityExceptionInterceptor implements Interceptor {
+    private static final String TAG = "SecurityExceptionInterceptor";
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request request = chain.request();
-        Response response = chain.proceed(request);
-        if (response.isSuccessful()) {
-            return response;
+        try {
+            return chain.proceed(chain.request());
+        } catch (Exception e) {
+            Logger.e(TAG, "HTTP FAILED: " + e.getMessage());
+            throw new IOException("Failed due to an Exception: " + e.getMessage());
         }
-
-        RequestExtra extra = request.tag(RequestExtra.class);
-        if (extra != null && extra.getRetryTimes() > 0) {
-            int retryNum = 0;
-            while (!response.isSuccessful() && retryNum <= extra.getRetryTimes()) {
-                retryNum++;
-                Logger.e(TAG, "HTTP request retry " + retryNum + " times");
-                response = chain.proceed(request);
-            }
-        }
-        return response;
     }
 }
