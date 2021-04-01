@@ -20,7 +20,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 
 public class PermissionUtil {
@@ -55,7 +55,7 @@ public class PermissionUtil {
 
     private static boolean checkPermission(String permissionName, int flag) {
         if (sPackageManager == null) {
-            Context context = ContextProvider.getApplicationContext();
+            Context context = TrackerContext.get().getApplicationContext();
             sPackageManager = context.getPackageManager();
             sPackageName = context.getPackageName();
         }

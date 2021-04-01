@@ -28,7 +28,7 @@ import com.growingio.android.sdk.autotrack.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.autotrack.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.autotrack.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.autotrack.view.WindowHelper;
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
@@ -58,7 +58,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
     }
 
     private ScreenshotProvider() {
-        DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(ContextProvider.getApplicationContext());
+        DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
         mScale = SCREENSHOT_STANDARD_WIDTH / Math.min(metrics.widthPixels, metrics.heightPixels);
 
         mHandlerThread = new HandlerThread("ScreenshotProvider");

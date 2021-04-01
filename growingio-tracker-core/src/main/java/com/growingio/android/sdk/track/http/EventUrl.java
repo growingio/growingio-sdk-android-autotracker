@@ -21,36 +21,56 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HttpUrl {
+public class EventUrl {
     private final String mHost;
     private final Map<String, String> mHeaders = new HashMap<>();
     private final List<String> mPaths = new ArrayList<>();
     private final Map<String, String> mParams = new HashMap<>();
+    private String mBodyData = "";
+    private String mMediaType = "application/json";//or "application/x-www-form-urlencoded" for data
 
-    HttpUrl(String host) {
+    public EventUrl(String host) {
         mHost = host;
     }
 
-    HttpUrl addPath(String path) {
+    public EventUrl addPath(String path) {
         mPaths.add(path);
         return this;
     }
 
-    HttpUrl addParam(String key, String param) {
+    public EventUrl addParam(String key, String param) {
         mParams.put(key, param);
         return this;
     }
 
-    HttpUrl addHeader(String key, String value) {
+    public EventUrl addHeader(String key, String value) {
         mHeaders.put(key, value);
         return this;
     }
 
-    public Map<String, String> getHeaders(){
+    public String getMediaType() {
+        return mMediaType;
+    }
+
+    public String getRequestBody() {
+        return mBodyData;
+    }
+
+    public EventUrl setBodyData(String mBodyData) {
+        this.mBodyData = mBodyData;
+        return this;
+    }
+
+    public EventUrl setMediaType(String mMediaType) {
+        this.mMediaType = mMediaType;
+        return this;
+    }
+
+    public Map<String, String> getHeaders() {
         return mHeaders;
     }
 
-    public String toUrl(){
+    public String toUrl() {
         StringBuilder urlBuilder = new StringBuilder(mHost);
         for (String path : mPaths) {
             if (urlBuilder.charAt(urlBuilder.length() - 1) != '/') {

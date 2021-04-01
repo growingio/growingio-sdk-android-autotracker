@@ -18,7 +18,7 @@ package com.growingio.android.sdk.track.events;
 
 import android.content.Context;
 
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
 
@@ -61,7 +61,7 @@ public class AppClosedEvent extends BaseEvent {
         @Override
         public void readPropertyInTrackThread() {
             super.readPropertyInTrackThread();
-            Context context = ContextProvider.getApplicationContext();
+            Context context = TrackerContext.get().getApplicationContext();
             mNetworkState = NetworkUtil.getActiveNetworkState(context).getNetworkName();
         }
     }

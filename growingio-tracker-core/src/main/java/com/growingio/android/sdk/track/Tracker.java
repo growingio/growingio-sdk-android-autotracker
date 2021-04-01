@@ -50,7 +50,10 @@ public class Tracker {
     protected Tracker(Application application, TrackConfiguration trackConfiguration) {
         mApplication = application;
         mTrackConfiguration = trackConfiguration;
-        ContextProvider.setContext(application);
+        TrackerContext.init(application);
+        if (trackConfiguration.getRegistryCallback() != null) {
+            trackConfiguration.getRegistryCallback().register(TrackerContext.get().getRegistry());
+        }
 
         ConfigurationProvider.get().setTrackConfiguration(trackConfiguration);
 
