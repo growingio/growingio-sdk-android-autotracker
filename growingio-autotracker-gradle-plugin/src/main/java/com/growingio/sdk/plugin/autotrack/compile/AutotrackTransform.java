@@ -218,11 +218,11 @@ public class AutotrackTransform extends Transform {
         final String relativeClassPath = file.getAbsolutePath().substring(inputDirPath.length());
         mExecutor.execute(() -> {
             File outFile = new File(outDirPath, relativeClassPath);
-            if (added==Status.REMOVED) {
+            if (added == Status.REMOVED) {
                 FileUtils.deleteQuietly(outFile);
-            } else if(added == Status.NOTCHANGED){
+            } else if (added == Status.NOTCHANGED) {
                 log("class file no change" + file);
-            }else { // ADDED or CHANGED
+            } else { // ADDED or CHANGED
                 if (relativeClassPath.endsWith(".class")) {
                     if (mClassRewriter.transformClassFile(file, outFile)) {
                         log("transformed class file " + file + " to " + outFile);
