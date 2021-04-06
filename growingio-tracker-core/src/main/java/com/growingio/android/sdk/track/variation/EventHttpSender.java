@@ -40,14 +40,20 @@ public class EventHttpSender implements IEventNetSender {
     private final EventMarshaller<JSONObject, JSONArray> mEventMarshaller;
     private final String mProjectId;
     private final String mServerHost;
-    private final ModelLoader<EventUrl, EventResponse> httpLoader;
+    private ModelLoader<EventUrl, EventResponse> mHttpLoader;
 
     public EventHttpSender(EventMarshaller<JSONObject, JSONArray> eventMarshaller) {
         mEventMarshaller = eventMarshaller;
         TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
         mProjectId = configuration.getProjectId();
         mServerHost = configuration.getDataCollectionServerHost();
-        httpLoader = TrackerContext.get().getRegistry().getModelLoader(EventUrl.class, EventResponse.class);
+    }
+
+    private ModelLoader<EventUrl, EventResponse> getModelLoader() {
+        if (mHttpLoader == null) {
+            mHttpLoader = TrackerContext.get().getRegistry().getModelLoader(EventUrl.class, EventResponse.class);
+        }
+        return mHttpLoader;
     }
 
     /**
@@ -59,7 +65,7 @@ public class EventHttpSender implements IEventNetSender {
         if (events == null || events.isEmpty()) {
             return new SendResponse(true, 0);
         }
-        if (httpLoader == null) {
+        if (getModelLoader() == null) {
             Logger.e(TAG, "please register http request component first");
             return new SendResponse(false, 0);
         }
@@ -77,14 +83,14 @@ public class EventHttpSender implements IEventNetSender {
                 .addParam("stm", String.valueOf(System.currentTimeMillis()))
                 .setBodyData(data)
                 .setMediaType("application/json");
-        ModelLoader.LoadData<EventResponse> loadData = httpLoader.buildLoadData(eventUrl);
+        ModelLoader.LoadData<EventResponse> loadData = getModelLoader().buildLoadData(eventUrl);
         if (loadData.fetcher.getDataClass() != EventResponse.class) {
             Logger.e(TAG, new IllegalArgumentException("illegal data class for http response."));
             return new SendResponse(true, 0);
         }
         EventResponse response = loadData.fetcher.executeData();
 
-        boolean successful = response.isSucceeded();
+        boolean successful = response != null && response.isSucceeded();
         if (successful) {
             Logger.d(TAG, "Send events successfully");
         } else {
