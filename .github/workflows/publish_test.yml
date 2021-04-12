@@ -33,7 +33,6 @@ jobs:
       - name: Build with Gradle
         run: |
           bash ./gradle/publishAllToMavenLocal.sh
-          ./gradlew clean
 
       # 解码秘钥
       - name: Decode
