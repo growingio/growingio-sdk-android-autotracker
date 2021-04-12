@@ -13,5 +13,4 @@ nexusStaging {
     serverUrl = "https://oss.sonatype.org/service/local/"
     username = getRepositoryUsername()
     password = getRepositoryPassword()
-    println username + "," + password
 }

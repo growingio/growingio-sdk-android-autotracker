@@ -138,9 +138,9 @@ dependencies {
     implementation (name: 'oaid_sdk_1.0.22', ext: 'aar')
     debugApi project(':growingio-tracker')
     releaseApi libraries.growingio.tracker
-    implementation project(':demos:demo-core')
+    implementation project(':demo-core')
     if (withAutotrack) {
-        implementation project(":demos:demo-autotrack")
+        implementation project(":demo-autotrack")
     }
 
     compileOnly libraries.androidx.appcompat
