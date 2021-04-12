@@ -207,9 +207,7 @@ afterEvaluate { project ->
     }
 
     signing {
-        if (isReleaseBuild()) {
-            sign publishing.publications.mavenAgent
-        }
-        //required { isReleaseBuild() }
+        required { isReleaseBuild() && gradle.taskGraph.hasTask("publish") }
+        sign publishing.publications.mavenAgent
     }
 }
