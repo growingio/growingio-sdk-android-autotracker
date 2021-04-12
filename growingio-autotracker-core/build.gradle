@@ -31,8 +31,8 @@ android {
 
 dependencies {
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    debugApi project(':growingio-tracker-core')
-    releaseApi libraries.growingio.tracker_core
+    api project(':growingio-tracker-core')
+    //releaseApi libraries.growingio.tracker_core
     implementation project(':inject-annotation')
     annotationProcessor project(':inject-compiler')
 
@@ -43,4 +43,4 @@ dependencies {
     compileOnly libraries.others.x5_webview
 }
 
-apply from: "${project.rootProject.file('mavenPush.gradle')}"
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

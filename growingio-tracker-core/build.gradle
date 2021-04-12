@@ -48,4 +48,5 @@ dependencies {
     compileOnly libraries.others.x5_webview
 }
 
-apply from: "${project.rootProject.file('mavenPush.gradle')}"
+//apply from: "${project.rootProject.file('mavenPush.gradle')}"
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

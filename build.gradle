@@ -11,8 +11,8 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.1.0-SNAPSHOT",
-                releaseVersionCode: 30100,
+                releaseVersion    : "3.0.0",
+                releaseVersionCode: 30000,
         ]
 
         versions = [
@@ -89,23 +89,29 @@ buildscript {
 
     repositories {
         mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         google()
         jcenter()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${versions.gradleTool}"
         classpath libraries.publish.novoda
-        classpath libraries.publish.jfrog
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
     }
 }
 
 allprojects {
     repositories {
         mavenLocal()
-        jcenter()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         google()
+        jcenter()
     }
 }
+
+apply from: "${rootProject.projectDir}/gradle/stagingMaven.gradle"
 
 subprojects { project ->
     apply plugin: 'checkstyle'

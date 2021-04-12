@@ -32,14 +32,14 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    debugApi project(':growingio-tracker-core')
-    releaseApi libraries.growingio.tracker_core
+    api project(':growingio-tracker-core')
+    //releaseApi libraries.growingio.tracker_core
 
-    debugApi project(':growingio-autotracker-core')
-    releaseApi libraries.growingio.autotracker_core
+    api project(':growingio-autotracker-core')
+    //releaseApi libraries.growingio.autotracker_core
 
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.android.appcompat
 }
 
-apply from: "${project.rootProject.file('mavenPush.gradle')}"
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

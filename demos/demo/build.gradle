@@ -12,6 +12,7 @@ buildscript {
         google()
         jcenter()
         mavenLocal()
+        maven {url "https://oss.sonatype.org/content/repositories/snapshots/"}
     }
     dependencies {
         classpath "com.growingio.android:autotracker-gradle-plugin:${releaseConfiguration.releaseVersion}"
@@ -137,9 +138,9 @@ dependencies {
     implementation (name: 'oaid_sdk_1.0.22', ext: 'aar')
     debugApi project(':growingio-tracker')
     releaseApi libraries.growingio.tracker
-    implementation project(':demo-core')
+    implementation project(':demos:demo-core')
     if (withAutotrack) {
-        implementation project(":demo-autotrack")
+        implementation project(":demos:demo-autotrack")
     }
 
     compileOnly libraries.androidx.appcompat

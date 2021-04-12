@@ -263,7 +263,7 @@ public class ViewNode {
                 mXPath = mOriginalXPath;
                 return;
             } else if (page != null) {
-                mOriginalXPath = mPrefixPage + "/" + page.getName();
+                mOriginalXPath = "/Page";
                 mXPath = mOriginalXPath;
                 mPrefixPage = mOriginalXPath;
                 return;

@@ -1,6 +1,0 @@
-boolean isExcludeDemos() {
-    return System.getenv("IS_EXCLUDE_DEMOS") == 'true'
-}
-ext {
-    isExcludeDemos = this.&isExcludeDemos
-}
