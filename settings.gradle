@@ -1,4 +1,8 @@
-include ':demos:demo-core',':demos:demo-autotrack',':demos:demo'
+apply from: 'gradle/publicFun.gradle'
+
+if (!isExcludeDemos()) {
+    apply from: 'demos/settings-parent.gradle'
+}
 
 include ':inject-annotation'
 include ':inject-compiler'
@@ -9,4 +13,3 @@ include ':growingio-tracker'
 include ':growingio-autotracker-gradle-plugin'
 include ':growingio-autotracker-core'
 include ':growingio-autotracker'
-
