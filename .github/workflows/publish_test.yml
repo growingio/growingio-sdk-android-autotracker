@@ -1,4 +1,4 @@
-name: Publish Maven
+name: Publish Maven Test
 on:
   push:
     branches: [ squash ]
