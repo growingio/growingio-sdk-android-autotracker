@@ -200,6 +200,7 @@ afterEvaluate { project ->
                         }
                     }
                 } else {
+                    from components.java
                     artifact sourcesJar
                     artifact javadocsJar
                 }
