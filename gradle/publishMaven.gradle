@@ -125,6 +125,7 @@ afterEvaluate { project ->
             }
         }
     } else {
+
         task sourcesJar(type: Jar, dependsOn: classes) {
             classifier = 'sources'
             from sourceSets.main.allSource
@@ -199,15 +200,26 @@ afterEvaluate { project ->
                         }
                     }
                 } else {
-                    from components.java
                     artifact sourcesJar
+                    artifact javadocsJar
+                }
+            }
+
+            if (project.plugins.hasPlugin('java-gradle-plugin')) {
+                pluginMaven(MavenPublication) {
+                    groupId GROUP
+                    artifactId POM_ARTIFACT_ID
+                    version version
+                    configurePom(pom)
                 }
             }
         }
     }
+}
 
-    signing {
-        required { isReleaseBuild() && gradle.taskGraph.hasTask("publish") }
-        sign publishing.publications.mavenAgent
+signing {
+    required { isReleaseBuild() && gradle.taskGraph.hasTask("publish") }
+    publishing.publications.all { publication ->
+        sign publication
     }
 }
