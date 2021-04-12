@@ -27,7 +27,7 @@ jobs:
       - name: Grant Permission to Execute
         run: |
           chmod +x gradlew
-          chmod +x /gradle/publishAllToMavenLocal.sh
+          chmod +x gradle/publishAllToMavenLocal.sh
 
       # 构建项目
       - name: Build with Gradle
