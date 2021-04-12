@@ -1,11 +1,11 @@
-name: Publish Bintray
+name: Publish Maven
 on:
   release:
     types: [published]
 
 jobs:
   publish:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -14,13 +14,34 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+
+      # Gradle 缓存配置
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      # 给 gradlew 文件授权
       - name: Grant Permission to Execute
         run: chmod +x gradlew
-      - name: Publish Library
-        env:
-          BINTRAY_USER_NAME: ${{ secrets.BINTRAY_USER_NAME }}
-          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+
+      # 构建项目
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      # 解码秘钥
+      - name: Decode
         run: |
-          bash ./publishAllToMavenLocal.sh
-          ./gradlew clean
-          ./gradlew bintrayUpload
+          echo "${{secrets.SIGNING_SECRET_KEY_RING_FILE}}" > ~/.gradle/secring.gpg.b64
+          base64 -d ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
+
+      - name: Publish to Sonatype
+        env:
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: ./gradlew publish -PNEXUS_USERNAME="${NEXUS_USERNAME}" -PNEXUS_PASSWORD="${NEXUS_PASSWORD}" -Psigning.keyId=${{secrets.SIGNING_KEY_ID}} -Psigning.password=${{secrets.SIGNING_PASSWORD}} -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
+
+      - name: Close And Release Package
+        run: ./gradlew closeAndReleaseRepository

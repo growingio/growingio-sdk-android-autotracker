@@ -176,7 +176,6 @@ public class CircularFifoQueue<E> extends AbstractCollection<E>
     }
 
     /**
-     * {@inheritDoc}
      * <p>
      * A {@code CircularFifoQueue} can never be full, thus this returns always
      * {@code false}.

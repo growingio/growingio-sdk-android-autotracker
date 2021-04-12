@@ -31,7 +31,7 @@ dependencies {
     debugApi project(':growingio-autotracker')
     releaseApi libraries.growingio.autotracker
 
-    implementation project(':demo-core')
+    implementation project(':demos:demo-core')
 
     compileOnly libraries.androidx.appcompat
 }
