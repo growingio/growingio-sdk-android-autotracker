@@ -17,7 +17,7 @@ nexusStaging {
 
 task tryCloseAndReleaseRepository() {
     if (releaseConfiguration.releaseVersion.contains("SNAPSHOT")) {
-        println "not release, closeAndReleaseRepository pass"
+        //println "not release, closeAndReleaseRepository pass"
     } else {
         dependsOn closeAndReleaseRepository
     }

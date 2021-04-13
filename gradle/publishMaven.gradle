@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Chris Banes
+ * Copyright 2021 Cpacm
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  *
  * To install in a local maven repo:
  * 1. In the project you want to test, add mavenLocal() to the repositories list.
- * 2. In Project, run: ./gradlew publish -PLOCAL
+ * 2. In Project, run: ./gradlew publishToMavenLocal
  *
  * For faster runs add: -x check when building.
  */
@@ -83,9 +83,6 @@ def configurePom(pom) {
 
 afterEvaluate { project ->
     def isAndroidProject = project.plugins.hasPlugin('com.android.application') || project.plugins.hasPlugin('com.android.library')
-    // To avoid uploading the default empty jar artifact in the project root directory, we use a custom
-    // configuration to specify which artifacts we want to upload.
-
     publishing {
         repositories {
             maven {
@@ -185,7 +182,6 @@ afterEvaluate { project ->
                             def name = configuration.name
                             // api will duplicate with implementation
                             if (name == 'releaseImplementation' || name == 'implementation') {
-                                println "============configuration:" + name + "================"
                                 configuration.allDependencies.each {
                                     if (it.name != "unspecified" && it.version != "unspecified") {
                                         def groupId = it.group

@@ -506,7 +506,7 @@ public class ViewClickEventsTest extends EventsTest {
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPath("/NestedFragmentActivity/GreenFragment[fragment1]/OrangeFragment[TestTag]")
-                        .setXpath("/Page/RedFragment[small]/TextView[0]#fragment_title")
+                        .setXpath("/Page/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
                         .build()
@@ -530,7 +530,7 @@ public class ViewClickEventsTest extends EventsTest {
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPath("/NestedFragmentActivity/GreenFragment[fragment1]")
-                        .setXpath("/Page/OrangeFragment[TestTag]/RedFragment[small]/TextView[0]#fragment_title")
+                        .setXpath("/Page/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
                         .build()
@@ -554,7 +554,7 @@ public class ViewClickEventsTest extends EventsTest {
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPath("/NestedFragmentActivity")
-                        .setXpath("/Page/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]/TextView[0]#fragment_title")
+                        .setXpath("/Page/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
                         .build()
