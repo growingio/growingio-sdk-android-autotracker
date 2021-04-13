@@ -181,21 +181,28 @@ afterEvaluate { project ->
 
                     pom.withXml {
                         def dependenciesNode = asNode().appendNode('dependencies')
-                        project.configurations.implementation.allDependencies.each {
-                            if (it.name != "unspecified" && it.version != "unspecified") {
-                                def groupId = it.group
-                                def artifactId = it.name
-                                if (it instanceof ProjectDependency) {
-                                    def properties = it.getDependencyProject().getProperties()
-                                    groupId = properties.get("GROUP")
-                                    artifactId = properties.get("POM_ARTIFACT_ID")
+                        project.configurations.all { configuration ->
+                            def name = configuration.name
+                            // api will duplicate with implementation
+                            if (name == 'releaseImplementation' || name == 'implementation') {
+                                println "============configuration:" + name + "================"
+                                configuration.allDependencies.each {
+                                    if (it.name != "unspecified" && it.version != "unspecified") {
+                                        def groupId = it.group
+                                        def artifactId = it.name
+                                        if (it instanceof ProjectDependency) {
+                                            def properties = it.getDependencyProject().getProperties()
+                                            groupId = properties.get("GROUP")
+                                            artifactId = properties.get("POM_ARTIFACT_ID")
+                                        }
+                                        println "dependencies:" + groupId + ":" + artifactId + ":" + it.version
+                                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                                        dependencyNode.appendNode('groupId', groupId)
+                                        dependencyNode.appendNode('artifactId', artifactId)
+                                        dependencyNode.appendNode('version', it.version)
+                                        dependencyNode.appendNode('scope', 'compile')
+                                    }
                                 }
-                                println "dependencies:" + groupId + artifactId + it.version
-                                def dependencyNode = dependenciesNode.appendNode('dependency')
-                                dependencyNode.appendNode('groupId', groupId)
-                                dependencyNode.appendNode('artifactId', artifactId)
-                                dependencyNode.appendNode('version', it.version)
-                                dependencyNode.appendNode('scope', 'compile')
                             }
                         }
                     }
