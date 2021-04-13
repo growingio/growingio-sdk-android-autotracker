@@ -14,3 +14,12 @@ nexusStaging {
     username = getRepositoryUsername()
     password = getRepositoryPassword()
 }
+
+task tryCloseAndReleaseRepository() {
+    if (releaseConfiguration.releaseVersion.contains("SNAPSHOT")) {
+        println "not release, closeAndReleaseRepository pass"
+    } else {
+        dependsOn closeAndReleaseRepository
+    }
+
+}
