@@ -23,6 +23,7 @@ import java.util.Set;
 public class TargetClass {
     private final String mName;
     private final Set<TargetMethod> mTargetMethods = new HashSet<>();
+    private boolean mInterface = false;
 
     public TargetClass(String name) {
         mName = name;
@@ -47,6 +48,14 @@ public class TargetClass {
             }
         }
         return null;
+    }
+
+    public void setInterface(boolean anInterface) {
+        mInterface = anInterface;
+    }
+
+    public boolean isInterface() {
+        return mInterface;
     }
 
     @Override

@@ -61,6 +61,7 @@ public class InjectSuperClassVisitor extends ClassVisitor {
         for (String i : interfaces) {
             TargetClass targetInterface = HookClassesConfig.getSuperHookClasses().get(i);
             if (targetInterface != null) {
+                targetInterface.setInterface(true);
                 mTargetClasses.add(targetInterface);
             }
         }
@@ -99,9 +100,11 @@ public class InjectSuperClassVisitor extends ClassVisitor {
                             mLog.debug("Method Add: " + injectMethod.getClassName() + "#" + injectMethod.getMethodName() + injectMethod.getMethodDesc() + " ===SuperBefore===> " + mCurrentClass + "#" + targetMethod.getName() + targetMethod.getDesc());
                         }
                     }
-                    mg.loadThis();
-                    mg.loadArgs();
-                    mg.invokeConstructor(Type.getObjectType(targetClass.getName()), new Method(targetMethod.getName(), targetMethod.getDesc()));
+                    if (!targetClass.isInterface()) {
+                        mg.loadThis();
+                        mg.loadArgs();
+                        mg.invokeConstructor(Type.getObjectType(targetClass.getName()), new Method(targetMethod.getName(), targetMethod.getDesc()));
+                    }
                     for (InjectMethod injectMethod : injectMethods) {
                         if (injectMethod.isAfter()) {
                             mg.loadThis();
