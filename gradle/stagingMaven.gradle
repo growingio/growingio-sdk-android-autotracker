@@ -10,7 +10,7 @@ def getRepositoryPassword() {
 
 nexusStaging {
     packageGroup = "com.growingio" //optional if packageGroup == project.getGroup()
-    serverUrl = "https://oss.sonatype.org/service/local/"
+    serverUrl = "https://s01.oss.sonatype.org/service/local/"
     username = getRepositoryUsername()
     password = getRepositoryPassword()
 }
