@@ -48,7 +48,7 @@ import com.gio.test.three.autotrack.fragments.RedFragment;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
+import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;

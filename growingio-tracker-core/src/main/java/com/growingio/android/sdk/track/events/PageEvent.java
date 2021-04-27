@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.events;
+package com.growingio.android.sdk.track.events;
 
 import androidx.annotation.StringDef;
 
@@ -117,6 +117,11 @@ public class PageEvent extends BaseEvent {
         @Override
         public PageEvent build() {
             return new PageEvent(this);
+        }
+
+        @Override
+        public void readPropertyInTrackThread() {
+            super.readPropertyInTrackThread();
         }
 
         public Builder setTimestamp(long timestamp) {

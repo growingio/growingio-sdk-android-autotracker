@@ -17,9 +17,12 @@
 package com.growingio.android.sdk.track.events.base;
 
 
+import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 
+import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.data.EventSequenceId;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
@@ -31,11 +34,13 @@ import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ConstantPool;
+import com.growingio.android.sdk.track.utils.NetworkUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class BaseEvent extends GEvent {
@@ -56,6 +61,20 @@ public abstract class BaseEvent extends GEvent {
     private final long mEventSequenceId;
     private final Map<String, String> mExtraParams;
 
+    private final String mNetworkState;
+    private final String mAppChannel;
+    private final int mScreenHeight;
+    private final int mScreenWidth;
+    private final String mDeviceBrand;
+    private final String mDeviceModel;
+    private final String mDeviceType;
+    private final String mAppName;
+    private final String mAppVersion;
+    private final String mLanguage;
+    private final double mLatitude;
+    private final double mLongitude;
+    private final String mSdkVersion;
+
     protected BaseEvent(BaseBuilder<?> eventBuilder) {
         mPlatform = eventBuilder.mPlatform;
         mPlatformVersion = eventBuilder.mPlatformVersion;
@@ -70,6 +89,20 @@ public abstract class BaseEvent extends GEvent {
         mGlobalSequenceId = eventBuilder.mGlobalSequenceId;
         mEventSequenceId = eventBuilder.mEventSequenceId;
         mExtraParams = eventBuilder.mExtraParams;
+
+        mNetworkState = eventBuilder.mNetworkState;
+        mAppChannel = eventBuilder.mAppChannel;
+        mScreenHeight = eventBuilder.mScreenHeight;
+        mScreenWidth = eventBuilder.mScreenWidth;
+        mDeviceBrand = eventBuilder.mDeviceBrand;
+        mDeviceModel = eventBuilder.mDeviceModel;
+        mDeviceType = eventBuilder.mDeviceType;
+        mAppName = eventBuilder.mAppName;
+        mAppVersion = eventBuilder.mAppVersion;
+        mLanguage = eventBuilder.mLanguage;
+        mLatitude = eventBuilder.mLatitude;
+        mLongitude = eventBuilder.mLongitude;
+        mSdkVersion = eventBuilder.mSdkVersion;
     }
 
     public static String getAppStateForeground() {
@@ -116,6 +149,58 @@ public abstract class BaseEvent extends GEvent {
         return mEventSequenceId;
     }
 
+    public String getNetworkState() {
+        return mNetworkState;
+    }
+
+    public String getAppChannel() {
+        return mAppChannel;
+    }
+
+    public int getScreenHeight() {
+        return mScreenHeight;
+    }
+
+    public int getScreenWidth() {
+        return mScreenWidth;
+    }
+
+    public String getDeviceBrand() {
+        return mDeviceBrand;
+    }
+
+    public String getDeviceModel() {
+        return mDeviceModel;
+    }
+
+    public String getDeviceType() {
+        return mDeviceType;
+    }
+
+    public String getAppName() {
+        return mAppName;
+    }
+
+    public String getAppVersion() {
+        return mAppVersion;
+    }
+
+    public String getLanguage() {
+        return mLanguage;
+    }
+
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    public double getLongitude() {
+        return mLongitude;
+    }
+
+    public String getSdkVersion() {
+        return mSdkVersion;
+    }
+
     @Override
     public String getEventType() {
         return mEventType;
@@ -143,6 +228,25 @@ public abstract class BaseEvent extends GEvent {
             json.put("appState", mAppState);
             json.put("globalSequenceId", mGlobalSequenceId);
             json.put("eventSequenceId", mEventSequenceId);
+
+            json.put("networkState", mNetworkState);
+            if (!TextUtils.isEmpty(mAppChannel)) {
+                json.put("appChannel", mAppChannel);
+            }
+            json.put("screenHeight", mScreenHeight);
+            json.put("screenWidth", mScreenWidth);
+            json.put("deviceBrand", mDeviceBrand);
+            json.put("deviceModel", mDeviceModel);
+            json.put("deviceType", mDeviceType);
+            json.put("appName", mAppName);
+            json.put("appVersion", mAppVersion);
+            json.put("language", mLanguage);
+            if (mLatitude != 0 || mLongitude != 0) {
+                json.put("latitude", mLatitude);
+                json.put("longitude", mLongitude);
+            }
+            json.put("sdkVersion", mSdkVersion);
+
         } catch (JSONException ignored) {
         }
         return json;
@@ -163,6 +267,20 @@ public abstract class BaseEvent extends GEvent {
         private long mEventSequenceId;
         private final Map<String, String> mExtraParams = new HashMap<>();
 
+        private String mNetworkState;
+        private String mAppChannel;
+        private int mScreenHeight;
+        private int mScreenWidth;
+        private String mDeviceBrand;
+        private String mDeviceModel;
+        private String mDeviceType;
+        private String mAppName;
+        private String mAppVersion;
+        private String mLanguage;
+        private double mLatitude;
+        private double mLongitude;
+        private String mSdkVersion;
+
         protected BaseBuilder() {
             mPlatform = ConstantPool.ANDROID;
             mPlatformVersion = DeviceInfoProvider.get().getOperatingSystemVersion();
@@ -182,6 +300,38 @@ public abstract class BaseEvent extends GEvent {
             EventSequenceId sequenceId = PersistentDataProvider.get().getAndIncrement(mEventType);
             mGlobalSequenceId = sequenceId.getGlobalId();
             mEventSequenceId = sequenceId.getEventTypeId();
+
+            Context context = ContextProvider.getApplicationContext();
+            mNetworkState = NetworkUtil.getActiveNetworkState(context).getNetworkName();
+
+            DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
+            mScreenHeight = deviceInfo.getScreenHeight();
+            mScreenWidth = deviceInfo.getScreenWidth();
+            mDeviceBrand = deviceInfo.getDeviceBrand();
+            mDeviceModel = deviceInfo.getDeviceModel();
+            mDeviceType = deviceInfo.getDeviceType();
+
+            AppInfoProvider appInfo = AppInfoProvider.get();
+            mAppChannel = appInfo.getAppChannel();
+            mAppName = appInfo.getAppName();
+            mAppVersion = appInfo.getAppVersion();
+
+            SessionProvider session = SessionProvider.get();
+            mLatitude = session.getLatitude();
+            mLongitude = session.getLongitude();
+
+            mSdkVersion = SDKConfig.SDK_VERSION;
+            mLanguage = Locale.getDefault().getLanguage();
+        }
+
+        public BaseBuilder<?> setLatitude(double latitude) {
+            mLatitude = latitude;
+            return this;
+        }
+
+        public BaseBuilder<?> setLongitude(double longitude) {
+            mLongitude = longitude;
+            return this;
         }
 
         public BaseBuilder<?> addExtraParam(String key, String value) {

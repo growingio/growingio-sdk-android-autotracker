@@ -142,6 +142,14 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         mLongitude = 0;
     }
 
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    public double getLongitude() {
+        return mLongitude;
+    }
+
     @Override
     public void onActivityLifecycle(final ActivityLifecycleEvent event) {
         if (!ConfigurationProvider.get().getTrackConfiguration().isDataCollectionEnabled()) {

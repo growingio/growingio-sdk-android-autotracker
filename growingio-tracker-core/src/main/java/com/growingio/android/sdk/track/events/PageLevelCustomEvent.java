@@ -14,31 +14,23 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.events;
-
-import android.text.TextUtils;
-
-import com.growingio.android.sdk.track.events.base.BaseEvent;
+package com.growingio.android.sdk.track.events;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ViewElementEvent extends BaseEvent {
+import java.util.Map;
+
+public class PageLevelCustomEvent extends CustomEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mPath;
     private final long mPageShowTimestamp;
-    private final String mTextValue;
-    private final String mXpath;
-    private final int mIndex;
 
-    protected ViewElementEvent(Builder eventBuilder) {
+    protected PageLevelCustomEvent(Builder eventBuilder) {
         super(eventBuilder);
         mPath = eventBuilder.mPath;
         mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
-        mTextValue = eventBuilder.mTextValue;
-        mXpath = eventBuilder.mXpath;
-        mIndex = eventBuilder.mIndex;
     }
 
     public String getPath() {
@@ -49,53 +41,22 @@ public class ViewElementEvent extends BaseEvent {
         return mPageShowTimestamp;
     }
 
-    public String getTextValue() {
-        return mTextValue;
-    }
-
-    public String getXpath() {
-        return mXpath;
-    }
-
-    public int getIndex() {
-        return mIndex;
-    }
-
     @Override
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
             json.put("path", mPath);
             json.put("pageShowTimestamp", mPageShowTimestamp);
-            if (!TextUtils.isEmpty(mTextValue)) {
-                json.put("textValue", mTextValue);
-            }
-            json.put("xpath", mXpath);
-            json.put("index", mIndex);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
-    public static class Builder extends BaseBuilder<ViewElementEvent> {
+    public static class Builder extends CustomEvent.Builder {
         private String mPath;
         private long mPageShowTimestamp;
-        private String mTextValue;
-        private String mXpath;
-        private int mIndex = -1;
 
         public Builder() {
-            super();
-        }
-
-        @Override
-        public String getEventType() {
-            return null;
-        }
-
-        public Builder setEventType(String eventType) {
-            mEventType = eventType;
-            return this;
         }
 
         public Builder setPath(String path) {
@@ -108,24 +69,21 @@ public class ViewElementEvent extends BaseEvent {
             return this;
         }
 
-        public Builder setTextValue(String textValue) {
-            mTextValue = textValue;
-            return this;
-        }
-
-        public Builder setXpath(String xpath) {
-            mXpath = xpath;
-            return this;
-        }
-
-        public Builder setIndex(int index) {
-            mIndex = index;
+        @Override
+        public Builder setEventName(String eventName) {
+            super.setEventName(eventName);
             return this;
         }
 
         @Override
-        public ViewElementEvent build() {
-            return new ViewElementEvent(this);
+        public Builder setAttributes(Map<String, String> attributes) {
+            super.setAttributes(attributes);
+            return this;
+        }
+
+        @Override
+        public PageLevelCustomEvent build() {
+            return new PageLevelCustomEvent(this);
         }
     }
 }

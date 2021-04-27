@@ -21,7 +21,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
+import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridEventType;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;

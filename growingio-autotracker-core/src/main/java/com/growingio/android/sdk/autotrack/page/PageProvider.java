@@ -25,8 +25,8 @@ import android.view.View;
 
 import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.autotrack.events.PageAttributesEvent;
-import com.growingio.android.sdk.autotrack.events.PageEvent;
+import com.growingio.android.sdk.track.events.PageAttributesEvent;
+import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;

@@ -26,7 +26,7 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
-import com.growingio.android.sdk.autotrack.events.PageLevelCustomEvent;
+import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.view.OnViewStateChangedListener;

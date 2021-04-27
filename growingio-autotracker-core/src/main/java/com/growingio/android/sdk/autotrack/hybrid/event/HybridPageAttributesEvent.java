@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.autotrack.hybrid.event;
 
-import com.growingio.android.sdk.autotrack.events.PageAttributesEvent;
+import com.growingio.android.sdk.track.events.PageAttributesEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
