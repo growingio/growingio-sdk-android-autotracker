@@ -21,6 +21,6 @@ package com.growingio.android.sdk.track.modelloader;
  *
  * @author cpacm 2021/4/1
  */
-public interface ModelLoaderFactory<T,Y> {
-    ModelLoader<T,Y> build();
+public interface ModelLoaderFactory<T, Y> {
+    ModelLoader<T, Y> build();
 }

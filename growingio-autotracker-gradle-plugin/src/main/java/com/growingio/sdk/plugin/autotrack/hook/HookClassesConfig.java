@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 该Class是由 inject-compiler 自动生成的，请不要随意更改！ */
+ * 该Class是由 inject-compiler 自动生成的，请不要随意更改！
+ */
 public class HookClassesConfig {
   private static final Map<String, TargetClass> AROUND_HOOK_CLASSES = new HashMap<>();
 

@@ -23,11 +23,13 @@ import com.growingio.android.sdk.track.middleware.GEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
-public class TrackEventJsonMarshaller implements EventMarshaller<JSONObject, JSONArray> {
+public class TrackEventJsonMarshaller implements EventMarshaller {
 
-    @Override
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
+
     public JSONObject marshall(GEvent event) {
         if (event instanceof BaseEvent) {
             return ((BaseEvent) event).toJSONObject();
@@ -36,18 +38,17 @@ public class TrackEventJsonMarshaller implements EventMarshaller<JSONObject, JSO
     }
 
     @Override
-    public JSONArray marshall(List<GEvent> events) {
-        JSONArray jsonArray = new JSONArray();
+    public byte[] marshall(List<GEvent> events) {
         if (events == null || events.isEmpty()) {
-            return jsonArray;
+            return null;
         }
-
+        JSONArray jsonArray = new JSONArray();
         for (GEvent event : events) {
             JSONObject eventJson = marshall(event);
             if (eventJson != null) {
                 jsonArray.put(marshall(event));
             }
         }
-        return jsonArray;
+        return jsonArray.toString().getBytes(UTF_8);
     }
 }

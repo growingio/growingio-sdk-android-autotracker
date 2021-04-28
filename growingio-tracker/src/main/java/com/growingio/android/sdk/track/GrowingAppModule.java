@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.events.marshaller;
+package com.growingio.android.sdk.track;
 
-import com.growingio.android.sdk.track.middleware.GEvent;
 
-import java.util.List;
+import com.growingio.android.sdk.module.AppGioModule;
+import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOTracker;
 
-public interface EventMarshaller {
-    byte[] marshall(List<GEvent> events);
+/**
+ * <p>
+ *
+ * @author cpacm 4/28/21
+ */
+@GIOModule
+@GIOTracker(className = GrowingTracker.class)
+public final class GrowingAppModule extends AppGioModule {
+
 }

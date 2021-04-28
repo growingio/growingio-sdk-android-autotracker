@@ -26,7 +26,7 @@ public class EventUrl {
     private final Map<String, String> mHeaders = new HashMap<>();
     private final List<String> mPaths = new ArrayList<>();
     private final Map<String, String> mParams = new HashMap<>();
-    private String mBodyData = "";
+    private byte[] mBodyData;
     private String mMediaType = "application/json";//or "application/x-www-form-urlencoded" for data
 
     public EventUrl(String host) {
@@ -52,11 +52,11 @@ public class EventUrl {
         return mMediaType;
     }
 
-    public String getRequestBody() {
+    public byte[] getRequestBody() {
         return mBodyData;
     }
 
-    public EventUrl setBodyData(String mBodyData) {
+    public EventUrl setBodyData(byte[] mBodyData) {
         this.mBodyData = mBodyData;
         return this;
     }

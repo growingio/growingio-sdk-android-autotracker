@@ -1,0 +1,24 @@
+import org.gradle.internal.jvm.Jvm
+
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    annotationProcessor libraries.google.auto_service
+    compileOnly libraries.google.auto_service_annotations
+    implementation libraries.squareup.javapoet
+
+    implementation project(":growingio-annotation")
+    if (!Jvm.current().getJavaVersion().java9Compatible) {
+        compileOnly files(Jvm.current().getToolsJar())
+    }
+}

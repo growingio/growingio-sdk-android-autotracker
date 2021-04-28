@@ -4,9 +4,6 @@ if (!isExcludeDemos()) {
     apply from: 'demos/settings-parent.gradle'
 }
 
-include ':inject-annotation'
-include ':inject-compiler'
-
 include ':growingio-tracker-core'
 include ':growingio-tracker'
 
@@ -15,3 +12,9 @@ include ':growingio-autotracker-core'
 include ':growingio-autotracker'
 
 include ':integration:okhttp3'
+
+include ':growingio-annotation'
+include ':growingio-annotation:compiler'
+
+include ':inject-annotation'
+include ':inject-annotation:compiler'

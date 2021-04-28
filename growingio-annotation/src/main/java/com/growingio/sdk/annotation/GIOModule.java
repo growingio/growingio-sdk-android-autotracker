@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.events.marshaller;
+package com.growingio.sdk.annotation;
 
-import com.growingio.android.sdk.track.middleware.GEvent;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.List;
-
-public interface EventMarshaller {
-    byte[] marshall(List<GEvent> events);
+@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.TYPE)
+public @interface GIOModule {
+    String gioName() default "GrowingTracker";
 }
