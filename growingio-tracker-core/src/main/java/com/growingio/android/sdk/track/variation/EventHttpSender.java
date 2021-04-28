@@ -37,12 +37,12 @@ import java.util.List;
 public class EventHttpSender implements IEventNetSender {
     private static final String TAG = "EventHttpSender";
 
-    private final EventMarshaller<JSONObject, JSONArray> mEventMarshaller;
+    private final EventMarshaller mEventMarshaller;
     private final String mProjectId;
     private final String mServerHost;
     private ModelLoader<EventUrl, EventResponse> mHttpLoader;
 
-    public EventHttpSender(EventMarshaller<JSONObject, JSONArray> eventMarshaller) {
+    public EventHttpSender(EventMarshaller eventMarshaller) {
         mEventMarshaller = eventMarshaller;
         TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
         mProjectId = configuration.getProjectId();
@@ -74,7 +74,7 @@ public class EventHttpSender implements IEventNetSender {
             return new SendResponse(true, 0);
         }
 
-        String data = mEventMarshaller.marshall(events).toString();
+        byte[] data = mEventMarshaller.marshall(events);
         EventUrl eventUrl = new EventUrl(mServerHost)
                 .addPath("v3")
                 .addPath("projects")
@@ -97,6 +97,6 @@ public class EventHttpSender implements IEventNetSender {
             Logger.d(TAG, "Send events failed, response = " + response);
         }
 
-        return new SendResponse(successful, data.getBytes().length);
+        return new SendResponse(successful, data.length);
     }
 }

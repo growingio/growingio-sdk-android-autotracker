@@ -27,4 +27,7 @@ android {
 dependencies {
     implementation project(':growingio-tracker-core')
     implementation libraries.squareup.okhttp3
+
+    implementation project(":growingio-annotation")
+    annotationProcessor project(":growingio-annotation:compiler")
 }

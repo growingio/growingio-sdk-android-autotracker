@@ -67,7 +67,6 @@ public class GrowingTracker implements IGrowingTracker {
 
         //register default component
         TrackerContext.init(application);
-        TrackerContext.get().getRegistry().register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory());
 
         if (TextUtils.isEmpty(trackConfiguration.getProjectId())) {
             throw new IllegalStateException("ProjectId is NULL");
