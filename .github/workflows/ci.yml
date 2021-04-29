@@ -26,13 +26,13 @@ jobs:
       - name: Before script
         run: |
           chmod +x gradlew
-          chmod +x checkstyle/checkstyle.sh
+          chmod +x config/checkstyle/checkstyle.sh
           chmod +x gradle/publishAllToMavenLocal.sh
 
       - name: Run Gradle command
         run: |
           bash ./gradle/publishAllToMavenLocal.sh
-          bash ./checkstyle/checkstyle.sh
+          bash ./config/checkstyle/checkstyle.sh
           ./gradlew test
           ./gradlew assemble
 
