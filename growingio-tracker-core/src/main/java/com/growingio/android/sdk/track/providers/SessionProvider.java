@@ -102,7 +102,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     private void generateVisit(String sessionId, long timestamp) {
         mAlreadySendVisit = true;
         mLatestVisitTime = timestamp;
-        TrackEventGenerator.generateVisitEvent(sessionId, timestamp, mLatitude, mLongitude);
+        TrackEventGenerator.generateVisitEvent(sessionId, timestamp);
     }
 
     public boolean createdSession() {
@@ -140,6 +140,14 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     public void cleanLocation() {
         mLatitude = 0;
         mLongitude = 0;
+    }
+
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    public double getLongitude() {
+        return mLongitude;
     }
 
     @Override

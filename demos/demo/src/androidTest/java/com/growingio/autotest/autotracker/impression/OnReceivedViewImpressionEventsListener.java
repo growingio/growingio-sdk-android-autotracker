@@ -16,7 +16,7 @@
 
 package com.growingio.autotest.autotracker.impression;
 
-import com.growingio.android.sdk.autotrack.events.PageLevelCustomEvent;
+import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.track.utils.JsonUtil;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 import com.growingio.autotest.help.MockEventsApiServer;

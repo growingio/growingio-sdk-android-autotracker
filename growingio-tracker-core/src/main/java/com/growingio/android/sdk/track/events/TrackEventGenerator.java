@@ -24,13 +24,11 @@ public class TrackEventGenerator {
     private TrackEventGenerator() {
     }
 
-    public static void generateVisitEvent(String sessionId, long timestamp, double latitude, double longitude) {
+    public static void generateVisitEvent(String sessionId, long timestamp) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new VisitEvent.Builder()
                         .setSessionId(sessionId)
                         .setTimestamp(timestamp)
-                        .setLatitude(latitude)
-                        .setLongitude(longitude)
         );
     }
 
