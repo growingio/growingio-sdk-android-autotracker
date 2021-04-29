@@ -31,7 +31,7 @@ import com.gio.test.three.autotrack.activity.ViewImpressionActivity;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.autotrack.events.PageLevelCustomEvent;
+import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;

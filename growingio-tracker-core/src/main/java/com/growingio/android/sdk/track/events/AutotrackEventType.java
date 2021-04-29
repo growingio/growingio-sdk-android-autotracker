@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.events;
+package com.growingio.android.sdk.track.events;
 
 public class AutotrackEventType {
     private AutotrackEventType() {

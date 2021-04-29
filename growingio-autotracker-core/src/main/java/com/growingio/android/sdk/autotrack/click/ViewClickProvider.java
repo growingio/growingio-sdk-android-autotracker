@@ -26,8 +26,8 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.growingio.android.sdk.autotrack.Autotracker;
-import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
-import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
+import com.growingio.android.sdk.track.events.AutotrackEventType;
+import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.shadow.AlertControllerShadow;

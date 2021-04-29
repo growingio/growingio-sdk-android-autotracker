@@ -22,8 +22,8 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
-import com.growingio.android.sdk.autotrack.events.AutotrackEventType;
-import com.growingio.android.sdk.autotrack.events.PageEvent;
+import com.growingio.android.sdk.track.events.AutotrackEventType;
+import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridCustomEvent;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridEventType;
 import com.growingio.android.sdk.autotrack.hybrid.event.HybridPageAttributesEvent;

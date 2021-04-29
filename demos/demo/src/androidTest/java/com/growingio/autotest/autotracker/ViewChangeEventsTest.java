@@ -23,7 +23,7 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.R;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.autotrack.activity.ui.login.LoginActivity;
-import com.growingio.android.sdk.autotrack.events.ViewElementEvent;
+import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;
