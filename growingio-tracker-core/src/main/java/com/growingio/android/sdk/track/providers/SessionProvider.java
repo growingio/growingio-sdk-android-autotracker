@@ -102,7 +102,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     private void generateVisit(String sessionId, long timestamp) {
         mAlreadySendVisit = true;
         mLatestVisitTime = timestamp;
-        TrackEventGenerator.generateVisitEvent(sessionId, timestamp, mLatitude, mLongitude);
+        TrackEventGenerator.generateVisitEvent(sessionId, timestamp);
     }
 
     public boolean createdSession() {

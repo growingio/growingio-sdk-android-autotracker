@@ -324,16 +324,6 @@ public abstract class BaseEvent extends GEvent {
             mLanguage = Locale.getDefault().getLanguage();
         }
 
-        public BaseBuilder<?> setLatitude(double latitude) {
-            mLatitude = latitude;
-            return this;
-        }
-
-        public BaseBuilder<?> setLongitude(double longitude) {
-            mLongitude = longitude;
-            return this;
-        }
-
         public BaseBuilder<?> addExtraParam(String key, String value) {
             mExtraParams.put(key, value);
             return this;
