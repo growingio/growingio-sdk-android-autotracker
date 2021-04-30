@@ -43,7 +43,6 @@ public class DefaultDataUploadIntervalTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration()
                 .setDebugEnabled(false)
         );

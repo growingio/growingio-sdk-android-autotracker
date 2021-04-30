@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package com.growingio.android.okhttp3;
+package com.growingio.android.sdk;
 
 import android.content.Context;
 
-import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.http.EventResponse;
-import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.sdk.annotation.GIOModule;
 
 /**
- * <p>
+ * Registers a set of components to use when initializing GrowingIO whthin an app when GrowingIO's
+ * annotation processor is used.
  *
- * @author cpacm 4/28/21
+ * @author cpacm 4/23/21
  */
-@GIOModule
-public class OkhttpLibraryGioModule extends LibraryGioModule {
-    @Override
+public abstract class LibraryGioModule {
+
     public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory());
+        //Default empty impl;
     }
 }

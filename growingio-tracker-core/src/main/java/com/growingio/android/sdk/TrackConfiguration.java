@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track;
+package com.growingio.android.sdk;
 
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
 import com.growingio.android.sdk.track.base.Configurable;
-import com.growingio.android.sdk.track.modelloader.OnTrackerRegistry;
 
 public class TrackConfiguration implements Cloneable, Configurable {
-    private final String mProjectId;
-    private final String mUrlScheme;
+    private String mProjectId;
+    private String mUrlScheme;
 
     private String mChannel;
     private boolean mDebugEnabled = false;
@@ -36,11 +35,19 @@ public class TrackConfiguration implements Cloneable, Configurable {
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
     private boolean mOaidEnabled = false;
-    private OnTrackerRegistry mRegistryCallback;
 
     public TrackConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
         mUrlScheme = urlScheme;
+    }
+
+    public TrackConfiguration() {
+    }
+
+    public TrackConfiguration setProject(String projectId, String urlScheme) {
+        mProjectId = projectId;
+        mUrlScheme = urlScheme;
+        return this;
     }
 
     public String getProjectId() {
@@ -134,15 +141,6 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return this;
     }
 
-    public TrackConfiguration registerComponents(OnTrackerRegistry registry) {
-        this.mRegistryCallback = registry;
-        return this;
-    }
-
-    public OnTrackerRegistry getRegistryCallback() {
-        return mRegistryCallback;
-    }
-
     @NonNull
     @Override
     public TrackConfiguration clone() {
@@ -155,7 +153,6 @@ public class TrackConfiguration implements Cloneable, Configurable {
         clone.mUploadExceptionEnabled = this.mUploadExceptionEnabled;
         clone.mDataCollectionServerHost = this.mDataCollectionServerHost;
         clone.mOaidEnabled = this.mOaidEnabled;
-        clone.mRegistryCallback = this.mRegistryCallback;
         return clone;
     }
 }

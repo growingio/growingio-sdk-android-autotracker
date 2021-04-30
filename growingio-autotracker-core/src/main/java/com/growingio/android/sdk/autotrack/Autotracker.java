@@ -30,7 +30,7 @@ import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.autotrack.webservices.circle.CircleService;
 import com.growingio.android.sdk.autotrack.webservices.debugger.DebuggerEventWrapper;
 import com.growingio.android.sdk.autotrack.webservices.debugger.DebuggerService;
-import com.growingio.android.sdk.track.Tracker;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;

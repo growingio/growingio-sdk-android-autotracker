@@ -1,7 +1,6 @@
 package com.growingio.sdk.annotation.compiler;
 
 import com.growingio.sdk.annotation.GIOModule;
-import com.growingio.sdk.annotation.compiler.Index;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
@@ -24,7 +23,7 @@ import javax.lang.model.element.TypeElement;
  * <pre>
  * <code>
  *     {@literal @Index(}
- *       modules = "com.cpacm.module.module.TestModule2"
+ *       modules = "com.cpacm.module.module.TestModule"
  *   )
  *   public class GioIndexer_GIOModule_com_xxx_xxxModule {
  *   }
@@ -34,30 +33,30 @@ import javax.lang.model.element.TypeElement;
 final class IndexerGenerator {
     private static final String INDEXER_NAME_PREFIX = "GioIndexer_";
     private static final int MAXIMUM_FILE_NAME_LENGTH = 255;
-    private final ProcessUtils processorUtil;
+    private final ProcessUtils processUtils;
 
-    IndexerGenerator(ProcessUtils processorUtil) {
-        this.processorUtil = processorUtil;
+    IndexerGenerator(ProcessUtils processUtils) {
+        this.processUtils = processUtils;
     }
 
     void generate(List<TypeElement> types) {
         List<TypeElement> modules = new ArrayList<>();
         for (TypeElement element : types) {
-            if (processorUtil.isAppGioModule(element)) {
+            if (processUtils.isAppGioModule(element)) {
                 continue;
             }
-            if (processorUtil.isGioModule(element)) {
+            if (processUtils.isGioModule(element)) {
                 modules.add(element);
             } else {
                 throw new IllegalArgumentException("Unrecognized type: " + element);
             }
         }
-        processorUtil.debugLog("generate indexer:" + types);
+        processUtils.debugLog("generate indexer:" + types);
 
         if (modules.size() > 0) {
             TypeSpec indexer = generate(modules, GIOModule.class);
-            processorUtil.writeIndexer(indexer);
-            processorUtil.debugLog("[" + processorUtil.getRound() + "]" +
+            processUtils.writeIndexer(indexer);
+            processUtils.debugLog("[" + processUtils.getRound() + "]" +
                     "Wrote an Indexer this round, skipping the app module to ensure all "
                     + "indexers are found");
         }

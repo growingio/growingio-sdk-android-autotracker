@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.growingio.sdk.annotation;
+package com.growingio.android.sdk.autotrack;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.growingio.android.sdk.AppGioModule;
+import com.growingio.sdk.annotation.GIOConfig;
+import com.growingio.sdk.annotation.GIOModule;
 
 /**
  * <p>
  *
- * @author cpacm 4/28/21
+ * @author cpacm 4/30/21
  */
-@Retention(RetentionPolicy.CLASS)
-@Target(ElementType.TYPE)
-public @interface GIOTracker {
-    Class<?> className();
+@GIOModule(gioName = "GrowingAutotracker")
+public class GrowingAutoAppModule extends AppGioModule {
+
+    @GIOConfig(tracker = Autotracker.class, config = AutotrackConfiguration.class)
+    public void config(AutotrackConfiguration config) {
+
+    }
 }

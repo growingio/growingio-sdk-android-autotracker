@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package com.growingio.sdk.annotation;
+package com.growingio.android.sdk;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Retention(RetentionPolicy.CLASS)
-@Target(ElementType.TYPE)
-public @interface GIOModule {
-    String gioName() default "GrowingTracker";//it's useless in librarymodule
+/**
+ * Registers a set of components when initializing GIO within an application.
+ **/
+public abstract class AppGioModule extends LibraryGioModule {
 }
