@@ -16,18 +16,25 @@
 
 package com.growingio.android.sdk.track;
 
+import android.content.Context;
 
-import com.growingio.android.sdk.module.AppGioModule;
+import com.growingio.android.sdk.AppGioModule;
+import com.growingio.android.sdk.TrackConfiguration;
+import com.growingio.android.sdk.Tracker;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOModule;
-import com.growingio.sdk.annotation.GIOTracker;
+import com.growingio.sdk.annotation.GIOConfig;
 
 /**
  * <p>
  *
  * @author cpacm 4/28/21
  */
-@GIOModule
-@GIOTracker(className = GrowingTracker.class)
+@GIOModule()
 public final class GrowingAppModule extends AppGioModule {
 
+    @GIOConfig(tracker = Tracker.class,
+            config = TrackConfiguration.class)
+    public void config(TrackConfiguration configuration) {
+    }
 }

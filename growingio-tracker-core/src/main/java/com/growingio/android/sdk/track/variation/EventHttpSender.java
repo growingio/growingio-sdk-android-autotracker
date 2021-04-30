@@ -17,7 +17,7 @@
 package com.growingio.android.sdk.track.variation;
 
 import com.growingio.android.sdk.track.TrackerContext;
-import com.growingio.android.sdk.track.TrackConfiguration;
+import com.growingio.android.sdk.TrackConfiguration;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.marshaller.EventMarshaller;
 import com.growingio.android.sdk.track.http.EventResponse;
@@ -28,9 +28,6 @@ import com.growingio.android.sdk.track.middleware.IEventNetSender;
 import com.growingio.android.sdk.track.middleware.SendResponse;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.List;
 

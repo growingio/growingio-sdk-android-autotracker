@@ -18,11 +18,12 @@ package com.growingio.sdk.annotation.compiler
 
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
+import com.sun.tools.javac.code.Attribute.UnresolvedClass
+import com.sun.tools.javac.code.Type
+import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
-import javax.lang.model.element.Element
-import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
+import javax.lang.model.element.*
 import javax.lang.model.util.ElementFilter
 import javax.tools.Diagnostic
 
@@ -63,7 +64,6 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
 
     fun isAppGioModule(element: TypeElement): Boolean {
         return processEnv.getTypeUtils().isAssignable(element.asType(), gioAppModuleType.asType())
-        element.enclosedElements
 //        debugLog("isAppGioModule:" + element.toString())
 //        var isApp = true
 //        val annotation = element.getAnnotation(GIOModule::class.java)
@@ -78,6 +78,16 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
     fun getElementsFor(clazz: Class<out Annotation>, env: RoundEnvironment): List<TypeElement> {
         val annotatedElements: Collection<Element> = env.getElementsAnnotatedWith(clazz)
         return ElementFilter.typesIn(annotatedElements)
+    }
+
+    fun findAnnotatedElementsInClasses(inClass: TypeElement, annotationClass: Class<out Annotation>): List<ExecutableElement> {
+        val result: MutableList<ExecutableElement> = ArrayList()
+        for (element in inClass.enclosedElements) {
+            if (element.getAnnotation(annotationClass) != null) {
+                result.add(element as ExecutableElement)
+            }
+        }
+        return result
     }
 
     fun writeIndexer(indexer: TypeSpec) {
@@ -99,7 +109,7 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
 
 
     companion object {
-        const val GROWINGIO_MODULE_PACKAGE_NAME = "com.growingio.android.sdk.module"
+        const val GROWINGIO_MODULE_PACKAGE_NAME = "com.growingio.android.sdk"
         const val GROWINGIO_MODULE_NAME = "LibraryGioModule"
         private const val GROWINGIO_APP_MODULE_NAME = "AppGioModule"
         const val DEBUG = true
@@ -113,10 +123,12 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
         @JvmField
         val COMPILER_PACKAGE_NAME: String = GioModuleProcessor::class.java.getPackage().getName()
         const val GENERATED_APP_MODULE_IMPL_SIMPLE_NAME = "GeneratedGioModuleImpl"
-        const val GENERATED_ROOT_MODULE_PACKAGE_NAME = "com.growingio.android.sdk.module"
         const val GENERATED_ROOT_MODULE_SIMPLE_NAME = "GeneratedGioModule"
 
         const val GIO_TRACKER_REGISTRY_PACKAGE_NAME = "com.growingio.android.sdk.track.modelloader"
         const val GIO_TRACKER_REGISTRY_NAME = "TrackerRegistry"
+
+        const val GIO_DEFAULT_TRACKER = "com.growingio.android.sdk.Tracker"
+        const val GIO_DEFAULT_CONFIGURATION = "com.growingio.android.sdk.TrackConfiguration"
     }
 }

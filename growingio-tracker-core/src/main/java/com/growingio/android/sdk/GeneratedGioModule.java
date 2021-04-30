@@ -14,15 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.modelloader;
+package com.growingio.android.sdk;
 
-/**
- * <p>
- * user can use this callback register components
- * //TODO we can auto register use apt
- *
- * @author cpacm 2021/4/1
- */
-public interface OnTrackerRegistry {
-    void register(TrackerRegistry registry);
+abstract class GeneratedGioModule extends AppGioModule {
 }

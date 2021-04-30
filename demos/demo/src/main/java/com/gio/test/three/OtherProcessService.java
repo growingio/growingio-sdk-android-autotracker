@@ -21,7 +21,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 
 public class OtherProcessService extends Service {
     private static final String TAG = "OtherProcessService";
@@ -38,6 +38,6 @@ public class OtherProcessService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.e(TAG, "onCreate: ");
-        GrowingTracker.get().trackCustomEvent("OtherProcess");
+        GrowingAutotracker.get().trackCustomEvent("OtherProcess");
     }
 }

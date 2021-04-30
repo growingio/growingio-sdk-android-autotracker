@@ -26,7 +26,7 @@ import android.widget.ListView;
 
 import com.gio.test.R;
 import com.gio.test.three.ModuleEntry;
-import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,22 +73,22 @@ public class TrackActivity extends Activity {
     private void handleItemClick(String itemString) {
         switch (itemString) {
             case TRACK_CUSTOM_EVENT:
-                GrowingTracker.get().trackCustomEvent("registerSuccess");
+                GrowingAutotracker.get().trackCustomEvent("registerSuccess");
 
                 Map<String, String> map = new HashMap<>();
                 map.put("name", "June");
                 map.put("age", "12");
-                GrowingTracker.get().trackCustomEvent("registerSuccess", map);
+                GrowingAutotracker.get().trackCustomEvent("registerSuccess", map);
 
                 break;
             case SET_USER_ID_ZHANGSAN:
-                GrowingTracker.get().setLoginUserId("zhangsan");
+                GrowingAutotracker.get().setLoginUserId("zhangsan");
                 break;
             case SET_USER_ID_NULL:
-                GrowingTracker.get().cleanLoginUserId();
+                GrowingAutotracker.get().cleanLoginUserId();
                 break;
             case SET_USER_ID_LISI:
-                GrowingTracker.get().setLoginUserId("lisi");
+                GrowingAutotracker.get().setLoginUserId("lisi");
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

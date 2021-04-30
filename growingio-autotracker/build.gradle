@@ -43,6 +43,10 @@ dependencies {
 
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.android.appcompat
+
+
+    implementation project(":growingio-annotation")
+    annotationProcessor project(":growingio-annotation:compiler")
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

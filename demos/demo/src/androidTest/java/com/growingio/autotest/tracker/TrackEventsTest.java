@@ -22,7 +22,7 @@ import androidx.test.filters.LargeTest;
 
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.core.TrackActivity;
-import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;
@@ -50,7 +50,6 @@ public class TrackEventsTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration());
     }
 
@@ -70,7 +69,7 @@ public class TrackEventsTest extends EventsTest {
                 }
             }
         });
-        GrowingTracker.get().trackCustomEvent(testCustomEvent);
+        GrowingAutotracker.get().trackCustomEvent(testCustomEvent);
         Awaiter.untilTrue(receivedEvent);
     }
 
@@ -83,7 +82,7 @@ public class TrackEventsTest extends EventsTest {
         attributes.put("key3", "");
         attributes.put("key4", null);
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
-        GrowingTracker.get().trackCustomEvent(testCustomEvent, attributes);
+        GrowingAutotracker.get().trackCustomEvent(testCustomEvent, attributes);
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedCustomEvents(JSONArray jsonArray) throws JSONException {
@@ -110,7 +109,7 @@ public class TrackEventsTest extends EventsTest {
         attributes.put("key3", "");
         attributes.put("key4", null);
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
-        GrowingTracker.get().setVisitorAttributes(attributes);
+        GrowingAutotracker.get().setVisitorAttributes(attributes);
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitorAttributesEvents(JSONArray jsonArray) throws JSONException {
@@ -135,7 +134,7 @@ public class TrackEventsTest extends EventsTest {
         attributes.put("key3", "");
         attributes.put("key4", null);
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
-        GrowingTracker.get().setLoginUserAttributes(attributes);
+        GrowingAutotracker.get().setLoginUserAttributes(attributes);
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedLoginUserAttributesEvents(JSONArray jsonArray) throws JSONException {
@@ -160,7 +159,7 @@ public class TrackEventsTest extends EventsTest {
         attributes.put("key3", "");
         attributes.put("key4", null);
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
-        GrowingTracker.get().setConversionVariables(attributes);
+        GrowingAutotracker.get().setConversionVariables(attributes);
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedConversionVariablesEvents(JSONArray jsonArray) throws JSONException {
@@ -179,21 +178,19 @@ public class TrackEventsTest extends EventsTest {
 
     @Test
     public void invalidArgumentsTest() {
-        GrowingTracker.get().trackCustomEvent(null);
-        GrowingTracker.get().trackCustomEvent(null, null);
-        GrowingTracker.get().trackCustomEvent(null, new HashMap<>());
-        GrowingTracker.get().trackCustomEvent("");
-        GrowingTracker.get().trackCustomEvent("", null);
-        GrowingTracker.get().trackCustomEvent("", new HashMap<>());
+        GrowingAutotracker.get().trackCustomEvent(null);
+        GrowingAutotracker.get().trackCustomEvent(null, new HashMap<>());
+        GrowingAutotracker.get().trackCustomEvent("");
+        GrowingAutotracker.get().trackCustomEvent("", new HashMap<>());
 
-        GrowingTracker.get().setVisitorAttributes(null);
-        GrowingTracker.get().setVisitorAttributes(new HashMap<>());
+        GrowingAutotracker.get().setVisitorAttributes(null);
+        GrowingAutotracker.get().setVisitorAttributes(new HashMap<>());
 
-        GrowingTracker.get().setLoginUserAttributes(null);
-        GrowingTracker.get().setLoginUserAttributes(new HashMap<>());
+        GrowingAutotracker.get().setLoginUserAttributes(null);
+        GrowingAutotracker.get().setLoginUserAttributes(new HashMap<>());
 
-        GrowingTracker.get().setConversionVariables(null);
-        GrowingTracker.get().setConversionVariables(new HashMap<>());
+        GrowingAutotracker.get().setConversionVariables(null);
+        GrowingAutotracker.get().setConversionVariables(new HashMap<>());
 
         TrackHelper.waitForIdleSync();
     }

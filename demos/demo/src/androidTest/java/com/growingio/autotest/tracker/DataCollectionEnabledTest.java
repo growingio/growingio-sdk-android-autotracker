@@ -23,7 +23,7 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.MainActivity;
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;
@@ -53,7 +53,6 @@ public class DataCollectionEnabledTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration()
                 .setDataCollectionEnabled(false)
         );
@@ -64,7 +63,7 @@ public class DataCollectionEnabledTest extends EventsTest {
         dataCollectionDisabled();
         dataCollectionFirstEnabled();
 
-        GrowingTracker.get().setDataCollectionEnabled(false);
+        GrowingAutotracker.get().setDataCollectionEnabled(false);
         dataCollectionSecondEnabled();
     }
 
@@ -76,7 +75,7 @@ public class DataCollectionEnabledTest extends EventsTest {
             }
         });
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
-        GrowingTracker.get().trackCustomEvent("test");
+        GrowingAutotracker.get().trackCustomEvent("test");
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
     }
 
@@ -97,10 +96,10 @@ public class DataCollectionEnabledTest extends EventsTest {
                 }
             }
         });
-        GrowingTracker.get().setDataCollectionEnabled(true);
+        GrowingAutotracker.get().setDataCollectionEnabled(true);
         Awaiter.untilTrue(receivedVisit);
 
-        GrowingTracker.get().trackCustomEvent("test");
+        GrowingAutotracker.get().trackCustomEvent("test");
         Awaiter.untilTrue(receivedCustom);
     }
 
@@ -120,10 +119,10 @@ public class DataCollectionEnabledTest extends EventsTest {
                 }
             }
         });
-        GrowingTracker.get().setDataCollectionEnabled(true);
+        GrowingAutotracker.get().setDataCollectionEnabled(true);
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
 
-        GrowingTracker.get().trackCustomEvent("test");
+        GrowingAutotracker.get().trackCustomEvent("test");
         Awaiter.untilTrue(receivedCustom);
     }
 }
