@@ -24,5 +24,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
 public @interface GIOModule {
-    String gioName() default "GrowingTracker";//it's useless in librarymodule
+    String gioName() default "GrowingTracker"; //it's useless in librarymodule
 }

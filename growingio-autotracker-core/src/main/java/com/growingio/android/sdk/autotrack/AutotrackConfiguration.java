@@ -27,7 +27,8 @@ public class AutotrackConfiguration extends TrackConfiguration {
         super(projectId, urlScheme);
     }
 
-    AutotrackConfiguration(){}
+    AutotrackConfiguration() {
+    }
 
     public AutotrackConfiguration setImpressionScale(float scale) {
         if (scale < 0) {
