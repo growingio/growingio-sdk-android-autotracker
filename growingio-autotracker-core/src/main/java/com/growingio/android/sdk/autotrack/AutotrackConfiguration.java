@@ -101,16 +101,7 @@ public class AutotrackConfiguration extends TrackConfiguration {
     @NonNull
     @Override
     public AutotrackConfiguration clone() {
-        return new AutotrackConfiguration(getProjectId(), getUrlScheme())
-                .setChannel(getChannel())
-                .setDebugEnabled(isDebugEnabled())
-                .setCellularDataLimit(getCellularDataLimit())
-                .setDataUploadInterval(getDataUploadInterval())
-                .setSessionInterval(getSessionInterval())
-                .setUploadExceptionEnabled(isUploadExceptionEnabled())
-                .setDataCollectionEnabled(isDataCollectionEnabled())
-                .setImpressionScale(getImpressionScale())
-                .setDataCollectionServerHost(getDataCollectionServerHost())
-                .setOaidEnabled(isOaidEnabled());
+        AutotrackConfiguration clone = (AutotrackConfiguration) super.clone();
+        return clone.setImpressionScale(getImpressionScale());
     }
 }

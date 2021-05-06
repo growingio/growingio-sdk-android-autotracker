@@ -195,42 +195,22 @@ public class Tracker {
 
     public void setLoginUserId(final String userId) {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                UserInfoProvider.get().setLoginUserId(userId);
-            }
-        });
+        TrackMainThread.trackMain().postActionToTrackMain(() -> UserInfoProvider.get().setLoginUserId(userId));
     }
 
     public void cleanLoginUserId() {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                UserInfoProvider.get().setLoginUserId(null);
-            }
-        });
+        TrackMainThread.trackMain().postActionToTrackMain(() -> UserInfoProvider.get().setLoginUserId(null));
     }
 
     public void setLocation(final double latitude, final double longitude) {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                SessionProvider.get().setLocation(latitude, longitude);
-            }
-        });
+        TrackMainThread.trackMain().postActionToTrackMain(() -> SessionProvider.get().setLocation(latitude, longitude));
     }
 
     public void cleanLocation() {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                SessionProvider.get().cleanLocation();
-            }
-        });
+        TrackMainThread.trackMain().postActionToTrackMain(() -> SessionProvider.get().cleanLocation());
     }
 
     public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
