@@ -31,8 +31,6 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.util.List;
 
-import okhttp3.Response;
-
 public class EventHttpSender implements IEventNetSender {
     private static final String TAG = "EventHttpSender";
 

@@ -21,8 +21,8 @@ import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.ContextProvider;
 import com.growingio.android.sdk.track.SDKConfig;
+import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.data.EventSequenceId;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
@@ -301,7 +301,7 @@ public abstract class BaseEvent extends GEvent {
             mGlobalSequenceId = sequenceId.getGlobalId();
             mEventSequenceId = sequenceId.getEventTypeId();
 
-            Context context = ContextProvider.getApplicationContext();
+            Context context = TrackerContext.get().getApplicationContext();
             mNetworkState = NetworkUtil.getActiveNetworkState(context).getNetworkName();
 
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
