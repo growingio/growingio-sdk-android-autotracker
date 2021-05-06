@@ -68,7 +68,7 @@ class ModelLoaderRegistry {
             Class<Model> modelClass,
             Class<Data> dataClass,
             ModelLoaderFactory<? extends Model, ? extends Data> factory) {
-        for (Iterator<Entry<?, ?>> iterator = entries.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Entry<?, ?>> iterator = entries.iterator(); iterator.hasNext();) {
             Entry<?, ?> entry = iterator.next();
             if (entry.handles(modelClass, dataClass)) {
                 iterator.remove();
@@ -93,7 +93,7 @@ class ModelLoaderRegistry {
         final Class<Data> dataClass;
         final ModelLoaderFactory<? extends Model, ? extends Data> factory;
 
-        public Entry(
+        Entry(
                 Class<Model> modelClass,
                 Class<Data> dataClass,
                 ModelLoaderFactory<? extends Model, ? extends Data> factory) {

@@ -16,12 +16,9 @@
 
 package com.growingio.android.sdk.track;
 
-import android.content.Context;
-
 import com.growingio.android.sdk.AppGioModule;
 import com.growingio.android.sdk.TrackConfiguration;
 import com.growingio.android.sdk.Tracker;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOModule;
 import com.growingio.sdk.annotation.GIOConfig;
 

@@ -18,12 +18,13 @@ package com.growingio.android.sdk.track.webservices;
 
 /**
  * <p>
- *     we can use this object contract with service web socket.
+ * we can use this object contract with service web socket.
+ *
  * @author cpacm 2021/4/6
  */
 public class WebSocket {
 
-    public interface OnSocketListener{
+    public interface OnSocketListener {
         void onPrepared();
 
         boolean onOpen(String message);
