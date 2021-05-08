@@ -22,3 +22,5 @@ dependencies {
         compileOnly files(Jvm.current().getToolsJar())
     }
 }
+
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

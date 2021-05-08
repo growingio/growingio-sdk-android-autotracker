@@ -1,3 +1,4 @@
+
 apply from: 'gradle/publicFun.gradle'
 
 if (!isExcludeDemos()) {
@@ -12,6 +13,7 @@ include ':growingio-autotracker-core'
 include ':growingio-autotracker'
 
 include ':integration:okhttp3'
+include ':growingio-webservice:debugger'
 
 include ':growingio-annotation'
 include ':growingio-annotation:compiler'
