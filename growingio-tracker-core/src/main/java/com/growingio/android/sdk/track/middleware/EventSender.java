@@ -138,6 +138,18 @@ public class EventSender {
     }
 
     public void removeOverdueEvents() {
+
+        boolean locked = true;
+        try {
+            locked = mProcessLock.tryLock();
+        } catch (IOException e) {
+            Logger.e(TAG, e);
+        }
+        if (!locked) {
+            Logger.e(TAG, "removeOverdueEvents: this process can not get lock");
+            return;
+        }
+
         mEventsSQLite.removeOverdueEvents();
     }
 
