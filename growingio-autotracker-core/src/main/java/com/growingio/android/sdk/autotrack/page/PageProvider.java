@@ -278,6 +278,10 @@ public class PageProvider implements IActivityLifecycle {
         if (page == null) {
             page = new FragmentPage(fragment);
             Page<?> pageParent = findPageParent(fragment);
+            if (pageParent == null) {
+                Logger.e(TAG, "pageParent is NULL");
+                return;
+            }
             page.assignParent(pageParent);
             pageParent.addChildren(page);
             addPageAlias(page);
@@ -337,10 +341,9 @@ public class PageProvider implements IActivityLifecycle {
         } else {
             pageParent = findPage(parentFragment, activityPage);
         }
-        if (pageParent == null) {
-            // TODO: 2020/4/24
-            throw new NullPointerException("pageParent is NULL");
-        }
+        // TODO: 2021/04/26 如果为null可能存在以下情况
+        // 1.父fragment getUserVisibleHint为false， 导致子fragment无法找到page
+        // 2.2021/04/26 旋转、内存不足导致activity销毁， fragment重建导致无法找到page
         return pageParent;
     }
 

@@ -21,6 +21,10 @@ dependencies {
     testImplementation libraries.test.powermock_module_junit4
     testImplementation libraries.test.powermock_module_junit4_rule
     testImplementation libraries.test.truth
+    testImplementation libraries.asm.asm
+    testImplementation libraries.asm.asm_commons
+    testImplementation libraries.asm.asm_util
+    testImplementation libraries.asm.asm_tree
 
     compileOnly gradleApi()
     implementation libraries.android.gradle_plugin

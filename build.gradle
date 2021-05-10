@@ -11,7 +11,7 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.1.0-SNAPSHOT",
+                releaseVersion    : "3.1.0",
                 releaseVersionCode: 30100,
         ]
 
@@ -84,6 +84,17 @@ buildscript {
                         'novoda': 'com.novoda:bintray-release:0.9.2',
                         'jfrog' : 'org.jfrog.buildinfo:build-info-extractor-gradle:4.18.0',
                 ],
+
+                'sonar' : [
+                        'sonar': 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1.1',
+                ],
+
+                'asm' : [
+                        'asm': 'org.ow2.asm:asm:9.1',
+                        'asm_commons': 'org.ow2.asm:asm-commons:9.1',
+                        'asm_util': 'org.ow2.asm:asm-util:9.1',
+                        'asm_tree': 'org.ow2.asm:asm-tree:9.1',
+                ],
         ]
     }
 
@@ -93,13 +104,17 @@ buildscript {
         maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
         google()
         jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${versions.gradleTool}"
         classpath libraries.publish.novoda
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath libraries.sonar.sonar
     }
 }
+
+apply from: "${rootProject.projectDir}/gradle/sonarcloud.gradle"
 
 allprojects {
     repositories {
@@ -117,8 +132,8 @@ subprojects { project ->
     apply plugin: 'checkstyle'
 
     task checkstyle(type: Checkstyle, group: 'check') {
-        configFile rootProject.file('checkstyle/checkstyle.xml')
-        configProperties.checkstyleJavaHeader = rootProject.file('checkstyle/java.header')
+        configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
+        configProperties.checkstyleJavaHeader = file("${rootDir}/config/checkstyle/java.header")
         source 'src/main/java', 'src/test/java', 'src/androidTest/java'
         ignoreFailures false
         showViolations true
