@@ -7,7 +7,8 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :growingio-annotation:compiler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tracker-core:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-autotracker-core:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :integration:okhttp3:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-network:okhttp3:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-network:urlconnection:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:debugger:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:circler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tracker:publishMavenAgentPublicationToMavenLocal \

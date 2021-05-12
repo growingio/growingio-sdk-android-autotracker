@@ -40,8 +40,6 @@ dependencies {
 
     implementation libraries.growingio.gmonitor
 
-    api libraries.squareup.okhttp3
-
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
@@ -49,5 +47,4 @@ dependencies {
     compileOnly libraries.others.x5_webview
 }
 
-//apply from: "${project.rootProject.file('mavenPush.gradle')}"
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

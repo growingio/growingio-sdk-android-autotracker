@@ -11,7 +11,8 @@ include ':growingio-autotracker-gradle-plugin'
 include ':growingio-autotracker-core'
 include ':growingio-autotracker'
 
-include ':integration:okhttp3'
+include ':growingio-network:okhttp3'
+include ':growingio-network:urlconnection'
 include ':growingio-webservice:debugger'
 include ':growingio-webservice:circler'
 

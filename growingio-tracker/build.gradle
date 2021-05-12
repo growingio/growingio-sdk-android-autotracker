@@ -35,7 +35,7 @@ dependencies {
     debugApi project(':growingio-tracker-core')
     releaseApi libraries.growingio.tracker_core
 
-    debugApi project(':integration:okhttp3')
+    debugApi project(':growingio-network:okhttp3')
     releaseApi libraries.growingio.okhttp3
 
     api project(':growingio-webservice:debugger')

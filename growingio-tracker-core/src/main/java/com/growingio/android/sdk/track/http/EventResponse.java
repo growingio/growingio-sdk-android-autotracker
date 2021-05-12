@@ -16,20 +16,40 @@
 
 package com.growingio.android.sdk.track.http;
 
-public class EventResponse {
-    private final boolean mSucceeded;
-    private final long mUsedBytes;
+import java.io.InputStream;
 
-    public EventResponse(boolean succeeded, long usedBytes) {
-        mSucceeded = succeeded;
-        mUsedBytes = usedBytes;
+public class EventResponse {
+    private final boolean succeeded;
+    private final InputStream stream;//it's useless
+    private final long usedBytes;//it's useless
+
+    public EventResponse(boolean succeeded) {
+        this.succeeded = succeeded;
+        usedBytes = 0L;
+        stream = null;
+    }
+
+    public EventResponse(boolean succeeded, InputStream stream, long usedBytes) {
+        this.succeeded = succeeded;
+        this.usedBytes = usedBytes;
+        this.stream = stream;
+    }
+
+    public EventResponse(boolean succeeded, InputStream stream) {
+        this.succeeded = succeeded;
+        usedBytes = 0L;
+        this.stream = stream;
     }
 
     public boolean isSucceeded() {
-        return mSucceeded;
+        return succeeded;
     }
 
     public long getUsedBytes() {
-        return mUsedBytes;
+        return usedBytes;
+    }
+
+    public InputStream getStream() {
+        return stream;
     }
 }

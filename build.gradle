@@ -44,9 +44,9 @@ buildscript {
                         'tracker'         : "com.growingio.android:tracker:$releaseConfiguration.releaseVersion",
                         'autotracker_core': "com.growingio.android:autotracker-core:$releaseConfiguration.releaseVersion",
                         'autotracker'     : "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion",
-                        'okhttp3'         : "com.growingio.android:okhttp3-integration:$releaseConfiguration.releaseVersion",
-                        'annotation'         : "com.growingio.android:annotation:$releaseConfiguration.releaseVersion",
-                        'compiler'         : "com.growingio.android:compiler:$releaseConfiguration.releaseVersion",
+                        'okhttp3'         : "com.growingio.android:okhttp3:$releaseConfiguration.releaseVersion",
+                        'annotation'      : "com.growingio.android:annotation:$releaseConfiguration.releaseVersion",
+                        'compiler'        : "com.growingio.android:compiler:$releaseConfiguration.releaseVersion",
                 ],
 
                 'google'   : [
@@ -83,15 +83,15 @@ buildscript {
                         'orchestrator'                  : 'androidx.test:orchestrator:1.3.0',
                 ],
 
-                'sonar' : [
+                'sonar'    : [
                         'sonar': 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1.1',
                 ],
 
-                'asm' : [
-                        'asm': 'org.ow2.asm:asm:9.1',
+                'asm'      : [
+                        'asm'        : 'org.ow2.asm:asm:9.1',
                         'asm_commons': 'org.ow2.asm:asm-commons:9.1',
-                        'asm_util': 'org.ow2.asm:asm-util:9.1',
-                        'asm_tree': 'org.ow2.asm:asm-tree:9.1',
+                        'asm_util'   : 'org.ow2.asm:asm-util:9.1',
+                        'asm_tree'   : 'org.ow2.asm:asm-tree:9.1',
                 ],
         ]
         kotlin_version = '1.4.32'

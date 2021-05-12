@@ -112,7 +112,7 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
         const val GROWINGIO_MODULE_PACKAGE_NAME = "com.growingio.android.sdk"
         const val GROWINGIO_MODULE_NAME = "LibraryGioModule"
         private const val GROWINGIO_APP_MODULE_NAME = "AppGioModule"
-        const val DEBUG = true
+        const val DEBUG = false
 
         const val APP_GIO_MODULE_QUALIFIED_NAME = "$GROWINGIO_MODULE_PACKAGE_NAME.$GROWINGIO_APP_MODULE_NAME"
         const val GIO_MODULE_QUALIFIED_NAME = "$GROWINGIO_MODULE_PACKAGE_NAME.$GROWINGIO_MODULE_NAME"

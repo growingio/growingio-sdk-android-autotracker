@@ -18,7 +18,6 @@ package com.growingio.android.debugger
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.text.TextUtils
-import android.view.View
 import com.growingio.android.debugger.DebuggerEventWrapper.Companion.get
 import com.growingio.android.debugger.WebSocketHandler.OnWebSocketListener
 import com.growingio.android.sdk.TrackerContext
