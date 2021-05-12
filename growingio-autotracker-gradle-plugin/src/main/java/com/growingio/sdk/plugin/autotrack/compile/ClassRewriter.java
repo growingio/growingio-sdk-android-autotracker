@@ -118,7 +118,7 @@ public class ClassRewriter {
             classReader.accept(new ContextClassVisitor(context), ClassReader.SKIP_DEBUG | ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES);
             className = context.getClassName();
             ClassVisitor classVisitor;
-            if (this.isExcludedPackage(context.getClassName())) {
+            if (className == null || this.isExcludedPackage(context.getClassName())) {
                 return null;
             }
             DesugaringClassVisitor desugaringClassVisitor = new DesugaringClassVisitor(

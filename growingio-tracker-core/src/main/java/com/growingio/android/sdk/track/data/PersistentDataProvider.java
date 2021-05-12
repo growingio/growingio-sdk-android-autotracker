@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.TrackerContext;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.IDataSharer;
 import com.growingio.android.sdk.track.ipc.MultiProcessDataSharer;
 

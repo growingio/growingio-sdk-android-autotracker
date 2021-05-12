@@ -18,7 +18,7 @@ package com.growingio.android.sdk.track.events;
 
 import android.content.Context;
 
-import com.growingio.android.sdk.track.TrackerContext;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
 

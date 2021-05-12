@@ -23,6 +23,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 
 import com.growingio.android.sdk.TrackConfiguration;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;

@@ -24,7 +24,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
-import com.growingio.android.sdk.track.TrackerContext;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;

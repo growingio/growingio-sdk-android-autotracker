@@ -34,7 +34,6 @@ public interface DataFetcher<T> {
     T executeData();
 
     void cleanup();
-
     void cancel();
 
     Class<T> getDataClass();

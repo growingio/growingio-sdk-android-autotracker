@@ -26,17 +26,16 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.TrackerContext;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.DeepLinkProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
-import com.growingio.android.sdk.track.webservices.WebServicesProvider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -46,8 +45,7 @@ public class Tracker {
 
     private static final String TAG = "GrowingIO Track SDK";
 
-    protected WebServicesProvider mWebServicesProvider;
-    protected boolean isInited = false;
+    protected volatile boolean isInited = false;
 
     public Tracker(Application application, TrackConfiguration trackConfiguration) {
         if (application == null || trackConfiguration == null) {
@@ -73,62 +71,22 @@ public class Tracker {
 
 
         TrackerContext.init(application);
-        loadAnnotationGeneratedModules(application);
-
         ConfigurationProvider.get().setTrackConfiguration(trackConfiguration);
+
+        // init core service
+        TrackMainThread.trackMain().register(SessionProvider.get());
+        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
+        DeepLinkProvider.get().init();
 
         if (trackConfiguration.isDebugEnabled()) {
             Logger.addLogger(new DebugLogger());
         }
 
-        // init core service
-        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
-        TrackMainThread.trackMain().register(SessionProvider.get());
-        // init other service
-        mWebServicesProvider = new WebServicesProvider(trackConfiguration.getUrlScheme(), ActivityStateProvider.get());
+        loadAnnotationGeneratedModules(application);
 
         isInited = true;
     }
 
-    @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
-    private void loadAnnotationGeneratedModules(Context context) {
-        try {
-            Class<GeneratedGioModule> clazz =
-                    (Class<GeneratedGioModule>)
-                            Class.forName("com.growingio.android.sdk.GeneratedGioModuleImpl");
-            GeneratedGioModule generatedGioModule = clazz.getDeclaredConstructor(Context.class).newInstance(context.getApplicationContext());
-
-            if (generatedGioModule != null) {
-                generatedGioModule.registerComponents(context, TrackerContext.get().getRegistry());
-            }
-        } catch (ClassNotFoundException e) {
-            if (Log.isLoggable(TAG, Log.WARN)) {
-                Log.w(
-                        TAG,
-                        "Failed to find GeneratedGioModule. You should include an"
-                                + " annotationProcessor compile dependency on com.growingio.android.sdk:compiler"
-                                + " in your application and a @GIOModule annotated AppGioModule implementation"
-                                + " or LibraryGioModules will be silently ignored");
-            }
-            // These exceptions can't be squashed across all versions of Android.
-        } catch (InstantiationException e) {
-            throwIncorrectGioModule(e);
-        } catch (IllegalAccessException e) {
-            throwIncorrectGioModule(e);
-        } catch (NoSuchMethodException e) {
-            throwIncorrectGioModule(e);
-        } catch (InvocationTargetException e) {
-            throwIncorrectGioModule(e);
-        }
-    }
-
-    private static void throwIncorrectGioModule(Exception e) {
-        throw new IllegalStateException(
-                "GeneratedGioModuleImpl is implemented incorrectly."
-                        + " If you've manually implemented this class, remove your implementation. The"
-                        + " Annotation processor will generate a correct implementation.",
-                e);
-    }
 
     public void trackCustomEvent(String eventName) {
         if (!isInited) return;
@@ -220,6 +178,53 @@ public class Tracker {
             return;
         }
         ActivityStateProvider.get().onActivityNewIntent(activity, intent);
+    }
+
+    @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
+    private void loadAnnotationGeneratedModules(Context context) {
+        try {
+            Class<GeneratedGioModule> clazz =
+                    (Class<GeneratedGioModule>)
+                            Class.forName("com.growingio.android.sdk.GeneratedGioModuleImpl");
+            GeneratedGioModule generatedGioModule = clazz.getDeclaredConstructor(Context.class).newInstance(context.getApplicationContext());
+            generatedGioModule.registerComponents(context, TrackerContext.get().getRegistry());
+        } catch (ClassNotFoundException e) {
+            if (Log.isLoggable(TAG, Log.WARN)) {
+                Log.w(
+                        TAG,
+                        "Failed to find GeneratedGioModule. You should include an"
+                                + " annotationProcessor compile dependency on com.growingio.android.sdk:compiler"
+                                + " in your application and a @GIOModule annotated AppGioModule implementation"
+                                + " or LibraryGioModules will be silently ignored");
+            }
+            // These exceptions can't be squashed across all versions of Android.
+        } catch (InstantiationException e) {
+            throwIncorrectGioModule(e);
+        } catch (IllegalAccessException e) {
+            throwIncorrectGioModule(e);
+        } catch (NoSuchMethodException e) {
+            throwIncorrectGioModule(e);
+        } catch (InvocationTargetException e) {
+            throwIncorrectGioModule(e);
+        }
+    }
+
+    /**
+     * you can register module manually through this api.
+     *
+     * @param module GIOLibraryModule
+     */
+    public void registerComponent(LibraryGioModule module) {
+        if (!isInited) return;
+        module.registerComponents(TrackerContext.get(), TrackerContext.get().getRegistry());
+    }
+
+    private void throwIncorrectGioModule(Exception e) {
+        throw new IllegalStateException(
+                "GeneratedGioModuleImpl is implemented incorrectly."
+                        + " If you've manually implemented this class, remove your implementation. The"
+                        + " Annotation processor will generate a correct implementation.",
+                e);
     }
 
 }

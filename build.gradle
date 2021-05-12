@@ -11,8 +11,8 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.1.0",
-                releaseVersionCode: 30100,
+                releaseVersion    : "3.2.0-SNAPSHOT",
+                releaseVersionCode: 30200,
         ]
 
         versions = [
@@ -39,12 +39,14 @@ buildscript {
                 ],
 
                 'growingio': [
-                        'gmonitor'        : 'com.growingio.android:gmonitor:1.4.0',
+                        'gmonitor'        : 'com.growingio.android:gmonitor:1.5.0',
                         'tracker_core'    : "com.growingio.android:tracker-core:$releaseConfiguration.releaseVersion",
                         'tracker'         : "com.growingio.android:tracker:$releaseConfiguration.releaseVersion",
                         'autotracker_core': "com.growingio.android:autotracker-core:$releaseConfiguration.releaseVersion",
                         'autotracker'     : "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion",
                         'okhttp3'         : "com.growingio.android:okhttp3-integration:$releaseConfiguration.releaseVersion",
+                        'annotation'         : "com.growingio.android:annotation:$releaseConfiguration.releaseVersion",
+                        'compiler'         : "com.growingio.android:compiler:$releaseConfiguration.releaseVersion",
                 ],
 
                 'google'   : [

@@ -21,7 +21,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.TrackerContext;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 
 public class AppInfoProvider {

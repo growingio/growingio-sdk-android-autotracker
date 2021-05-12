@@ -38,6 +38,8 @@ dependencies {
     debugApi project(':integration:okhttp3')
     releaseApi libraries.growingio.okhttp3
 
+    api project(':growingio-webservice:debugger')
+
     compileOnly libraries.android.appcompat
 
     implementation project(":growingio-annotation")

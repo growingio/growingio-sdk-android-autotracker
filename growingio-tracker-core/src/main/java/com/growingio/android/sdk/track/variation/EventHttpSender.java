@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.track.variation;
 
-import com.growingio.android.sdk.track.TrackerContext;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.TrackConfiguration;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.marshaller.EventMarshaller;
@@ -37,7 +37,6 @@ public class EventHttpSender implements IEventNetSender {
     private final EventMarshaller mEventMarshaller;
     private final String mProjectId;
     private final String mServerHost;
-    private ModelLoader<EventUrl, EventResponse> mHttpLoader;
 
     public EventHttpSender(EventMarshaller eventMarshaller) {
         mEventMarshaller = eventMarshaller;
@@ -47,10 +46,7 @@ public class EventHttpSender implements IEventNetSender {
     }
 
     private ModelLoader<EventUrl, EventResponse> getModelLoader() {
-        if (mHttpLoader == null) {
-            mHttpLoader = TrackerContext.get().getRegistry().getModelLoader(EventUrl.class, EventResponse.class);
-        }
-        return mHttpLoader;
+        return TrackerContext.get().getRegistry().getModelLoader(EventUrl.class, EventResponse.class);
     }
 
     /**

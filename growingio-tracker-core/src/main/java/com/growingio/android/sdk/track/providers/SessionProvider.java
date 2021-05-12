@@ -20,7 +20,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.TrackerContext;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;

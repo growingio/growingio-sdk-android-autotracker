@@ -20,7 +20,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
-import com.growingio.android.sdk.track.TrackerContext;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 
 public class PermissionUtil {

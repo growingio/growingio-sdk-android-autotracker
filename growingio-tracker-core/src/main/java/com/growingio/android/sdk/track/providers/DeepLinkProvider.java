@@ -18,12 +18,22 @@ package com.growingio.android.sdk.track.providers;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 
+import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
-import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.webservices.Circler;
+import com.growingio.android.sdk.track.webservices.Debugger;
+import com.growingio.android.sdk.track.webservices.WebService;
 
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent.EVENT_TYPE.ON_CREATED;
 import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent.EVENT_TYPE.ON_NEW_INTENT;
@@ -34,7 +44,7 @@ import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEv
  *
  * @author cpacm 2021/3/25
  */
-public class DeepLinkProvider extends ListenerContainer<DeepLinkProvider.OnDeepLinkListener, Uri> implements IActivityLifecycle {
+public class DeepLinkProvider implements IActivityLifecycle {
 
     private static final String TAG = "DeepLinkProvider";
 
@@ -43,6 +53,9 @@ public class DeepLinkProvider extends ListenerContainer<DeepLinkProvider.OnDeepL
     }
 
     private DeepLinkProvider() {
+    }
+
+    public void init() {
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
     }
 
@@ -66,18 +79,63 @@ public class DeepLinkProvider extends ListenerContainer<DeepLinkProvider.OnDeepL
 
             if (urlScheme.equals(data.getScheme())) {
                 Logger.d(TAG, "enter growingio:" + data.toString());
-                dispatchActions(data);
+                TrackMainThread.trackMain().postActionToTrackMain(() -> dispatchUri(data));
             }
         }
     }
 
-    @Override
-    protected void singleAction(OnDeepLinkListener listener, Uri action) {
-        listener.onDeepLink(action);
-    }
+    private static final String WEB_SERVICES_HOST = "growingio";
+    private static final String WEB_SERVICES_PATH = "/webservice";
+    private static final String WEB_SERVICES_TYPE = "serviceType";
 
+    public static final String SERVICE_DEBUGGER_TYPE = "debugger";
+    public static final String SERVICE_CIRCLE_TYPE = "circle";
 
-    public interface OnDeepLinkListener {
-        void onDeepLink(Uri uri);
+    private void dispatchUri(Uri data) {
+        if (WEB_SERVICES_HOST.equals(data.getHost()) && WEB_SERVICES_PATH.equals(data.getPath())) {
+            String serviceType = data.getQueryParameter(WEB_SERVICES_TYPE);
+            if (!TextUtils.isEmpty(serviceType)) {
+                Logger.d(TAG, "Start web service " + serviceType);
+                Map<String, String> params = new HashMap<>();
+                for (String parameterName : data.getQueryParameterNames()) {
+                    params.put(parameterName, data.getQueryParameter(parameterName));
+                }
+                if (serviceType.equals(SERVICE_DEBUGGER_TYPE)) {
+                    TrackerContext.get().loadData(new Debugger(params), Debugger.class, WebService.class, new DataFetcher.DataCallback<WebService>() {
+                        @Override
+                        public void onDataReady(WebService data) {
+                            Logger.d(TAG, "start debugger success");
+                        }
+
+                        @Override
+                        public void onLoadFailed(Exception e) {
+                            Logger.e(TAG, e.getMessage());
+                        }
+                    });
+                } else if (serviceType.equals(SERVICE_CIRCLE_TYPE)) {
+                    TrackerContext.get().loadData(new Circler(params), Circler.class, WebService.class, new DataFetcher.DataCallback<WebService>() {
+                        @Override
+                        public void onDataReady(WebService data) {
+                            Logger.d(TAG, "start circle choose success");
+                        }
+
+                        @Override
+                        public void onLoadFailed(Exception e) {
+                            Logger.e(TAG, e.getMessage());
+                        }
+                    });
+                }
+            }
+
+            String openConsole = data.getQueryParameter("openConsoleLog");
+            if (!TextUtils.isEmpty(openConsole)) {
+                if ("YES".equalsIgnoreCase(openConsole)) {
+                    Logger.addLogger(new DebugLogger());
+                }
+            }
+//                intent.setData(null);
+        } else {
+            // TODO DeepLink
+        }
     }
 }

@@ -71,7 +71,7 @@ public class TipView extends FrameLayout {
         mDragTip.setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
         mContent.setTextColor(Color.WHITE);
         mDragTip.setTextColor(Color.WHITE);
-        mDragTip.setText(R.string.growing_tracker_drag_tip);
+        mDragTip.setText("如有遮挡请拖动此条");
         addView(mContent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         addView(mDragTip, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -199,6 +199,10 @@ public class TipView extends FrameLayout {
     public void dismiss() {
         mIsDismissed = true;
         remove();
+    }
+
+    public void show(){
+        mIsDismissed = false;
     }
 
     public boolean isDismissed() {
