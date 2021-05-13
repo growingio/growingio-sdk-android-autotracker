@@ -31,6 +31,7 @@ buildscript {
                         'navigation_ui'      : 'android.arch.navigation:navigation-ui:1.0.0',
                         'livedata'           : 'android.arch.lifecycle:livedata:1.1.1',
                         'viewmodel'          : 'android.arch.lifecycle:viewmodel:1.1.1',
+                        'volley'             : 'com.android.volley:volley:1.2.0',
                 ],
 
                 'androidx' : [

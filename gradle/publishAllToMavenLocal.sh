@@ -9,6 +9,7 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :growingio-autotracker-core:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-network:okhttp3:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-network:urlconnection:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-network:volley:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:debugger:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:circler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tracker:publishMavenAgentPublicationToMavenLocal \
