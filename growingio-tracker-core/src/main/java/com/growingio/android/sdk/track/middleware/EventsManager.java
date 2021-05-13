@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.growingio.android.sdk.track.middleware;
 
 import android.annotation.SuppressLint;
@@ -6,11 +22,17 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 import com.growingio.android.sdk.track.log.Logger;
 
-import static com.growingio.android.sdk.track.middleware.EventsInfoTable.*;
+import static com.growingio.android.sdk.track.middleware.EventsInfoTable.COLUMN_CREATE_TIME;
+import static com.growingio.android.sdk.track.middleware.EventsInfoTable.COLUMN_DATA;
+import static com.growingio.android.sdk.track.middleware.EventsInfoTable.COLUMN_EVENT_TYPE;
+import static com.growingio.android.sdk.track.middleware.EventsInfoTable.COLUMN_ID;
+import static com.growingio.android.sdk.track.middleware.EventsInfoTable.COLUMN_POLICY;
+import static com.growingio.android.sdk.track.middleware.EventsInfoTable.TABLE_EVENTS;
+import static com.growingio.android.sdk.track.middleware.EventsInfoTable.getContentUri;
+import static com.growingio.android.sdk.track.middleware.EventsInfoTable.putValues;
 
 
 public class EventsManager {

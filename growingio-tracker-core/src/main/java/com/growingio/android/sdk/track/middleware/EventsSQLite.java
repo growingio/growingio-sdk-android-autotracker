@@ -29,15 +29,15 @@ public class EventsSQLite {
 
     private static final long EVENT_VALID_PERIOD_MILLS = 7 * 24 * 60 * 60_000;
 
-    private final EventsManager eventsManager;
+    private final EventsManager mEventsManager;
 
     EventsSQLite(Context context) {
-        eventsManager = new EventsManager(context);
+        mEventsManager = new EventsManager(context);
     }
 
     void insertEvent(GEvent gEvent) {
         try {
-            eventsManager.insertEvents(Serializer.objectSerialize(gEvent), gEvent.getEventType(), gEvent.getSendPolicy());
+            mEventsManager.insertEvents(Serializer.objectSerialize(gEvent), gEvent.getEventType(), gEvent.getSendPolicy());
         } catch (IOException e) {
             Logger.e(TAG, e, "insertEvent failed: %s", e.getMessage());
         }
@@ -46,14 +46,14 @@ public class EventsSQLite {
     void removeOverdueEvents() {
         long current = System.currentTimeMillis();
         long sevenDayAgo = current - EVENT_VALID_PERIOD_MILLS;
-          eventsManager.removeOverdueEvents(sevenDayAgo);
+        mEventsManager.removeOverdueEvents(sevenDayAgo);
     }
 
     long queryEvents(int policy, int limit, List<GEvent> events) {
         Cursor cursor = null;
         long lastId = -1;
         try {
-            cursor = eventsManager.queryEvents(policy, limit);
+            cursor = mEventsManager.queryEvents(policy, limit);
             while (cursor.moveToNext()) {
                 if (cursor.isLast()) {
                     lastId = cursor.getLong(cursor.getColumnIndex(EventsInfoTable.COLUMN_ID));
@@ -64,7 +64,7 @@ public class EventsSQLite {
                     events.add(event);
                 } else {
                     long delId = cursor.getLong(cursor.getColumnIndex(EventsInfoTable.COLUMN_ID));
-                    eventsManager.removeEventById(delId);
+                    mEventsManager.removeEventById(delId);
                 }
             }
         } catch (Throwable t) {
@@ -78,7 +78,7 @@ public class EventsSQLite {
     }
 
     void removeEvents(long lastId, int policy, String eventType) {
-        eventsManager.removeEvents(lastId, policy, eventType);
+        mEventsManager.removeEvents(lastId, policy, eventType);
     }
 
     private GEvent unpack(byte[] data) {
@@ -93,7 +93,7 @@ public class EventsSQLite {
     }
 
     void removeAllEvents() {
-        eventsManager.removeAllEvents();
+        mEventsManager.removeAllEvents();
     }
 
 }

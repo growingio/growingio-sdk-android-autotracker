@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.growingio.android.sdk.track.middleware;
 
 import android.content.ContentProvider;
@@ -17,16 +33,12 @@ import static com.growingio.android.sdk.track.middleware.EventsInfoTable.TABLE_E
 
 public class EventsContentProvider extends ContentProvider {
 
-    public EventsSQLiteOpenHelper dbHelper;
-    private static final UriMatcher MATCHER;
-
-    private static final String TAG = "EventsContentProvider";
-    private final Object mLock = new Object();
-
     //Uri info
     //authority
     public static final String EVENTS_INFO_AUTHORITY = "com.growingio.android.sdk.track.middleware.EventsContentProvider";
     public static final Uri AUTHORITY_URI = Uri.parse("content://" + EVENTS_INFO_AUTHORITY);
+    private static final UriMatcher MATCHER;
+    private static final String TAG = "EventsContentProvider";
     //code
     private static final int EVENTS_INFO_CODE = 1;
 
@@ -34,6 +46,9 @@ public class EventsContentProvider extends ContentProvider {
         MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
         MATCHER.addURI(EVENTS_INFO_AUTHORITY, TABLE_EVENTS, EVENTS_INFO_CODE);
     }
+
+    private final Object mLock = new Object();
+    public EventsSQLiteOpenHelper dbHelper;
 
     @Override
     public boolean onCreate() {
@@ -45,22 +60,22 @@ public class EventsContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
-        try{
+        try {
             synchronized (mLock) {
                 SQLiteDatabase db = dbHelper.getReadableDatabase();
-                switch (MATCHER.match(uri)){
+                switch (MATCHER.match(uri)) {
                     case EVENTS_INFO_CODE:
 
-                        if(sortOrder.equals("rawQuery")){
+                        if (sortOrder != null && "rawQuery".equals(sortOrder)) {
                             return db.rawQuery(selection, null);
                         }
-                        return db.query(TABLE_EVENTS,projection, selection, selectionArgs,null, null, sortOrder);
+                        return db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, sortOrder);
                     default:
                         throw new IllegalArgumentException("UnKnow Uri: " + uri.toString());
                 }
             }
-        }catch (SQLException e){
-            Log.e(TAG, "query error: "+ e.getMessage());
+        } catch (SQLException e) {
+            Log.e(TAG, "query error: " + e.getMessage());
             return null;
         }
     }
@@ -79,10 +94,10 @@ public class EventsContentProvider extends ContentProvider {
         switch (MATCHER.match(uri)) {
 
             case EVENTS_INFO_CODE:
-                 long rowId = db.insert(TABLE_EVENTS, null, values);
-                 Uri insertUri = ContentUris.withAppendedId(uri, rowId);
-                 this.getContext().getContentResolver().notifyChange(uri, null);
-                 return insertUri;
+                long rowId = db.insert(TABLE_EVENTS, null, values);
+                Uri insertUri = ContentUris.withAppendedId(uri, rowId);
+                this.getContext().getContentResolver().notifyChange(uri, null);
+                return insertUri;
 
             default:
                 throw new IllegalArgumentException("UnKnow Uri:" + uri.toString());
