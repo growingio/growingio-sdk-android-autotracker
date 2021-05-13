@@ -55,7 +55,7 @@ public class OkHttpDataFetcher implements DataFetcher<EventResponse>, Callback {
     public void loadData(DataCallback<? super EventResponse> callback) {
         Request.Builder requestBuilder = new Request.Builder().url(eventUrl.toUrl());
         if (eventUrl.getRequestBody() != null) {
-            requestBuilder.post(RequestBody.create(MediaType.parse("application/json"), eventUrl.getRequestBody()));
+            requestBuilder.post(RequestBody.create(MediaType.parse(eventUrl.getMediaType()), eventUrl.getRequestBody()));
         }
         for (Map.Entry<String, String> headerEntry : eventUrl.getHeaders().entrySet()) {
             String key = headerEntry.getKey();

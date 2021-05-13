@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.events.marshaller;
+package com.growingio.android.sdk.track.http;
 
 import com.growingio.android.sdk.track.middleware.GEvent;
 
 import java.util.List;
 
-public interface EventMarshaller {
-    byte[] marshall(List<GEvent> events);
+/**
+ * <p>
+ *
+ * @author cpacm 5/13/21
+ */
+public class EventData {
+    private final List<GEvent> events;
+
+    public EventData(List<GEvent> events) {
+        this.events = events;
+    }
+
+    public List<GEvent> getEvents() {
+        return events;
+    }
 }
