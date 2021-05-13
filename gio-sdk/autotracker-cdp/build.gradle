@@ -1,4 +1,6 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+}
 
 android {
     compileSdkVersion buildConfiguration.compileVersion
@@ -10,30 +12,24 @@ android {
     }
 
     buildTypes {
-        debug {
-            testCoverageEnabled = true
-        }
-
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            consumerProguardFiles 'consumer-proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
-        sourceCompatibility buildConfiguration.sourceCompatibility
-        targetCompatibility buildConfiguration.targetCompatibility
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
+
     lintOptions {
         abortOnError false
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    debugApi project(':growingio-tracker-core')
-    releaseApi libraries.growingio.tracker_core
+    compileOnly libraries.android.fragment
+    compileOnly libraries.androidx.fragment
 
     debugApi project(':growingio-autotracker-core')
     releaseApi libraries.growingio.autotracker_core
@@ -41,9 +37,11 @@ dependencies {
     debugApi project(':growingio-network:okhttp3')
     releaseApi libraries.growingio.okhttp3
 
-    compileOnly libraries.androidx.appcompat
-    compileOnly libraries.android.appcompat
+    debugApi project(':growingio-webservice:debugger')
+    releaseApi libraries.growingio.debugger
 
+    debugApi project(':growingio-webservice:circler')
+    releaseApi libraries.growingio.circler
 
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
