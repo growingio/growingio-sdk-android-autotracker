@@ -46,7 +46,7 @@ public class EventsInfoTable {
 
     public static final String DROP_TABLE_EVENTS = "DROP TABLE IF EXISTS " + TABLE_EVENTS + ";";
 
-    private static final Uri CONTENT_URI = Uri.withAppendedPath(EventsContentProvider.AUTHORITY_URI, TABLE_EVENTS);
+    private static final Uri CONTENT_URI = Uri.withAppendedPath(EventsContentProvider.authorityUri, TABLE_EVENTS);
 
     public static Uri getContentUri() {
         return CONTENT_URI;

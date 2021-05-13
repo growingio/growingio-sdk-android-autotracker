@@ -11,8 +11,9 @@
     <application>
         <provider
             android:name="com.growingio.android.sdk.track.middleware.EventsContentProvider"
-            android:authorities="com.growingio.android.sdk.track.middleware.EventsContentProvider"
-            android:exported="true" />
+            android:authorities="${applicationId}.EventsContentProvider"
+            android:grantUriPermissions="true"
+            android:exported="false" />
     </application>
 
 

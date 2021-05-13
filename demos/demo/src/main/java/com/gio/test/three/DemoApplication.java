@@ -54,6 +54,14 @@ public class DemoApplication extends Application {
         Log.e(TAG, "onCreate: ");
         super.onCreate();
 
+        //不允许多个进程共享一个 WebView 数据目录
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            String processName = getProcessName();
+            if (!getPackageName().equals(processName)) {
+                WebView.setDataDirectorySuffix(processName);
+            }
+        }
+
         if (isMainProcess()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 WebView.setWebContentsDebuggingEnabled(true);

@@ -35,8 +35,10 @@ public class EventsContentProvider extends ContentProvider {
 
     //Uri info
     //authority
-    public static final String EVENTS_INFO_AUTHORITY = "com.growingio.android.sdk.track.middleware.EventsContentProvider";
-    public static final Uri AUTHORITY_URI = Uri.parse("content://" + EVENTS_INFO_AUTHORITY);
+
+     public static String eventsInfoAuthority;
+     public static Uri authorityUri;
+
     private static final UriMatcher MATCHER;
     private static final String TAG = "EventsContentProvider";
     //code
@@ -44,7 +46,6 @@ public class EventsContentProvider extends ContentProvider {
 
     static {
         MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        MATCHER.addURI(EVENTS_INFO_AUTHORITY, TABLE_EVENTS, EVENTS_INFO_CODE);
     }
 
     private final Object mLock = new Object();
@@ -52,6 +53,12 @@ public class EventsContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+
+        eventsInfoAuthority =  this.getContext().getPackageName() + ".EventsContentProvider";
+        authorityUri = Uri.parse("content://" + eventsInfoAuthority);
+
+        MATCHER.addURI(eventsInfoAuthority, TABLE_EVENTS, EVENTS_INFO_CODE);
+
         this.dbHelper = new EventsSQLiteOpenHelper(this.getContext(), "growing3.db");
         return true;
     }
@@ -66,7 +73,7 @@ public class EventsContentProvider extends ContentProvider {
                 switch (MATCHER.match(uri)) {
                     case EVENTS_INFO_CODE:
 
-                        if (sortOrder != null && "rawQuery".equals(sortOrder)) {
+                        if ("rawQuery".equals(sortOrder)) {
                             return db.rawQuery(selection, null);
                         }
                         return db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, sortOrder);
