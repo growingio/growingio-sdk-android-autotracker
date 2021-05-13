@@ -13,29 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.growingio.android.json
 
-package com.growingio.android.sdk.track.encrypt;
+import android.content.Context
+import com.growingio.android.sdk.LibraryGioModule
+import com.growingio.android.sdk.track.http.EventData
+import com.growingio.android.sdk.track.http.EventStream
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry
+import com.growingio.sdk.annotation.GIOModule
 
-public class XORUtils {
-    private XORUtils() {
-    }
-
-    /**
-     * XOR异或算法加密
-     *
-     * @param data 数据
-     * @param key  密钥
-     * @return 返回加密后的数据
-     */
-    public static byte[] encrypt(byte[] data, int key) {
-        if (data == null || data.length == 0) {
-            return data;
-        }
-
-        byte[] result = new byte[data.length];
-        for (int i = 0; i < data.length; i++) {
-            result[i] = (byte) (data[i] ^ key);
-        }
-        return result;
+/**
+ *
+ * @author cpacm 5/13/21
+ */
+@GIOModule
+class JsonLibraryGioModule : LibraryGioModule() {
+    override fun registerComponents(context: Context, registry: TrackerRegistry) {
+        registry.register(EventData::class.java, EventStream::class.java, JsonDataLoader.Factory())
     }
 }

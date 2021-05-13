@@ -14,21 +14,31 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk;
-
-import android.content.Context;
-
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+package com.growingio.android.sdk.track.http;
 
 /**
- * Registers a set of components to use when initializing GrowingIO whthin an library when GrowingIO's
- * annotation processor is used.
+ * <p>
  *
- * @author cpacm 4/23/21
+ * @author cpacm 5/13/21
  */
-public abstract class LibraryGioModule {
+public class EventStream {
+    private final byte[] bodyData;
+    private String mediaType = "multipart/form-data";
 
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        //Default empty impl;
+    public EventStream(byte[] bodyData) {
+        this.bodyData = bodyData;
+    }
+
+    public EventStream(byte[] bodyData, String mediaType) {
+        this.bodyData = bodyData;
+        this.mediaType = mediaType;
+    }
+
+    public byte[] getBodyData() {
+        return bodyData;
+    }
+
+    public String getMediaType() {
+        return mediaType;
     }
 }

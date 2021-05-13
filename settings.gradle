@@ -21,6 +21,10 @@ include ':growingio-network:volley'
 include ':growingio-webservice:debugger'
 include ':growingio-webservice:circler'
 
+include ':growingio-data:json'
+include ':growingio-data:encoder'
+
+
 // sdks
 include ':gio-sdk:tracker'
 include ':gio-sdk:autotracker'

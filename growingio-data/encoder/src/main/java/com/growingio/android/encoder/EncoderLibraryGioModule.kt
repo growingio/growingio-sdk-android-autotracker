@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.growingio.android.encoder
 
-package com.growingio.android.sdk;
-
-import android.content.Context;
-
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import android.content.Context
+import com.growingio.android.sdk.LibraryGioModule
+import com.growingio.android.sdk.track.http.EventData
+import com.growingio.android.sdk.track.http.EventStream
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry
+import com.growingio.sdk.annotation.GIOModule
 
 /**
- * Registers a set of components to use when initializing GrowingIO whthin an library when GrowingIO's
- * annotation processor is used.
  *
- * @author cpacm 4/23/21
+ * @author cpacm 5/13/21
  */
-public abstract class LibraryGioModule {
-
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        //Default empty impl;
+@GIOModule
+class EncoderLibraryGioModule : LibraryGioModule() {
+    override fun registerComponents(context: Context, registry: TrackerRegistry) {
+        registry.register(EventStream::class.java, EventStream::class.java, EncoderDataLoader.Factory())
     }
 }

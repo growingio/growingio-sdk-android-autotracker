@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk;
+package com.growingio.android.encoder;
 
-import android.content.Context;
+public class XORUtils {
+    private XORUtils() {
+    }
 
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+    /**
+     * XOR异或算法加密
+     *
+     * @param data 数据
+     * @param key  密钥
+     * @return 返回加密后的数据
+     */
+    public static byte[] encrypt(byte[] data, int key) {
+        if (data == null || data.length == 0) {
+            return data;
+        }
 
-/**
- * Registers a set of components to use when initializing GrowingIO whthin an library when GrowingIO's
- * annotation processor is used.
- *
- * @author cpacm 4/23/21
- */
-public abstract class LibraryGioModule {
-
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        //Default empty impl;
+        byte[] result = new byte[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = (byte) (data[i] ^ key);
+        }
+        return result;
     }
 }
