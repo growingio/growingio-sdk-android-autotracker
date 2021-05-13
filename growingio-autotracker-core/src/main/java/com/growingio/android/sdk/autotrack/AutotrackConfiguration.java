@@ -18,13 +18,16 @@ package com.growingio.android.sdk.autotrack;
 
 import androidx.annotation.NonNull;
 
-import com.growingio.android.sdk.track.TrackConfiguration;
+import com.growingio.android.sdk.TrackConfiguration;
 
 public class AutotrackConfiguration extends TrackConfiguration {
     private float mImpressionScale = 0;
 
     public AutotrackConfiguration(String projectId, String urlScheme) {
         super(projectId, urlScheme);
+    }
+
+    AutotrackConfiguration() {
     }
 
     public AutotrackConfiguration setImpressionScale(float scale) {

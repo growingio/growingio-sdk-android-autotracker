@@ -28,7 +28,7 @@ dependencies {
     implementation libraries.others.x5_webview
 
 
-    debugApi project(':growingio-autotracker')
+    debugApi project(':gio-sdk:autotracker')
     releaseApi libraries.growingio.autotracker
 
     implementation project(':demo-core')

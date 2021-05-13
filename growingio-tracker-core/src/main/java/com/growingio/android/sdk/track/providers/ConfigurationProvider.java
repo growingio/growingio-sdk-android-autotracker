@@ -18,7 +18,7 @@ package com.growingio.android.sdk.track.providers;
 
 import androidx.annotation.NonNull;
 
-import com.growingio.android.sdk.track.TrackConfiguration;
+import com.growingio.android.sdk.TrackConfiguration;
 import com.growingio.android.sdk.track.base.Configurable;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 

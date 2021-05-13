@@ -35,7 +35,7 @@ dependencies {
     releaseApi libraries.growingio.tracker_core
 
     implementation project(':inject-annotation')
-    annotationProcessor project(':inject-compiler')
+    annotationProcessor project(':inject-annotation:compiler')
 
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.androidx.recyclerview

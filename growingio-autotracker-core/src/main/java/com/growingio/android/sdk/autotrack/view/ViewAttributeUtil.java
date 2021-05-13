@@ -82,18 +82,7 @@ public class ViewAttributeUtil {
         return null;
     }
 
-    public static void setMonitoringViewTreeEnabled(View view, boolean monitoring) {
-        if (monitoring) {
-            view.setTag(R.id.growing_tracker_monitoring_view_tree_enabled, new Object());
-        } else {
-            view.setTag(R.id.growing_tracker_monitoring_view_tree_enabled, null);
-        }
-    }
 
-    public static boolean isMonitoringViewTree(View view) {
-        Object monitoring = view.getTag(R.id.growing_tracker_monitoring_view_tree_enabled);
-        return monitoring != null;
-    }
 
     public static void setMonitoringFocusContent(View view, String text) {
         view.setTag(R.id.growing_tracker_monitoring_focus_content, text);

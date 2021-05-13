@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <string name="growing_circler_progress">正在进行圈选</string>
+
+    <string name="growing_circler_continue">继续圈选</string>
+    <string name="growing_circler_exit">退出圈选</string>
+    <string name="growing_circler_unconnected">当前设备已与电脑端断开连接，如需继续圈选请扫码重新连接</string>
+
+    <string name="growing_circler_connecting_to_web">正在和Web端建立连接....</string>
+    <string name="growing_circler_connected_to_web_failed">和Web端建立连接失败，请重新尝试</string>
+    <string name="growing_circler_device_unconnected">设备已断开连接</string>
+
+    <string name="growing_circler_app_version">APP版本：</string>
+    <string name="growing_circler_sdk_version">SDK版本：</string>
+</resources>

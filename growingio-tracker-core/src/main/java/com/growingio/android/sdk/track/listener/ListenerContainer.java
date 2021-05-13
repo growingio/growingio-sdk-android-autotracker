@@ -77,5 +77,10 @@ public abstract class ListenerContainer<L, A> {
         }
     }
 
+    protected int getListenerCount() {
+        return mListeners.size();
+    }
+
+
     abstract protected void singleAction(L listener, A action);
 }

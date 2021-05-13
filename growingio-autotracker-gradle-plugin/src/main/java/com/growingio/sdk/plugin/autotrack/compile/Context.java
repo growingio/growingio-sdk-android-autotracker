@@ -33,7 +33,7 @@ public class Context {
     }
 
     public int getASMVersion() {
-        return Opcodes.ASM5;
+        return Opcodes.ASM6;
     }
 
     public ClassLoader getClassLoader() {

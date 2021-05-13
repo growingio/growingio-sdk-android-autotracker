@@ -16,35 +16,37 @@
 
 package com.growingio.android.sdk.track.variation;
 
-import com.growingio.android.sdk.track.TrackConfiguration;
+import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.TrackConfiguration;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.marshaller.EventMarshaller;
-import com.growingio.android.sdk.track.http.HttpRequest;
+import com.growingio.android.sdk.track.http.EventResponse;
+import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.IEventNetSender;
 import com.growingio.android.sdk.track.middleware.SendResponse;
+import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.List;
-
-import okhttp3.Response;
 
 public class EventHttpSender implements IEventNetSender {
     private static final String TAG = "EventHttpSender";
 
-    private final EventMarshaller<JSONObject, JSONArray> mEventMarshaller;
+    private final EventMarshaller mEventMarshaller;
     private final String mProjectId;
     private final String mServerHost;
 
-    public EventHttpSender(EventMarshaller<JSONObject, JSONArray> eventMarshaller) {
+    public EventHttpSender(EventMarshaller eventMarshaller) {
         mEventMarshaller = eventMarshaller;
         TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
         mProjectId = configuration.getProjectId();
         mServerHost = configuration.getDataCollectionServerHost();
+    }
+
+    private ModelLoader<EventUrl, EventResponse> getModelLoader() {
+        return TrackerContext.get().getRegistry().getModelLoader(EventUrl.class, EventResponse.class);
     }
 
     /**
@@ -56,33 +58,38 @@ public class EventHttpSender implements IEventNetSender {
         if (events == null || events.isEmpty()) {
             return new SendResponse(true, 0);
         }
+        if (getModelLoader() == null) {
+            Logger.e(TAG, "please register http request component first");
+            return new SendResponse(false, 0);
+        }
 
-        BaseEvent event;
-        if (events.get(0) instanceof BaseEvent) {
-            event = (BaseEvent) events.get(0);
-        } else {
+        if (!(events.get(0) instanceof BaseEvent)) {
             return new SendResponse(true, 0);
         }
 
-        String data = mEventMarshaller.marshall(events).toString();
-        HttpRequest httpRequest = HttpRequest.postJson(mServerHost)
+        byte[] data = mEventMarshaller.marshall(events);
+        EventUrl eventUrl = new EventUrl(mServerHost)
                 .addPath("v3")
                 .addPath("projects")
                 .addPath(mProjectId)
                 .addPath("collect")
                 .addParam("stm", String.valueOf(System.currentTimeMillis()))
-                .setBody(data)
-                .build();
-        Logger.printJson(TAG, "POST: " + httpRequest.getRequest().url().toString(), data);
-        Response response = httpRequest.execute();
+                .setBodyData(data)
+                .setMediaType("application/json");
+        ModelLoader.LoadData<EventResponse> loadData = getModelLoader().buildLoadData(eventUrl);
+        if (loadData.fetcher.getDataClass() != EventResponse.class) {
+            Logger.e(TAG, new IllegalArgumentException("illegal data class for http response."));
+            return new SendResponse(true, 0);
+        }
+        EventResponse response = loadData.fetcher.executeData();
 
-        boolean successful = response != null && response.isSuccessful();
+        boolean successful = response != null && response.isSucceeded();
         if (successful) {
             Logger.d(TAG, "Send events successfully");
         } else {
             Logger.d(TAG, "Send events failed, response = " + response);
         }
 
-        return new SendResponse(successful, data.getBytes().length);
+        return new SendResponse(successful, data.length);
     }
 }

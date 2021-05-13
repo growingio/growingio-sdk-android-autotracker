@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.IDataSharer;
 import com.growingio.android.sdk.track.ipc.MultiProcessDataSharer;
 
@@ -41,7 +41,7 @@ public class PersistentDataProvider {
     }
 
     private PersistentDataProvider() {
-        Context context = ContextProvider.getApplicationContext();
+        Context context = TrackerContext.get().getApplicationContext();
         mDataSharer = new MultiProcessDataSharer(context, SHARER_NAME, SHARER_MAX_SIZE);
     }
 

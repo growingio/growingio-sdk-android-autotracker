@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.objectweb.asm.Opcodes.ACONST_NULL;
-import static org.objectweb.asm.Opcodes.ASM5;
 
 public class DesugaringClassVisitor extends ClassVisitor {
     private static final String TAG = "DesugaringClassVisitor";
@@ -50,7 +49,7 @@ public class DesugaringClassVisitor extends ClassVisitor {
     private int mGenerateMethodIndex = 0;
 
     public DesugaringClassVisitor(ClassVisitor cv, Context context) {
-        super(ASM5, cv);
+        super(context.getASMVersion(), cv);
         mContext = context;
         mLog = context.getLog();
     }
@@ -58,7 +57,7 @@ public class DesugaringClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor methodVisitor = super.visitMethod(access, name, desc, signature, exceptions);
-        return new DesugaringMethodVisitor(ASM5, methodVisitor, access, name, desc);
+        return new DesugaringMethodVisitor(mContext.getASMVersion(), methodVisitor, access, name, desc);
     }
 
     @Override

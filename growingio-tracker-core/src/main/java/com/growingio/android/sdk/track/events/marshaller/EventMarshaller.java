@@ -20,8 +20,6 @@ import com.growingio.android.sdk.track.middleware.GEvent;
 
 import java.util.List;
 
-public interface EventMarshaller<S, M> {
-    S marshall(GEvent event);
-
-    M marshall(List<GEvent> events);
+public interface EventMarshaller {
+    byte[] marshall(List<GEvent> events);
 }

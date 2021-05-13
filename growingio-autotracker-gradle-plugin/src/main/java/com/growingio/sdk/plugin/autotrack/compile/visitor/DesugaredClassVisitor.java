@@ -29,8 +29,6 @@ import org.objectweb.asm.commons.Method;
 
 import java.util.Set;
 
-import static org.objectweb.asm.Opcodes.ASM5;
-
 public class DesugaredClassVisitor extends ClassVisitor {
     private final Context mContext;
     private final Log mLog;
@@ -46,7 +44,7 @@ public class DesugaredClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor methodVisitor = super.visitMethod(access, name, desc, signature, exceptions);
-        return new DesugaredMethodVisitor(ASM5, methodVisitor, access, name, desc);
+        return new DesugaredMethodVisitor(mContext.getASMVersion(), methodVisitor, access, name, desc);
     }
 
     private TargetMethod findTargetMethod(String name, String desc) {
