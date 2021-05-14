@@ -23,7 +23,7 @@ include ':growingio-webservice:circler'
 
 include ':growingio-data:json'
 include ':growingio-data:encoder'
-
+include ':growingio-tools:crash'
 
 // sdks
 include ':gio-sdk:tracker'

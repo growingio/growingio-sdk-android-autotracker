@@ -50,10 +50,6 @@ public class EventHttpSender implements IEventNetSender {
         return TrackerContext.get().getRegistry().getModelLoader(EventUrl.class, EventResponse.class);
     }
 
-    /**
-     * 数据可以选择压缩+加密
-     * https://codes.growingio.com/w/api_v3_interface/
-     */
     @Override
     public SendResponse send(List<GEvent> events) {
         if (events == null || events.isEmpty()) {
@@ -85,7 +81,7 @@ public class EventHttpSender implements IEventNetSender {
             eventUrl.setMediaType("application/json");
         }
 
-        // data encoder
+        //data encoder - https://codes.growingio.com/w/api_v3_interface/
         EventStream encoder = TrackerContext.get().executeData(new EventStream(data), EventStream.class, EventStream.class);
         if (encoder != null) {
             eventUrl.setBodyData(encoder.getBodyData())

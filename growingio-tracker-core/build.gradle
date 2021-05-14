@@ -38,8 +38,6 @@ android {
 dependencies {
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
-    implementation libraries.growingio.gmonitor
-
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
