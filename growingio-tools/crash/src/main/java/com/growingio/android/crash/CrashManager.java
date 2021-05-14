@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.crash;
+package com.growingio.android.crash;
 
 import android.content.Context;
 import android.support.annotation.RestrictTo;

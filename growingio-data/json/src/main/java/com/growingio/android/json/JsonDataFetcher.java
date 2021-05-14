@@ -27,7 +27,6 @@ import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 

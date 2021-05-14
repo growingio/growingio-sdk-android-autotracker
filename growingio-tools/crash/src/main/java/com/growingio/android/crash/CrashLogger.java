@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.crash;
+package com.growingio.android.crash;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.growingio.android.sdk.monitor.event.Event;
@@ -30,7 +28,7 @@ class CrashLogger extends BaseLogger {
     private static final String TYPE = "Monitor";
 
     @Override
-    protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
+    protected void print(int priority, String tag, String message, Throwable t) {
         switch (priority) {
             case Log.VERBOSE:
                 MonitorLogger.v(CrashManager.ALIAS, tag, message);
