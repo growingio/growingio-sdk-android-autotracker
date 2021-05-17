@@ -77,7 +77,7 @@ public class EventsManager {
         Uri uri = getContentUri();
         contentResolver.delete(uri,
                 COLUMN_ID + "<=? AND " + COLUMN_EVENT_TYPE + "=? AND " + COLUMN_POLICY + "=?",
-                new String[]{String.valueOf(id)});
+                new String[]{String.valueOf(id), eventType, String.valueOf(policy)});
     }
 
     public void removeEventById(long id) {
