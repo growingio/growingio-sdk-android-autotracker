@@ -89,6 +89,10 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
 
     private static void sendChangeEvent(ViewNode viewNode) {
         Page<?> page = PageProvider.get().findPage(viewNode.getView());
+        if (page == null) {
+            Logger.e(TAG, "sendChangeEvent page Activity is NULL");
+            return;
+        }
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ViewElementEvent.Builder()
                         .setEventType(AutotrackEventType.VIEW_CHANGE)
