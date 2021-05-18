@@ -33,12 +33,6 @@ import static com.growingio.android.sdk.track.middleware.EventsInfoTable.TABLE_E
 
 public class EventsContentProvider extends ContentProvider {
 
-    //Uri info
-    //authority
-
-     public static String eventsInfoAuthority;
-     public static Uri authorityUri;
-
     private static final UriMatcher MATCHER;
     private static final String TAG = "EventsContentProvider";
     //code
@@ -53,12 +47,8 @@ public class EventsContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-
-        eventsInfoAuthority =  this.getContext().getPackageName() + ".EventsContentProvider";
-        authorityUri = Uri.parse("content://" + eventsInfoAuthority);
-
+        String eventsInfoAuthority =  this.getContext().getPackageName() + ".EventsContentProvider";
         MATCHER.addURI(eventsInfoAuthority, TABLE_EVENTS, EVENTS_INFO_CODE);
-
         this.dbHelper = new EventsSQLiteOpenHelper(this.getContext(), "growing3.db");
         return true;
     }
