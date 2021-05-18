@@ -51,11 +51,13 @@
         android:layout_height="wrap_content">
 
         <RadioButton
+            android:id="@+id/rb_male"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="male" />
 
         <RadioButton
+            android:id="@+id/rb_female"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="female" />

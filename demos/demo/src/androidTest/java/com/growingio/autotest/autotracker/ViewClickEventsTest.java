@@ -174,21 +174,21 @@ public class ViewClickEventsTest extends EventsTest {
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPath("/ClickTestActivity")
-                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[0]")
-                        .setTextValue("male")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[1]#rb_female")
+                        .setTextValue("female")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
                         .setPath("/ClickTestActivity")
-                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[1]")
-                        .setTextValue("female")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[0]#rb_male")
+                        .setTextValue("male")
                         .setIndex(-1)
                         .build()
 
         ));
         ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
-        onView(withText("male")).perform(click());
         onView(withText("female")).perform(click());
+        onView(withText("male")).perform(click());
         Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
