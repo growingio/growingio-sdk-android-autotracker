@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <item name="growing_tracker_monitoring_view_tree_enabled" type="id" />
+</resources>

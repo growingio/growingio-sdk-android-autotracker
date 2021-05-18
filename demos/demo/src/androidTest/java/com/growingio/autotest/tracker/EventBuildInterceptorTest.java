@@ -22,7 +22,7 @@ import androidx.test.filters.LargeTest;
 
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.core.TrackActivity;
-import com.growingio.android.sdk.track.GrowingTracker;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -49,7 +49,6 @@ public class EventBuildInterceptorTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration());
     }
 
@@ -89,7 +88,7 @@ public class EventBuildInterceptorTest extends EventsTest {
             }
         });
         ActivityScenario.launch(TrackActivity.class);
-        GrowingTracker.get().trackCustomEvent(testCustomEvent);
+        GrowingAutotracker.get().trackCustomEvent(testCustomEvent);
         Awaiter.untilTrue(receivedEvent);
     }
 }

@@ -10,7 +10,6 @@ if (withAutotrack) {
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenLocal()
         mavenCentral()
         maven {url "https://s01.oss.sonatype.org/content/repositories/snapshots/"}
@@ -136,13 +135,10 @@ dependencies {
     implementation libraries.android.constraint
     implementation libraries.android.multidex
     implementation libraries.others.x5_webview
-    implementation (name: 'oaid_sdk_1.0.22', ext: 'aar')
-    debugApi project(':growingio-tracker')
-    releaseApi libraries.growingio.tracker
+    implementation(name: 'oaid_sdk_1.0.22', ext: 'aar')
     implementation project(':demo-core')
-    if (withAutotrack) {
-        implementation project(":demo-autotrack")
-    }
+    implementation project(":demo-autotrack")
 
     compileOnly libraries.androidx.appcompat
+
 }

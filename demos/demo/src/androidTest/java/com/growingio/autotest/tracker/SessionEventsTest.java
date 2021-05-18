@@ -32,8 +32,8 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.MainActivity;
 import com.google.common.truth.Truth;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.BuildConfig;
-import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.autotest.EventsTest;
@@ -70,7 +70,6 @@ public class SessionEventsTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteAllData();
-        DemoApplication.setIsAutotracker(false);
         DemoApplication.setConfiguration(new TestTrackConfiguration()
                 .setSessionInterval(10)
                 .setChannel(APP_CHANNEL)
@@ -265,7 +264,7 @@ public class SessionEventsTest extends EventsTest {
                 }
             }
         });
-        GrowingTracker.get().setLoginUserId("New" + mLoginUserId);
+        GrowingAutotracker.get().setLoginUserId("New" + mLoginUserId);
         Awaiter.untilTrue(receivedVisit);
     }
 
@@ -279,7 +278,7 @@ public class SessionEventsTest extends EventsTest {
                 Truth.assertWithMessage("Received Visit Event").fail();
             }
         });
-        GrowingTracker.get().setLoginUserId(mLoginUserId);
+        GrowingAutotracker.get().setLoginUserId(mLoginUserId);
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
     }
 
@@ -300,7 +299,7 @@ public class SessionEventsTest extends EventsTest {
                 }
             }
         });
-        GrowingTracker.get().setLoginUserId("New" + mLoginUserId);
+        GrowingAutotracker.get().setLoginUserId("New" + mLoginUserId);
         Awaiter.untilTrue(receivedVisit);
     }
 
@@ -311,7 +310,7 @@ public class SessionEventsTest extends EventsTest {
                 Truth.assertWithMessage("Received Visit Event").fail();
             }
         });
-        GrowingTracker.get().setLoginUserId("TestMockedName");
+        GrowingAutotracker.get().setLoginUserId("TestMockedName");
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
     }
 
@@ -331,7 +330,7 @@ public class SessionEventsTest extends EventsTest {
                 }
             }
         });
-        GrowingTracker.get().setLoginUserId("TestMockedName");
+        GrowingAutotracker.get().setLoginUserId("TestMockedName");
         Awaiter.untilTrue(receivedVisit);
 
     }
@@ -343,7 +342,7 @@ public class SessionEventsTest extends EventsTest {
                 Truth.assertWithMessage("Received Visit Event").fail();
             }
         });
-        GrowingTracker.get().cleanLoginUserId();
+        GrowingAutotracker.get().cleanLoginUserId();
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
     }
 
@@ -366,7 +365,7 @@ public class SessionEventsTest extends EventsTest {
         resendVisitEventLocationFromNull2NotNull();
         resendVisitEventLocationFromNotNull2NotNull();
 
-        GrowingTracker.get().cleanLocation();
+        GrowingAutotracker.get().cleanLocation();
         resendVisitEventLocationFromNull2NotNull();
         scenario.close();
     }
@@ -386,7 +385,7 @@ public class SessionEventsTest extends EventsTest {
                 }
             }
         });
-        GrowingTracker.get().setLocation(66, 99);
+        GrowingAutotracker.get().setLocation(66, 99);
         Awaiter.untilTrue(receivedVisit);
     }
 
@@ -397,7 +396,7 @@ public class SessionEventsTest extends EventsTest {
                 Truth.assertWithMessage("Received Visit Event").fail();
             }
         });
-        GrowingTracker.get().setLocation(100, 100);
+        GrowingAutotracker.get().setLocation(100, 100);
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
     }
 
@@ -431,7 +430,7 @@ public class SessionEventsTest extends EventsTest {
             }
         });
 
-        GrowingTracker.get().trackCustomEvent("beforeVisitEvent");
+        GrowingAutotracker.get().trackCustomEvent("beforeVisitEvent");
         Awaiter.untilTrue(receivedVisit);
         Awaiter.untilTrue(receivedCustom);
 
@@ -453,7 +452,7 @@ public class SessionEventsTest extends EventsTest {
         });
 
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
-        GrowingTracker.get().trackCustomEvent("beforeVisitEvent");
+        GrowingAutotracker.get().trackCustomEvent("beforeVisitEvent");
         scenario.close();
     }
 

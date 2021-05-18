@@ -31,9 +31,9 @@ import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
-import com.growingio.android.sdk.autotrack.webservices.circle.ViewUtil;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
+import com.growingio.android.sdk.track.view.WindowHelper;
 
 import java.lang.annotation.Retention;
 

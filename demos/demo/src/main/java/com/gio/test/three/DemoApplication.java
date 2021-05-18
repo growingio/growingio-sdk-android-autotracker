@@ -28,7 +28,6 @@ import androidx.annotation.RequiresApi;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-import com.growingio.android.sdk.track.GrowingTracker;
 import com.growingio.android.sdk.track.log.Logger;
 import com.tencent.smtt.sdk.QbSdk;
 
@@ -39,10 +38,6 @@ public class DemoApplication extends Application {
 
     private static boolean sIsAutotracker = true;
     private static AutotrackConfiguration sConfiguration;
-
-    public static void setIsAutotracker(boolean isAutotracker) {
-        sIsAutotracker = isAutotracker;
-    }
 
     public static void setConfiguration(AutotrackConfiguration configuration) {
         sConfiguration = configuration;
@@ -86,11 +81,7 @@ public class DemoApplication extends Application {
                     .setDebugEnabled(true)
                     .setOaidEnabled(false);
         }
-        if (sIsAutotracker) {
-            GrowingAutotracker.startWithConfiguration(this, sConfiguration);
-        } else {
-            GrowingTracker.startWithConfiguration(this, sConfiguration);
-        }
+        GrowingAutotracker.startWithConfiguration(this, sConfiguration);
     }
 
     private boolean isMainProcess() {

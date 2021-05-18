@@ -43,11 +43,12 @@ import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
-import com.growingio.android.sdk.track.ContextProvider;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
+import com.growingio.android.sdk.track.view.WindowHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,11 +119,11 @@ public class ViewHelper {
     public static ViewNode getMenuItemViewNode(Page<?> page, MenuItem menuItem) {
         StringBuilder xpath = new StringBuilder();
         if (page.isIgnored()) {
-            xpath.append(WindowHelper.IGNORE_PAGE_PREFIX);
+            xpath.append(PageHelper.IGNORE_PAGE_PREFIX);
         } else {
-            xpath.append(WindowHelper.PAGE_PREFIX);
+            xpath.append(PageHelper.PAGE_PREFIX);
         }
-        Context context = ContextProvider.getApplicationContext();
+        Context context = TrackerContext.get().getApplicationContext();
         xpath.append("/MenuView/MenuItem#").append(getPackageId(context, menuItem.getItemId()));
 
         return ViewNode.ViewNodeBuilder.newViewNode()
@@ -225,14 +226,14 @@ public class ViewHelper {
             originalXpath = "/" + ViewAttributeUtil.getCustomId(rootView);
             xpath = originalXpath;
         } else if (rootPage != null) {
-            originalXpath = WindowHelper.get().getWindowPrefix(rootView);
+            originalXpath = PageHelper.getWindowPrefix(rootView);
             xpath = originalXpath;
         } else {
-            String prefix = WindowHelper.get().getWindowPrefix(rootView);
+            String prefix = PageHelper.getWindowPrefix(rootView);
 
             // PopupDecorView 这个class是在Android 6.0的时候才引入的，为了兼容6.0以下的版本，需要手动添加这个class层级
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
-                    && prefix.equals(WindowHelper.POPUP_WINDOW_PREFIX)
+                    && prefix.equals(PageHelper.POPUP_WINDOW_PREFIX)
                     && !POPUP_DECOR_VIEW_CLASS_NAME.equals(ClassUtil.getSimpleClassName(rootView.getClass()))) {
                 xpath = prefix + "/" + POPUP_DECOR_VIEW_CLASS_NAME + "/" + ClassUtil.getSimpleClassName(rootView.getClass()) + "[0]";
             } else {
