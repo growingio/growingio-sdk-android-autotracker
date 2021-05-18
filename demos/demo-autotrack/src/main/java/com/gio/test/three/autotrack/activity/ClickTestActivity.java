@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
@@ -63,6 +64,8 @@ public class ClickTestActivity extends Activity {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
 
         });
+        RadioButton radioButton = findViewById(R.id.rb_male);
+        radioGroup.check(radioButton.getId());
 
         Switch switchBtn = findViewById(R.id.switch1);
         switchBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {

@@ -161,6 +161,10 @@ class ViewClickProvider {
     }
 
     private static void sendClickEvent(Page<?> page, ViewNode viewNode) {
+        if (page == null) {
+            Logger.e(TAG, "sendClickEvent page Activity is NULL");
+            return;
+        }
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ViewElementEvent.Builder()
                         .setEventType(AutotrackEventType.VIEW_CLICK)
