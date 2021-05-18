@@ -16,9 +16,10 @@
 
 package com.growingio.android.encoder;
 
-import com.growingio.android.encoder.snappy.Snappy;
 import com.growingio.android.sdk.track.http.EventStream;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.snappy.Snappy;
+import com.growingio.android.snappy.XORUtils;
 
 /**
  * <p>

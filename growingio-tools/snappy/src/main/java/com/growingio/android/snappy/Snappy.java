@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.encoder.snappy;
+package com.growingio.android.snappy;
 
 import android.annotation.TargetApi;
 import android.os.Build;
@@ -53,8 +53,7 @@ public final class Snappy
     {
         byte[] compressedOut = new byte[maxCompressedLength(data.length)];
         int compressedSize = compress(data, 0, data.length, compressedOut, 0);
-        byte[] trimmedBuffer = Arrays.copyOf(compressedOut, compressedSize);
-        return trimmedBuffer;
+        return Arrays.copyOf(compressedOut, compressedSize);
     }
 
     static final int LITERAL = 0;

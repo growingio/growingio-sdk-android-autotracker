@@ -1,7 +1,5 @@
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
 }
 
 android {
@@ -26,14 +24,5 @@ android {
     }
 }
 
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
-    compileOnly project(':growingio-tracker-core')
-    debugApi project(':growingio-tools:snappy')
-    releaseApi libraries.growingio.snappy
-
-    implementation project(":growingio-annotation")
-    kapt project(":growingio-annotation:compiler")
-}
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+// snappy为工具库，固定版本为1.1.0，不再随着sdk版本迭代
+// apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

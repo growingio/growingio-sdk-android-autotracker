@@ -44,8 +44,10 @@ buildscript {
                         'gmonitor'        : 'com.growingio.android:gmonitor:1.5.0',
                         'tracker_core'    : "com.growingio.android:tracker-core:$releaseConfiguration.releaseVersion",
                         'tracker'         : "com.growingio.android:tracker:$releaseConfiguration.releaseVersion",
+                        'tracker_cdp'     : "com.growingio.android:tracker-cdp:$releaseConfiguration.releaseVersion",
                         'autotracker_core': "com.growingio.android:autotracker-core:$releaseConfiguration.releaseVersion",
                         'autotracker'     : "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion",
+                        'autotracker_cdp' : "com.growingio.android:autotracker-cdp:$releaseConfiguration.releaseVersion",
                         'annotation'      : "com.growingio.android:annotation:$releaseConfiguration.releaseVersion",
                         'compiler'        : "com.growingio.android:compiler:$releaseConfiguration.releaseVersion",
 
@@ -54,6 +56,10 @@ buildscript {
                         'urlconnection'   : "com.growingio.android:urlconnection:$releaseConfiguration.releaseVersion",
                         'debugger'        : "com.growingio.android:debugger:$releaseConfiguration.releaseVersion",
                         'circler'         : "com.growingio.android:circler:$releaseConfiguration.releaseVersion",
+                        'json'            : "com.growingio.android:json:$releaseConfiguration.releaseVersion",
+                        'encoder'         : "com.growingio.android:encoder:$releaseConfiguration.releaseVersion",
+                        'crash'           : "com.growingio.android:crash:$releaseConfiguration.releaseVersion",
+                        'snappy'          : "com.growingio.android:snappy:1.1.0",
                 ],
 
                 'google'   : [

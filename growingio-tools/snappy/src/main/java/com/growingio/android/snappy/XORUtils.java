@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.encoder;
+package com.growingio.android.snappy;
 
 public class XORUtils {
     private XORUtils() {

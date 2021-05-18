@@ -53,7 +53,7 @@ public class EventHttpSender implements IEventNetSender {
     @Override
     public SendResponse send(List<GEvent> events) {
         if (events == null || events.isEmpty()) {
-            return new SendResponse(true, 0);
+            return new SendResponse(false, 0);
         }
         if (getNetworkModelLoader() == null) {
             Logger.e(TAG, "please register http request component first");

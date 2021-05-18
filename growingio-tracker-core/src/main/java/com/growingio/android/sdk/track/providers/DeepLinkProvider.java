@@ -29,6 +29,7 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
+import com.growingio.android.sdk.track.webservices.DeepLink;
 import com.growingio.android.sdk.track.webservices.WebService;
 
 
@@ -135,7 +136,21 @@ public class DeepLinkProvider implements IActivityLifecycle {
             }
 //                intent.setData(null);
         } else {
-            // TODO DeepLink
+            Map<String, String> params = new HashMap<>();
+            for (String parameterName : data.getQueryParameterNames()) {
+                params.put(parameterName, data.getQueryParameter(parameterName));
+            }
+            TrackerContext.get().loadData(new DeepLink(params), DeepLink.class, WebService.class, new DataFetcher.DataCallback<WebService>() {
+                @Override
+                public void onDataReady(WebService data) {
+                    Logger.d(TAG, "open deep link.");
+                }
+
+                @Override
+                public void onLoadFailed(Exception e) {
+                    Logger.e(TAG, e.getMessage());
+                }
+            });
         }
     }
 }
