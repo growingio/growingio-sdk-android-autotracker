@@ -18,8 +18,6 @@ package com.growingio.sdk.annotation.compiler
 
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
-import com.sun.tools.javac.code.Attribute.UnresolvedClass
-import com.sun.tools.javac.code.Type
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
