@@ -1,13 +1,11 @@
 /*
- * Copyright (C) 2011 the original author or authors.
- * See the notice.md file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
 package com.growingio.android.snappy;
 
 import java.lang.ref.SoftReference;
@@ -26,8 +26,7 @@ import java.lang.ref.SoftReference;
  *
  * @author tatu
  */
-class BufferRecycler
-{
+class BufferRecycler {
     private static final int MIN_ENCODING_BUFFER = 4000;
 
     private static final int MIN_OUTPUT_BUFFER = 8000;
@@ -37,7 +36,7 @@ class BufferRecycler
      * to a {@link BufferRecycler} used to provide a low-cost
      * buffer recycling for buffers we need for encoding, decoding.
      */
-    protected static final ThreadLocal<SoftReference<BufferRecycler>> recyclerRef = new ThreadLocal<SoftReference<BufferRecycler>>();
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> RECYCLER_REF = new ThreadLocal<SoftReference<BufferRecycler>>();
 
     private byte[] inputBuffer;
     private byte[] outputBuffer;
@@ -50,27 +49,24 @@ class BufferRecycler
     /**
      * Accessor to get thread-local recycler instance
      */
-    public static BufferRecycler instance()
-    {
-        SoftReference<BufferRecycler> ref = recyclerRef.get();
+    public static BufferRecycler instance() {
+        SoftReference<BufferRecycler> ref = RECYCLER_REF.get();
 
         BufferRecycler bufferRecycler;
         if (ref == null) {
             bufferRecycler = null;
-        }
-        else {
+        } else {
             bufferRecycler = ref.get();
         }
 
         if (bufferRecycler == null) {
             bufferRecycler = new BufferRecycler();
-            recyclerRef.set(new SoftReference<BufferRecycler>(bufferRecycler));
+            RECYCLER_REF.set(new SoftReference<BufferRecycler>(bufferRecycler));
         }
         return bufferRecycler;
     }
 
-    public void clear()
-    {
+    public void clear() {
         inputBuffer = null;
         outputBuffer = null;
         decodingBuffer = null;
@@ -82,58 +78,49 @@ class BufferRecycler
     // Buffers for encoding (output)
     ///////////////////////////////////////////////////////////////////////
 
-    public byte[] allocEncodingBuffer(int minSize)
-    {
+    public byte[] allocEncodingBuffer(int minSize) {
         byte[] buf = encodingBuffer;
         if (buf == null || buf.length < minSize) {
             buf = new byte[Math.max(minSize, MIN_ENCODING_BUFFER)];
-        }
-        else {
+        } else {
             encodingBuffer = null;
         }
         return buf;
     }
 
-    public void releaseEncodeBuffer(byte[] buffer)
-    {
+    public void releaseEncodeBuffer(byte[] buffer) {
         if (encodingBuffer == null || buffer.length > encodingBuffer.length) {
             encodingBuffer = buffer;
         }
     }
 
-    public byte[] allocOutputBuffer(int minSize)
-    {
+    public byte[] allocOutputBuffer(int minSize) {
         byte[] buf = outputBuffer;
         if (buf == null || buf.length < minSize) {
             buf = new byte[Math.max(minSize, MIN_OUTPUT_BUFFER)];
-        }
-        else {
+        } else {
             outputBuffer = null;
         }
         return buf;
     }
 
-    public void releaseOutputBuffer(byte[] buffer)
-    {
+    public void releaseOutputBuffer(byte[] buffer) {
         if (outputBuffer == null || (buffer != null && buffer.length > outputBuffer.length)) {
             outputBuffer = buffer;
         }
     }
 
-    public short[] allocEncodingHash(int suggestedSize)
-    {
+    public short[] allocEncodingHash(int suggestedSize) {
         short[] buf = encodingHash;
         if (buf == null || buf.length < suggestedSize) {
             buf = new short[suggestedSize];
-        }
-        else {
+        } else {
             encodingHash = null;
         }
         return buf;
     }
 
-    public void releaseEncodingHash(short[] buffer)
-    {
+    public void releaseEncodingHash(short[] buffer) {
         if (encodingHash == null || (buffer != null && buffer.length > encodingHash.length)) {
             encodingHash = buffer;
         }
@@ -143,39 +130,33 @@ class BufferRecycler
     // Buffers for decoding (input)
     ///////////////////////////////////////////////////////////////////////
 
-    public byte[] allocInputBuffer(int minSize)
-    {
+    public byte[] allocInputBuffer(int minSize) {
         byte[] buf = inputBuffer;
         if (buf == null || buf.length < minSize) {
             buf = new byte[Math.max(minSize, MIN_OUTPUT_BUFFER)];
-        }
-        else {
+        } else {
             inputBuffer = null;
         }
         return buf;
     }
 
-    public void releaseInputBuffer(byte[] buffer)
-    {
+    public void releaseInputBuffer(byte[] buffer) {
         if (inputBuffer == null || (buffer != null && buffer.length > inputBuffer.length)) {
             inputBuffer = buffer;
         }
     }
 
-    public byte[] allocDecodeBuffer(int size)
-    {
+    public byte[] allocDecodeBuffer(int size) {
         byte[] buf = decodingBuffer;
         if (buf == null || buf.length < size) {
             buf = new byte[size];
-        }
-        else {
+        } else {
             decodingBuffer = null;
         }
         return buf;
     }
 
-    public void releaseDecodeBuffer(byte[] buffer)
-    {
+    public void releaseDecodeBuffer(byte[] buffer) {
         if (decodingBuffer == null || (buffer != null && buffer.length > decodingBuffer.length)) {
             decodingBuffer = buffer;
         }

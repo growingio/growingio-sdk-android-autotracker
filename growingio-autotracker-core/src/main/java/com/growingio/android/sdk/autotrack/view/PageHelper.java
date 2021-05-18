@@ -28,7 +28,7 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
  *
  * @author cpacm 5/10/21
  */
-public class PageHelper {
+class PageHelper {
 
     public static final String PAGE_PREFIX = "/Page";
     public static final String IGNORE_PAGE_PREFIX = "/IgnorePage";
@@ -38,11 +38,14 @@ public class PageHelper {
     public static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
     public static final String CUSTOM_WINDOW_PREFIX = "/CustomWindow";
 
-    public static String getMainWindowPrefix() {
+    private PageHelper() {
+    }
+
+    static String getMainWindowPrefix() {
         return MAIN_WINDOW_PREFIX;
     }
 
-    public static String getWindowPrefix(View root) {
+    static String getWindowPrefix(View root) {
         String windowPrefix;
         Page<?> page = ViewAttributeUtil.getViewPage(root);
         if (page != null) {

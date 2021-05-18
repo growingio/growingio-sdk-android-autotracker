@@ -53,7 +53,7 @@ public class VolleyDataLoader implements ModelLoader<EventUrl, EventResponse> {
     }
 
     public static class Factory implements ModelLoaderFactory<EventUrl, EventResponse> {
-        private static volatile RequestQueue internalQueue;
+        private static volatile RequestQueue sInternalQueue;
 
         private final VolleyRequestFactory requestFactory;
         private final RequestQueue requestQueue;
@@ -82,14 +82,14 @@ public class VolleyDataLoader implements ModelLoader<EventUrl, EventResponse> {
         }
 
         private static RequestQueue getInternalQueue(Context context) {
-            if (internalQueue == null) {
+            if (sInternalQueue == null) {
                 synchronized (Factory.class) {
-                    if (internalQueue == null) {
-                        internalQueue = Volley.newRequestQueue(context);
+                    if (sInternalQueue == null) {
+                        sInternalQueue = Volley.newRequestQueue(context);
                     }
                 }
             }
-            return internalQueue;
+            return sInternalQueue;
         }
 
         @Override

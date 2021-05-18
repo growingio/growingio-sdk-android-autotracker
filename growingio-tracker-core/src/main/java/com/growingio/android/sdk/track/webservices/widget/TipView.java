@@ -201,7 +201,7 @@ public class TipView extends FrameLayout {
         remove();
     }
 
-    public void show(){
+    public void show() {
         mIsDismissed = false;
     }
 

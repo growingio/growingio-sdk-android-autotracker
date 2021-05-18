@@ -1,13 +1,11 @@
 /*
- * Copyright (C) 2011 the original author or authors.
- * See the notice.md file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.growingio.android.snappy;
 
 import android.annotation.SuppressLint;
@@ -22,8 +21,7 @@ import android.annotation.SuppressLint;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-final class SnappyCompressor
-{
+final class SnappyCompressor {
     private static final boolean NATIVE_LITTLE_ENDIAN = ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN;
 
     // *** DO NOT CHANGE THE VALUE OF kBlockSize ***
@@ -42,8 +40,10 @@ final class SnappyCompressor
     private static final int MAX_HASH_TABLE_BITS = 14;
     private static final int MAX_HASH_TABLE_SIZE = 1 << MAX_HASH_TABLE_BITS;
 
-    public static int maxCompressedLength(int sourceLength)
-    {
+    private SnappyCompressor() {
+    }
+
+    public static int maxCompressedLength(int sourceLength) {
         // Compressed data can be defined as:
         //    compressed := item* literal*
         //    item       := literal* copy
@@ -72,8 +72,7 @@ final class SnappyCompressor
             final int uncompressedOffset,
             final int uncompressedLength,
             final byte[] compressed,
-            final int compressedOffset)
-    {
+            final int compressedOffset) {
         // First write the uncompressed size to the output as a variable length int
         int compressedIndex = writeUncompressedLength(compressed, compressedOffset, uncompressedLength);
 
@@ -106,8 +105,7 @@ final class SnappyCompressor
             final int inputSize,
             final byte[] output,
             int outputIndex,
-            final short[] table)
-    {
+            final short[] table) {
         int ipIndex = inputOffset;
         assert inputSize <= BLOCK_SIZE;
         final int ipEndIndex = inputOffset + inputSize;
@@ -192,8 +190,7 @@ final class SnappyCompressor
     }
 
     @SuppressLint("Assert")
-    private static int[] findCandidate(byte[] input, int ipIndex, int ipLimit, int inputOffset, int shift, short[] table, int skip)
-    {
+    private static int[] findCandidate(byte[] input, int ipIndex, int ipLimit, int inputOffset, int shift, short[] table, int skip) {
 
         int candidateIndex = 0;
         for (ipIndex += 1; ipIndex + bytesBetweenHashLookups(skip) <= ipLimit; ipIndex += bytesBetweenHashLookups(skip++)) {
@@ -215,11 +212,10 @@ final class SnappyCompressor
                 break;
             }
         }
-        return new int[] {ipIndex, candidateIndex, skip};
+        return new int[]{ipIndex, candidateIndex, skip};
     }
 
-    private static int bytesBetweenHashLookups(int skip)
-    {
+    private static int bytesBetweenHashLookups(int skip) {
         return (skip >>> 5);
     }
 
@@ -233,8 +229,7 @@ final class SnappyCompressor
             int outputIndex,
             short[] table,
             int shift,
-            int candidateIndex)
-    {
+            int candidateIndex) {
         // Step 3: Call EmitCopy, and then see if another EmitCopy could
         // be our next move.  Repeat until we find no match for the
         // input immediately after what was consumed by the last EmitCopy call.
@@ -257,7 +252,7 @@ final class SnappyCompressor
 
             // are we done?
             if (ipIndex >= inputOffset + inputSize - INPUT_MARGIN_BYTES) {
-                return new int[] {ipIndex, outputIndex};
+                return new int[]{ipIndex, outputIndex};
             }
 
             // We could immediately start working at ip now, but to improve
@@ -267,8 +262,7 @@ final class SnappyCompressor
                 long foo = SnappyInternalUtils.loadLong(input, ipIndex - 1);
                 prevInt = (int) foo;
                 inputBytes = (int) (foo >>> 8);
-            }
-            else {
+            } else {
                 prevInt = SnappyInternalUtils.loadInt(input, ipIndex - 1);
                 inputBytes = SnappyInternalUtils.loadInt(input, ipIndex);
             }
@@ -284,7 +278,7 @@ final class SnappyCompressor
             table[curHash] = (short) (ipIndex - inputOffset);
 
         } while (inputBytes == SnappyInternalUtils.loadInt(input, candidateIndex));
-        return new int[] {ipIndex, outputIndex};
+        return new int[]{ipIndex, outputIndex};
     }
 
     private static int emitLiteral(
@@ -293,8 +287,7 @@ final class SnappyCompressor
             byte[] literal,
             final int literalIndex,
             final int length,
-            final boolean allowFastPath)
-    {
+            final boolean allowFastPath) {
         SnappyInternalUtils.checkPositionIndexes(literalIndex, literalIndex + length, literal.length);
 
         int n = length - 1;      // Zero-length literals are disallowed
@@ -318,23 +311,19 @@ final class SnappyCompressor
                 outputIndex += length;
                 return outputIndex;
             }
-        }
-        else if (n < (1 << 8)) {
+        } else if (n < (1 << 8)) {
             output[outputIndex++] = (byte) (Snappy.LITERAL | 59 + 1 << 2);
             output[outputIndex++] = (byte) (n);
-        }
-        else if (n < (1 << 16)) {
+        } else if (n < (1 << 16)) {
             output[outputIndex++] = (byte) (Snappy.LITERAL | 59 + 2 << 2);
             output[outputIndex++] = (byte) (n);
             output[outputIndex++] = (byte) (n >>> 8);
-        }
-        else if (n < (1 << 24)) {
+        } else if (n < (1 << 24)) {
             output[outputIndex++] = (byte) (Snappy.LITERAL | 59 + 3 << 2);
             output[outputIndex++] = (byte) (n);
             output[outputIndex++] = (byte) (n >>> 8);
             output[outputIndex++] = (byte) (n >>> 16);
-        }
-        else {
+        } else {
             output[outputIndex++] = (byte) (Snappy.LITERAL | 59 + 4 << 2);
             output[outputIndex++] = (byte) (n);
             output[outputIndex++] = (byte) (n >>> 8);
@@ -354,8 +343,7 @@ final class SnappyCompressor
             byte[] output,
             int outputIndex,
             int offset,
-            int length)
-    {
+            int length) {
         assert offset >= 0;
         assert length <= 64;
         assert length >= 4;
@@ -366,8 +354,7 @@ final class SnappyCompressor
             assert (lenMinus4 < 8);            // Must fit in 3 bits
             output[outputIndex++] = (byte) (Snappy.COPY_1_BYTE_OFFSET | ((lenMinus4) << 2) | ((offset >>> 8) << 5));
             output[outputIndex++] = (byte) (offset);
-        }
-        else {
+        } else {
             output[outputIndex++] = (byte) (Snappy.COPY_2_BYTE_OFFSET | ((length - 1) << 2));
             output[outputIndex++] = (byte) (offset);
             output[outputIndex++] = (byte) (offset >>> 8);
@@ -379,8 +366,7 @@ final class SnappyCompressor
             byte[] output,
             int outputIndex,
             int offset,
-            int length)
-    {
+            int length) {
         // Emit 64 byte copies but make sure to keep at least four bytes reserved
         while (length >= 68) {
             outputIndex = emitCopyLessThan64(output, outputIndex, offset, 64);
@@ -404,8 +390,7 @@ final class SnappyCompressor
             int s1Index,
             byte[] s2,
             final int s2Index,
-            int s2Limit)
-    {
+            int s2Limit) {
         assert (s2Limit >= s2Index);
 
         if (SnappyInternalUtils.HAS_UNSAFE) {
@@ -419,15 +404,13 @@ final class SnappyCompressor
                 int x = SnappyInternalUtils.loadInt(s2, s2Index + matched) ^ SnappyInternalUtils.loadInt(s1, s1Index + matched);
                 int matchingBits = Integer.numberOfTrailingZeros(x);
                 matched += matchingBits >> 3;
-            }
-            else {
+            } else {
                 while (s2Index + matched < s2Limit && s1[s1Index + matched] == s2[s2Index + matched]) {
                     ++matched;
                 }
             }
             return matched;
-        }
-        else {
+        } else {
             int length = s2Limit - s2Index;
             for (int matched = 0; matched < length; matched++) {
                 if (s1[s1Index + matched] != s2[s2Index + matched]) {
@@ -439,8 +422,7 @@ final class SnappyCompressor
     }
 
     @SuppressLint("Assert")
-    private static int getHashTableSize(int inputSize)
-    {
+    private static int getHashTableSize(int inputSize) {
         // Use smaller hash table when input.size() is smaller, since we
         // fill the table, incurring O(hash table size) overhead for
         // compression, and if the input is short, we won't need that
@@ -476,42 +458,35 @@ final class SnappyCompressor
     // compression for compressible input, and more speed for incompressible
     // input. Of course, it doesn't hurt if the hash function is reasonably fast
     // either, as it gets called a lot.
-    private static int hashBytes(int bytes, int shift)
-    {
+    private static int hashBytes(int bytes, int shift) {
         int kMul = 0x1e35a7bd;
         return (bytes * kMul) >>> shift;
     }
 
-    private static int log2Floor(int n)
-    {
+    private static int log2Floor(int n) {
         return n == 0 ? -1 : 31 ^ Integer.numberOfLeadingZeros(n);
     }
 
     /**
      * Writes the uncompressed length as variable length integer.
      */
-    private static int writeUncompressedLength(byte[] compressed, int compressedOffset, int uncompressedLength)
-    {
+    private static int writeUncompressedLength(byte[] compressed, int compressedOffset, int uncompressedLength) {
         int highBitMask = 0x80;
         if (uncompressedLength < (1 << 7) && uncompressedLength >= 0) {
             compressed[compressedOffset++] = (byte) (uncompressedLength);
-        }
-        else if (uncompressedLength < (1 << 14) && uncompressedLength > 0) {
+        } else if (uncompressedLength < (1 << 14) && uncompressedLength > 0) {
             compressed[compressedOffset++] = (byte) (uncompressedLength | highBitMask);
             compressed[compressedOffset++] = (byte) (uncompressedLength >>> 7);
-        }
-        else if (uncompressedLength < (1 << 21) && uncompressedLength > 0) {
+        } else if (uncompressedLength < (1 << 21) && uncompressedLength > 0) {
             compressed[compressedOffset++] = (byte) (uncompressedLength | highBitMask);
             compressed[compressedOffset++] = (byte) ((uncompressedLength >>> 7) | highBitMask);
             compressed[compressedOffset++] = (byte) (uncompressedLength >>> 14);
-        }
-        else if (uncompressedLength < (1 << 28) && uncompressedLength > 0) {
+        } else if (uncompressedLength < (1 << 28) && uncompressedLength > 0) {
             compressed[compressedOffset++] = (byte) (uncompressedLength | highBitMask);
             compressed[compressedOffset++] = (byte) ((uncompressedLength >>> 7) | highBitMask);
             compressed[compressedOffset++] = (byte) ((uncompressedLength >>> 14) | highBitMask);
             compressed[compressedOffset++] = (byte) (uncompressedLength >>> 21);
-        }
-        else {
+        } else {
             compressed[compressedOffset++] = (byte) (uncompressedLength | highBitMask);
             compressed[compressedOffset++] = (byte) ((uncompressedLength >>> 7) | highBitMask);
             compressed[compressedOffset++] = (byte) ((uncompressedLength >>> 14) | highBitMask);

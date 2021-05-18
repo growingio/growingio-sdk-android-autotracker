@@ -45,17 +45,17 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
     }
 
     public static class Factory implements ModelLoaderFactory<EventUrl, EventResponse> {
-        private static volatile Call.Factory internalClient;
+        private static volatile Call.Factory sInternalClient;
         private final Call.Factory client;
 
         private static final int DEFAULT_CONNECT_TIMEOUT = 5;
         private static final int DEFAULT_READ_TIMEOUT = 10;
 
-        private static Call.Factory getInternalClient() {
-            if (internalClient == null) {
+        private static Call.Factory getsInternalClient() {
+            if (sInternalClient == null) {
                 synchronized (Factory.class) {
-                    if (internalClient == null) {
-                        internalClient = new OkHttpClient.Builder()
+                    if (sInternalClient == null) {
+                        sInternalClient = new OkHttpClient.Builder()
                                 .connectTimeout(DEFAULT_CONNECT_TIMEOUT, TimeUnit.SECONDS)
                                 .readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.SECONDS)
                                 .addInterceptor(new SecurityExceptionInterceptor())
@@ -63,14 +63,14 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
                     }
                 }
             }
-            return internalClient;
+            return sInternalClient;
         }
 
         public Factory() {
-            this(getInternalClient());
+            this(getsInternalClient());
         }
 
-        public Factory( Call.Factory client) {
+        public Factory(Call.Factory client) {
             this.client = client;
         }
 

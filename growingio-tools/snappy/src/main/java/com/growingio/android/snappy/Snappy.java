@@ -1,13 +1,11 @@
 /*
- * Copyright (C) 2011 the original author or authors.
- * See the notice.md file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,15 +20,12 @@ import android.os.Build;
 
 import java.util.Arrays;
 
-public final class Snappy
-{
+public final class Snappy {
 
-    private Snappy()
-    {
+    private Snappy() {
     }
 
-    public static int maxCompressedLength(int sourceLength)
-    {
+    public static int maxCompressedLength(int sourceLength) {
         return SnappyCompressor.maxCompressedLength(sourceLength);
     }
 
@@ -39,8 +34,7 @@ public final class Snappy
             int uncompressedOffset,
             int uncompressedLength,
             byte[] compressed,
-            int compressedOffset)
-    {
+            int compressedOffset) {
         return SnappyCompressor.compress(uncompressed,
                 uncompressedOffset,
                 uncompressedLength,
@@ -49,8 +43,7 @@ public final class Snappy
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
-    public static byte[] compress(byte[] data)
-    {
+    public static byte[] compress(byte[] data) {
         byte[] compressedOut = new byte[maxCompressedLength(data.length)];
         int compressedSize = compress(data, 0, data.length, compressedOut, 0);
         return Arrays.copyOf(compressedOut, compressedSize);

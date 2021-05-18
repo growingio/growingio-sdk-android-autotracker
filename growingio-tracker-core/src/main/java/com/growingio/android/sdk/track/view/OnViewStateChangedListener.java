@@ -16,8 +16,6 @@
 
 package com.growingio.android.sdk.track.view;
 
-import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
-
 public interface OnViewStateChangedListener {
     void onViewStateChanged(ViewStateChangedEvent changedEvent);
 }

@@ -20,14 +20,15 @@ import java.util.Map;
 
 /**
  * <p>
- *     start debugger module.
+ * start debugger module.
+ *
  * @author cpacm 5/10/21
  */
 public class Debugger {
 
     private final Map<String, String> params;
 
-    public Debugger( Map<String, String> params) {
+    public Debugger(Map<String, String> params) {
         this.params = params;
     }
 

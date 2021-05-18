@@ -1,13 +1,11 @@
 /*
- * Copyright (C) 2011 the original author or authors.
- * See the notice.md file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,29 +16,24 @@
 package com.growingio.android.snappy;
 
 class SlowMemory
-        implements Memory
-{
+        implements Memory {
     @Override
-    public boolean fastAccessSupported()
-    {
+    public boolean fastAccessSupported() {
         return false;
     }
 
     @Override
-    public int lookupShort(short[] data, int index)
-    {
+    public int lookupShort(short[] data, int index) {
         return data[index] & 0xFFFF;
     }
 
     @Override
-    public int loadByte(byte[] data, int index)
-    {
+    public int loadByte(byte[] data, int index) {
         return data[index] & 0xFF;
     }
 
     @Override
-    public int loadInt(byte[] data, int index)
-    {
+    public int loadInt(byte[] data, int index) {
         return (data[index] & 0xff) |
                 (data[index + 1] & 0xff) << 8 |
                 (data[index + 2] & 0xff) << 16 |
@@ -48,16 +41,14 @@ class SlowMemory
     }
 
     @Override
-    public void copyLong(byte[] src, int srcIndex, byte[] dest, int destIndex)
-    {
+    public void copyLong(byte[] src, int srcIndex, byte[] dest, int destIndex) {
         for (int i = 0; i < 8; i++) {
             dest[destIndex + i] = src[srcIndex + i];
         }
     }
 
     @Override
-    public long loadLong(byte[] data, int index)
-    {
+    public long loadLong(byte[] data, int index) {
         return (data[index] & 0xffL) |
                 (data[index + 1] & 0xffL) << 8 |
                 (data[index + 2] & 0xffL) << 16 |
@@ -69,8 +60,7 @@ class SlowMemory
     }
 
     @Override
-    public void copyMemory(byte[] input, int inputIndex, byte[] output, int outputIndex, int length)
-    {
+    public void copyMemory(byte[] input, int inputIndex, byte[] output, int outputIndex, int length) {
         System.arraycopy(input, inputIndex, output, outputIndex, length);
     }
 }

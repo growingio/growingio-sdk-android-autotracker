@@ -119,7 +119,7 @@ class CirclerService(private val client: OkHttpClient) : DataFetcher<WebService>
         socketState.set(SOCKET_STATE_READIED)
         ScreenshotProvider.get().registerScreenshotRefreshedListener(this)
         tipView?.setContent(R.string.growing_circler_progress)
-        tipView?.setOnClickListener { v: View? -> showExitDialog() }
+        tipView?.setOnClickListener { showExitDialog() }
 
     }
 

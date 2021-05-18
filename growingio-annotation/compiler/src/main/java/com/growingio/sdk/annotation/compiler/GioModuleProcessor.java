@@ -33,7 +33,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.ElementFilter;
 
 import static com.growingio.sdk.annotation.compiler.ProcessUtils.COMPILER_PACKAGE_NAME;
 
@@ -75,13 +74,12 @@ public class GioModuleProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         processUtils.process();
-        Set<TypeElement> typeElements = ElementFilter.typesIn(roundEnvironment.getElementsAnnotatedWith(GIOModule.class));
-        List<TypeElement> typeList = new ArrayList<>(typeElements);
+        List<TypeElement> typeList = processUtils.getElementsFor(GIOModule.class, roundEnvironment);
         if (typeList.size() > 0) {
             indexerGenerator.generate(typeList);
         }
 
-        for (TypeElement element : processUtils.getElementsFor(GIOModule.class, roundEnvironment)) {
+        for (TypeElement element : typeList) {
             if (processUtils.isAppGioModule(element)) {
                 appGioModules.add(element);
             }
