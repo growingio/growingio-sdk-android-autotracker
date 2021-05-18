@@ -93,8 +93,8 @@ public class CircleServiceTest extends WebServicesTest {
             add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/SeekBar[0]#seek_bar");
             add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RatingBar[0]#rating_bar");
             add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Spinner[0]#spinner_test/TextView[-]");
-            add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[0]");
-            add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[1]");
+            add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[0]#rb_male");
+            add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[1]#rb_female");
             add("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/EditText[0]#test_input");
             add("/Page/MenuView/MenuItem#navigation_home");
             add("/Page/MenuView/MenuItem#navigation_dashboard");
