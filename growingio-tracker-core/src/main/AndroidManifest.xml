@@ -8,4 +8,13 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <application>
+        <provider
+            android:name="com.growingio.android.sdk.track.middleware.EventsContentProvider"
+            android:authorities="${applicationId}.EventsContentProvider"
+            android:grantUriPermissions="true"
+            android:exported="false" />
+    </application>
+
+
 </manifest>
