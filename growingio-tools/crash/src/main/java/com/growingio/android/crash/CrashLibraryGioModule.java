@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.circler
 
-import android.content.Context
-import com.growingio.android.sdk.LibraryGioModule
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry
-import com.growingio.android.sdk.track.webservices.Circler
-import com.growingio.android.sdk.track.webservices.WebService
-import com.growingio.sdk.annotation.GIOModule
+package com.growingio.android.crash;
+
+import android.content.Context;
+
+import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.sdk.annotation.GIOModule;
 
 /**
+ * <p>
  *
- * @author cpacm 5/08/21
+ * @author cpacm 5/19/21
  */
 @GIOModule
-class CirclerLibraryGioModule : LibraryGioModule() {
-    override fun registerComponents(context: Context, registry: TrackerRegistry) {
-        registry.register(Circler::class.java, WebService::class.java, CirclerDataLoader.Factory())
+public class CrashLibraryGioModule extends LibraryGioModule {
+    @Override
+    public void registerComponents(Context context, TrackerRegistry registry) {
+        //registry.register(Crash::class.java, Void::class.java, CrashDataLoader.Factory(context))
+        //just start
+        new CrashDataLoader.Factory(context).build();
     }
 }

@@ -13,27 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk.autotrack;
+package com.growingio.android.debugger;
 
-import android.text.TextUtils;
+import android.content.Context;
 
-import com.growingio.android.sdk.AppGioModule;
-import com.growingio.sdk.annotation.GIOConfig;
+import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.webservices.Debugger;
+import com.growingio.android.sdk.track.webservices.WebService;
 import com.growingio.sdk.annotation.GIOModule;
 
 /**
  * <p>
  *
- * @author cpacm 5/12/21
+ * @author cpacm 5/19/21
  */
-@GIOModule(gioName = "GrowingAutotracker")
-public final class GrowingAppModule extends AppGioModule {
-
-    @GIOConfig(tracker = CdpAutotracker.class,
-            config = CdpAutotrackConfiguration.class)
-    public void config(CdpAutotrackConfiguration configuration) {
-        if (TextUtils.isEmpty(configuration.getDataSourceId())) {
-            throw new IllegalStateException("DataSourceId is NULL");
-        }
+@GIOModule
+public class DebuggerLibraryGioModule extends LibraryGioModule {
+    @Override
+    public void registerComponents(Context context, TrackerRegistry registry) {
+        registry.register(Debugger.class, WebService.class, new DebuggerDataLoader.Factory());
+        DebuggerEventWrapper.get().observeEventBuild();
     }
 }

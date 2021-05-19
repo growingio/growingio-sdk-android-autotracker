@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.circler
+package com.growingio.android.encoder;
 
-import com.growingio.android.sdk.autotrack.Autotracker
-import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider
-import com.growingio.android.sdk.track.log.Logger
+import android.content.Context;
 
-object ClassUtils {
+import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.sdk.annotation.GIOModule;
 
-    fun isAutoTracker(): Boolean {
-        try {
-            Autotracker.initializedSuccessfully()
-            return true
-        } catch (e: ClassNotFoundException) {
-            Logger.e("ClassUtils", "Circler component should implement AutoTracker core.")
-        }
-        return false
+/**
+ * <p>
+ *
+ * @author cpacm 5/19/21
+ */
+@GIOModule
+public class EncoderLibraryGioModule extends LibraryGioModule {
+    @Override
+    public void registerComponents(Context context, TrackerRegistry registry) {
+        registry.register(EventStream.class, EventStream.class, new EncoderDataLoader.Factory());
     }
 }
