@@ -17,7 +17,6 @@
 package com.gio.test.three;
 
 import android.app.ActivityManager;
-import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.os.Process;
