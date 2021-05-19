@@ -86,6 +86,8 @@ public class EventHttpSender implements IEventNetSender {
         if (encoder != null) {
             eventUrl.setBodyData(encoder.getBodyData())
                     .setMediaType(encoder.getMediaType());
+            eventUrl.addHeader("X-Compress-Codec", "2");
+            eventUrl.addHeader("X-Crypt-Codec", "1");
         } else {
             eventUrl.setBodyData(data);
         }
