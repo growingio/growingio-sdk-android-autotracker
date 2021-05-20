@@ -86,7 +86,7 @@ public class Autotracker extends Tracker {
 
     }
 
-    public void trackCustomEvent(String eventName, androidx.fragment.app.Fragment page) {
+    public void trackCustomEventX(String eventName, androidx.fragment.app.Fragment page) {
 
     }
 
@@ -102,7 +102,7 @@ public class Autotracker extends Tracker {
 
     }
 
-    public void trackCustomEvent(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page) {
+    public void trackCustomEventX(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page) {
 
     }
 
@@ -145,7 +145,7 @@ public class Autotracker extends Tracker {
         });
     }
 
-    public void setPageAttributes(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
+    public void setPageAttributesX(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
         if (page == null || attributes == null || attributes.isEmpty()) {
             Logger.e(TAG, "page or attributes is NULL");
@@ -227,7 +227,7 @@ public class Autotracker extends Tracker {
         });
     }
 
-    public void setPageAlias(final androidx.fragment.app.Fragment page, final String alias) {
+    public void setPageAliasX(final androidx.fragment.app.Fragment page, final String alias) {
         if (!isInited) return;
         if (page == null || TextUtils.isEmpty(alias)) {
             Logger.e(TAG, "fragment or alias is NULL");
@@ -283,7 +283,7 @@ public class Autotracker extends Tracker {
         });
     }
 
-    public void ignorePage(final androidx.fragment.app.Fragment page, final IgnorePolicy policy) {
+    public void ignorePageX(final androidx.fragment.app.Fragment page, final IgnorePolicy policy) {
         if (!isInited) return;
         if (page == null || policy == null) {
             Logger.e(TAG, "fragment or policy is NULL");
