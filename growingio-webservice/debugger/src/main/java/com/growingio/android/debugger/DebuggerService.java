@@ -33,6 +33,9 @@ import com.growingio.android.sdk.track.webservices.WebService;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -196,7 +199,17 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
 
     @Override
     public void onMessage(String msg) {
-
+        try {
+            JSONObject message = new JSONObject(msg);
+            String msgType = message.optString("msgType");
+            if (DebuggerEventWrapper.SERVICE_LOGGER_OPEN.equals(msgType)) {
+                DebuggerEventWrapper.get().openLogger();
+            } else if (DebuggerEventWrapper.SERVICE_LOGGER_CLOSE.equals(msgType)) {
+                DebuggerEventWrapper.get().closeLogger();
+            }
+        } catch (JSONException e) {
+            Logger.e(TAG, e);
+        }
     }
 
     private void exitDebugger() {
