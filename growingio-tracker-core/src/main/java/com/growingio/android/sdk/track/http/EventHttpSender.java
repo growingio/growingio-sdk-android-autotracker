@@ -65,7 +65,7 @@ public class EventHttpSender implements IEventNetSender {
         }
         byte[] data;
         long time = System.currentTimeMillis();
-        EventUrl eventUrl = new EventUrl(mServerHost,time)
+        EventUrl eventUrl = new EventUrl(mServerHost, time)
                 .addPath("v3")
                 .addPath("projects")
                 .addPath(mProjectId)
@@ -84,9 +84,9 @@ public class EventHttpSender implements IEventNetSender {
 
         eventUrl.setBodyData(data);
         //data encoder - https://codes.growingio.com/w/api_v3_interface/
-        EventUrl encoderUrl = TrackerContext.get().executeData(eventUrl, EventUrl.class, EventUrl.class);
-        if (encoderUrl != null) {
-            eventUrl = encoderUrl;
+        EventEncoder encoder = TrackerContext.get().executeData(new EventEncoder(eventUrl), EventEncoder.class, EventEncoder.class);
+        if (encoder != null) {
+            eventUrl = encoder.getEventUrl();
         } else {
             eventUrl.setBodyData(data);
         }

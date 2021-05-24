@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.encoder;
 
-import android.content.Context;
+package com.growingio.android.sdk.track.http;
 
-import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.http.EventEncoder;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.sdk.annotation.GIOModule;
+public class EventEncoder {
+    private final EventUrl eventUrl;
 
-/**
- * <p>
- *
- * @author cpacm 5/19/21
- */
-@GIOModule
-public class EncoderLibraryGioModule extends LibraryGioModule {
-    @Override
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(EventEncoder.class, EventEncoder.class, new EncoderDataLoader.Factory());
+    public EventEncoder(EventUrl eventUrl) {
+        this.eventUrl = eventUrl;
+    }
+
+    public EventUrl getEventUrl() {
+        return eventUrl;
     }
 }

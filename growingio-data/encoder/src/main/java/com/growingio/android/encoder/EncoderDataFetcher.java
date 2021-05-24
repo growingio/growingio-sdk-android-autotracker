@@ -16,6 +16,7 @@
 
 package com.growingio.android.encoder;
 
+import com.growingio.android.sdk.track.http.EventEncoder;
 import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.snappy.Snappy;
@@ -26,18 +27,19 @@ import com.growingio.android.snappy.XORUtils;
  *
  * @author cpacm 2021/5/13
  */
-public class EncoderDataFetcher implements DataFetcher<EventUrl> {
+public class EncoderDataFetcher implements DataFetcher<EventEncoder> {
     private static final String TAG = "EncoderDataFetcher";
 
-    private final EventUrl eventUrl;
+    private final EventEncoder eventEncoder;
 
-    public EncoderDataFetcher(EventUrl eventUrl) {
-        this.eventUrl = eventUrl;
+    public EncoderDataFetcher(EventEncoder eventEncoder) {
+        this.eventEncoder = eventEncoder;
     }
 
     @Override
-    public void loadData(DataCallback<? super EventUrl> callback) {
+    public void loadData(DataCallback<? super EventEncoder> callback) {
         try {
+            EventUrl eventUrl = eventEncoder.getEventUrl();
             long currentTimeMillis = eventUrl.getTime();
             byte[] compressData = Snappy.compress(eventUrl.getRequestBody());
             compressData = XORUtils.encrypt(compressData, (int) (currentTimeMillis & 0xFF));
@@ -45,14 +47,15 @@ public class EncoderDataFetcher implements DataFetcher<EventUrl> {
             eventUrl.setBodyData(compressData);
             eventUrl.addHeader("X-Compress-Codec", "2");
             eventUrl.addHeader("X-Crypt-Codec", "1");
-            callback.onDataReady(eventUrl);
+            callback.onDataReady(eventEncoder);
         } catch (Exception e) {
             callback.onLoadFailed(e);
         }
     }
 
     @Override
-    public EventUrl executeData() {
+    public EventEncoder executeData() {
+        EventUrl eventUrl = eventEncoder.getEventUrl();
         long currentTimeMillis = eventUrl.getTime();
         byte[] compressData = Snappy.compress(eventUrl.getRequestBody());
         compressData = XORUtils.encrypt(compressData, (int) (currentTimeMillis & 0xFF));
@@ -60,7 +63,7 @@ public class EncoderDataFetcher implements DataFetcher<EventUrl> {
         eventUrl.setBodyData(compressData);
         eventUrl.addHeader("X-Compress-Codec", "2");
         eventUrl.addHeader("X-Crypt-Codec", "1");
-        return eventUrl;
+        return eventEncoder;
     }
 
     @Override
@@ -72,8 +75,8 @@ public class EncoderDataFetcher implements DataFetcher<EventUrl> {
     }
 
     @Override
-    public Class<EventUrl> getDataClass() {
-        return EventUrl.class;
+    public Class<EventEncoder> getDataClass() {
+        return EventEncoder.class;
     }
 
 }

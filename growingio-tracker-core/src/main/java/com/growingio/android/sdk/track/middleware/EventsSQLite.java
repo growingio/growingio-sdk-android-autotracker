@@ -77,6 +77,34 @@ public class EventsSQLite {
         return lastId;
     }
 
+    long queryEventsAndDelete(int policy, int limit, List<GEvent> events) {
+        Cursor cursor = null;
+        long lastId = -1;
+        try {
+            cursor = mEventsManager.queryEvents(policy, limit);
+            while (cursor.moveToNext()) {
+                if (cursor.isLast()) {
+                    lastId = cursor.getLong(cursor.getColumnIndex(EventsInfoTable.COLUMN_ID));
+                }
+                byte[] data = cursor.getBlob(cursor.getColumnIndex(EventsInfoTable.COLUMN_DATA));
+                GEvent event = unpack(data);
+                if (event != null) {
+                    events.add(event);
+                }
+                long delId = cursor.getLong(cursor.getColumnIndex(EventsInfoTable.COLUMN_ID));
+                mEventsManager.removeEventById(delId);
+            }
+        } catch (Throwable t) {
+            Logger.e(TAG, t, t.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return lastId;
+    }
+
+
     void removeEvents(long lastId, int policy, String eventType) {
         mEventsManager.removeEvents(lastId, policy, eventType);
     }
