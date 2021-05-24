@@ -16,7 +16,7 @@
 
 package com.growingio.android.encoder;
 
-import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 
@@ -25,16 +25,16 @@ import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
  *
  * @author cpacm 2021/5/13
  */
-public class EncoderDataLoader implements ModelLoader<EventStream, EventStream> {
+public class EncoderDataLoader implements ModelLoader<EventUrl, EventUrl> {
 
     @Override
-    public LoadData<EventStream> buildLoadData(EventStream eventStream) {
-        return new LoadData<>(new EncoderDataFetcher(eventStream));
+    public LoadData<EventUrl> buildLoadData(EventUrl eventUrl) {
+        return new LoadData<>(new EncoderDataFetcher(eventUrl));
     }
 
-    public static class Factory implements ModelLoaderFactory<EventStream, EventStream> {
+    public static class Factory implements ModelLoaderFactory<EventUrl, EventUrl> {
         @Override
-        public ModelLoader<EventStream, EventStream> build() {
+        public ModelLoader<EventUrl, EventUrl> build() {
             return new EncoderDataLoader();
         }
     }

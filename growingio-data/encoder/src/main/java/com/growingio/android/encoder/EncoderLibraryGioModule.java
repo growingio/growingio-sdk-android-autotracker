@@ -18,7 +18,7 @@ package com.growingio.android.encoder;
 import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOModule;
 
@@ -31,6 +31,6 @@ import com.growingio.sdk.annotation.GIOModule;
 public class EncoderLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(EventStream.class, EventStream.class, new EncoderDataLoader.Factory());
+        registry.register(EventUrl.class, EventUrl.class, new EncoderDataLoader.Factory());
     }
 }

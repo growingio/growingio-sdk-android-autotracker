@@ -27,10 +27,12 @@ public class EventUrl {
     private final List<String> mPaths = new ArrayList<>();
     private final Map<String, String> mParams = new HashMap<>();
     private byte[] mBodyData;
+    private final long mTime;
     private String mMediaType = "application/json"; //or "application/x-www-form-urlencoded" for data
 
-    public EventUrl(String host) {
+    public EventUrl(String host, long time) {
         mHost = host;
+        mTime = time;
     }
 
     public EventUrl addPath(String path) {
@@ -54,6 +56,10 @@ public class EventUrl {
 
     public byte[] getRequestBody() {
         return mBodyData;
+    }
+
+    public long getTime() {
+        return mTime;
     }
 
     public EventUrl setBodyData(byte[] mBodyData) {
