@@ -90,10 +90,10 @@ public class OkHttpDataFetcher implements DataFetcher<EventResponse>, Callback {
                 return new EventResponse(false);
             }
         } catch (IOException e) {
-            Logger.e(TAG, e.getMessage());
+            Logger.e(TAG, e);
             return new EventResponse(false);
         } catch (NullPointerException e) {
-            Logger.e(TAG, e.getMessage());
+            Logger.e(TAG, e);
             return new EventResponse(false);
         }
     }

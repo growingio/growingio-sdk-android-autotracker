@@ -82,6 +82,10 @@ public class EventSender {
         mSendHandler = new SendHandler(thread.getLooper());
     }
 
+    /**
+     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
+     * if you want modify it,please check adsdk first
+     */
     public void setEventNetSender(IEventNetSender mEventNetSender) {
         this.mEventNetSender = mEventNetSender;
     }
@@ -196,7 +200,6 @@ public class EventSender {
         }
 
         for (int policy : uploadEvents) {
-            Logger.d(TAG, "uploadEventsPolicy:" + policy);
             boolean succeeded;
             do {
                 if (policy != SEND_POLICY_INSTANT
@@ -207,7 +210,6 @@ public class EventSender {
                 }
                 List<GEvent> resultEvents = new ArrayList<>();
                 long lastId = mEventsSQLite.queryEvents(policy, numOfMaxEventsPerRequest(), resultEvents);
-                Logger.d(TAG, "uploadEventsLastId:" + lastId);
                 if (!resultEvents.isEmpty()) {
                     SendResponse sendResponse = mEventNetSender.send(resultEvents);
                     succeeded = sendResponse.isSucceeded();
@@ -226,6 +228,10 @@ public class EventSender {
     }
 
 
+    /**
+     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
+     * if you want modify it,please check adsdk first
+     */
     public List<GEvent> getGEventsFromPolicy(int policy) {
         List<GEvent> resultEvents = new ArrayList<>();
         long lastId = mEventsSQLite.queryEventsAndDelete(policy, numOfMaxEventsPerRequest(), resultEvents);

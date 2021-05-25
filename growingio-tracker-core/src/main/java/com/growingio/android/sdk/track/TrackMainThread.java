@@ -67,6 +67,10 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         mMainHandler.sendEmptyMessage(MSG_INIT_SDK);
     }
 
+    /**
+     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
+     * if you want modify it,please check adsdk first
+     */
     public EventSender getEventSender() {
         return mEventSender;
     }
@@ -109,6 +113,10 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         }
     }
 
+    /**
+     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
+     * if you want modify it,please check adsdk first
+     */
     public void postGEventToTrackMain(GEvent gEvent) {
         if (gEvent == null) return;
         if (ConfigurationProvider.get().isDataCollectionEnabled()) {
