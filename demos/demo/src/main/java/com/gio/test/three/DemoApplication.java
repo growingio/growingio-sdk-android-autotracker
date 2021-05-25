@@ -17,10 +17,10 @@
 package com.gio.test.three;
 
 import android.app.ActivityManager;
-import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.os.Process;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.webkit.WebView;
 
@@ -33,7 +33,7 @@ import com.tencent.smtt.sdk.QbSdk;
 
 import java.util.List;
 
-public class DemoApplication extends Application {
+public class DemoApplication extends MultiDexApplication {
     private static final String TAG = "DemoApplication";
 
     private static boolean sIsAutotracker = true;

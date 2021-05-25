@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.json
+package com.growingio.android.json;
 
-import android.content.Context
-import com.growingio.android.sdk.LibraryGioModule
-import com.growingio.android.sdk.track.http.EventData
-import com.growingio.android.sdk.track.http.EventStream
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry
-import com.growingio.sdk.annotation.GIOModule
+import android.content.Context;
+
+import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.track.http.EventData;
+import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.sdk.annotation.GIOModule;
 
 /**
+ * <p>
  *
- * @author cpacm 5/13/21
+ * @author cpacm 5/19/21
  */
 @GIOModule
-class JsonLibraryGioModule : LibraryGioModule() {
-    override fun registerComponents(context: Context, registry: TrackerRegistry) {
-        registry.register(EventData::class.java, EventStream::class.java, JsonDataLoader.Factory())
+public class JsonLibraryModule extends LibraryGioModule {
+    @Override
+    public void registerComponents(Context context, TrackerRegistry registry) {
+        registry.register(EventData.class, EventStream.class, new JsonDataLoader.Factory());
     }
 }

@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.debugger
 
-import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider
-import com.growingio.android.sdk.track.log.Logger
+package com.growingio.android.sdk.track.http;
 
-object ClassUtils {
+public class EventEncoder {
+    private final EventUrl eventUrl;
 
-    fun registerHybridScreenShot(screenshotProvider: ScreenshotProvider) {
-        try {
-            HybridBridgeProvider.get().registerDomChangedListener { screenshotProvider.refreshScreenshot() }
-        } catch (e: ClassNotFoundException) {
-            Logger.w("ClassUtils", "can't find HybridBridgeProvider")
-        }
+    public EventEncoder(EventUrl eventUrl) {
+        this.eventUrl = eventUrl;
+    }
+
+    public EventUrl getEventUrl() {
+        return eventUrl;
     }
 }

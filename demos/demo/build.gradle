@@ -55,6 +55,10 @@ android {
     buildTypes {
         debug {
             testCoverageEnabled = true
+            multiDexKeepFile file('multidex-config.txt')
+        }
+        release {
+            multiDexKeepFile file('multidex-config.txt')
         }
     }
 

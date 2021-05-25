@@ -64,12 +64,13 @@ public class EventHttpSender implements IEventNetSender {
             return new SendResponse(true, 0);
         }
         byte[] data;
-        EventUrl eventUrl = new EventUrl(mServerHost)
+        long time = System.currentTimeMillis();
+        EventUrl eventUrl = new EventUrl(mServerHost, time)
                 .addPath("v3")
                 .addPath("projects")
                 .addPath(mProjectId)
                 .addPath("collect")
-                .addParam("stm", String.valueOf(System.currentTimeMillis()));
+                .addParam("stm", String.valueOf(time));
 
         // data stream transfer
         EventStream eventStream = TrackerContext.get().executeData(new EventData(events), EventData.class, EventStream.class);
@@ -81,11 +82,11 @@ public class EventHttpSender implements IEventNetSender {
             eventUrl.setMediaType("application/json");
         }
 
+        eventUrl.setBodyData(data);
         //data encoder - https://codes.growingio.com/w/api_v3_interface/
-        EventStream encoder = TrackerContext.get().executeData(new EventStream(data), EventStream.class, EventStream.class);
+        EventEncoder encoder = TrackerContext.get().executeData(new EventEncoder(eventUrl), EventEncoder.class, EventEncoder.class);
         if (encoder != null) {
-            eventUrl.setBodyData(encoder.getBodyData())
-                    .setMediaType(encoder.getMediaType());
+            eventUrl = encoder.getEventUrl();
         } else {
             eventUrl.setBodyData(data);
         }

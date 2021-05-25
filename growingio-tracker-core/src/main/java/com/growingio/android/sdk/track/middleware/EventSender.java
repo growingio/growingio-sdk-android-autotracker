@@ -51,7 +51,7 @@ public class EventSender {
 
     private final Context mContext;
     private final EventsSQLite mEventsSQLite;
-    private final IEventNetSender mEventNetSender;
+    private IEventNetSender mEventNetSender;
     private final SharedPreferences mSharedPreferences;
     private final SendHandler mSendHandler;
     private final ProcessLock mProcessLock;
@@ -80,6 +80,18 @@ public class EventSender {
         HandlerThread thread = new HandlerThread(EventSender.class.getName());
         thread.start();
         mSendHandler = new SendHandler(thread.getLooper());
+    }
+
+    /**
+     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
+     * if you want modify it,please check adsdk first
+     */
+    public void setEventNetSender(IEventNetSender mEventNetSender) {
+        this.mEventNetSender = mEventNetSender;
+    }
+
+    public void cacheEvent(GEvent event) {
+        mEventsSQLite.insertEvent(event);
     }
 
     public void sendEvent(GEvent event) {
@@ -213,6 +225,17 @@ public class EventSender {
                 }
             } while (succeeded);
         }
+    }
+
+
+    /**
+     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
+     * if you want modify it,please check adsdk first
+     */
+    public List<GEvent> getGEventsFromPolicy(int policy) {
+        List<GEvent> resultEvents = new ArrayList<>();
+        long lastId = mEventsSQLite.queryEventsAndDelete(policy, numOfMaxEventsPerRequest(), resultEvents);
+        return resultEvents;
     }
 
     // 由于数据发送是耗时操作，网络端更有可能被block，所以这里另起一个线程处理

@@ -86,7 +86,7 @@ public class Autotracker extends Tracker {
 
     }
 
-    public void trackCustomEvent(String eventName, androidx.fragment.app.Fragment page) {
+    public void trackCustomEventX(String eventName, androidx.fragment.app.Fragment page) {
 
     }
 
@@ -102,7 +102,7 @@ public class Autotracker extends Tracker {
 
     }
 
-    public void trackCustomEvent(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page) {
+    public void trackCustomEventX(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page) {
 
     }
 
@@ -122,7 +122,12 @@ public class Autotracker extends Tracker {
             return;
         }
 
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes)));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
+            }
+        });
     }
 
     public void setPageAttributes(final android.support.v4.app.Fragment page, final Map<String, String> attributes) {
@@ -132,17 +137,27 @@ public class Autotracker extends Tracker {
             return;
         }
 
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes)));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
+            }
+        });
     }
 
-    public void setPageAttributes(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
+    public void setPageAttributesX(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
         if (page == null || attributes == null || attributes.isEmpty()) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
 
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes)));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
+            }
+        });
     }
 
     public void trackViewImpression(View view, String impressionEventName) {
@@ -190,7 +205,12 @@ public class Autotracker extends Tracker {
             Logger.e(TAG, "fragment or alias is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
+            }
+        });
     }
 
     public void setPageAlias(final android.support.v4.app.Fragment page, final String alias) {
@@ -199,16 +219,26 @@ public class Autotracker extends Tracker {
             Logger.e(TAG, "fragment or alias is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
+            }
+        });
     }
 
-    public void setPageAlias(final androidx.fragment.app.Fragment page, final String alias) {
+    public void setPageAliasX(final androidx.fragment.app.Fragment page, final String alias) {
         if (!isInited) return;
         if (page == null || TextUtils.isEmpty(alias)) {
             Logger.e(TAG, "fragment or alias is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
+            }
+        });
     }
 
     public void ignorePage(final Activity page, final IgnorePolicy policy) {
@@ -217,7 +247,12 @@ public class Autotracker extends Tracker {
             Logger.e(TAG, "activity or policy is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().addIgnoreActivity(page, policy));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().addIgnoreActivity(page, policy);
+            }
+        });
     }
 
     public void ignorePage(final android.app.Fragment page, final IgnorePolicy policy) {
@@ -226,7 +261,12 @@ public class Autotracker extends Tracker {
             Logger.e(TAG, "fragment or policy is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
+            }
+        });
     }
 
     public void ignorePage(final android.support.v4.app.Fragment page, final IgnorePolicy policy) {
@@ -235,16 +275,26 @@ public class Autotracker extends Tracker {
             Logger.e(TAG, "fragment or policy is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
+            }
+        });
     }
 
-    public void ignorePage(final androidx.fragment.app.Fragment page, final IgnorePolicy policy) {
+    public void ignorePageX(final androidx.fragment.app.Fragment page, final IgnorePolicy policy) {
         if (!isInited) return;
         if (page == null || policy == null) {
             Logger.e(TAG, "fragment or policy is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy));
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
+            }
+        });
     }
 
     public void ignoreView(final View view, final IgnorePolicy policy) {

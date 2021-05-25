@@ -48,6 +48,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
 
     private static final int MSG_INIT_SDK = 1;
     private static final int MSG_POST_EVENT = 2;
+    private static final int MSG_CACHE_EVENT = 3;
     private final Looper mMainLooper;
     private final Handler mMainHandler;
     private final EventSender mEventSender;
@@ -64,7 +65,14 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         mMainLooper = handlerThread.getLooper();
         mMainHandler = new H(mMainLooper);
         mMainHandler.sendEmptyMessage(MSG_INIT_SDK);
+    }
 
+    /**
+     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
+     * if you want modify it,please check adsdk first
+     */
+    public EventSender getEventSender() {
+        return mEventSender;
     }
 
     @Override
@@ -101,6 +109,19 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
 
             Message msg = mMainHandler.obtainMessage(MSG_POST_EVENT);
             msg.obj = eventBuilder;
+            mMainHandler.sendMessage(msg);
+        }
+    }
+
+    /**
+     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
+     * if you want modify it,please check adsdk first
+     */
+    public void postGEventToTrackMain(GEvent gEvent) {
+        if (gEvent == null) return;
+        if (ConfigurationProvider.get().isDataCollectionEnabled()) {
+            Message msg = mMainHandler.obtainMessage(MSG_CACHE_EVENT);
+            msg.obj = gEvent;
             mMainHandler.sendMessage(msg);
         }
     }
@@ -188,6 +209,16 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         mEventSender.sendEvent(event);
     }
 
+    @TrackThread
+    private void cacheEvent(GEvent event) {
+        if (event instanceof BaseEvent) {
+            Logger.printJson(TAG, "cache: event, type is " + event.getEventType(), ((BaseEvent) event).toJSONObject().toString());
+        } else {
+            Logger.d(TAG, "cache: event, type is " + event.getEventType() + event.toString());
+        }
+        mEventSender.cacheEvent(event);
+    }
+
     private class H extends Handler {
         private H(Looper looper) {
             super(looper);
@@ -202,6 +233,11 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                 case MSG_POST_EVENT: {
                     BaseEvent.BaseBuilder<?> eventBuilder = (BaseEvent.BaseBuilder<?>) msg.obj;
                     onGenerateGEvent(eventBuilder);
+                    break;
+                }
+                case MSG_CACHE_EVENT: {
+                    GEvent event = (GEvent) msg.obj;
+                    cacheEvent(event);
                     break;
                 }
                 default:

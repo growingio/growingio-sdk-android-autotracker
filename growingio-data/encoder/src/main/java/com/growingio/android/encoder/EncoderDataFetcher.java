@@ -16,7 +16,8 @@
 
 package com.growingio.android.encoder;
 
-import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.http.EventEncoder;
+import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.snappy.Snappy;
 import com.growingio.android.snappy.XORUtils;
@@ -26,33 +27,43 @@ import com.growingio.android.snappy.XORUtils;
  *
  * @author cpacm 2021/5/13
  */
-public class EncoderDataFetcher implements DataFetcher<EventStream> {
+public class EncoderDataFetcher implements DataFetcher<EventEncoder> {
     private static final String TAG = "EncoderDataFetcher";
 
-    private final EventStream eventStream;
+    private final EventEncoder eventEncoder;
 
-    public EncoderDataFetcher(EventStream eventStream) {
-        this.eventStream = eventStream;
+    public EncoderDataFetcher(EventEncoder eventEncoder) {
+        this.eventEncoder = eventEncoder;
     }
 
     @Override
-    public void loadData(DataCallback<? super EventStream> callback) {
+    public void loadData(DataCallback<? super EventEncoder> callback) {
         try {
-            long currentTimeMillis = System.currentTimeMillis();
-            byte[] compressData = Snappy.compress(eventStream.getBodyData());
+            EventUrl eventUrl = eventEncoder.getEventUrl();
+            long currentTimeMillis = eventUrl.getTime();
+            byte[] compressData = Snappy.compress(eventUrl.getRequestBody());
             compressData = XORUtils.encrypt(compressData, (int) (currentTimeMillis & 0xFF));
-            callback.onDataReady(new EventStream(compressData));
+            eventUrl.setMediaType("application/json");
+            eventUrl.setBodyData(compressData);
+            eventUrl.addHeader("X-Compress-Codec", "2");
+            eventUrl.addHeader("X-Crypt-Codec", "1");
+            callback.onDataReady(eventEncoder);
         } catch (Exception e) {
             callback.onLoadFailed(e);
         }
     }
 
     @Override
-    public EventStream executeData() {
-        long currentTimeMillis = System.currentTimeMillis();
-        byte[] compressData = Snappy.compress(eventStream.getBodyData());
+    public EventEncoder executeData() {
+        EventUrl eventUrl = eventEncoder.getEventUrl();
+        long currentTimeMillis = eventUrl.getTime();
+        byte[] compressData = Snappy.compress(eventUrl.getRequestBody());
         compressData = XORUtils.encrypt(compressData, (int) (currentTimeMillis & 0xFF));
-        return new EventStream(compressData);
+        eventUrl.setMediaType("application/json");
+        eventUrl.setBodyData(compressData);
+        eventUrl.addHeader("X-Compress-Codec", "2");
+        eventUrl.addHeader("X-Crypt-Codec", "1");
+        return eventEncoder;
     }
 
     @Override
@@ -64,8 +75,8 @@ public class EncoderDataFetcher implements DataFetcher<EventStream> {
     }
 
     @Override
-    public Class<EventStream> getDataClass() {
-        return EventStream.class;
+    public Class<EventEncoder> getDataClass() {
+        return EventEncoder.class;
     }
 
 }

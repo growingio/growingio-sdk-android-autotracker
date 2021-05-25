@@ -20,6 +20,10 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.growingio.android.sdk.TrackerContext;
+
+import java.io.File;
+
 public class EventsInfoTable {
 
     private static final int DATABASE_VERSION = 1;
@@ -46,10 +50,8 @@ public class EventsInfoTable {
 
     public static final String DROP_TABLE_EVENTS = "DROP TABLE IF EXISTS " + TABLE_EVENTS + ";";
 
-    private static final Uri CONTENT_URI = Uri.withAppendedPath(EventsContentProvider.authorityUri, TABLE_EVENTS);
-
     public static Uri getContentUri() {
-        return CONTENT_URI;
+        return Uri.parse("content://" + TrackerContext.get().getPackageName() + ".EventsContentProvider" + File.separator + TABLE_EVENTS);
     }
 
     public static ContentValues putValues(EventsInfo info) {
