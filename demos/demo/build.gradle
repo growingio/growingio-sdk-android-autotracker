@@ -124,9 +124,9 @@ dependencies {
     androidTestUtil libraries.test.orchestrator
     androidTestImplementation libraries.test.androidx_junit
     androidTestImplementation libraries.test.androidx_runner
+    androidTestImplementation libraries.test.androidx_rules
     androidTestImplementation libraries.test.espresso_core
     androidTestImplementation libraries.test.espresso_web
-    androidTestImplementation libraries.test.androidx_rules
     androidTestImplementation libraries.test.mockito_core
     androidTestImplementation libraries.test.truth
     androidTestImplementation libraries.test.okhttp3_mockwebserver
