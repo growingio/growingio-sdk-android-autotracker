@@ -17,7 +17,8 @@
 package com.growingio.sdk.annotation.compiler;
 
 import com.google.auto.service.AutoService;
-import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOAppModule;
+import com.growingio.sdk.annotation.GIOLibraryModule;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +52,7 @@ public class GioModuleProcessor extends AbstractProcessor {
     private boolean isGeneratedAppGioModuleWritten;
     private AppModuleGenerator appModuleGenerator;
     private GioTrackerGenerator gioTrackerGenerator;
+    private ConfigurationGenerator configurationGenerator;
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
@@ -59,11 +61,15 @@ public class GioModuleProcessor extends AbstractProcessor {
         indexerGenerator = new IndexerGenerator(processUtils);
         appModuleGenerator = new AppModuleGenerator(processUtils);
         gioTrackerGenerator = new GioTrackerGenerator(env, processUtils);
+        configurationGenerator = new ConfigurationGenerator(env, processUtils);
     }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return Collections.singleton(GIOModule.class.getName());
+        Set<String> annotations = new HashSet<>();
+        annotations.add(GIOAppModule.class.getName());
+        annotations.add(GIOLibraryModule.class.getName());
+        return annotations;
     }
 
     @Override
@@ -74,12 +80,16 @@ public class GioModuleProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         processUtils.process();
-        List<TypeElement> typeList = processUtils.getElementsFor(GIOModule.class, roundEnvironment);
+
+        // deal with GIOLibraryModule
+        List<TypeElement> typeList = processUtils.getElementsFor(GIOLibraryModule.class, roundEnvironment);
         if (typeList.size() > 0) {
             indexerGenerator.generate(typeList);
         }
 
-        for (TypeElement element : typeList) {
+        // deal with GIOAppModule
+        List<TypeElement> appTypeList = processUtils.getElementsFor(GIOAppModule.class, roundEnvironment);
+        for (TypeElement element : appTypeList) {
             if (processUtils.isAppGioModule(element)) {
                 appGioModules.add(element);
             }
@@ -109,6 +119,7 @@ public class GioModuleProcessor extends AbstractProcessor {
                 processingEnv.getElementUtils().getPackageElement(COMPILER_PACKAGE_NAME);
 
         Set<String> gioModules = new HashSet<>();
+        HashSet<String> gioConfigs = new HashSet<>();
         List<? extends Element> gioGeneratedElements = gioGenPackage.getEnclosedElements();
         for (Element indexer : gioGeneratedElements) {
             Index annotation = indexer.getAnnotation(Index.class);
@@ -116,9 +127,11 @@ public class GioModuleProcessor extends AbstractProcessor {
             // that we can safely ignore.
             if (annotation != null) {
                 Collections.addAll(gioModules, annotation.modules());
+                Collections.addAll(gioConfigs, annotation.configs());
             }
         }
         appModuleGenerator.generate(appModule, gioModules);
+        configurationGenerator.generate(appModule, gioConfigs);
 
         processUtils.debugLog("writeGioTracker:" + processUtils.getRound());
         gioTrackerGenerator.generate(appModule);

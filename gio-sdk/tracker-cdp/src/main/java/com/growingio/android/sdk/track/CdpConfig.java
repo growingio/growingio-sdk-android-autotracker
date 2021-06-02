@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-package com.growingio.sdk.annotation;
+package com.growingio.android.sdk.track;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.growingio.android.sdk.Configurable;
 
-@Retention(RetentionPolicy.CLASS)
-@Target(ElementType.TYPE)
-public @interface GIOModule {
-    String gioName() default "GrowingTracker"; //it's useless in librarymodule
+public class CdpConfig implements Configurable {
+    private String mDataSourceId;
+
+    public String getDataSourceId() {
+        return mDataSourceId;
+    }
+
+    /**
+     * 设置dataSourceId
+     *
+     * @param dataSourceId 官网的中您的相应APP的DataSourceId
+     * @return this
+     */
+    public CdpConfig setDataSourceId(String dataSourceId) {
+        mDataSourceId = dataSourceId;
+        return this;
+    }
 }

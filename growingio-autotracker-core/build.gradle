@@ -41,7 +41,10 @@ dependencies {
     compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
     compileOnly libraries.android.recyclerview
-    compileOnly libraries.others.x5_webview
+    //compileOnly libraries.others.x5_webview
+
+    implementation project(":growingio-annotation")
+    annotationProcessor project(":growingio-annotation:compiler")
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.growingio.sdk.annotation.compiler;
+package com.growingio.android.sdk.autotrack;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.growingio.android.sdk.Configurable;
 
-/**
- * Used to retrieve LibraryModule our annotation processor from
- * libraries and applications.
- *
- * <p>Part of the internals of GIO's annotation processor and not for public use.
- */
-@Target(ElementType.TYPE)
-// Needs to be parsed from class files in JAR.
-@Retention(RetentionPolicy.CLASS)
-@interface Index {
-    String[] modules() default {};
+public class AutotrackConfig implements Configurable {
+    private float mImpressionScale = 0;
 
-    String[] configs() default {};
+    public AutotrackConfig setImpressionScale(float scale) {
+        if (scale < 0) {
+            scale = 0;
+        } else if (scale > 1) {
+            scale = 1;
+        }
+        this.mImpressionScale = scale;
+        return this;
+    }
+
+    public float getImpressionScale() {
+        return mImpressionScale;
+    }
 }

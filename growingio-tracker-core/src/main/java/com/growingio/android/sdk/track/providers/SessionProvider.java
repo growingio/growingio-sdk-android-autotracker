@@ -55,7 +55,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     private SessionProvider() {
         mContext = TrackerContext.get().getApplicationContext();
-        mSessionInterval = ConfigurationProvider.get().getTrackConfiguration().getSessionInterval() * 1000;
+        mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000;
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
     }
 
@@ -152,7 +152,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     @Override
     public void onActivityLifecycle(final ActivityLifecycleEvent event) {
-        if (!ConfigurationProvider.get().getTrackConfiguration().isDataCollectionEnabled()) {
+        if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
             return;
         }
 

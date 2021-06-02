@@ -19,6 +19,7 @@ package com.growingio.android.sdk;
 import android.content.Context;
 
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 /**
  * Registers a set of components to use when initializing GrowingIO whthin an library when GrowingIO's
@@ -30,5 +31,9 @@ public abstract class LibraryGioModule {
 
     public void registerComponents(Context context, TrackerRegistry registry) {
         //Default empty impl;
+    }
+
+    protected <T> T getConfiguration(Class<? extends Configurable> clazz) {
+        return ConfigurationProvider.get().getConfiguration(clazz);
     }
 }

@@ -18,19 +18,18 @@ package com.growingio.android.sdk.autotrack;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.AppGioModule;
-import com.growingio.sdk.annotation.GIOConfig;
-import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOAppModule;
+import com.growingio.sdk.annotation.GIOTracker;
 
 /**
  * <p>
  *
  * @author cpacm 5/12/21
  */
-@GIOModule(gioName = "GrowingAutotracker")
+@GIOAppModule(name = "GrowingAutotracker", config = CdpAutotrackConfig.class, configName = "CdpAutotrack")
 public final class GrowingAppModule extends AppGioModule {
 
-    @GIOConfig(tracker = CdpAutotracker.class,
-            config = CdpAutotrackConfiguration.class)
+    @GIOTracker(name = CdpAutotracker.class)
     public void config(CdpAutotrackConfiguration configuration) {
         if (TextUtils.isEmpty(configuration.getDataSourceId())) {
             throw new IllegalStateException("DataSourceId is NULL");

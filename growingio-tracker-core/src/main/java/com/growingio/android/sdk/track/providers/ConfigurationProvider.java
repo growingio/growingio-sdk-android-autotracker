@@ -16,62 +16,84 @@
 
 package com.growingio.android.sdk.track.providers;
 
-import androidx.annotation.NonNull;
+import android.text.TextUtils;
 
-import com.growingio.android.sdk.TrackConfiguration;
-import com.growingio.android.sdk.track.base.Configurable;
+import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.track.log.DebugLogger;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ConstantPool;
+import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationProvider {
-    private volatile TrackConfiguration mTrackConfiguration;
-    private static final Map<Class<? extends Configurable>, Configurable> OTHER_CONFIGURATIONS = new HashMap();
+    private static final String TAG = "ConfigurationProvider";
+    private final CoreConfiguration mCoreConfiguration;
+    private final Map<Class<? extends Configurable>, Configurable> sModuleConfigs = new HashMap<>();
+    private static ConfigurationProvider INSTANCE = null;
 
-    private static class SingleInstance {
-        private static final ConfigurationProvider INSTANCE = new ConfigurationProvider();
-    }
+    private ConfigurationProvider(CoreConfiguration coreConfiguration, Map<Class<? extends Configurable>, Configurable> moduleConfigs) {
+        if (TextUtils.isEmpty(coreConfiguration.getProjectId())) {
+            throw new IllegalStateException("ProjectId is NULL");
+        }
 
-    private ConfigurationProvider() {
+        if (TextUtils.isEmpty(coreConfiguration.getUrlScheme())) {
+            throw new IllegalStateException("UrlScheme is NULL");
+        }
 
+        if (!ThreadUtils.runningOnUiThread()) {
+            throw new IllegalStateException("Growing Sdk 初始化必须在主线程中调用。");
+        }
+
+        this.mCoreConfiguration = coreConfiguration;
+        sModuleConfigs.clear();
+        if (moduleConfigs != null) {
+            sModuleConfigs.putAll(moduleConfigs);
+        }
+        if (coreConfiguration.isDebugEnabled()) {
+            Logger.addLogger(new DebugLogger());
+        }
     }
 
     public static ConfigurationProvider get() {
-        return SingleInstance.INSTANCE;
+        if (INSTANCE == null) {
+            Logger.e(TAG, "GrowingSDK hasn't config, please initialized before use API");
+            return empty();
+        }
+        synchronized (ConfigurationProvider.class) {
+            if (INSTANCE != null) {
+                return INSTANCE;
+            }
+            Logger.e(TAG, "GrowingSDK hasn't config, please initialized before use API");
+            return empty();
+        }
     }
 
-    public boolean isDataCollectionEnabled() {
-        return getTrackConfiguration().isDataCollectionEnabled();
+    public static void initWithConfig(CoreConfiguration coreConfiguration, Map<Class<? extends Configurable>, Configurable> moduleConfigs) {
+        INSTANCE = new ConfigurationProvider(coreConfiguration, moduleConfigs);
     }
 
-    public void addConfiguration(Configurable config) {
+    private static ConfigurationProvider empty() {
+        return new ConfigurationProvider(new CoreConfiguration(ConstantPool.UNKNOWN, ConstantPool.UNKNOWN), null);
+    }
+
+    void addConfiguration(Configurable config) {
         if (config != null) {
-            OTHER_CONFIGURATIONS.put(config.getClass(), config);
+            sModuleConfigs.put(config.getClass(), config);
         }
     }
 
+    /**
+     * @return module's configuration
+     */
+    @SuppressWarnings("unchecked")
     public <T> T getConfiguration(Class<? extends Configurable> clazz) {
-        return (T) OTHER_CONFIGURATIONS.get(clazz);
+        return (T) sModuleConfigs.get(clazz);
     }
 
-    @NonNull
-    public TrackConfiguration getTrackConfiguration() {
-        if (mTrackConfiguration != null) {
-            return mTrackConfiguration.clone();
-        }
-        return new TrackConfiguration(ConstantPool.UNKNOWN, ConstantPool.UNKNOWN);
-    }
-
-    public void setDataCollectionEnabled(boolean enabled) {
-        if (mTrackConfiguration != null) {
-            mTrackConfiguration.setDataCollectionEnabled(enabled);
-        }
-    }
-
-    public void setTrackConfiguration(TrackConfiguration configuration) {
-        if (mTrackConfiguration == null) {
-            mTrackConfiguration = configuration.clone();
-        }
+    public static CoreConfiguration core() {
+        return get().mCoreConfiguration;
     }
 }

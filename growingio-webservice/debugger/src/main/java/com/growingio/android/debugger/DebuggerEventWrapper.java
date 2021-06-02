@@ -121,12 +121,12 @@ public class DebuggerEventWrapper implements EventBuildInterceptor, ScreenshotPr
     }
 
     private String getUrl() {
-        StringBuilder url = new StringBuilder(ConfigurationProvider.get().getTrackConfiguration().getDataCollectionServerHost());
+        StringBuilder url = new StringBuilder(ConfigurationProvider.core().getDataCollectionServerHost());
         if (url.length() > 0 && url.charAt(url.length() - 1) != '/') {
             url.append("/");
         }
         url.append("v3/projects/");
-        String projectId = ConfigurationProvider.get().getTrackConfiguration().getProjectId();
+        String projectId = ConfigurationProvider.core().getProjectId();
         url.append(projectId);
         url.append("/collect?stm=");
         url.append(System.currentTimeMillis());

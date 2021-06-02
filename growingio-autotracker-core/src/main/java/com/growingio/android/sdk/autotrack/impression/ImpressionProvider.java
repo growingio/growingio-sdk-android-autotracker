@@ -25,7 +25,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
@@ -65,7 +65,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
     }
 
     private ImpressionProvider() {
-        AutotrackConfiguration configuration = ConfigurationProvider.get().getConfiguration(AutotrackConfiguration.class);
+        AutotrackConfig configuration = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         mImpressionScale = configuration.getImpressionScale();
 
         mUiHandler = new Handler(Looper.getMainLooper());

@@ -22,14 +22,14 @@ import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.http.EventResponse;
 import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
  * <p>
  *
  * @author cpacm 4/28/21
  */
-@GIOModule
+@GIOLibraryModule
 public class OkhttpLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {

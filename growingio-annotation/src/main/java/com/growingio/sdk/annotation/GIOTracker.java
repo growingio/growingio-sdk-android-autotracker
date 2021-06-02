@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.growingio.sdk.annotation.compiler;
+package com.growingio.sdk.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,16 +21,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to retrieve LibraryModule our annotation processor from
- * libraries and applications.
+ * <p>
+ * define sdk's api
+ * it use in {@link GIOAppModule}
  *
- * <p>Part of the internals of GIO's annotation processor and not for public use.
+ * @author cpacm 2021/5/31
  */
-@Target(ElementType.TYPE)
-// Needs to be parsed from class files in JAR.
 @Retention(RetentionPolicy.CLASS)
-@interface Index {
-    String[] modules() default {};
+@Target(ElementType.METHOD)
+public @interface GIOTracker {
+    Class<?> name();
 
-    String[] configs() default {};
+    String projectId() default "UNKNOWN";
+
+    String urlScheme() default "UNKNOWN";
 }

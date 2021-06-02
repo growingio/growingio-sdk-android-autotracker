@@ -29,7 +29,6 @@ import com.growingio.android.sdk.autotrack.page.SuperFragment;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.util.HashMap;
@@ -44,13 +43,12 @@ public class Autotracker extends Tracker {
         return sInitializedSuccessfully;
     }
 
-    Autotracker(Application application, AutotrackConfiguration trackConfiguration) {
-        super(application, trackConfiguration);
-        if (application == null || trackConfiguration == null) {
+    Autotracker(Application application) {
+        super(application);
+        if (application == null) {
             sInitializedSuccessfully = false;
             return;
         }
-        ConfigurationProvider.get().addConfiguration(trackConfiguration.clone());
         PageProvider.get().start();
         ViewChangeProvider mViewChangeProvider;
         mViewChangeProvider = new ViewChangeProvider();

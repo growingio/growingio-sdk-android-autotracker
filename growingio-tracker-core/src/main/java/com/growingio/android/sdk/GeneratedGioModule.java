@@ -17,4 +17,5 @@
 package com.growingio.android.sdk;
 
 abstract class GeneratedGioModule extends AppGioModule {
+
 }

@@ -27,6 +27,7 @@ android {
 dependencies {
     implementation project(':growingio-tracker-core')
     implementation libraries.android.volley
+    compileOnly libraries.androidx.appcompat
 
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")

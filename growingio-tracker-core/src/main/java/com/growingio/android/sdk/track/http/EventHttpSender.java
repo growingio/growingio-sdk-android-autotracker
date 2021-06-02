@@ -18,8 +18,8 @@ package com.growingio.android.sdk.track.http;
 
 import android.os.Build;
 
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.TrackConfiguration;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
@@ -41,7 +41,7 @@ public class EventHttpSender implements IEventNetSender {
     private final String mServerHost;
 
     public EventHttpSender() {
-        TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
+        CoreConfiguration configuration = ConfigurationProvider.core();
         mProjectId = configuration.getProjectId();
         mServerHost = configuration.getDataCollectionServerHost();
     }

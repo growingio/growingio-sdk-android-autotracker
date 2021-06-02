@@ -14,7 +14,25 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.base;
+package com.growingio.android.sdk.autotrack;
 
-public interface Configurable {
+import com.growingio.android.sdk.Configurable;
+
+public class CdpAutotrackConfig implements Configurable {
+    private String mDataSourceId;
+
+    public String getDataSourceId() {
+        return mDataSourceId;
+    }
+
+    /**
+     * 设置dataSourceId
+     *
+     * @param dataSourceId 官网的中您的相应APP的DataSourceId
+     * @return this
+     */
+    public CdpAutotrackConfig setDataSourceId(String dataSourceId) {
+        mDataSourceId = dataSourceId;
+        return this;
+    }
 }

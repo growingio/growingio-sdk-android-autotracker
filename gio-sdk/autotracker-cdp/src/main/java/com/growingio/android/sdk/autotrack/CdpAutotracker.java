@@ -24,6 +24,7 @@ import com.growingio.android.sdk.track.cdp.CdpEventBuildInterceptor;
 import com.growingio.android.sdk.track.cdp.ResourceItem;
 import com.growingio.android.sdk.track.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +32,11 @@ import java.util.Map;
 public class CdpAutotracker extends Autotracker {
     private static final String TAG = "GrowingAutotracker";
 
-    public CdpAutotracker(Application application, CdpAutotrackConfiguration trackConfiguration) {
-        super(application, trackConfiguration);
-        if (trackConfiguration != null) {
-            TrackMainThread.trackMain().addEventBuildInterceptor(new CdpEventBuildInterceptor(trackConfiguration.getDataSourceId()));
+    public CdpAutotracker(Application application) {
+        super(application);
+        CdpAutotrackConfig config = ConfigurationProvider.get().getConfiguration(CdpAutotrackConfig.class);
+        if (config != null) {
+            TrackMainThread.trackMain().addEventBuildInterceptor(new CdpEventBuildInterceptor(config.getDataSourceId()));
         }
     }
 

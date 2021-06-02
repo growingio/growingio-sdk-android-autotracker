@@ -33,6 +33,7 @@ android {
     lintOptions {
         abortOnError false
     }
+
 }
 
 dependencies {
@@ -42,7 +43,8 @@ dependencies {
     compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
     compileOnly libraries.android.recyclerview
-    compileOnly libraries.others.x5_webview
+    //compileOnly libraries.others.x5_webview
+
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

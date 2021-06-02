@@ -76,7 +76,7 @@ public class DeepLinkProvider implements IActivityLifecycle {
             if (data == null) {
                 return;
             }
-            String urlScheme = ConfigurationProvider.get().getTrackConfiguration().getUrlScheme();
+            String urlScheme = ConfigurationProvider.core().getUrlScheme();
 
             if (urlScheme.equals(data.getScheme())) {
                 Logger.d(TAG, "enter growingio:" + data.toString());

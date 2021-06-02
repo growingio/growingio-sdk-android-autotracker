@@ -58,7 +58,7 @@ public class TrackConfigurationImpressionScaleTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setConfiguration(new TestTrackConfiguration().setImpressionScale(1));
+        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig().setImpressionScale(1));
     }
 
     @Test

@@ -21,14 +21,14 @@ import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.WebService;
-import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
  * <p>
  *
  * @author cpacm 5/19/21
  */
-@GIOModule
+@GIOLibraryModule
 public class CirclerLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {

@@ -19,20 +19,19 @@ package com.growingio.android.sdk.track;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.AppGioModule;
-import com.growingio.sdk.annotation.GIOConfig;
-import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOAppModule;
+import com.growingio.sdk.annotation.GIOTracker;
 
 /**
  * <p>
  *
  * @author cpacm 4/28/21
  */
-@GIOModule()
+@GIOAppModule(config = CdpConfig.class, configName = "CdpCore")
 public final class GrowingAppModule extends AppGioModule {
 
-    @GIOConfig(tracker = CdpTracker.class,
-            config = CdpTrackConfiguration.class)
-    public void config(CdpTrackConfiguration configuration) {
+    @GIOTracker(name = CdpTracker.class)
+    public void config(CdpCoreConfiguration configuration) {
         if (TextUtils.isEmpty(configuration.getDataSourceId())) {
             throw new IllegalStateException("DataSourceId is NULL");
         }

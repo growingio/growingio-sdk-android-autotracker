@@ -18,11 +18,7 @@ package com.growingio.android.sdk;
 
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-
-import com.growingio.android.sdk.track.base.Configurable;
-
-public class TrackConfiguration implements Cloneable, Configurable {
+public class CoreConfiguration implements Configurable {
     private String mProjectId;
     private String mUrlScheme;
 
@@ -36,15 +32,12 @@ public class TrackConfiguration implements Cloneable, Configurable {
     private String mDataCollectionServerHost = "http://api.growingio.com";
     private boolean mOaidEnabled = false;
 
-    public TrackConfiguration(String projectId, String urlScheme) {
+    public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
         mUrlScheme = urlScheme;
     }
 
-    public TrackConfiguration() {
-    }
-
-    public TrackConfiguration setProject(String projectId, String urlScheme) {
+    public CoreConfiguration setProject(String projectId, String urlScheme) {
         mProjectId = projectId;
         mUrlScheme = urlScheme;
         return this;
@@ -58,7 +51,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mDataCollectionEnabled;
     }
 
-    public TrackConfiguration setDataCollectionEnabled(boolean dataCollectionEnabled) {
+    public CoreConfiguration setDataCollectionEnabled(boolean dataCollectionEnabled) {
         mDataCollectionEnabled = dataCollectionEnabled;
         return this;
     }
@@ -71,7 +64,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mChannel;
     }
 
-    public TrackConfiguration setChannel(String channel) {
+    public CoreConfiguration setChannel(String channel) {
         this.mChannel = channel;
         return this;
     }
@@ -80,7 +73,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mUploadExceptionEnabled;
     }
 
-    public TrackConfiguration setUploadExceptionEnabled(boolean uploadExceptionEnabled) {
+    public CoreConfiguration setUploadExceptionEnabled(boolean uploadExceptionEnabled) {
         this.mUploadExceptionEnabled = uploadExceptionEnabled;
         return this;
     }
@@ -89,7 +82,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mDebugEnabled;
     }
 
-    public TrackConfiguration setDebugEnabled(boolean enabled) {
+    public CoreConfiguration setDebugEnabled(boolean enabled) {
         this.mDebugEnabled = enabled;
         return this;
     }
@@ -98,7 +91,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mCellularDataLimit;
     }
 
-    public TrackConfiguration setCellularDataLimit(int cellularDataLimit) {
+    public CoreConfiguration setCellularDataLimit(int cellularDataLimit) {
         this.mCellularDataLimit = cellularDataLimit;
         return this;
     }
@@ -107,7 +100,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mDataUploadInterval;
     }
 
-    public TrackConfiguration setDataUploadInterval(int dataUploadInterval) {
+    public CoreConfiguration setDataUploadInterval(int dataUploadInterval) {
         this.mDataUploadInterval = dataUploadInterval;
         return this;
     }
@@ -116,7 +109,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mSessionInterval;
     }
 
-    public TrackConfiguration setSessionInterval(int sessionInterval) {
+    public CoreConfiguration setSessionInterval(int sessionInterval) {
         this.mSessionInterval = sessionInterval;
         return this;
     }
@@ -125,7 +118,7 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mDataCollectionServerHost;
     }
 
-    public TrackConfiguration setDataCollectionServerHost(String dataCollectionServerHost) {
+    public CoreConfiguration setDataCollectionServerHost(String dataCollectionServerHost) {
         if (!TextUtils.isEmpty(dataCollectionServerHost)) {
             mDataCollectionServerHost = dataCollectionServerHost;
         }
@@ -136,23 +129,8 @@ public class TrackConfiguration implements Cloneable, Configurable {
         return mOaidEnabled;
     }
 
-    public TrackConfiguration setOaidEnabled(boolean enabled) {
+    public CoreConfiguration setOaidEnabled(boolean enabled) {
         this.mOaidEnabled = enabled;
         return this;
-    }
-
-    @NonNull
-    @Override
-    public TrackConfiguration clone() {
-        TrackConfiguration clone = new TrackConfiguration(this.mProjectId, this.mUrlScheme);
-        clone.mChannel = this.mChannel;
-        clone.mDebugEnabled = this.mDebugEnabled;
-        clone.mCellularDataLimit = this.mCellularDataLimit;
-        clone.mDataUploadInterval = this.mDataUploadInterval;
-        clone.mSessionInterval = this.mSessionInterval;
-        clone.mUploadExceptionEnabled = this.mUploadExceptionEnabled;
-        clone.mDataCollectionServerHost = this.mDataCollectionServerHost;
-        clone.mOaidEnabled = this.mOaidEnabled;
-        return clone;
     }
 }

@@ -62,11 +62,13 @@ public class HurtLocker {
                 + type.getName() + ".");
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getInternalState(Object object, String fieldName) throws Exception {
         Field foundField = getField(object.getClass(), fieldName);
         return (T) foundField.get(object);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T invokeMethod(Object object, Class<?> declaringClass, String methodToExecute,
                                      Class<?>[] parameterTypes, Object... arguments) throws Exception {
         Method declaredMethod = declaringClass.getDeclaredMethod(methodToExecute, parameterTypes);

@@ -117,7 +117,7 @@ public class DeviceInfoProvider {
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
     public String getImei() {
-        if (TextUtils.isEmpty(mImei) && ConfigurationProvider.get().isDataCollectionEnabled()) {
+        if (TextUtils.isEmpty(mImei) && ConfigurationProvider.core().isDataCollectionEnabled()) {
             if (PermissionUtil.checkReadPhoneStatePermission()) {
                 try {
                     TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
@@ -131,14 +131,14 @@ public class DeviceInfoProvider {
     }
 
     public String getAndroidId() {
-        if (TextUtils.isEmpty(mAndroidId) && ConfigurationProvider.get().isDataCollectionEnabled()) {
+        if (TextUtils.isEmpty(mAndroidId) && ConfigurationProvider.core().isDataCollectionEnabled()) {
             mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
         }
         return mAndroidId;
     }
 
     public String getOaid() {
-        if (TextUtils.isEmpty(mOaid) && ConfigurationProvider.get().isDataCollectionEnabled() && ConfigurationProvider.get().getTrackConfiguration().isOaidEnabled()) {
+        if (TextUtils.isEmpty(mOaid) && ConfigurationProvider.core().isDataCollectionEnabled() && ConfigurationProvider.core().isOaidEnabled()) {
             if (ClassExistHelper.hasMSA()) {
                 mOaid = new OaidHelper().getOaid(mContext);
             }
@@ -153,7 +153,7 @@ public class DeviceInfoProvider {
     public String getDeviceId() {
         if (TextUtils.isEmpty(mDeviceId)) {
             mDeviceId = PersistentDataProvider.get().getDeviceId();
-            if (TextUtils.isEmpty(mDeviceId) && ConfigurationProvider.get().isDataCollectionEnabled()) {
+            if (TextUtils.isEmpty(mDeviceId) && ConfigurationProvider.core().isDataCollectionEnabled()) {
                 mDeviceId = calculateDeviceId();
             }
         }

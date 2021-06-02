@@ -59,13 +59,13 @@ public class ReadyMessage {
 
     public static ReadyMessage createMessage() {
         Context context = TrackerContext.get().getApplicationContext();
-        String projectId = ConfigurationProvider.get().getTrackConfiguration().getProjectId();
+        String projectId = ConfigurationProvider.core().getProjectId();
         String domain = AppInfoProvider.get().getPackageName();
         String sdkVersion = SDKConfig.SDK_VERSION;
         int sdkVersionCode = SDKConfig.SDK_VERSION_CODE;
 
         DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
-        String urlScheme = ConfigurationProvider.get().getTrackConfiguration().getUrlScheme();
+        String urlScheme = ConfigurationProvider.core().getUrlScheme();
         return new ReadyMessage(projectId, domain, sdkVersion, sdkVersionCode, metrics.widthPixels, metrics.heightPixels, urlScheme);
     }
 

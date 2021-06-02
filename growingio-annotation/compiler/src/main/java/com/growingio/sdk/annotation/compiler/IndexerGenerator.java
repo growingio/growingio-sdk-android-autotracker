@@ -16,7 +16,7 @@
 
 package com.growingio.sdk.annotation.compiler;
 
-import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOLibraryModule;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
@@ -24,10 +24,17 @@ import com.squareup.javapoet.TypeSpec;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+
+import static com.growingio.sdk.annotation.compiler.ProcessUtils.GIO_INDEX_ANNOTATION_CONFIGS;
+import static com.growingio.sdk.annotation.compiler.ProcessUtils.GIO_INDEX_ANNOTATION_MODULES;
 
 /**
  * Generates an empty class with an annotation containing the class names of one or more
@@ -40,6 +47,7 @@ import javax.lang.model.element.TypeElement;
  * <code>
  *     {@literal @Index(}
  *       modules = "com.cpacm.module.module.TestModule"
+ *       configs = "com.cpacm.module.module.Config"
  *   )
  *   public class GioIndexer_GIOModule_com_xxx_xxxModule {
  *   }
@@ -59,18 +67,19 @@ final class IndexerGenerator {
         List<TypeElement> modules = new ArrayList<>();
         for (TypeElement element : types) {
             if (processUtils.isAppGioModule(element)) {
-                continue;
+                throw new IllegalArgumentException("[" + processUtils.getRound() + "]" +
+                        "You can't use @GIOLibraryModule with AppGioModule");
             }
             if (processUtils.isGioModule(element)) {
                 modules.add(element);
             } else {
-                throw new IllegalArgumentException("Unrecognized type: " + element);
+                throw new IllegalArgumentException("Unrecognized type: " + element + "You should use @GIOLibraryModule with LibraryGioModule");
             }
         }
         processUtils.debugLog("generate indexer:" + types);
 
         if (modules.size() > 0) {
-            TypeSpec indexer = generate(modules, GIOModule.class);
+            TypeSpec indexer = generate(modules, GIOLibraryModule.class);
             processUtils.writeIndexer(indexer);
             processUtils.debugLog("[" + processUtils.getRound() + "]" +
                     "Wrote an Indexer this round, skipping the app module to ensure all "
@@ -78,14 +87,33 @@ final class IndexerGenerator {
         }
     }
 
-    private TypeSpec generate(
-            List<TypeElement> libraryModules, Class<? extends Annotation> annotation) {
+    private TypeSpec generate(List<TypeElement> libraryModules, Class<? extends Annotation> annotation) {
 
         AnnotationSpec.Builder annotationBuilder = AnnotationSpec.builder(Index.class);
 
-        String value = getAnnotationValue(annotation);
+        // add module
         for (TypeElement childModule : libraryModules) {
-            annotationBuilder.addMember(value, "$S", ClassName.get(childModule).toString());
+            annotationBuilder.addMember(GIO_INDEX_ANNOTATION_MODULES, "$S", ClassName.get(childModule).toString());
+        }
+        // add config
+        String annotationClassName = GIOLibraryModule.class.getName();
+        for (TypeElement childModule : libraryModules) {
+            for (AnnotationMirror annotationMirror : childModule.getAnnotationMirrors()) {
+                if (!annotationClassName.equals(annotationMirror.getAnnotationType().toString())) {
+                    continue;
+                }
+                for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+                    //String key = entry.getKey().getSimpleName().toString();//judge isEqual 'config'
+                    //Type.ClassType classType = (Type.ClassType) entry.getValue().getValue();
+                    //processUtils.debugLog("classType: " + classType.tsym.getQualifiedName().toString());
+                    String mirrorValue = entry.getValue().getValue().toString();
+                    if (!mirrorValue.equals(Void.class.getName())) {
+                        annotationBuilder.addMember(GIO_INDEX_ANNOTATION_CONFIGS, "$S", mirrorValue);
+                    }
+
+                    processUtils.debugLog(entry.getKey().getSimpleName() + ":" + entry.getValue().getValue());
+                }
+            }
         }
 
         StringBuilder indexerNameBuilder =
@@ -112,11 +140,11 @@ final class IndexerGenerator {
                 .build();
     }
 
-    private static String getAnnotationValue(Class<? extends Annotation> annotation) {
-        if (annotation == GIOModule.class) {
-            return "modules";
-        } else {
-            throw new IllegalArgumentException("Unrecognized annotation: " + annotation);
-        }
-    }
+//    private static String getAnnotationValue(Class<? extends Annotation> annotation) {
+//        if (annotation == GIOLibraryModule.class) {
+//            return "modules";
+//        } else {
+//            throw new IllegalArgumentException("Unrecognized annotation: " + annotation);
+//        }
+//    }
 }

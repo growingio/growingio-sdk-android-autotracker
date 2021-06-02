@@ -17,18 +17,18 @@
 package com.growingio.android.sdk.autotrack;
 
 import com.growingio.android.sdk.AppGioModule;
-import com.growingio.sdk.annotation.GIOConfig;
-import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOAppModule;
+import com.growingio.sdk.annotation.GIOTracker;
 
 /**
  * <p>
  *
  * @author cpacm 4/30/21
  */
-@GIOModule(gioName = "GrowingAutotracker")
+@GIOAppModule(name = "GrowingAutotracker", configName = "AutotrackConfiguration")
 public class GrowingAutoAppModule extends AppGioModule {
 
-    @GIOConfig(tracker = Autotracker.class, config = AutotrackConfiguration.class)
+    @GIOTracker(name = Autotracker.class)
     public void config(AutotrackConfiguration config) {
 
     }

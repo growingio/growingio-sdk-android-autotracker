@@ -70,7 +70,7 @@ public class SessionEventsTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteAllData();
-        DemoApplication.setConfiguration(new TestTrackConfiguration()
+        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig()
                 .setSessionInterval(10)
                 .setChannel(APP_CHANNEL)
         );
@@ -198,7 +198,7 @@ public class SessionEventsTest extends EventsTest {
             }
         });
 
-        long delayTime = ConfigurationProvider.get().getTrackConfiguration().getSessionInterval();
+        long delayTime = ConfigurationProvider.core().getSessionInterval();
         Uninterruptibles.sleepUninterruptibly(delayTime * 1000 + 1, TimeUnit.MILLISECONDS);
 
         //To State RESUMED
