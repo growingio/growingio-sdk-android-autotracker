@@ -68,7 +68,7 @@ import javax.tools.Diagnostic;
 @AutoService(Processor.class)
 public class InjectProcessor extends AbstractProcessor {
     private static final String TAG = "InjectProcessor";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String LICENSE_HEADER = "/*\n" +
             " * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.\n" +
             " *\n" +
