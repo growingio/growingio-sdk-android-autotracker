@@ -30,16 +30,16 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 public class Okhttp3Test {
 
     @Before
-    public void prepare(){
+    public void prepare() {
         mockStatic(Log.class);
     }
 
     @Mock
     Context fakeContext;
 
-    private EventUrl initEventUrl() {
+    private EventUrl initEventUrl(String host) {
         long time = System.currentTimeMillis();
-        return new EventUrl("http://106.75.81.105:8080", time)
+        return new EventUrl(host, time)
                 .addPath("v3")
                 .addPath("projects")
                 .addPath("bfc5d6a3693a110d")
@@ -54,9 +54,12 @@ public class Okhttp3Test {
         module.registerComponents(fakeContext, trackerRegistry);
 
         ModelLoader<EventUrl, EventResponse> modelLoader = trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
-        EventUrl eventUrl = initEventUrl();
+        EventUrl eventUrl = initEventUrl("http://106.75.81.105:8080");
         EventResponse response = modelLoader.buildLoadData(eventUrl).fetcher.executeData();
         assertThat(response.isSucceeded()).isTrue();
+        eventUrl = initEventUrl("http://localhost/");
+        response = modelLoader.buildLoadData(eventUrl).fetcher.executeData();
+        assertThat(response.isSucceeded()).isFalse();
 
     }
 }
