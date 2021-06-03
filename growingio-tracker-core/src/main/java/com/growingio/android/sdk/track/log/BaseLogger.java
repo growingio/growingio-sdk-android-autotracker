@@ -116,7 +116,7 @@ public abstract class BaseLogger implements ILogger {
     }
 
     private void prepareLog(int priority, String tag, Throwable t, String message, Object... args) {
-        if (TextUtils.isEmpty(tag)) {
+        if (tag == null || tag.length() == 0) {
             return;
         }
 
