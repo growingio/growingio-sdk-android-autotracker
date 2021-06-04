@@ -29,7 +29,7 @@ import com.growingio.sdk.annotation.GIOTracker;
 @GIOAppModule()
 public final class GrowingAppModule extends AppGioModule {
 
-    @GIOTracker(name = Tracker.class, projectId = "adkasd", urlScheme = "aksdakdssada")
+    @GIOTracker(name = Tracker.class)
     public void config(TrackConfiguration configuration) {
     }
 }

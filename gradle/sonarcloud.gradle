@@ -8,7 +8,7 @@ sonarqube {
         property "sonar.organization", "growingio"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/demos/demo/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
-        property 'sonar.exclusions', "**/*.html, **/*.xml"
+        property 'sonar.exclusions', "**/*.html, **/*.xml, **/*AppModule.java"
     }
 }
 

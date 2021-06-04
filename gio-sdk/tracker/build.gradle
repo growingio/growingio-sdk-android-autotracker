@@ -48,3 +48,8 @@ dependencies {
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+
+//tasks.withType(Javadoc) {
+//    failOnError false
+//    classpath += project.files("${buildDir}/generated/ap_generated_sources/debug/out")
+//}
