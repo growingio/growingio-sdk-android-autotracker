@@ -30,7 +30,7 @@ import com.growingio.sdk.annotation.GIOTracker;
 @GIOAppModule(config = CdpConfig.class, configName = "CdpCore")
 public final class GrowingAppModule extends AppGioModule {
 
-    @GIOTracker(name = CdpTracker.class)
+    @GIOTracker(path = CdpTracker.class)
     public void config(CdpCoreConfiguration configuration) {
         if (TextUtils.isEmpty(configuration.getDataSourceId())) {
             throw new IllegalStateException("DataSourceId is NULL");

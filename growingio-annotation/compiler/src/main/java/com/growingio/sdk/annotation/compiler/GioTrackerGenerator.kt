@@ -319,7 +319,7 @@ class GioTrackerGenerator(
             }
             trackerMethodName = gioTracker.simpleName.toString()
             for ((key, value) in mirror.elementValues) {
-                if (key.simpleName.toString() == GIOTracker::name.name) {
+                if (key.simpleName.toString() == GIOTracker::path.name) {
                     trackerClassName = value.value.toString()
                 } else if (key.simpleName.toString() == GIOTracker::projectId.name) {
                     projectId = value.value.toString()

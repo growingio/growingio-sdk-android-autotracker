@@ -20,16 +20,10 @@ import com.growingio.android.sdk.AppGioModule;
 import com.growingio.sdk.annotation.GIOAppModule;
 import com.growingio.sdk.annotation.GIOTracker;
 
-/**
- * <p>
- *
- * @author cpacm 4/30/21
- */
 @GIOAppModule(name = "GrowingAutotracker", configName = "AutotrackConfiguration")
 public class GrowingAutoAppModule extends AppGioModule {
 
-    @GIOTracker(name = Autotracker.class)
+    @GIOTracker(path = Autotracker.class)
     public void config(AutotrackConfiguration config) {
-
     }
 }
