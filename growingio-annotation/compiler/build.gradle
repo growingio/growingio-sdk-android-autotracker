@@ -11,6 +11,14 @@ java {
 }
 
 dependencies {
+    testImplementation libraries.test.junit
+    testImplementation ("com.google.testing.compile:compile-testing:0.19") {
+        // We don't use this and including it requires us to list it separatel which would be
+        // confusing.
+        exclude group: "com.google.auto.value", module: "auto-value"
+    }
+
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     annotationProcessor libraries.google.auto_service

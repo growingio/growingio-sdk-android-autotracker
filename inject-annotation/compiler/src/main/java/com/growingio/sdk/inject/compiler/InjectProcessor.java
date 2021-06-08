@@ -33,7 +33,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;
 
 import org.apache.commons.io.IOUtils;
@@ -89,11 +88,13 @@ public class InjectProcessor extends AbstractProcessor {
     private final List<List<Object>> mSuperHookClassesArgs = new ArrayList<>();
 
     private Messager mMessager;
+    private ProcessingEnvironment processingEnv;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         mMessager = processingEnvironment.getMessager();
+        this.processingEnv = processingEnvironment;
         log("InjectProcessor init finish");
     }
 
@@ -139,9 +140,9 @@ public class InjectProcessor extends AbstractProcessor {
                 if (mirror == null) {
                     continue;
                 }
-                List<Attribute.Compound> annotations = AnnotationUtil.getAnnotations(mirror, "value");
+                List<AnnotationMirror> annotations = AnnotationUtil.getAnnotations(mirror, "value");
                 if (annotations != null && !annotations.isEmpty()) {
-                    for (Attribute.Compound annotation : annotations) {
+                    for (AnnotationMirror annotation : annotations) {
                         stashHookClassesArgs(element, annotation);
                     }
                 }
@@ -152,7 +153,7 @@ public class InjectProcessor extends AbstractProcessor {
     }
 
     private void stashHookClassesArgs(Element element, AnnotationMirror annotationMirror) {
-        String originalTargetClassName = AnnotationUtil.getClassValue(annotationMirror, "clazz");
+        String originalTargetClassName = AnnotationUtil.getClassValue(processingEnv, annotationMirror, "clazz");
         String targetClassName = TypeUtil.getInternalName(originalTargetClassName);
 
         String targetMethodName = AnnotationUtil.getStringValue(annotationMirror, "method");
@@ -164,17 +165,27 @@ public class InjectProcessor extends AbstractProcessor {
         for (int i = 0; i < targetParameters.size(); i++) {
             argumentTypes[i] = TypeUtil.getType(targetParameters.get(i));
         }
-        String targetReturnType = AnnotationUtil.getClassValue(annotationMirror, "returnType");
+        String targetReturnType = AnnotationUtil.getClassValue(processingEnv, annotationMirror, "returnType");
         if (targetReturnType == null) {
             targetReturnType = void.class.getName();
         }
         Type returnType = TypeUtil.getType(targetReturnType);
         String targetDesc = Type.getMethodDescriptor(returnType, argumentTypes);
 
-        Symbol.ClassSymbol enclosingElement = (Symbol.ClassSymbol) element.getEnclosingElement();
-        String originalInjectClass = enclosingElement.flatName().toString();
+        String originalInjectClass = element.getEnclosingElement().toString();
         String injectClass = TypeUtil.getInternalName(originalInjectClass);
         String injectMethod = element.getSimpleName().toString();
+
+//        if (element instanceof ExecutableElement) {
+//            List<String> injectParameters = new ArrayList<>();
+//            List<? extends VariableElement> methodParams = ((ExecutableElement) element).getParameters();
+//            for (VariableElement param : methodParams) {
+//                String className = param.asType().toString();
+//                String convertName = AnnotationUtil.getConvertName(processingEnv, className);
+//                injectParameters.add(convertName);
+//            }
+//            System.out.println("[change]:" + injectParameters.toString());
+//        }
 
         if (element instanceof Symbol.MethodSymbol) {
             List<String> injectParameters = new ArrayList<>();
@@ -183,6 +194,7 @@ public class InjectProcessor extends AbstractProcessor {
             for (Symbol.VarSymbol parameter : parameters) {
                 injectParameters.add(parameter.asType().asElement().flatName().toString());
             }
+            System.out.println("[origin]:" + injectParameters.toString());
             argumentTypes = new Type[injectParameters.size()];
             for (int i = 0; i < injectParameters.size(); i++) {
                 argumentTypes[i] = TypeUtil.getType(injectParameters.get(i));
@@ -338,7 +350,9 @@ public class InjectProcessor extends AbstractProcessor {
     }
 
     private void generatePerfectJava(JavaFile javaFile) throws IOException {
+        ///Users/shenliming/Workspace/growing/growingio-sdk-android-autotracker/growingio-autotracker-gradle-plugin/src/main/java/com/growingio/sdk/plugin/autotrack/hook/HookClassesConfig.java
         String classPath = getProjectRootPath() + "/growingio-autotracker-gradle-plugin/src/main/java/" + javaFile.packageName.replace(".", "/") + "/" + javaFile.typeSpec.name + ".java";
+        System.out.println("[generate path]:" + classPath);
         File file = new File(classPath);
         OutputStream out = new FileOutputStream(file);
 

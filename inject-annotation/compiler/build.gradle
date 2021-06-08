@@ -8,7 +8,6 @@ java {
 }
 
 dependencies {
-    testImplementation libraries.test.junit
 
     annotationProcessor libraries.google.auto_service
     implementation libraries.google.auto_service_annotations

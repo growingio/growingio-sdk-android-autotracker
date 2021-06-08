@@ -18,32 +18,54 @@ package com.growingio.sdk.inject.compiler;
 
 import com.sun.tools.javac.code.Attribute;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 
 public final class AnnotationUtil {
     private AnnotationUtil() {
     }
 
     @Nullable
-    public static String getClassValue(AnnotationMirror annotationMirror, String key) {
+    public static String getClassValue(ProcessingEnvironment processingEnv, AnnotationMirror annotationMirror, String key) {
         AnnotationValue annotationValue = getAnnotationValue(annotationMirror, key);
         if (annotationValue == null) {
             return null;
         }
 
         if (annotationValue instanceof Attribute.Class) {
-            return ((Attribute.Class) annotationValue).classType.asElement().flatName().toString();
+            String result = ((Attribute.Class) annotationValue).classType.asElement().flatName().toString();
+            System.out.println("[Attribute]:" + result);
+            return result;
         }
-
         return null;
+        //return getConvertName(processingEnv, annotationValue.getValue().toString());
+    }
+
+
+    public static String getConvertName(ProcessingEnvironment processingEnv, String className) {
+        System.out.println("[getConvertName]:" + className);
+        TypeElement element = processingEnv.getElementUtils().getTypeElement(className);
+        if (element != null && element.getKind().equals(ElementKind.INTERFACE)) {
+            String fullName = element.getQualifiedName().toString();
+            int index = fullName.lastIndexOf('.');
+            String pack = fullName.substring(0, index);
+            String clz = fullName.substring(index).replace('.', '$');
+            return pack + clz;
+        } else {
+            return className;
+        }
     }
 
     public static String getStringValue(AnnotationMirror annotationMirror, String key) {
@@ -51,12 +73,7 @@ public final class AnnotationUtil {
         if (annotationValue == null) {
             return null;
         }
-
-        if (annotationValue instanceof Attribute.Constant) {
-            return annotationValue.getValue().toString();
-        }
-
-        return null;
+        return annotationValue.getValue().toString();
     }
 
     @Nullable
@@ -66,38 +83,55 @@ public final class AnnotationUtil {
             return null;
         }
 
-        if (annotationValue instanceof Attribute.Array) {
-            Attribute.Array arrayValue = (Attribute.Array) annotationValue;
-            List<String> valueList = new ArrayList<>();
-            for (Attribute value : arrayValue.values) {
-                if (value instanceof Attribute.Class) {
-                    valueList.add(((Attribute.Class) value).classType.asElement().flatName().toString());
-                } else {
-                    throw new IllegalArgumentException(value + " is NOT CLASS");
+        Object values = annotationValue.getValue();
+
+        if (values instanceof List) {
+            List<?> valueList = (List<?>) values;
+            List<String> result = new ArrayList<>();
+            for (Object current : valueList) {
+                result.add(getClassFromAnnotationAttribute(current));
+            }
+            return result;
+        }
+        return null;
+
+    }
+
+    private static String getClassFromAnnotationAttribute(Object attribute) {
+        if (attribute.getClass().getSimpleName().equals("UnresolvedClass")) {
+            throw new IllegalArgumentException(
+                    "Failed to parse class for: "
+                            + attribute
+                            + ".Ensure that all"
+                            + "class are included in your classpath.");
+        }
+        Method[] methods = attribute.getClass().getDeclaredMethods();
+        if (methods.length == 0) {
+            throw new IllegalArgumentException(
+                    "Failed to parse class for: " + attribute);
+        }
+        for (Method method : methods) {
+            if (method.getName().equals("getValue")) {
+                try {
+                    return method.invoke(attribute).toString();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new IllegalArgumentException("Failed to parse class for: " + attribute, e);
                 }
             }
-            return valueList;
         }
-
-        return null;
+        throw new IllegalArgumentException("Failed to parse class for: " + attribute);
     }
 
     @Nullable
-    public static List<Attribute.Compound> getAnnotations(AnnotationMirror annotationMirror, String key) {
+    @SuppressWarnings("unchecked")
+    public static List<AnnotationMirror> getAnnotations(AnnotationMirror annotationMirror, String key) {
         AnnotationValue annotationValue = getAnnotationValue(annotationMirror, key);
         if (annotationValue == null) {
             return null;
         }
 
-        if (annotationValue instanceof Attribute.Array) {
-            Attribute.Array arrayValue = (Attribute.Array) annotationValue;
-            List<Attribute.Compound> valueList = new ArrayList<>();
-            for (Attribute value : arrayValue.values) {
-                if (value instanceof Attribute.Compound) {
-                    valueList.add((Attribute.Compound) value);
-                }
-            }
-            return valueList;
+        if (annotationValue.getValue() instanceof List) {
+            return (List<AnnotationMirror>) annotationValue.getValue();
         }
 
         return null;

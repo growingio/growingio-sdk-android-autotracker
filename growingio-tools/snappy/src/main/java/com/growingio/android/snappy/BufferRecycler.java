@@ -38,12 +38,6 @@ class BufferRecycler {
      */
     protected static final ThreadLocal<SoftReference<BufferRecycler>> RECYCLER_REF = new ThreadLocal<SoftReference<BufferRecycler>>();
 
-    private byte[] inputBuffer;
-    private byte[] outputBuffer;
-
-    private byte[] decodingBuffer;
-    private byte[] encodingBuffer;
-
     private short[] encodingHash;
 
     /**
@@ -66,49 +60,6 @@ class BufferRecycler {
         return bufferRecycler;
     }
 
-    public void clear() {
-        inputBuffer = null;
-        outputBuffer = null;
-        decodingBuffer = null;
-        encodingBuffer = null;
-        encodingHash = null;
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    // Buffers for encoding (output)
-    ///////////////////////////////////////////////////////////////////////
-
-    public byte[] allocEncodingBuffer(int minSize) {
-        byte[] buf = encodingBuffer;
-        if (buf == null || buf.length < minSize) {
-            buf = new byte[Math.max(minSize, MIN_ENCODING_BUFFER)];
-        } else {
-            encodingBuffer = null;
-        }
-        return buf;
-    }
-
-    public void releaseEncodeBuffer(byte[] buffer) {
-        if (encodingBuffer == null || buffer.length > encodingBuffer.length) {
-            encodingBuffer = buffer;
-        }
-    }
-
-    public byte[] allocOutputBuffer(int minSize) {
-        byte[] buf = outputBuffer;
-        if (buf == null || buf.length < minSize) {
-            buf = new byte[Math.max(minSize, MIN_OUTPUT_BUFFER)];
-        } else {
-            outputBuffer = null;
-        }
-        return buf;
-    }
-
-    public void releaseOutputBuffer(byte[] buffer) {
-        if (outputBuffer == null || (buffer != null && buffer.length > outputBuffer.length)) {
-            outputBuffer = buffer;
-        }
-    }
 
     public short[] allocEncodingHash(int suggestedSize) {
         short[] buf = encodingHash;
@@ -130,35 +81,4 @@ class BufferRecycler {
     // Buffers for decoding (input)
     ///////////////////////////////////////////////////////////////////////
 
-    public byte[] allocInputBuffer(int minSize) {
-        byte[] buf = inputBuffer;
-        if (buf == null || buf.length < minSize) {
-            buf = new byte[Math.max(minSize, MIN_OUTPUT_BUFFER)];
-        } else {
-            inputBuffer = null;
-        }
-        return buf;
-    }
-
-    public void releaseInputBuffer(byte[] buffer) {
-        if (inputBuffer == null || (buffer != null && buffer.length > inputBuffer.length)) {
-            inputBuffer = buffer;
-        }
-    }
-
-    public byte[] allocDecodeBuffer(int size) {
-        byte[] buf = decodingBuffer;
-        if (buf == null || buf.length < size) {
-            buf = new byte[size];
-        } else {
-            decodingBuffer = null;
-        }
-        return buf;
-    }
-
-    public void releaseDecodeBuffer(byte[] buffer) {
-        if (decodingBuffer == null || (buffer != null && buffer.length > decodingBuffer.length)) {
-            decodingBuffer = buffer;
-        }
-    }
 }

@@ -52,6 +52,10 @@ final class SnappyInternalUtils {
         sMemory.copyLong(src, srcIndex, dest, destIndex);
     }
 
+    static void copyMemory(byte[] input, int inputIndex, byte[] output, int outputIndex, int length){
+        sMemory.copyMemory(input, inputIndex, output, outputIndex, length);
+    }
+
     static long loadLong(byte[] data, int index) {
         return sMemory.loadLong(data, index);
     }
@@ -83,5 +87,6 @@ final class SnappyInternalUtils {
             return String.format("%s (%s) must not be greater than size (%s)", desc, index, size);
         }
     }
+
 
 }
