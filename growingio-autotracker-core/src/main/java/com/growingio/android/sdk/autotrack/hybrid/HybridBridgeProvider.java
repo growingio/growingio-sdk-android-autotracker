@@ -22,6 +22,7 @@ import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.webkit.ValueCallback;
 
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
@@ -75,6 +76,10 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
 
     @SuppressLint("SetJavaScriptEnabled")
     public void bridgeForWebView(SuperWebView<?> webView) {
+        if (!Autotracker.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
         webView.setJavaScriptEnabled(true);
         webView.addJavascriptInterface(new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration()), WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
     }
