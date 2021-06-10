@@ -48,8 +48,7 @@ public class JsonDataFetcher implements DataFetcher<EventStream> {
     @Override
     public void loadData(DataCallback<? super EventStream> callback) {
         try {
-            byte[] data = marshall(eventData.getEvents());
-            callback.onDataReady(new EventStream(data, "application/json"));
+            callback.onDataReady(executeData());
         } catch (Exception e) {
             callback.onLoadFailed(e);
         }
