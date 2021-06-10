@@ -30,8 +30,6 @@ public class TrackerContext extends ContextWrapper {
 
     private TrackerContext(Application application) {
         super(application);
-        //application.registerComponentCallbacks(this);
-
         registry = new TrackerRegistry();
     }
 
