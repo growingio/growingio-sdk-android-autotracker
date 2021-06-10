@@ -67,7 +67,6 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
         this.params = params;
     }
 
-
     public DebuggerService(OkHttpClient client) {
         DebuggerEventWrapper.get().registerDebuggerEventListener(new DebuggerEventWrapper.OnDebuggerEventListener() {
             @Override
@@ -238,6 +237,9 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
         showQuitedDialog();
     }
 
+    public AtomicInteger getSocketState() {
+        return socketState;
+    }
 
     private void showQuitedDialog() {
         Activity activity = ActivityStateProvider.get().getForegroundActivity();

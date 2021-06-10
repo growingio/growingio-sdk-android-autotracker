@@ -74,7 +74,7 @@ class WebSocketHandler extends WebSocketListener {
         if (TextUtils.isEmpty(text) || TextUtils.isEmpty(text.trim())) {
             return;
         }
-        Logger.d(TAG, "Received message is $text");
+        Logger.d(TAG, "Received message is " + text);
         try {
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");
@@ -100,7 +100,7 @@ class WebSocketHandler extends WebSocketListener {
         } catch (JSONException e) {
             Logger.e(TAG, e);
         }
-        ThreadUtils.postOnUiThread(new Runnable() {
+        ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 webSocketListener.onMessage(text);

@@ -466,7 +466,14 @@ public class PageProvider implements IActivityLifecycle {
             activity = ActivityStateProvider.get().getForegroundActivity();
         }
         if (activity != null) {
-            return ALL_PAGE_TREE.get(activity);
+            if (ALL_PAGE_TREE.containsKey(activity)) {
+                return ALL_PAGE_TREE.get(activity);
+            } else {
+                //一般不会进入，如果出现则新生成page返回
+                ActivityPage newPage = new ActivityPage(activity);
+                newPage.setTitle(activity.getTitle().toString());
+                return newPage;
+            }
         }
 
         // TODO: 2020/6/10 这种情况需要观察

@@ -132,6 +132,14 @@ public class CircleScreenshot {
             if (callback == null) {
                 return Disposable.EMPTY_DISPOSABLE;
             }
+            List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
+            return build(decorViews, callback);
+        }
+
+        public Disposable build(List<DecorView> decorViews, Callback<CircleScreenshot> callback) {
+            if (callback == null) {
+                return Disposable.EMPTY_DISPOSABLE;
+            }
             mBuildDisposable = new UnsubscribedDisposable();
             mScreenshotResultCallback = callback;
 
@@ -139,7 +147,6 @@ public class CircleScreenshot {
             mScreenWidth = displayMetrics.widthPixels;
             mScreenHeight = displayMetrics.heightPixels;
 
-            List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
             for (DecorView decorView : decorViews) {
                 if (decorView.getView() instanceof TipView) {
                     continue;

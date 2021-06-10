@@ -210,7 +210,7 @@ public class ThreadUtils {
     }
 
     /**
-     * @return true iff the current thread is the main (UI) thread.
+     * @return true if the current thread is the main (UI) thread.
      */
     public static boolean runningOnUiThread() {
         return getUiThreadHandler().getLooper() == Looper.myLooper();

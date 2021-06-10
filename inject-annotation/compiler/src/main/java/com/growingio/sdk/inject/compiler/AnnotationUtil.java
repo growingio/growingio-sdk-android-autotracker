@@ -45,9 +45,7 @@ public final class AnnotationUtil {
         }
 
         if (annotationValue instanceof Attribute.Class) {
-            String result = ((Attribute.Class) annotationValue).classType.asElement().flatName().toString();
-            System.out.println("[Attribute]:" + result);
-            return result;
+            return ((Attribute.Class) annotationValue).classType.asElement().flatName().toString();
         }
         return null;
         //return getConvertName(processingEnv, annotationValue.getValue().toString());

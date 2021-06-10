@@ -23,13 +23,24 @@ android {
         targetCompatibility buildConfiguration.targetCompatibility
     }
 
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
+    testImplementation libraries.test.junit
+    testImplementation libraries.test.truth
+    testImplementation libraries.test.okhttp3_mockwebserver
+    testImplementation libraries.test.androidx_core
+    testImplementation libraries.test.robolectric
+
     compileOnly fileTree(include: ['*.jar'], dir: '../../thirdLibs')
 
-    compileOnly project(':growingio-autotracker-core')
-    compileOnly project(':growingio-tracker-core')
+    implementation project(':growingio-autotracker-core')
+    implementation project(':growingio-tracker-core')
     //compileOnly(name: 'tbs_sdk_44051', ext: 'jar')
     //compileOnly libraries.others.x5_webview
     //compileOnly files(name: 'uc_webview_sdk-2.14.0.31-Build181010110034.jar')
