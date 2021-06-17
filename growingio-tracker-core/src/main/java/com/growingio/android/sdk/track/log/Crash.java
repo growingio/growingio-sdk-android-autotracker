@@ -23,5 +23,4 @@ package com.growingio.android.sdk.track.log;
  * @author cpacm 5/14/21
  */
 public class Crash {
-
 }

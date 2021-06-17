@@ -194,7 +194,6 @@ public class InjectProcessor extends AbstractProcessor {
             for (Symbol.VarSymbol parameter : parameters) {
                 injectParameters.add(parameter.asType().asElement().flatName().toString());
             }
-            System.out.println("[origin]:" + injectParameters.toString());
             argumentTypes = new Type[injectParameters.size()];
             for (int i = 0; i < injectParameters.size(); i++) {
                 argumentTypes[i] = TypeUtil.getType(injectParameters.get(i));

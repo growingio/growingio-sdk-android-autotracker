@@ -47,11 +47,12 @@ public class EventsContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        String eventsInfoAuthority =  this.getContext().getPackageName() + ".EventsContentProvider";
+        String eventsInfoAuthority = this.getContext().getPackageName() + ".EventsContentProvider";
         MATCHER.addURI(eventsInfoAuthority, TABLE_EVENTS, EVENTS_INFO_CODE);
         this.dbHelper = new EventsSQLiteOpenHelper(this.getContext(), "growing3.db");
         return true;
     }
+
 
     @Nullable
     @Override

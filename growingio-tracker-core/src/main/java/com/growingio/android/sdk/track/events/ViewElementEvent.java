@@ -65,13 +65,13 @@ public class ViewElementEvent extends BaseEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("path", mPath);
-            json.put("pageShowTimestamp", mPageShowTimestamp);
-            if (!TextUtils.isEmpty(mTextValue)) {
-                json.put("textValue", mTextValue);
+            json.put("path", getPath());
+            json.put("pageShowTimestamp", getPageShowTimestamp());
+            if (!TextUtils.isEmpty(getTextValue())) {
+                json.put("textValue", getTextValue());
             }
-            json.put("xpath", mXpath);
-            json.put("index", mIndex);
+            json.put("xpath", getXpath());
+            json.put("index", getIndex());
         } catch (JSONException ignored) {
         }
         return json;

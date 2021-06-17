@@ -18,10 +18,83 @@
 
 package com.growingio.android.sdk;
 
-/**
- * <p>
- *
- * @author cpacm 2021/6/10
- */
-class ModelLoaderTest {
+import com.google.common.truth.Truth;
+import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.modelloader.ModelLoader;
+import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+
+@RunWith(JUnit4.class)
+public class ModelLoaderTest {
+
+    @Test
+    public void registryTest() {
+        TrackerRegistry registry = new TrackerRegistry();
+        Truth.assertThat(registry.getModelLoader(String.class)).isEqualTo(null);
+        ModelLoader<String, Integer> modelLoader = new TestModelLoader();
+        TestModelLoaderFactory factory1 = new TestModelLoaderFactory(modelLoader);
+        registry.register(String.class, Integer.class, factory1);
+        Truth.assertThat(modelLoader).isEqualTo(registry.getModelLoader(String.class));
+        int result = modelLoader.buildLoadData("cpacm").fetcher.executeData();
+        Truth.assertThat(result).isEqualTo(0);
+
+        ModelLoader<String, Integer> modelLoader2 = new TestModelLoader();
+        TestModelLoaderFactory factory2 = new TestModelLoaderFactory(modelLoader2);
+        registry.register(String.class, Integer.class, factory2);
+        Truth.assertThat(modelLoader2).isEqualTo(registry.getModelLoader(String.class, Integer.class));
+    }
+
+    static class TestModelLoaderFactory implements ModelLoaderFactory<String, Integer> {
+
+        private final ModelLoader<String, Integer> modelLoader;
+
+        public TestModelLoaderFactory(ModelLoader<String, Integer> modelLoader) {
+            this.modelLoader = modelLoader;
+        }
+
+        @Override
+        public ModelLoader<String, Integer> build() {
+            return modelLoader;
+        }
+
+    }
+
+    static class TestModelLoader implements ModelLoader<String, Integer> {
+        @Override
+        public LoadData<Integer> buildLoadData(String s) {
+            return new LoadData<>(new DataFetcher<Integer>() {
+                @Override
+                public void loadData(DataCallback<? super Integer> callback) {
+                    callback.onDataReady(0);
+                }
+
+                @Override
+                public Integer executeData() {
+                    return 0;
+                }
+
+                @Override
+                public void cleanup() {
+
+                }
+
+                @Override
+                public void cancel() {
+
+                }
+
+                @Override
+                public Class<Integer> getDataClass() {
+                    return null;
+                }
+            });
+        }
+    }
+
+
 }

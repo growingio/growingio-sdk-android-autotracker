@@ -37,8 +37,8 @@ public abstract class BaseAttributesEvent extends BaseEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            if (mAttributes != null && !mAttributes.isEmpty()) {
-                json.put("attributes", new JSONObject(mAttributes));
+            if (getAttributes() != null && !getAttributes().isEmpty()) {
+                json.put("attributes", new JSONObject(getAttributes()));
             }
         } catch (JSONException ignored) {
         }
