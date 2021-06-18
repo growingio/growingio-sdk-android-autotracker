@@ -90,6 +90,9 @@ public class EventsSQLite {
                 GEvent event = unpack(data);
                 if (event != null) {
                     events.add(event);
+                } else {
+                    long delId = cursor.getLong(cursor.getColumnIndex(EventsInfoTable.COLUMN_ID));
+                    removeEventById(client, delId);
                 }
             }
         } catch (Throwable t) {

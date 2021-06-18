@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -42,11 +43,13 @@ public class RobolectricActivity extends Activity {
 
     public ActivityLifecycleEvent.EVENT_TYPE state;
 
+    private TextView textView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         state = ON_CREATED;
         super.onCreate(savedInstanceState);
-        TextView textView = new TextView(this);
+        textView = new TextView(this);
         textView.setText("this is cpacm");
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +65,14 @@ public class RobolectricActivity extends Activity {
         linearLayout.addView(textView);
         linearLayout.addView(imageView);
         setContentView(linearLayout);
+        WindowManager.LayoutParams wlp = new WindowManager.LayoutParams();
+        wlp.packageName = "com.cpacm.test";
+        getWindow().getDecorView().setLayoutParams(wlp);
+    }
+
+    public void refresh() {
+        getWindow().getDecorView().getViewTreeObserver().dispatchOnGlobalLayout();
+        getWindow().getDecorView().getViewTreeObserver().dispatchOnDraw();
     }
 
     @Override

@@ -45,8 +45,8 @@ public class WindowManagerShadow {
     private final boolean mIsArrayList;
 
     @SuppressLint("PrivateApi")
-    public WindowManagerShadow() throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Class<?> windowManager = Class.forName("android.view.WindowManagerGlobal");
+    public WindowManagerShadow(String wmClassName) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Class<?> windowManager = Class.forName(wmClassName);
         Method method = windowManager.getMethod("getInstance");
         method.setAccessible(true);
         mRealWindowManager = method.invoke(null);
@@ -55,6 +55,7 @@ public class WindowManagerShadow {
         mViews.setAccessible(true);
         mIsArrayList = mViews.getType() == ArrayList.class;
     }
+
 
     public View[] getAllWindowViews() throws IllegalAccessException {
         View[] views;

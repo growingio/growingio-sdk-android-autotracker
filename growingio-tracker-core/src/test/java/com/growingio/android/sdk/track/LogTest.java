@@ -16,7 +16,7 @@
  *
  */
 
-package com.growingio.android.sdk;
+package com.growingio.android.sdk.track;
 
 
 import android.util.Log;
@@ -26,6 +26,7 @@ import com.growingio.android.sdk.track.log.BaseLogger;
 import com.growingio.android.sdk.track.log.CacheLogger;
 import com.growingio.android.sdk.track.log.CircularFifoQueue;
 import com.growingio.android.sdk.track.log.DebugLogger;
+import com.growingio.android.sdk.track.log.ILogger;
 import com.growingio.android.sdk.track.log.Logger;
 
 import org.junit.Before;
@@ -53,7 +54,7 @@ public class LogTest {
 
     @Test
     public void loggerTest() {
-        Logger.addLogger(new BaseLogger() {
+        ILogger log = new BaseLogger() {
             @Override
             protected void print(int priority, String tag, String message, Throwable t) {
                 Truth.assertThat(tag).isEqualTo(TAG);
@@ -71,7 +72,7 @@ public class LogTest {
                         if (t != null) {
                             Truth.assertThat(t).hasMessageThat().isEqualTo("d");
                         } else {
-                            //Truth.assertThat(message).isEqualTo("DEBUG");
+                            Truth.assertThat(message).isEqualTo("DEBUG");
                         }
                         break;
                     case INFO:
@@ -114,7 +115,8 @@ public class LogTest {
             public String getType() {
                 return "TestLogger";
             }
-        });
+        };
+        Logger.addLogger(log);
         Logger.v(TAG, "%s", "VERBOSE");
         Logger.v(TAG, new NullPointerException("v"));
         Logger.v(TAG, new NullPointerException("v"), "VERBOSE");
@@ -139,6 +141,7 @@ public class LogTest {
         Logger.wtf(TAG, new NullPointerException("wtf"));
         Logger.wtf(TAG, new NullPointerException("wtf"), "ASSERT");
 
+        Logger.removeLogger(log);
 
     }
 

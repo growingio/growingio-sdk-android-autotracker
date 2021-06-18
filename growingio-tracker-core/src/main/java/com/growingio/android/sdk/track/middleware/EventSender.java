@@ -209,7 +209,7 @@ public class EventSender {
                     break;
                 }
                 List<GEvent> resultEvents = new ArrayList<>();
-                long lastId = mEventsSQLite.queryEventsAndDelete(policy, numOfMaxEventsPerRequest(), resultEvents);
+                long lastId = mEventsSQLite.queryEvents(policy, numOfMaxEventsPerRequest(), resultEvents);
                 if (!resultEvents.isEmpty()) {
                     SendResponse sendResponse = mEventNetSender.send(resultEvents);
                     succeeded = sendResponse.isSucceeded();

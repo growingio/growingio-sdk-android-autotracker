@@ -83,7 +83,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         }
     }
 
-    private String refreshSessionId() {
+    String refreshSessionId() {
         mSessionId = UUID.randomUUID().toString();
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override

@@ -16,7 +16,7 @@
  *
  */
 
-package com.growingio.android.sdk;
+package com.growingio.android.sdk.track;
 
 
 import android.app.Application;
@@ -25,13 +25,16 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.TrackConfiguration;
+import com.growingio.android.sdk.Tracker;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.cdp.CdpEventBuildInterceptor;
 import com.growingio.android.sdk.track.cdp.ResourceItem;
 import com.growingio.android.sdk.track.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.middleware.GEvent;
+import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,14 +58,14 @@ public class CdpTest {
     @Before
     public void setup() {
         TrackerContext.init(application);
-        Tracker tracker = new Tracker(application, new TrackConfiguration("test", "test"));
+        Tracker tracker = new Tracker(application, new TrackConfiguration(ConstantPool.UNKNOWN, ConstantPool.UNKNOWN));
         tracker.setLoginUserId("cpacm");
         TrackMainThread.trackMain().addEventBuildInterceptor(new CdpEventBuildInterceptor("12345"));
     }
 
     @Test
     public void cdpTest() {
-        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
+        EventBuildInterceptor testInterceptor = new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
 
@@ -86,7 +89,9 @@ public class CdpTest {
                     }
                 }
             }
-        });
+        };
+
+        TrackMainThread.trackMain().addEventBuildInterceptor(testInterceptor);
 
         Map<String, String> attrs = new HashMap<>();
         attrs.put("name", "cpacm");
@@ -98,5 +103,7 @@ public class CdpTest {
         );
         Robolectric.flushForegroundThreadScheduler();
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+
+        TrackMainThread.trackMain().removeEventBuildInterceptor(testInterceptor);
     }
 }

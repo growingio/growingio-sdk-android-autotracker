@@ -16,7 +16,7 @@
  *
  */
 
-package com.growingio.android.sdk;
+package com.growingio.android.sdk.track;
 
 
 import android.app.Application;

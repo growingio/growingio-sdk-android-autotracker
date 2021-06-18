@@ -18,9 +18,9 @@
 
 package com.growingio.android.sdk.track.providers;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.test.core.app.ApplicationProvider;
@@ -81,8 +81,84 @@ public class ProviderTest {
     }
 
     @Test
-    public void appInfoProvider(){
+    public void appInfoProvider() {
+        Truth.assertThat(AppInfoProvider.get().getPackageName()).isEqualTo(application.getPackageName());
+        Truth.assertThat(AppInfoProvider.get().getAppChannel()).isNull();
+        Truth.assertThat(AppInfoProvider.get().getAppName()).isEqualTo(application.getPackageManager().getApplicationLabel(application.getApplicationInfo()).toString());
+        Truth.assertThat(AppInfoProvider.get().getAppVersion()).isNull();
+    }
+
+    @Test
+    public void configProvider() {
+        //TODO
+    }
+
+    @Test
+    public void deeplinkProvider() {
+        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
+        DeepLinkProvider.get().init();
+
+        //empty
+        Robolectric.buildActivity(RobolectricActivity.class).create().get();
+
+        //debugger
+        Intent intent = new Intent();
+        intent.setData(Uri.parse("UNKNOWN://growingio/webservice?serviceType=debugger"));
+        Robolectric.buildActivity(RobolectricActivity.class, intent).create().get();
+        Robolectric.flushForegroundThreadScheduler();
+
+        //circler
+        Intent intent2 = new Intent();
+        intent2.setData(Uri.parse("UNKNOWN://growingio/webservice?serviceType=circle"));
+        Robolectric.buildActivity(RobolectricActivity.class, intent2).create().get();
+        Robolectric.flushForegroundThreadScheduler();
+
+        //deeplink
+        Intent intent3 = new Intent();
+        intent3.setData(Uri.parse("UNKNOWN://growingio/deeplink?name=cpacm"));
+        Robolectric.buildActivity(RobolectricActivity.class, intent3).create().get();
+        Robolectric.flushForegroundThreadScheduler();
 
     }
+
+    @Test
+    public void deviceInfoProvider() {
+        Truth.assertThat(DeviceInfoProvider.get().getAndroidId()).isNull();
+        Truth.assertThat(DeviceInfoProvider.get().getDeviceBrand()).isEqualTo("generic_x86");
+        Truth.assertThat(DeviceInfoProvider.get().getDeviceId()).isNotEmpty();
+        Truth.assertThat(DeviceInfoProvider.get().getDeviceModel()).isEqualTo("robolectric");
+        Truth.assertThat(DeviceInfoProvider.get().getDeviceType()).isEqualTo("PHONE");
+        Truth.assertThat(DeviceInfoProvider.get().getGoogleAdId()).isNull();
+        Truth.assertThat(DeviceInfoProvider.get().getImei()).isNull();
+        Truth.assertThat(DeviceInfoProvider.get().getOaid()).isNull();
+        Truth.assertThat(DeviceInfoProvider.get().getOperatingSystemVersion()).isEqualTo("4.1.2");
+        Truth.assertThat(DeviceInfoProvider.get().getScreenHeight()).isEqualTo(470);
+        Truth.assertThat(DeviceInfoProvider.get().getScreenWidth()).isEqualTo(320);
+    }
+
+    @Test
+    public void sessionProvider() {
+        String sessionId = SessionProvider.get().getSessionId();
+        Truth.assertThat(sessionId).isEmpty();
+        SessionProvider.get().checkAndSendVisit(0);
+        sessionId = SessionProvider.get().getSessionId();
+        Truth.assertThat(sessionId).isEmpty();
+        SessionProvider.get().setLocation(0d, 1d);
+        Truth.assertThat(SessionProvider.get().getLatitude()).isEqualTo(0d);
+        Truth.assertThat(SessionProvider.get().getLongitude()).isEqualTo(1d);
+        SessionProvider.get().cleanLocation();
+
+        UserInfoProvider.get().registerUserIdChangedListener(SessionProvider.get());
+        UserInfoProvider.get().setLoginUserId("cpacm");
+        String newSessionId1 = SessionProvider.get().refreshSessionId();
+        String newSessionId2 = SessionProvider.get().getSessionId();
+        Truth.assertThat(newSessionId1).isEqualTo(newSessionId2);
+
+        UserInfoProvider.get().setLoginUserId("cpacm2");
+        String newSessionId3 = SessionProvider.get().getSessionId();
+        Truth.assertThat(newSessionId3).isNotEqualTo(newSessionId2);
+        UserInfoProvider.get().unregisterUserIdChangedListener(SessionProvider.get());
+    }
+
 
 }

@@ -16,12 +16,13 @@
 package com.growingio.android.sdk.track.utils;
 
 import android.content.Context;
+
 import com.bun.miitmdid.core.MdidSdkHelper;
 import com.bun.miitmdid.interfaces.IIdentifierListener;
 import com.bun.miitmdid.interfaces.IdSupplier;
 import com.growingio.android.sdk.track.log.Logger;
 
-public class OaidHelper implements IIdentifierListener {
+public class OaidHelper {
     private static final String TAG = "GIO.oaid";
     private String mOaid;
     private volatile boolean mComplete = false;
@@ -30,30 +31,32 @@ public class OaidHelper implements IIdentifierListener {
     }
 
     public String getOaid(Context context) {
-        Logger.d("GIO.oaid", "call getOaid");
-
-        int ret;
+        int initCode;
         try {
-            ret = MdidSdkHelper.InitSdk(context, true, this);
+            initCode = MdidSdkHelper.InitSdk(context, true, onSupportListener);
+            return waitCompleteAndGetOaid(initCode, 3000L);
         } catch (Throwable throwable) {
             Logger.e("GIO.oaid", "InitSdkError: " + throwable.getMessage());
             return null;
         }
+    }
 
-        switch (ret) {
+    String waitCompleteAndGetOaid(int initCode, long duration) {
+        Logger.d("GIO.oaid", "call getOaid");
+        switch (initCode) {
             case 0:
             case 1008610:
             case 1008614:
-                Logger.d("GIO.oaid", "InitSdk success: and returnCode: " + ret);
+                Logger.d("GIO.oaid", "InitSdk success: and returnCode: " + initCode);
                 break;
             case 1008611:
             case 1008612:
             case 1008613:
             case 1008615:
-                Logger.e("GIO.oaid", "MdidSdkHelper.InitSdk failed, and returnCode: " + ret);
+                Logger.e("GIO.oaid", "MdidSdkHelper.InitSdk failed, and returnCode: " + initCode);
                 return null;
             default:
-                Logger.d("GIO.oaid", "other error code: " + ret);
+                Logger.d("GIO.oaid", "other error code: " + initCode);
         }
 
         if (this.mComplete) {
@@ -68,7 +71,7 @@ public class OaidHelper implements IIdentifierListener {
 
                 while (!this.mComplete) {
                     try {
-                        this.wait(3000L);
+                        this.wait(duration);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -84,22 +87,32 @@ public class OaidHelper implements IIdentifierListener {
         }
     }
 
-    @Override
-    public void OnSupport(boolean isSupport, IdSupplier idSupplier) {
-        if (isSupport && idSupplier != null) {
-            try {
-                this.mOaid = idSupplier.getOAID();
-                Logger.d("GIO.oaid", "get oaid: " + this.mOaid);
-            } catch (Throwable throwable) {
-                Logger.e("GIO.oaid", "getOAID failed: " + throwable.getMessage());
-            }
-        } else {
-            Logger.d("GIO.oaid", "oaid not support, and isSupport: " + isSupport + ", idSupplier:" + idSupplier);
-        }
-
-        synchronized (this) {
-            this.mComplete = true;
-            this.notifyAll();
-        }
+    void setOaid(String mOaid) {
+        this.mOaid = mOaid;
     }
+
+    void setComplete(boolean complete) {
+        this.mComplete = complete;
+    }
+
+    private final IIdentifierListener onSupportListener = new IIdentifierListener() {
+        @Override
+        public void OnSupport(boolean isSupport, IdSupplier idSupplier) {
+            if (isSupport && idSupplier != null) {
+                try {
+                    OaidHelper.this.mOaid = idSupplier.getOAID();
+                    Logger.d("GIO.oaid", "get oaid: " + OaidHelper.this.mOaid);
+                } catch (Throwable throwable) {
+                    Logger.e("GIO.oaid", "getOAID failed: " + throwable.getMessage());
+                }
+            } else {
+                Logger.d("GIO.oaid", "oaid not support, and isSupport: " + isSupport + ", idSupplier:" + idSupplier);
+            }
+
+            synchronized (OaidHelper.this) {
+                OaidHelper.this.mComplete = true;
+                OaidHelper.this.notifyAll();
+            }
+        }
+    };
 }

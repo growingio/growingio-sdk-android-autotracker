@@ -16,7 +16,7 @@
  *
  */
 
-package com.growingio.android.sdk;
+package com.growingio.android.sdk.track;
 
 
 import com.google.common.truth.Truth;
