@@ -124,7 +124,7 @@ public class Tracker {
         if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
             Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
         } else {
-            ConfigurationProvider.get().setDataCollectionEnabled(enabled);
+            ConfigurationProvider.core().setDataCollectionEnabled(enabled);
             if (enabled) {
                 SessionProvider.get().forceReissueVisit();
             }
