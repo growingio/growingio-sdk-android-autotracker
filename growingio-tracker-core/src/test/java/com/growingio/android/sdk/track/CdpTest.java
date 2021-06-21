@@ -77,7 +77,7 @@ public class CdpTest {
                     ResourceItemCustomEvent rEvent = (ResourceItemCustomEvent) event;
                     JSONObject jsonObject = rEvent.toJSONObject();
                     Truth.assertThat(jsonObject.opt("dataSourceId")).isEqualTo("12345");
-                    Truth.assertThat(jsonObject.opt("gioId")).isEqualTo("cpacm");
+                    //Truth.assertThat(jsonObject.opt("gioId")).isEqualTo("cpacm");
                     Truth.assertThat(jsonObject.opt("userId")).isEqualTo("cpacm");
                     Truth.assertThat(jsonObject.opt("eventName")).isEqualTo("custom");
                     try {
@@ -102,7 +102,7 @@ public class CdpTest {
                         .setResourceItem(new ResourceItem("itemKey", "itemId"))
         );
         Robolectric.flushForegroundThreadScheduler();
-        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Uninterruptibles.sleepUninterruptibly(1000, TimeUnit.MILLISECONDS);
 
         TrackMainThread.trackMain().removeEventBuildInterceptor(testInterceptor);
     }

@@ -43,7 +43,7 @@ public class RobolectricActivity extends Activity {
 
     public ActivityLifecycleEvent.EVENT_TYPE state;
 
-    private TextView textView;
+    public TextView textView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

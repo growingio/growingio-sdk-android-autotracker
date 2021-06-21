@@ -26,10 +26,18 @@ android {
             consumerProguardFiles 'consumer-proguard-rules.pro'
         }
     }
+    
     compileOptions {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     lintOptions {
         abortOnError false
     }

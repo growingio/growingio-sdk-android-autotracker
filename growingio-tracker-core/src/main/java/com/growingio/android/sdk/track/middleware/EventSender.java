@@ -150,7 +150,11 @@ public class EventSender {
     }
 
     public void removeOverdueEvents() {
-        mEventsSQLite.removeOverdueEvents();
+        try {
+            mEventsSQLite.removeOverdueEvents();
+        } catch (Exception e) {
+            Logger.d(TAG, "action: removeOverdueEvents,failed");
+        }
     }
 
     private ActivityManager.MemoryInfo getMemoryInfo() {

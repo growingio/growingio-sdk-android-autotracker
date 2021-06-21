@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track;
+import android.content.Context;
 
-public class TrackException extends RuntimeException {
+import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.sdk.annotation.GIOModule;
 
-    public TrackException(String message) {
-        super(message);
-    }
+@GIOModule
+public class EmptyLibraryGioModule extends LibraryGioModule {
+    @Override
+    public void registerComponents(Context context, TrackerRegistry registry) {
 
-    public TrackException(Throwable t) {
-        super(t);
     }
 }

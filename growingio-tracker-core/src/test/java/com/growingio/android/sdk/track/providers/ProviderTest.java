@@ -124,14 +124,14 @@ public class ProviderTest {
     @Test
     public void deviceInfoProvider() {
         Truth.assertThat(DeviceInfoProvider.get().getAndroidId()).isNull();
-        Truth.assertThat(DeviceInfoProvider.get().getDeviceBrand()).isEqualTo("generic_x86");
+        Truth.assertThat(DeviceInfoProvider.get().getDeviceBrand()).isEqualTo("robolectric");
         Truth.assertThat(DeviceInfoProvider.get().getDeviceId()).isNotEmpty();
         Truth.assertThat(DeviceInfoProvider.get().getDeviceModel()).isEqualTo("robolectric");
         Truth.assertThat(DeviceInfoProvider.get().getDeviceType()).isEqualTo("PHONE");
         Truth.assertThat(DeviceInfoProvider.get().getGoogleAdId()).isNull();
         Truth.assertThat(DeviceInfoProvider.get().getImei()).isNull();
         Truth.assertThat(DeviceInfoProvider.get().getOaid()).isNull();
-        Truth.assertThat(DeviceInfoProvider.get().getOperatingSystemVersion()).isEqualTo("4.1.2");
+        Truth.assertThat(DeviceInfoProvider.get().getOperatingSystemVersion()).isEqualTo("11");
         Truth.assertThat(DeviceInfoProvider.get().getScreenHeight()).isEqualTo(470);
         Truth.assertThat(DeviceInfoProvider.get().getScreenWidth()).isEqualTo(320);
     }
@@ -148,7 +148,7 @@ public class ProviderTest {
         Truth.assertThat(SessionProvider.get().getLongitude()).isEqualTo(1d);
         SessionProvider.get().cleanLocation();
 
-        UserInfoProvider.get().registerUserIdChangedListener(SessionProvider.get());
+        SessionProvider.get().onTrackMainInitSDK();
         UserInfoProvider.get().setLoginUserId("cpacm");
         String newSessionId1 = SessionProvider.get().refreshSessionId();
         String newSessionId2 = SessionProvider.get().getSessionId();

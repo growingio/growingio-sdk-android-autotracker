@@ -29,27 +29,25 @@ public class ErrorLog {
     public static final String TRACK_FRAGMENT_ERROR = "trackAllFragment策略与全局策略相同， 不需要单独设置";
     public static final String USER_ID_TOO_LONG = "GrowingIO.setUserId(VALUE):VALUE长度大于1000，不发送";
 
-    private ErrorLog() {
+    private ErrorLog() {}
 
-    }
-
-    public static String jsonValueTooLong(String key) {
-        return "JSON Object中有键值对，值的字符个数在1000个以下, 发送失败, key: " + key;
-    }
-
-    public static String jsonObjArrayNotSupport(String key) {
-        return "jsonObject 不支持嵌套JSONObject或者JsonArray， 发送失败, key:" + key;
-    }
-
-    public static String jsonNullValue(String key) {
-        return "value 不能为null, 可以传字符串\"null\"代替: " + key;
-    }
-
-    public static String jsonInValidKey(String key) {
-        return "JSONObject中的key要求: 1. 非空, 2. 长度小于50: " + key;
-    }
-
-    public static String argumentBeNull(String name) {
-        return "参数:" + name + "不能为null";
-    }
+//    public static String jsonValueTooLong(String key) {
+//        return "JSON Object中有键值对，值的字符个数在1000个以下, 发送失败, key: " + key;
+//    }
+//
+//    public static String jsonObjArrayNotSupport(String key) {
+//        return "jsonObject 不支持嵌套JSONObject或者JsonArray， 发送失败, key:" + key;
+//    }
+//
+//    public static String jsonNullValue(String key) {
+//        return "value 不能为null, 可以传字符串\"null\"代替: " + key;
+//    }
+//
+//    public static String jsonInValidKey(String key) {
+//        return "JSONObject中的key要求: 1. 非空, 2. 长度小于50: " + key;
+//    }
+//
+//    public static String argumentBeNull(String name) {
+//        return "参数:" + name + "不能为null";
+//    }
 }

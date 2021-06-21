@@ -29,9 +29,7 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
  */
 public abstract class LibraryGioModule {
 
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        //Default empty impl;
-    }
+    public void registerComponents(Context context, TrackerRegistry registry) {}
 
     protected <T> T getConfiguration(Class<? extends Configurable> clazz) {
         return ConfigurationProvider.get().getConfiguration(clazz);

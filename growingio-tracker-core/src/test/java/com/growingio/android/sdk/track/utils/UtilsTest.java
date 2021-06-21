@@ -53,17 +53,16 @@ import org.robolectric.annotation.Config;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class UtilsTest {
 
     @Test
     public void activityTest() {
         ActivityController<RobolectricActivity> activityController = Robolectric.buildActivity(RobolectricActivity.class);
-        Activity activity = activityController.create().get();
-        Truth.assertThat(activity).isEqualTo(ActivityUtil.findActivity(activity.getWindow().getDecorView()));
+        RobolectricActivity activity = activityController.create().get();
+        Truth.assertThat(activity).isEqualTo(ActivityUtil.findActivity(activity.textView));
         activityController.destroy();
-        Truth.assertThat(ActivityUtil.isDestroy(activity)).isFalse();
+        Truth.assertThat(ActivityUtil.isDestroy(activity)).isTrue();
         Truth.assertThat(ActivityUtil.findActivity(new ContextWrapper(activity))).isEqualTo(activity);
     }
 
@@ -165,8 +164,8 @@ public class UtilsTest {
     @Test
     public void permissionTest() {
         TrackerContext.init(application);
-        Truth.assertThat(PermissionUtil.hasAccessNetworkStatePermission()).isFalse();
-        Truth.assertThat(PermissionUtil.hasInternetPermission()).isFalse();
+        Truth.assertThat(PermissionUtil.hasAccessNetworkStatePermission()).isTrue();
+        Truth.assertThat(PermissionUtil.hasInternetPermission()).isTrue();
         Truth.assertThat(PermissionUtil.hasWriteExternalPermission()).isFalse();
     }
 
