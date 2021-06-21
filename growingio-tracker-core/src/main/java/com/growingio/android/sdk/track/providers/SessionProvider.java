@@ -162,7 +162,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
             }
             mActivityStartCount++;
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
-            mActivityStartCount--;
+            if (mActivityStartCount != 0)  mActivityStartCount--;
             if (mActivityStartCount == 0) {
                 TrackEventGenerator.generateAppClosedEvent();
                 mLatestPauseTime = System.currentTimeMillis();
