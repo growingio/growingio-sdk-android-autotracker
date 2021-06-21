@@ -101,8 +101,9 @@ afterEvaluate { project ->
         task androidJavadocs(type: Javadoc, dependsOn: assembleDebug) {
             source = android.sourceSets.main.java.source
             classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-            // include BuildConfig.java
-            classpath += project.files(project.file("build/generated/source/buildConfig/debug"))
+            // include generated file
+            classpath += project.files("${buildDir}/generated/source/buildConfig/debug")
+            classpath += project.files("${buildDir}/generated/ap_generated_sources/debug/out")
             excludes = ['**/*.kt']
         }
 

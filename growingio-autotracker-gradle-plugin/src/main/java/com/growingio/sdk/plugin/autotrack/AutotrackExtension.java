@@ -17,7 +17,7 @@
 package com.growingio.sdk.plugin.autotrack;
 
 public class AutotrackExtension {
-    private boolean mIsLogEnabled = true;
+    private boolean mIsLogEnabled = false;
     private boolean mIsDevelopment = true;
     private String[] mExcludePackages;
 

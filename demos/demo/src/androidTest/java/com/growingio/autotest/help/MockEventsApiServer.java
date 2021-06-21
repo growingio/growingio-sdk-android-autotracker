@@ -129,7 +129,7 @@ public class MockEventsApiServer extends MockServer {
             if (mIsCheckDomain) {
                 Truth.assertThat(jsonObject.getString("domain")).isEqualTo("com.gio.test.three");
             }
-            Truth.assertThat(jsonObject.getString("urlScheme")).isEqualTo(ConfigurationProvider.get().getTrackConfiguration().getUrlScheme());
+            Truth.assertThat(jsonObject.getString("urlScheme")).isEqualTo(ConfigurationProvider.core().getUrlScheme());
             Truth.assertThat(jsonObject.getString("appState")).isIn(Arrays.asList("FOREGROUND", "BACKGROUND"));
             Truth.assertThat(jsonObject.getLong("globalSequenceId")).isGreaterThan(0);
             Truth.assertThat(jsonObject.getLong("eventSequenceId")).isGreaterThan(0);

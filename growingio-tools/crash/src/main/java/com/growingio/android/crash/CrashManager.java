@@ -17,8 +17,6 @@
 package com.growingio.android.crash;
 
 import android.content.Context;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.VisibleForTesting;
 
 import com.growingio.android.sdk.monitor.Monitor;
 import com.growingio.android.sdk.monitor.MonitorClient;
@@ -34,21 +32,13 @@ import com.growingio.android.sdk.track.log.Logger;
  * RestrictTo 该类仅能在group ID and artifact ID相同情况下调用，会有lint提示
  * 参见：https://developer.android.google.cn/reference/androidx/annotation/RestrictTo.Scope.html#LIBRARY_GROUP_PREFIX
  */
-@RestrictTo({RestrictTo.Scope.LIBRARY})
 public class CrashManager {
-    public static final String ALIAS = "gandroid";
-
-    /**
-     * https://sentry.growingio.com/settings/growingio/projects/gioandroid/keys/ 查看对应DSN
-     */
-    private static final String DSN = "https://3db1f04a7238465ab285f46b462b5ffe@sentry.growingio.com/7";
-
     private static final String PROJECT_ID = "ai";
+    public static String alias = "gandroid";
 
     private static volatile boolean sEnabled = false;
 
     private CrashManager() {
-
     }
 
     /**
@@ -56,9 +46,10 @@ public class CrashManager {
      *
      * @param context 建议传入application的context
      */
-    public static void register(Context context) {
+    public static void register(Context context, String dsn, String alias) {
+        CrashManager.alias = alias;
         if (!sEnabled) {
-            MonitorClient client = Monitor.register(ALIAS, DSN, context, new MonitorClient.FilterThrowableRule() {
+            MonitorClient client = Monitor.register(alias, dsn, context, new MonitorClient.FilterThrowableRule() {
                 @Override
                 public boolean filterThrowable(Throwable thrown) {
                     Analyser analyser = GIOAnalyser.getInstance().getAnalyser();
@@ -83,7 +74,7 @@ public class CrashManager {
      */
     public static void unRegister() {
         if (sEnabled) {
-            Monitor.unregister(ALIAS);
+            Monitor.unregister(alias);
             sEnabled = false;
         }
     }
@@ -93,7 +84,7 @@ public class CrashManager {
      */
     public static void close() {
         if (sEnabled) {
-            Monitor.close(ALIAS);
+            Monitor.close(alias);
         }
     }
 
@@ -103,23 +94,22 @@ public class CrashManager {
 
     public static void sendMessage(String msg) {
         if (sEnabled) {
-            Monitor.getStoredClient(ALIAS).sendMessage(msg);
+            Monitor.getStoredClient(alias).sendMessage(msg);
         }
     }
 
     public static void sendException(Throwable throwable) {
         if (sEnabled) {
-            Monitor.getStoredClient(ALIAS).sendException(throwable);
+            Monitor.getStoredClient(alias).sendException(throwable);
         }
     }
 
     public static void sendEvent(EventBuilder eventBuilder) {
         if (sEnabled) {
-            Monitor.getStoredClient(ALIAS).sendEvent(eventBuilder);
+            Monitor.getStoredClient(alias).sendEvent(eventBuilder);
         }
     }
 
-    @VisibleForTesting
     private static boolean isSdkException(Analysed analysed) {
         if (analysed == null || !analysed.isFindTarget()) {
             return false;

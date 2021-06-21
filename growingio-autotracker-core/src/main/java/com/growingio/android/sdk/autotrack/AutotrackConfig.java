@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track;
+package com.growingio.android.sdk.autotrack;
 
-import android.text.TextUtils;
+import com.growingio.android.sdk.Configurable;
 
-import com.growingio.android.sdk.AppGioModule;
-import com.growingio.sdk.annotation.GIOAppModule;
-import com.growingio.sdk.annotation.GIOTracker;
+public class AutotrackConfig implements Configurable {
+    private float mImpressionScale = 0;
 
-/**
- * <p>
- *
- * @author cpacm 4/28/21
- */
-@GIOAppModule(config = CdpConfig.class, configName = "CdpCore")
-public final class GrowingAppModule extends AppGioModule {
-
-    @GIOTracker(path = CdpTracker.class)
-    public void config(CdpCoreConfiguration configuration) {
-        if (TextUtils.isEmpty(configuration.getDataSourceId())) {
-            throw new IllegalStateException("DataSourceId is NULL");
+    public AutotrackConfig setImpressionScale(float scale) {
+        if (scale < 0) {
+            scale = 0;
+        } else if (scale > 1) {
+            scale = 1;
         }
+        this.mImpressionScale = scale;
+        return this;
+    }
+
+    public float getImpressionScale() {
+        return mImpressionScale;
     }
 }

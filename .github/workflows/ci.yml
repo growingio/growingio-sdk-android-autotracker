@@ -46,7 +46,7 @@ jobs:
           bash ./gradle/publishAllToMavenLocal.sh
           bash ./config/checkstyle/checkstyle.sh
           ./gradlew test
-          ./gradlew assemble
+          ./gradlew assembleDebug
 
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2

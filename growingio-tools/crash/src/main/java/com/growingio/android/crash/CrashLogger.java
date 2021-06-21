@@ -31,17 +31,17 @@ class CrashLogger extends BaseLogger {
     protected void print(int priority, String tag, String message, Throwable t) {
         switch (priority) {
             case Log.VERBOSE:
-                MonitorLogger.v(CrashManager.ALIAS, tag, message);
+                MonitorLogger.v(CrashManager.alias, tag, message);
                 break;
             case Log.DEBUG:
-                MonitorLogger.d(CrashManager.ALIAS, tag, message);
+                MonitorLogger.d(CrashManager.alias, tag, message);
                 break;
             case Log.INFO:
             case Log.WARN:
-                MonitorLogger.i(CrashManager.ALIAS, tag, message);
+                MonitorLogger.i(CrashManager.alias, tag, message);
                 break;
             case Log.ERROR:
-                MonitorLogger.e(CrashManager.ALIAS, tag, message);
+                MonitorLogger.e(CrashManager.alias, tag, message);
                 break;
             case Log.ASSERT:
                 CrashManager.sendEvent(new EventBuilder()

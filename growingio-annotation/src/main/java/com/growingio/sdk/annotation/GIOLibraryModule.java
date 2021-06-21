@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track;
+package com.growingio.sdk.annotation;
 
-import android.text.TextUtils;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.growingio.android.sdk.AppGioModule;
-import com.growingio.sdk.annotation.GIOAppModule;
-import com.growingio.sdk.annotation.GIOTracker;
 
 /**
  * <p>
  *
- * @author cpacm 4/28/21
+ * @author cpacm 2021/6/1
  */
-@GIOAppModule(config = CdpConfig.class, configName = "CdpCore")
-public final class GrowingAppModule extends AppGioModule {
-
-    @GIOTracker(path = CdpTracker.class)
-    public void config(CdpCoreConfiguration configuration) {
-        if (TextUtils.isEmpty(configuration.getDataSourceId())) {
-            throw new IllegalStateException("DataSourceId is NULL");
-        }
-    }
+@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.TYPE)
+public @interface GIOLibraryModule {
+    Class<?> config() default Void.class; // config class
 }

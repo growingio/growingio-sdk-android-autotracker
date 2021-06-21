@@ -22,6 +22,7 @@ android {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
     }
+
 }
 
 dependencies {
@@ -29,7 +30,8 @@ dependencies {
 
     compileOnly project(':growingio-autotracker-core')
     compileOnly project(':growingio-tracker-core')
-    compileOnly libraries.others.x5_webview
+    //compileOnly(name: 'tbs_sdk_44051', ext: 'jar')
+    //compileOnly libraries.others.x5_webview
     //compileOnly files(name: 'uc_webview_sdk-2.14.0.31-Build181010110034.jar')
 
     implementation libraries.squareup.okhttp3

@@ -22,7 +22,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 
-import com.growingio.android.sdk.TrackConfiguration;
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -56,7 +56,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     private final List<EventBuildInterceptor> mEventBuildInterceptors = new ArrayList<>();
 
     private TrackMainThread() {
-        TrackConfiguration configuration = ConfigurationProvider.get().getTrackConfiguration();
+        CoreConfiguration configuration = ConfigurationProvider.core();
         int uploadInterval = configuration.isDebugEnabled() ? 0 : configuration.getDataUploadInterval();
         mEventSender = new EventSender(TrackerContext.get().getApplicationContext(), new EventHttpSender(), uploadInterval, configuration.getCellularDataLimit());
 
@@ -102,7 +102,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         if (eventBuilder == null) {
             return;
         }
-        if (ConfigurationProvider.get().isDataCollectionEnabled()) {
+        if (ConfigurationProvider.core().isDataCollectionEnabled()) {
             if (!SessionProvider.get().createdSession()) {
                 SessionProvider.get().forceReissueVisit();
             }
@@ -119,7 +119,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
      */
     public void postGEventToTrackMain(GEvent gEvent) {
         if (gEvent == null) return;
-        if (ConfigurationProvider.get().isDataCollectionEnabled()) {
+        if (ConfigurationProvider.core().isDataCollectionEnabled()) {
             Message msg = mMainHandler.obtainMessage(MSG_CACHE_EVENT);
             msg.obj = gEvent;
             mMainHandler.sendMessage(msg);

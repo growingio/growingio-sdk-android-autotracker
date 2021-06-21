@@ -288,7 +288,7 @@ public abstract class BaseEvent extends GEvent {
             mEventType = getEventType();
             mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
             mDomain = AppInfoProvider.get().getPackageName();
-            mUrlScheme = ConfigurationProvider.get().getTrackConfiguration().getUrlScheme();
+            mUrlScheme = ConfigurationProvider.core().getUrlScheme();
         }
 
         @TrackThread

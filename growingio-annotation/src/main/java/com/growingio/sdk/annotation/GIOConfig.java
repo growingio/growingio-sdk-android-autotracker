@@ -23,13 +23,11 @@ import java.lang.annotation.Target;
 
 /**
  * <p>
+ * define module's config
  *
  * @author cpacm 4/28/21
  */
 @Retention(RetentionPolicy.CLASS)
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 public @interface GIOConfig {
-    Class<?> tracker();
-
-    Class<?> config();
 }

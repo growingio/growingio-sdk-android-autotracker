@@ -80,7 +80,7 @@ public class AppInfoProvider {
 
     public String getAppChannel() {
         if (TextUtils.isEmpty(mAppChannel)) {
-            mAppChannel = ConfigurationProvider.get().getTrackConfiguration().getChannel();
+            mAppChannel = ConfigurationProvider.core().getChannel();
         }
         return mAppChannel;
     }

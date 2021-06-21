@@ -28,8 +28,8 @@ import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
  * @author cpacm 5/19/21
  */
 public class CrashDataLoader implements ModelLoader<Crash, Void> {
-    public CrashDataLoader(Context context) {
-        CrashManager.register(context);
+    public CrashDataLoader(Context context, String dsn, String alias) {
+        CrashManager.register(context, dsn, alias);
     }
 
     @Override
@@ -64,14 +64,18 @@ public class CrashDataLoader implements ModelLoader<Crash, Void> {
 
     public static class Factory implements ModelLoaderFactory<Crash, Void> {
         private final Context context;
+        private final String dsn;
+        private final String alias;
 
-        public Factory(Context context) {
+        public Factory(Context context, String dsn, String alias) {
             this.context = context;
+            this.dsn = dsn;
+            this.alias = alias;
         }
 
         @Override
         public ModelLoader<Crash, Void> build() {
-            return new CrashDataLoader(context);
+            return new CrashDataLoader(context, dsn, alias);
         }
     }
 }

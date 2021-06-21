@@ -15,6 +15,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    repositories {
+        flatDir {
+            dirs '../../thirdLibs'
+        }
+    }
 }
 
 dependencies {
@@ -25,8 +31,7 @@ dependencies {
     implementation libraries.android.livedata
     implementation libraries.android.viewmodel
 
-    implementation libraries.others.x5_webview
-
+    implementation(name: 'tbs_sdk_44051', ext: 'jar')
 
     debugApi project(':gio-sdk:autotracker')
     releaseApi libraries.growingio.autotracker

@@ -68,6 +68,7 @@ import javax.tools.Diagnostic;
 @AutoService(Processor.class)
 public class InjectProcessor extends AbstractProcessor {
     private static final String TAG = "InjectProcessor";
+    private static final boolean DEBUG = false;
     private static final String LICENSE_HEADER = "/*\n" +
             " * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.\n" +
             " *\n" +
@@ -116,6 +117,7 @@ public class InjectProcessor extends AbstractProcessor {
         return SourceVersion.RELEASE_8;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         Class<? extends Annotation>[] allAnnotations = new Class[]{Before.class, After.class, BeforeSuper.class, AfterSuper.class,
@@ -131,6 +133,7 @@ public class InjectProcessor extends AbstractProcessor {
     private void analyzeAnnotation(Class<? extends Annotation> clazz, RoundEnvironment roundEnvironment) {
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(clazz);
         for (Element element : elements) {
+            log("================[@" + clazz.getSimpleName() + "] " + element.getEnclosingElement() + "#" + element.getSimpleName() + "================");
             if (clazz == Befores.class || clazz == Afters.class || clazz == BeforeSupers.class || clazz == AfterSupers.class) {
                 AnnotationMirror mirror = AnnotationUtil.findAnnotationMirror(element, clazz);
                 if (mirror == null) {
@@ -191,7 +194,7 @@ public class InjectProcessor extends AbstractProcessor {
             String annotationClass = annotationMirror.getAnnotationType().toString();
             boolean isAfter = After.class.getName().equals(annotationClass) || AfterSuper.class.getName().equals(annotationClass);
 
-            log(originalInjectClass + "#" + injectMethod + " ===" + annotationClass + "===> " + originalTargetClassName + "#" + targetMethodName);
+            log(originalTargetClassName + "#" + targetMethodName);
             if (Before.class.getName().equals(annotationClass) || After.class.getName().equals(annotationClass)) {
                 mAroundHookClassesArgs.add(Arrays.<Object>asList(targetClassName, targetMethodName, targetDesc, injectClass, injectMethod, injectDesc, isAfter));
             } else {
@@ -202,7 +205,7 @@ public class InjectProcessor extends AbstractProcessor {
 
 
     private void log(String msg) {
-        mMessager.printMessage(Diagnostic.Kind.NOTE, TAG + ": " + msg);
+        if (DEBUG) mMessager.printMessage(Diagnostic.Kind.NOTE, TAG + ": " + msg);
     }
 
     private void generateJavaFile() {

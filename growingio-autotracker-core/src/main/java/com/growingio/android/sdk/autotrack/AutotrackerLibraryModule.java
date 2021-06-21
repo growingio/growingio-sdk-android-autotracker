@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.debugger;
 
-import android.content.Context;
+package com.growingio.android.sdk.autotrack;
 
 import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.webservices.WebService;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
-/**
- * <p>
- *
- * @author cpacm 5/19/21
- */
-@GIOLibraryModule
-public class DebuggerLibraryGioModule extends LibraryGioModule {
-    @Override
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(Debugger.class, WebService.class, new DebuggerDataLoader.Factory());
-        DebuggerEventWrapper.get().observeEventBuild();
-    }
+@GIOLibraryModule(config = AutotrackConfig.class)
+public class AutotrackerLibraryModule extends LibraryGioModule {
+
 }

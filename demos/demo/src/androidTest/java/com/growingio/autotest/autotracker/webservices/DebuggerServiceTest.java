@@ -68,7 +68,7 @@ public class DebuggerServiceTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setConfiguration(new TestTrackConfiguration("growing.d80871b41ef40518"));
+        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig("growing.d80871b41ef40518"));
     }
 
     protected String getWsUrl() {

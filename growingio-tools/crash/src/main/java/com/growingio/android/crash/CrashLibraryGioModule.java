@@ -20,19 +20,20 @@ import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.sdk.annotation.GIOModule;
+import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
  * <p>
  *
  * @author cpacm 5/19/21
  */
-@GIOModule
+@GIOLibraryModule(config = CrashConfig.class)
 public class CrashLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
         //registry.register(Crash::class.java, Void::class.java, CrashDataLoader.Factory(context))
         //just start
-        new CrashDataLoader.Factory(context).build();
+        CrashConfig crashConfig = getConfiguration(CrashConfig.class);
+        new CrashDataLoader.Factory(context, crashConfig.getCrashDsn(), crashConfig.getCrashAlias()).build();
     }
 }

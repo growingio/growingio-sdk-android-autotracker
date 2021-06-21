@@ -27,7 +27,6 @@ import android.util.Log;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
-import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
@@ -35,7 +34,6 @@ import com.growingio.android.sdk.track.providers.DeepLinkProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
-import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -47,40 +45,22 @@ public class Tracker {
 
     protected volatile boolean isInited = false;
 
-    public Tracker(Application application, TrackConfiguration trackConfiguration) {
-        if (application == null || trackConfiguration == null) {
+    public Tracker(Application application) {
+        if (application == null) {
             isInited = false;
             Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized before use API");
             return;
         }
-        initTracker(application, trackConfiguration);
+        initTracker(application);
     }
 
-    private void initTracker(Application application, TrackConfiguration trackConfiguration) {
-        if (TextUtils.isEmpty(trackConfiguration.getProjectId())) {
-            throw new IllegalStateException("ProjectId is NULL");
-        }
-
-        if (TextUtils.isEmpty(trackConfiguration.getUrlScheme())) {
-            throw new IllegalStateException("UrlScheme is NULL");
-        }
-
-        if (!ThreadUtils.runningOnUiThread()) {
-            throw new IllegalStateException("Growing Sdk 初始化必须在主线程中调用。");
-        }
-
-
+    private void initTracker(Application application) {
         TrackerContext.init(application);
-        ConfigurationProvider.get().setTrackConfiguration(trackConfiguration);
 
         // init core service
         TrackMainThread.trackMain().register(SessionProvider.get());
         application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         DeepLinkProvider.get().init();
-
-        if (trackConfiguration.isDebugEnabled()) {
-            Logger.addLogger(new DebugLogger());
-        }
 
         loadAnnotationGeneratedModules(application);
 
@@ -141,10 +121,10 @@ public class Tracker {
 
     public void setDataCollectionEnabled(boolean enabled) {
         if (!isInited) return;
-        if (enabled == ConfigurationProvider.get().isDataCollectionEnabled()) {
+        if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
             Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
         } else {
-            ConfigurationProvider.get().setDataCollectionEnabled(enabled);
+            ConfigurationProvider.core().setDataCollectionEnabled(enabled);
             if (enabled) {
                 SessionProvider.get().forceReissueVisit();
             }

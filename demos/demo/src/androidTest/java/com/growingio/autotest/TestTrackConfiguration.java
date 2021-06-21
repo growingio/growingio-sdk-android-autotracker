@@ -20,21 +20,26 @@ import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 
 import static com.growingio.autotest.help.MockServer.MOCK_SERVER_HOST;
 
-public class TestTrackConfiguration extends AutotrackConfiguration {
+public class TestTrackConfiguration {
     public static final String TEST_PROJECT_ID = "testProjectId";
     public static final String TEST_URL_SCHEME = "testUrlScheme";
 
-    public TestTrackConfiguration() {
-        super(TEST_PROJECT_ID, TEST_URL_SCHEME);
-        setUploadExceptionEnabled(false)
-                .setDataCollectionServerHost(MOCK_SERVER_HOST)
-                .setDebugEnabled(true);
+    private TestTrackConfiguration() {
     }
 
-    public TestTrackConfiguration(String urlScheme) {
-        super(TEST_PROJECT_ID, urlScheme);
-        setUploadExceptionEnabled(false)
+    public static AutotrackConfiguration getTestConfig() {
+        AutotrackConfiguration configuration = new AutotrackConfiguration(TEST_PROJECT_ID, TEST_URL_SCHEME);
+        configuration.setUploadExceptionEnabled(false)
                 .setDataCollectionServerHost(MOCK_SERVER_HOST)
                 .setDebugEnabled(true);
+        return configuration;
+    }
+
+    public static AutotrackConfiguration getTestConfig(String urlScheme) {
+        AutotrackConfiguration configuration = new AutotrackConfiguration(TEST_PROJECT_ID, urlScheme);
+        configuration.setUploadExceptionEnabled(false)
+                .setDataCollectionServerHost(MOCK_SERVER_HOST)
+                .setDebugEnabled(true);
+        return configuration;
     }
 }

@@ -133,12 +133,13 @@ dependencies {
     androidTestImplementation libraries.test.powermock_reflect
     androidTestImplementation libraries.androidx.appcompat
     androidTestImplementation libraries.android.appcompat
-    androidTestImplementation libraries.others.x5_webview
+    androidTestImplementation(name: 'tbs_sdk_44051', ext: 'jar')
+    //androidTestImplementation libraries.others.x5_webview
 
     implementation libraries.android.appcompat
     implementation libraries.android.constraint
     implementation libraries.android.multidex
-    implementation libraries.others.x5_webview
+    implementation(name: 'tbs_sdk_44051', ext: 'jar')
     implementation(name: 'oaid_sdk_1.0.22', ext: 'aar')
     implementation project(':demo-core')
     implementation project(":demo-autotrack")
