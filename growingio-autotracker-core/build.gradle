@@ -46,7 +46,6 @@ dependencies {
     testImplementation libraries.test.robolectric
     testImplementation libraries.androidx.appcompat
     testImplementation libraries.androidx.recyclerview
-    testCompileOnly libraries.android.appcompat
 
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
     debugApi project(':growingio-tracker-core')

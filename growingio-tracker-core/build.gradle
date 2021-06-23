@@ -53,6 +53,7 @@ dependencies {
     testImplementation libraries.test.robolectric
     testImplementation libraries.androidx.appcompat
     testImplementation libraries.androidx.recyclerview
+    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.androidx.recyclerview

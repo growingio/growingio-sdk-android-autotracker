@@ -44,11 +44,13 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.android.controller.FragmentController;
+import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+@Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class PageTest {
 
@@ -146,16 +148,6 @@ public class PageTest {
             Truth.assertThat(findPage).isNull();
         });
     }
-
-    @Test
-    public void fragmentSupportInjectTest() {
-        android.support.v4.app.Fragment v4Fragment = new android.support.v4.app.Fragment();
-        FragmentInjector.v4FragmentOnResume(v4Fragment);
-        FragmentInjector.v4FragmentSetUserVisibleHint(v4Fragment, false);
-        FragmentInjector.v4FragmentOnHiddenChanged(v4Fragment, false);
-        FragmentInjector.v4FragmentOnDestroyView(v4Fragment);
-    }
-
 
     public static class TestFragment extends android.app.Fragment {
         @Override

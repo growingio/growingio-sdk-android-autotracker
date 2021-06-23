@@ -47,7 +47,7 @@ public class CrashTest {
         module.registerComponents(context, trackerRegistry);
         assertThat(CrashManager.isEnabled()).isTrue();
 
-        trackerRegistry.register(Crash.class, Void.class, new CrashDataLoader.Factory(context));
+        trackerRegistry.register(Crash.class, Void.class, new CrashDataLoader.Factory(context,CrashConfig.DSN,CrashConfig.ALIAS));
         ModelLoader<Crash, Void> modelLoader = trackerRegistry.getModelLoader(Crash.class, Void.class);
         modelLoader.buildLoadData(new Crash()).fetcher.executeData();
         modelLoader.buildLoadData(new Crash()).fetcher.loadData(new DataFetcher.DataCallback<Void>() {
@@ -67,8 +67,6 @@ public class CrashTest {
         CrashManager.sendMessage("cpacm");
         CrashManager.sendException(new IllegalStateException("cpacm"));
         CrashManager.sendEvent(new EventBuilder().withMessage("cpacm"));
-        CrashManager.throwableRule().filterThrowable(new IllegalStateException("cpacm"));
-        CrashManager.throwableRule().filterThrowable(null);
         CrashManager.close();
         CrashManager.unRegister();
         assertThat(CrashManager.isEnabled()).isFalse();

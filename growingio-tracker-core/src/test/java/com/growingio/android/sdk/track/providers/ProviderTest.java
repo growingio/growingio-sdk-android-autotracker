@@ -28,6 +28,7 @@ import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -91,8 +92,8 @@ public class ProviderTest {
 
     @Test
     public void configProvider() {
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", null), new HashMap<>());
-        Truth.assertThat(ConfigurationProvider.core().getUrlScheme()).isNull();
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", ConstantPool.UNKNOWN), new HashMap<>());
+        Truth.assertThat(ConfigurationProvider.core().getUrlScheme()).isEqualTo(ConstantPool.UNKNOWN);
         ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"), new HashMap<>());
         TestConfigurable testConfigurable = new TestConfigurable();
         ConfigurationProvider.get().addConfiguration(testConfigurable);

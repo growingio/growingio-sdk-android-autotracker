@@ -34,6 +34,10 @@ public class CrashLibraryGioModule extends LibraryGioModule {
         //registry.register(Crash::class.java, Void::class.java, CrashDataLoader.Factory(context))
         //just start
         CrashConfig crashConfig = getConfiguration(CrashConfig.class);
+        if (crashConfig == null) {
+            crashConfig = new CrashConfig();
+        }
         new CrashDataLoader.Factory(context, crashConfig.getCrashDsn(), crashConfig.getCrashAlias()).build();
+
     }
 }
