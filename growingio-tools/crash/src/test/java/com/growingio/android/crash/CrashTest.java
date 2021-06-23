@@ -47,7 +47,7 @@ public class CrashTest {
         module.registerComponents(context, trackerRegistry);
         assertThat(CrashManager.isEnabled()).isTrue();
 
-        trackerRegistry.register(Crash.class, Void.class, new CrashDataLoader.Factory(context,CrashConfig.DSN,CrashConfig.ALIAS));
+        trackerRegistry.register(Crash.class, Void.class, new CrashDataLoader.Factory(context, CrashConfig.DSN, CrashConfig.ALIAS));
         ModelLoader<Crash, Void> modelLoader = trackerRegistry.getModelLoader(Crash.class, Void.class);
         modelLoader.buildLoadData(new Crash()).fetcher.executeData();
         modelLoader.buildLoadData(new Crash()).fetcher.loadData(new DataFetcher.DataCallback<Void>() {
