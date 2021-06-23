@@ -246,12 +246,12 @@ public class CircleScreenshot {
             }
 
             if (ClassExistHelper.instanceOfX5WebView(viewNode.getView())) {
-                getWebViewDomTree(SuperWebView.make((com.tencent.smtt.sdk.WebView) viewNode.getView()), viewNode);
+                getWebViewDomTree(SuperWebView.makeX5((com.tencent.smtt.sdk.WebView) viewNode.getView()), viewNode);
                 return true;
             }
 
             if (ClassExistHelper.instanceOfUcWebView(viewNode.getView())) {
-                getWebViewDomTree(SuperWebView.make((com.uc.webview.export.WebView) viewNode.getView()), viewNode);
+                getWebViewDomTree(SuperWebView.makeUC((com.uc.webview.export.WebView) viewNode.getView()), viewNode);
                 return true;
             }
 

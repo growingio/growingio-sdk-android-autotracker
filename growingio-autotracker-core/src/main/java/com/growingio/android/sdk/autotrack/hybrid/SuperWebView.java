@@ -59,11 +59,11 @@ public abstract class SuperWebView<T extends View> {
         return new SystemWebView(webView);
     }
 
-    public static SuperWebView<com.tencent.smtt.sdk.WebView> make(com.tencent.smtt.sdk.WebView webView) {
+    public static SuperWebView<com.tencent.smtt.sdk.WebView> makeX5(com.tencent.smtt.sdk.WebView webView) {
         return new X5WebView(webView);
     }
 
-    public static SuperWebView<com.uc.webview.export.WebView> make(com.uc.webview.export.WebView webView) {
+    public static SuperWebView<com.uc.webview.export.WebView> makeUC(com.uc.webview.export.WebView webView) {
         return new UCWebView(webView);
     }
 

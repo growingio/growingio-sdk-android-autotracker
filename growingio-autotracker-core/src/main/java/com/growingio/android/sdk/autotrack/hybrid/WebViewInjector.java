@@ -50,37 +50,37 @@ public class WebViewInjector {
     @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadUrl", parameterTypes = {String.class})
     public static void x5WebViewLoadUrl(com.tencent.smtt.sdk.WebView webView, String url) {
         Logger.d(TAG, "x5WebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);
-        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
+        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeX5(webView));
     }
 
     @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadUrl", parameterTypes = {String.class, Map.class})
     public static void x5WebViewLoadUrl(com.tencent.smtt.sdk.WebView webView, String url, Map<String, String> additionalHttpHeaders) {
         Logger.d(TAG, "x5WebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url + ", additionalHttpHeaders = " + additionalHttpHeaders);
-        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
+        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeX5(webView));
     }
 
     @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadData", parameterTypes = {String.class, String.class, String.class})
     public static void x5WebViewLoadData(com.tencent.smtt.sdk.WebView webView, String data, String mimeType, String encoding) {
         Logger.d(TAG, "x5WebViewLoadData: webView = " + webView.getClass().getName());
-        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
+        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeX5(webView));
     }
 
     @Before(clazz = com.uc.webview.export.WebView.class, method = "loadUrl", parameterTypes = {String.class})
     public static void ucWebViewLoadUrl(com.uc.webview.export.WebView webView, String url) {
         Logger.d(TAG, "ucWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);
-        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
+        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeUC(webView));
     }
 
     @Before(clazz = com.uc.webview.export.WebView.class, method = "loadUrl", parameterTypes = {String.class, Map.class})
     public static void ucWebViewLoadUrl(com.uc.webview.export.WebView webView, String url, Map<String, String> additionalHttpHeaders) {
         Logger.d(TAG, "ucWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url + ", additionalHttpHeaders = " + additionalHttpHeaders);
-        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
+        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeUC(webView));
     }
 
     @Before(clazz = com.uc.webview.export.WebView.class, method = "loadData", parameterTypes = {String.class, String.class, String.class})
     public static void ucWebViewLoadData(com.uc.webview.export.WebView webView, String data, String mimeType, String encoding) {
         Logger.d(TAG, "ucWebViewLoadData: webView = " + webView.getClass().getName());
-        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
+        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeUC(webView));
     }
 
     @Before(clazz = WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
@@ -92,12 +92,12 @@ public class WebViewInjector {
     @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
     public static void x5WebViewLoadDataWithBaseURL(com.tencent.smtt.sdk.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         Logger.d(TAG, "x5WebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
-        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
+        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeX5(webView));
     }
 
     @Before(clazz = com.uc.webview.export.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
     public static void ucWebViewLoadDataWithBaseURL(com.uc.webview.export.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         Logger.d(TAG, "ucWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
-        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make(webView));
+        HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeUC(webView));
     }
 }
