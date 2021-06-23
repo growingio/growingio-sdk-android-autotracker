@@ -52,22 +52,14 @@ public class TrackerTest {
 
     @Test
     public void initTest() {
-        Tracker nullTracker = new Tracker(null, null);
+        Tracker nullTracker = new Tracker(null);
         assertThat(nullTracker.isInited).isFalse();
-
-        try {
-            Tracker errorTracker = new Tracker(application, new TrackConfiguration());
-        } catch (Exception e) {
-            assertThat(e).isInstanceOf(IllegalStateException.class);
-        }
     }
 
     @Test
     public void apiTest() {
         Robolectric.buildContentProvider(EventsContentProvider.class).create();
-        TrackConfiguration trackConfiguration = new TrackConfiguration("test", "test");
-        trackConfiguration.setDebugEnabled(true);
-        Tracker tracker = new Tracker(application, trackConfiguration);
+        Tracker tracker = new Tracker(application);
         Map<String, String> valueMap = new HashMap<>();
         valueMap.put("user", "cpacm");
         tracker.trackCustomEvent("test");
@@ -87,11 +79,18 @@ public class TrackerTest {
         tracker.cleanLocation();
         tracker.onActivityNewIntent(null, null);
 
-        tracker.registerComponent(new LibraryGioModule() {
-            @Override
-            public void registerComponents(Context context, TrackerRegistry registry) {
-                //nothing
-            }
-        });
+        TestLibraryGioModule testLibraryGioModule = new TestLibraryGioModule();
+        testLibraryGioModule.registerComponents(application, TrackerContext.get().getRegistry());
+        testLibraryGioModule.getConfiguration(TestLibraryGioModule.class);
+
+        tracker.registerComponent(testLibraryGioModule);
     }
+
+    public static class TestLibraryGioModule extends LibraryGioModule implements Configurable {
+        @Override
+        public void registerComponents(Context context, TrackerRegistry registry) {
+            super.registerComponents(context, registry);
+        }
+    }
+
 }

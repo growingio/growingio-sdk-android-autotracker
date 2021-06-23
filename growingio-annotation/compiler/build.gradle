@@ -1,4 +1,4 @@
-import org.gradle.internal.jvm.Jvm
+//import org.gradle.internal.jvm.Jvm
 
 plugins {
     id 'java-library'
@@ -11,12 +11,16 @@ java {
 }
 
 dependencies {
+
+    // About test: we couldn't use compile-testing in android project unless import jre's rt.jar.
     testImplementation libraries.test.junit
-    testImplementation ("com.google.testing.compile:compile-testing:0.19") {
+    testImplementation("com.google.testing.compile:compile-testing:0.19") {
         // We don't use this and including it requires us to list it separatel which would be
         // confusing.
         exclude group: "com.google.auto.value", module: "auto-value"
     }
+
+    testImplementation libraries.growingio.tracker_core
 
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -26,9 +30,6 @@ dependencies {
     implementation libraries.squareup.javapoet
 
     implementation project(":growingio-annotation")
-    if (!Jvm.current().getJavaVersion().java9Compatible) {
-        compileOnly files(Jvm.current().getToolsJar())
-    }
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

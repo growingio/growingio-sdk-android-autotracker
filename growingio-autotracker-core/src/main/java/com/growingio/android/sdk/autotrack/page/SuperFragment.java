@@ -46,7 +46,7 @@ public abstract class SuperFragment<T> {
     }
 
     @Nullable
-    public static SuperFragment<android.support.v4.app.Fragment> make(android.support.v4.app.Fragment fragment) {
+    public static SuperFragment<android.support.v4.app.Fragment> makeSupport(android.support.v4.app.Fragment fragment) {
         if (fragment == null) {
             return null;
         }
@@ -54,7 +54,7 @@ public abstract class SuperFragment<T> {
     }
 
     @Nullable
-    public static SuperFragment<androidx.fragment.app.Fragment> make(androidx.fragment.app.Fragment fragment) {
+    public static SuperFragment<androidx.fragment.app.Fragment> makeX(androidx.fragment.app.Fragment fragment) {
         if (fragment == null) {
             return null;
         }
@@ -182,7 +182,7 @@ public abstract class SuperFragment<T> {
 
         @Override
         public SuperFragment<android.support.v4.app.Fragment> getParentFragment() {
-            return make(getRealFragment().getParentFragment());
+            return makeSupport(getRealFragment().getParentFragment());
         }
 
         @Override
@@ -234,7 +234,7 @@ public abstract class SuperFragment<T> {
         @Nullable
         @Override
         public SuperFragment<androidx.fragment.app.Fragment> getParentFragment() {
-            return make(getRealFragment().getParentFragment());
+            return makeX(getRealFragment().getParentFragment());
         }
 
         @Override

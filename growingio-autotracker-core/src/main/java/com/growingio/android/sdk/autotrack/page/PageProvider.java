@@ -148,7 +148,10 @@ public class PageProvider implements IActivityLifecycle {
         if (TextUtils.isEmpty(alias)) {
             return;
         }
-
+        ActivityPage page = ALL_PAGE_TREE.get(activity);
+        if (page != null) {
+            page.setAlias(alias);
+        }
         ALL_PAGE_ALIAS.put(activity, alias);
     }
 
@@ -347,7 +350,7 @@ public class PageProvider implements IActivityLifecycle {
         return pageParent;
     }
 
-    private Page<?> findPage(SuperFragment<?> carrier) {
+    protected Page<?> findPage(SuperFragment<?> carrier) {
         Activity activity = carrier.getActivity();
         Page<?> page = ALL_PAGE_TREE.get(activity);
         if (page == null) {

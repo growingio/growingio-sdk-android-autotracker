@@ -184,6 +184,24 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         delayCheckImpression();
     }
 
+    boolean hasTrackViewImpression(View trackedView) {
+        if (trackedView == null) {
+            return false;
+        }
+        Activity activity = findViewActivity(trackedView);
+        if (activity == null) {
+            Logger.e(TAG, "TrackedView context activity is NULL");
+            return false;
+        }
+
+        List<ViewImpression> viewImpressions = ACTIVITY_SCOPE.get(activity);
+        if (viewImpressions == null || viewImpressions.isEmpty()) {
+            Logger.e(TAG, "ViewImpressions is NULL");
+            return false;
+        }
+        return true;
+    }
+
     public void stopTrackViewImpression(View trackedView) {
         if (trackedView == null) {
             return;

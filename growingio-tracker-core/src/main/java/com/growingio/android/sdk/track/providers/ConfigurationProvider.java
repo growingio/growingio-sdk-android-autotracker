@@ -43,6 +43,13 @@ public class ConfigurationProvider {
             throw new IllegalStateException("UrlScheme is NULL");
         }
 
+        if (coreConfiguration.getProjectId().equals(ConstantPool.UNKNOWN)
+                || coreConfiguration.getUrlScheme().equals(ConstantPool.UNKNOWN)) {
+            Logger.e(TAG, "Growing Sdk 配置加载失败，请重新初始化");
+            this.mCoreConfiguration = coreConfiguration;
+            return;
+        }
+
         if (!ThreadUtils.runningOnUiThread()) {
             throw new IllegalStateException("Growing Sdk 初始化必须在主线程中调用。");
         }

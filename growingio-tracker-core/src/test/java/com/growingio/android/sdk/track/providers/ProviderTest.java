@@ -26,6 +26,8 @@ import android.os.Bundle;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
+import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
@@ -37,6 +39,8 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
+
+import java.util.HashMap;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -90,8 +94,15 @@ public class ProviderTest {
 
     @Test
     public void configProvider() {
-        //TODO
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", null), new HashMap<>());
+        Truth.assertThat(ConfigurationProvider.core().getUrlScheme()).isNull();
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"), new HashMap<>());
+        TestConfigurable testConfigurable = new TestConfigurable();
+        ConfigurationProvider.get().addConfiguration(testConfigurable);
+        Truth.assertThat((TestConfigurable) ConfigurationProvider.get().getConfiguration(TestConfigurable.class)).isEqualTo(testConfigurable);
     }
+
+    public static class TestConfigurable implements Configurable {}
 
     @Test
     public void deeplinkProvider() {

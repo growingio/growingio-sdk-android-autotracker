@@ -138,7 +138,7 @@ public class Autotracker extends Tracker {
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
+                PageProvider.get().setPageAttributes(SuperFragment.makeSupport(page), new HashMap<>(attributes));
             }
         });
     }
@@ -153,7 +153,7 @@ public class Autotracker extends Tracker {
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
+                PageProvider.get().setPageAttributes(SuperFragment.makeX(page), new HashMap<>(attributes));
             }
         });
     }
@@ -220,7 +220,7 @@ public class Autotracker extends Tracker {
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
+                PageProvider.get().setFragmentAlias(SuperFragment.makeSupport(page), alias);
             }
         });
     }
@@ -234,7 +234,7 @@ public class Autotracker extends Tracker {
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
+                PageProvider.get().setFragmentAlias(SuperFragment.makeX(page), alias);
             }
         });
     }
@@ -276,7 +276,7 @@ public class Autotracker extends Tracker {
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
+                PageProvider.get().addIgnoreFragment(SuperFragment.makeSupport(page), policy);
             }
         });
     }
@@ -290,7 +290,7 @@ public class Autotracker extends Tracker {
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
+                PageProvider.get().addIgnoreFragment(SuperFragment.makeX(page), policy);
             }
         });
     }

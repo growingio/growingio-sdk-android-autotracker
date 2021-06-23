@@ -20,16 +20,34 @@ android {
             consumerProguardFiles 'consumer-proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     lintOptions {
         abortOnError false
     }
 }
 
 dependencies {
+
+    testImplementation libraries.test.junit
+    testImplementation libraries.test.truth
+    testImplementation libraries.test.androidx_core
+    testImplementation libraries.test.androidx_fragment
+    testImplementation libraries.test.robolectric
+    testImplementation libraries.androidx.appcompat
+    testImplementation libraries.androidx.recyclerview
+    testCompileOnly libraries.android.appcompat
+
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
     debugApi project(':growingio-tracker-core')
     releaseApi libraries.growingio.tracker_core
