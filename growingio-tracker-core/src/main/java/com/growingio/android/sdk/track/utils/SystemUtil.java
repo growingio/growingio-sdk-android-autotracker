@@ -16,9 +16,7 @@
 
 package com.growingio.android.sdk.track.utils;
 
-import android.app.ActivityManager;
 import android.content.Context;
-import android.os.Process;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.log.Logger;
@@ -26,7 +24,6 @@ import com.growingio.android.sdk.track.log.Logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.List;
 
 public class SystemUtil {
     private static final String TAG = "SystemUtil";

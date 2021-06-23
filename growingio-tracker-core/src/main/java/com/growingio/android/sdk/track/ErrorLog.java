@@ -29,7 +29,8 @@ public class ErrorLog {
     public static final String TRACK_FRAGMENT_ERROR = "trackAllFragment策略与全局策略相同， 不需要单独设置";
     public static final String USER_ID_TOO_LONG = "GrowingIO.setUserId(VALUE):VALUE长度大于1000，不发送";
 
-    private ErrorLog() {}
+    private ErrorLog() {
+    }
 
 //    public static String jsonValueTooLong(String key) {
 //        return "JSON Object中有键值对，值的字符个数在1000个以下, 发送失败, key: " + key;

@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.track.middleware;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.net.Uri;
 
 import com.growingio.android.sdk.TrackerContext;

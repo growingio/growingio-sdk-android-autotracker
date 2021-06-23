@@ -27,7 +27,6 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
-import com.growingio.android.sdk.track.utils.SystemUtil;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
 import com.growingio.android.sdk.track.webservices.DeepLink;

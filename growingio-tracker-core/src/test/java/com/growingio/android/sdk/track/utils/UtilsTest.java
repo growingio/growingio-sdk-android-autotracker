@@ -1,19 +1,17 @@
 /*
+ * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
  *
- *  Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.growingio.android.sdk.track.utils;
@@ -23,7 +21,6 @@ import android.app.Application;
 import android.app.Dialog;
 import android.content.ContextWrapper;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
@@ -37,7 +34,6 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.common.truth.Truth;
-import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
 
@@ -48,10 +44,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
-import org.robolectric.annotation.Config;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @RunWith(RobolectricTestRunner.class)
 public class UtilsTest {
@@ -141,15 +135,15 @@ public class UtilsTest {
     }
 
     @Test
-    public void oaidTest(){
+    public void oaidTest() {
         OaidHelper oaidHelper = new OaidHelper();
-        Truth.assertThat(oaidHelper.waitCompleteAndGetOaid(1008613,10L)).isNull();
+        Truth.assertThat(oaidHelper.waitCompleteAndGetOaid(1008613, 10L)).isNull();
         oaidHelper.setOaid("error oaid");
-        String oaid = oaidHelper.waitCompleteAndGetOaid(0,100L);
+        String oaid = oaidHelper.waitCompleteAndGetOaid(0, 100L);
         Truth.assertThat(oaid).isEqualTo("error oaid");
         oaidHelper.setOaid("test oaid");
         oaidHelper.setComplete(true);
-        oaid = oaidHelper.waitCompleteAndGetOaid(0,10000L);
+        oaid = oaidHelper.waitCompleteAndGetOaid(0, 10000L);
         Truth.assertThat(oaid).isEqualTo("test oaid");
     }
 
@@ -185,7 +179,7 @@ public class UtilsTest {
         Truth.assertThat(ThreadUtils.runningOnUiThread()).isTrue();
         ThreadUtils.setWillOverrideUiThread();
         ThreadUtils.runOnUiThread(this::objectTest);
-        ThreadUtils.postOnUiThreadDelayed(this::objectTest,1000L);
+        ThreadUtils.postOnUiThreadDelayed(this::objectTest, 1000L);
     }
 
 
