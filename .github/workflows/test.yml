@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [ test/junit ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Before script
+        run: |
+          chmod +x gradlew
+          chmod +x config/checkstyle/checkstyle.sh
+          chmod +x gradle/publishAllToMavenLocal.sh
+
+      - name: Run Gradle command
+        run: |
+          bash ./gradle/publishAllToMavenLocal.sh
+          bash ./config/checkstyle/checkstyle.sh
+          ./gradlew test
+          ./gradlew assembleDebug
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          profile: Nexus 6
+          script: |
+            adb shell logcat -c
+            adb shell logcat > ./uiTest.log &
+            ./gradlew :demo:jacocoTestReport
+
+      - name: Upload logcat
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: uiTestLog
+          path: ./uiTest.log
+
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew build sonarqube --info
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./demos/demo/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+

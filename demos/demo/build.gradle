@@ -75,10 +75,10 @@ growingAutotracker {
 def rootDir = project.rootProject.rootDir
 
 def coverageSourceDirs = [
-        "$rootDir/gio-sdk/tracker/src/main/java",
-        "$rootDir/gio-sdk/tracker-cdp/src/main/java",
-        "$rootDir/gio-sdk/autotracker/src/main/java",
-        "$rootDir/gio-sdk/autotracker-cdp/src/main/java",
+//        "$rootDir/gio-sdk/tracker/src/main/java",
+//        "$rootDir/gio-sdk/tracker-cdp/src/main/java",
+//        "$rootDir/gio-sdk/autotracker/src/main/java",
+//        "$rootDir/gio-sdk/autotracker-cdp/src/main/java",
         "$rootDir/growingio-annotation/compiler/src/main/java",
         "$rootDir/growingio-annotation/src/main/java",
         "$rootDir/growingio-tracker-core/src/main/java",
@@ -96,10 +96,10 @@ def coverageSourceDirs = [
 ]
 
 def coverageClassDirs = [
-        "$rootDir/gio-sdk/tracker/build/intermediates/javac/debug/classes",
-        "$rootDir/gio-sdk/tracker-cdp/build/intermediates/javac/debug/classes",
-        "$rootDir/gio-sdk/autotracker/build/intermediates/javac/debug/classes",
-        "$rootDir/gio-sdk/autotracker-cdp/build/intermediates/javac/debug/classes",
+//        "$rootDir/gio-sdk/tracker/build/intermediates/javac/debug/classes",
+//        "$rootDir/gio-sdk/tracker-cdp/build/intermediates/javac/debug/classes",
+//        "$rootDir/gio-sdk/autotracker/build/intermediates/javac/debug/classes",
+//        "$rootDir/gio-sdk/autotracker-cdp/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-annotation/compiler/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-annotation/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-tracker-core/build/intermediates/javac/debug/classes",
