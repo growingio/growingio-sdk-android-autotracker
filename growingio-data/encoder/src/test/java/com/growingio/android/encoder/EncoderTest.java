@@ -53,25 +53,40 @@ public class EncoderTest {
                 .addParam("stm", String.valueOf(10000L));
 
         EventEncoder encoder = new EventEncoder(eventUrl);
-        trackerRegistry.getModelLoader(EventEncoder.class, EventEncoder.class)
+        DataFetcher<EventEncoder> dataFetcher = trackerRegistry.getModelLoader(EventEncoder.class, EventEncoder.class)
                 .buildLoadData(encoder)
-                .fetcher
-                .loadData(new DataFetcher.DataCallback<EventEncoder>() {
-                    @Override
-                    public void onDataReady(EventEncoder data) {
-                        EventUrl eurl = data.getEventUrl();
-                        byte[] compressData = Snappy.compress("cpacm".getBytes());
-                        compressData = XORUtils.encrypt(compressData, (int) (eventUrl.getTime() & 0xFF));
-                        Truth.assertThat(eurl.getMediaType()).isEqualTo("application/json");
-                        Truth.assertThat(eurl.getRequestBody()).isEqualTo(compressData);
-                    }
+                .fetcher;
+        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventEncoder.class);
+        dataFetcher.loadData(new DataFetcher.DataCallback<EventEncoder>() {
+            @Override
+            public void onDataReady(EventEncoder data) {
+                EventUrl eurl = data.getEventUrl();
+                byte[] compressData = Snappy.compress("cpacm".getBytes());
+                compressData = XORUtils.encrypt(compressData, (int) (eventUrl.getTime() & 0xFF));
+                Truth.assertThat(eurl.getMediaType()).isEqualTo("application/json");
+                Truth.assertThat(eurl.getRequestBody()).isEqualTo(compressData);
+            }
 
-                    @Override
-                    public void onLoadFailed(Exception e) {
+            @Override
+            public void onLoadFailed(Exception e) {
 
-                    }
-                });
+            }
+        });
 
+        dataFetcher.loadData(new DataFetcher.DataCallback<EventEncoder>() {
+            @Override
+            public void onDataReady(EventEncoder data) {
+                //just return error
+                int k = 1245/0;
+            }
+
+            @Override
+            public void onLoadFailed(Exception e) {
+                Truth.assertThat(e).isInstanceOf(ArithmeticException.class);
+            }
+        });
+        dataFetcher.cleanup();
+        dataFetcher.cancel();
 
     }
 

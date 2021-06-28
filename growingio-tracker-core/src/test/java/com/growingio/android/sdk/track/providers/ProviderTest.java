@@ -26,6 +26,7 @@ import com.google.common.truth.Truth;
 import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.utils.ConstantPool;
@@ -144,6 +145,8 @@ public class ProviderTest {
         Truth.assertThat(DeviceInfoProvider.get().getOperatingSystemVersion()).isEqualTo("11");
         Truth.assertThat(DeviceInfoProvider.get().getScreenHeight()).isEqualTo(470);
         Truth.assertThat(DeviceInfoProvider.get().getScreenWidth()).isEqualTo(320);
+        PersistentDataProvider.get().setDeviceId("");
+        Truth.assertThat(PersistentDataProvider.get().getDeviceId()).isNotEmpty();
     }
 
     @Test

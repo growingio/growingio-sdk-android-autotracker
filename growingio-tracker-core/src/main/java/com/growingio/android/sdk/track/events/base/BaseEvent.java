@@ -105,14 +105,6 @@ public abstract class BaseEvent extends GEvent {
         mSdkVersion = eventBuilder.mSdkVersion;
     }
 
-    public static String getAppStateForeground() {
-        return APP_STATE_FOREGROUND;
-    }
-
-    public static String getAppStateBackground() {
-        return APP_STATE_BACKGROUND;
-    }
-
     public String getDeviceId() {
         return mDeviceId;
     }
