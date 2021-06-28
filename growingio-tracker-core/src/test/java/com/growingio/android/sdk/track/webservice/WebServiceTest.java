@@ -19,6 +19,7 @@ package com.growingio.android.sdk.track.webservice;
 import android.app.Activity;
 import android.app.Application;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -80,7 +81,10 @@ public class WebServiceTest {
     @Test
     public void tipTest() {
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
+
         TipView tipView = new TipView(activity);
+        WindowManager windowManager = activity.getWindowManager();
+        windowManager.addView(tipView,new WindowManager.LayoutParams());
         tipView.setContent("this is test tip");
         tipView.setErrorMessage("this is test error");
         int height = tipView.getStatusBarHeight();
