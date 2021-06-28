@@ -336,17 +336,18 @@ public class PageProvider implements IActivityLifecycle {
     }
 
     private Page<?> findPageParent(SuperFragment<?> fragment) {
-        Page<?> pageParent;
+        Page<?> pageParent = null;
         SuperFragment<?> parentFragment = fragment.getParentFragment();
         ActivityPage activityPage = ALL_PAGE_TREE.get(fragment.getActivity());
         if (parentFragment == null) {
             pageParent = activityPage;
-        } else {
+        } else if (activityPage != null) {
             pageParent = findPage(parentFragment, activityPage);
         }
         // TODO: 2021/04/26 如果为null可能存在以下情况
-        // 1.父fragment getUserVisibleHint为false， 导致子fragment无法找到page
-        // 2.2021/04/26 旋转、内存不足导致activity销毁， fragment重建导致无法找到page
+        // 1. 父fragment getUserVisibleHint为false， 导致子fragment无法找到page
+        // 2. 2021/04/26 旋转、内存不足导致activity销毁， fragment无法找到page
+        // 3. 延迟初始化导致activityPage为null
         return pageParent;
     }
 
