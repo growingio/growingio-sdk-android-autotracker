@@ -23,7 +23,7 @@ android {
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         applicationId "com.gio.test.three"
-        minSdkVersion buildConfiguration.minSdkVersion
+        minSdkVersion 26
         targetSdkVersion buildConfiguration.targetSdkVersion
 
         buildConfigField "boolean", "withAutotrack", "$withAutotrack"
@@ -63,6 +63,12 @@ android {
     }
 
     testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+        unitTests.returnDefaultValues = true
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 }
@@ -71,79 +77,6 @@ growingAutotracker {
     development true
     logEnabled true
 //    excludePackages "com.gio.test.three.autotrack.fragments", "com.example"
-}
-def rootDir = project.rootProject.rootDir
-
-def coverageSourceDirs = [
-//        "$rootDir/gio-sdk/tracker/src/main/java",
-//        "$rootDir/gio-sdk/tracker-cdp/src/main/java",
-//        "$rootDir/gio-sdk/autotracker/src/main/java",
-//        "$rootDir/gio-sdk/autotracker-cdp/src/main/java",
-        "$rootDir/growingio-annotation/compiler/src/main/java",
-        "$rootDir/growingio-annotation/src/main/java",
-        "$rootDir/growingio-tracker-core/src/main/java",
-        "$rootDir/growingio-autotracker-core/src/main/java",
-        "$rootDir/growingio-autotracker-gradle-plugin/src/main/java",
-        "$rootDir/growingio-data/encoder/src/main/java",
-        "$rootDir/growingio-data/json/src/main/java",
-        "$rootDir/growingio-network/okhttp3/src/main/java",
-        "$rootDir/growingio-network/volley/src/main/java",
-        "$rootDir/growingio-network/urlconnection/src/main/java",
-        "$rootDir/growingio-tools/crash/src/main/java",
-        "$rootDir/growingio-tools/snappy/src/main/java",
-        "$rootDir/growingio-webservice/circler/src/main/java",
-        "$rootDir/growingio-webservice/debugger/src/main/java",
-]
-
-def coverageClassDirs = [
-//        "$rootDir/gio-sdk/tracker/build/intermediates/javac/debug/classes",
-//        "$rootDir/gio-sdk/tracker-cdp/build/intermediates/javac/debug/classes",
-//        "$rootDir/gio-sdk/autotracker/build/intermediates/javac/debug/classes",
-//        "$rootDir/gio-sdk/autotracker-cdp/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-annotation/compiler/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-annotation/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-tracker-core/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-autotracker-core/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-autotracker-gradle-plugin/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-data/encoder/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-data/json/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-network/okhttp3/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-network/volley/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-network/urlconnection/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-tools/crash/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-tools/snappy/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-webservice/circler/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-webservice/debugger/build/intermediates/javac/debug/classes"
-]
-
-task jacocoTestReport(type: JacocoReport, group: 'Reporting', dependsOn: 'connectedCheck') {
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-
-    sourceDirectories = files(coverageSourceDirs)
-
-    executionData = fileTree(
-            dir: "$rootDir",
-            include: ["**/*.exec", "**/*.ec"]
-    )
-
-    doFirst {
-        println(project.rootProject.rootDir)
-        classDirectories = files(files(coverageClassDirs).collect {
-            fileTree(dir: it, exclude: [
-                    'android/**',
-                    'androidx/**',
-                    'com/example/**',
-                    'com/gio/**',
-                    '**/R.class',
-                    '**/R$*.class',
-                    '**/BuildConfig.*',
-                    '**/HookClassesConfig.*',
-            ])
-        })
-    }
 }
 
 dependencies {
@@ -171,5 +104,6 @@ dependencies {
     implementation project(":demo-autotrack")
 
     compileOnly libraries.androidx.appcompat
-
 }
+
+apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"

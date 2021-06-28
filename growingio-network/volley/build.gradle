@@ -22,6 +22,19 @@ android {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
     }
+
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+                excludes = ['jdk.internal.*']
+            }
+        }
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -33,3 +46,4 @@ dependencies {
     annotationProcessor project(":growingio-annotation:compiler")
 }
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"
