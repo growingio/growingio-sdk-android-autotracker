@@ -77,7 +77,7 @@ public class EncoderTest {
             @Override
             public void onDataReady(EventEncoder data) {
                 //just return error
-                int k = 1245/0;
+                int k = 1245 / 0;
             }
 
             @Override

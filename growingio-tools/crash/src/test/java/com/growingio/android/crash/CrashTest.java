@@ -27,6 +27,7 @@ import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
+import org.checkerframework.checker.units.qual.C;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -46,6 +47,8 @@ public class CrashTest {
         TrackerRegistry trackerRegistry = new TrackerRegistry();
         module.registerComponents(context, trackerRegistry);
         assertThat(CrashManager.isEnabled()).isTrue();
+        CrashConfig crashConfig = new CrashConfig();
+        crashConfig.setCrashAlias("").setCrashDsn("");
 
         trackerRegistry.register(Crash.class, Void.class, new CrashDataLoader.Factory(context, CrashConfig.DSN, CrashConfig.ALIAS));
         ModelLoader<Crash, Void> modelLoader = trackerRegistry.getModelLoader(Crash.class, Void.class);

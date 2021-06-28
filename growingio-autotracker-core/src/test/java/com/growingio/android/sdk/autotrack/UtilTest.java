@@ -20,14 +20,17 @@ package com.growingio.android.sdk.autotrack;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Intent;
+import android.view.View;
 
 import androidx.appcompat.view.menu.ListMenuItemView;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
+import com.growingio.android.sdk.autotrack.change.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.inject.ActivityInjector;
 import com.growingio.android.sdk.autotrack.shadow.AlertControllerShadow;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
+import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.autotrack.util.HurtLocker;
 
 import org.junit.Test;
@@ -46,6 +49,12 @@ public class UtilTest {
             Truth.assertThat(field.getName()).isEqualTo("state");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        try {
+            Field field = HurtLocker.getField(RobolectricActivity.class, "nosuchfiled");
+        } catch (Exception e) {
+            Truth.assertThat(e).isInstanceOf(NoSuchFieldException.class);
         }
 
         try {
@@ -75,5 +84,14 @@ public class UtilTest {
     public void activityInjectTest() {
         RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).get();
         ActivityInjector.onActivityNewIntent(activity, new Intent());
+        ViewChangeProvider.viewOnChange(activity.getTextView());
+    }
+
+    @Test
+    public void anonymousTest() {
+        View.OnClickListener testListener = v -> {
+        };
+        String name = ClassUtil.getSimpleClassName(testListener.getClass());
+        Truth.assertThat(name).isEqualTo("Anonymous");
     }
 }

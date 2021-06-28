@@ -64,7 +64,9 @@ public class ImpressionTest {
         boolean result = ImpressionProvider.get().hasTrackViewImpression(activity.getTextView());
         Truth.assertThat(result).isTrue();
 
-        ImpressionProvider.get().onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.LAYOUT_CHANGED));
+        ViewStateChangedEvent vscEvent = new ViewStateChangedEvent(ViewStateChangedEvent.StateType.LAYOUT_CHANGED);
+        Truth.assertThat(vscEvent.getNewFocus()).isNull();
+        ImpressionProvider.get().onViewStateChanged(vscEvent);
         Robolectric.flushForegroundThreadScheduler();
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
 

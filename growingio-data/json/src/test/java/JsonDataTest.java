@@ -59,28 +59,32 @@ public class JsonDataTest {
                 .build();
 
         EventData eventData = new EventData(Collections.singletonList(customEvent));
-        trackerRegistry.getModelLoader(EventData.class, EventStream.class)
-                .buildLoadData(eventData).fetcher
-                .loadData(new DataFetcher.DataCallback<EventStream>() {
-                    @Override
-                    public void onDataReady(EventStream data) {
-                        try {
-                            JSONArray jsonArray = new JSONArray(new String(data.getBodyData()));
-                            String eventName = jsonArray.getJSONObject(0).optString("eventName");
-                            String eventType = jsonArray.getJSONObject(0).optString("eventType");
-                            Truth.assertThat(eventType).isEqualTo("CUSTOM");
-                            Truth.assertThat(eventName).isEqualTo("jsonTest");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Truth.assertThat(true).isFalse();
-                        }
-                    }
+        DataFetcher<EventStream> dataFetcher =
+                trackerRegistry.getModelLoader(EventData.class, EventStream.class)
+                        .buildLoadData(eventData).fetcher;
+        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventStream.class);
+        dataFetcher.loadData(new DataFetcher.DataCallback<EventStream>() {
+            @Override
+            public void onDataReady(EventStream data) {
+                try {
+                    JSONArray jsonArray = new JSONArray(new String(data.getBodyData()));
+                    String eventName = jsonArray.getJSONObject(0).optString("eventName");
+                    String eventType = jsonArray.getJSONObject(0).optString("eventType");
+                    Truth.assertThat(eventType).isEqualTo("CUSTOM");
+                    Truth.assertThat(eventName).isEqualTo("jsonTest");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Truth.assertThat(true).isFalse();
+                }
+            }
 
-                    @Override
-                    public void onLoadFailed(Exception e) {
-                        Truth.assertThat(true).isFalse();
-                    }
-                });
+            @Override
+            public void onLoadFailed(Exception e) {
+                Truth.assertThat(true).isFalse();
+            }
+        });
+        dataFetcher.cleanup();
+        dataFetcher.cancel();
     }
 
 }

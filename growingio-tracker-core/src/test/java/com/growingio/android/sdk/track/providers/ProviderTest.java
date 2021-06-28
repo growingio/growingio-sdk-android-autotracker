@@ -23,6 +23,7 @@ import android.os.Bundle;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
@@ -40,6 +41,7 @@ import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -73,7 +75,9 @@ public class ProviderTest {
                 }
             }
         };
+        ActivityStateProvider.get().register(null);
         ActivityStateProvider.get().register(iActivityLifecycle);
+        ActivityStateProvider.get().register(null);
 
         activityController.create(testBundle);
         activityController.resume();
@@ -130,6 +134,7 @@ public class ProviderTest {
         Robolectric.buildActivity(RobolectricActivity.class, intent3).create().get();
         Robolectric.flushForegroundThreadScheduler();
 
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
     }
 
     @Test

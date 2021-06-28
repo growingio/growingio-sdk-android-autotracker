@@ -39,14 +39,6 @@ public class LoggerDataMessage {
         mLogs = logs;
     }
 
-    public static LogItem createLogItem(String type, String subType, String message, long time) {
-        return LogItem.create(type, subType, message, time);
-    }
-
-    public static LoggerDataMessage createMessage(List<LogItem> logs) {
-        return new LoggerDataMessage(logs);
-    }
-
     public static LoggerDataMessage createTrackMessage(List<com.growingio.android.sdk.track.log.LogItem> logs) {
         List<LogItem> list = new ArrayList<>(logs.size());
         for (int i = 0; i < logs.size(); i++) {
@@ -54,12 +46,6 @@ public class LoggerDataMessage {
             list.add(LogItem.create(priorityToState(logItem.getPriority()), "subType", logItem.getMessage(), logItem.getTimeStamp()));
         }
         return new LoggerDataMessage(list);
-    }
-
-    public static LoggerDataMessage createMessage(String type, String subType, String message, long time) {
-        List<LogItem> logs = new ArrayList<>(1);
-        logs.add(createLogItem(type, subType, message, time));
-        return new LoggerDataMessage(logs);
     }
 
     public JSONObject toJSONObject() {

@@ -149,7 +149,6 @@ public class RobolectricActivity extends FragmentActivity {
         super.onDestroy();
     }
 
-
     public static class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestViewHolder> {
 
         private final Context context;

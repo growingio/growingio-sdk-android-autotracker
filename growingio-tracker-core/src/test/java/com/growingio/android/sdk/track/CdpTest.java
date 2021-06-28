@@ -28,8 +28,10 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.cdp.CdpEventBuildInterceptor;
 import com.growingio.android.sdk.track.cdp.ResourceItem;
 import com.growingio.android.sdk.track.cdp.ResourceItemCustomEvent;
+import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.middleware.EventSender;
 import com.growingio.android.sdk.track.middleware.GEvent;
 
 import org.json.JSONException;
@@ -101,5 +103,13 @@ public class CdpTest {
         Uninterruptibles.sleepUninterruptibly(1000, TimeUnit.MILLISECONDS);
 
         TrackMainThread.trackMain().removeEventBuildInterceptor(testInterceptor);
+    }
+
+    @Test
+    public void adSdkTest() {
+        Truth.assertThat(TrackMainThread.trackMain().getEventSender()).isInstanceOf(EventSender.class);
+        TrackMainThread.trackMain().postGEventToTrackMain(new CustomEvent.Builder().build());
+        Robolectric.flushForegroundThreadScheduler();
+        Uninterruptibles.sleepUninterruptibly(1000, TimeUnit.MILLISECONDS);
     }
 }

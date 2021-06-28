@@ -76,9 +76,9 @@ public class HurtLocker {
         return (T) declaredMethod.invoke(object, arguments);
     }
 
-    public static <T> T invokeStaticMethod(Class<?> declaringClass, String methodToExecute, Class<?>[] parameterTypes, Object... arguments) throws Exception {
-        return invokeMethod(null, declaringClass, methodToExecute, parameterTypes, arguments);
-    }
+//    public static <T> T invokeStaticMethod(Class<?> declaringClass, String methodToExecute, Class<?>[] parameterTypes, Object... arguments) throws Exception {
+//        return invokeMethod(null, declaringClass, methodToExecute, parameterTypes, arguments);
+//    }
 
     public static Field[] getDeclaredFields(Class<?> type) throws Exception {
         return invokeMethod(type, Class.class, "getDeclaredFields", null);

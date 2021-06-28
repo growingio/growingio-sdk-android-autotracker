@@ -41,7 +41,6 @@ jobs:
       - name: Run Gradle command
         run: |
           bash ./gradle/publishAllToMavenLocal.sh
-          bash ./config/checkstyle/checkstyle.sh
           ./gradlew test
           ./gradlew assembleDebug
 

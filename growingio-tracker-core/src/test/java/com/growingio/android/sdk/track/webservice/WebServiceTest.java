@@ -90,7 +90,7 @@ public class WebServiceTest {
                 MotionEvent.ACTION_DOWN, 10f, 10f, 1f, 0, 0, 0, 0, 0, 0));
         tipView.onTouchEvent(MotionEvent.obtain(System.currentTimeMillis(),
                 System.currentTimeMillis() + 100L,
-                MotionEvent.ACTION_MOVE, 10f, 10f, 1f, 0, 0, 0, 0, 0, 0));
+                MotionEvent.ACTION_MOVE, 100f, 100f, 1f, 0, 0, 0, 0, 0, 0));
         tipView.onTouchEvent(MotionEvent.obtain(System.currentTimeMillis(),
                 System.currentTimeMillis() + 100L,
                 MotionEvent.ACTION_UP, 10f, 10f, 1f, 0, 0, 0, 0, 0, 0));
