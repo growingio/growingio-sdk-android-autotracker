@@ -87,11 +87,4 @@ public class UtilTest {
         ViewChangeProvider.viewOnChange(activity.getTextView());
     }
 
-    @Test
-    public void anonymousTest() {
-        View.OnClickListener testListener = v -> {
-        };
-        String name = ClassUtil.getSimpleClassName(testListener.getClass());
-        Truth.assertThat(name).isEqualTo("Anonymous");
-    }
 }
