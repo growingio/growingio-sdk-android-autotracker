@@ -51,6 +51,9 @@ public abstract class WebServicesTest {
                         case "ready":
                             handleReadyMessage(message);
                             break;
+                        case "client_info":
+                            handleClientInfoMessage(message);
+                            break;
                         case "refreshScreenshot":
                             if (mOnReceivedMessageListener != null) {
                                 mOnReceivedMessageListener.onReceivedRefreshScreenshotMessage(message);
@@ -111,6 +114,33 @@ public abstract class WebServicesTest {
         Truth.assertThat(message.getInt("screenWidth") > 0).isTrue();
         Truth.assertThat(message.getInt("screenHeight") > 0).isTrue();
         sendMessage(new JSONObject().put("msgType", "ready").toString());
+    }
+
+    /**
+     * {
+     *   "msgType": "client_info",
+     *   "sdkVersion": "3.0.0",
+     *   "data": {
+     *     "os": "iOS",
+     *     "appVersion": "1.0",
+     *     "appChannel": "App Store",
+     *     "osVersion": "9.0",
+     *     "deviceType": "iPhone",
+     *     "deviceBrand": "Apple",
+     *     "deviceModel": "iPhone7,2"
+     *   }
+     * }
+     */
+    private void handleClientInfoMessage(JSONObject message) throws JSONException {
+        Truth.assertThat(message.getString("msgType")).isEqualTo("client_info");
+        Truth.assertThat(message.getString("sdkVersion")).isNotEmpty();
+        JSONObject data = message.getJSONObject("data");
+        Truth.assertThat(data.getString("os")).isEqualTo("Android");
+        Truth.assertThat(data.getString("appVersion")).isNotEmpty();
+//        Truth.assertThat(data.getString("appChannel")).isNotEmpty();
+        Truth.assertThat(data.getString("deviceType")).isNotEmpty();
+        Truth.assertThat(data.getString("deviceBrand")).isNotEmpty();
+        Truth.assertThat(data.getString("deviceModel")).isNotEmpty();
     }
 
     public interface OnReceivedMessageListener {
