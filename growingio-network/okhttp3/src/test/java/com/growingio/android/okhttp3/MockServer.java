@@ -23,7 +23,7 @@ import okhttp3.mockwebserver.MockWebServer;
 
 public class MockServer {
     public static final String MOCK_SERVER_HOST = "http://localhost:8910";
-    private final MockWebServer mMockWebServer = new MockWebServer();
+    protected final MockWebServer mMockWebServer = new MockWebServer();
 
     private Dispatcher mDispatcher;
 

@@ -18,8 +18,10 @@ package com.growingio.android.okhttp3;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.http.EventResponse;
 import com.growingio.android.sdk.track.http.EventUrl;
+import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
@@ -30,6 +32,14 @@ import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.RecordedRequest;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -42,11 +52,30 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Log.class)
 @PowerMockIgnore("javax.net.ssl.*")
-public class Okhttp3Test {
+public class Okhttp3Test extends MockServer {
 
     @Before
-    public void prepare() {
+    public void prepare() throws IOException {
         mockStatic(Log.class);
+        mockEventsApiServer();
+        start();
+    }
+
+    public void mockEventsApiServer() {
+        Dispatcher dispatcher = new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+                String url = request.getRequestUrl().toString();
+                URI uri = URI.create(url);
+                checkPath(uri.getPath());
+
+
+                String json = request.getBody().readUtf8();
+                dispatchReceivedEvents(json);
+                return new MockResponse().setResponseCode(200);
+            }
+        };
+        setDispatcher(dispatcher);
     }
 
     @Mock
@@ -59,7 +88,18 @@ public class Okhttp3Test {
                 .addPath("projects")
                 .addPath("bfc5d6a3693a110d")
                 .addPath("collect")
+                .addHeader("name", "cpacm")
+                .setBodyData("cpacm".getBytes())
                 .addParam("stm", String.valueOf(time));
+    }
+
+    private void checkPath(String path) {
+        String expectedPath = "/v3/projects/bfc5d6a3693a110d/collect";
+        Truth.assertThat(path).isEqualTo(expectedPath);
+    }
+
+    private void dispatchReceivedEvents(String json) {
+        Truth.assertThat(json).isEqualTo("cpacm");
     }
 
     @Test
@@ -69,13 +109,28 @@ public class Okhttp3Test {
         module.registerComponents(fakeContext, trackerRegistry);
 
         ModelLoader<EventUrl, EventResponse> modelLoader = trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
-        // http request fail in github ci.
-        //EventUrl eventUrl = initEventUrl("http://106.75.81.105:8080");
-        //EventResponse response = modelLoader.buildLoadData(eventUrl).fetcher.executeData();
-        //assertThat(response.isSucceeded()).isTrue();
-        EventUrl eventUrl = initEventUrl("http://localhost/");
+        EventUrl eventUrl = initEventUrl("http://localhost:8910/");
         EventResponse response = modelLoader.buildLoadData(eventUrl).fetcher.executeData();
-        assertThat(response.isSucceeded()).isFalse();
+        assertThat(response.isSucceeded()).isTrue();
+        Truth.assertThat(response.getStream()).isInstanceOf(InputStream.class);
+        Truth.assertThat(response.getUsedBytes()).isEqualTo(0L);
 
+        DataFetcher<EventResponse> dataFetcher = modelLoader.buildLoadData(eventUrl).fetcher;
+        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventResponse.class);
+        dataFetcher.loadData(new DataFetcher.DataCallback<EventResponse>() {
+            @Override
+            public void onDataReady(EventResponse response) {
+                assertThat(response.isSucceeded()).isTrue();
+                Truth.assertThat(response.getStream()).isInstanceOf(InputStream.class);
+                Truth.assertThat(response.getUsedBytes()).isEqualTo(0L);
+                dataFetcher.cleanup();
+                dataFetcher.cancel();
+            }
+
+            @Override
+            public void onLoadFailed(Exception e) {
+
+            }
+        });
     }
 }
