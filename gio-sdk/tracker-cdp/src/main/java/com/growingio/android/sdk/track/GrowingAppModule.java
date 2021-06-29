@@ -27,11 +27,11 @@ import com.growingio.sdk.annotation.GIOTracker;
  *
  * @author cpacm 4/28/21
  */
-@GIOAppModule(config = CdpConfig.class, configName = "CdpCore")
+@GIOAppModule(config = CdpConfig.class, configName = "CdpTrack")
 public final class GrowingAppModule extends AppGioModule {
 
     @GIOTracker(path = CdpTracker.class)
-    public void config(CdpCoreConfiguration configuration) {
+    public void config(CdpTrackConfiguration configuration) {
         if (TextUtils.isEmpty(configuration.getDataSourceId())) {
             throw new IllegalStateException("DataSourceId is NULL");
         }
