@@ -32,6 +32,7 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.WebService;
+import com.growingio.android.sdk.track.webservices.message.ClientInfoMessage;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
@@ -149,6 +150,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
     /************************** WebSocket Handler  ************************/
     @Override
     public void onReady() {
+        sendMessage(ClientInfoMessage.createMessage().toJSONObject().toString());
         socketState.set(SOCKET_STATE_READIED);
         ScreenshotProvider.get().registerScreenshotRefreshedListener(this);
         tipView.setContent(R.string.growing_circler_progress);
