@@ -60,7 +60,7 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
     private final TipView tipView;
     private final WebSocketHandler webSocketHandler;
     private Map<String, String> params;
-    private final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
+    protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
 
 
     void init(Map<String, String> params) {
@@ -172,7 +172,7 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
     }
 
 
-    private void showExitDialog() {
+    protected void showExitDialog() {
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null) {
             Logger.e(TAG, "showExitDialog: ForegroundActivity is NULL");
@@ -211,7 +211,7 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
         }
     }
 
-    private void exitDebugger() {
+    protected void exitDebugger() {
         sendMessage(new QuitMessage().toJSONObject().toString());
         cleanup();
     }

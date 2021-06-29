@@ -67,7 +67,7 @@ def fileFilter = [
         'com/gio/**',
         '**/HookClassesConfig.*',
         'android/**/*.*',
-        'GioIndexer_GIO*',
+        '**/GioIndexer_GIO*',
 ]
 
 subprojects {

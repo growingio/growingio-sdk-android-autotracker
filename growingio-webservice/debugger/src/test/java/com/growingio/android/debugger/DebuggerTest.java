@@ -15,6 +15,7 @@
  */
 package com.growingio.android.debugger;
 
+import android.app.Activity;
 import android.app.Application;
 import android.os.Looper;
 
@@ -22,11 +23,15 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.growingio.android.debugger.shadow.ShadowThreadUtils;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.Debugger;
 import com.growingio.android.sdk.track.webservices.WebService;
@@ -38,6 +43,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -56,7 +62,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 
-@Config(manifest = Config.NONE)
+@Config(manifest = Config.NONE, shadows = {ShadowThreadUtils.class})
 @RunWith(RobolectricTestRunner.class)
 public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
 
@@ -122,8 +128,7 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
                                     break;
                                 default:
                                     webSocket.send("error data");
-                                    webSocket.cancel();
-                                    //webSocket.close(1000, "close");
+                                    webSocket.close(1000, "close");
                             }
                         } catch (JSONException ignored) {
                         }
@@ -198,7 +203,7 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
 
 
     @Test
-    public void debuggerModelTest() {
+    public void debuggerModelTest() throws JSONException {
         DebuggerLibraryGioModule module = new DebuggerLibraryGioModule();
         TrackerRegistry registry = new TrackerRegistry();
         module.registerComponents(context, registry);
@@ -206,19 +211,26 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
 
         HashMap<String, String> param = new HashMap<>();
         param.put("wsUrl", getWsUrl());
-        dataLoader.buildLoadData(new Debugger(param)).fetcher.executeData();
+        DataFetcher<WebService> dataFetcher = dataLoader.buildLoadData(new Debugger(param)).fetcher;
+        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(WebService.class);
+        dataFetcher.executeData();
+
+        if (dataFetcher instanceof DebuggerService) {
+            serviceTest((DebuggerService) dataFetcher);
+        }
     }
 
-    @Test
-    public void debuggerScreenShotTest() {
-        ScreenshotProvider.get().registerScreenshotRefreshedListener(new ScreenshotProvider.OnScreenshotRefreshedListener() {
-            @Override
-            public void onScreenshotRefreshed(DebuggerScreenshot screenshot) {
-                Truth.assertThat(screenshot.toJSONObject().toString()).isEqualTo(
-                        "{\"screenWidth\":320,\"screenHeight\":470,\"scale\":100,\"screenshot\":\"this test base64\",\"msgType\":\"refreshScreenshot\",\"snapshotKey\":0}");
-            }
-        });
-        ScreenshotProvider.get().sendScreenshotRefreshed("this test base64", 100);
+    public void serviceTest(DebuggerService service) throws JSONException {
+        Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
+        ActivityStateProvider.get().onActivityResumed(activity);
+        service.sendMessage("test");
+        service.socketState.getAndSet(1);
+        service.onMessage(new JSONObject().put("msgType", DebuggerEventWrapper.SERVICE_LOGGER_OPEN).toString());
+        service.onActivityLifecycle(ActivityLifecycleEvent.createOnStartedEvent(activity));
+        service.showExitDialog();
+        service.onFailed();
+        service.exitDebugger();
+        service.onQuited();
     }
 
     @Test
@@ -243,4 +255,5 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
 
         Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
     }
+
 }

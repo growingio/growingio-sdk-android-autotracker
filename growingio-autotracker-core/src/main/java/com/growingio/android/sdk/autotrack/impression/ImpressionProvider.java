@@ -184,7 +184,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         delayCheckImpression();
     }
 
-    boolean hasTrackViewImpression(View trackedView) {
+    public boolean hasTrackViewImpression(View trackedView) {
         if (trackedView == null) {
             return false;
         }

@@ -38,6 +38,10 @@ public class CirclerDataLoader implements ModelLoader<Circler, WebService> {
         circlerService = new CirclerService(client);
     }
 
+    public CirclerService getCirclerService() {
+        return circlerService;
+    }
+
     @Override
     public LoadData<WebService> buildLoadData(Circler circler) {
         circlerService.init(circler.getParams());

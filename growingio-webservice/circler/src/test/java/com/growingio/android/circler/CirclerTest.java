@@ -17,23 +17,20 @@ package com.growingio.android.circler;
 
 import android.app.Activity;
 import android.app.Application;
-import android.graphics.Rect;
 import android.os.Looper;
-import android.view.View;
-import android.view.WindowManager;
 
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.circler.screenshot.CircleScreenshot;
-import com.growingio.android.circler.screenshot.ScreenshotProvider;
+import com.google.common.util.concurrent.Uninterruptibles;
+import com.growingio.android.circler.shadow.ShadowThreadUtils;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.async.Callback;
+import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
-import com.growingio.android.sdk.track.view.DecorView;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.WebService;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
@@ -48,9 +45,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -63,7 +58,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
-@Config(manifest = Config.NONE)
+@Config(manifest = Config.NONE, shadows = {ShadowThreadUtils.class})
 @RunWith(RobolectricTestRunner.class)
 public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
     private WebSocketHandler webSocketHandler;
@@ -113,8 +108,7 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
                                     break;
                                 default:
                                     webSocket.send("error data");
-                                    webSocket.cancel();
-                                    //webSocket.close(1000, "close");
+                                    webSocket.close(1000, "close");
                             }
                         } catch (JSONException ignored) {
                         }
@@ -177,56 +171,25 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
 
         HashMap<String, String> param = new HashMap<>();
         param.put("wsUrl", getWsUrl());
-        dataLoader.buildLoadData(new Circler(param)).fetcher.executeData();
+        DataFetcher<WebService> dataFetcher = dataLoader.buildLoadData(new Circler(param)).fetcher;
+        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(WebService.class);
+        dataFetcher.executeData();
+
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        if (dataLoader instanceof CirclerDataLoader) {
+            serviceTest(((CirclerDataLoader) dataLoader).getCirclerService());
+        }
     }
 
-    @Test
-    public void circlerScreenShotTest() {
-        ScreenshotProvider.get().sendScreenshotRefreshed("this test base64", 100);
-        ScreenshotProvider.get().registerScreenshotRefreshedListener(new ScreenshotProvider.OnScreenshotRefreshedListener() {
-            @Override
-            public void onScreenshotRefreshed(CircleScreenshot screenshot) {
-                System.out.println(screenshot.toJSONObject());
-                Truth.assertThat(screenshot.toJSONObject().toString()).isEqualTo(
-                        "{\"screenWidth\":320,\"screenHeight\":470,\"scale\":100,\"screenshot\":\"this is test base64\",\"msgType\":\"refreshScreenshot\",\"snapshotKey\":0,\"elements\":[{\"xpath\":\"\\/MainWindow\\/DecorView\\/ActionBarOverlayLayout[0]\\/FrameLayout[0]\\/LinearLayout[0]\\/TextView[0]\",\"left\":0,\"top\":0,\"width\":0,\"height\":0,\"nodeType\":\"TEXT\",\"content\":\"this is cpacm\",\"page\":\"\\/RobolectricActivity\",\"zLevel\":0}],\"pages\":[{\"path\":\"\\/RobolectricActivity\",\"left\":0,\"top\":0,\"width\":0,\"height\":0,\"isIgnored\":false}]}"
-                );
-            }
-        });
-
-        new CircleScreenshot.Builder()
-                .setScale(100)
-                .setScreenshot("this is test base64")
-                .setSnapshotKey(0)
-                .build(getAllWindowDecorViews(), new Callback<CircleScreenshot>() {
-                    @Override
-                    public void onSuccess(CircleScreenshot result) {
-                        ScreenshotProvider.get().sendScreenshot(result);
-                    }
-
-                    @Override
-                    public void onFailed() {
-
-                    }
-                });
-    }
-
-    public List<DecorView> getAllWindowDecorViews() {
+    public void serviceTest(CirclerService circlerService) {
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
-        ActivityStateProvider.get().onActivityCreated(activity, null);
         ActivityStateProvider.get().onActivityResumed(activity);
-        View view = activity.getWindow().getDecorView();
-
-        List<DecorView> decorViews = new ArrayList<>();
-        int[] location = new int[2];
-        view.getLocationOnScreen(location);
-        int x = location[0];
-        int y = location[1];
-
-        Rect area = new Rect(x, y, x + view.getWidth(), y + view.getHeight());
-        WindowManager.LayoutParams wlp = new WindowManager.LayoutParams();
-        decorViews.add(new DecorView(view, area, wlp));
-
-        return decorViews;
+        circlerService.sendMessage("test");
+        circlerService.socketState.getAndSet(1);
+        circlerService.onScreenshotRefreshed(null);
+        circlerService.onActivityLifecycle(ActivityLifecycleEvent.createOnStartedEvent(activity));
+        circlerService.onFailed();
+        circlerService.exitCircler();
+        circlerService.onQuited();
     }
-
 }

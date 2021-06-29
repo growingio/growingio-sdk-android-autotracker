@@ -166,5 +166,18 @@ public class HybridTest {
         WebViewInjector.webkitWebViewLoadUrl(webView, "https://www.baidu.com/");
         WebViewInjector.webkitWebViewLoadUrl(webView, "https://www.baidu.com/", new HashMap<>());
         WebViewInjector.webkitWebViewLoadDataWithBaseURL(webView, "https://www.baidu.com/", "<p>", "text", "UTF8", "https://www/growingio.com/");
+
+        com.uc.webview.export.WebView ucWebView = new com.uc.webview.export.WebView(activity);
+        WebViewInjector.ucWebViewLoadData(ucWebView, "<html></html>", "text", "UTF8");
+        WebViewInjector.ucWebViewLoadUrl(ucWebView, "https://www.baidu.com/");
+        WebViewInjector.ucWebViewLoadUrl(ucWebView, "https://www.baidu.com/", new HashMap<>());
+        WebViewInjector.ucWebViewLoadDataWithBaseURL(ucWebView, "https://www.baidu.com/", "<p>", "text", "UTF8", "https://www/growingio.com/");
+
+        com.tencent.smtt.sdk.WebView x5WebView = new com.tencent.smtt.sdk.WebView(activity);
+        WebViewInjector.x5WebViewLoadData(x5WebView, "<html></html>", "text", "UTF8");
+        WebViewInjector.x5WebViewLoadUrl(x5WebView, "https://www.baidu.com/");
+        WebViewInjector.x5WebViewLoadUrl(x5WebView, "https://www.baidu.com/", new HashMap<>());
+        WebViewInjector.x5WebViewLoadDataWithBaseURL(x5WebView, "https://www.baidu.com/", "<p>", "text", "UTF8", "https://www/growingio.com/");
+
     }
 }
