@@ -31,6 +31,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
     private boolean mOaidEnabled = false;
+    private int mFilterMask = 0;
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -133,4 +134,14 @@ public class CoreConfiguration implements Configurable {
         this.mOaidEnabled = enabled;
         return this;
     }
+
+    public CoreConfiguration setFilterMask(int filterMask){
+        this.mFilterMask = filterMask;
+        return this;
+    }
+
+    public int getFilterMask() {
+        return mFilterMask;
+    }
+    
 }

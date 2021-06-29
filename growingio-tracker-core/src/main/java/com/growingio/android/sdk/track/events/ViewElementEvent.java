@@ -90,7 +90,7 @@ public class ViewElementEvent extends BaseEvent {
 
         @Override
         public String getEventType() {
-            return null;
+            return mEventType;
         }
 
         public Builder setEventType(String eventType) {
