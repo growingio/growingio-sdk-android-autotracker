@@ -30,6 +30,7 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.WebService;
+import com.growingio.android.sdk.track.webservices.message.ClientInfoMessage;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
@@ -155,6 +156,7 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
     /************************** WebSocket Handler  ************************/
     @Override
     public void onReady() {
+        sendMessage(ClientInfoMessage.createMessage().toJSONObject().toString());
         DebuggerEventWrapper.get().registerDebuggerEventListener(new DebuggerEventWrapper.OnDebuggerEventListener() {
             @Override
             public void onDebuggerMessage(String message) {
