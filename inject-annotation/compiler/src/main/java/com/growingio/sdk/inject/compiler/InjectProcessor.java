@@ -362,7 +362,6 @@ public class InjectProcessor extends AbstractProcessor {
     }
 
     private String getProjectRootPath() {
-        String jarPath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-        return new File(jarPath).getParentFile().getParentFile().getParentFile().getParentFile().getParent();
+        return System.getProperty("user.dir");
     }
 }
