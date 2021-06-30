@@ -2,7 +2,6 @@
 
 export IS_EXCLUDE_DEMOS=true
 ./gradlew clean \
-&& ./gradlew :growingio-autotracker-gradle-plugin:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-annotation:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-annotation:compiler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tracker-core:publishMavenAgentPublicationToMavenLocal \
@@ -19,5 +18,6 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :gio-sdk:tracker-cdp:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker-cdp:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-autotracker-gradle-plugin:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew clean
 export IS_EXCLUDE_DEMOS=false
