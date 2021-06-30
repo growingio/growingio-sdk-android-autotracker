@@ -21,16 +21,15 @@ import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler
 import com.google.testing.compile.JavaFileObjects
 import com.growingio.sdk.annotation.compiler.rule.CompilationProvider
-import com.growingio.sdk.annotation.compiler.rule.RegenerateResourcesRule
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.io.ByteArrayOutputStream
 import javax.tools.JavaFileObject
 
 @RunWith(JUnit4::class)
-class EmptyModuleTest : CompilationProvider {
+class EmptyAppModuleTest : CompilationProvider {
     private var compilation: Compilation? = null
 
     @Before
@@ -43,16 +42,20 @@ class EmptyModuleTest : CompilationProvider {
 
     @Test
     fun generatedFileTest() {
-        Truth.assertThat(compilation!!.generatedSourceFiles().size).isEqualTo(1)
+        Truth.assertThat(compilation!!.generatedSourceFiles().size).isEqualTo(3)
+        System.out.println(compilation!!.generatedSourceFiles())
 
-        val expectedClassName =
-            "GioIndexer_GIOLibraryModule_com_growingio_android_sdk_EmptyLibraryGioModule"
-        assertThat(compilation!!).generatedSourceFile(TestUtil.annotation(expectedClassName))
-            .toString().contains(expectedClassName)
+        assertThat(compilation!!).generatedSourceFile(TestUtil.subpackage("GrowingTracker"))
+            .hasSourceEquivalentTo(forResource("GrowingTracker.java"))
 
-        assertThat(compilation!!).generatedSourceFile(TestUtil.annotation(expectedClassName))
-            .hasSourceEquivalentTo(forResource(expectedClassName + ".java"))
+        assertThat(compilation!!).generatedSourceFile(TestUtil.growingio("GeneratedGioModuleImpl"))
+            .hasSourceEquivalentTo(forResource("GeneratedGioModuleImpl.java"))
 
+        assertThat(compilation!!).generatedSourceFile(TestUtil.subpackage("TestTrackConfiguration"))
+            .hasSourceEquivalentTo(forResource("TestTrackConfiguration.java"))
+
+
+//            .hasSourceEquivalentTo(forResource("GeneratedGioModuleImpl.java"))
     }
 
     private fun forResource(name: String): JavaFileObject {
@@ -60,7 +63,7 @@ class EmptyModuleTest : CompilationProvider {
     }
 
     companion object {
-        private const val MODULE_NAME = "EmptyLibraryGioModule.java"
+        private const val MODULE_NAME = "EmptyAppGioModule.java"
     }
 
     override fun getCompilation(): Compilation {

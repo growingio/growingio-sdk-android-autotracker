@@ -21,6 +21,7 @@ def coverageSourceDirs = [
         "$rootDir/growingio-tools/snappy/src/main/java",
         "$rootDir/growingio-webservice/circler/src/main/java",
         "$rootDir/growingio-webservice/debugger/src/main/java",
+        "$rootDir/growingio-annotation/compiler/src/main/java",
 //        "$rootDir/gio-sdk/tracker/src/main/java",
 //        "$rootDir/gio-sdk/tracker-cdp/src/main/java",
 //        "$rootDir/gio-sdk/autotracker/src/main/java",
@@ -41,7 +42,8 @@ def coverageClassDirs = [
         "$rootDir/growingio-tools/crash/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-tools/snappy/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-webservice/circler/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-webservice/debugger/build/intermediates/javac/debug/classes"
+        "$rootDir/growingio-webservice/debugger/build/intermediates/javac/debug/classes",
+        "$rootDir/growingio-annotation/compiler/build/classes/java/main",
         //        "$rootDir/gio-sdk/tracker/build/intermediates/javac/debug/classes",
 //        "$rootDir/gio-sdk/tracker-cdp/build/intermediates/javac/debug/classes",
 //        "$rootDir/gio-sdk/autotracker/build/intermediates/javac/debug/classes",
@@ -63,6 +65,8 @@ def fileFilter = [
         '**/Manifest*.*',
         '**/*Test*.*',
         'androidx/**',
+        'android/app/**',
+        'android/content/**',
         'com/example/**',
         'com/gio/**',
         '**/HookClassesConfig.*',
@@ -113,6 +117,6 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
     classDirectories.setFrom(files([debugTree]))
     executionData.setFrom(fileTree(dir: "$buildDir", includes: [
             "jacoco/testDebugUnitTest.exec",
-            "outputs/code-coverage/connected/*coverage.ec"
+            "**/*.ec"
     ]))
 }

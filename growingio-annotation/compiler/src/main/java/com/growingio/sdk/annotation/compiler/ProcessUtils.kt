@@ -69,15 +69,6 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
 
     fun isAppGioModule(element: TypeElement): Boolean {
         return processEnv.getTypeUtils().isAssignable(element.asType(), gioAppModuleType.asType())
-//        debugLog("isAppGioModule:" + element.toString())
-//        var isApp = true
-//        val annotation = element.getAnnotation(GIOModule::class.java)
-//        debugLog(element.toString() + "----" + annotation.toString())
-//        if (annotation != null) {
-//            isApp = !annotation.isLibrary
-//        }
-//
-//        return isApp
     }
 
     fun getElementsFor(clazz: Class<out Annotation>, env: RoundEnvironment): List<TypeElement> {

@@ -13,11 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk;
-import com.growingio.android.sdk.LibraryGioModule;
+package com.growingio.android.sdk.test;
+import com.growingio.android.sdk.AppGioModule;
+import com.growingio.android.sdk.Tracker;
+import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.sdk.annotation.GIOAppModule;
+import com.growingio.sdk.annotation.GIOTracker;
 import com.growingio.sdk.annotation.compiler.sample.EmptyConfig;
-import com.growingio.sdk.annotation.GIOLibraryModule;
 
-@GIOLibraryModule(config = EmptyConfig.class)
-public class EmptyLibraryGioModule extends LibraryGioModule {
+/**
+ * <p>
+ *
+ * @author cpacm 4/28/21
+ */
+@GIOAppModule(config = EmptyConfig.class, configName = "TestTrack")
+public final class EmptyAppGioModule extends AppGioModule {
+
+    @GIOTracker(path = Tracker.class)
+    public void config(TestTrackConfiguration configuration) {
+
+    }
 }

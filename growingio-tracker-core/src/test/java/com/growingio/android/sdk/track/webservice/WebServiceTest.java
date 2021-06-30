@@ -84,7 +84,7 @@ public class WebServiceTest {
 
         TipView tipView = new TipView(activity);
         WindowManager windowManager = activity.getWindowManager();
-        windowManager.addView(tipView,new WindowManager.LayoutParams());
+        windowManager.addView(tipView, new WindowManager.LayoutParams());
         tipView.setContent("this is test tip");
         tipView.setErrorMessage("this is test error");
         int height = tipView.getStatusBarHeight();

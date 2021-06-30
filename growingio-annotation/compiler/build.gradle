@@ -3,11 +3,20 @@
 plugins {
     id 'java-library'
     id 'kotlin'
+    id 'jacoco'
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+//test {
+//    finalizedBy jacocoTestReport
+//}
+
+jacocoTestReport{
+    dependsOn test // report is always generated after tests run
 }
 
 dependencies {
@@ -19,9 +28,7 @@ dependencies {
         // confusing.
         exclude group: "com.google.auto.value", module: "auto-value"
     }
-
-    testImplementation libraries.growingio.tracker_core
-
+    testImplementation files('libs/tracker-core-test.jar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

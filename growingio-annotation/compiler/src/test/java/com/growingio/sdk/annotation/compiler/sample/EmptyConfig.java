@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk;
-import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.sdk.annotation.compiler.sample.EmptyConfig;
-import com.growingio.sdk.annotation.GIOLibraryModule;
+package com.growingio.sdk.annotation.compiler.sample;
 
-@GIOLibraryModule(config = EmptyConfig.class)
-public class EmptyLibraryGioModule extends LibraryGioModule {
+import com.growingio.android.sdk.Configurable;
+
+public class EmptyConfig implements Configurable {
 }
