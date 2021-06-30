@@ -19,9 +19,7 @@ import com.google.common.truth.Truth
 import com.google.testing.compile.Compilation
 import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler
-import com.google.testing.compile.JavaFileObjects
 import com.growingio.sdk.annotation.compiler.rule.CompilationProvider
-import com.growingio.sdk.annotation.compiler.rule.RegenerateResourcesRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
