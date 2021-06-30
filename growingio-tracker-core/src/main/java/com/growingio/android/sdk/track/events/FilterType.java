@@ -17,6 +17,8 @@ public enum FilterType {
 
     private final int mask;
 
+    public static final int maskOfClickChangeSubmit = of(VIEW_CLICK, VIEW_CHANGE, FORM_SUBMIT);
+
     FilterType() {
         mask = (1 << ordinal());
     }

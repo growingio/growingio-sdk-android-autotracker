@@ -131,7 +131,6 @@ internal class ConfigurationGenerator(
             .addMethod(generateGetConfigModules(mapOfConfigAndClass))
             .addMethod(generateAddConfiguration(configurableClass))
             .addMethod(generateGetConfiguration())
-            .addMethod(generateSetFilterMask())
 
         methodMap.clear()
         for (config in gioConfigs) {
@@ -239,22 +238,6 @@ internal class ConfigurationGenerator(
             .addParameter(classAny, "clazz")
             .addStatement("return (T) MODULE_CONFIGURATIONS.get(clazz)")
         return getMethod.build()
-    }
-
-    private fun generateSetFilterMask(): MethodSpec {
-
-        val classFilterType : ClassName = ClassName.get("com.growingio.android.sdk.track.events","FilterType")
-        val classReturn : ClassName = ClassName.get("com.growingio.android.sdk.autotrack","AutotrackConfiguration")
-
-        val modulesMethod = MethodSpec.methodBuilder("setFilterMask")
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .returns(classReturn)
-                .addParameter(ArrayTypeName.of(classFilterType), "types")
-                .varargs()
-                .addStatement("int mask = ${classFilterType.simpleName()}.of(types)")
-                .addStatement("setFilterMask(mask)")
-                .addStatement("return this")
-        return modulesMethod.build()
     }
 
     private fun overriding(

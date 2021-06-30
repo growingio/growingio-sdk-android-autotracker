@@ -81,7 +81,7 @@ public class DemoApplication extends MultiDexApplication {
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setOaidEnabled(false)
-                    .setFilterMask(FilterType.VIEW_CLICK, FilterType.VIEW_CHANGE, FilterType.FORM_SUBMIT);;
+                    .setFilterMask(FilterType.maskOfClickChangeSubmit);
         }
         GrowingAutotracker.startWithConfiguration(this, sConfiguration);
     }
