@@ -17,8 +17,37 @@
 package com.growingio.sdk.sample;
 
 
-public class TestOnClickListener {
-    public void onClick(Object obj) {
+import java.util.List;
 
+public class TestOnClickListener {
+    public void onClick(int obj) {
+    }
+
+    public void show() {
+    }
+
+    public boolean onOptionsItemSelected() {
+        return false;
+    }
+
+    public boolean onOptionsItemSelected2() {
+        return true;
+    }
+
+    public void loadUrl(String url) {
+    }
+
+    public void onResume() {
+    }
+
+    public void onResume2() {
+    }
+
+    public String types(float type1, double type2, char type3, short type4, boolean type5, byte type6) {
+        return "";
+    }
+
+    public Object arrays(List<String> params) {
+        return "";
     }
 }

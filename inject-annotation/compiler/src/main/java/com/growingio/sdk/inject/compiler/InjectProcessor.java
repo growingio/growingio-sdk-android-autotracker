@@ -16,6 +16,7 @@
 
 package com.growingio.sdk.inject.compiler;
 
+import com.android.annotations.VisibleForTesting;
 import com.google.auto.service.AutoService;
 import com.growingio.sdk.inject.annotation.After;
 import com.growingio.sdk.inject.annotation.AfterSuper;
@@ -43,6 +44,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -89,6 +92,15 @@ public class InjectProcessor extends AbstractProcessor {
 
     private Messager mMessager;
     private ProcessingEnvironment processingEnv;
+    private String testPath;
+
+    public InjectProcessor(String testPath) {
+        this.testPath = testPath;
+    }
+
+    public InjectProcessor() {
+        this.testPath = null;
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
@@ -341,7 +353,11 @@ public class InjectProcessor extends AbstractProcessor {
             JavaFile javaFile = JavaFile.builder("com.growingio.sdk.plugin.autotrack.hook", builder.build())
                     .skipJavaLangImports(true)
                     .build();
-            generatePerfectJava(javaFile);
+            if (testPath != null) {
+                generateTestJava(javaFile);
+            } else {
+                generatePerfectJava(javaFile);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -349,9 +365,7 @@ public class InjectProcessor extends AbstractProcessor {
     }
 
     private void generatePerfectJava(JavaFile javaFile) throws IOException {
-        ///Users/shenliming/Workspace/growing/growingio-sdk-android-autotracker/growingio-autotracker-gradle-plugin/src/main/java/com/growingio/sdk/plugin/autotrack/hook/HookClassesConfig.java
-        String classPath = getProjectRootPath() + "/growingio-autotracker-gradle-plugin/src/main/java/" + javaFile.packageName.replace(".", "/") + "/" + javaFile.typeSpec.name + ".java";
-        System.out.println("[generate path]:" + classPath);
+        String classPath = getProjectRootPath() + "/src/main/java/" + javaFile.packageName.replace(".", "/") + "/" + javaFile.typeSpec.name + ".java";
         File file = new File(classPath);
         OutputStream out = new FileOutputStream(file);
 
@@ -362,6 +376,41 @@ public class InjectProcessor extends AbstractProcessor {
     }
 
     private String getProjectRootPath() {
-        return System.getProperty("user.dir");
+        File userDir = new File(System.getProperty("user.dir"));
+        File findPlugin = getGrowingPluginPath(userDir, 0);
+        if (findPlugin != null) {
+            return URLDecoder.decode(findPlugin.getPath(), StandardCharsets.UTF_8);
+        }
+        return System.getProperty("user.dir") + "/growingio-autotracker-gradle-plugin";
     }
+
+    private File getGrowingPluginPath(File userDir, int depth) {
+        if (depth >= 5 || userDir == null || !userDir.isDirectory()) return null;
+        File[] dirList = userDir.listFiles();
+        if (dirList == null || dirList.length == 0)
+            return getGrowingPluginPath(userDir.getParentFile(), depth + 1);
+        for (File file : dirList) {
+            if (file.isDirectory() && file.getName().equals("growingio-autotracker-gradle-plugin")) {
+                return file;
+            }
+        }
+        return getGrowingPluginPath(userDir.getParentFile(), depth + 1);
+    }
+
+    @VisibleForTesting
+    void generateTestJava(JavaFile javaFile) throws IOException {
+        String originPath = getProjectRootPath();
+        if (originPath.endsWith("growingio-autotracker-gradle-plugin")) {
+            log("====[file origin generate]:" + originPath);
+        }
+        log("====[file test generate]:" + testPath);
+        File file = new File(testPath);
+        OutputStream out = new FileOutputStream(file);
+
+        StringBuilder builder = new StringBuilder(LICENSE_HEADER);
+        builder.append(System.lineSeparator())
+                .append(javaFile.toString());
+        IOUtils.write(builder, out);
+    }
+
 }

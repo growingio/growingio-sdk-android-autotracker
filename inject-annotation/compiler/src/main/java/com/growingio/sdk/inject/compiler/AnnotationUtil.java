@@ -51,21 +51,6 @@ public final class AnnotationUtil {
         //return getConvertName(processingEnv, annotationValue.getValue().toString());
     }
 
-
-    public static String getConvertName(ProcessingEnvironment processingEnv, String className) {
-        System.out.println("[getConvertName]:" + className);
-        TypeElement element = processingEnv.getElementUtils().getTypeElement(className);
-        if (element != null && element.getKind().equals(ElementKind.INTERFACE)) {
-            String fullName = element.getQualifiedName().toString();
-            int index = fullName.lastIndexOf('.');
-            String pack = fullName.substring(0, index);
-            String clz = fullName.substring(index).replace('.', '$');
-            return pack + clz;
-        } else {
-            return className;
-        }
-    }
-
     public static String getStringValue(AnnotationMirror annotationMirror, String key) {
         AnnotationValue annotationValue = getAnnotationValue(annotationMirror, key);
         if (annotationValue == null) {
@@ -80,6 +65,19 @@ public final class AnnotationUtil {
         if (annotationValue == null) {
             return null;
         }
+
+//        if (annotationValue instanceof Attribute.Array) {
+//            Attribute.Array arrayValue = (Attribute.Array) annotationValue;
+//            List<String> valueList = new ArrayList<>();
+//            for (Attribute value : arrayValue.values) {
+//                if (value instanceof Attribute.Class) {
+//                    valueList.add(((Attribute.Class) value).classType.asElement().flatName().toString());
+//                } else {
+//                    throw new IllegalArgumentException(value + " is NOT CLASS");
+//                }
+//            }
+//            return valueList;
+//        }
 
         Object values = annotationValue.getValue();
 

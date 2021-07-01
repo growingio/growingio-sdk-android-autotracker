@@ -16,6 +16,8 @@
 
 package com.growingio.sdk.sample;
 
+import java.util.List;
+
 /**
  * <p>
  *
@@ -23,7 +25,32 @@ package com.growingio.sdk.sample;
  */
 public class TestActionProvider {
 
-    public static void viewOnClick(Object obj) {
+    public static void viewOnClick(int obj) {
         System.out.println(obj);
     }
+
+    public static void alertDialogShow(Object obj) {
+        System.out.println(obj);
+    }
+
+    public static void menuItemOnClick(TestOnClickListener listener, Object obj) {
+        System.out.println(obj);
+    }
+
+    public static void bridgeForWebView(TestOnClickListener listener, String url) {
+        System.out.println(url);
+    }
+
+    public static void createOrResumePage(TestOnClickListener listener) {
+        System.out.println(listener);
+    }
+
+    public static String types(float type1, double type2, char type3, short type4, boolean type5, byte type6) {
+        return "";
+    }
+
+    public static void arrays(List<String> params) {
+    }
+
+
 }
