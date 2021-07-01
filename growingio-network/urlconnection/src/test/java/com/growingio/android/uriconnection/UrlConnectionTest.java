@@ -65,7 +65,7 @@ public class UrlConnectionTest {
                 if (uri.getPath().contains("errorCode")) {
                     return new MockResponse().setResponseCode(503);
                 } else if (uri.getPath().contains("redirect")) {
-                    return new MockResponse().setResponseCode(304).setHeader("Location","http://localhost:8910/404");
+                    return new MockResponse().setResponseCode(304).setHeader("Location", "http://localhost:8910/404");
                 } else if (uri.getPath().contains("404")) {
                     return new MockResponse().setResponseCode(-1);
                 }
@@ -177,7 +177,7 @@ public class UrlConnectionTest {
     }
 
     @Test
-    public void HttpException() throws IOException {
+    public void httpException() throws IOException {
         HttpException httpException = new HttpException("error");
         Truth.assertThat(httpException.getStatusCode()).isEqualTo(-1);
         HttpException httpException2 = new HttpException(404);

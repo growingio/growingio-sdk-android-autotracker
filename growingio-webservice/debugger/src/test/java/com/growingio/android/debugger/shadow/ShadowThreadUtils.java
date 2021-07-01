@@ -25,6 +25,9 @@ import org.robolectric.annotation.Implements;
 @Implements(ThreadUtils.class)
 public class ShadowThreadUtils {
 
+    public void doSomeThing() {
+    }
+
     @Implementation
     public static void runOnUiThread(Runnable r) {
         r.run();

@@ -20,7 +20,6 @@ package com.growingio.android.sdk.autotrack;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Intent;
-import android.view.View;
 
 import androidx.appcompat.view.menu.ListMenuItemView;
 import androidx.test.core.app.ApplicationProvider;
@@ -30,7 +29,6 @@ import com.growingio.android.sdk.autotrack.change.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.inject.ActivityInjector;
 import com.growingio.android.sdk.autotrack.shadow.AlertControllerShadow;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
-import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.autotrack.util.HurtLocker;
 
 import org.junit.Test;
