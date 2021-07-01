@@ -27,7 +27,7 @@ import java.util.List;
 public class EventsSQLite {
     private static final String TAG = "EventsSQLite";
 
-    private static final long EVENT_VALID_PERIOD_MILLS = 7 * 24 * 60 * 60_000;
+    private static final long EVENT_VALID_PERIOD_MILLS = 7L * 24 * 60 * 60_000;
 
     private final EventsManager mEventsManager;
 

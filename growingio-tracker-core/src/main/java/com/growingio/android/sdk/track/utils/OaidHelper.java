@@ -70,7 +70,8 @@ public class OaidHelper implements IIdentifierListener {
                     try {
                         this.wait(3000L);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Logger.e(TAG, e, "awaitLoadedLocked interrupted");
+                        Thread.currentThread().interrupt();
                     }
 
                     if (!this.mComplete) {

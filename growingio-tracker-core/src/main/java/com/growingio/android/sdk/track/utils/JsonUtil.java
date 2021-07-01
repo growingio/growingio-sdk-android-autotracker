@@ -31,7 +31,7 @@ public final class JsonUtil {
     /**
      * @return true if left and right key value equal,
      */
-    public static boolean equal(JSONObject left, JSONObject right) {
+    public static boolean equals(JSONObject left, JSONObject right) {
         if (left == null || right == null) {
             return left == right;
         }
@@ -46,7 +46,7 @@ public final class JsonUtil {
                 Object leftValue = left.get(key);
                 Object rightValue = right.get(key);
                 // leftValue and rightValue all not null
-                if (!jsonEqual(leftValue, rightValue)) {
+                if (!jsonEquals(leftValue, rightValue)) {
                     return false;
                 }
             }
@@ -56,13 +56,13 @@ public final class JsonUtil {
         return true;
     }
 
-    private static boolean jsonEqual(Object left, Object right) {
+    private static boolean jsonEquals(Object left, Object right) {
         if (ObjectUtils.equals(left, right)) {
             return true;
         } else if (left instanceof JSONObject && right instanceof JSONObject) {
-            return equal((JSONObject) left, (JSONObject) right);
+            return equals((JSONObject) left, (JSONObject) right);
         } else if (left instanceof JSONArray && right instanceof JSONArray) {
-            return equal((JSONArray) left, (JSONArray) right);
+            return equals((JSONArray) left, (JSONArray) right);
         }
         return false;
     }
@@ -70,7 +70,7 @@ public final class JsonUtil {
     /**
      * @return true if left and right key value equal,
      */
-    public static boolean equal(JSONArray left, JSONArray right) {
+    public static boolean equals(JSONArray left, JSONArray right) {
         if (left == null || right == null) {
             return left == right;
         }
@@ -81,7 +81,7 @@ public final class JsonUtil {
             for (int i = 0; i < left.length(); i++) {
                 Object leftValue = left.get(i);
                 Object rightValue = right.get(i);
-                if (!jsonEqual(leftValue, rightValue)) {
+                if (!jsonEquals(leftValue, rightValue)) {
                     return false;
                 }
             }

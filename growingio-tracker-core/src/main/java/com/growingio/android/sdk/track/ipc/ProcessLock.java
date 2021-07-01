@@ -22,7 +22,6 @@ import com.growingio.android.sdk.track.log.Logger;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
 public class ProcessLock {
@@ -31,6 +30,7 @@ public class ProcessLock {
     private final Context mContext;
     private final String mName;
     private volatile FileLock mLock;
+    private volatile FileOutputStream outputStream;
 
     public ProcessLock(Context context, String name) {
         mContext = context;
@@ -41,12 +41,12 @@ public class ProcessLock {
      * 该方法会block，直到别的持有锁的地方release
      */
     public void lock() throws IOException {
-        if (mLock != null) {
-            return;
+        if (mLock == null) {
+            if (outputStream == null) {
+                outputStream = mContext.openFileOutput(mName, Context.MODE_PRIVATE);
+            }
+            mLock = outputStream.getChannel().lock();
         }
-        FileOutputStream outputStream = mContext.openFileOutput(mName, Context.MODE_PRIVATE);
-        FileChannel channel = outputStream.getChannel();
-        mLock = channel.lock();
     }
 
     /**
@@ -55,13 +55,15 @@ public class ProcessLock {
      * @return 是否成功获取lock
      */
     public boolean tryLock() throws IOException {
-        if (mLock != null) {
-            return mLock.isValid();
+        if (mLock == null) {
+            if (outputStream == null) {
+                outputStream = mContext.openFileOutput(mName, Context.MODE_PRIVATE);
+            }
+            mLock = outputStream.getChannel().tryLock();
+            return mLock != null;
         }
-        FileOutputStream outputStream = mContext.openFileOutput(mName, Context.MODE_PRIVATE);
-        FileChannel channel = outputStream.getChannel();
-        mLock = channel.tryLock();
-        return mLock != null;
+
+        return mLock.isValid();
     }
 
     /**
@@ -79,7 +81,8 @@ public class ProcessLock {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    Logger.e(TAG, e);
+                    Logger.e(TAG, e, "tryLock interrupted");
+                    Thread.currentThread().interrupt();
                 }
             }
         } while (System.currentTimeMillis() < endTime);
@@ -94,6 +97,14 @@ public class ProcessLock {
             mLock = null;
         } catch (IOException e) {
             Logger.e(TAG, e);
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

@@ -82,7 +82,8 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
         try {
             return future.get(5L, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            Logger.e(TAG, e);
+            Logger.e(TAG, e, "executeData interrupted");
+            Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             Logger.e(TAG, e);
         } catch (TimeoutException e) {

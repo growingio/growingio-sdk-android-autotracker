@@ -53,10 +53,9 @@ public class SystemUtil {
     public static String getProcessName() {
         try {
             File file = new File("/proc/" + android.os.Process.myPid() + "/" + "cmdline");
-            BufferedReader mBufferedReader = new BufferedReader(new FileReader(file));
-            String processName = mBufferedReader.readLine().trim();
-            mBufferedReader.close();
-            return processName;
+            try (BufferedReader mBufferedReader = new BufferedReader(new FileReader(file))) {
+                return mBufferedReader.readLine().trim();
+            }
         } catch (Exception e) {
             Logger.e(TAG, e);
             return null;
