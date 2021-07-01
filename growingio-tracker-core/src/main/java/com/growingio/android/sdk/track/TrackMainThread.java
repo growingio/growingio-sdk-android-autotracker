@@ -25,7 +25,7 @@ import android.support.annotation.NonNull;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
-import com.growingio.android.sdk.track.events.FilterType;
+import com.growingio.android.sdk.track.events.FilterEventParams;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
@@ -104,8 +104,8 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
             return;
         }
         // 判断当前事件类型是否被过滤
-        int filterMask = ConfigurationProvider.core().getFilterMask();
-        if(filterMask != 0 && (filterMask & FilterType.valueOf(eventBuilder.getEventType()).getMask()) > 0){
+        int filterMask = ConfigurationProvider.core().getEventFilterMask();
+        if (filterMask != 0 && ((filterMask & FilterEventParams.valueOf(eventBuilder.getEventType())) > 0)) {
             return;
         }
 
