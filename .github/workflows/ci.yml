@@ -75,5 +75,5 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
-          files: ./demos/demo/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          files: ./demos/demo/build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml
 
