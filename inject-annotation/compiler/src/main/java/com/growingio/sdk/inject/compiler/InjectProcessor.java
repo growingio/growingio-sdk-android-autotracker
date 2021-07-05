@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -375,11 +376,11 @@ public class InjectProcessor extends AbstractProcessor {
         IOUtils.write(builder, out);
     }
 
-    private String getProjectRootPath() {
+    private String getProjectRootPath() throws UnsupportedEncodingException {
         File userDir = new File(System.getProperty("user.dir"));
         File findPlugin = getGrowingPluginPath(userDir, 0);
         if (findPlugin != null) {
-            return URLDecoder.decode(findPlugin.getPath(), StandardCharsets.UTF_8);
+            return URLDecoder.decode(findPlugin.getPath(), StandardCharsets.UTF_8.name());
         }
         return System.getProperty("user.dir") + "/growingio-autotracker-gradle-plugin";
     }

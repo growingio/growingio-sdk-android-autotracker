@@ -148,10 +148,10 @@ public class PageProvider implements IActivityLifecycle {
         if (TextUtils.isEmpty(alias)) {
             return;
         }
-        ActivityPage page = ALL_PAGE_TREE.get(activity);
-        if (page != null) {
-            page.setAlias(alias);
-        }
+//        ActivityPage page = ALL_PAGE_TREE.get(activity);
+//        if (page != null) {
+//            page.setAlias(alias);
+//        }
         ALL_PAGE_ALIAS.put(activity, alias);
     }
 
