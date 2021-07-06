@@ -240,7 +240,6 @@ internal class ConfigurationGenerator(
         return getMethod.build()
     }
 
-
     private fun overriding(
         generateClass:ClassName,
         config: TypeElement,
