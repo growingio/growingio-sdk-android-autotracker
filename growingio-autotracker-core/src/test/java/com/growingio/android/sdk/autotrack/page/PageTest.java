@@ -99,8 +99,9 @@ public class PageTest {
 
     @Test
     public void pageViewTest() {
-        RobolectricActivity activity = activityController.create().resume().get();
+        RobolectricActivity activity = activityController.get();
         PageProvider.get().setActivityAlias(activity, "test");
+        activityController.create().resume();
         Map<String, String> attrMap = new HashMap<>();
         attrMap.put("username", "cpacm");
         PageProvider.get().setPageAttributes(activity, attrMap);
