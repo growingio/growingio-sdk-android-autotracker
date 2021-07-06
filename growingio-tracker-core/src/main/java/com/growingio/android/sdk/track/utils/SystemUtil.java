@@ -31,29 +31,12 @@ public class SystemUtil {
     private SystemUtil() {
     }
 
-/*    public static void killAppProcess(Context context) {
-        //注意：不能先杀掉主进程，否则逻辑代码无法继续执行，需先杀掉相关进程最后杀掉主进程
-        ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> processes = mActivityManager.getRunningAppProcesses();
-        if (processes != null && !processes.isEmpty()) {
-            for (ActivityManager.RunningAppProcessInfo runningAppProcessInfo : processes) {
-                if (runningAppProcessInfo.pid != android.os.Process.myPid()) {
-                    Process.killProcess(runningAppProcessInfo.pid);
-                }
-            }
-        }
-
-        Process.killProcess(Process.myPid());
-        System.exit(0);
-    }*/
-
     public static String getProcessName() {
         try {
-            File file = new File("/proc/" + android.os.Process.myPid() + "/" + "cmdline");
-            BufferedReader mBufferedReader = new BufferedReader(new FileReader(file));
-            String processName = mBufferedReader.readLine().trim();
-            mBufferedReader.close();
-            return processName;
+            try (BufferedReader mBufferedReader = new BufferedReader(
+                    new FileReader(new File("/proc/" + android.os.Process.myPid() + "/" + "cmdline")))) {
+                return mBufferedReader.readLine().trim();
+            }
         } catch (Exception e) {
             Logger.e(TAG, e);
             return null;
