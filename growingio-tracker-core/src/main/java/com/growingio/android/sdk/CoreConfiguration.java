@@ -31,6 +31,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
     private boolean mOaidEnabled = false;
+    private int mEventFilterMask = 0;
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -132,5 +133,14 @@ public class CoreConfiguration implements Configurable {
     public CoreConfiguration setOaidEnabled(boolean enabled) {
         this.mOaidEnabled = enabled;
         return this;
+    }
+
+    public CoreConfiguration setEventFilterMask(int filterMask) {
+        this.mEventFilterMask = filterMask;
+        return this;
+    }
+
+    public int getEventFilterMask() {
+        return mEventFilterMask;
     }
 }
