@@ -92,7 +92,7 @@ public class DeepLinkProvider implements IActivityLifecycle {
     public static final String SERVICE_DEBUGGER_TYPE = "debugger";
     public static final String SERVICE_CIRCLE_TYPE = "circle";
 
-    private void dispatchUri(Uri data) {
+    void dispatchUri(Uri data) {
         if (WEB_SERVICES_HOST.equals(data.getHost()) && WEB_SERVICES_PATH.equals(data.getPath())) {
             String serviceType = data.getQueryParameter(WEB_SERVICES_TYPE);
             if (!TextUtils.isEmpty(serviceType)) {

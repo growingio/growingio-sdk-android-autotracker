@@ -1,14 +1,26 @@
 import org.gradle.internal.jvm.Jvm
 
-apply plugin: 'java-library'
+plugins{
+    id 'java-library'
+    id 'jacoco'
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+jacocoTestReport{
+    dependsOn test // report is always generated after tests run
+}
+
 dependencies {
     testImplementation libraries.test.junit
+    testImplementation("com.google.testing.compile:compile-testing:0.19") {
+        // We don't use this and including it requires us to list it separatel which would be
+        // confusing.
+        exclude group: "com.google.auto.value", module: "auto-value"
+    }
 
     annotationProcessor libraries.google.auto_service
     implementation libraries.google.auto_service_annotations

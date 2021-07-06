@@ -17,10 +17,10 @@
 package com.growingio.android.urlconnection;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.growingio.android.sdk.track.http.EventResponse;
 import com.growingio.android.sdk.track.http.EventUrl;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
 import java.io.IOException;
@@ -64,14 +64,10 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
             EventResponse result = loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, eventUrl.getHeaders());
             callback.onDataReady(result);
         } catch (IOException e) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Failed to load data for url", e);
-            }
+            Logger.d(TAG, "Failed to load data for url", e);
             callback.onLoadFailed(e);
         } finally {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Finished http url fetcher fetch in " + LogTime.getElapsedMillis(startTime));
-            }
+            Logger.v(TAG, "Finished http url fetcher fetch in " + LogTime.getElapsedMillis(startTime));
         }
     }
 
@@ -127,11 +123,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
         } else if (statusCode == INVALID_STATUS_CODE) {
             throw new HttpException(statusCode);
         } else {
-            try {
-                throw new HttpException(urlConnection.getResponseMessage(), statusCode);
-            } catch (IOException e) {
-                throw new HttpException("Failed to get a response message", statusCode, e);
-            }
+            throw new HttpException("Failed to get a response message", statusCode);
         }
     }
 
@@ -139,9 +131,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
         try {
             return urlConnection.getResponseCode();
         } catch (IOException e) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Failed to get a response code", e);
-            }
+            Logger.d(TAG, "Failed to get a response code", e);
         }
         return INVALID_STATUS_CODE;
     }
@@ -184,15 +174,12 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
             if (TextUtils.isEmpty(urlConnection.getContentEncoding())) {
                 contentLength = urlConnection.getContentLength();
             } else {
-                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Log.d(TAG, "Got non empty content encoding: " + urlConnection.getContentEncoding());
-                }
+                Logger.d(TAG, "Got non empty content encoding: " + urlConnection.getContentEncoding());
             }
             stream = urlConnection.getInputStream();
             return new EventResponse(true, urlConnection.getInputStream(), contentLength);
         } catch (IOException e) {
-            throw new HttpException(
-                    "Failed to obtain InputStream", getHttpStatusCodeOrInvalid(urlConnection), e);
+            throw new HttpException("Failed to obtain InputStream", getHttpStatusCodeOrInvalid(urlConnection), e);
         }
     }
 
@@ -203,13 +190,9 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
         try {
             return loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, eventUrl.getHeaders());
         } catch (IOException e) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Failed to load data for url", e);
-            }
+            Logger.d(TAG, "Failed to load data for url", e);
         } finally {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Finished http url fetcher fetch in " + LogTime.getElapsedMillis(startTime));
-            }
+            Logger.v(TAG, "Finished http url fetcher fetch in " + LogTime.getElapsedMillis(startTime));
         }
         return new EventResponse(false);
     }

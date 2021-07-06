@@ -18,7 +18,6 @@ package com.growingio.android.sdk.track.log;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.PrintWriter;
@@ -116,7 +115,7 @@ public abstract class BaseLogger implements ILogger {
     }
 
     private void prepareLog(int priority, String tag, Throwable t, String message, Object... args) {
-        if (TextUtils.isEmpty(tag)) {
+        if (tag == null || tag.length() == 0) {
             return;
         }
 

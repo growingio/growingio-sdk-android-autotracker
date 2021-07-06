@@ -70,10 +70,10 @@ public class PageEvent extends BaseEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("path", mPath);
-            json.put("orientation", mOrientation);
-            json.put("title", mTitle);
-            json.put("referralPage", mReferralPage);
+            json.put("path", getPath());
+            json.put("orientation", getOrientation());
+            json.put("title", getTitle());
+            json.put("referralPage", getReferralPage());
         } catch (JSONException ignored) {
         }
         return json;

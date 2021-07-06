@@ -16,6 +16,8 @@
 
 package com.growingio.autotest.help;
 
+import com.google.common.util.concurrent.Uninterruptibles;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 

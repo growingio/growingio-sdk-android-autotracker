@@ -53,21 +53,21 @@ public final class VisitEvent extends BaseEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            if (!TextUtils.isEmpty(mImei)) {
-                json.put("imei", mImei);
+            if (!TextUtils.isEmpty(getImei())) {
+                json.put("imei", getImei());
             }
-            if (!TextUtils.isEmpty(mAndroidId)) {
-                json.put("androidId", mAndroidId);
+            if (!TextUtils.isEmpty(getAndroidId())) {
+                json.put("androidId", getAndroidId());
             }
-            if (!TextUtils.isEmpty(mOaid)) {
-                json.put("oaid", mOaid);
+            if (!TextUtils.isEmpty(getOaid())) {
+                json.put("oaid", getOaid());
             }
-            if (!TextUtils.isEmpty(mGoogleAdvertisingId)) {
-                json.put("googleAdvertisingId", mGoogleAdvertisingId);
+            if (!TextUtils.isEmpty(getGoogleAdvertisingId())) {
+                json.put("googleAdvertisingId", getGoogleAdvertisingId());
             }
 
-            if (mExtraSdk != null && !mExtraSdk.isEmpty()) {
-                json.put("extraSdk", mExtraSdk);
+            if (getExtraSdk() != null && !getExtraSdk().isEmpty()) {
+                json.put("extraSdk", getExtraSdk());
             }
         } catch (JSONException ignored) {
         }

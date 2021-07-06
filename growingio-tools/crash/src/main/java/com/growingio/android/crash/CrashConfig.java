@@ -27,7 +27,7 @@ public class CrashConfig implements Configurable {
     /**
      * https://sentry.growingio.com/settings/growingio/projects/gioandroid/keys/ 查看对应DSN
      */
-    private static final String DSN = "https://3db1f04a7238465ab285f46b462b5ffe@sentry.growingio.com/7";
+    public static final String DSN = "https://3db1f04a7238465ab285f46b462b5ffe@sentry.growingio.com/7";
 
 
     private String crashDsn = DSN;

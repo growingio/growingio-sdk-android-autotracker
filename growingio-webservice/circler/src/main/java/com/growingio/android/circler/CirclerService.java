@@ -61,7 +61,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
     private final TipView tipView;
     private final WebSocketHandler webSocketHandler;
     private Map<String, String> params;
-    private final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
+    protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
 
 
     void init(Map<String, String> params) {
@@ -163,7 +163,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
     }
 
 
-    private void showExitDialog() {
+    protected void showExitDialog() {
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null) {
             Logger.e(TAG, "showExitDialog: ForegroundActivity is NULL");
@@ -189,10 +189,9 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
 
     @Override
     public void onMessage(String msg) {
-
     }
 
-    private void exitCircler() {
+    protected void exitCircler() {
         sendMessage(new QuitMessage().toJSONObject().toString());
         cleanup();
     }
@@ -249,7 +248,9 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
 
     @Override
     public void onScreenshotRefreshed(CircleScreenshot screenshot) {
-        sendMessage(screenshot.toJSONObject().toString());
+        if (screenshot != null) {
+            sendMessage(screenshot.toJSONObject().toString());
+        }
     }
 
 

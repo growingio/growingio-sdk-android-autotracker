@@ -70,53 +70,53 @@ public class FragmentInjector {
     @AfterSuper(clazz = android.support.v4.app.Fragment.class, method = "onResume")
     public static void v4FragmentOnResume(android.support.v4.app.Fragment fragment) {
         Logger.d(TAG, "v4FragmentOnResume: fragment = " + fragment.getClass().getName());
-        PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
+        PageProvider.get().createOrResumePage(SuperFragment.makeSupport(fragment));
     }
 
     @AfterSuper(clazz = android.support.v4.app.Fragment.class, method = "setUserVisibleHint", parameterTypes = {boolean.class})
     public static void v4FragmentSetUserVisibleHint(android.support.v4.app.Fragment fragment, boolean isVisibleToUser) {
         Logger.d(TAG, "v4FragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
-            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.makeSupport(fragment));
         }
     }
 
     @AfterSuper(clazz = android.support.v4.app.Fragment.class, method = "onHiddenChanged", parameterTypes = {boolean.class})
     public static void v4FragmentOnHiddenChanged(android.support.v4.app.Fragment fragment, boolean hidden) {
         Logger.d(TAG, "v4FragmentOnHiddenChanged: fragment = " + fragment.getClass().getName() + ", hidden = " + hidden);
-        PageProvider.get().fragmentOnHiddenChanged(SuperFragment.make(fragment), hidden);
+        PageProvider.get().fragmentOnHiddenChanged(SuperFragment.makeSupport(fragment), hidden);
     }
 
     @AfterSuper(clazz = android.support.v4.app.Fragment.class, method = "onDestroyView")
     public static void v4FragmentOnDestroyView(android.support.v4.app.Fragment fragment) {
         Logger.d(TAG, "v4FragmentOnDestroyView: fragment = " + fragment.getClass().getName());
-        PageProvider.get().removePage(SuperFragment.make(fragment));
+        PageProvider.get().removePage(SuperFragment.makeSupport(fragment));
     }
 
     @AfterSuper(clazz = androidx.fragment.app.Fragment.class, method = "onResume")
     public static void androidxFragmentOnResume(androidx.fragment.app.Fragment fragment) {
         Logger.d(TAG, "androidxFragmentOnResume: fragment = " + fragment.getClass().getName());
-        PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
+        PageProvider.get().createOrResumePage(SuperFragment.makeX(fragment));
     }
 
     @AfterSuper(clazz = androidx.fragment.app.Fragment.class, method = "setUserVisibleHint", parameterTypes = {boolean.class})
     public static void androidxFragmentSetUserVisibleHint(androidx.fragment.app.Fragment fragment, boolean isVisibleToUser) {
         Logger.d(TAG, "androidxFragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
-            PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
+            PageProvider.get().createOrResumePage(SuperFragment.makeX(fragment));
         }
     }
 
     @AfterSuper(clazz = androidx.fragment.app.Fragment.class, method = "onHiddenChanged", parameterTypes = {boolean.class})
     public static void androidxFragmentOnHiddenChanged(androidx.fragment.app.Fragment fragment, boolean hidden) {
         Logger.d(TAG, "androidxFragmentOnHiddenChanged: fragment = " + fragment.getClass().getName() + ", hidden" + hidden);
-        PageProvider.get().fragmentOnHiddenChanged(SuperFragment.make(fragment), hidden);
+        PageProvider.get().fragmentOnHiddenChanged(SuperFragment.makeX(fragment), hidden);
     }
 
     @AfterSuper(clazz = androidx.fragment.app.Fragment.class, method = "onDestroyView")
     public static void androidxFragmentOnDestroyView(androidx.fragment.app.Fragment fragment) {
         Logger.d(TAG, "androidxFragmentOnDestroyView: fragment = " + fragment.getClass().getName());
-        PageProvider.get().removePage(SuperFragment.make(fragment));
+        PageProvider.get().removePage(SuperFragment.makeX(fragment));
     }
 
 }

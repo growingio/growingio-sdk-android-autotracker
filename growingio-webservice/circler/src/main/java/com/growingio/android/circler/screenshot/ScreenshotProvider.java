@@ -94,15 +94,12 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
             }
         });
 
-        topView.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String screenshotBase64 = ScreenshotUtil.getScreenshotBase64(mScale);
-                    sendScreenshotRefreshed(screenshotBase64, mScale);
-                } catch (IOException e) {
-                    Logger.e(TAG, e);
-                }
+        topView.post(() -> {
+            try {
+                String screenshotBase64 = ScreenshotUtil.getScreenshotBase64(mScale);
+                sendScreenshotRefreshed(screenshotBase64, mScale);
+            } catch (IOException e) {
+                Logger.e(TAG, e);
             }
         });
     }
@@ -150,7 +147,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
                     @Override
                     public void onSuccess(CircleScreenshot result) {
                         Logger.d(TAG, "Create circle screenshot successfully");
-                        if (result != null) dispatchActions(result);
+                        sendScreenshot(result);
                     }
 
                     @Override
@@ -159,4 +156,9 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
                     }
                 });
     }
+
+    public void sendScreenshot(CircleScreenshot result) {
+        if (result != null) dispatchActions(result);
+    }
+
 }

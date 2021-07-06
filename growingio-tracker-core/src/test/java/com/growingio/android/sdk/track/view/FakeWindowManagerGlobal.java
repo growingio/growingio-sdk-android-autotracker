@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track;
+package com.growingio.android.sdk.track.view;
 
-public class TrackException extends RuntimeException {
+import android.view.View;
 
-    public TrackException(String message) {
-        super(message);
+import java.util.ArrayList;
+
+public class FakeWindowManagerGlobal {
+
+    private static FakeWindowManagerGlobal sDefaultWindowManager;
+
+    private final ArrayList<View> mViews = new ArrayList<View>();
+
+    public static FakeWindowManagerGlobal getInstance() {
+        synchronized (FakeWindowManagerGlobal.class) {
+            if (sDefaultWindowManager == null) {
+                sDefaultWindowManager = new FakeWindowManagerGlobal();
+            }
+            return sDefaultWindowManager;
+        }
     }
 
-    public TrackException(Throwable t) {
-        super(t);
+    private FakeWindowManagerGlobal() {
     }
 }

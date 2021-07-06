@@ -37,7 +37,7 @@ public class CustomEvent extends BaseAttributesEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("eventName", mEventName);
+            json.put("eventName", getEventName());
         } catch (JSONException ignored) {
         }
         return json;

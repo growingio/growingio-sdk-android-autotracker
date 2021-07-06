@@ -132,6 +132,14 @@ public class CircleScreenshot {
             if (callback == null) {
                 return Disposable.EMPTY_DISPOSABLE;
             }
+            List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
+            return build(decorViews, callback);
+        }
+
+        public Disposable build(List<DecorView> decorViews, Callback<CircleScreenshot> callback) {
+            if (callback == null) {
+                return Disposable.EMPTY_DISPOSABLE;
+            }
             mBuildDisposable = new UnsubscribedDisposable();
             mScreenshotResultCallback = callback;
 
@@ -139,7 +147,6 @@ public class CircleScreenshot {
             mScreenWidth = displayMetrics.widthPixels;
             mScreenHeight = displayMetrics.heightPixels;
 
-            List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
             for (DecorView decorView : decorViews) {
                 if (decorView.getView() instanceof TipView) {
                     continue;
@@ -239,12 +246,12 @@ public class CircleScreenshot {
             }
 
             if (ClassExistHelper.instanceOfX5WebView(viewNode.getView())) {
-                getWebViewDomTree(SuperWebView.make((com.tencent.smtt.sdk.WebView) viewNode.getView()), viewNode);
+                getWebViewDomTree(SuperWebView.makeX5((com.tencent.smtt.sdk.WebView) viewNode.getView()), viewNode);
                 return true;
             }
 
             if (ClassExistHelper.instanceOfUcWebView(viewNode.getView())) {
-                getWebViewDomTree(SuperWebView.make((com.uc.webview.export.WebView) viewNode.getView()), viewNode);
+                getWebViewDomTree(SuperWebView.makeUC((com.uc.webview.export.WebView) viewNode.getView()), viewNode);
                 return true;
             }
 

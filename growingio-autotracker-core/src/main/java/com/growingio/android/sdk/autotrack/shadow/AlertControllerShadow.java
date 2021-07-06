@@ -20,7 +20,6 @@ import android.app.AlertDialog;
 import android.support.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.util.HurtLocker;
-import com.growingio.android.sdk.track.log.Logger;
 
 public class AlertControllerShadow {
     private static final String TAG = "AlertControllerShadow";
@@ -32,25 +31,17 @@ public class AlertControllerShadow {
     }
 
     @Nullable
-    public CharSequence getTitle() {
+    public CharSequence getTitle() throws Exception {
         if (mRealAlertController != null) {
-            try {
-                return HurtLocker.getInternalState(mRealAlertController, "mTitle");
-            } catch (Exception e) {
-                Logger.e(TAG, e);
-            }
+            return HurtLocker.getInternalState(mRealAlertController, "mTitle");
         }
         return null;
     }
 
     @Nullable
-    public CharSequence getMessage() {
+    public CharSequence getMessage() throws Exception {
         if (mRealAlertController != null) {
-            try {
-                return HurtLocker.getInternalState(mRealAlertController, "mMessage");
-            } catch (Exception e) {
-                Logger.e(TAG, e);
-            }
+            return HurtLocker.getInternalState(mRealAlertController, "mMessage");
         }
         return null;
     }

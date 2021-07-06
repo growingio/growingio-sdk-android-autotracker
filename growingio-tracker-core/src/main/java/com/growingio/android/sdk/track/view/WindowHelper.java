@@ -38,7 +38,7 @@ public class WindowHelper {
     private WindowHelper() {
         WindowManagerShadow managerShadow = null;
         try {
-            managerShadow = new WindowManagerShadow();
+            managerShadow = new WindowManagerShadow("android.view.WindowManagerGlobal");
         } catch (Exception e) {
             Logger.e(TAG, e);
         }

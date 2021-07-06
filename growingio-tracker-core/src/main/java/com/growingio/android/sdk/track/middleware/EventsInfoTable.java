@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.track.middleware;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.net.Uri;
 
 import com.growingio.android.sdk.TrackerContext;
@@ -65,11 +64,11 @@ public class EventsInfoTable {
         return contentValues;
     }
 
-    public static EventsInfo getValues(Cursor cursor) {
+/*    public static EventsInfo getValues(Cursor cursor) {
         String eventType = cursor.getString(cursor.getColumnIndex(COLUMN_EVENT_TYPE));
         int policy = cursor.getInt(cursor.getColumnIndex(COLUMN_POLICY));
         byte[] data = cursor.getBlob(cursor.getColumnIndex(COLUMN_DATA));
         return new EventsInfo(eventType, policy, data);
-    }
+    }*/
 
 }

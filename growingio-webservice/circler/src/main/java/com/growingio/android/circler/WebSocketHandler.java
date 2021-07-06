@@ -101,7 +101,7 @@ class WebSocketHandler extends WebSocketListener {
         } catch (JSONException e) {
             Logger.e(TAG, e);
         }
-        ThreadUtils.postOnUiThread(new Runnable() {
+        ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 webSocketListener.onMessage(text);

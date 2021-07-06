@@ -39,15 +39,7 @@ public class EncoderDataFetcher implements DataFetcher<EventEncoder> {
     @Override
     public void loadData(DataCallback<? super EventEncoder> callback) {
         try {
-            EventUrl eventUrl = eventEncoder.getEventUrl();
-            long currentTimeMillis = eventUrl.getTime();
-            byte[] compressData = Snappy.compress(eventUrl.getRequestBody());
-            compressData = XORUtils.encrypt(compressData, (int) (currentTimeMillis & 0xFF));
-            eventUrl.setMediaType("application/json");
-            eventUrl.setBodyData(compressData);
-            eventUrl.addHeader("X-Compress-Codec", "2");
-            eventUrl.addHeader("X-Crypt-Codec", "1");
-            callback.onDataReady(eventEncoder);
+            callback.onDataReady(executeData());
         } catch (Exception e) {
             callback.onLoadFailed(e);
         }

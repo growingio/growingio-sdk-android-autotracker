@@ -61,13 +61,12 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
     private final TipView tipView;
     private final WebSocketHandler webSocketHandler;
     private Map<String, String> params;
-    private final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
+    protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
 
 
     void init(Map<String, String> params) {
         this.params = params;
     }
-
 
     public DebuggerService(OkHttpClient client) {
         DebuggerEventWrapper.get().registerDebuggerEventListener(new DebuggerEventWrapper.OnDebuggerEventListener() {
@@ -175,7 +174,7 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
     }
 
 
-    private void showExitDialog() {
+    protected void showExitDialog() {
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null) {
             Logger.e(TAG, "showExitDialog: ForegroundActivity is NULL");
@@ -214,7 +213,7 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
         }
     }
 
-    private void exitDebugger() {
+    protected void exitDebugger() {
         sendMessage(new QuitMessage().toJSONObject().toString());
         cleanup();
     }
@@ -240,6 +239,9 @@ public class DebuggerService implements DataFetcher<WebService>, IActivityLifecy
         showQuitedDialog();
     }
 
+    public AtomicInteger getSocketState() {
+        return socketState;
+    }
 
     private void showQuitedDialog() {
         Activity activity = ActivityStateProvider.get().getForegroundActivity();

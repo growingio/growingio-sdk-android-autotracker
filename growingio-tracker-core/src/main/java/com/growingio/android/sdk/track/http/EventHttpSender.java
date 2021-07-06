@@ -87,6 +87,7 @@ public class EventHttpSender implements IEventNetSender {
         EventEncoder encoder = TrackerContext.get().executeData(new EventEncoder(eventUrl), EventEncoder.class, EventEncoder.class);
         if (encoder != null) {
             eventUrl = encoder.getEventUrl();
+            data = eventUrl.getRequestBody();
         } else {
             eventUrl.setBodyData(data);
         }
@@ -104,8 +105,8 @@ public class EventHttpSender implements IEventNetSender {
         } else {
             Logger.d(TAG, "Send events failed, response = " + response);
         }
-
-        return new SendResponse(successful, data.length);
+        long totalUsed = data == null ? 0L : data.length;
+        return new SendResponse(successful, totalUsed);
     }
 
     public byte[] defaultDataTransfer(List<GEvent> events) {

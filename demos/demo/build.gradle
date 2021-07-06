@@ -23,7 +23,7 @@ android {
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         applicationId "com.gio.test.three"
-        minSdkVersion buildConfiguration.minSdkVersion
+        minSdkVersion 26
         targetSdkVersion buildConfiguration.targetSdkVersion
 
         buildConfigField "boolean", "withAutotrack", "$withAutotrack"
@@ -63,6 +63,12 @@ android {
     }
 
     testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+        unitTests.returnDefaultValues = true
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 }
@@ -72,61 +78,14 @@ growingAutotracker {
     logEnabled true
 //    excludePackages "com.gio.test.three.autotrack.fragments", "com.example"
 }
-def rootDir = project.rootProject.rootDir
-
-def coverageSourceDirs = [
-        "$rootDir/growingio-tracker/src/main/java",
-        "$rootDir/growingio-tracker-core/src/main/java",
-        "$rootDir/growingio-autotracker/src/main/java",
-        "$rootDir/growingio-autotracker-core/src/main/java",
-        "$rootDir/growingio-autotracker-gradle-plugin/src/main/java"
-]
-
-def coverageClassDirs = [
-        "$rootDir/growingio-tracker/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-tracker-core/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-autotracker/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-autotracker-core/build/intermediates/javac/debug/classes",
-        "$rootDir/growingio-autotracker-gradle-plugin/build/classes/java/main"
-]
-
-task jacocoTestReport(type: JacocoReport, group: 'Reporting', dependsOn: 'connectedCheck') {
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-
-    sourceDirectories = files(coverageSourceDirs)
-
-    executionData = fileTree(
-            dir: "$rootDir",
-            include: ["**/*.exec", "**/*.ec"]
-    )
-
-    doFirst {
-        println(project.rootProject.rootDir)
-        classDirectories = files(files(coverageClassDirs).collect {
-            fileTree(dir: it, exclude: [
-                    'android/**',
-                    'androidx/**',
-                    'com/example/**',
-                    'com/gio/**',
-                    '**/R.class',
-                    '**/R$*.class',
-                    '**/BuildConfig.*',
-                    '**/HookClassesConfig.*',
-            ])
-        })
-    }
-}
 
 dependencies {
     androidTestUtil libraries.test.orchestrator
     androidTestImplementation libraries.test.androidx_junit
     androidTestImplementation libraries.test.androidx_runner
+    androidTestImplementation libraries.test.androidx_rules
     androidTestImplementation libraries.test.espresso_core
     androidTestImplementation libraries.test.espresso_web
-    androidTestImplementation libraries.test.androidx_rules
     androidTestImplementation libraries.test.mockito_core
     androidTestImplementation libraries.test.truth
     androidTestImplementation libraries.test.okhttp3_mockwebserver
@@ -145,5 +104,6 @@ dependencies {
     implementation project(":demo-autotrack")
 
     compileOnly libraries.androidx.appcompat
-
 }
+
+apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"

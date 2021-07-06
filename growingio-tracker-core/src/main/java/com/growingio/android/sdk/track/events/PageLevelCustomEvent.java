@@ -45,8 +45,8 @@ public class PageLevelCustomEvent extends CustomEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("path", mPath);
-            json.put("pageShowTimestamp", mPageShowTimestamp);
+            json.put("path", getPath());
+            json.put("pageShowTimestamp", getPageShowTimestamp());
         } catch (JSONException ignored) {
         }
         return json;

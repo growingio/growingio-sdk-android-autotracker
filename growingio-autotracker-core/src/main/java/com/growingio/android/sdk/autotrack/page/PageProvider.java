@@ -148,7 +148,10 @@ public class PageProvider implements IActivityLifecycle {
         if (TextUtils.isEmpty(alias)) {
             return;
         }
-
+//        ActivityPage page = ALL_PAGE_TREE.get(activity);
+//        if (page != null) {
+//            page.setAlias(alias);
+//        }
         ALL_PAGE_ALIAS.put(activity, alias);
     }
 
@@ -348,7 +351,7 @@ public class PageProvider implements IActivityLifecycle {
         return pageParent;
     }
 
-    private Page<?> findPage(SuperFragment<?> carrier) {
+    protected Page<?> findPage(SuperFragment<?> carrier) {
         Activity activity = carrier.getActivity();
         Page<?> page = ALL_PAGE_TREE.get(activity);
         if (page == null) {
@@ -467,7 +470,14 @@ public class PageProvider implements IActivityLifecycle {
             activity = ActivityStateProvider.get().getForegroundActivity();
         }
         if (activity != null) {
-            return ALL_PAGE_TREE.get(activity);
+            if (ALL_PAGE_TREE.containsKey(activity)) {
+                return ALL_PAGE_TREE.get(activity);
+            } else {
+                //一般不会进入，如果出现则新生成page返回
+                ActivityPage newPage = new ActivityPage(activity);
+                newPage.setTitle(activity.getTitle().toString());
+                return newPage;
+            }
         }
 
         // TODO: 2020/6/10 这种情况需要观察

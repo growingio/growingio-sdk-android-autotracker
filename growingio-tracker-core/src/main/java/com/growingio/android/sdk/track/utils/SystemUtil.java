@@ -16,9 +16,7 @@
 
 package com.growingio.android.sdk.track.utils;
 
-import android.app.ActivityManager;
 import android.content.Context;
-import android.os.Process;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.log.Logger;
@@ -26,7 +24,6 @@ import com.growingio.android.sdk.track.log.Logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.List;
 
 public class SystemUtil {
     private static final String TAG = "SystemUtil";
@@ -34,7 +31,7 @@ public class SystemUtil {
     private SystemUtil() {
     }
 
-    public static void killAppProcess(Context context) {
+/*    public static void killAppProcess(Context context) {
         //注意：不能先杀掉主进程，否则逻辑代码无法继续执行，需先杀掉相关进程最后杀掉主进程
         ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> processes = mActivityManager.getRunningAppProcesses();
@@ -48,7 +45,7 @@ public class SystemUtil {
 
         Process.killProcess(Process.myPid());
         System.exit(0);
-    }
+    }*/
 
     public static String getProcessName() {
         try {

@@ -94,7 +94,7 @@ class GioTrackerGenerator(
         initGIOConfig(appModule)
         val generatedCodePackageName = appModule.enclosingElement.toString()
         val tracker = processEnv.elementUtils.getTypeElement(trackerClassName)
-            ?: throw IllegalStateException("Do you have implement this class:$trackerClassName?")
+            ?: throw IllegalStateException("Do you have import this class:$trackerClassName?")
         val trackerClass = ClassName.get(tracker)
         val annotation = appModule.getAnnotation(GIOAppModule::class.java)
         val growingName = annotation.name

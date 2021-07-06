@@ -105,14 +105,6 @@ public abstract class BaseEvent extends GEvent {
         mSdkVersion = eventBuilder.mSdkVersion;
     }
 
-    public static String getAppStateForeground() {
-        return APP_STATE_FOREGROUND;
-    }
-
-    public static String getAppStateBackground() {
-        return APP_STATE_BACKGROUND;
-    }
-
     public String getDeviceId() {
         return mDeviceId;
     }
@@ -216,36 +208,36 @@ public abstract class BaseEvent extends GEvent {
         try {
             json.put("platform", mPlatform);
             json.put("platformVersion", mPlatformVersion);
-            json.put("deviceId", mDeviceId);
-            if (!TextUtils.isEmpty(mUserId)) {
-                json.put("userId", mUserId);
+            json.put("deviceId", getDeviceId());
+            if (!TextUtils.isEmpty(getUserId())) {
+                json.put("userId", getUserId());
             }
-            json.put("sessionId", mSessionId);
-            json.put("eventType", mEventType);
-            json.put("timestamp", mTimestamp);
-            json.put("domain", mDomain);
-            json.put("urlScheme", mUrlScheme);
-            json.put("appState", mAppState);
-            json.put("globalSequenceId", mGlobalSequenceId);
-            json.put("eventSequenceId", mEventSequenceId);
+            json.put("sessionId", getSessionId());
+            json.put("eventType", getEventType());
+            json.put("timestamp", getTimestamp());
+            json.put("domain", getDomain());
+            json.put("urlScheme", getUrlScheme());
+            json.put("appState", getAppState());
+            json.put("globalSequenceId", getGlobalSequenceId());
+            json.put("eventSequenceId", getEventSequenceId());
 
-            json.put("networkState", mNetworkState);
-            if (!TextUtils.isEmpty(mAppChannel)) {
-                json.put("appChannel", mAppChannel);
+            json.put("networkState", getNetworkState());
+            if (!TextUtils.isEmpty(getAppChannel())) {
+                json.put("appChannel", getAppChannel());
             }
-            json.put("screenHeight", mScreenHeight);
-            json.put("screenWidth", mScreenWidth);
-            json.put("deviceBrand", mDeviceBrand);
-            json.put("deviceModel", mDeviceModel);
-            json.put("deviceType", mDeviceType);
-            json.put("appName", mAppName);
-            json.put("appVersion", mAppVersion);
-            json.put("language", mLanguage);
-            if (mLatitude != 0 || mLongitude != 0) {
-                json.put("latitude", mLatitude);
-                json.put("longitude", mLongitude);
+            json.put("screenHeight", getScreenHeight());
+            json.put("screenWidth", getScreenWidth());
+            json.put("deviceBrand", getDeviceBrand());
+            json.put("deviceModel", getDeviceModel());
+            json.put("deviceType", getDeviceType());
+            json.put("appName", getAppName());
+            json.put("appVersion", getAppVersion());
+            json.put("language", getLanguage());
+            if (getLatitude() != 0 || getLongitude() != 0) {
+                json.put("latitude", getLatitude());
+                json.put("longitude", getLongitude());
             }
-            json.put("sdkVersion", mSdkVersion);
+            json.put("sdkVersion", getSdkVersion());
 
         } catch (JSONException ignored) {
         }

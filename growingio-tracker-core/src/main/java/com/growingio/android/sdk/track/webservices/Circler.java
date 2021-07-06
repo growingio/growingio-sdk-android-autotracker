@@ -35,14 +35,4 @@ public class Circler {
         return params;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder urlBuilder = new StringBuilder();
-        if (!params.isEmpty()) {
-            for (String key : params.keySet()) {
-                urlBuilder.append(key).append("=").append(params.get(key)).append("\n");
-            }
-        }
-        return urlBuilder.toString();
-    }
 }

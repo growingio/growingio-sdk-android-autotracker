@@ -88,7 +88,7 @@ internal class ConfigurationGenerator(
         gioConfigs.add(GIO_DEFAULT_CONFIGURATION) // add CoreConfiguration
         val configName = processUtils.getConfigName(appModule)
         val coreConfiguration = processEnv.elementUtils.getTypeElement(GIO_DEFAULT_CONFIGURATION)
-            ?: throw IllegalStateException("Do you have implement this class:$GIO_DEFAULT_CONFIGURATION?")
+            ?: throw IllegalStateException("Do you have import this class:$GIO_DEFAULT_CONFIGURATION?")
         val generatedCodePackageName = appModule.enclosingElement.toString()
         val generateClass = ClassName.get(generatedCodePackageName,configName)
         val coreConfigurationClass = ClassName.get(coreConfiguration)

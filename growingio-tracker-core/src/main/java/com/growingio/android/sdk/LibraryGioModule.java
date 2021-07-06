@@ -30,7 +30,6 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 public abstract class LibraryGioModule {
 
     public void registerComponents(Context context, TrackerRegistry registry) {
-        //Default empty impl;
     }
 
     protected <T> T getConfiguration(Class<? extends Configurable> clazz) {

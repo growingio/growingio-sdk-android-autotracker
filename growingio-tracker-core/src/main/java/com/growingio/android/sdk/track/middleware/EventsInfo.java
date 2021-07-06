@@ -28,24 +28,12 @@ public class EventsInfo {
         return mEventType;
     }
 
-    public void setEventType(String eventType) {
-        this.mEventType = eventType;
-    }
-
     public int getPolicy() {
         return mPolicy;
     }
 
-    public void setPolicy(int policy) {
-        this.mPolicy = policy;
-    }
-
     public byte[] getData() {
         return mData;
-    }
-
-    public void setData(byte[] data) {
-        this.mData = data;
     }
 
     public EventsInfo(String eventType, int policy, byte[] data) {

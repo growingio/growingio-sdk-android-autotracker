@@ -54,10 +54,6 @@ public final class HybridCustomEvent extends PageLevelCustomEvent {
             super();
         }
 
-        public String getQuery() {
-            return mQuery;
-        }
-
         public Builder setQuery(String query) {
             mQuery = query;
             return this;

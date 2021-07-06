@@ -60,17 +60,9 @@ public class HybridPageEvent extends PageEvent {
             super();
         }
 
-        public String getProtocolType() {
-            return mProtocolType;
-        }
-
         public Builder setProtocolType(String protocolType) {
             mProtocolType = protocolType;
             return this;
-        }
-
-        public String getQuery() {
-            return mQuery;
         }
 
         public Builder setQuery(String query) {

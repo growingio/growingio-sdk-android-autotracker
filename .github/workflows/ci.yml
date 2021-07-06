@@ -45,7 +45,6 @@ jobs:
         run: |
           bash ./gradle/publishAllToMavenLocal.sh
           bash ./config/checkstyle/checkstyle.sh
-          ./gradlew test
           ./gradlew assembleDebug
 
       - name: Run tests
@@ -53,10 +52,12 @@ jobs:
         with:
           api-level: 29
           profile: Nexus 6
+          # emulator-build: 7425822
           script: |
             adb shell logcat -c
             adb shell logcat > ./uiTest.log &
-            ./gradlew :demo:jacocoTestReport
+            ./gradlew jacocoTestReport
+            ./gradlew :demo:jacocoAllReport
 
       - name: Upload logcat
         uses: actions/upload-artifact@v2
@@ -69,17 +70,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build sonarqube --info
-
-      #- name: Publish Test Results
-      #  uses: scacap/action-surefire-report@v1
-      #  if: always()
-      #  with:
-      #    github_token: ${{ secrets.GITHUB_TOKEN }}
-      #    report_paths: '**/build/**/TEST-*.xml'
+        run: ./gradlew sonarqube
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
-          files: ./demos/demo/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          files: ./demos/demo/build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml
 

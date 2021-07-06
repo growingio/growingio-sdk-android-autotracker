@@ -41,11 +41,6 @@ public class HandlerDisposable implements Disposable {
 
         mHandler.sendMessageDelayed(message, timeout);
 
-        if (mDisposed) {
-            mHandler.removeCallbacks(scheduled);
-            return EmptyDisposable.INSTANCE;
-        }
-
         return scheduled;
     }
 
