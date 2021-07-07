@@ -61,16 +61,10 @@ public class PageTest {
     public void setup() {
         application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         TrackerContext.init(application);
+        TrackerContext.initSuccess();
         PageProvider.get().start();
         SessionProvider.get();
         activityController = Robolectric.buildActivity(RobolectricActivity.class);
-        try {
-            Field field = HurtLocker.getField(Autotracker.class, "sInitializedSuccessfully");
-            field.setAccessible(true);
-            field.setBoolean(null, true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Test

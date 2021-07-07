@@ -22,6 +22,7 @@ import android.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.change.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
@@ -37,16 +38,9 @@ import java.util.Map;
 public class Autotracker extends Tracker {
     private static final String TAG = "Autotracker";
 
-    private static volatile boolean sInitializedSuccessfully = false;
-
-    public static boolean initializedSuccessfully() {
-        return sInitializedSuccessfully;
-    }
-
     Autotracker(Application application) {
         super(application);
         if (application == null) {
-            sInitializedSuccessfully = false;
             return;
         }
         PageProvider.get().start();
@@ -54,7 +48,7 @@ public class Autotracker extends Tracker {
         mViewChangeProvider = new ViewChangeProvider();
         mViewChangeProvider.start();
 
-        sInitializedSuccessfully = true;
+        TrackerContext.initSuccess();
     }
 
     public void setUniqueTag(final View view, final String tag) {

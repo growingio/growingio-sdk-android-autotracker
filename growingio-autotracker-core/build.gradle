@@ -58,6 +58,7 @@ dependencies {
     testCompileOnly 'com.android.support:support-fragment:28.0.0'
 
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
+
     debugApi project(':growingio-tracker-core')
     releaseApi libraries.growingio.tracker_core
 

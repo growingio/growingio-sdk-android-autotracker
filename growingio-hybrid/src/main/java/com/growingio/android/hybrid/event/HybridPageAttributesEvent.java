@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid.event;
+package com.growingio.android.hybrid.event;
 
-import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
+import com.growingio.android.sdk.track.events.PageAttributesEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
 
-public final class HybridCustomEvent extends PageLevelCustomEvent {
+public final class HybridPageAttributesEvent extends PageAttributesEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mQuery;
 
-    protected HybridCustomEvent(Builder eventBuilder) {
+    protected HybridPageAttributesEvent(Builder eventBuilder) {
         super(eventBuilder);
         mQuery = eventBuilder.mQuery;
     }
@@ -47,7 +47,7 @@ public final class HybridCustomEvent extends PageLevelCustomEvent {
         return json;
     }
 
-    public static class Builder extends PageLevelCustomEvent.Builder {
+    public static class Builder extends PageAttributesEvent.Builder {
         private String mQuery;
 
         public Builder() {
@@ -65,6 +65,11 @@ public final class HybridCustomEvent extends PageLevelCustomEvent {
         }
 
         @Override
+        public HybridPageAttributesEvent build() {
+            return new HybridPageAttributesEvent(this);
+        }
+
+        @Override
         public Builder setPath(String path) {
             super.setPath(path);
             return this;
@@ -77,20 +82,9 @@ public final class HybridCustomEvent extends PageLevelCustomEvent {
         }
 
         @Override
-        public Builder setEventName(String eventName) {
-            super.setEventName(eventName);
-            return this;
-        }
-
-        @Override
         public Builder setAttributes(Map<String, String> attributes) {
             super.setAttributes(attributes);
             return this;
-        }
-
-        @Override
-        public HybridCustomEvent build() {
-            return new HybridCustomEvent(this);
         }
     }
 }

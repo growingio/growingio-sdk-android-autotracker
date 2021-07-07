@@ -50,16 +50,9 @@ public class ViewClickTest {
     @Before
     public void setup() {
         TrackerContext.init(application);
+        TrackerContext.initSuccess();
         activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
         ActivityStateProvider.get().onActivityResumed(activity);
-
-        try {
-            Field field = HurtLocker.getField(Autotracker.class, "sInitializedSuccessfully");
-            field.setAccessible(true);
-            field.setBoolean(null, true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Test
