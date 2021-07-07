@@ -25,7 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.growingio.android.sdk.autotrack.Autotracker;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
@@ -70,7 +70,7 @@ class ViewClickProvider {
      * 所以这里人为的给view定义一个id
      */
     public static void alertDialogShow(AlertDialog dialog) {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
@@ -117,7 +117,7 @@ class ViewClickProvider {
     }
 
     public static void viewOnClick(View view) {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
@@ -132,7 +132,7 @@ class ViewClickProvider {
     }
 
     public static void menuItemOnClick(Activity activity, MenuItem menuItem) {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
@@ -151,7 +151,7 @@ class ViewClickProvider {
     }
 
     public static void menuItemOnClick(MenuItem menuItem) {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }

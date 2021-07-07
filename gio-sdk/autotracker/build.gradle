@@ -47,6 +47,9 @@ dependencies {
     debugApi project(':growingio-webservice:debugger')
     releaseApi libraries.growingio.debugger
 
+    debugApi project(':growingio-hybrid')
+    releaseApi libraries.growingio.hybrid
+
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.android.appcompat
 

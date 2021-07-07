@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid;
+package com.growingio.android.hybrid;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
@@ -22,9 +22,6 @@ import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.annotation.Size;
 
 public abstract class SuperWebView<T extends View> {
     private final T mRealWebView;
@@ -37,7 +34,9 @@ public abstract class SuperWebView<T extends View> {
         return mRealWebView;
     }
 
-    public void getLocationOnScreen(@Size(2) int[] outLocation) {
+    private boolean hasAddJavaScript = false;
+
+    public void getLocationOnScreen(int[] outLocation) {
         getRealWebView().getLocationOnScreen(outLocation);
     }
 
@@ -53,7 +52,15 @@ public abstract class SuperWebView<T extends View> {
 
     public abstract void addJavascriptInterface(Object obj, String interfaceName);
 
-    public abstract void evaluateJavascript(String script, @Nullable ValueCallback<String> resultCallback);
+    public abstract void evaluateJavascript(String script, ValueCallback<String> resultCallback);
+
+    public boolean hasAddJavaScripted() {
+        return hasAddJavaScript;
+    }
+
+    public void setAddJavaScript(boolean hasAddJavaScript) {
+        this.hasAddJavaScript = hasAddJavaScript;
+    }
 
     public static SuperWebView<WebView> make(WebView webView) {
         return new SystemWebView(webView);
@@ -84,10 +91,12 @@ public abstract class SuperWebView<T extends View> {
             getRealWebView().addJavascriptInterface(obj, interfaceName);
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+
         @Override
-        public void evaluateJavascript(String script, @Nullable ValueCallback<String> resultCallback) {
-            getRealWebView().evaluateJavascript(script, resultCallback);
+        public void evaluateJavascript(String script, ValueCallback<String> resultCallback) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                getRealWebView().evaluateJavascript(script, resultCallback);
+            }
         }
     }
 
@@ -108,7 +117,7 @@ public abstract class SuperWebView<T extends View> {
         }
 
         @Override
-        public void evaluateJavascript(String script, @Nullable final ValueCallback<String> resultCallback) {
+        public void evaluateJavascript(String script, final ValueCallback<String> resultCallback) {
             getRealWebView().evaluateJavascript(script, new com.tencent.smtt.sdk.ValueCallback<String>() {
                 @Override
                 public void onReceiveValue(String s) {
@@ -137,7 +146,7 @@ public abstract class SuperWebView<T extends View> {
         }
 
         @Override
-        public void evaluateJavascript(String script, @Nullable final ValueCallback<String> resultCallback) {
+        public void evaluateJavascript(String script, final ValueCallback<String> resultCallback) {
             getRealWebView().evaluateJavascript(script, resultCallback);
         }
     }

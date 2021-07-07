@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid;
+package com.growingio.android.hybrid;
 
 public interface OnDomChangedListener {
     void onDomChanged();

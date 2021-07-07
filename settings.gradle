@@ -13,6 +13,7 @@ include ':growingio-annotation:compiler'
 
 include ':growingio-tracker-core'
 include ':growingio-autotracker-core'
+include ':growingio-hybrid'
 
 include ':growingio-network:okhttp3'
 include ':growingio-network:urlconnection'
