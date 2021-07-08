@@ -24,7 +24,6 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.track.events.PageAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;

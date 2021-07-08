@@ -19,7 +19,6 @@ package com.growingio.android.circler.screenshot;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.page.Page;

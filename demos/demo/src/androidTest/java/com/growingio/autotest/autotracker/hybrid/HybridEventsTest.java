@@ -442,7 +442,7 @@ public class HybridEventsTest extends EventsTest {
     public void hybridDomChangedTest() throws Exception {
         AtomicBoolean receivedEvent = new AtomicBoolean(false);
         WebView webView = launchMockWebView();
-        SuperWebView<WebView> superWebView = (SuperWebView<WebView>) Whitebox.invokeConstructor(Class.forName("com.growingio.android.sdk.autotrack.hybrid.SuperWebView$SystemWebView"), webView);
+        SuperWebView<WebView> superWebView = (SuperWebView<WebView>) Whitebox.invokeConstructor(Class.forName("com.growingio.android.hybrid.SuperWebView$SystemWebView"), webView);
         HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
             @Override
             public void onDomChanged() {

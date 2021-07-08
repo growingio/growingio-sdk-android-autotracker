@@ -30,10 +30,8 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
-import com.growingio.android.sdk.autotrack.util.HurtLocker;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 
@@ -46,7 +44,6 @@ import org.robolectric.android.controller.ActivityController;
 import org.robolectric.android.controller.FragmentController;
 import org.robolectric.annotation.Config;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
