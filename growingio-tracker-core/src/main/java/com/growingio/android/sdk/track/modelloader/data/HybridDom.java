@@ -40,7 +40,7 @@ public class HybridDom {
     }
 
     public interface OnDomChangedListener {
-        public void onDomChanged();
+        void onDomChanged();
     }
 
 }

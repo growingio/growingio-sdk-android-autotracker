@@ -19,6 +19,7 @@ package com.growingio.android.sdk;
 
 import android.app.Application;
 import android.content.Context;
+import android.webkit.WebView;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -70,6 +71,9 @@ public class TrackerTest {
         tracker.setLocation(0d, 1d);
         tracker.cleanLocation();
         tracker.onActivityNewIntent(null, null);
+
+        WebView webView = new WebView(application);
+        tracker.bridgeWebView(webView);
 
         TestLibraryGioModule testLibraryGioModule = new TestLibraryGioModule();
         testLibraryGioModule.registerComponents(application, TrackerContext.get().getRegistry());

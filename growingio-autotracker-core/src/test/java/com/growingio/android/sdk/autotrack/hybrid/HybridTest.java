@@ -33,9 +33,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE, sdk = 23)
 @RunWith(RobolectricTestRunner.class)

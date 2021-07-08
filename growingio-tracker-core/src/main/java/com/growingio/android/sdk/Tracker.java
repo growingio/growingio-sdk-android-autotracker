@@ -24,16 +24,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.modelloader.ModelLoader;
+import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeepLinkProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
+import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -158,6 +162,29 @@ public class Tracker {
             return;
         }
         ActivityStateProvider.get().onActivityNewIntent(activity, intent);
+    }
+
+    /**
+     * inject webview javaInterface bridge.
+     *
+     * @param webView:WebView or com.tencent.smtt.sdk.WebView or com.uc.webview.export.WebView
+     */
+    public void bridgeWebView(View webView) {
+        if (!isInited) return;
+        if (ClassExistHelper.isWebView(webView)) {
+            TrackMainThread.trackMain().postActionToTrackMain(() -> bridgeInnerWebView(webView));
+        } else {
+            Logger.e(TAG, "please check your " + webView.getClass().getName() + "is WebView or com.tencent.smtt.sdk.WebView or com.uc.webview.export.WebView");
+        }
+    }
+
+    private void bridgeInnerWebView(View view) {
+        boolean result = false;
+        ModelLoader<HybridBridge, Boolean> modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridBridge.class, Boolean.class);
+        if (modelLoader != null) {
+            result = modelLoader.buildLoadData(new HybridBridge(view)).fetcher.executeData();
+        }
+        Logger.d(TAG, "bridgeForWebView: webView = " + view.getClass().getName() + ", result = " + result);
     }
 
     @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
