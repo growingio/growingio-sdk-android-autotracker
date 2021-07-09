@@ -55,7 +55,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     private SessionProvider() {
         mContext = TrackerContext.get().getApplicationContext();
-        mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000;
+        mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000L;
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
     }
 

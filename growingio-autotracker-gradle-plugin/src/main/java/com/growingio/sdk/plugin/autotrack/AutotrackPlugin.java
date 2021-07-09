@@ -121,12 +121,13 @@ public class AutotrackPlugin implements Plugin<Project> {
     public String getPluginVersion() {
         try {
             String jarPath = URLDecoder.decode(new File(ClassRewriter.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath());
-            JarInputStream inputStream = new JarInputStream(new FileInputStream(jarPath));
-            String pluginVersion = inputStream.getManifest().getMainAttributes().getValue("Gradle-Plugin-Version");
-            if (pluginVersion == null) {
-                throw new AutotrackBuildException("Cannot find GrowingIO autotrack gradle plugin version");
+            try (JarInputStream inputStream = new JarInputStream(new FileInputStream(jarPath))) {
+                String pluginVersion = inputStream.getManifest().getMainAttributes().getValue("Gradle-Plugin-Version");
+                if (pluginVersion == null) {
+                    throw new AutotrackBuildException("Cannot find GrowingIO autotrack gradle plugin version");
+                }
+                return pluginVersion;
             }
-            return pluginVersion;
         } catch (IOException e) {
             throw new AutotrackBuildException("Cannot find GrowingIO autotrack gradle plugin version");
         }

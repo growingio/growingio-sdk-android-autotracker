@@ -73,7 +73,8 @@ public class OaidHelper {
                     try {
                         this.wait(duration);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Logger.e(TAG, e, "waitCompleteAndGetOaid interrupted");
+                        Thread.currentThread().interrupt();
                     }
 
                     if (!this.mComplete) {
