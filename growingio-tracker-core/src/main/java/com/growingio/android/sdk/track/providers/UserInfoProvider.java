@@ -39,21 +39,42 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
         return SingleInstance.INSTANCE;
     }
 
+    public String getLoginUserKey() {
+        return PersistentDataProvider.get().getLoginUserKey();
+    }
+
     public String getLoginUserId() {
         return PersistentDataProvider.get().getLoginUserId();
     }
 
     public void setLoginUserId(String userId) {
+        setLoginUserId(userId, null);
+    }
+
+    public void setLoginUserId(String userId, String userKey) {
+        // 考虑DataSharer存储限制
+        if (userKey != null && userKey.length() > 1000) {
+            Logger.e(TAG, ErrorLog.USER_KEY_TOO_LONG);
+            return;
+        }
+        if (userId != null && userId.length() > 1000) {
+            Logger.e(TAG, ErrorLog.USER_ID_TOO_LONG);
+            return;
+        }
+
         if (TextUtils.isEmpty(userId)) {
             // to null, never send visit, just return
+            PersistentDataProvider.get().setLoginUserKey(null);
             PersistentDataProvider.get().setLoginUserId(null);
+            Logger.d(TAG, "clean the userId (and will also clean the userKey");
             dispatchActions(null);
             return;
         }
 
-        if (userId.length() > 1000) {
-            Logger.e(TAG, ErrorLog.USER_ID_TOO_LONG);
-            return;
+        if (TextUtils.isEmpty(userKey)) {
+            PersistentDataProvider.get().setLoginUserKey(null);
+        } else if (!ObjectUtils.equals(getLoginUserKey(), userKey)) {
+            PersistentDataProvider.get().setLoginUserKey(userKey);
         }
 
         // to non-null

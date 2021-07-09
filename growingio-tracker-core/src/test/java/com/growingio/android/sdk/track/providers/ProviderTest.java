@@ -176,7 +176,42 @@ public class ProviderTest {
         String newSessionId3 = SessionProvider.get().getSessionId();
         Truth.assertThat(newSessionId3).isNotEqualTo(newSessionId2);
         UserInfoProvider.get().unregisterUserIdChangedListener(SessionProvider.get());
-    }
 
+        // key为null， 不影响id设置
+        UserInfoProvider.get().setLoginUserId(null, "id1");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("id1");
+
+        // key不为null， id不为null， 设置有效
+        UserInfoProvider.get().setLoginUserId("key2", "id2");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("key2");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("id2");
+
+        // key或者id超过1000存储长度， 设置无效
+        StringBuilder longString = new StringBuilder();
+        for (int i = 0; i < 1001; i++) {
+            longString.append(0);
+        }
+        UserInfoProvider.get().setLoginUserId(longString.toString(), "id3");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isNotEqualTo(longString.toString());
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isNotEqualTo("id3");
+
+        UserInfoProvider.get().setLoginUserId("key3", longString.toString());
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isNotEqualTo("key3");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isNotEqualTo(longString.toString());
+
+        // key不为null， id为null， 同时清空key和id
+        UserInfoProvider.get().setLoginUserId("key4", null);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
+
+        // id为null， 清空key和id
+        UserInfoProvider.get().setLoginUserId("key5", "key5");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("key5");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("key5");
+        UserInfoProvider.get().setLoginUserId(null);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
+
+    }
 
 }

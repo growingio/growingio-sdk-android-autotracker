@@ -30,6 +30,7 @@ public class PersistentDataProvider {
     private static final int SHARER_MAX_SIZE = 50;
 
     private static final String KEY_TYPE_GLOBAL = "TYPE_GLOBAL";
+    private static final String KEY_LOGIN_USER_KEY = "LOGIN_USER_KEY";
     private static final String KEY_LOGIN_USER_ID = "LOGIN_USER_ID";
     private static final String KEY_DEVICE_ID = "DEVICE_ID";
     private static final String KEY_SESSION_ID = "SESSION_ID";
@@ -72,6 +73,14 @@ public class PersistentDataProvider {
             return;
         }
         mDataSharer.putString(KEY_DEVICE_ID, deviceId);
+    }
+
+    public String getLoginUserKey() {
+        return mDataSharer.getString(KEY_LOGIN_USER_KEY, "");
+    }
+
+    public void setLoginUserKey(@Nullable String userKey) {
+        mDataSharer.putString(KEY_LOGIN_USER_KEY, userKey);
     }
 
     public String getLoginUserId() {
