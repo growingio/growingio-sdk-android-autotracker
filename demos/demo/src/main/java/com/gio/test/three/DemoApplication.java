@@ -29,6 +29,7 @@ import androidx.annotation.RequiresApi;
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.events.FilterEventParams;
+import com.growingio.android.sdk.track.events.IgnoreFieldsParams;
 import com.growingio.android.sdk.track.log.Logger;
 import com.tencent.smtt.sdk.QbSdk;
 
@@ -81,7 +82,8 @@ public class DemoApplication extends MultiDexApplication {
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setOaidEnabled(false)
-                    .setEventFilterMask(FilterEventParams.MASK_CLICK_CHANGE_SUBMIT);
+                    .setEventFilterMask(FilterEventParams.MASK_CLICK_CHANGE_SUBMIT)
+                    .setIgnoreFieldsMask(IgnoreFieldsParams.IGNORE_ALL_FIELDS);
         }
         GrowingAutotracker.startWithConfiguration(this, sConfiguration);
     }

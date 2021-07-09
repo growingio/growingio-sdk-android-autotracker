@@ -16,33 +16,20 @@
 
 package com.growingio.android.sdk.track.events;
 
-import android.content.Context;
-
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
-import com.growingio.android.sdk.track.utils.NetworkUtil;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AppClosedEvent extends BaseEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mNetworkState;
-
     protected AppClosedEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mNetworkState = eventBuilder.mNetworkState;
     }
 
     @Override
     public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("networkState", mNetworkState);
-        } catch (JSONException ignored) {
-        }
-        return json;
+        return super.toJSONObject();
     }
 
     public static final class Builder extends BaseBuilder<AppClosedEvent> {
@@ -61,8 +48,6 @@ public class AppClosedEvent extends BaseEvent {
         @Override
         public void readPropertyInTrackThread() {
             super.readPropertyInTrackThread();
-            Context context = TrackerContext.get().getApplicationContext();
-            mNetworkState = NetworkUtil.getActiveNetworkState(context).getNetworkName();
         }
     }
 }
