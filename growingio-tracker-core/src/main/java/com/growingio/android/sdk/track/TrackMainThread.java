@@ -104,9 +104,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
             return;
         }
         // 判断当前事件类型是否被过滤
-        int filterMask = ConfigurationProvider.core().getEventFilterMask();
-        if (filterMask != 0 && ((filterMask & FilterEventParams.valueOf(eventBuilder.getEventType())) > 0)) {
-            Logger.d(TAG, eventBuilder.getEventType() + " event is filtered ...");
+        if (FilterEventParams.isFilterEvent(eventBuilder.getEventType())) {
             return;
         }
 

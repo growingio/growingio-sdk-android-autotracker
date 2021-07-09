@@ -282,6 +282,8 @@ class GioTrackerGenerator(
             processEnv.elementUtils.getTypeElement(GIO_DEFAULT_LOGGER)
         val sdk =
             processEnv.elementUtils.getTypeElement("com.growingio.android.sdk.track.SDKConfig")
+        val filterEventParams =
+            processEnv.elementUtils.getTypeElement("com.growingio.android.sdk.track.events.FilterEventParams")
         val successMethod = MethodSpec.methodBuilder("initSuccess")
             .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
             .addStatement(
@@ -293,6 +295,11 @@ class GioTrackerGenerator(
                 "\$T.i(TAG, \"!!! GrowingIO Tracker version: \"+\$T.SDK_VERSION+\" !!!\")",
                 ClassName.get(logger),
                 ClassName.get(sdk)
+            )
+            .addStatement(
+                    "\$T.i(TAG, \$T.getFilterEventLog())",
+                    ClassName.get(logger),
+                    ClassName.get(filterEventParams)
             )
         return successMethod.build()
     }
