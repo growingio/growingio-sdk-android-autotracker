@@ -24,9 +24,7 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
-import com.growingio.android.sdk.autotrack.util.HurtLocker;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
@@ -36,8 +34,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import java.lang.reflect.Field;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(shadows = {TrackMainThreadShadow.class})
@@ -50,16 +46,9 @@ public class ViewClickTest {
     @Before
     public void setup() {
         TrackerContext.init(application);
+        TrackerContext.initSuccess();
         activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
         ActivityStateProvider.get().onActivityResumed(activity);
-
-        try {
-            Field field = HurtLocker.getField(Autotracker.class, "sInitializedSuccessfully");
-            field.setAccessible(true);
-            field.setBoolean(null, true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Test

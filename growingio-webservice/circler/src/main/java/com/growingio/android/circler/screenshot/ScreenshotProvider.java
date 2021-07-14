@@ -22,12 +22,13 @@ import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider;
-import com.growingio.android.sdk.autotrack.hybrid.OnDomChangedListener;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.modelloader.ModelLoader;
+import com.growingio.android.sdk.track.modelloader.data.HybridDom;
+import com.growingio.android.sdk.track.modelloader.data.HybridJson;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.view.DecorView;
 import com.growingio.android.sdk.track.view.ScreenshotUtil;
@@ -47,6 +48,8 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
     private final float mScale;
     private final Handler mHandler;
     private final Runnable mRefreshScreenshotRunnable = this::dispatchScreenshot;
+    private ModelLoader<HybridDom, HybridJson> modelLoader;
+
 
     private static class SingleInstance {
         private static final ScreenshotProvider INSTANCE = new ScreenshotProvider();
@@ -62,12 +65,17 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
         ViewTreeStatusProvider.get().register(changedEvent -> refreshScreenshot());
 
-        HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
-            @Override
-            public void onDomChanged() {
-                refreshScreenshot();
+        getHybridModelLoader();
+    }
+
+    ModelLoader<HybridDom, HybridJson> getHybridModelLoader() {
+        if (modelLoader == null) {
+            modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridDom.class, HybridJson.class);
+            if (modelLoader != null) {
+                modelLoader.buildLoadData(new HybridDom(this::refreshScreenshot)).fetcher.executeData();
             }
-        });
+        }
+        return modelLoader;
     }
 
     private void dispatchScreenshot() {

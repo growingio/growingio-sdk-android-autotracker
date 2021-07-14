@@ -14,74 +14,59 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid.event;
+package com.growingio.android.hybrid.event;
 
-import com.growingio.android.sdk.track.events.ViewElementEvent;
+import com.growingio.android.sdk.track.events.PageEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class HybridViewElementEvent extends ViewElementEvent {
+public class HybridPageEvent extends PageEvent {
     private static final long serialVersionUID = 1L;
 
+    private final String mProtocolType;
     private final String mQuery;
-    private final String mHyperlink;
 
-    protected HybridViewElementEvent(Builder eventBuilder) {
+    protected HybridPageEvent(Builder eventBuilder) {
         super(eventBuilder);
+        mProtocolType = eventBuilder.mProtocolType;
         mQuery = eventBuilder.mQuery;
-        mHyperlink = eventBuilder.mHyperlink;
     }
 
     public String getQuery() {
         return mQuery;
     }
 
-    public String getHyperlink() {
-        return mHyperlink;
+    public String getProtocolType() {
+        return mProtocolType;
     }
 
     @Override
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
+            json.put("protocolType", mProtocolType);
             json.put("query", mQuery);
-            json.put("hyperlink", mHyperlink);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
-    public final static class Builder extends ViewElementEvent.Builder {
+    public static class Builder extends PageEvent.Builder {
+        private String mProtocolType;
         private String mQuery;
-        private String mHyperlink;
 
         public Builder() {
             super();
         }
 
-        @Override
-        public String getEventType() {
-            return mEventType;
-        }
-
-        public Builder setEventType(String eventType) {
-            mEventType = eventType;
+        public Builder setProtocolType(String protocolType) {
+            mProtocolType = protocolType;
             return this;
-        }
-
-        @Override
-        public HybridViewElementEvent build() {
-            return new HybridViewElementEvent(this);
         }
 
         public Builder setQuery(String query) {
             mQuery = query;
-            return this;
-        }
-
-        public Builder setHyperlink(String hyperlink) {
-            mHyperlink = hyperlink;
             return this;
         }
 
@@ -91,32 +76,37 @@ public final class HybridViewElementEvent extends ViewElementEvent {
         }
 
         @Override
+        public HybridPageEvent build() {
+            return new HybridPageEvent(this);
+        }
+
+        @Override
         public Builder setPath(String path) {
             super.setPath(path);
             return this;
         }
 
         @Override
-        public Builder setPageShowTimestamp(long pageShowTimestamp) {
-            super.setPageShowTimestamp(pageShowTimestamp);
+        public Builder setTitle(String title) {
+            super.setTitle(title);
             return this;
         }
 
         @Override
-        public Builder setTextValue(String textValue) {
-            super.setTextValue(textValue);
+        public Builder setReferralPage(String referralPage) {
+            super.setReferralPage(referralPage);
             return this;
         }
 
         @Override
-        public Builder setXpath(String xpath) {
-            super.setXpath(xpath);
+        public Builder setTimestamp(long timestamp) {
+            super.setTimestamp(timestamp);
             return this;
         }
 
         @Override
-        public Builder setIndex(int index) {
-            super.setIndex(index);
+        public Builder setOrientation(String orientation) {
+            super.setOrientation(orientation);
             return this;
         }
     }

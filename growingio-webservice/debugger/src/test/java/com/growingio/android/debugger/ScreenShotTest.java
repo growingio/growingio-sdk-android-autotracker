@@ -24,6 +24,7 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.growingio.android.debugger.shadow.ShadowHandler;
 import com.growingio.android.debugger.shadow.ShadowWH;
+import com.growingio.android.hybrid.HybridLibraryGioModule;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
@@ -43,6 +44,8 @@ public class ScreenShotTest {
     @Before
     public void setup() {
         TrackerContext.init(application);
+        HybridLibraryGioModule module = new HybridLibraryGioModule();
+        module.registerComponents(application, TrackerContext.get().getRegistry());
     }
 
     @Test

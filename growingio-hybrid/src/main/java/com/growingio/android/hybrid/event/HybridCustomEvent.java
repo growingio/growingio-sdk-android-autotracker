@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid.event;
+package com.growingio.android.hybrid.event;
 
-import com.growingio.android.sdk.track.events.PageEvent;
+import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class HybridPageEvent extends PageEvent {
+import java.util.Map;
+
+public final class HybridCustomEvent extends PageLevelCustomEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mProtocolType;
     private final String mQuery;
 
-    protected HybridPageEvent(Builder eventBuilder) {
+    protected HybridCustomEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mProtocolType = eventBuilder.mProtocolType;
         mQuery = eventBuilder.mQuery;
     }
 
@@ -37,32 +37,21 @@ public class HybridPageEvent extends PageEvent {
         return mQuery;
     }
 
-    public String getProtocolType() {
-        return mProtocolType;
-    }
-
     @Override
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            json.put("protocolType", mProtocolType);
             json.put("query", mQuery);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
-    public static class Builder extends PageEvent.Builder {
-        private String mProtocolType;
+    public static class Builder extends PageLevelCustomEvent.Builder {
         private String mQuery;
 
         public Builder() {
             super();
-        }
-
-        public Builder setProtocolType(String protocolType) {
-            mProtocolType = protocolType;
-            return this;
         }
 
         public Builder setQuery(String query) {
@@ -76,38 +65,32 @@ public class HybridPageEvent extends PageEvent {
         }
 
         @Override
-        public HybridPageEvent build() {
-            return new HybridPageEvent(this);
-        }
-
-        @Override
         public Builder setPath(String path) {
             super.setPath(path);
             return this;
         }
 
         @Override
-        public Builder setTitle(String title) {
-            super.setTitle(title);
+        public Builder setPageShowTimestamp(long pageShowTimestamp) {
+            super.setPageShowTimestamp(pageShowTimestamp);
             return this;
         }
 
         @Override
-        public Builder setReferralPage(String referralPage) {
-            super.setReferralPage(referralPage);
+        public Builder setEventName(String eventName) {
+            super.setEventName(eventName);
             return this;
         }
 
         @Override
-        public Builder setTimestamp(long timestamp) {
-            super.setTimestamp(timestamp);
+        public Builder setAttributes(Map<String, String> attributes) {
+            super.setAttributes(attributes);
             return this;
         }
 
         @Override
-        public Builder setOrientation(String orientation) {
-            super.setOrientation(orientation);
-            return this;
+        public HybridCustomEvent build() {
+            return new HybridCustomEvent(this);
         }
     }
 }

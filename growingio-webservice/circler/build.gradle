@@ -43,6 +43,7 @@ dependencies {
     testImplementation libraries.test.okhttp3_mockwebserver
     testImplementation libraries.test.androidx_core
     testImplementation libraries.test.robolectric
+    testImplementation project(':growingio-hybrid')
 
     compileOnly fileTree(include: ['*.jar'], dir: '../../thirdLibs')
 

@@ -11,8 +11,8 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.2.1-SNAPSHOT",
-                releaseVersionCode: 30210,
+                releaseVersion    : "3.2.2-SNAPSHOT",
+                releaseVersionCode: 30220,
         ]
 
         versions = [
@@ -51,6 +51,7 @@ buildscript {
                         'annotation'      : "com.growingio.android:annotation:$releaseConfiguration.releaseVersion",
                         'compiler'        : "com.growingio.android:compiler:$releaseConfiguration.releaseVersion",
 
+                        'hybrid'          : "com.growingio.android:hybrid:$releaseConfiguration.releaseVersion",
                         'okhttp3'         : "com.growingio.android:okhttp3:$releaseConfiguration.releaseVersion",
                         'volley'          : "com.growingio.android:volley:$releaseConfiguration.releaseVersion",
                         'urlconnection'   : "com.growingio.android:urlconnection:$releaseConfiguration.releaseVersion",

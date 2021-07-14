@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid.event;
+package com.growingio.android.hybrid;
 
-public class HybridEventType {
-    private HybridEventType() {
-    }
 
-    public static final String FORM_SUBMIT = "FORM_SUBMIT";
+import com.growingio.android.sdk.track.events.base.BaseEvent;
+
+public interface HybridTransformer {
+    BaseEvent.BaseBuilder<?> transform(String hybridEvent);
 }

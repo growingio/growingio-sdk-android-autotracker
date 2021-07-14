@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid;
+package com.growingio.android.hybrid;
 
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.text.TextUtils;
 
-import androidx.annotation.Nullable;
-
+import com.growingio.android.hybrid.event.HybridCustomEvent;
+import com.growingio.android.hybrid.event.HybridEventType;
+import com.growingio.android.hybrid.event.HybridPageAttributesEvent;
+import com.growingio.android.hybrid.event.HybridPageEvent;
+import com.growingio.android.hybrid.event.HybridViewElementEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
-import com.growingio.android.sdk.track.events.PageEvent;
-import com.growingio.android.sdk.autotrack.hybrid.event.HybridCustomEvent;
-import com.growingio.android.sdk.autotrack.hybrid.event.HybridEventType;
-import com.growingio.android.sdk.autotrack.hybrid.event.HybridPageAttributesEvent;
-import com.growingio.android.sdk.autotrack.hybrid.event.HybridPageEvent;
-import com.growingio.android.sdk.autotrack.hybrid.event.HybridViewElementEvent;
 import com.growingio.android.sdk.track.events.ConversionVariablesEvent;
 import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
+import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -61,7 +59,6 @@ public class HybridTransformerImp implements HybridTransformer {
     private static final String KEY_TEXT_VALUE = "textValue";
     private static final String KEY_XPATH = "xpath";
 
-    @Nullable
     @Override
     public BaseEvent.BaseBuilder<?> transform(String hybridEvent) {
         try {

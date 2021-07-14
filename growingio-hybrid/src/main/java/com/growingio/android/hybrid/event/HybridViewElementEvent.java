@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid.event;
+package com.growingio.android.hybrid.event;
 
-import com.growingio.android.sdk.track.events.PageAttributesEvent;
+import com.growingio.android.sdk.track.events.ViewElementEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Map;
-
-public final class HybridPageAttributesEvent extends PageAttributesEvent {
+public final class HybridViewElementEvent extends ViewElementEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mQuery;
+    private final String mHyperlink;
 
-    protected HybridPageAttributesEvent(Builder eventBuilder) {
+    protected HybridViewElementEvent(Builder eventBuilder) {
         super(eventBuilder);
         mQuery = eventBuilder.mQuery;
+        mHyperlink = eventBuilder.mHyperlink;
     }
 
     public String getQuery() {
         return mQuery;
+    }
+
+    public String getHyperlink() {
+        return mHyperlink;
     }
 
     @Override
@@ -42,16 +46,33 @@ public final class HybridPageAttributesEvent extends PageAttributesEvent {
         JSONObject json = super.toJSONObject();
         try {
             json.put("query", mQuery);
+            json.put("hyperlink", mHyperlink);
         } catch (JSONException ignored) {
         }
         return json;
     }
 
-    public static class Builder extends PageAttributesEvent.Builder {
+    public final static class Builder extends ViewElementEvent.Builder {
         private String mQuery;
+        private String mHyperlink;
 
         public Builder() {
             super();
+        }
+
+        @Override
+        public String getEventType() {
+            return mEventType;
+        }
+
+        public Builder setEventType(String eventType) {
+            mEventType = eventType;
+            return this;
+        }
+
+        @Override
+        public HybridViewElementEvent build() {
+            return new HybridViewElementEvent(this);
         }
 
         public Builder setQuery(String query) {
@@ -59,14 +80,14 @@ public final class HybridPageAttributesEvent extends PageAttributesEvent {
             return this;
         }
 
-        public Builder setDomain(String domain) {
-            mDomain = domain;
+        public Builder setHyperlink(String hyperlink) {
+            mHyperlink = hyperlink;
             return this;
         }
 
-        @Override
-        public HybridPageAttributesEvent build() {
-            return new HybridPageAttributesEvent(this);
+        public Builder setDomain(String domain) {
+            mDomain = domain;
+            return this;
         }
 
         @Override
@@ -82,8 +103,20 @@ public final class HybridPageAttributesEvent extends PageAttributesEvent {
         }
 
         @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
+        public Builder setTextValue(String textValue) {
+            super.setTextValue(textValue);
+            return this;
+        }
+
+        @Override
+        public Builder setXpath(String xpath) {
+            super.setXpath(xpath);
+            return this;
+        }
+
+        @Override
+        public Builder setIndex(int index) {
+            super.setIndex(index);
             return this;
         }
     }

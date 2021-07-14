@@ -20,7 +20,7 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.EditText;
 
-import com.growingio.android.sdk.autotrack.Autotracker;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
@@ -75,7 +75,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
     }
 
     public static void viewOnChange(View view) {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
         }
 

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid;
+package com.growingio.android.hybrid.event;
 
-import androidx.annotation.Nullable;
+public class HybridEventType {
+    private HybridEventType() {
+    }
 
-import com.growingio.android.sdk.track.events.base.BaseEvent;
-
-public interface HybridTransformer {
-    @Nullable
-    BaseEvent.BaseBuilder<?> transform(String hybridEvent);
+    public static final String FORM_SUBMIT = "FORM_SUBMIT";
 }

@@ -27,6 +27,16 @@ import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 public class TrackerContext extends ContextWrapper {
     private final static String TAG = "ContextProvider";
     private static volatile TrackerContext INSTANCE = null;
+    private static volatile boolean sInitializedSuccessfully = false;
+
+    public static boolean initializedSuccessfully() {
+        if (INSTANCE == null) return false;
+        return sInitializedSuccessfully;
+    }
+
+    public static void initSuccess() {
+        sInitializedSuccessfully = true;
+    }
 
     private TrackerContext(Application application) {
         super(application);

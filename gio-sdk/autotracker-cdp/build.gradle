@@ -43,6 +43,9 @@ dependencies {
     debugApi project(':growingio-webservice:circler')
     releaseApi libraries.growingio.circler
 
+    debugApi project(':growingio-hybrid')
+    releaseApi libraries.growingio.hybrid
+
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }

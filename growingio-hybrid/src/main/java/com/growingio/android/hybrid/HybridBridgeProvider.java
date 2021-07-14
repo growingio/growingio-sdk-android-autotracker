@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid;
+package com.growingio.android.hybrid;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
-import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.webkit.ValueCallback;
 
-import com.growingio.android.sdk.autotrack.Autotracker;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
@@ -35,7 +34,7 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.growingio.android.sdk.autotrack.hybrid.WebViewBridgeJavascriptInterface.JAVASCRIPT_GET_DOM_TREE_METHOD;
+import static com.growingio.android.hybrid.WebViewBridgeJavascriptInterface.JAVASCRIPT_GET_DOM_TREE_METHOD;
 
 public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener, Void> {
     private static final String TAG = "HybridBridgePolicy";
@@ -76,15 +75,16 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
 
     @SuppressLint("SetJavaScriptEnabled")
     public void bridgeForWebView(SuperWebView<?> webView) {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
         webView.setJavaScriptEnabled(true);
+        if (webView.hasAddJavaScripted()) return;
         webView.addJavascriptInterface(new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration()), WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
+        webView.setAddJavaScript(true);
     }
 
-    @UiThread
     public Disposable getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
         Logger.d(TAG, "getWebViewDomTree");
         if (callback == null) {

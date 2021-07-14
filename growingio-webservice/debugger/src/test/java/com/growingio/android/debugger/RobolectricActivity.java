@@ -24,8 +24,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import com.growingio.android.sdk.autotrack.page.ActivityPage;
-
 import static android.widget.LinearLayout.VERTICAL;
 
 /**
@@ -48,7 +46,6 @@ public class RobolectricActivity extends Activity {
         });
 
         ImageView imageView = new ImageView(this);
-        imageView.setTag(com.growingio.android.sdk.autotrack.R.id.growing_tracker_view_page, new ActivityPage(this));
 
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(VERTICAL);

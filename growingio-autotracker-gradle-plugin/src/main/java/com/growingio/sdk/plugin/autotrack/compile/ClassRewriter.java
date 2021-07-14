@@ -47,7 +47,6 @@ public class ClassRewriter {
             "com/blueware/agent/android",
             "com/oneapm/agent/android",
             "com/networkbench/agent",
-            "com/networkbench/agent",
             "android/taobao/windvane/webview",
     };
 

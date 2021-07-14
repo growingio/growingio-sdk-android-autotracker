@@ -44,10 +44,9 @@ dependencies {
     testImplementation libraries.test.okhttp3_mockwebserver
     testImplementation libraries.test.androidx_core
     testImplementation libraries.test.robolectric
-    testImplementation libraries.growingio.autotracker_core
+    testImplementation project(':growingio-hybrid')
 
     implementation project(':growingio-tracker-core')
-    compileOnly project(':growingio-autotracker-core')
     implementation libraries.squareup.okhttp3
 
     implementation project(":growingio-annotation")

@@ -28,9 +28,9 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.autotrack.activity.WebViewActivity;
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider;
-import com.growingio.android.sdk.autotrack.hybrid.OnDomChangedListener;
-import com.growingio.android.sdk.autotrack.hybrid.SuperWebView;
+import com.growingio.android.hybrid.HybridBridgeProvider;
+import com.growingio.android.hybrid.OnDomChangedListener;
+import com.growingio.android.hybrid.SuperWebView;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
@@ -442,7 +442,7 @@ public class HybridEventsTest extends EventsTest {
     public void hybridDomChangedTest() throws Exception {
         AtomicBoolean receivedEvent = new AtomicBoolean(false);
         WebView webView = launchMockWebView();
-        SuperWebView<WebView> superWebView = (SuperWebView<WebView>) Whitebox.invokeConstructor(Class.forName("com.growingio.android.sdk.autotrack.hybrid.SuperWebView$SystemWebView"), webView);
+        SuperWebView<WebView> superWebView = (SuperWebView<WebView>) Whitebox.invokeConstructor(Class.forName("com.growingio.android.hybrid.SuperWebView$SystemWebView"), webView);
         HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
             @Override
             public void onDomChanged() {

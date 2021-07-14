@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.autotrack.hybrid;
+package com.growingio.android.hybrid;
 
-import com.growingio.android.sdk.autotrack.Autotracker;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
@@ -31,7 +31,7 @@ class NativeBridge {
     }
 
     void dispatchEvent(String event) {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
@@ -40,7 +40,7 @@ class NativeBridge {
     }
 
     void setNativeUserId(String userId) {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
@@ -54,7 +54,7 @@ class NativeBridge {
     }
 
     void clearNativeUserId() {
-        if (!Autotracker.initializedSuccessfully()) {
+        if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }

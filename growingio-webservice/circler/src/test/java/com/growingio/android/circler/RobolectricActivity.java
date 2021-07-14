@@ -18,6 +18,7 @@ package com.growingio.android.circler;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,10 +51,14 @@ public class RobolectricActivity extends Activity {
         ImageView imageView = new ImageView(this);
         imageView.setTag(com.growingio.android.sdk.autotrack.R.id.growing_tracker_view_page, new ActivityPage(this));
 
+        WebView webView = new WebView(this);
+        webView.loadUrl("https://www.growingio.com/");
+
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(VERTICAL);
         linearLayout.addView(textView);
         linearLayout.addView(imageView);
+        //linearLayout.addView(webView);
         setContentView(linearLayout);
     }
 }

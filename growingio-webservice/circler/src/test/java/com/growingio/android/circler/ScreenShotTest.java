@@ -29,6 +29,7 @@ import com.growingio.android.circler.screenshot.CircleScreenshot;
 import com.growingio.android.circler.screenshot.ScreenshotProvider;
 import com.growingio.android.circler.shadow.ShadowHandler;
 import com.growingio.android.circler.shadow.ShadowWH;
+import com.growingio.android.hybrid.HybridLibraryGioModule;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -53,6 +54,8 @@ public class ScreenShotTest {
     @Before
     public void setup() {
         TrackerContext.init(application);
+        HybridLibraryGioModule module = new HybridLibraryGioModule();
+        module.registerComponents(application, TrackerContext.get().getRegistry());
     }
 
     @Test
