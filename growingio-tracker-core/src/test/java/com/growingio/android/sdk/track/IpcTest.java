@@ -31,8 +31,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.io.IOException;
-import java.nio.channels.OverlappingFileLockException;
 import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE)
@@ -67,27 +65,18 @@ public class IpcTest {
     @Test
     public void lockTest() {
         ProcessLock lock1 = new ProcessLock(application, "test");
-        try {
-            lock1.lock();
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        ProcessLock lock2 = new ProcessLock(application, "test");
-                        lock2.tryLock(1000);
-                    } catch (Exception e) {
-                        Truth.assertThat(e).isInstanceOf(OverlappingFileLockException.class);
-                    }
-                }
-            }.start();
-            Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
-            lock1.release();
-
-            ProcessLock lock3 = new ProcessLock(application, "test");
-            Truth.assertThat(lock3.tryLock()).isTrue();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        Truth.assertThat(lock1.isAcquired()).isTrue();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ProcessLock lock2 = new ProcessLock(application, "test");
+                Truth.assertThat(lock2.isAcquired()).isFalse();
+            }
+        }).start();
+        Truth.assertThat(lock1.isAcquired()).isTrue();
+        Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+        lock1.release();
+        Truth.assertThat(lock1.isAcquired()).isTrue();
+        lock1.release();
     }
 }

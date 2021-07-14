@@ -31,7 +31,6 @@ import com.growingio.android.sdk.track.ipc.ProcessLock;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -178,13 +177,7 @@ public class EventSender {
      * @param onlyInstant true -- 仅发送实时消息
      */
     void sendEvents(boolean onlyInstant) {
-        boolean locked = true;
-        try {
-            locked = mProcessLock.tryLock();
-        } catch (IOException e) {
-            Logger.e(TAG, e);
-        }
-        if (!locked) {
+        if (!mProcessLock.isAcquired()) {
             Logger.e(TAG, "sendEvents: this process can not get lock");
             return;
         }

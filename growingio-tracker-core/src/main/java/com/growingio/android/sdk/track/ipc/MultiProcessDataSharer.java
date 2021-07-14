@@ -70,7 +70,9 @@ public class MultiProcessDataSharer implements IDataSharer {
                 Logger.d(TAG, "awaitLoadedLocked");
                 wait();
                 Logger.d(TAG, "awaitLoadedLocked end");
-            } catch (InterruptedException ignored) {
+            } catch (InterruptedException e) {
+                Logger.e(TAG, e, "awaitLoadedLocked interrupted");
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -85,7 +87,7 @@ public class MultiProcessDataSharer implements IDataSharer {
             try {
                 RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
                 mFileChannel = randomAccessFile.getChannel();
-                mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, mMaxSize * SharedEntry.MAX_SIZE);
+                mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, (long) mMaxSize * SharedEntry.MAX_SIZE);
                 incrementLoadFromDisk();
             } catch (IOException e) {
                 Logger.e(TAG, e);
