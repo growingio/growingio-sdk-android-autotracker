@@ -127,7 +127,7 @@ public class PageAttributesEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(eventsListener);
         FragmentLifecycleMonitor.get().addLifecycleCallback((fragment, stage) -> {
             if (fragment.getClass() == PlaceholderFragment.class && stage == FragmentLifecycleCallback.Stage.CREATED) {
-                GrowingAutotracker.get().setPageAttributes(fragment, TEST_ATTRIBUTES);
+                GrowingAutotracker.get().setPageAttributesSupport(fragment, TEST_ATTRIBUTES);
             }
         });
 
@@ -152,7 +152,7 @@ public class PageAttributesEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(eventsListener);
         FragmentLifecycleMonitor.get().addLifecycleCallback((fragment, stage) -> {
             if (fragment.getClass() == PlaceholderFragment.class && stage == FragmentLifecycleCallback.Stage.RESUMED) {
-                TrackHelper.postToUiThread(() -> GrowingAutotracker.get().setPageAttributes(fragment, TEST_ATTRIBUTES));
+                TrackHelper.postToUiThread(() -> GrowingAutotracker.get().setPageAttributesSupport(fragment, TEST_ATTRIBUTES));
             }
         });
 
@@ -237,7 +237,7 @@ public class PageAttributesEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(eventsListener);
         FragmentLifecycleMonitor.get().addLifecycleCallback((fragment, stage) -> {
             if (fragment.getClass() == GreenFragment.class && stage == FragmentLifecycleCallback.Stage.CREATED) {
-                GrowingAutotracker.get().setPageAttributes(fragment, TEST_ATTRIBUTES);
+                GrowingAutotracker.get().setPageAttributesSupport(fragment, TEST_ATTRIBUTES);
             }
         });
 
@@ -264,7 +264,7 @@ public class PageAttributesEventsTest extends EventsTest {
         getEventsApiServer().setOnReceivedEventListener(eventsListener);
         FragmentLifecycleMonitor.get().addLifecycleCallback((fragment, stage) -> {
             if (fragment.getClass() == GreenFragment.class && stage == FragmentLifecycleCallback.Stage.RESUMED) {
-                TrackHelper.postToUiThread(() -> GrowingAutotracker.get().setPageAttributes(fragment, TEST_ATTRIBUTES));
+                TrackHelper.postToUiThread(() -> GrowingAutotracker.get().setPageAttributesSupport(fragment, TEST_ATTRIBUTES));
             }
         });
 

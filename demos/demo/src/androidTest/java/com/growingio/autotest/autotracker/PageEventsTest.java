@@ -141,7 +141,7 @@ public class PageEventsTest extends EventsTest {
 
         FragmentLifecycleCallback fragmentLifecycleCallback = (fragment, stage) -> {
             if (stage == FragmentLifecycleCallback.Stage.CREATED && fragment.getClass() == GreenFragment.class) {
-                GrowingAutotracker.get().ignorePage(fragment, IgnorePolicy.IGNORE_SELF);
+                GrowingAutotracker.get().ignorePageSupport(fragment, IgnorePolicy.IGNORE_SELF);
             }
         };
         FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);
@@ -183,7 +183,7 @@ public class PageEventsTest extends EventsTest {
 
         FragmentLifecycleCallback fragmentLifecycleCallback = (fragment, stage) -> {
             if (stage == FragmentLifecycleCallback.Stage.CREATED && fragment.getClass() == GreenFragment.class) {
-                GrowingAutotracker.get().ignorePage(fragment, IgnorePolicy.IGNORE_CHILD);
+                GrowingAutotracker.get().ignorePageSupport(fragment, IgnorePolicy.IGNORE_CHILD);
             }
         };
         FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);
@@ -219,7 +219,7 @@ public class PageEventsTest extends EventsTest {
 
         FragmentLifecycleCallback fragmentLifecycleCallback = (fragment, stage) -> {
             if (stage == FragmentLifecycleCallback.Stage.CREATED && fragment.getClass() == GreenFragment.class) {
-                GrowingAutotracker.get().ignorePage(fragment, IgnorePolicy.IGNORE_ALL);
+                GrowingAutotracker.get().ignorePageSupport(fragment, IgnorePolicy.IGNORE_ALL);
             }
         };
         FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);
@@ -276,7 +276,7 @@ public class PageEventsTest extends EventsTest {
 
         FragmentLifecycleCallback fragmentLifecycleCallback = (fragment, stage) -> {
             if (stage == FragmentLifecycleCallback.Stage.CREATED && fragment.getClass() == GreenFragment.class) {
-                GrowingAutotracker.get().setPageAlias(fragment, "TestGreenPage");
+                GrowingAutotracker.get().setPageAliasSupport(fragment, "TestGreenPage");
             }
         };
         FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);

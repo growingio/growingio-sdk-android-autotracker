@@ -514,7 +514,7 @@ public class ViewClickEventsTest extends EventsTest {
         ));
         FragmentLifecycleMonitor.get().addLifecycleCallback((fragment, stage) -> {
             if (fragment.getClass() == RedFragment.class && stage == FragmentLifecycleCallback.Stage.CREATED) {
-                GrowingAutotracker.get().ignorePage(fragment, IgnorePolicy.IGNORE_SELF);
+                GrowingAutotracker.get().ignorePageSupport(fragment, IgnorePolicy.IGNORE_SELF);
             }
         });
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
@@ -538,7 +538,7 @@ public class ViewClickEventsTest extends EventsTest {
         ));
         FragmentLifecycleMonitor.get().addLifecycleCallback((fragment, stage) -> {
             if (fragment.getClass() == GreenFragment.class && stage == FragmentLifecycleCallback.Stage.CREATED) {
-                GrowingAutotracker.get().ignorePage(fragment, IgnorePolicy.IGNORE_CHILD);
+                GrowingAutotracker.get().ignorePageSupport(fragment, IgnorePolicy.IGNORE_CHILD);
             }
         });
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
