@@ -51,8 +51,7 @@ public class AutotrackTest {
         autotracker = new Autotracker(application);
         Map<Class<? extends Configurable>, Configurable> modules = new HashMap<>();
         modules.put(AutotrackConfig.class, new AutotrackConfig().setImpressionScale(0.5f));
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"),
-                modules);
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"), modules);
     }
 
 
