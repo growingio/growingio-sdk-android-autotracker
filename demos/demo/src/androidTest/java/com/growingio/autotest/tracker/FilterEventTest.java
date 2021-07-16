@@ -52,7 +52,7 @@ public class FilterEventTest extends EventsTest {
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
         DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig()
-                .setEventFilterMask(FilterEventParams.of(FilterEventParams.MASK_CLICK_CHANGE_SUBMIT))
+                .setFilterEvent(FilterEventParams.of(FilterEventParams.MASK_CLICK_CHANGE_SUBMIT))
         );
     }
 

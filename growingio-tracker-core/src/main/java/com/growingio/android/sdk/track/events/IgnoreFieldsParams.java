@@ -73,10 +73,10 @@ public class IgnoreFieldsParams {
 
     public static boolean isIgnoreField(String typeName) {
 
-        int ignoreFieldsMask = ConfigurationProvider.core().getIgnoreFieldsMask();
-        if (ignoreFieldsMask > 0) {
+        int ignoreFieldsFlag = ConfigurationProvider.core().getIgnoreFields();
+        if (ignoreFieldsFlag > 0) {
             int fieldMask = valueOf(typeName);
-            return (ignoreFieldsMask & fieldMask) > 0;
+            return (ignoreFieldsFlag & fieldMask) > 0;
         }
         return false;
     }

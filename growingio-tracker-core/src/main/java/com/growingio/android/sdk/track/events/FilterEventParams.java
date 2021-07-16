@@ -86,9 +86,9 @@ public final class FilterEventParams {
     }
 
     public static boolean isFilterEvent(String typeName) {
-        int filterMask = ConfigurationProvider.core().getEventFilterMask();
-        if (filterMask > 0) {
-            return (filterMask & valueOf(typeName)) > 0;
+        int filterFlag = ConfigurationProvider.core().getFilterEvent();
+        if (filterFlag > 0) {
+            return (filterFlag & valueOf(typeName)) > 0;
         }
         return false;
     }

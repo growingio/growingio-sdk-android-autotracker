@@ -82,8 +82,8 @@ public class DemoApplication extends MultiDexApplication {
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setOaidEnabled(false)
-                    .setEventFilterMask(FilterEventParams.of(FilterEventParams.MASK_CLICK_CHANGE_SUBMIT))
-                    .setIgnoreFieldsMask(IgnoreFieldsParams.of(IgnoreFieldsParams.IGNORE_ALL_FIELDS));
+                    .setFilterEvent(FilterEventParams.of(FilterEventParams.MASK_CLICK_CHANGE_SUBMIT))
+                    .setIgnoreFields(IgnoreFieldsParams.of(IgnoreFieldsParams.IGNORE_ALL_FIELDS));
         }
         GrowingAutotracker.startWithConfiguration(this, sConfiguration);
     }

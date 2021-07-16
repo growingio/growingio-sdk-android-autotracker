@@ -33,7 +33,6 @@ public class AppClosedEvent extends BaseEvent {
     }
 
     public static final class Builder extends BaseBuilder<AppClosedEvent> {
-        private String mNetworkState;
 
         @Override
         public String getEventType() {

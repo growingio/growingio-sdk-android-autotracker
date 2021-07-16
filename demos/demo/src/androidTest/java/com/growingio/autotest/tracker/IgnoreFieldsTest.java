@@ -54,7 +54,7 @@ public class IgnoreFieldsTest extends EventsTest {
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
         DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig()
-                .setIgnoreFieldsMask(IgnoreFieldsParams.of(IgnoreFieldsParams.IGNORE_ALL_FIELDS))
+                .setIgnoreFields(IgnoreFieldsParams.of(IgnoreFieldsParams.IGNORE_ALL_FIELDS))
         );
     }
 

@@ -31,8 +31,8 @@ public class CoreConfiguration implements Configurable {
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
     private boolean mOaidEnabled = false;
-    private int mEventFilterMask = 0;
-    private int mIgnoreFieldsMask = 0;
+    private int mFilterEventFlag = 0;
+    private int mIgnoreFieldsFlag = 0;
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -136,22 +136,22 @@ public class CoreConfiguration implements Configurable {
         return this;
     }
 
-    public CoreConfiguration setEventFilterMask(int eventFilterMask) {
-        this.mEventFilterMask = eventFilterMask;
+    public CoreConfiguration setFilterEvent(int filterEventFlag) {
+        this.mFilterEventFlag = filterEventFlag;
         return this;
     }
 
-    public int getEventFilterMask() {
-        return mEventFilterMask;
+    public int getFilterEvent() {
+        return mFilterEventFlag;
     }
 
-    public CoreConfiguration setIgnoreFieldsMask(int ignoreFieldsMask) {
-        this.mIgnoreFieldsMask = ignoreFieldsMask;
+    public CoreConfiguration setIgnoreFields(int ignoreFieldsFlag) {
+        this.mIgnoreFieldsFlag = ignoreFieldsFlag;
         return this;
     }
 
-    public int getIgnoreFieldsMask() {
-        return mIgnoreFieldsMask;
+    public int getIgnoreFields() {
+        return mIgnoreFieldsFlag;
     }
 
 }
