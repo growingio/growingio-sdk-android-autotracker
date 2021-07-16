@@ -23,7 +23,7 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.R;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.autotrack.activity.ui.login.LoginActivity;
-import com.growingio.android.sdk.track.events.FilterEventParams;
+import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
@@ -46,13 +46,13 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class FilterEventTest extends EventsTest {
+public class EventExcludeFilterTest extends EventsTest {
 
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
         DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig()
-                .setFilterEvent(FilterEventParams.of(FilterEventParams.MASK_CLICK_CHANGE_SUBMIT))
+                .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.EVENT_MASK_TRIGGER))
         );
     }
 

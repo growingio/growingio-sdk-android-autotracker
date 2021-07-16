@@ -18,6 +18,9 @@ package com.growingio.android.sdk;
 
 import android.text.TextUtils;
 
+import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
+import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
+
 public class CoreConfiguration implements Configurable {
     private String mProjectId;
     private String mUrlScheme;
@@ -31,8 +34,8 @@ public class CoreConfiguration implements Configurable {
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
     private boolean mOaidEnabled = false;
-    private int mFilterEventFlag = 0;
-    private int mIgnoreFieldsFlag = 0;
+    private int mExcludeEventFlag = EventExcludeFilter.EVENT_MASK_NONE;
+    private int mIgnoreFieldFlag = FieldIgnoreFilter.FIELD_IGNORE_NONE;
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -136,22 +139,30 @@ public class CoreConfiguration implements Configurable {
         return this;
     }
 
-    public CoreConfiguration setFilterEvent(int filterEventFlag) {
-        this.mFilterEventFlag = filterEventFlag;
+    public CoreConfiguration setExcludeEvent(int filterEventFlag) {
+        if (filterEventFlag == EventExcludeFilter.EVENT_MASK_NONE) {
+            this.mExcludeEventFlag = EventExcludeFilter.EVENT_MASK_NONE;
+        } else {
+            this.mExcludeEventFlag |= filterEventFlag;
+        }
         return this;
     }
 
     public int getFilterEvent() {
-        return mFilterEventFlag;
+        return mExcludeEventFlag;
     }
 
-    public CoreConfiguration setIgnoreFields(int ignoreFieldsFlag) {
-        this.mIgnoreFieldsFlag = ignoreFieldsFlag;
+    public CoreConfiguration setIgnoreField(int ignoreFieldFlag) {
+        if (ignoreFieldFlag == FieldIgnoreFilter.FIELD_IGNORE_NONE) {
+            this.mIgnoreFieldFlag = FieldIgnoreFilter.FIELD_IGNORE_NONE;
+        } else {
+            this.mIgnoreFieldFlag |= ignoreFieldFlag;
+        }
         return this;
     }
 
-    public int getIgnoreFields() {
-        return mIgnoreFieldsFlag;
+    public int getIgnoreField() {
+        return mIgnoreFieldFlag;
     }
 
 }

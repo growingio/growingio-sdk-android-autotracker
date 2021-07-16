@@ -23,7 +23,7 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.R;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.autotrack.activity.ui.login.LoginActivity;
-import com.growingio.android.sdk.track.events.IgnoreFieldsParams;
+import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
@@ -54,7 +54,7 @@ public class IgnoreFieldsTest extends EventsTest {
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
         DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig()
-                .setIgnoreFields(IgnoreFieldsParams.of(IgnoreFieldsParams.IGNORE_ALL_FIELDS))
+                .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
         );
     }
 

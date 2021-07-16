@@ -25,7 +25,7 @@ import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.data.EventSequenceId;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
-import com.growingio.android.sdk.track.events.IgnoreFieldsParams;
+import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -307,14 +307,14 @@ public abstract class BaseEvent extends GEvent {
             mEventSequenceId = sequenceId.getEventTypeId();
 
             Context context = TrackerContext.get().getApplicationContext();
-            mNetworkState = IgnoreFieldsParams.isIgnoreField("networkState") ? "" : NetworkUtil.getActiveNetworkState(context).getNetworkName();
+            mNetworkState = FieldIgnoreFilter.isFieldFilter("networkState") ? "" : NetworkUtil.getActiveNetworkState(context).getNetworkName();
 
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
-            mScreenHeight = IgnoreFieldsParams.isIgnoreField("screenHeight") ? 0 : deviceInfo.getScreenHeight();
-            mScreenWidth = IgnoreFieldsParams.isIgnoreField("screenWidth") ? 0 : deviceInfo.getScreenWidth();
-            mDeviceBrand = IgnoreFieldsParams.isIgnoreField("deviceBrand") ? "" : deviceInfo.getDeviceBrand();
-            mDeviceModel = IgnoreFieldsParams.isIgnoreField("deviceModel") ? "" : deviceInfo.getDeviceModel();
-            mDeviceType = IgnoreFieldsParams.isIgnoreField("deviceType") ? "" : deviceInfo.getDeviceType();
+            mScreenHeight = FieldIgnoreFilter.isFieldFilter("screenHeight") ? 0 : deviceInfo.getScreenHeight();
+            mScreenWidth = FieldIgnoreFilter.isFieldFilter("screenWidth") ? 0 : deviceInfo.getScreenWidth();
+            mDeviceBrand = FieldIgnoreFilter.isFieldFilter("deviceBrand") ? "" : deviceInfo.getDeviceBrand();
+            mDeviceModel = FieldIgnoreFilter.isFieldFilter("deviceModel") ? "" : deviceInfo.getDeviceModel();
+            mDeviceType = FieldIgnoreFilter.isFieldFilter("deviceType") ? "" : deviceInfo.getDeviceType();
 
             AppInfoProvider appInfo = AppInfoProvider.get();
             mAppChannel = appInfo.getAppChannel();
