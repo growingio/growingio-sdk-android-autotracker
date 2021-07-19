@@ -172,7 +172,7 @@ public class AutotrackTransform extends Transform {
             return;
         }
         if (out.exists()) {
-            out.delete();
+            FileUtils.deleteQuietly(out);
         }
         if (isIncremental && jarInput.getStatus() == Status.REMOVED) {
             return;

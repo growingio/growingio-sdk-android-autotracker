@@ -18,82 +18,73 @@ package com.growingio.android.sdk.track.ipc;
 
 import android.content.Context;
 
-import com.growingio.android.sdk.track.log.Logger;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 
 public class ProcessLock {
     private static final String TAG = "ProcessLock";
 
     private final Context mContext;
     private final String mName;
-    private volatile FileLock mLock;
+    private FileOutputStream mOutputStream;
+    private FileChannel mFileChannel;
+    private FileLock mFileLock;
 
     public ProcessLock(Context context, String name) {
         mContext = context;
         mName = name + ".lock";
     }
 
-    /**
-     * 该方法会block，直到别的持有锁的地方release
-     */
-    public void lock() throws IOException {
-        if (mLock != null) {
-            return;
+    private FileLock getFileLock() {
+        if (mFileLock == null) {
+            try {
+                if (mOutputStream == null || mFileChannel == null) {
+                    mOutputStream = mContext.openFileOutput(mName, Context.MODE_PRIVATE);
+                    mFileChannel = mOutputStream.getChannel();
+                }
+                mFileLock = mFileChannel.tryLock();
+            } catch (IOException e) {
+                return null;
+            } catch (OverlappingFileLockException e) {
+                return null;
+            }
         }
-        FileOutputStream outputStream = mContext.openFileOutput(mName, Context.MODE_PRIVATE);
-        FileChannel channel = outputStream.getChannel();
-        mLock = channel.lock();
+        return mFileLock;
     }
 
-    /**
-     * 该方法不会block，无论有没有获取到lock都会立刻返回
-     *
-     * @return 是否成功获取lock
-     */
-    public boolean tryLock() throws IOException {
-        if (mLock != null) {
-            return mLock.isValid();
-        }
-        FileOutputStream outputStream = mContext.openFileOutput(mName, Context.MODE_PRIVATE);
-        FileChannel channel = outputStream.getChannel();
-        mLock = channel.tryLock();
-        return mLock != null;
-    }
-
-    /**
-     * 该方法会block，直到成功获取lock或者超时
-     *
-     * @param timeout 超时时间
-     * @return 是否成功获取lock
-     */
-    public boolean tryLock(long timeout) throws IOException {
-        long endTime = System.currentTimeMillis() + timeout;
-        do {
-            if (tryLock()) {
-                return true;
-            } else {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    Logger.e(TAG, e);
+    private void internalRelease() throws IOException {
+        try {
+            if (mFileLock != null && mFileLock.isValid()) {
+                mFileLock.release();
+            }
+        } finally {
+            try {
+                if (mFileChannel != null) {
+                    mFileChannel.close();
+                }
+            } finally {
+                if (mOutputStream != null) {
+                    mOutputStream.close();
                 }
             }
-        } while (System.currentTimeMillis() < endTime);
-        return false;
+        }
     }
 
     public void release() {
         try {
-            if (mLock != null) {
-                mLock.release();
-            }
-            mLock = null;
-        } catch (IOException e) {
-            Logger.e(TAG, e);
+            internalRelease();
+        } catch (IOException ignored) {
+        } finally {
+            mOutputStream = null;
+            mFileChannel = null;
+            mFileLock = null;
         }
+    }
+
+    public boolean isAcquired() {
+        return getFileLock() != null && getFileLock().isValid();
     }
 }
