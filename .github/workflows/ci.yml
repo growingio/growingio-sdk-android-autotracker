@@ -52,7 +52,7 @@ jobs:
         with:
           api-level: 29
           profile: Nexus 6
-          # emulator-build: 7425822
+          emulator-build: 7425822
           script: |
             adb shell logcat -c
             adb shell logcat > ./uiTest.log &
