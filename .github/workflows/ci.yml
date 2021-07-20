@@ -50,9 +50,9 @@ jobs:
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: 27
           profile: Nexus 6
-          emulator-build: 7425822
+          # emulator-build: 7425822
           script: |
             adb shell logcat -c
             adb shell logcat > ./uiTest.log &
