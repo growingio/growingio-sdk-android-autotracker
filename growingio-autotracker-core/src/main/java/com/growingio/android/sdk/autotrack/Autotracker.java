@@ -43,7 +43,7 @@ public class Autotracker extends Tracker {
         return sInitializedSuccessfully;
     }
 
-    Autotracker(Application application) {
+    public Autotracker(Application application) {
         super(application);
         if (application == null) {
             sInitializedSuccessfully = false;
