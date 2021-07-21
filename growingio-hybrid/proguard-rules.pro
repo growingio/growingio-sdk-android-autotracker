@@ -19,10 +19,3 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
-
--keep class * extends com.growingio.android.sdk.LibraryGioModule
--keep class * extends com.growingio.android.sdk.GeneratedGioModule
-
-# Uncomment for DexGuard only
-#-keepresourcexmlelements manifest/application/meta-data@value=GlideModule

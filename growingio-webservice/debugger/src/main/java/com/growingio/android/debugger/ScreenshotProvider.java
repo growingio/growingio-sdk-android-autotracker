@@ -26,6 +26,9 @@ import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.modelloader.ModelLoader;
+import com.growingio.android.sdk.track.modelloader.data.HybridDom;
+import com.growingio.android.sdk.track.modelloader.data.HybridJson;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.view.DecorView;
 import com.growingio.android.sdk.track.view.ScreenshotUtil;
@@ -60,7 +63,14 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
         ViewTreeStatusProvider.get().register(changedEvent -> refreshScreenshot());
 
-        ClassUtils.registerHybridScreenShot(this);
+        getHybridModelLoader();
+    }
+
+    private void getHybridModelLoader() {
+        ModelLoader<HybridDom, HybridJson> modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridDom.class, HybridJson.class);
+        if (modelLoader != null) {
+            modelLoader.buildLoadData(new HybridDom(this::refreshScreenshot)).fetcher.executeData();
+        }
     }
 
     private void dispatchScreenshot() {

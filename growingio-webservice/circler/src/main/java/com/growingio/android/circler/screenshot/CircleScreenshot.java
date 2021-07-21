@@ -19,11 +19,8 @@ package com.growingio.android.circler.screenshot;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.hybrid.HybridBridgeProvider;
-import com.growingio.android.sdk.autotrack.hybrid.SuperWebView;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
@@ -33,6 +30,10 @@ import com.growingio.android.sdk.autotrack.view.ViewUtil;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.async.UnsubscribedDisposable;
+import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.modelloader.ModelLoader;
+import com.growingio.android.sdk.track.modelloader.data.HybridDom;
+import com.growingio.android.sdk.track.modelloader.data.HybridJson;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.view.DecorView;
@@ -196,25 +197,6 @@ public class CircleScreenshot {
                     .setZLevel(mViewCount++);
         }
 
-        private void getWebViewDomTree(final SuperWebView<?> webView, final ViewNode viewNode) {
-            mWebViewCount.incrementAndGet();
-            HybridBridgeProvider.get().getWebViewDomTree(webView, new Callback<JSONObject>() {
-                @Override
-                public void onSuccess(JSONObject result) {
-                    ViewElement.Builder elementBuilder = createViewElementBuilder(viewNode);
-                    mViewElements.add(elementBuilder.setWebView(result).build());
-                    if (mWebViewCount.decrementAndGet() == 0) {
-                        callResultOnSuccess();
-                    }
-                }
-
-                @Override
-                public void onFailed() {
-                    callResultOnFailed();
-                }
-            });
-        }
-
         private void checkView2ViewElement(View view) {
             ViewNode topViewNode = ViewHelper.getTopViewNode(view, null);
             if (disposeWebView(topViewNode)) {
@@ -240,21 +222,27 @@ public class CircleScreenshot {
         }
 
         private boolean disposeWebView(ViewNode viewNode) {
-            if (viewNode.getView() instanceof WebView) {
-                getWebViewDomTree(SuperWebView.make((WebView) viewNode.getView()), viewNode);
+            if (ClassExistHelper.isWebView(viewNode.getView())) {
+                ModelLoader<HybridDom, HybridJson> modelLoader = ScreenshotProvider.get().getHybridModelLoader();
+                if (modelLoader == null) return false;
+                mWebViewCount.incrementAndGet();
+                modelLoader.buildLoadData(new HybridDom(viewNode.getView())).fetcher.loadData(new DataFetcher.DataCallback<HybridJson>() {
+                    @Override
+                    public void onDataReady(HybridJson data) {
+                        ViewElement.Builder elementBuilder = createViewElementBuilder(viewNode);
+                        mViewElements.add(elementBuilder.setWebView(data.getJsonObject()).build());
+                        if (mWebViewCount.decrementAndGet() == 0) {
+                            callResultOnSuccess();
+                        }
+                    }
+
+                    @Override
+                    public void onLoadFailed(Exception e) {
+                        callResultOnFailed();
+                    }
+                });
                 return true;
             }
-
-            if (ClassExistHelper.instanceOfX5WebView(viewNode.getView())) {
-                getWebViewDomTree(SuperWebView.makeX5((com.tencent.smtt.sdk.WebView) viewNode.getView()), viewNode);
-                return true;
-            }
-
-            if (ClassExistHelper.instanceOfUcWebView(viewNode.getView())) {
-                getWebViewDomTree(SuperWebView.makeUC((com.uc.webview.export.WebView) viewNode.getView()), viewNode);
-                return true;
-            }
-
             return false;
         }
 
