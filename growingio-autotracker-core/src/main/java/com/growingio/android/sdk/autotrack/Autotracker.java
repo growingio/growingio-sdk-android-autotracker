@@ -66,35 +66,36 @@ public class Autotracker extends Tracker {
         });
     }
 
-    public void trackCustomEvent(String eventName, Activity page) {
+    // TODO: 用户cstm事件不关联page，可扩展通过特定API发送的cstm事件支持p字段(通过private隐藏相关方法)
+    private void trackCustomEvent(String eventName, Activity page) {
 
     }
 
-    public void trackCustomEvent(String eventName, Fragment page) {
+    private void trackCustomEvent(String eventName, Fragment page) {
 
     }
 
-    public void trackCustomEvent(String eventName, android.support.v4.app.Fragment page) {
+    private void trackCustomEventSupport(String eventName, android.support.v4.app.Fragment page) {
 
     }
 
-    public void trackCustomEventX(String eventName, androidx.fragment.app.Fragment page) {
+    private void trackCustomEventX(String eventName, androidx.fragment.app.Fragment page) {
 
     }
 
-    public void trackCustomEvent(String eventName, Map<String, String> attributes, Activity page) {
+    private void trackCustomEvent(String eventName, Map<String, String> attributes, Activity page) {
 
     }
 
-    public void trackCustomEvent(String eventName, Map<String, String> attributes, Fragment page) {
+    private void trackCustomEvent(String eventName, Map<String, String> attributes, Fragment page) {
 
     }
 
-    public void trackCustomEvent(String eventName, Map<String, String> attributes, android.support.v4.app.Fragment page) {
+    private void trackCustomEventSupport(String eventName, Map<String, String> attributes, android.support.v4.app.Fragment page) {
 
     }
 
-    public void trackCustomEventX(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page) {
+    private void trackCustomEventX(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page) {
 
     }
 
@@ -122,7 +123,7 @@ public class Autotracker extends Tracker {
         });
     }
 
-    public void setPageAttributes(final android.support.v4.app.Fragment page, final Map<String, String> attributes) {
+    public void setPageAttributesSupport(final android.support.v4.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
         if (page == null || attributes == null || attributes.isEmpty()) {
             Logger.e(TAG, "page or attributes is NULL");
@@ -205,7 +206,7 @@ public class Autotracker extends Tracker {
         });
     }
 
-    public void setPageAlias(final android.support.v4.app.Fragment page, final String alias) {
+    public void setPageAliasSupport(final android.support.v4.app.Fragment page, final String alias) {
         if (!isInited) return;
         if (page == null || TextUtils.isEmpty(alias)) {
             Logger.e(TAG, "fragment or alias is NULL");
@@ -261,7 +262,7 @@ public class Autotracker extends Tracker {
         });
     }
 
-    public void ignorePage(final android.support.v4.app.Fragment page, final IgnorePolicy policy) {
+    public void ignorePageSupport(final android.support.v4.app.Fragment page, final IgnorePolicy policy) {
         if (!isInited) return;
         if (page == null || policy == null) {
             Logger.e(TAG, "fragment or policy is NULL");
