@@ -19,7 +19,6 @@ package com.growingio.android.sdk.autotrack;
 
 import android.app.Application;
 import android.app.Fragment;
-import android.content.Intent;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -27,7 +26,6 @@ import com.google.common.truth.Truth;
 import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
-import com.growingio.android.sdk.autotrack.inject.ActivityInjector;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.junit.Before;
@@ -52,19 +50,6 @@ public class AutotrackTest {
         Map<Class<? extends Configurable>, Configurable> modules = new HashMap<>();
         modules.put(AutotrackConfig.class, new AutotrackConfig().setImpressionScale(0.5f));
         ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"), modules);
-    }
-
-
-    @Test
-    public void emptyApiTest() {
-        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).get();
-        ActivityInjector.onActivityNewIntent(activity, new Intent());
-        autotracker.trackCustomEvent("custom", activity);
-        autotracker.trackCustomEvent("custom", new HashMap<>(), activity);
-        autotracker.trackCustomEvent("custom", new Fragment());
-        autotracker.trackCustomEvent("custom", new HashMap<>(), new Fragment());
-        autotracker.trackCustomEventX("custom", new androidx.fragment.app.Fragment());
-        autotracker.trackCustomEventX("custom", new HashMap<>(), new androidx.fragment.app.Fragment());
     }
 
     @Test
