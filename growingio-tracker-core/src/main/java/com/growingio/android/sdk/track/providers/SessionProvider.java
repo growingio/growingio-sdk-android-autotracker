@@ -16,6 +16,7 @@
 
 package com.growingio.android.sdk.track.providers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -32,6 +33,8 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.SystemUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListener, OnTrackMainInitSDKCallback {
@@ -39,7 +42,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     private volatile boolean mAlreadySendVisit = false;
     private String mLatestNonNullUserId;
-    private int mActivityStartCount = 0;
+    private final List<String> mActivityList = new ArrayList<>();
     private final long mSessionInterval;
     private double mLatitude = 0;
     private double mLongitude = 0;
@@ -56,6 +59,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     private SessionProvider() {
         mContext = TrackerContext.get().getApplicationContext();
         mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000L;
+        mActivityList.clear();
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
     }
 
@@ -103,6 +107,9 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     }
 
     private void generateVisit(String sessionId, long timestamp) {
+        if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
+            return;
+        }
         mAlreadySendVisit = true;
         mLatestVisitTime = timestamp;
         TrackEventGenerator.generateVisitEvent(sessionId, timestamp);
@@ -155,23 +162,27 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     @Override
     public void onActivityLifecycle(final ActivityLifecycleEvent event) {
-        if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
-            return;
-        }
-
+        Activity activity = event.getActivity();
+        if (activity == null) return;
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
-            if (mActivityStartCount == 0) {
+            if (mActivityList.size() == 0) {
                 checkAndSendVisit(System.currentTimeMillis());
             }
-            mActivityStartCount++;
+            mActivityList.add(activity.toString());
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
-            if (mActivityStartCount != 0)  mActivityStartCount--;
-            if (mActivityStartCount == 0) {
-                TrackEventGenerator.generateAppClosedEvent();
-                mLatestPauseTime = System.currentTimeMillis();
+            if (mActivityList.contains(activity.toString())) {
+                mActivityList.remove(activity.toString());
+                if (mActivityList.size() == 0) {
+                    if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
+                        return;
+                    }
+                    TrackEventGenerator.generateAppClosedEvent();
+                    mLatestPauseTime = System.currentTimeMillis();
+                }
             }
         }
     }
+
 
     @Override
     public void onTrackMainInitSDK() {
