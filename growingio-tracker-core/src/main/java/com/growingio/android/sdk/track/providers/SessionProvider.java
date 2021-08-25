@@ -99,7 +99,8 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     @TrackThread
     public void resendVisit() {
         if (!createdSession()) {
-            mLatestVisitTime = System.currentTimeMillis();
+            forceReissueVisit();
+            return;
         }
         generateVisit(getSessionId(), mLatestVisitTime);
     }
