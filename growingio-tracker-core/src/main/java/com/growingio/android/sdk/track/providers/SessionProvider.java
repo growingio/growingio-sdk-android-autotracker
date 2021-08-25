@@ -40,7 +40,6 @@ import java.util.UUID;
 public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListener, OnTrackMainInitSDKCallback {
     private static final String TAG = "SessionProvider";
 
-    private volatile boolean mAlreadySendVisit = false;
     private String mLatestNonNullUserId;
     private final List<String> mActivityList = new ArrayList<>();
     private final long mSessionInterval;
@@ -67,8 +66,9 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         return SingleInstance.INSTANCE;
     }
 
+    @TrackThread
     void checkAndSendVisit(long resumeTime) {
-        if (mAlreadySendVisit && mLatestPauseTime == 0) {
+        if (createdSession() && mLatestPauseTime == 0) {
             Logger.w(TAG, "Visit event already send by force reissue");
             return;
         }
@@ -79,6 +79,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         }
     }
 
+    @TrackThread
     public String getSessionId() {
         if (mSessionId != null) {
             return mSessionId;
@@ -87,40 +88,39 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         }
     }
 
+    @TrackThread
     String refreshSessionId() {
         mSessionId = UUID.randomUUID().toString();
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                PersistentDataProvider.get().setSessionId(mSessionId);
-            }
-        });
+        PersistentDataProvider.get().setSessionId(mSessionId);
+
         return mSessionId;
     }
 
     @TrackThread
     public void resendVisit() {
-        if (mLatestVisitTime == 0) {
+        if (!createdSession()) {
             mLatestVisitTime = System.currentTimeMillis();
         }
         generateVisit(getSessionId(), mLatestVisitTime);
     }
 
+    @TrackThread
     private void generateVisit(String sessionId, long timestamp) {
         if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
             return;
         }
-        mAlreadySendVisit = true;
         mLatestVisitTime = timestamp;
         TrackEventGenerator.generateVisitEvent(sessionId, timestamp);
     }
 
+    @TrackThread
     public boolean createdSession() {
-        return mAlreadySendVisit;
+        return mLatestVisitTime > 0;
     }
 
+    @TrackThread
     public void forceReissueVisit() {
-        if (mAlreadySendVisit || !SystemUtil.isMainProcess(mContext)) {
+        if (createdSession() || !SystemUtil.isMainProcess(mContext)) {
             return;
         }
         String sessionId = refreshSessionId();
@@ -128,6 +128,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         generateVisit(sessionId, eventTime);
     }
 
+    @TrackThread
     public void setLocation(double latitude, double longitude) {
         double eps = 1e-5;
         if (Math.abs(latitude) < eps && Math.abs(longitude) < eps) {
@@ -147,15 +148,18 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         }
     }
 
+    @TrackThread
     public void cleanLocation() {
         mLatitude = 0;
         mLongitude = 0;
     }
 
+    @TrackThread
     public double getLatitude() {
         return mLatitude;
     }
 
+    @TrackThread
     public double getLongitude() {
         return mLongitude;
     }
@@ -166,30 +170,41 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         if (activity == null) return;
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
             if (mActivityList.size() == 0) {
-                checkAndSendVisit(System.currentTimeMillis());
+                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkAndSendVisit(System.currentTimeMillis());
+                    }
+                });
             }
             mActivityList.add(activity.toString());
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
             if (mActivityList.contains(activity.toString())) {
                 mActivityList.remove(activity.toString());
                 if (mActivityList.size() == 0) {
-                    if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
-                        return;
-                    }
-                    TrackEventGenerator.generateAppClosedEvent();
-                    mLatestPauseTime = System.currentTimeMillis();
+                    TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
+                                return;
+                            }
+                            TrackEventGenerator.generateAppClosedEvent();
+                            mLatestPauseTime = System.currentTimeMillis();
+                        }
+                    });
                 }
             }
         }
     }
 
-
+    @TrackThread
     @Override
     public void onTrackMainInitSDK() {
         mLatestNonNullUserId = UserInfoProvider.get().getLoginUserId();
         UserInfoProvider.get().registerUserIdChangedListener(this);
     }
 
+    @TrackThread
     @Override
     public void onUserIdChanged(@Nullable String newUserId) {
         Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);

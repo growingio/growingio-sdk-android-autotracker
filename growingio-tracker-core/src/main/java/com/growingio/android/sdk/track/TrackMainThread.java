@@ -48,8 +48,6 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     private static final String TAG = "TrackMainThread";
 
     private static final int MSG_INIT_SDK = 1;
-    private static final int MSG_POST_EVENT = 2;
-    private static final int MSG_CACHE_EVENT = 3;
     private final Looper mMainLooper;
     private final Handler mMainHandler;
     private final EventSender mEventSender;
@@ -99,24 +97,28 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         dispatchActions(null);
     }
 
-    public void postEventToTrackMain(BaseEvent.BaseBuilder<?> eventBuilder) {
-        if (eventBuilder == null) {
-            return;
-        }
-        // 判断当前事件类型是否被过滤
-        if (EventExcludeFilter.isEventFilter(eventBuilder.getEventType())) {
-            return;
-        }
+    public void postEventToTrackMain(final BaseEvent.BaseBuilder<?> eventBuilder) {
+        postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                if (eventBuilder == null) {
+                    return;
+                }
 
-        if (ConfigurationProvider.core().isDataCollectionEnabled()) {
-            if (!SessionProvider.get().createdSession()) {
-                SessionProvider.get().forceReissueVisit();
+                // 判断当前事件类型是否被过滤
+                if (EventExcludeFilter.isEventFilter(eventBuilder.getEventType())) {
+                    return;
+                }
+
+                if (ConfigurationProvider.core().isDataCollectionEnabled()) {
+                    if (!SessionProvider.get().createdSession()) {
+                        SessionProvider.get().forceReissueVisit();
+                    }
+
+                    onGenerateGEvent(eventBuilder);
+                }
             }
-
-            Message msg = mMainHandler.obtainMessage(MSG_POST_EVENT);
-            msg.obj = eventBuilder;
-            mMainHandler.sendMessage(msg);
-        }
+        });
     }
 
     /**
@@ -124,15 +126,23 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
      * if you want modify it,please check adsdk first
      */
     public void postGEventToTrackMain(GEvent gEvent) {
-        if (gEvent == null) return;
-        if (ConfigurationProvider.core().isDataCollectionEnabled()) {
-            Message msg = mMainHandler.obtainMessage(MSG_CACHE_EVENT);
-            msg.obj = gEvent;
-            mMainHandler.sendMessage(msg);
-        }
+        postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                if (gEvent == null) return;
+                if (ConfigurationProvider.core().isDataCollectionEnabled()) {
+                    cacheEvent(gEvent);
+                }
+            }
+        });
     }
 
     public void postActionToTrackMain(Runnable runnable) {
+        if (mMainHandler.getLooper() == Looper.myLooper()) {
+            runnable.run();
+            return;
+        }
+
         mMainHandler.post(runnable);
     }
 
@@ -232,23 +242,12 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            switch (msg.what) {
-                case MSG_INIT_SDK:
-                    initSDK();
-                    break;
-                case MSG_POST_EVENT: {
-                    BaseEvent.BaseBuilder<?> eventBuilder = (BaseEvent.BaseBuilder<?>) msg.obj;
-                    onGenerateGEvent(eventBuilder);
-                    break;
-                }
-                case MSG_CACHE_EVENT: {
-                    GEvent event = (GEvent) msg.obj;
-                    cacheEvent(event);
-                    break;
-                }
-                default:
-                    throw new IllegalStateException("Unexpected value: " + msg.what);
+            if (msg.what == MSG_INIT_SDK) {
+                initSDK();
+                return;
             }
+
+            throw new IllegalStateException("Unexpected value: " + msg.what);
         }
     }
 
