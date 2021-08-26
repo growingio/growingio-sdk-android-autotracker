@@ -87,14 +87,14 @@ public final class EventExcludeFilter {
     }
 
     public static boolean isEventFilter(String typeName) {
-        int filterFlag = ConfigurationProvider.core().getFilterEvent();
+        int filterFlag = ConfigurationProvider.core().getExcludeEvent();
         if (filterFlag > 0) {
             return (filterFlag & valueOf(typeName)) > 0;
         }
         return false;
     }
 
-    static String getFilterEventLog(int filterMask) {
+    public static String getFilterEventLog(int filterMask) {
         StringBuilder stringBuilder = new StringBuilder();
         int index = 0;
 
@@ -109,6 +109,7 @@ public final class EventExcludeFilter {
         }
         if (stringBuilder.length() > 0) {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            stringBuilder.insert(0, "[").append("]");
             stringBuilder.append(" not tracking ...");
             return stringBuilder.toString();
         }
