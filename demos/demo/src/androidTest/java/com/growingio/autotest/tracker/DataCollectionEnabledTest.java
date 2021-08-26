@@ -104,11 +104,12 @@ public class DataCollectionEnabledTest extends EventsTest {
     }
 
     private void dataCollectionSecondEnabled() {
+        final AtomicBoolean receivedVisit = new AtomicBoolean(false);
         final AtomicBoolean receivedCustom = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
-                Truth.assertWithMessage("Received Events").fail();
+                receivedVisit.set(true);
             }
 
             @Override
@@ -121,6 +122,7 @@ public class DataCollectionEnabledTest extends EventsTest {
         });
         GrowingAutotracker.get().setDataCollectionEnabled(true);
         Uninterruptibles.sleepUninterruptibly(1, SECONDS);
+        Awaiter.untilTrue(receivedVisit);
 
         GrowingAutotracker.get().trackCustomEvent("test");
         Awaiter.untilTrue(receivedCustom);
