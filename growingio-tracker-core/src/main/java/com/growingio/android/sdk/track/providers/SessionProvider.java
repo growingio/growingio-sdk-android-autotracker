@@ -40,7 +40,6 @@ import java.util.UUID;
 public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListener, OnTrackMainInitSDKCallback {
     private static final String TAG = "SessionProvider";
 
-    private volatile boolean mAlreadySendVisit = false;
     private String mLatestNonNullUserId;
     private final List<String> mActivityList = new ArrayList<>();
     private final long mSessionInterval;
@@ -48,7 +47,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     private double mLongitude = 0;
 
     private long mLatestPauseTime = 0;
-    private long mLatestVisitTime = 0;
+    private boolean mAlreadySendVisit = false;
     private volatile String mSessionId;
     private final Context mContext;
 
@@ -67,18 +66,20 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         return SingleInstance.INSTANCE;
     }
 
+    @TrackThread
     void checkAndSendVisit(long resumeTime) {
-        if (mAlreadySendVisit && mLatestPauseTime == 0) {
+        if (createdSession() && mLatestPauseTime == 0) {
             Logger.w(TAG, "Visit event already send by force reissue");
             return;
         }
 
         if (resumeTime - mLatestPauseTime >= mSessionInterval) {
-            String sessionId = refreshSessionId();
-            generateVisit(sessionId, resumeTime);
+            refreshSessionId();
+            generateVisit();
         }
     }
 
+    @TrackThread
     public String getSessionId() {
         if (mSessionId != null) {
             return mSessionId;
@@ -87,47 +88,47 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         }
     }
 
+    @TrackThread
     String refreshSessionId() {
         mSessionId = UUID.randomUUID().toString();
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                PersistentDataProvider.get().setSessionId(mSessionId);
-            }
-        });
+        PersistentDataProvider.get().setSessionId(mSessionId);
+
         return mSessionId;
     }
 
     @TrackThread
     public void resendVisit() {
-        if (mLatestVisitTime == 0) {
-            mLatestVisitTime = System.currentTimeMillis();
+        if (!createdSession()) {
+            forceReissueVisit();
+            return;
         }
-        generateVisit(getSessionId(), mLatestVisitTime);
+        generateVisit();
     }
 
-    private void generateVisit(String sessionId, long timestamp) {
+    @TrackThread
+    private void generateVisit() {
         if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
             return;
         }
         mAlreadySendVisit = true;
-        mLatestVisitTime = timestamp;
-        TrackEventGenerator.generateVisitEvent(sessionId, timestamp);
+        TrackEventGenerator.generateVisitEvent();
     }
 
+    @TrackThread
     public boolean createdSession() {
         return mAlreadySendVisit;
     }
 
+    @TrackThread
     public void forceReissueVisit() {
-        if (mAlreadySendVisit || !SystemUtil.isMainProcess(mContext)) {
+        if (createdSession() || !SystemUtil.isMainProcess(mContext)) {
             return;
         }
-        String sessionId = refreshSessionId();
-        long eventTime = System.currentTimeMillis();
-        generateVisit(sessionId, eventTime);
+        refreshSessionId();
+        generateVisit();
     }
 
+    @TrackThread
     public void setLocation(double latitude, double longitude) {
         double eps = 1e-5;
         if (Math.abs(latitude) < eps && Math.abs(longitude) < eps) {
@@ -147,15 +148,18 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         }
     }
 
+    @TrackThread
     public void cleanLocation() {
         mLatitude = 0;
         mLongitude = 0;
     }
 
+    @TrackThread
     public double getLatitude() {
         return mLatitude;
     }
 
+    @TrackThread
     public double getLongitude() {
         return mLongitude;
     }
@@ -166,30 +170,41 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         if (activity == null) return;
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
             if (mActivityList.size() == 0) {
-                checkAndSendVisit(System.currentTimeMillis());
+                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkAndSendVisit(System.currentTimeMillis());
+                    }
+                });
             }
             mActivityList.add(activity.toString());
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
             if (mActivityList.contains(activity.toString())) {
                 mActivityList.remove(activity.toString());
                 if (mActivityList.size() == 0) {
-                    if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
-                        return;
-                    }
-                    TrackEventGenerator.generateAppClosedEvent();
-                    mLatestPauseTime = System.currentTimeMillis();
+                    TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
+                                return;
+                            }
+                            TrackEventGenerator.generateAppClosedEvent();
+                            mLatestPauseTime = System.currentTimeMillis();
+                        }
+                    });
                 }
             }
         }
     }
 
-
+    @TrackThread
     @Override
     public void onTrackMainInitSDK() {
         mLatestNonNullUserId = UserInfoProvider.get().getLoginUserId();
         UserInfoProvider.get().registerUserIdChangedListener(this);
     }
 
+    @TrackThread
     @Override
     public void onUserIdChanged(@Nullable String newUserId) {
         Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
@@ -198,9 +213,8 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
                 resendVisit();
             } else {
                 if (!newUserId.equals(mLatestNonNullUserId)) {
-                    String sessionId = refreshSessionId();
-                    long eventTime = System.currentTimeMillis();
-                    generateVisit(sessionId, eventTime);
+                    refreshSessionId();
+                    generateVisit();
                 }
             }
             mLatestNonNullUserId = newUserId;
