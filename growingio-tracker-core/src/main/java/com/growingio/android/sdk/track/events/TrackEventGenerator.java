@@ -24,11 +24,9 @@ public class TrackEventGenerator {
     private TrackEventGenerator() {
     }
 
-    public static void generateVisitEvent(String sessionId, long timestamp) {
+    public static void generateVisitEvent() {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new VisitEvent.Builder()
-                        .setSessionId(sessionId)
-                        .setTimestamp(timestamp)
         );
     }
 

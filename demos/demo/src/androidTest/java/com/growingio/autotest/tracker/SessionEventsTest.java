@@ -323,8 +323,7 @@ public class SessionEventsTest extends EventsTest {
                 checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
                 if (visit.getString("sessionId").equals(mSessionId)
-                        && visit.getString("userId").equals("TestMockedName")
-                        && visit.getLong("timestamp") == mVisitTimestamp) {
+                        && visit.getString("userId").equals("TestMockedName")) {
                     mLoginUserId = visit.getString("userId");
                     receivedVisit.set(true);
                 }
@@ -377,8 +376,7 @@ public class SessionEventsTest extends EventsTest {
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
                 checkVisitEvent(jsonArray);
                 JSONObject visit = jsonArray.getJSONObject(0);
-                if (visit.getString("sessionId").equals(mSessionId)
-                        && visit.getLong("timestamp") == mVisitTimestamp) {
+                if (visit.getString("sessionId").equals(mSessionId)) {
                     Truth.assertThat(visit.optLong("latitude")).isEqualTo(66);
                     Truth.assertThat(visit.optLong("longitude")).isEqualTo(99);
                     receivedVisit.set(true);
