@@ -80,7 +80,7 @@ public class FieldIgnoreFilter {
         return false;
     }
 
-    static String getFieldFilterLog(int ignoreMask) {
+    public static String getFieldFilterLog(int ignoreMask) {
         StringBuilder stringBuilder = new StringBuilder();
         int index = 0;
         while (ignoreMask > 0) {
@@ -94,6 +94,7 @@ public class FieldIgnoreFilter {
         }
         if (stringBuilder.length() > 0) {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            stringBuilder.insert(0, "[").append("]");
             stringBuilder.append(" is ignoring ...");
             return stringBuilder.toString();
         }

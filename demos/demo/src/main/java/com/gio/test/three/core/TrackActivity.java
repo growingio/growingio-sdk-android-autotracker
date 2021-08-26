@@ -39,12 +39,18 @@ public class TrackActivity extends Activity {
     private static final String SET_USER_ID_ZHANGSAN = "设置账号为张三";
     private static final String SET_USER_ID_NULL = "清除账号设置";
     private static final String SET_USER_ID_LISI = "设置账号为李四";
+    private static final String SET_LOCATION = "设置位置";
+    private static final String CLOSE_DATA_COLLECTION = "关闭数据收集";
+    private static final String OPEN_DATA_COLLECTION = "开启数据收集";
 
     private static final String[] ITEMS = {
             TRACK_CUSTOM_EVENT,
             SET_USER_ID_ZHANGSAN,
             SET_USER_ID_NULL,
             SET_USER_ID_LISI,
+            SET_LOCATION,
+            OPEN_DATA_COLLECTION,
+            CLOSE_DATA_COLLECTION
     };
 
     @Override
@@ -89,6 +95,15 @@ public class TrackActivity extends Activity {
                 break;
             case SET_USER_ID_LISI:
                 GrowingAutotracker.get().setLoginUserId("lisi");
+                break;
+            case SET_LOCATION:
+                GrowingAutotracker.get().setLocation(100.0, 100.0);
+                break;
+            case OPEN_DATA_COLLECTION:
+                GrowingAutotracker.get().setDataCollectionEnabled(true);
+                break;
+            case CLOSE_DATA_COLLECTION:
+                GrowingAutotracker.get().setDataCollectionEnabled(false);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

@@ -148,7 +148,7 @@ public class CoreConfiguration implements Configurable {
         return this;
     }
 
-    public int getFilterEvent() {
+    public int getExcludeEvent() {
         return mExcludeEventFlag;
     }
 
