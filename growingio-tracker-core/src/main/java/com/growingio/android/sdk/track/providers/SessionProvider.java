@@ -185,11 +185,11 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
                     TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
                         @Override
                         public void run() {
+                            mLatestPauseTime = System.currentTimeMillis();
                             if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
                                 return;
                             }
                             TrackEventGenerator.generateAppClosedEvent();
-                            mLatestPauseTime = System.currentTimeMillis();
                         }
                     });
                 }
