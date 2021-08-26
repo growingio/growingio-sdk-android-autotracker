@@ -125,14 +125,19 @@ public class Tracker {
 
     public void setDataCollectionEnabled(boolean enabled) {
         if (!isInited) return;
-        if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
-            Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
-        } else {
-            ConfigurationProvider.core().setDataCollectionEnabled(enabled);
-            if (enabled) {
-                SessionProvider.get().forceReissueVisit();
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
+                    Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
+                } else {
+                    ConfigurationProvider.core().setDataCollectionEnabled(enabled);
+                    if (enabled) {
+                        SessionProvider.get().resendVisit();
+                    }
+                }
             }
-        }
+        });
     }
 
     public void setLoginUserId(final String userId) {
