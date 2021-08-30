@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -111,10 +112,9 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                 }
 
                 if (ConfigurationProvider.core().isDataCollectionEnabled()) {
-                    if (!SessionProvider.get().createdSession()) {
-                        SessionProvider.get().forceReissueVisit();
+                    if (!PersistentDataProvider.get().isSendVisitAfterRefreshSessionId()) {
+                        SessionProvider.get().generateVisit();
                     }
-
                     onGenerateGEvent(eventBuilder);
                 }
             }

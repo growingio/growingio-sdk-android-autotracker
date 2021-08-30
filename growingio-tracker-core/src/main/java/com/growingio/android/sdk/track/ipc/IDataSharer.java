@@ -18,6 +18,8 @@ package com.growingio.android.sdk.track.ipc;
 
 import androidx.annotation.Nullable;
 
+import java.util.List;
+
 public interface IDataSharer {
     @Nullable
     String getString(String key, @Nullable String defValue);
@@ -30,6 +32,8 @@ public interface IDataSharer {
 
     boolean getBoolean(String key, boolean defValue);
 
+    List<Integer> getIntArray(String key, List<Integer> defValue);
+
     void putString(String key, @Nullable String value);
 
     void putInt(String key, int value);
@@ -40,7 +44,17 @@ public interface IDataSharer {
 
     void putBoolean(String key, boolean value);
 
-    long getAndIncrement(String key, long startValue);
+    void putIntArray(String key, List<Integer> value);
 
-    long getAndAdd(String key, long delta, long startValue);
+    long getAndIncrementLong(String key, long startValue);
+
+    long getAndAddLong(String key, long delta, long startValue);
+
+    int getAndIncrementInt(String key, int startValue);
+
+    int getAndAddInt(String key, int delta, int startValue);
+
+    int getAndDecrementInt(String key, int startValue);
+
+    int getAndDelInt(String key, int delta, int startValue);
 }

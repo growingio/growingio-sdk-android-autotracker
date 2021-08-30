@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
@@ -62,11 +63,19 @@ public class Tracker {
         TrackerContext.init(application);
 
         // init core service
-        TrackMainThread.trackMain().register(SessionProvider.get());
+        SessionProvider sessionProvider = SessionProvider.get();
+        TrackMainThread.trackMain().register(sessionProvider);
         application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         DeepLinkProvider.get().init();
 
         loadAnnotationGeneratedModules(application);
+
+        if (PersistentDataProvider.get().firstInit()) {
+            sessionProvider.refreshSessionId();
+            sessionProvider.generateVisit();
+            PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
+            PersistentDataProvider.get().setActivityCount(0);
+        }
 
         isInited = true;
     }
@@ -133,7 +142,7 @@ public class Tracker {
                 } else {
                     ConfigurationProvider.core().setDataCollectionEnabled(enabled);
                     if (enabled) {
-                        SessionProvider.get().resendVisit();
+                        SessionProvider.get().generateVisit();
                     }
                 }
             }

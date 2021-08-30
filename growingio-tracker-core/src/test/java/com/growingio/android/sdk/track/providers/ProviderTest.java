@@ -154,29 +154,5 @@ public class ProviderTest {
         Truth.assertThat(PersistentDataProvider.get().getDeviceId()).isNotEmpty();
     }
 
-    @Test
-    public void sessionProvider() {
-        String sessionId = SessionProvider.get().getSessionId();
-        Truth.assertThat(sessionId).isEmpty();
-        SessionProvider.get().checkAndSendVisit(0);
-        sessionId = SessionProvider.get().getSessionId();
-        Truth.assertThat(sessionId).isEmpty();
-        SessionProvider.get().setLocation(0d, 1d);
-        Truth.assertThat(SessionProvider.get().getLatitude()).isEqualTo(0d);
-        Truth.assertThat(SessionProvider.get().getLongitude()).isEqualTo(1d);
-        SessionProvider.get().cleanLocation();
-
-        SessionProvider.get().onTrackMainInitSDK();
-        UserInfoProvider.get().setLoginUserId("cpacm");
-        String newSessionId1 = SessionProvider.get().refreshSessionId();
-        String newSessionId2 = SessionProvider.get().getSessionId();
-        Truth.assertThat(newSessionId1).isEqualTo(newSessionId2);
-
-        UserInfoProvider.get().setLoginUserId("cpacm2");
-        String newSessionId3 = SessionProvider.get().getSessionId();
-        Truth.assertThat(newSessionId3).isNotEqualTo(newSessionId2);
-        UserInfoProvider.get().unregisterUserIdChangedListener(SessionProvider.get());
-    }
-
 
 }

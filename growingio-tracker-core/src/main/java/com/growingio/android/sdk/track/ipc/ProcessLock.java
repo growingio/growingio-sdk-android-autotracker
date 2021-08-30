@@ -73,6 +73,23 @@ public class ProcessLock {
         }
     }
 
+    public void lockedRun(Runnable runnable) {
+        if (mFileLock == null) {
+            try {
+                if (mOutputStream == null || mFileChannel == null) {
+                    mOutputStream = mContext.openFileOutput(mName, Context.MODE_PRIVATE);
+                    mFileChannel = mOutputStream.getChannel();
+                }
+                mFileLock = mFileChannel.lock();
+                runnable.run();
+            } catch (Exception ignored) {
+            } finally {
+                release();
+            }
+        }
+
+    }
+
     public void release() {
         try {
             internalRelease();

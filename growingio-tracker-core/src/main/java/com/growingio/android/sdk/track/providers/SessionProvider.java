@@ -17,11 +17,9 @@
 package com.growingio.android.sdk.track.providers;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
@@ -31,7 +29,6 @@ import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.utils.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,17 +43,11 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     private double mLatitude = 0;
     private double mLongitude = 0;
 
-    private long mLatestPauseTime = 0;
-    private boolean mAlreadySendVisit = false;
-    private volatile String mSessionId;
-    private final Context mContext;
-
     private static class SingleInstance {
         private static final SessionProvider INSTANCE = new SessionProvider();
     }
 
     private SessionProvider() {
-        mContext = TrackerContext.get().getApplicationContext();
         mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000L;
         mActivityList.clear();
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
@@ -68,64 +59,29 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
 
     @TrackThread
     void checkAndSendVisit(long resumeTime) {
-        if (createdSession() && mLatestPauseTime == 0) {
-            Logger.w(TAG, "Visit event already send by force reissue");
-            return;
-        }
-
-        if (resumeTime - mLatestPauseTime >= mSessionInterval) {
+        if (resumeTime - PersistentDataProvider.get().getLatestPauseTime() >= mSessionInterval) {
             refreshSessionId();
             generateVisit();
         }
     }
 
-    @TrackThread
-    public String getSessionId() {
-        if (mSessionId != null) {
-            return mSessionId;
-        } else {
-            return PersistentDataProvider.get().getSessionId();
-        }
+    /**
+     * 刷新sessionId的场景:
+     * 1. 第一个进程初始化时会刷新session
+     * 2. 后台30s返回后刷新session
+     * 3. 用户id发生改变刷新session
+     */
+    public void refreshSessionId() {
+        PersistentDataProvider.get().setSessionId(UUID.randomUUID().toString());
+        PersistentDataProvider.get().setSendVisitAfterRefreshSessionId(false);
     }
 
-    @TrackThread
-    String refreshSessionId() {
-        mSessionId = UUID.randomUUID().toString();
-        PersistentDataProvider.get().setSessionId(mSessionId);
-
-        return mSessionId;
-    }
-
-    @TrackThread
-    public void resendVisit() {
-        if (!createdSession()) {
-            forceReissueVisit();
-            return;
-        }
-        generateVisit();
-    }
-
-    @TrackThread
-    private void generateVisit() {
+    public void generateVisit() {
         if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
             return;
         }
-        mAlreadySendVisit = true;
+        PersistentDataProvider.get().setSendVisitAfterRefreshSessionId(true);
         TrackEventGenerator.generateVisitEvent();
-    }
-
-    @TrackThread
-    public boolean createdSession() {
-        return mAlreadySendVisit;
-    }
-
-    @TrackThread
-    public void forceReissueVisit() {
-        if (createdSession() || !SystemUtil.isMainProcess(mContext)) {
-            return;
-        }
-        refreshSessionId();
-        generateVisit();
     }
 
     @TrackThread
@@ -141,7 +97,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
                 (mLongitude == 0 && Math.abs(longitude) > eps)) {
             mLatitude = latitude;
             mLongitude = longitude;
-            resendVisit();
+            generateVisit();
         } else {
             mLatitude = latitude;
             mLongitude = longitude;
@@ -169,7 +125,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
         Activity activity = event.getActivity();
         if (activity == null) return;
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
-            if (mActivityList.size() == 0) {
+            if (PersistentDataProvider.get().getActivityCount() == 0) {
                 TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
                     @Override
                     public void run() {
@@ -178,14 +134,17 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
                 });
             }
             mActivityList.add(activity.toString());
+            PersistentDataProvider.get().addActivityCount();
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
             if (mActivityList.contains(activity.toString())) {
-                mActivityList.remove(activity.toString());
-                if (mActivityList.size() == 0) {
+                if (mActivityList.remove(activity.toString())) {
+                    PersistentDataProvider.get().delActivityCount();
+                }
+                if (PersistentDataProvider.get().getActivityCount() == 0) {
                     TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
                         @Override
                         public void run() {
-                            mLatestPauseTime = System.currentTimeMillis();
+                            PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
                             if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
                                 return;
                             }
@@ -200,17 +159,18 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
     @TrackThread
     @Override
     public void onTrackMainInitSDK() {
-        mLatestNonNullUserId = UserInfoProvider.get().getLoginUserId();
+        PersistentDataProvider.get().setLatestNonNullUserId(UserInfoProvider.get().getLoginUserId());
         UserInfoProvider.get().registerUserIdChangedListener(this);
     }
 
     @TrackThread
     @Override
     public void onUserIdChanged(@Nullable String newUserId) {
+        mLatestNonNullUserId = PersistentDataProvider.get().getLatestNonNullUserId();
         Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
         if (!TextUtils.isEmpty(newUserId)) {
             if (TextUtils.isEmpty(mLatestNonNullUserId)) {
-                resendVisit();
+                generateVisit();
             } else {
                 if (!newUserId.equals(mLatestNonNullUserId)) {
                     refreshSessionId();
@@ -218,6 +178,7 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
                 }
             }
             mLatestNonNullUserId = newUserId;
+            PersistentDataProvider.get().setLatestNonNullUserId(mLatestNonNullUserId);
         }
     }
 }

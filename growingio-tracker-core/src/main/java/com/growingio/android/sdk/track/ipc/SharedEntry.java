@@ -19,6 +19,8 @@ package com.growingio.android.sdk.track.ipc;
 import androidx.annotation.Nullable;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 该数据结构最大存储长度为{@link SharedEntry#MAX_SIZE}，所以该数据结构不适于存储对象序列化或者长字符串。
@@ -44,6 +46,7 @@ class SharedEntry {
     public static final byte VALUE_TYPE_FLOAT = 3;
     public static final byte VALUE_TYPE_BOOLEAN = 4;
     public static final byte VALUE_TYPE_STRING = 5;
+    public static final byte VALUE_TYPE_INT_ARRAY = 6;
 
     private final int mPosition;
     private final String mKey;
@@ -114,11 +117,32 @@ class SharedEntry {
                     return new String(bytes);
                 }
                 break;
+            case VALUE_TYPE_INT_ARRAY:
+                if (valueLength > 0) {
+                    List<Integer> array = new ArrayList<>();
+                    for (int i = 0; i < valueLength; i++) {
+                        array.add(byteBuffer.getInt());
+                    }
+                    return array;
+                }
+                break;
             default:
                 break;
         }
 
         return null;
+    }
+
+    public void putIntArray(ByteBuffer byteBuffer, List<Integer> values) {
+        byteBuffer.position(mValuePosition);
+        byteBuffer.put(VALUE_TYPE_INT_ARRAY);
+        if ((values.size() * (Integer.SIZE / Byte.SIZE)) > (MAX_SIZE - (mValuePosition - mPosition))) {
+            throw new IllegalArgumentException("value is too long, value.length() = " + values.size());
+        }
+        byteBuffer.putShort((short) values.size());
+        for (int value : values) {
+            byteBuffer.putInt(value);
+        }
     }
 
     public void putString(ByteBuffer byteBuffer, @Nullable String value) throws IllegalArgumentException {
@@ -180,6 +204,9 @@ class SharedEntry {
                 break;
             case VALUE_TYPE_STRING:
                 putString(byteBuffer, (String) value);
+                break;
+            case VALUE_TYPE_INT_ARRAY:
+                putIntArray(byteBuffer, (List<Integer>) value);
                 break;
             default:
                 break;
