@@ -18,6 +18,7 @@ package com.growingio.android.sdk.track.webservices.log;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 
 import com.growingio.android.sdk.track.log.CacheLogger;
 import com.growingio.android.sdk.track.log.ILogger;
@@ -67,10 +68,14 @@ public class WsLogger {
 
 
     public void printOut() {
+        if (Looper.myLooper() != sLogHandler.getLooper()) {
+            sLogHandler.post(mLogRunnable);
+            return;
+        }
+
         if (mCacheLogger != null) {
             List<LogItem> mLoggers = mCacheLogger.getCacheLogsAndClear();
-            if (mLoggers == null || mLoggers.size() == 0) return;
-            if (mCallback != null) {
+            if (mLoggers != null && !mLoggers.isEmpty() && mCallback != null) {
                 String loggerData = LoggerDataMessage.createTrackMessage(mLoggers).toJSONObject().toString();
                 mCallback.disposeLog(loggerData);
             }
