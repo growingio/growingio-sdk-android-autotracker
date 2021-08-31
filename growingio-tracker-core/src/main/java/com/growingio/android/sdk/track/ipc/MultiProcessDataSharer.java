@@ -29,6 +29,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -242,6 +243,15 @@ public class MultiProcessDataSharer implements IDataSharer {
     }
 
     @Override
+    public List<Integer> getIntArray(String key, List<Integer> defValue) {
+        synchronized (this) {
+            awaitLoadedLocked();
+            List<Integer> value = (List<Integer>) getValue(key);
+            return value != null ? value : defValue;
+        }
+    }
+
+    @Override
     public void putString(String key, @Nullable String value) {
         synchronized (this) {
             awaitLoadedLocked();
@@ -282,14 +292,22 @@ public class MultiProcessDataSharer implements IDataSharer {
     }
 
     @Override
-    public long getAndIncrement(String key, long startValue) {
-        return getAndAdd(key, 1, startValue);
+    public void putIntArray(String key, List<Integer> value) {
+        synchronized (this) {
+            awaitLoadedLocked();
+            putValue(key, SharedEntry.VALUE_TYPE_INT_ARRAY, value);
+        }
     }
 
     @Override
-    public long getAndAdd(String key, long delta, long startValue) {
+    public long getAndIncrementLong(String key, long startValue) {
+        return getAndAddLong(key, 1, startValue);
+    }
+
+    @Override
+    public long getAndAddLong(String key, long delta, long startValue) {
         synchronized (this) {
-            Logger.d(TAG, "getAndAdd: key = " + key + ", delta = " + delta + ", startValue = " + startValue);
+            Logger.d(TAG, "getAndAddLong: key = " + key + ", delta = " + delta + ", startValue = " + startValue);
             awaitLoadedLocked();
             final long[] result = new long[1];
             SharedEntry entry = mSharedEntries.get(key);
@@ -301,11 +319,71 @@ public class MultiProcessDataSharer implements IDataSharer {
                         entry.putLong(mMappedByteBuffer, result[0]);
                     }
                 }, entry.getPosition(), SharedEntry.MAX_SIZE);
-                Logger.d(TAG, "getAndAdd: result = " + result[0]);
+                Logger.d(TAG, "getAndAddLong: result = " + result[0]);
                 return result[0];
             } else {
                 putValue(key, SharedEntry.VALUE_TYPE_LONG, startValue);
-                Logger.d(TAG, "getAndAdd: return startValue");
+                Logger.d(TAG, "getAndAddLong: return startValue");
+                return startValue;
+            }
+        }
+    }
+
+    @Override
+    public int getAndIncrementInt(String key, int startValue) {
+        return getAndAddInt(key, 1, startValue);
+    }
+
+    @Override
+    public int getAndAddInt(String key, int delta, int startValue) {
+        synchronized (this) {
+            Logger.d(TAG, "getAndAddInt: key = " + key + ", delta = " + delta + ", startValue = " + startValue);
+            awaitLoadedLocked();
+            final int[] result = new int[1];
+            SharedEntry entry = mSharedEntries.get(key);
+            if (entry != null) {
+                lockedRun(new Runnable() {
+                    @Override
+                    public void run() {
+                        result[0] = (int) entry.getValue(mMappedByteBuffer) + delta;
+                        entry.putInt(mMappedByteBuffer, result[0]);
+                    }
+                }, entry.getPosition(), SharedEntry.MAX_SIZE);
+                Logger.d(TAG, "getAndAddInt: result = " + result[0]);
+                return result[0];
+            } else {
+                putValue(key, SharedEntry.VALUE_TYPE_INT, startValue);
+                Logger.d(TAG, "getAndAddInt: return startValue");
+                return startValue;
+            }
+        }
+    }
+
+    @Override
+    public int getAndDecrementInt(String key, int startValue) {
+        return getAndDelInt(key, 1, startValue);
+    }
+
+    @Override
+    public int getAndDelInt(String key, int delta, int startValue) {
+        synchronized (this) {
+            Logger.d(TAG, "getAndDelInt: key = " + key + ", delta = " + delta + ", startValue = " + startValue);
+            awaitLoadedLocked();
+            final int[] result = new int[1];
+            SharedEntry entry = mSharedEntries.get(key);
+            if (entry != null) {
+                lockedRun(new Runnable() {
+                    @Override
+                    public void run() {
+                        result[0] = (int) entry.getValue(mMappedByteBuffer) - delta;
+                        entry.putInt(mMappedByteBuffer, result[0]);
+                    }
+                }, entry.getPosition(), SharedEntry.MAX_SIZE);
+                Logger.d(TAG, "getAndDelInt: result = " + result[0]);
+                return result[0];
+            } else {
+                putValue(key, SharedEntry.VALUE_TYPE_INT, startValue);
+                Logger.d(TAG, "getAndDelInt: return startValue");
                 return startValue;
             }
         }

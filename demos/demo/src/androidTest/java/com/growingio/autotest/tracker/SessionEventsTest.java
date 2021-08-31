@@ -34,7 +34,6 @@ import com.gio.test.three.MainActivity;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.BuildConfig;
-import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
@@ -406,7 +405,6 @@ public class SessionEventsTest extends EventsTest {
     public void forceReissueVisitEventTest() {
         final AtomicBoolean receivedVisit = new AtomicBoolean(false);
         final AtomicBoolean receivedCustom = new AtomicBoolean(false);
-        String oldSessionId = PersistentDataProvider.get().getSessionId();
         getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
             @Override
             protected void onReceivedVisitEvents(JSONArray jsonArray) throws JSONException {
@@ -414,7 +412,6 @@ public class SessionEventsTest extends EventsTest {
                 JSONObject visit = jsonArray.getJSONObject(0);
                 mSessionId = visit.getString("sessionId");
                 Truth.assertThat(mSessionId).isNotEmpty();
-                Truth.assertThat(oldSessionId).isNotEqualTo(mSessionId);
                 receivedVisit.set(true);
             }
 
