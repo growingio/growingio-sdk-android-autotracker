@@ -69,7 +69,7 @@ public class PageProvider implements IActivityLifecycle {
     }
 
     public void addIgnoreFragment(SuperFragment<?> fragment, IgnorePolicy policy) {
-        IGNORE_PAGES.put(fragment, policy);
+        IGNORE_PAGES.put(fragment.getRealFragment(), policy);
     }
 
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
@@ -160,11 +160,17 @@ public class PageProvider implements IActivityLifecycle {
             return;
         }
 
-        ALL_PAGE_ALIAS.put(fragment, alias);
+        ALL_PAGE_ALIAS.put(fragment.getRealFragment(), alias);
     }
 
     private void addPageAlias(Page<?> page) {
-        String alias = ALL_PAGE_ALIAS.get(page.getCarrier());
+        String alias = null;
+        if (page.getCarrier() instanceof Activity) {
+            alias = ALL_PAGE_ALIAS.get(page.getCarrier());
+        } else if (page.getCarrier() instanceof SuperFragment) {
+            alias = ALL_PAGE_ALIAS.get(((SuperFragment<?>) page.getCarrier()).getRealFragment());
+        }
+
         if (!TextUtils.isEmpty(alias)) {
             page.setAlias(alias);
         }
@@ -179,7 +185,7 @@ public class PageProvider implements IActivityLifecycle {
     }
 
     private boolean isIgnoreFragment(SuperFragment<?> fragment) {
-        IgnorePolicy ignorePolicy = IGNORE_PAGES.get(fragment);
+        IgnorePolicy ignorePolicy = IGNORE_PAGES.get(fragment.getRealFragment());
         if (ignorePolicy != null) {
             return ignorePolicy == IgnorePolicy.IGNORE_SELF || ignorePolicy == IgnorePolicy.IGNORE_ALL;
         }
@@ -189,7 +195,7 @@ public class PageProvider implements IActivityLifecycle {
     private boolean isIgnoreByParent(SuperFragment<?> fragment) {
         SuperFragment<?> parentFragment = fragment.getParentFragment();
         while (parentFragment != null) {
-            IgnorePolicy ignorePolicy = IGNORE_PAGES.get(parentFragment);
+            IgnorePolicy ignorePolicy = IGNORE_PAGES.get(parentFragment.getRealFragment());
             if ((ignorePolicy == IgnorePolicy.IGNORE_ALL || ignorePolicy == IgnorePolicy.IGNORE_CHILD)) {
                 return true;
             } else {
@@ -313,7 +319,7 @@ public class PageProvider implements IActivityLifecycle {
         }
 
         Logger.e(TAG, "removePage: fragment is " + fragment.getRealFragment());
-        PAGE_ATTRIBUTES_CACHE.remove(fragment);
+        PAGE_ATTRIBUTES_CACHE.remove(fragment.getRealFragment());
 
         Page<?> page = ALL_PAGE_TREE.get(fragment.getActivity());
         if (page == null) {
@@ -379,7 +385,13 @@ public class PageProvider implements IActivityLifecycle {
     }
 
     private void reissuePageAttributes(Page<?> page) {
-        Map<String, String> attributes = PAGE_ATTRIBUTES_CACHE.remove(page.getCarrier());
+        Map<String, String> attributes = null;
+        if (page.getCarrier() instanceof Activity) {
+            attributes = PAGE_ATTRIBUTES_CACHE.remove(page.getCarrier());
+        } else if (page.getCarrier() instanceof SuperFragment) {
+            attributes = PAGE_ATTRIBUTES_CACHE.remove(((SuperFragment<?>) page.getCarrier()).getRealFragment());
+        }
+
         if (attributes != null) {
             setPageAttributes(page, attributes, false);
             return;
@@ -415,7 +427,7 @@ public class PageProvider implements IActivityLifecycle {
             setPageAttributes(page, attributes, true);
         } else {
             Logger.e(TAG, "setPageAttributes: can't find Fragment " + fragment.getRealFragment());
-            PAGE_ATTRIBUTES_CACHE.put(fragment, attributes);
+            PAGE_ATTRIBUTES_CACHE.put(fragment.getRealFragment(), attributes);
         }
     }
 
