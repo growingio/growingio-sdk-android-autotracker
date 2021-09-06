@@ -104,6 +104,9 @@ dependencies {
     implementation project(":demo-autotrack")
 
     compileOnly libraries.androidx.appcompat
+
+    // leakcanary 避免发版前未使用Profiler进行内存泄漏检测
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 }
 
 apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"

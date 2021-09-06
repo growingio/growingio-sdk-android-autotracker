@@ -23,18 +23,11 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
 public abstract class SuperFragment<T> {
     private final T mRealFragment;
 
-    //将SuperFragment对象和Fragment对象产生关联，防止GC后SuperFragment对象被释放，保证SuperFragment对象和Fragment对象生命周期一致
-    private static final Map<Object, SuperFragment<?>> ASSOCIATION_OBJECTS = new WeakHashMap<>();
-
     protected SuperFragment(T realFragment) {
         mRealFragment = realFragment;
-        ASSOCIATION_OBJECTS.put(mRealFragment, this);
     }
 
     @Nullable
