@@ -24,10 +24,12 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.ipc.IDataSharer;
 import com.growingio.android.sdk.track.ipc.MultiProcessDataSharer;
 import com.growingio.android.sdk.track.ipc.ProcessLock;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.SessionProvider;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -53,8 +55,6 @@ public class PersistentDataProvider {
     private final ProcessLock mProcessLock;
     private final Context mContext;
 
-    private boolean mIsFirstInit;
-
     private static class SingleInstance {
         private static final PersistentDataProvider INSTANCE = new PersistentDataProvider();
     }
@@ -63,11 +63,15 @@ public class PersistentDataProvider {
         mContext = TrackerContext.get().getApplicationContext();
         mDataSharer = new MultiProcessDataSharer(mContext, SHARER_NAME, SHARER_MAX_SIZE);
         mProcessLock = new ProcessLock(mContext, PersistentDataProvider.class.getName());
-        repairPid();
     }
 
     public static PersistentDataProvider get() {
         return SingleInstance.INSTANCE;
+    }
+
+    @TrackThread
+    public void start() {
+        repairPid();
     }
 
     public EventSequenceId getAndIncrement(String eventType) {
@@ -152,10 +156,6 @@ public class PersistentDataProvider {
         return mDataSharer.getString(key, defValue);
     }
 
-    public boolean firstInit() {
-        return mIsFirstInit;
-    }
-
     private void repairPid() {
         mProcessLock.lockedRun(new Runnable() {
             @Override
@@ -167,7 +167,15 @@ public class PersistentDataProvider {
                         alivePid.add(pid);
                     }
                 }
-                mIsFirstInit = alivePid.isEmpty();
+
+                if (alivePid.isEmpty()) {
+                    SessionProvider.get().refreshSessionId();
+                    SessionProvider.get().generateVisit();
+                    setLatestPauseTime(System.currentTimeMillis());
+                    setActivityCount(0);
+                    setLatestNonNullUserId(getLoginUserId());
+                }
+
                 alivePid.add(Process.myPid());
                 putAlivePid(alivePid);
             }

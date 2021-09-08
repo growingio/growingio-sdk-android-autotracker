@@ -17,16 +17,12 @@
 package com.growingio.android.sdk.track.providers;
 
 import android.app.Activity;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
-import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
-import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 
@@ -34,10 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListener, OnTrackMainInitSDKCallback {
+public class SessionProvider implements IActivityLifecycle {
     private static final String TAG = "SessionProvider";
 
-    private String mLatestNonNullUserId;
     private final List<String> mActivityList = new ArrayList<>();
     private final long mSessionInterval;
     private double mLatitude = 0;
@@ -71,11 +66,13 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
      * 2. 后台30s返回后刷新session
      * 3. 用户id发生改变刷新session
      */
+    @TrackThread
     public void refreshSessionId() {
         PersistentDataProvider.get().setSessionId(UUID.randomUUID().toString());
         PersistentDataProvider.get().setSendVisitAfterRefreshSessionId(false);
     }
 
+    @TrackThread
     public void generateVisit() {
         if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
             return;
@@ -145,40 +142,11 @@ public class SessionProvider implements IActivityLifecycle, OnUserIdChangedListe
                         @Override
                         public void run() {
                             PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
-                            if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
-                                return;
-                            }
                             TrackEventGenerator.generateAppClosedEvent();
                         }
                     });
                 }
             }
-        }
-    }
-
-    @TrackThread
-    @Override
-    public void onTrackMainInitSDK() {
-        PersistentDataProvider.get().setLatestNonNullUserId(UserInfoProvider.get().getLoginUserId());
-        UserInfoProvider.get().registerUserIdChangedListener(this);
-    }
-
-    @TrackThread
-    @Override
-    public void onUserIdChanged(@Nullable String newUserId) {
-        mLatestNonNullUserId = PersistentDataProvider.get().getLatestNonNullUserId();
-        Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
-        if (!TextUtils.isEmpty(newUserId)) {
-            if (TextUtils.isEmpty(mLatestNonNullUserId)) {
-                generateVisit();
-            } else {
-                if (!newUserId.equals(mLatestNonNullUserId)) {
-                    refreshSessionId();
-                    generateVisit();
-                }
-            }
-            mLatestNonNullUserId = newUserId;
-            PersistentDataProvider.get().setLatestNonNullUserId(mLatestNonNullUserId);
         }
     }
 }

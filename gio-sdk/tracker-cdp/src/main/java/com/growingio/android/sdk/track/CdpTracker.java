@@ -19,6 +19,8 @@ package com.growingio.android.sdk.track;
 import android.app.Application;
 import android.text.TextUtils;
 
+import androidx.annotation.CallSuper;
+
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.track.cdp.CdpEventBuildInterceptor;
 import com.growingio.android.sdk.track.cdp.ResourceItem;
@@ -34,6 +36,12 @@ public class CdpTracker extends Tracker {
 
     public CdpTracker(Application application) {
         super(application);
+    }
+
+    @Override
+    @CallSuper
+    protected void setup(Application application) {
+        super.setup(application);
         CdpConfig cdpConfig = ConfigurationProvider.get().getConfiguration(CdpConfig.class);
         if (cdpConfig != null) {
             TrackMainThread.trackMain().addEventBuildInterceptor(new CdpEventBuildInterceptor(cdpConfig.getDataSourceId()));

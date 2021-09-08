@@ -20,6 +20,7 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.ErrorLog;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
+import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.log.Logger;
@@ -43,6 +44,7 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
         return PersistentDataProvider.get().getLoginUserId();
     }
 
+    @TrackThread
     public void setLoginUserId(String userId) {
         if (TextUtils.isEmpty(userId)) {
             // to null, never send visit, just return
@@ -62,8 +64,11 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
             Logger.d(TAG, "setUserId, but the userId is same as the old userId, just return");
             return;
         }
-        PersistentDataProvider.get().setLoginUserId(userId);
+
+        // 回调中通过getUserId获取oldUserId, 通过参数获取newUserId
         dispatchActions(userId);
+        PersistentDataProvider.get().setLoginUserId(userId);
+        needSendVisit(userId);
     }
 
     public void registerUserIdChangedListener(OnUserIdChangedListener l) {
@@ -77,5 +82,21 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
     @Override
     protected void singleAction(OnUserIdChangedListener listener, String action) {
         listener.onUserIdChanged(action);
+    }
+
+    private void needSendVisit(String newUserId) {
+        String mLatestNonNullUserId = PersistentDataProvider.get().getLatestNonNullUserId();
+        Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
+        if (!TextUtils.isEmpty(newUserId)) {
+            if (TextUtils.isEmpty(mLatestNonNullUserId)) {
+                SessionProvider.get().generateVisit();
+            } else {
+                if (!newUserId.equals(mLatestNonNullUserId)) {
+                    SessionProvider.get().refreshSessionId();
+                    SessionProvider.get().generateVisit();
+                }
+            }
+            PersistentDataProvider.get().setLatestNonNullUserId(newUserId);
+        }
     }
 }

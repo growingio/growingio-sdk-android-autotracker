@@ -43,7 +43,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
     public ViewChangeProvider() {
     }
 
-    public void start() {
+    public void setup() {
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
         ViewTreeStatusProvider.get().register(this);
     }

@@ -20,7 +20,6 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
-import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -35,22 +34,16 @@ public class CdpEventBuildInterceptor implements EventBuildInterceptor, OnUserId
     private static final String KEY_GIO_ID = "GIO_ID";
 
     private final String mDataSourceId;
-    private String mLatestGioId;
 
     public CdpEventBuildInterceptor(String dataSourceId) {
         mDataSourceId = dataSourceId;
         UserInfoProvider.get().registerUserIdChangedListener(this);
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                mLatestGioId = getGioId();
-            }
-        });
     }
 
     @Override
     public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
         eventBuilder.addExtraParam("dataSourceId", mDataSourceId);
+        String mLatestGioId = getGioId();
         if (!TextUtils.isEmpty(mLatestGioId)) {
             eventBuilder.addExtraParam("gioId", mLatestGioId);
         }
@@ -71,10 +64,10 @@ public class CdpEventBuildInterceptor implements EventBuildInterceptor, OnUserId
 
     @Override
     public void onUserIdChanged(@Nullable String newUserId) {
+        String mLatestGioId = getGioId();
         Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestGioId = " + mLatestGioId);
         if (!TextUtils.isEmpty(newUserId) && !newUserId.equals(mLatestGioId)) {
-            mLatestGioId = newUserId;
-            setGioId(mLatestGioId);
+            setGioId(newUserId);
         }
     }
 }

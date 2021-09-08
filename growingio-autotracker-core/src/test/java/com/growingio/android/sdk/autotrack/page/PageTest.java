@@ -59,7 +59,7 @@ public class PageTest {
         application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         TrackerContext.init(application);
         TrackerContext.initSuccess();
-        PageProvider.get().start();
+        PageProvider.get().setup();
         SessionProvider.get();
         activityController = Robolectric.buildActivity(RobolectricActivity.class);
     }

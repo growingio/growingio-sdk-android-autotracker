@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -56,28 +57,32 @@ public class Tracker {
             Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized before use API");
             return;
         }
-        initTracker(application);
+        // 配置
+        setup(application);
+        // 业务逻辑
+        start();
+
+        isInited = true;
     }
 
-    private void initTracker(Application application) {
+    @CallSuper
+    protected void setup(Application application) {
         TrackerContext.init(application);
-
         // init core service
-        SessionProvider sessionProvider = SessionProvider.get();
-        TrackMainThread.trackMain().register(sessionProvider);
         application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         DeepLinkProvider.get().init();
 
         loadAnnotationGeneratedModules(application);
+    }
 
-        if (PersistentDataProvider.get().firstInit()) {
-            sessionProvider.refreshSessionId();
-            sessionProvider.generateVisit();
-            PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
-            PersistentDataProvider.get().setActivityCount(0);
-        }
-
-        isInited = true;
+    private void start() {
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                // 判断进程是否是首次启动, 耗时操作放到子线程中执行
+                PersistentDataProvider.get().start();
+            }
+        });
     }
 
 
