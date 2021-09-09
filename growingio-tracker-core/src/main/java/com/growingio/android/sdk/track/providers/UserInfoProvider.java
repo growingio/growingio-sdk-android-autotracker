@@ -84,6 +84,7 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
         listener.onUserIdChanged(action);
     }
 
+    @TrackThread
     private void needSendVisit(String newUserId) {
         String mLatestNonNullUserId = PersistentDataProvider.get().getLatestNonNullUserId();
         Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
