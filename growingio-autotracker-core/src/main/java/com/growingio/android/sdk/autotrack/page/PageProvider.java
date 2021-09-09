@@ -60,7 +60,7 @@ public class PageProvider implements IActivityLifecycle {
         return SingleInstance.INSTANCE;
     }
 
-    public void start() {
+    public void setup() {
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
     }
 

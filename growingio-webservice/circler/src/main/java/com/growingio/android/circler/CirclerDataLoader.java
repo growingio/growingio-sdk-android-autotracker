@@ -50,7 +50,6 @@ public class CirclerDataLoader implements ModelLoader<Circler, WebService> {
 
     public static class Factory implements ModelLoaderFactory<Circler, WebService> {
         private static volatile OkHttpClient sInternalClient;
-        private final OkHttpClient client;
 
         private static final int DEFAULT_CONNECT_TIMEOUT = 5;
         private static final int DEFAULT_READ_TIMEOUT = 10;
@@ -70,16 +69,11 @@ public class CirclerDataLoader implements ModelLoader<Circler, WebService> {
         }
 
         public Factory() {
-            this(getsInternalClient());
-        }
-
-        public Factory(OkHttpClient client) {
-            this.client = client;
         }
 
         @Override
         public ModelLoader<Circler, WebService> build() {
-            return new CirclerDataLoader(client);
+            return new CirclerDataLoader(getsInternalClient());
         }
     }
 }

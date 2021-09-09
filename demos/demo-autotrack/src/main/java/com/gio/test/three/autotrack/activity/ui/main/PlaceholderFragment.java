@@ -87,7 +87,7 @@ public class PlaceholderFragment extends BaseFragment {
             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_tab, container, false);
         final TextView textView = root.findViewById(R.id.section_label);
-        mPageViewModel.getText().observe(this, new Observer<String>() {
+        mPageViewModel.getText().observe(this.getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

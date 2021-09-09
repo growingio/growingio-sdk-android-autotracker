@@ -106,12 +106,12 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                     return;
                 }
 
-                // 判断当前事件类型是否被过滤
-                if (EventExcludeFilter.isEventFilter(eventBuilder.getEventType())) {
-                    return;
-                }
-
                 if (ConfigurationProvider.core().isDataCollectionEnabled()) {
+                    // 判断当前事件类型是否被过滤
+                    if (EventExcludeFilter.isEventFilter(eventBuilder.getEventType())) {
+                        return;
+                    }
+
                     if (!PersistentDataProvider.get().isSendVisitAfterRefreshSessionId()) {
                         SessionProvider.get().generateVisit();
                     }

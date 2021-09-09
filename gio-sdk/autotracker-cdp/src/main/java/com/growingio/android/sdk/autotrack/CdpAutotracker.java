@@ -17,6 +17,7 @@
 package com.growingio.android.sdk.autotrack;
 
 import android.app.Application;
+import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -34,6 +35,12 @@ public class CdpAutotracker extends Autotracker {
 
     public CdpAutotracker(Application application) {
         super(application);
+    }
+
+    @Override
+    @CallSuper
+    protected void setup(Application application) {
+        super.setup(application);
         CdpAutotrackConfig config = ConfigurationProvider.get().getConfiguration(CdpAutotrackConfig.class);
         if (config != null) {
             TrackMainThread.trackMain().addEventBuildInterceptor(new CdpEventBuildInterceptor(config.getDataSourceId()));
