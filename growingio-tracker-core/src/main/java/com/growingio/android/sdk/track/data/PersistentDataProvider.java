@@ -170,10 +170,11 @@ public class PersistentDataProvider {
 
                 if (alivePid.isEmpty()) {
                     setActivityCount(0);
-                    SessionProvider.get().refreshSessionId();
-                    SessionProvider.get().generateVisit();
                     setLatestPauseTime(System.currentTimeMillis());
                     setLatestNonNullUserId(getLoginUserId());
+
+                    SessionProvider.get().refreshSessionId();
+                    SessionProvider.get().generateVisit();
                 }
 
                 alivePid.add(Process.myPid());

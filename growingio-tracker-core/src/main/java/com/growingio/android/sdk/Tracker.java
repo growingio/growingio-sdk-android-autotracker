@@ -71,18 +71,13 @@ public class Tracker {
         // init core service
         application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         DeepLinkProvider.get().init();
+        SessionProvider.get().init();
 
         loadAnnotationGeneratedModules(application);
     }
 
     private void start() {
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                // 判断进程是否是首次启动, 耗时操作放到子线程中执行
-                PersistentDataProvider.get().start();
-            }
-        });
+        PersistentDataProvider.get().start();
     }
 
 

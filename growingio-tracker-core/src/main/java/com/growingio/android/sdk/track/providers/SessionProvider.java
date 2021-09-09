@@ -44,6 +44,9 @@ public class SessionProvider implements IActivityLifecycle {
 
     private SessionProvider() {
         mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000L;
+    }
+
+    public void init() {
         mActivityList.clear();
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
     }
