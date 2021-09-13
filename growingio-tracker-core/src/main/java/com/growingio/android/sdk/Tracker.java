@@ -73,6 +73,10 @@ public class Tracker {
         DeepLinkProvider.get().init();
         SessionProvider.get().init();
 
+        // 支持配置中注册模块, 如加密模块等事件模块需要先于所有事件发送注册
+        for (LibraryGioModule component : ConfigurationProvider.core().getComponents()) {
+            component.registerComponents(application, TrackerContext.get().getRegistry());
+        }
         loadAnnotationGeneratedModules(application);
     }
 

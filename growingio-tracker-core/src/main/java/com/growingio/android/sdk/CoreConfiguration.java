@@ -21,6 +21,9 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CoreConfiguration implements Configurable {
     private String mProjectId;
     private String mUrlScheme;
@@ -36,6 +39,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mOaidEnabled = false;
     private int mExcludeEventFlag = EventExcludeFilter.EVENT_MASK_NONE;
     private int mIgnoreFieldFlag = FieldIgnoreFilter.FIELD_IGNORE_NONE;
+    private final List<LibraryGioModule> mComponents = new ArrayList<>();
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -163,6 +167,19 @@ public class CoreConfiguration implements Configurable {
 
     public int getIgnoreField() {
         return mIgnoreFieldFlag;
+    }
+
+    public CoreConfiguration registerComponent(LibraryGioModule component) {
+        if (component == null) {
+            return this;
+        }
+
+        mComponents.add(component);
+        return this;
+    }
+
+    public List<LibraryGioModule> getComponents() {
+        return mComponents;
     }
 
 }
