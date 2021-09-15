@@ -85,7 +85,7 @@ public class DemoApplication extends MultiDexApplication {
                     .setDataCollectionEnabled(true)
                     .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.EVENT_MASK_TRIGGER))
                     .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
-                    .registerComponent(new OaidLibraryGioModule());
+                    .setPreloadComponent(new OaidLibraryGioModule());
         }
         long startTime = System.currentTimeMillis();
         GrowingAutotracker.startWithConfiguration(this, sConfiguration);

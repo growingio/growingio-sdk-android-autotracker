@@ -159,7 +159,7 @@ public class CoreConfiguration implements Configurable {
         return mIgnoreFieldFlag;
     }
 
-    public CoreConfiguration registerComponent(LibraryGioModule component) {
+    public CoreConfiguration setPreloadComponent(LibraryGioModule component) {
         if (component == null) {
             return this;
         }
@@ -168,7 +168,7 @@ public class CoreConfiguration implements Configurable {
         return this;
     }
 
-    public List<LibraryGioModule> getComponents() {
+    public List<LibraryGioModule> getPreoloadComponents() {
         return mComponents;
     }
 
