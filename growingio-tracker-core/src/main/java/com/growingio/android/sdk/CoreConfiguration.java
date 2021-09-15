@@ -36,7 +36,6 @@ public class CoreConfiguration implements Configurable {
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
-    private boolean mOaidEnabled = false;
     private int mExcludeEventFlag = EventExcludeFilter.EVENT_MASK_NONE;
     private int mIgnoreFieldFlag = FieldIgnoreFilter.FIELD_IGNORE_NONE;
     private final List<LibraryGioModule> mComponents = new ArrayList<>();
@@ -131,15 +130,6 @@ public class CoreConfiguration implements Configurable {
         if (!TextUtils.isEmpty(dataCollectionServerHost)) {
             mDataCollectionServerHost = dataCollectionServerHost;
         }
-        return this;
-    }
-
-    public boolean isOaidEnabled() {
-        return mOaidEnabled;
-    }
-
-    public CoreConfiguration setOaidEnabled(boolean enabled) {
-        this.mOaidEnabled = enabled;
         return this;
     }
 

@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package com.growingio.android.sdk.track.utils;
+package com.growingio.android.oaid;
 
-public class OaidHelper {
+import android.content.Context;
+
+public interface IOaidHelper {
+    public void preloadOaid(Context context);
+    public String getOaid();
 }

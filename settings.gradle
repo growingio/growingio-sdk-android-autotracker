@@ -26,6 +26,7 @@ include ':growingio-data:json'
 include ':growingio-data:encoder'
 include ':growingio-tools:crash'
 include ':growingio-tools:snappy'
+include ':growingio-tools:oaid'
 
 // sdks
 include ':gio-sdk:tracker'

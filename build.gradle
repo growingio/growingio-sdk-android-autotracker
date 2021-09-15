@@ -60,6 +60,7 @@ buildscript {
                         'json'            : "com.growingio.android:json:$releaseConfiguration.releaseVersion",
                         'encoder'         : "com.growingio.android:encoder:$releaseConfiguration.releaseVersion",
                         'crash'           : "com.growingio.android:crash:$releaseConfiguration.releaseVersion",
+                        'oaid'            : "com.growingio.android:oaid:$releaseConfiguration.releaseVersion",
                         'snappy'          : "com.growingio.android:snappy:1.1.0",
                 ],
 

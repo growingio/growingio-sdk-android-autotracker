@@ -134,19 +134,6 @@ public class UtilsTest {
         Truth.assertThat(NetworkUtil.getNetworkName(ConnectivityManager.TYPE_WIFI, TelephonyManager.NETWORK_TYPE_LTE, "Test Network")).isEqualTo("WIFI");
     }
 
-    @Test
-    public void oaidTest() {
-        OaidHelper oaidHelper = new OaidHelper();
-        Truth.assertThat(oaidHelper.waitCompleteAndGetOaid(1008613, 10L)).isNull();
-        oaidHelper.setOaid("error oaid");
-        String oaid = oaidHelper.waitCompleteAndGetOaid(0, 100L);
-        Truth.assertThat(oaid).isEqualTo("error oaid");
-        oaidHelper.setOaid("test oaid");
-        oaidHelper.setComplete(true);
-        oaid = oaidHelper.waitCompleteAndGetOaid(0, 10000L);
-        Truth.assertThat(oaid).isEqualTo("test oaid");
-    }
-
 
     @Test
     public void objectTest() {

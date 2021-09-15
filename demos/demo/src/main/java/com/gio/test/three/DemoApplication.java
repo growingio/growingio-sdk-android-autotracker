@@ -26,6 +26,7 @@ import android.webkit.WebView;
 
 import androidx.annotation.RequiresApi;
 
+import com.growingio.android.oaid.OaidLibraryGioModule;
 import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
@@ -81,12 +82,14 @@ public class DemoApplication extends MultiDexApplication {
             sConfiguration = new AutotrackConfiguration("bfc5d6a3693a110d", "growing.d80871b41ef40518")
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
-                    .setOaidEnabled(false)
                     .setDataCollectionEnabled(true)
                     .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.EVENT_MASK_TRIGGER))
-                    .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL));
+                    .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
+                    .registerComponent(new OaidLibraryGioModule());
         }
+        long startTime = System.currentTimeMillis();
         GrowingAutotracker.startWithConfiguration(this, sConfiguration);
+        Log.d(TAG, "start time: " + (System.currentTimeMillis() - startTime));
     }
 
     private boolean isMainProcess() {
