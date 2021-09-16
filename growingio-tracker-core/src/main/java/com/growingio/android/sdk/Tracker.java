@@ -241,7 +241,7 @@ public class Tracker {
      * @param module GIOLibraryModule
      */
     public void registerComponent(LibraryGioModule module) {
-        if (!isInited) return;
+        if (!isInited || module == null) return;
         module.registerComponents(TrackerContext.get(), TrackerContext.get().getRegistry());
     }
 
