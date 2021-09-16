@@ -16,9 +16,7 @@
 
 package com.growingio.android.hybrid;
 
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 class NativeBridge {
@@ -31,20 +29,10 @@ class NativeBridge {
     }
 
     void dispatchEvent(String event) {
-        if (!TrackerContext.initializedSuccessfully()) {
-            Logger.e(TAG, "Autotracker do not initialized successfully");
-            return;
-        }
-
         TrackMainThread.trackMain().postEventToTrackMain(mHybridTransformer.transform(event));
     }
 
     void setNativeUserId(String userId) {
-        if (!TrackerContext.initializedSuccessfully()) {
-            Logger.e(TAG, "Autotracker do not initialized successfully");
-            return;
-        }
-
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
             public void run() {
@@ -54,11 +42,6 @@ class NativeBridge {
     }
 
     void clearNativeUserId() {
-        if (!TrackerContext.initializedSuccessfully()) {
-            Logger.e(TAG, "Autotracker do not initialized successfully");
-            return;
-        }
-
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
             public void run() {
