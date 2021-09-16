@@ -62,6 +62,7 @@ public class Tracker {
         // 业务逻辑
         start();
 
+        TrackerContext.initSuccess();
         isInited = true;
     }
 
