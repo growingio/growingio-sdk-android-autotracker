@@ -62,6 +62,7 @@ public class Tracker {
         // 业务逻辑
         start();
 
+        TrackerContext.initSuccess();
         isInited = true;
     }
 
@@ -190,7 +191,7 @@ public class Tracker {
     public void bridgeWebView(View webView) {
         if (!isInited) return;
         if (ClassExistHelper.isWebView(webView)) {
-            TrackMainThread.trackMain().postActionToTrackMain(() -> bridgeInnerWebView(webView));
+            bridgeInnerWebView(webView);
         } else {
             Logger.e(TAG, "please check your " + webView.getClass().getName() + "is WebView or com.tencent.smtt.sdk.WebView or com.uc.webview.export.WebView");
         }

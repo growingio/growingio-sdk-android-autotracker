@@ -31,6 +31,11 @@ public class WebViewInjector {
     private static final String TAG = "WebViewInjector";
 
     private static void bridgeForWebView(View view) {
+        if (!TrackerContext.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
         boolean result = false;
         ModelLoader<HybridBridge, Boolean> modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridBridge.class, Boolean.class);
         if (modelLoader != null) {

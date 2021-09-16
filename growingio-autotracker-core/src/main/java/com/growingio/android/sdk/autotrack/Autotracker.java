@@ -23,7 +23,6 @@ import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.change.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
@@ -51,8 +50,6 @@ public class Autotracker extends Tracker {
         ViewChangeProvider mViewChangeProvider;
         mViewChangeProvider = new ViewChangeProvider();
         mViewChangeProvider.setup();
-
-        TrackerContext.initSuccess();
     }
 
     public void setUniqueTag(final View view, final String tag) {
