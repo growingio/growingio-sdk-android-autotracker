@@ -27,7 +27,6 @@ import android.util.DisplayMetrics;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.data.PersistentDataProvider;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.utils.ClassExistHelper;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.utils.OaidHelper;
@@ -117,7 +116,7 @@ public class DeviceInfoProvider {
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
     public String getImei() {
-        if (TextUtils.isEmpty(mImei) && ConfigurationProvider.core().isDataCollectionEnabled()) {
+        if (TextUtils.isEmpty(mImei)) {
             if (PermissionUtil.checkReadPhoneStatePermission()) {
                 try {
                     TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
@@ -131,17 +130,15 @@ public class DeviceInfoProvider {
     }
 
     public String getAndroidId() {
-        if (TextUtils.isEmpty(mAndroidId) && ConfigurationProvider.core().isDataCollectionEnabled()) {
+        if (TextUtils.isEmpty(mAndroidId)) {
             mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
         }
         return mAndroidId;
     }
 
     public String getOaid() {
-        if (TextUtils.isEmpty(mOaid) && ConfigurationProvider.core().isDataCollectionEnabled() && ConfigurationProvider.core().isOaidEnabled()) {
-            if (ClassExistHelper.hasMSA()) {
-                mOaid = new OaidHelper().getOaid(mContext);
-            }
+        if (TextUtils.isEmpty(mOaid)) {
+            mOaid = TrackerContext.get().executeData(null, OaidHelper.class, String.class);
         }
         return mOaid;
     }
@@ -153,7 +150,7 @@ public class DeviceInfoProvider {
     public String getDeviceId() {
         if (TextUtils.isEmpty(mDeviceId)) {
             mDeviceId = PersistentDataProvider.get().getDeviceId();
-            if (TextUtils.isEmpty(mDeviceId) && ConfigurationProvider.core().isDataCollectionEnabled()) {
+            if (TextUtils.isEmpty(mDeviceId)) {
                 mDeviceId = calculateDeviceId();
             }
         }

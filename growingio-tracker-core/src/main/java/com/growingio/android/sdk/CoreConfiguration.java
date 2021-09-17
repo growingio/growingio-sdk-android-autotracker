@@ -21,6 +21,9 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CoreConfiguration implements Configurable {
     private String mProjectId;
     private String mUrlScheme;
@@ -33,9 +36,9 @@ public class CoreConfiguration implements Configurable {
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
-    private boolean mOaidEnabled = false;
     private int mExcludeEventFlag = EventExcludeFilter.EVENT_MASK_NONE;
     private int mIgnoreFieldFlag = FieldIgnoreFilter.FIELD_IGNORE_NONE;
+    private final List<LibraryGioModule> mComponents = new ArrayList<>();
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -130,15 +133,6 @@ public class CoreConfiguration implements Configurable {
         return this;
     }
 
-    public boolean isOaidEnabled() {
-        return mOaidEnabled;
-    }
-
-    public CoreConfiguration setOaidEnabled(boolean enabled) {
-        this.mOaidEnabled = enabled;
-        return this;
-    }
-
     public CoreConfiguration setExcludeEvent(int filterEventFlag) {
         if (filterEventFlag == EventExcludeFilter.EVENT_MASK_NONE) {
             this.mExcludeEventFlag = EventExcludeFilter.EVENT_MASK_NONE;
@@ -163,6 +157,19 @@ public class CoreConfiguration implements Configurable {
 
     public int getIgnoreField() {
         return mIgnoreFieldFlag;
+    }
+
+    public CoreConfiguration setPreloadComponent(LibraryGioModule component) {
+        if (component == null) {
+            return this;
+        }
+
+        mComponents.add(component);
+        return this;
+    }
+
+    public List<LibraryGioModule> getPreoloadComponents() {
+        return mComponents;
     }
 
 }

@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.hybrid;
+
+package com.growingio.android.oaid;
 
 import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
-import com.growingio.android.sdk.track.modelloader.data.HybridDom;
-import com.growingio.android.sdk.track.modelloader.data.HybridJson;
+import com.growingio.android.sdk.track.utils.OaidHelper;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
-/**
- * <p>
- *
- * @author cpacm 5/19/21
- */
 @GIOLibraryModule
-public class HybridLibraryGioModule extends LibraryGioModule {
+public class OaidLibraryGioModule extends LibraryGioModule {
+
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(HybridBridge.class, Boolean.class, new HybridBridgeLoader.Factory());
-        registry.register(HybridDom.class, HybridJson.class, new HybridDomLoader.Factory());
+        registry.register(OaidHelper.class, String.class, new OaidDataLoader.Factory(context));
     }
 }

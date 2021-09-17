@@ -93,15 +93,15 @@ dependencies {
     androidTestImplementation libraries.androidx.appcompat
     androidTestImplementation libraries.android.appcompat
     androidTestImplementation(name: 'tbs_sdk_44051', ext: 'jar')
-    //androidTestImplementation libraries.others.x5_webview
 
     implementation libraries.android.appcompat
     implementation libraries.android.constraint
     implementation libraries.android.multidex
     implementation(name: 'tbs_sdk_44051', ext: 'jar')
-    implementation(name: 'oaid_sdk_1.0.22', ext: 'aar')
+    implementation(name: 'oaid_sdk_1.0.25', ext: 'aar')
     implementation project(':demo-core')
     implementation project(":demo-autotrack")
+    implementation project(":growingio-tools:oaid")
 
     compileOnly libraries.androidx.appcompat
 
