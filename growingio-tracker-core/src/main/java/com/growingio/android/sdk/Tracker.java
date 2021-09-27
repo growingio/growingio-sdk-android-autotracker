@@ -159,6 +159,11 @@ public class Tracker {
         TrackMainThread.trackMain().postActionToTrackMain(() -> UserInfoProvider.get().setLoginUserId(userId));
     }
 
+    public void setLoginUserId(final String userId, final String userKey) {
+        if (!isInited) return;
+        TrackMainThread.trackMain().postActionToTrackMain(() -> UserInfoProvider.get().setLoginUserId(userId, userKey));
+    }
+
     public void cleanLoginUserId() {
         if (!isInited) return;
         TrackMainThread.trackMain().postActionToTrackMain(() -> UserInfoProvider.get().setLoginUserId(null));

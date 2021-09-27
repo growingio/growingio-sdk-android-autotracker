@@ -39,6 +39,7 @@ public class CoreConfiguration implements Configurable {
     private int mExcludeEventFlag = EventExcludeFilter.EVENT_MASK_NONE;
     private int mIgnoreFieldFlag = FieldIgnoreFilter.FIELD_IGNORE_NONE;
     private final List<LibraryGioModule> mComponents = new ArrayList<>();
+    private boolean mIdMappingEnabled = false;
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -170,6 +171,15 @@ public class CoreConfiguration implements Configurable {
 
     public List<LibraryGioModule> getPreoloadComponents() {
         return mComponents;
+    }
+
+    public boolean isIdMappingEnabled() {
+        return mIdMappingEnabled;
+    }
+
+    public CoreConfiguration setIdMappingEnabled(boolean enabled) {
+        this.mIdMappingEnabled = enabled;
+        return (CoreConfiguration) this;
     }
 
 }

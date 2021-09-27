@@ -40,34 +40,54 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
         return SingleInstance.INSTANCE;
     }
 
+    public String getLoginUserKey() {
+        return PersistentDataProvider.get().getLoginUserKey();
+    }
+
     public String getLoginUserId() {
         return PersistentDataProvider.get().getLoginUserId();
     }
 
     @TrackThread
     public void setLoginUserId(String userId) {
-        if (TextUtils.isEmpty(userId)) {
-            // to null, never send visit, just return
-            PersistentDataProvider.get().setLoginUserId(null);
-            dispatchActions(null);
-            return;
+        setLoginUserId(userId, null);
+    }
+
+    public void setLoginUserId(String userId, String userKey) {
+        if (!ConfigurationProvider.core().isIdMappingEnabled()) {
+            userKey = null;
         }
 
-        if (userId.length() > 1000) {
+        // 考虑DataSharer存储限制
+        if (userKey != null && userKey.length() > 1000) {
+            Logger.e(TAG, ErrorLog.USER_KEY_TOO_LONG);
+            return;
+        }
+        if (userId != null && userId.length() > 1000) {
             Logger.e(TAG, ErrorLog.USER_ID_TOO_LONG);
             return;
         }
 
+        if (TextUtils.isEmpty(userId)) {
+            // to null, never send visit, just return
+            PersistentDataProvider.get().setLoginUserIdAndUserKey(null, null);
+            Logger.d(TAG, "clean the userId (and will also clean the userKey");
+            dispatchActions(null);
+            return;
+        }
+
         // to non-null
-        String oldUserId = getLoginUserId();
-        if (ObjectUtils.equals(userId, oldUserId)) {
+        if (ObjectUtils.equals(userId, getLoginUserId())) {
+            if (!ObjectUtils.equals(getLoginUserKey(), userKey)) {
+                PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, userKey);
+            }
             Logger.d(TAG, "setUserId, but the userId is same as the old userId, just return");
             return;
         }
 
         // 回调中通过getUserId获取oldUserId, 通过参数获取newUserId
         dispatchActions(userId);
-        PersistentDataProvider.get().setLoginUserId(userId);
+        PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, (TextUtils.isEmpty(userKey) ? null : userKey));
         needSendVisit(userId);
     }
 
