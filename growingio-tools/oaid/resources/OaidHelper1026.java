@@ -82,6 +82,7 @@ public class OaidHelper1026 implements IOaidHelper {
                         Logger.w(TAG, "getDeviceIds: cert init failed");
                     }
                 }
+
                 int initCode = MdidSdkHelper.InitSdk(context, true, mListener);
                 switch (initCode) {
                     case InfoCode.INIT_INFO_RESULT_DELAY:
@@ -128,9 +129,17 @@ public class OaidHelper1026 implements IOaidHelper {
     }
 
     private static void initSDKLibrary() {
+        // 不能通过MdidSdkHelper判断版本加载不同so，获取版本号为native方法
+        // 适配1.0.27的oaid_sdk
+        loadLibrary("nllvm1630571663641560568");
+        // 适配1.0.26的oaid_sdk
+        loadLibrary("nllvm1623827671");
+    }
+
+    private static void loadLibrary(String libName) {
         try {
-            System.loadLibrary("nllvm1623827671");
-        } catch (Throwable var1) {
+            System.loadLibrary(libName);
+        } catch (Throwable ignored) {
         }
     }
 
