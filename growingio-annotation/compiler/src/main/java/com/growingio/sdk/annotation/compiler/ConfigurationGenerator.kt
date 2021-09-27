@@ -22,9 +22,7 @@ import com.squareup.javapoet.*
 import java.lang.StringBuilder
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.Modifier
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.*
 import javax.lang.model.type.TypeVariable
 import javax.lang.model.util.ElementFilter
 import kotlin.collections.HashMap
@@ -331,9 +329,26 @@ internal class ConfigurationGenerator(
     private fun parametersOf(method: ExecutableElement): List<ParameterSpec> {
         val result: MutableList<ParameterSpec> = ArrayList()
         for (parameter in method.parameters) {
-            result.add(ParameterSpec.get(parameter))
+            // ParameterSpec.get 不会复制annotations
+            // 参考 https://github.com/square/javapoet/issues/482
+            // https://github.com/square/javapoet/pull/501 合并时放弃了getAll方法
+            result.add(getAllParameters(parameter))
         }
         return result
+    }
+
+    private fun getAllParameters(element: VariableElement): ParameterSpec {
+        require(element.kind == ElementKind.PARAMETER) { String.format("element is not a parameter") }
+        val type = TypeName.get(element.asType())
+        val name = element.simpleName.toString()
+
+        val builder = ParameterSpec.builder(type, name).addModifiers(element.modifiers)
+
+        for (annotationMirror in element.annotationMirrors) {
+            builder.addAnnotation(AnnotationSpec.get(annotationMirror))
+        }
+
+        return builder.build()
     }
 
     private fun writeConfig(packageName: String, gio: TypeSpec) {

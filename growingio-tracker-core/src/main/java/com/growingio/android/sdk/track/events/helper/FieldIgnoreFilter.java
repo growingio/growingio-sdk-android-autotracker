@@ -18,7 +18,6 @@ package com.growingio.android.sdk.track.events.helper;
 
 import androidx.annotation.IntDef;
 
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.lang.annotation.Retention;
@@ -30,27 +29,28 @@ public class FieldIgnoreFilter {
 
     @IntDef(
             value = {
+                    NONE,
                     NETWORK_STATE,
                     SCREEN_HEIGHT,
                     SCREEN_WIDTH,
                     DEVICE_BRAND,
                     DEVICE_MODEL,
                     DEVICE_TYPE,
+                    FIELD_IGNORE_ALL,
             }
     )
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface FieldFilterType {
     }
 
+    public static final int NONE = 0;
     public static final int NETWORK_STATE = 1;
     public static final int SCREEN_HEIGHT = 1 << 1;
     public static final int SCREEN_WIDTH = 1 << 2;
     public static final int DEVICE_BRAND = 1 << 3;
     public static final int DEVICE_MODEL = 1 << 4;
     public static final int DEVICE_TYPE = 1 << 5;
-
     public static final int FIELD_IGNORE_ALL = (NETWORK_STATE | SCREEN_HEIGHT | SCREEN_WIDTH | DEVICE_BRAND | DEVICE_MODEL | DEVICE_TYPE);
-    public static final int FIELD_IGNORE_NONE = 0;
 
     private static final ArrayList<String> FIELD_NAME_LIST = new ArrayList<>(
             Arrays.asList("networkState", "screenHeight", "screenWidth", "deviceBrand", "deviceModel", "deviceType"));
@@ -58,12 +58,14 @@ public class FieldIgnoreFilter {
     private FieldIgnoreFilter() {
     }
 
+    // of函数用于setIgnoreField同时传入多个字段类型
     public static int of(@FieldFilterType int... types) {
         int value = 0;
-        for (int type : types) {
-            value |= type;
+        if (types != null) {
+            for (int type : types) {
+                value |= type;
+            }
         }
-        Logger.d("IgnoreFieldsParams", getFieldFilterLog(value));
         return value;
     }
 

@@ -18,7 +18,6 @@ package com.growingio.android.sdk.track.events.helper;
 
 import androidx.annotation.IntDef;
 
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.lang.annotation.Retention;
@@ -31,6 +30,7 @@ public final class EventExcludeFilter {
     @IntDef(
             flag = true,
             value = {
+                    NONE,
                     VISIT,
                     CUSTOM,
                     VISITOR_ATTRIBUTES,
@@ -43,12 +43,14 @@ public final class EventExcludeFilter {
                     VIEW_CHANGE,
                     FORM_SUBMIT,
                     REENGAGE,
+                    EVENT_MASK_TRIGGER,
             }
     )
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface EventFilterLimit {
     }
 
+    public static final int NONE = 0;
     public static final int VISIT = 1;
     public static final int CUSTOM = 1 << 1;
     public static final int VISITOR_ATTRIBUTES = 1 << 2;
@@ -61,9 +63,7 @@ public final class EventExcludeFilter {
     public static final int VIEW_CHANGE = 1 << 9;
     public static final int FORM_SUBMIT = 1 << 10;
     public static final int REENGAGE = 1 << 11;
-
     public static final int EVENT_MASK_TRIGGER = (VIEW_CLICK | VIEW_CHANGE | FORM_SUBMIT);
-    public static final int EVENT_MASK_NONE = 0;
 
     private static final ArrayList<String> EVENT_TYPE_LIST = new ArrayList<>(
             Arrays.asList("VISIT", "CUSTOM", "VISITOR_ATTRIBUTES", "LOGIN_USER_ATTRIBUTES",
@@ -73,12 +73,14 @@ public final class EventExcludeFilter {
     private EventExcludeFilter() {
     }
 
+    // of函数用于setExcludeEvent同时传入多个事件类型
     public static int of(@EventFilterLimit int... types) {
         int value = 0;
-        for (int type : types) {
-            value |= type;
+        if (types != null) {
+            for (int type : types) {
+                value |= type;
+            }
         }
-        Logger.d("EventFilter", getFilterEventLog(value));
         return value;
     }
 

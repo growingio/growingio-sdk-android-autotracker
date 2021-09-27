@@ -23,6 +23,7 @@ import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ConstantPool;
+import com.growingio.android.sdk.track.utils.ObjectUtils;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.util.HashMap;
@@ -90,6 +91,15 @@ public class ConfigurationProvider {
         if (config != null) {
             sModuleConfigs.put(config.getClass(), config);
         }
+    }
+
+    public String getAllConfigurationInfo() {
+        StringBuilder info = new StringBuilder();
+        info.append(ObjectUtils.reflectToString(core()));
+        for (Configurable configurable : sModuleConfigs.values()) {
+            info.append(ObjectUtils.reflectToString(configurable));
+        }
+        return info.toString();
     }
 
     /**

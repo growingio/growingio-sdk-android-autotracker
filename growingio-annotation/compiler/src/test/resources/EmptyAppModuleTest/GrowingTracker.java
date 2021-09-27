@@ -75,5 +75,6 @@ public final class GrowingTracker {
     private static void initSuccess() {
         Logger.i(TAG, "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!");
         Logger.i(TAG, "!!! GrowingIO Tracker version: "+SDKConfig.SDK_VERSION+" !!!");
+        Logger.d(TAG, ConfigurationProvider.get().getAllConfigurationInfo());
     }
 }
