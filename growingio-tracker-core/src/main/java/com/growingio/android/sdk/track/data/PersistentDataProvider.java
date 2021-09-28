@@ -32,6 +32,7 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,7 @@ public class PersistentDataProvider {
     private static final int SHARER_MAX_SIZE = 50;
 
     private static final String KEY_TYPE_GLOBAL = "TYPE_GLOBAL";
+    private static final String KEY_LOGIN_USER_KEY = "LOGIN_USER_KEY";
     private static final String KEY_LOGIN_USER_ID = "LOGIN_USER_ID";
     private static final String KEY_DEVICE_ID = "DEVICE_ID";
     private static final String KEY_SESSION_ID = "SESSION_ID";
@@ -99,12 +101,19 @@ public class PersistentDataProvider {
         mDataSharer.putString(KEY_DEVICE_ID, deviceId);
     }
 
+    public String getLoginUserKey() {
+        return mDataSharer.getString(KEY_LOGIN_USER_KEY, "");
+    }
+
     public String getLoginUserId() {
         return mDataSharer.getString(KEY_LOGIN_USER_ID, "");
     }
 
-    public void setLoginUserId(@Nullable String userId) {
-        mDataSharer.putString(KEY_LOGIN_USER_ID, userId);
+    public void setLoginUserIdAndUserKey(@Nullable String userId, @Nullable String userKey) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put(KEY_LOGIN_USER_ID, userId);
+        map.put(KEY_LOGIN_USER_KEY, userKey);
+        mDataSharer.putMultiString(map);
     }
 
     public String getLatestNonNullUserId() {

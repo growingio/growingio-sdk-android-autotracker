@@ -27,7 +27,8 @@ public class ErrorLog {
     public static final String JSON_TOO_LONG = "JSONObject传参最长仅支持100个键值对";
     public static final String JSON_KEY_VALUE_NOT_VALID = "JSONObject传参中键值对不合法, 发送失败";
     public static final String TRACK_FRAGMENT_ERROR = "trackAllFragment策略与全局策略相同， 不需要单独设置";
-    public static final String USER_ID_TOO_LONG = "GrowingIO.setUserId(VALUE):VALUE长度大于1000，不发送";
+    public static final String USER_KEY_TOO_LONG = "GrowingIO.setUserId(KEY, VALUE):KEY长度大于1000，不发送";
+    public static final String USER_ID_TOO_LONG = "GrowingIO.setUserId(KEY, VALUE):VALUE长度大于1000，不发送";
 
     private ErrorLog() {
     }

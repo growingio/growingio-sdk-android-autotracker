@@ -42,6 +42,7 @@ public class CoreConfiguration implements Configurable {
     @FieldToString(clazz = FieldIgnoreFilter.class, method = "getFieldFilterLog", parameterTypes = {int.class}, returnType = String.class)
     private int mIgnoreFieldFlag = FieldIgnoreFilter.NONE;
     private final List<LibraryGioModule> mComponents = new ArrayList<>();
+    private boolean mIdMappingEnabled = false;
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -174,4 +175,14 @@ public class CoreConfiguration implements Configurable {
     public List<LibraryGioModule> getPreoloadComponents() {
         return mComponents;
     }
+  
+    public boolean isIdMappingEnabled() {
+        return mIdMappingEnabled;
+    }
+
+    public CoreConfiguration setIdMappingEnabled(boolean enabled) {
+        this.mIdMappingEnabled = enabled;
+        return (CoreConfiguration) this;
+    }
+  
 }

@@ -51,6 +51,7 @@ public abstract class BaseEvent extends GEvent {
     private final String mPlatform;
     private final String mPlatformVersion;
     private final String mDeviceId;
+    private final String mUserKey;
     private final String mUserId;
     private final String mSessionId;
     private final String mEventType;
@@ -80,6 +81,7 @@ public abstract class BaseEvent extends GEvent {
         mPlatform = eventBuilder.mPlatform;
         mPlatformVersion = eventBuilder.mPlatformVersion;
         mDeviceId = eventBuilder.mDeviceId;
+        mUserKey = eventBuilder.mUserKey;
         mUserId = eventBuilder.mUserId;
         mSessionId = eventBuilder.mSessionId;
         mEventType = eventBuilder.mEventType;
@@ -108,6 +110,10 @@ public abstract class BaseEvent extends GEvent {
 
     public String getDeviceId() {
         return mDeviceId;
+    }
+
+    public String getUserKey() {
+        return mUserKey;
     }
 
     public String getUserId() {
@@ -210,6 +216,9 @@ public abstract class BaseEvent extends GEvent {
             json.put("platform", mPlatform);
             json.put("platformVersion", mPlatformVersion);
             json.put("deviceId", getDeviceId());
+            if (!TextUtils.isEmpty(getUserKey())) {
+                json.put("userKey", getUserKey());
+            }
             if (!TextUtils.isEmpty(getUserId())) {
                 json.put("userId", getUserId());
             }
@@ -261,6 +270,7 @@ public abstract class BaseEvent extends GEvent {
         private String mPlatform;
         private String mPlatformVersion;
         private String mDeviceId;
+        private String mUserKey;
         private String mUserId;
         protected String mSessionId;
         protected String mEventType;
@@ -301,6 +311,7 @@ public abstract class BaseEvent extends GEvent {
             mTimestamp = (mTimestamp != 0) ? mTimestamp : System.currentTimeMillis();
             mDeviceId = DeviceInfoProvider.get().getDeviceId();
             mSessionId = PersistentDataProvider.get().getSessionId();
+            mUserKey = UserInfoProvider.get().getLoginUserKey();
             mUserId = UserInfoProvider.get().getLoginUserId();
             EventSequenceId sequenceId = PersistentDataProvider.get().getAndIncrement(mEventType);
             mGlobalSequenceId = sequenceId.getGlobalId();
