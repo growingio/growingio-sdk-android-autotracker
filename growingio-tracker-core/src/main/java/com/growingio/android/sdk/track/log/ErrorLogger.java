@@ -25,7 +25,7 @@ class ErrorLogger extends DebugLogger {
     @Override
     protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
         if (priority == Log.ERROR) {
-            super.printWithoutCache(priority, tag, message, t);
+            super.print(priority, tag, message, t);
         }
     }
 }

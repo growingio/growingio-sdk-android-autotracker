@@ -19,13 +19,11 @@ import com.google.common.truth.Truth
 import com.google.testing.compile.Compilation
 import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler
-import com.google.testing.compile.JavaFileObjects
 import com.growingio.sdk.annotation.compiler.rule.CompilationProvider
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.io.ByteArrayOutputStream
 import javax.tools.JavaFileObject
 
 @RunWith(JUnit4::class)

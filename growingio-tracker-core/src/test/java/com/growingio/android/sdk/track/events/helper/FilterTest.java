@@ -68,7 +68,7 @@ public class FilterTest {
         String zeroLog = EventExcludeFilter.getFilterEventLog(0);
         Truth.assertThat(zeroLog).isEmpty();
 
-        ConfigurationProvider.core().setExcludeEvent(EventExcludeFilter.EVENT_MASK_NONE);
+        ConfigurationProvider.core().setExcludeEvent(EventExcludeFilter.NONE);
         Truth.assertThat(EventExcludeFilter.isEventFilter("VIEW_CLICK")).isFalse();
     }
 
@@ -89,7 +89,7 @@ public class FilterTest {
         String zeroLog = FieldIgnoreFilter.getFieldFilterLog(0);
         Truth.assertThat(zeroLog).isEmpty();
 
-        ConfigurationProvider.core().setIgnoreField(FieldIgnoreFilter.FIELD_IGNORE_NONE);
+        ConfigurationProvider.core().setIgnoreField(FieldIgnoreFilter.NONE);
         Truth.assertThat(FieldIgnoreFilter.isFieldFilter("screenWidth")).isFalse();
     }
 
