@@ -19,6 +19,7 @@ package com.growingio.android.sdk.track.ipc;
 import androidx.annotation.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IDataSharer {
     @Nullable
@@ -35,6 +36,8 @@ public interface IDataSharer {
     List<Integer> getIntArray(String key, List<Integer> defValue);
 
     void putString(String key, @Nullable String value);
+
+    void putMultiString(Map<String, String> values);
 
     void putInt(String key, int value);
 

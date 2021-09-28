@@ -154,5 +154,4 @@ public class ProviderTest {
         Truth.assertThat(PersistentDataProvider.get().getDeviceId()).isNotEmpty();
     }
 
-
 }

@@ -260,6 +260,32 @@ public class MultiProcessDataSharer implements IDataSharer {
     }
 
     @Override
+    public void putMultiString(Map<String, String> values) {
+        synchronized (this) {
+            awaitLoadedLocked();
+            lockedRun(new Runnable() {
+                @Override
+                public void run() {
+                    if (values != null) {
+                        for (Map.Entry<String, String> value : values.entrySet()) {
+                            SharedEntry entry = mSharedEntries.get(value.getKey());
+                            if (entry == null) {
+                                incrementLoadFromDisk();
+                                entry = mSharedEntries.get(value.getKey());
+                                if (entry == null) {
+                                    entry = new SharedEntry(mMappedByteBuffer, mCurrentPosition, value.getKey());
+                                    mSharedEntries.put(value.getKey(), entry);
+                                }
+                            }
+                            entry.putObject(mMappedByteBuffer, SharedEntry.VALUE_TYPE_STRING, value.getValue());
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
     public void putInt(String key, int value) {
         synchronized (this) {
             awaitLoadedLocked();
