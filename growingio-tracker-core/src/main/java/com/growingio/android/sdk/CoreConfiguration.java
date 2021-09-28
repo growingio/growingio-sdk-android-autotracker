@@ -175,7 +175,7 @@ public class CoreConfiguration implements Configurable {
     public List<LibraryGioModule> getPreoloadComponents() {
         return mComponents;
     }
-  
+
     public boolean isIdMappingEnabled() {
         return mIdMappingEnabled;
     }
@@ -184,5 +184,5 @@ public class CoreConfiguration implements Configurable {
         this.mIdMappingEnabled = enabled;
         return (CoreConfiguration) this;
     }
-  
+
 }
