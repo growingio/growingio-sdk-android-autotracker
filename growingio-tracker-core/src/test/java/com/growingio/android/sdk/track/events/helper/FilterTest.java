@@ -62,10 +62,10 @@ public class FilterTest {
         Truth.assertThat(EventExcludeFilter.of(EventExcludeFilter.APP_CLOSED, EventExcludeFilter.PAGE)).isEqualTo(96);
         Truth.assertThat(EventExcludeFilter.isEventFilter("cpacm")).isFalse();
 
-        String eventFilterLog = EventExcludeFilter.getFilterEventLog(12);
+        String eventFilterLog = EventExcludeFilter.getEventFilterLog(12);
         Truth.assertThat(eventFilterLog).contains("VISITOR_ATTRIBUTES");
         Truth.assertThat(eventFilterLog).contains("LOGIN_USER_ATTRIBUTES");
-        String zeroLog = EventExcludeFilter.getFilterEventLog(0);
+        String zeroLog = EventExcludeFilter.getEventFilterLog(0);
         Truth.assertThat(zeroLog).isEmpty();
 
         ConfigurationProvider.core().setExcludeEvent(EventExcludeFilter.NONE);

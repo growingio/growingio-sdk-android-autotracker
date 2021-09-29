@@ -169,5 +169,4 @@ public class UtilsTest {
         ThreadUtils.postOnUiThreadDelayed(this::objectTest, 1000L);
     }
 
-
 }

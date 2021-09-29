@@ -96,7 +96,7 @@ public final class EventExcludeFilter {
         return false;
     }
 
-    public static String getFilterEventLog(int filterMask) {
+    public static String getEventFilterLog(int filterMask) {
         StringBuilder stringBuilder = new StringBuilder();
         int index = 0;
 

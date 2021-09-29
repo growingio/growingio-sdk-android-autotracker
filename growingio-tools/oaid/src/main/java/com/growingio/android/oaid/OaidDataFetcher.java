@@ -24,11 +24,9 @@ import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
 public class OaidDataFetcher implements DataFetcher<String> {
     private static final String TAG = "OaidDataFetcher";
-    private final Context mContext;
     private final IOaidHelper mOaidHelper;
 
     public OaidDataFetcher(Context context, IOaidHelper oaidHelper) {
-        this.mContext = context;
         this.mOaidHelper = oaidHelper;
     }
 
