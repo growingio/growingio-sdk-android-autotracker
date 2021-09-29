@@ -47,7 +47,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadow.api.Shadow;
 
 import java.util.concurrent.TimeUnit;
 

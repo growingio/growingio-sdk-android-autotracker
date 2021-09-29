@@ -6,6 +6,7 @@
 && ./gradlew :growingio-autotracker-core:checkstyle \
 && ./gradlew :growingio-data:json:checkstyle \
 && ./gradlew :growingio-data:encoder:checkstyle \
+&& ./gradlew :growingio-hybrid:checkstyle \
 && ./gradlew :growingio-network:okhttp3:checkstyle \
 && ./gradlew :growingio-network:urlconnection:checkstyle \
 && ./gradlew :growingio-network:volley:checkstyle \
