@@ -17,9 +17,7 @@
 package com.growingio.android.oaid;
 
 import android.content.Context;
-import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
 public class OaidDataFetcher implements DataFetcher<String> {

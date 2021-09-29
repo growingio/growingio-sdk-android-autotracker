@@ -34,10 +34,10 @@ import static com.google.common.truth.Truth.assertThat;
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class OaidTest {
-    private Context context = ApplicationProvider.getApplicationContext();
+    private final Context context = ApplicationProvider.getApplicationContext();
 
     @Test
-    public void crash() {
+    public void oaid() {
         OaidLibraryGioModule module = new OaidLibraryGioModule();
         TrackerRegistry trackerRegistry = new TrackerRegistry();
         module.registerComponents(context, trackerRegistry);

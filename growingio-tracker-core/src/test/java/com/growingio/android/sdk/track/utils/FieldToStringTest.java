@@ -43,7 +43,7 @@ public class FieldToStringTest {
         @ObjectUtils.FieldToString(clazz = FieldIgnoreFilter.class, method = "getFieldFilterLog", parameterTypes = {int.class})
         private int fieldFlag = 0;
 
-        public TestConfig(int eventFlag, int fieldFlag) {
+        private TestConfig(int eventFlag, int fieldFlag) {
             this.eventFlag = eventFlag;
             this.fieldFlag = fieldFlag;
         }

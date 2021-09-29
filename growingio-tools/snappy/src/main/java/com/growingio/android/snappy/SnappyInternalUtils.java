@@ -52,7 +52,7 @@ final class SnappyInternalUtils {
         sMemory.copyLong(src, srcIndex, dest, destIndex);
     }
 
-    static void copyMemory(byte[] input, int inputIndex, byte[] output, int outputIndex, int length){
+    static void copyMemory(byte[] input, int inputIndex, byte[] output, int outputIndex, int length) {
         sMemory.copyMemory(input, inputIndex, output, outputIndex, length);
     }
 
