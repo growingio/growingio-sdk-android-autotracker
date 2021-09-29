@@ -129,7 +129,7 @@ public class ViewHelper {
         return ViewNode.ViewNodeBuilder.newViewNode()
                 .needRecalculate(false)
                 .setIndex(-1)
-                .setViewContent(menuItem.getTitle().toString())
+                .setViewContent(menuItem.getTitle() != null ? menuItem.getTitle().toString() : null)
                 .setXPath(xpath.toString())
                 .setOriginalXPath(xpath.toString())
                 .setPrefixPage(xpath.toString())
