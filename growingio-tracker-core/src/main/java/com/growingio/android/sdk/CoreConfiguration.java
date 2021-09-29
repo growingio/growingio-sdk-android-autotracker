@@ -37,9 +37,9 @@ public class CoreConfiguration implements Configurable {
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
-    @FieldToString(clazz = EventExcludeFilter.class, method = "getFilterEventLog", parameterTypes = {int.class}, returnType = String.class)
+    @FieldToString(clazz = EventExcludeFilter.class, method = "getEventFilterLog", parameterTypes = {int.class})
     private int mExcludeEventFlag = EventExcludeFilter.NONE;
-    @FieldToString(clazz = FieldIgnoreFilter.class, method = "getFieldFilterLog", parameterTypes = {int.class}, returnType = String.class)
+    @FieldToString(clazz = FieldIgnoreFilter.class, method = "getFieldFilterLog", parameterTypes = {int.class})
     private int mIgnoreFieldFlag = FieldIgnoreFilter.NONE;
     private final List<LibraryGioModule> mComponents = new ArrayList<>();
     private boolean mIdMappingEnabled = false;

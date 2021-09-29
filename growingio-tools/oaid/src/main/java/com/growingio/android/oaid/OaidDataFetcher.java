@@ -17,18 +17,14 @@
 package com.growingio.android.oaid;
 
 import android.content.Context;
-import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
 public class OaidDataFetcher implements DataFetcher<String> {
     private static final String TAG = "OaidDataFetcher";
-    private final Context mContext;
     private final IOaidHelper mOaidHelper;
 
     public OaidDataFetcher(Context context, IOaidHelper oaidHelper) {
-        this.mContext = context;
         this.mOaidHelper = oaidHelper;
     }
 

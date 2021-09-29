@@ -19,6 +19,6 @@ package com.growingio.android.oaid;
 import android.content.Context;
 
 public interface IOaidHelper {
-    public void preloadOaid(Context context);
-    public String getOaid();
+    void preloadOaid(Context context);
+    String getOaid();
 }

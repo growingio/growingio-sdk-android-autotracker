@@ -102,7 +102,5 @@ public class ObjectUtils {
         String method();
 
         Class<?>[] parameterTypes() default {};
-
-        Class<?> returnType() default void.class;
     }
 }
