@@ -151,12 +151,14 @@ class SharedEntry {
         if (value == null) {
             value = "";
         }
-        if (value.length() > (MAX_SIZE - (mValuePosition - mPosition))) {
+        byte[] valueBytes = value.getBytes();
+        short valueLength = valueBytes == null ? 0 : ((short) valueBytes.length);
+        if (valueLength > (MAX_SIZE - (mValuePosition - mPosition))) {
             throw new IllegalArgumentException("value is too long, value.length() = " + value.length());
         }
-        byteBuffer.putShort((short) value.length());
-        if (value.length() > 0) {
-            byteBuffer.put(value.getBytes());
+        byteBuffer.putShort(valueLength);
+        if (valueLength > 0) {
+            byteBuffer.put(valueBytes);
         }
     }
 
