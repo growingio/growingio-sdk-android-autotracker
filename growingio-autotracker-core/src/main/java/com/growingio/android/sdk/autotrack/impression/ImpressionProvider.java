@@ -116,7 +116,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
 
             Rect rect = new Rect();
             view.getLocalVisibleRect(rect);
-            return rect.right * rect.bottom >= view.getMeasuredHeight() * view.getMeasuredWidth() * mImpressionScale;
+            return rect.width() * rect.height() >= view.getMeasuredHeight() * view.getMeasuredWidth() * mImpressionScale;
         }
         return false;
     }
