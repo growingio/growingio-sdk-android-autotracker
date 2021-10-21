@@ -60,7 +60,8 @@ public class EventsSQLite {
             EventsInfo eventsInfo = new EventsInfo(gEvent.getEventType(), gEvent.getSendPolicy(), Serializer.objectSerialize(gEvent));
             ContentValues contentValues = putValues(eventsInfo);
             contentResolver.insert(uri, contentValues);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            // https://issuetracker.google.com/issues/37124513
             Logger.e(TAG, e, "insertEvent failed: %s", e.getMessage());
         }
     }
