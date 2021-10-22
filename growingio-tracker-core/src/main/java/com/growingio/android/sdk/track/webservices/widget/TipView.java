@@ -86,8 +86,6 @@ public class TipView extends FrameLayout {
     }
 
     public void setContent(CharSequence content) {
-        mDragTip.clearAnimation();
-        mContent.clearAnimation();
         mDragTip.setVisibility(View.VISIBLE);
         mContent.setGravity(Gravity.LEFT);
         setBackgroundResource(R.color.growing_tracker_blue);
@@ -99,8 +97,6 @@ public class TipView extends FrameLayout {
     }
 
     public void setErrorMessage(CharSequence message) {
-        mDragTip.clearAnimation();
-        mContent.clearAnimation();
         mDragTip.setVisibility(View.GONE);
         mContent.setGravity(Gravity.CENTER);
         setBackgroundResource(R.color.growing_tracker_orange);
