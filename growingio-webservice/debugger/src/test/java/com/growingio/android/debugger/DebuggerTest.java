@@ -227,7 +227,6 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
         service.socketState.getAndSet(1);
         service.onMessage(new JSONObject().put("msgType", DebuggerEventWrapper.SERVICE_LOGGER_OPEN).toString());
         service.onActivityLifecycle(ActivityLifecycleEvent.createOnStartedEvent(activity));
-        service.showExitDialog();
         service.onFailed();
         service.exitDebugger();
         service.onQuited();
