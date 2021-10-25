@@ -15,26 +15,19 @@
  */
 package com.growingio.android.circler;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.view.View;
 
 import com.growingio.android.circler.screenshot.CircleScreenshot;
 import com.growingio.android.circler.screenshot.ScreenshotProvider;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.WebService;
 import com.growingio.android.sdk.track.webservices.message.ClientInfoMessage;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
-import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,7 +51,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
     private static final int SOCKET_STATE_CLOSED = 2;
 
     private final OkHttpClient client;
-    private final TipView tipView;
+    private final ThreadSafeTipView safeTipView;
     private final WebSocketHandler webSocketHandler;
     private Map<String, String> params;
     protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
@@ -72,7 +65,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
     public CirclerService(OkHttpClient client) {
         this.client = client;
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        tipView = new TipView(TrackerContext.get().getApplicationContext());
+        safeTipView = new ThreadSafeTipView(TrackerContext.get().getApplicationContext());
         webSocketHandler = new WebSocketHandler(this);
     }
 
@@ -97,11 +90,9 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
         }
         Request request = new Request.Builder().url(wsUrl).build();
         client.newWebSocket(request, webSocketHandler);
-        //client.dispatcher().executorService().shutdown()
 
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        tipView.setContent(R.string.growing_circler_connecting_to_web);
-        tipView.show();
+        safeTipView.enableShow();
 
         ThreadUtils.postOnUiThreadDelayed(
                 new Runnable() {
@@ -137,7 +128,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
             webSocketHandler.getWebSocket().cancel();
         }
         ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
-        tipView.dismiss();
+        safeTipView.dismiss();
         ActivityStateProvider.get().unregisterActivityLifecycleListener(this);
     }
 
@@ -153,38 +144,12 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
         sendMessage(ClientInfoMessage.createMessage().toJSONObject().toString());
         socketState.set(SOCKET_STATE_READIED);
         ScreenshotProvider.get().registerScreenshotRefreshedListener(this);
-        tipView.setContent(R.string.growing_circler_progress);
-        tipView.setOnClickListener(new View.OnClickListener() {
+        safeTipView.onReady(new ThreadSafeTipView.OnExitListener() {
             @Override
-            public void onClick(View v) {
-                showExitDialog();
+            public void onExitDebugger() {
+                exitCircler();
             }
         });
-    }
-
-
-    protected void showExitDialog() {
-        Activity activity = ActivityStateProvider.get().getForegroundActivity();
-        if (activity == null) {
-            Logger.e(TAG, "showExitDialog: ForegroundActivity is NULL");
-            return;
-        }
-        String message = activity.getString(R.string.growing_circler_app_version)
-                + AppInfoProvider.get().getAppVersion()
-                + activity.getString(R.string.growing_circler_sdk_version)
-                + SDKConfig.SDK_VERSION;
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.growing_circler_progress)
-                .setMessage(message)
-                .setPositiveButton(R.string.growing_circler_exit, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        exitCircler();
-                    }
-                })
-                .setNegativeButton(R.string.growing_circler_continue, null)
-                .create()
-                .show();
     }
 
     @Override
@@ -202,9 +167,9 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
             return;
         }
         socketState.set(SOCKET_STATE_CLOSED);
-        tipView.setErrorMessage(R.string.growing_circler_connected_to_web_failed);
+        safeTipView.setErrorMessage(R.string.growing_circler_connected_to_web_failed);
         Logger.e(TAG, "Start CirclerService Failed");
-        showQuitedDialog();
+        safeTipView.showQuitedDialog(this::exitCircler);
     }
 
     @Override
@@ -214,34 +179,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
         }
         cancel();
         socketState.set(SOCKET_STATE_CLOSED);
-        showQuitedDialog();
-    }
-
-
-    private void showQuitedDialog() {
-        Activity activity = ActivityStateProvider.get().getForegroundActivity();
-        if (activity == null) {
-            Logger.e(TAG, "showQuitedDialog: ForegroundActivity is NULL");
-            return;
-        }
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.growing_circler_device_unconnected)
-                .setMessage(R.string.growing_circler_unconnected)
-                .setPositiveButton(R.string.growing_circler_exit, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        exitCircler();
-                    }
-                })
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        exitCircler();
-                    }
-                })
-                .setCancelable(false)
-                .create()
-                .show();
+        safeTipView.showQuitedDialog(this::exitCircler);
     }
 
     /************************** Screenshot ************************/
@@ -259,9 +197,9 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
     @Override
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
-            tipView.show(event.getActivity());
+            safeTipView.show(event.getActivity());
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
-            tipView.remove();
+            safeTipView.removeOnly();
         }
     }
 }
