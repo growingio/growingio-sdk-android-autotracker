@@ -67,6 +67,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
             Logger.d(TAG, "Failed to load data for url", e);
             callback.onLoadFailed(e);
         } finally {
+            cleanup();
             Logger.v(TAG, "Finished http url fetcher fetch in " + LogTime.getElapsedMillis(startTime));
         }
     }
@@ -192,6 +193,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
         } catch (IOException e) {
             Logger.d(TAG, "Failed to load data for url", e);
         } finally {
+            cleanup();
             Logger.v(TAG, "Finished http url fetcher fetch in " + LogTime.getElapsedMillis(startTime));
         }
         return new EventResponse(false);

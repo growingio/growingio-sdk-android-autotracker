@@ -95,6 +95,8 @@ public class OkHttpDataFetcher implements DataFetcher<EventResponse>, Callback {
         } catch (NullPointerException e) {
             Logger.e(TAG, e);
             return new EventResponse(false);
+        } finally {
+            cleanup();
         }
     }
 
@@ -127,16 +129,20 @@ public class OkHttpDataFetcher implements DataFetcher<EventResponse>, Callback {
 
     @Override
     public void onResponse(Call call, Response response) {
-        responseBody = response.body();
-        if (response.isSuccessful()) {
-            if (responseBody == null) {
-                throw new IllegalArgumentException("Must not be null or empty");
+        try {
+            responseBody = response.body();
+            if (response.isSuccessful()) {
+                if (responseBody == null) {
+                    throw new IllegalArgumentException("Must not be null or empty");
+                }
+                long contentLength = responseBody.contentLength();
+                EventResponse eventResponse = new EventResponse(true, responseBody.byteStream(), contentLength);
+                callback.onDataReady(eventResponse);
+            } else {
+                callback.onLoadFailed(new Exception(response.message()));
             }
-            long contentLength = responseBody.contentLength();
-            EventResponse eventResponse = new EventResponse(true, responseBody.byteStream(), contentLength);
-            callback.onDataReady(eventResponse);
-        } else {
-            callback.onLoadFailed(new Exception(response.message()));
+        } finally {
+            cleanup();
         }
     }
 }
