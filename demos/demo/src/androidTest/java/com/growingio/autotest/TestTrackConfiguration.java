@@ -16,29 +16,32 @@
 
 package com.growingio.autotest;
 
-import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
 
 import static com.growingio.autotest.help.MockServer.MOCK_SERVER_HOST;
 
 public class TestTrackConfiguration {
     public static final String TEST_PROJECT_ID = "testProjectId";
     public static final String TEST_URL_SCHEME = "testUrlScheme";
+    public static final String TEST_DATA_SOURCE_ID = "testDataSourceId";
 
     private TestTrackConfiguration() {
     }
 
-    public static AutotrackConfiguration getTestConfig() {
-        AutotrackConfiguration configuration = new AutotrackConfiguration(TEST_PROJECT_ID, TEST_URL_SCHEME);
+    public static CdpAutotrackConfiguration getTestConfig() {
+        CdpAutotrackConfiguration configuration = new CdpAutotrackConfiguration(TEST_PROJECT_ID, TEST_URL_SCHEME);
         configuration.setUploadExceptionEnabled(false)
                 .setDataCollectionServerHost(MOCK_SERVER_HOST)
+                .setDataSourceId(TEST_DATA_SOURCE_ID)
                 .setDebugEnabled(true);
         return configuration;
     }
 
-    public static AutotrackConfiguration getTestConfig(String urlScheme) {
-        AutotrackConfiguration configuration = new AutotrackConfiguration(TEST_PROJECT_ID, urlScheme);
+    public static CdpAutotrackConfiguration getTestConfig(String urlScheme) {
+        CdpAutotrackConfiguration configuration = new CdpAutotrackConfiguration(TEST_PROJECT_ID, urlScheme);
         configuration.setUploadExceptionEnabled(false)
                 .setDataCollectionServerHost(MOCK_SERVER_HOST)
+                .setDataSourceId(TEST_DATA_SOURCE_ID)
                 .setDebugEnabled(true);
         return configuration;
     }

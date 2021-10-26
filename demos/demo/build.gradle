@@ -33,7 +33,7 @@ android {
         testInstrumentationRunnerArguments listener: "com.growingio.autotest.TrackTestRunListener"
 
         ndk {
-            abiFilters "armeabi", "armeabi-v7a", "x86"
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86"
         }
         multiDexEnabled true
     }
