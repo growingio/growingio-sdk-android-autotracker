@@ -18,6 +18,7 @@ package com.growingio.android.volley;
 
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -68,16 +69,18 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
     public void loadData(DataCallback<? super EventResponse> callback) {
         request = requestFactory.create(
                 url.toUrl(),
+                url.getHeaders(),
+                url.getRequestBody(),
                 callback::onDataReady,
-                callback::onLoadFailed,
-                url.getHeaders());
+                callback::onLoadFailed
+        );
         requestQueue.add(request);
     }
 
     @Override
     public EventResponse executeData() {
         RequestFuture<EventResponse> future = RequestFuture.newFuture();
-        request = requestFactory.create(url.toUrl(), future, future, url.getHeaders());
+        request = requestFactory.create(url.toUrl(), url.getHeaders(), url.getRequestBody(), future, future);
         requestQueue.add(request);
         try {
             return future.get(5L, TimeUnit.SECONDS);
@@ -119,18 +122,21 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
         private final Response.Listener<EventResponse> callback;
         private final Response.ErrorListener listener;
         private final Map<String, String> headers;
+        private final byte[] requestData;
 
         public GioRequest(String url, Response.Listener<EventResponse> callback, Response.ErrorListener errorListener) {
-            this(url, callback, errorListener, Collections.emptyMap());
+            this(url, Collections.emptyMap(), null, callback, errorListener);
         }
 
         public GioRequest(
                 String url,
+                Map<String, String> headers,
+                byte[] data,
                 Response.Listener<EventResponse> callback,
-                Response.ErrorListener errorListener,
-                Map<String, String> headers) {
+                Response.ErrorListener errorListener) {
             super(Method.GET, url, null);
             this.callback = callback;
+            this.requestData = data;
             this.listener = errorListener;
             this.headers = headers;
         }
@@ -152,7 +158,14 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
         }
 
         @Override
+        public byte[] getBody() throws AuthFailureError {
+            return requestData;
+        }
+
+        @Override
         protected Response<byte[]> parseNetworkResponse(NetworkResponse response) {
+            //Giokit inject point
+            //GioHttp.parseGioKitVolley
             if (!isCanceled()) {
                 EventResponse eventResponse = new EventResponse(true, new ByteArrayInputStream(response.data), response.data.length);
                 callback.onResponse(eventResponse);
