@@ -25,6 +25,8 @@ import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -61,7 +63,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
     public void loadData(DataCallback<? super EventResponse> callback) {
         long startTime = LogTime.getLogTime();
         try {
-            EventResponse result = loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, eventUrl.getHeaders());
+            EventResponse result = loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, eventUrl.getHeaders(), eventUrl.getRequestBody());
             callback.onDataReady(result);
         } catch (IOException e) {
             Logger.d(TAG, "Failed to load data for url", e);
@@ -72,7 +74,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
         }
     }
 
-    private EventResponse loadDataWithRedirects(URL url, int redirects, URL lastUrl, Map<String, String> headers) throws HttpException {
+    private EventResponse loadDataWithRedirects(URL url, int redirects, URL lastUrl, Map<String, String> headers, byte[] data) throws HttpException {
         if (redirects >= MAXIMUM_REDIRECTS) {
             throw new HttpException(
                     "Too many (> " + MAXIMUM_REDIRECTS + ") redirects!", INVALID_STATUS_CODE);
@@ -87,7 +89,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
                 // Do nothing, this is best effort.
             }
         }
-        urlConnection = buildAndConfigureConnection(url, headers);
+        urlConnection = buildAndConfigureConnection(url, headers, data);
 
         try {
             // Connect explicitly to avoid errors in decoders if connection fails.
@@ -120,7 +122,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
             // Closing the stream specifically is required to avoid leaking ResponseBodys in addition
             // to disconnecting the url connection below. See #2352.
             cleanup();
-            return loadDataWithRedirects(redirectUrl, redirects + 1, url, headers);
+            return loadDataWithRedirects(redirectUrl, redirects + 1, url, headers, data);
         } else if (statusCode == INVALID_STATUS_CODE) {
             throw new HttpException(statusCode);
         } else {
@@ -129,6 +131,8 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
     }
 
     private static int getHttpStatusCodeOrInvalid(HttpURLConnection urlConnection) {
+        // giokit inject point
+        // GioHttp.parseGiokitUrlConnection
         try {
             return urlConnection.getResponseCode();
         } catch (IOException e) {
@@ -137,24 +141,28 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
         return INVALID_STATUS_CODE;
     }
 
-    private HttpURLConnection buildAndConfigureConnection(URL url, Map<String, String> headers)
+    private HttpURLConnection buildAndConfigureConnection(URL url, Map<String, String> headers, byte[] data)
             throws HttpException {
         HttpURLConnection urlConnection;
         try {
             urlConnection = DEFAULT_CONNECTION_FACTORY.build(url);
+            for (Map.Entry<String, String> headerEntry : headers.entrySet()) {
+                urlConnection.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
+            }
+            urlConnection.setConnectTimeout(TIME_OUT);
+            urlConnection.setReadTimeout(TIME_OUT);
+            urlConnection.setUseCaches(false);
+            urlConnection.setDoInput(true);
+            OutputStream out = urlConnection.getOutputStream();
+            out.write(data);
+            out.flush();
+            out.close();
+            // Stop the urlConnection instance of HttpUrlConnection from following redirects so that
+            // redirects will be handled by recursive calls to this method, loadDataWithRedirects.
+            urlConnection.setInstanceFollowRedirects(false);
         } catch (IOException e) {
             throw new HttpException("URL.openConnection threw", /*statusCode=*/ 0, e);
         }
-        for (Map.Entry<String, String> headerEntry : headers.entrySet()) {
-            urlConnection.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
-        }
-        urlConnection.setConnectTimeout(TIME_OUT);
-        urlConnection.setReadTimeout(TIME_OUT);
-        urlConnection.setUseCaches(false);
-        urlConnection.setDoInput(true);
-        // Stop the urlConnection instance of HttpUrlConnection from following redirects so that
-        // redirects will be handled by recursive calls to this method, loadDataWithRedirects.
-        urlConnection.setInstanceFollowRedirects(false);
         return urlConnection;
     }
 
@@ -189,7 +197,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
     public EventResponse executeData() {
         long startTime = LogTime.getLogTime();
         try {
-            return loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, eventUrl.getHeaders());
+            return loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, eventUrl.getHeaders(), eventUrl.getRequestBody());
         } catch (IOException e) {
             Logger.d(TAG, "Failed to load data for url", e);
         } finally {
