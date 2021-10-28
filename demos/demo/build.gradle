@@ -101,7 +101,8 @@ dependencies {
     implementation(name: 'oaid_sdk_1.0.25', ext: 'aar')
     implementation project(':demo-core')
     implementation project(":demo-autotrack")
-    implementation project(":growingio-tools:oaid")
+    debugImplementation project(":growingio-tools:oaid")
+    releaseImplementation libraries.growingio.oaid
 
     compileOnly libraries.androidx.appcompat
 
