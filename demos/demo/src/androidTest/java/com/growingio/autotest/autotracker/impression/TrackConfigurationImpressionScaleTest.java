@@ -29,7 +29,7 @@ import com.gio.test.R;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.autotrack.activity.ViewImpressionActivity;
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.autotest.EventsTest;
@@ -93,7 +93,7 @@ public class TrackConfigurationImpressionScaleTest extends EventsTest {
     @Test
     public void invalidArgumentsTest() {
         ActivityScenario<ViewImpressionActivity> scenario = ActivityScenario.launch(ViewImpressionActivity.class);
-        AutotrackConfiguration configuration = new AutotrackConfiguration("xxx", "xxx");
+        CdpAutotrackConfiguration configuration = new CdpAutotrackConfiguration("xxx", "xxx");
         configuration.setImpressionScale(-1);
         Truth.assertThat(configuration.getImpressionScale()).isEqualTo(0);
         configuration.setImpressionScale(1.12F);

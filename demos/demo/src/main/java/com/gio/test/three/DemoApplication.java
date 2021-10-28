@@ -20,6 +20,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Process;
+import android.os.StrictMode;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.webkit.WebView;
@@ -27,7 +28,7 @@ import android.webkit.WebView;
 import androidx.annotation.RequiresApi;
 
 import com.growingio.android.oaid.OaidLibraryGioModule;
-import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
@@ -40,9 +41,9 @@ public class DemoApplication extends MultiDexApplication {
     private static final String TAG = "DemoApplication";
 
     private static boolean sIsAutotracker = true;
-    private static AutotrackConfiguration sConfiguration;
+    private static CdpAutotrackConfiguration sConfiguration;
 
-    public static void setConfiguration(AutotrackConfiguration configuration) {
+    public static void setConfiguration(CdpAutotrackConfiguration configuration) {
         sConfiguration = configuration;
     }
 
@@ -79,7 +80,9 @@ public class DemoApplication extends MultiDexApplication {
         }
 
         if (sConfiguration == null) {
-            sConfiguration = new AutotrackConfiguration("bfc5d6a3693a110d", "growing.d80871b41ef40518")
+            sConfiguration = new CdpAutotrackConfiguration("91eaf9b283361032", "growing.401dfd8bba45afda")
+                    .setDataSourceId("91373f31ba946d28")
+                    .setDataCollectionServerHost("http://uat-api.growingio.com")
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setDataCollectionEnabled(true)
@@ -87,6 +90,9 @@ public class DemoApplication extends MultiDexApplication {
                     .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
                     .setPreloadComponent(new OaidLibraryGioModule());
         }
+
+        enableStrictMode();
+
         long startTime = System.currentTimeMillis();
         GrowingAutotracker.startWithConfiguration(this, sConfiguration);
         Log.d(TAG, "start time: " + (System.currentTimeMillis() - startTime));
@@ -108,5 +114,31 @@ public class DemoApplication extends MultiDexApplication {
             }
         }
         return false;
+    }
+
+    private void enableStrictMode() {
+        StrictMode.ThreadPolicy.Builder threadPolicyBuilder = new StrictMode.ThreadPolicy.Builder()
+                .detectNetwork()
+                .detectCustomSlowCalls()
+                .permitDiskReads()
+                .permitDiskWrites()
+                .penaltyLog();
+        StrictMode.VmPolicy.Builder vmPolicyBuilder = new StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .detectLeakedRegistrationObjects()
+                .detectActivityLeaks()
+                .penaltyLog();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            threadPolicyBuilder.detectResourceMismatches();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            threadPolicyBuilder.detectUnbufferedIo();
+            vmPolicyBuilder.detectContentUriWithoutPermission();
+        }
+
+        StrictMode.setThreadPolicy(threadPolicyBuilder.build());
+        StrictMode.setVmPolicy(vmPolicyBuilder.build());
     }
 }

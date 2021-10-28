@@ -68,7 +68,7 @@ public class DebuggerServiceTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig("growing.d80871b41ef40518"));
+        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig("growing.401dfd8bba45afda"));
     }
 
     protected String getWsUrl() {
@@ -126,7 +126,7 @@ public class DebuggerServiceTest {
         });
         mMockWebServer.enqueue(ready);
 
-        String uri = "growing.d80871b41ef40518://growingio/webservice?serviceType=debugger&wsUrl=" + Uri.encode(getWsUrl());
+        String uri = "growing.401dfd8bba45afda://growingio/webservice?serviceType=debugger&wsUrl=" + Uri.encode(getWsUrl());
         Intent intent = new Intent();
         intent.setData(Uri.parse(uri));
         ActivityScenario.launch(intent);
