@@ -152,10 +152,13 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
             urlConnection.setReadTimeout(TIME_OUT);
             urlConnection.setUseCaches(false);
             urlConnection.setDoInput(true);
-            OutputStream out = urlConnection.getOutputStream();
-            out.write(data);
-            out.flush();
-            out.close();
+            if (data != null) {
+                urlConnection.setDoOutput(true);
+                OutputStream out = urlConnection.getOutputStream();
+                out.write(data);
+                out.flush();
+                out.close();
+            }
             // Stop the urlConnection instance of HttpUrlConnection from following redirects so that
             // redirects will be handled by recursive calls to this method, loadDataWithRedirects.
             urlConnection.setInstanceFollowRedirects(false);
