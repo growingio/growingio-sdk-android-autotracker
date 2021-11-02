@@ -152,6 +152,8 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
 
         @Override
         protected VolleyError parseNetworkError(VolleyError volleyError) {
+            //Giokit inject point
+            //GioHttp.parseGioKitVolleyError
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Volley failed to retrieve response", volleyError);
             }
@@ -169,7 +171,7 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
         @Override
         protected Response<byte[]> parseNetworkResponse(NetworkResponse response) {
             //Giokit inject point
-            //GioHttp.parseGioKitVolley
+            //GioHttp.parseGioKitVolleySuccess
             if (!isCanceled()) {
                 EventResponse eventResponse = new EventResponse(true, new ByteArrayInputStream(response.data), response.data.length);
                 callback.onResponse(eventResponse);
