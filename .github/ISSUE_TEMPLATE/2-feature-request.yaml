@@ -1,0 +1,24 @@
+name: 'Feature Request'
+description: 向我们提出一个需求
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 描述你的需求
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: 描述你想要的解决方案
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: 描述你考虑过的替代方案
+    validations:
+      required: true
