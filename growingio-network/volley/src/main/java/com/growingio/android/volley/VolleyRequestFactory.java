@@ -32,6 +32,7 @@ public interface VolleyRequestFactory {
   Request<byte[]> create(
       String url,
       Map<String, String> headers,
+      String requestType,
       byte[] requestData,
       Response.Listener<EventResponse> callback,
       Response.ErrorListener listener);

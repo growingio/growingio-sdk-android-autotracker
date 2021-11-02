@@ -70,6 +70,7 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
         request = requestFactory.create(
                 url.toUrl(),
                 url.getHeaders(),
+                url.getMediaType(),
                 url.getRequestBody(),
                 callback::onDataReady,
                 callback::onLoadFailed
@@ -80,7 +81,7 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
     @Override
     public EventResponse executeData() {
         RequestFuture<EventResponse> future = RequestFuture.newFuture();
-        request = requestFactory.create(url.toUrl(), url.getHeaders(), url.getRequestBody(), future, future);
+        request = requestFactory.create(url.toUrl(), url.getHeaders(), url.getMediaType(),url.getRequestBody(), future, future);
         requestQueue.add(request);
         try {
             return future.get(5L, TimeUnit.SECONDS);
@@ -123,22 +124,25 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
         private final Response.ErrorListener listener;
         private final Map<String, String> headers;
         private final byte[] requestData;
+        private final String mediaType;
 
         public GioRequest(String url, Response.Listener<EventResponse> callback, Response.ErrorListener errorListener) {
-            this(url, Collections.emptyMap(), null, callback, errorListener);
+            this(url, Collections.emptyMap(),"application/json", null, callback, errorListener);
         }
 
         public GioRequest(
                 String url,
                 Map<String, String> headers,
+                String mediaType,
                 byte[] data,
                 Response.Listener<EventResponse> callback,
                 Response.ErrorListener errorListener) {
-            super(Method.GET, url, null);
+            super(Method.POST, url, null);
             this.callback = callback;
             this.requestData = data;
             this.listener = errorListener;
             this.headers = headers;
+            this.mediaType = mediaType;
         }
 
         @Override
@@ -171,6 +175,11 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
                 callback.onResponse(eventResponse);
             }
             return Response.success(response.data, HttpHeaderParser.parseCacheHeaders(response));
+        }
+
+        @Override
+        public String getBodyContentType() {
+            return mediaType;
         }
 
         @Override

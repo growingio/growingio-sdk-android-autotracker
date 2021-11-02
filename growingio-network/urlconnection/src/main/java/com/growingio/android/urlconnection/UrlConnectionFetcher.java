@@ -62,7 +62,9 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
     public void loadData(DataCallback<? super EventResponse> callback) {
         long startTime = LogTime.getLogTime();
         try {
-            EventResponse result = loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, eventUrl.getHeaders(), eventUrl.getRequestBody());
+            Map<String,String> headers= eventUrl.getHeaders();
+            headers.put("content-type",eventUrl.getMediaType());
+            EventResponse result = loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, headers, eventUrl.getRequestBody());
             callback.onDataReady(result);
         } catch (IOException e) {
             Logger.d(TAG, "Failed to load data for url", e);
@@ -99,12 +101,12 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
             throw new HttpException(
                     "Failed to connect or obtain data", getHttpStatusCodeOrInvalid(urlConnection), e);
         }
-
         if (isCancelled) {
             return null;
         }
-
         final int statusCode = getHttpStatusCodeOrInvalid(urlConnection);
+        // giokit inject point
+        // GioHttp.parseGiokitUrlConnection(urlConnection,headers,data)
         if (isHttpOk(statusCode)) {
             return getStreamForSuccessfulRequest(urlConnection);
         } else if (isHttpRedirect(statusCode)) {
@@ -127,11 +129,10 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
         } else {
             throw new HttpException("Failed to get a response message", statusCode);
         }
+
     }
 
     private static int getHttpStatusCodeOrInvalid(HttpURLConnection urlConnection) {
-        // giokit inject point
-        // GioHttp.parseGiokitUrlConnection
         try {
             return urlConnection.getResponseCode();
         } catch (IOException e) {
@@ -148,6 +149,7 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
             for (Map.Entry<String, String> headerEntry : headers.entrySet()) {
                 urlConnection.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
             }
+            urlConnection.setRequestMethod("POST");
             urlConnection.setConnectTimeout(TIME_OUT);
             urlConnection.setReadTimeout(TIME_OUT);
             urlConnection.setUseCaches(false);
@@ -199,7 +201,9 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
     public EventResponse executeData() {
         long startTime = LogTime.getLogTime();
         try {
-            return loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, eventUrl.getHeaders(), eventUrl.getRequestBody());
+            Map<String,String> headers= eventUrl.getHeaders();
+            headers.put("content-type",eventUrl.getMediaType());
+            return loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, headers, eventUrl.getRequestBody());
         } catch (IOException e) {
             Logger.d(TAG, "Failed to load data for url", e);
         } finally {
