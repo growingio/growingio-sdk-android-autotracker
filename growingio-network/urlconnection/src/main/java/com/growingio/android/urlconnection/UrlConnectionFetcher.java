@@ -62,8 +62,8 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
     public void loadData(DataCallback<? super EventResponse> callback) {
         long startTime = LogTime.getLogTime();
         try {
-            Map<String,String> headers= eventUrl.getHeaders();
-            headers.put("content-type",eventUrl.getMediaType());
+            Map<String, String> headers = eventUrl.getHeaders();
+            headers.put("content-type", eventUrl.getMediaType());
             EventResponse result = loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, headers, eventUrl.getRequestBody());
             callback.onDataReady(result);
         } catch (IOException e) {
@@ -201,8 +201,8 @@ public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
     public EventResponse executeData() {
         long startTime = LogTime.getLogTime();
         try {
-            Map<String,String> headers= eventUrl.getHeaders();
-            headers.put("content-type",eventUrl.getMediaType());
+            Map<String, String> headers = eventUrl.getHeaders();
+            headers.put("content-type", eventUrl.getMediaType());
             return loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, headers, eventUrl.getRequestBody());
         } catch (IOException e) {
             Logger.d(TAG, "Failed to load data for url", e);

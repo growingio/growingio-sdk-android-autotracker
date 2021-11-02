@@ -81,7 +81,7 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
     @Override
     public EventResponse executeData() {
         RequestFuture<EventResponse> future = RequestFuture.newFuture();
-        request = requestFactory.create(url.toUrl(), url.getHeaders(), url.getMediaType(),url.getRequestBody(), future, future);
+        request = requestFactory.create(url.toUrl(), url.getHeaders(), url.getMediaType(), url.getRequestBody(), future, future);
         requestQueue.add(request);
         try {
             return future.get(5L, TimeUnit.SECONDS);
@@ -127,7 +127,7 @@ public class VolleyDataFetcher implements DataFetcher<EventResponse> {
         private final String mediaType;
 
         public GioRequest(String url, Response.Listener<EventResponse> callback, Response.ErrorListener errorListener) {
-            this(url, Collections.emptyMap(),"application/json", null, callback, errorListener);
+            this(url, Collections.emptyMap(), "application/json", null, callback, errorListener);
         }
 
         public GioRequest(
