@@ -25,6 +25,7 @@ import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.track.ipc.MultiProcessDataSharer;
 import com.growingio.android.sdk.track.ipc.ProcessLock;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,5 +79,19 @@ public class IpcTest {
         lock1.release();
         Truth.assertThat(lock1.isAcquired()).isTrue();
         lock1.release();
+    }
+
+    /**
+     * 该测试用例出现的可能为：运行内存中已经保存了相应的key值，但文件上由于未知原因导致该key值未保存或被删除；
+     * 解决：由于文件取值返回Object值，故所以取值都以基本类型的对象取值并加上非空判断。
+     */
+    @Test
+    public void npeTest() {
+        MultiProcessDataSharer dataSharer = new MultiProcessDataSharer(application, "npe", 100);
+        dataSharer.putLong("APP_CLOSED", 10L);
+        dataSharer.putInt("APP_OPENED", 10);
+        System.out.println(dataSharer.getAndIncrementLong("APP_CLOSED", 0L));
+        System.out.println(dataSharer.getAndIncrementInt("APP_OPENED", 9));
+        System.out.println(dataSharer.getAndDecrementInt("APP_OPENED", 10));
     }
 }
