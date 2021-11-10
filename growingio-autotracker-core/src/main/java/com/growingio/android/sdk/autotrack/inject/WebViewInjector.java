@@ -65,6 +65,18 @@ public class WebViewInjector {
         bridgeForWebView(webView);
     }
 
+    @Before(clazz = WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
+    public static void webkitWebViewLoadDataWithBaseURL(WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+        Logger.d(TAG, "webkitWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
+        bridgeForWebView(webView);
+    }
+
+    @Before(clazz = WebView.class, method = "postUrl", parameterTypes = {String.class, byte[].class})
+    public static void webkitWebViewPostUrl(WebView webView, String url, byte[] postData) {
+        Logger.d(TAG, "webkitWebViewPostUrl: webView = " + webView.getClass().getName());
+        bridgeForWebView(webView);
+    }
+
     @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadUrl", parameterTypes = {String.class})
     public static void x5WebViewLoadUrl(com.tencent.smtt.sdk.WebView webView, String url) {
         Logger.d(TAG, "x5WebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);
@@ -80,6 +92,18 @@ public class WebViewInjector {
     @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadData", parameterTypes = {String.class, String.class, String.class})
     public static void x5WebViewLoadData(com.tencent.smtt.sdk.WebView webView, String data, String mimeType, String encoding) {
         Logger.d(TAG, "x5WebViewLoadData: webView = " + webView.getClass().getName());
+        bridgeForWebView(webView);
+    }
+
+    @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
+    public static void x5WebViewLoadDataWithBaseURL(com.tencent.smtt.sdk.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+        Logger.d(TAG, "x5WebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
+        bridgeForWebView(webView);
+    }
+
+    @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "postUrl", parameterTypes = {String.class, byte[].class})
+    public static void x5WebViewPostUrl(com.tencent.smtt.sdk.WebView webView, String url, byte[] postData) {
+        Logger.d(TAG, "x5WebViewPostUrl: webView = " + webView.getClass().getName());
         bridgeForWebView(webView);
     }
 
@@ -101,21 +125,15 @@ public class WebViewInjector {
         bridgeForWebView(webView);
     }
 
-    @Before(clazz = WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
-    public static void webkitWebViewLoadDataWithBaseURL(WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
-        Logger.d(TAG, "webkitWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
-    public static void x5WebViewLoadDataWithBaseURL(com.tencent.smtt.sdk.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
-        Logger.d(TAG, "x5WebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
-        bridgeForWebView(webView);
-    }
-
     @Before(clazz = com.uc.webview.export.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
     public static void ucWebViewLoadDataWithBaseURL(com.uc.webview.export.WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         Logger.d(TAG, "ucWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
+        bridgeForWebView(webView);
+    }
+
+    @Before(clazz = com.uc.webview.export.WebView.class, method = "postUrl", parameterTypes = {String.class, byte[].class})
+    public static void ucWebViewPostUrl(com.uc.webview.export.WebView webView, String url, byte[] postData) {
+        Logger.d(TAG, "ucWebViewPostUrl: webView = " + webView.getClass().getName());
         bridgeForWebView(webView);
     }
 }

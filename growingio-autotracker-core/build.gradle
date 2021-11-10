@@ -42,6 +42,16 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        GRADLE_PLUGIN_DIR : ("$rootDir/growingio-autotracker-gradle-plugin".toString())
+                ]
+            }
+        }
+    }
 }
 
 dependencies {

@@ -55,11 +55,11 @@ public abstract class SuperWebView<T extends View> {
     public abstract void evaluateJavascript(String script, ValueCallback<String> resultCallback);
 
     public boolean hasAddJavaScripted() {
-        return hasAddJavaScript;
+        return mRealWebView.getTag(R.id.growing_tracker_has_add_java_script) != null;
     }
 
-    public void setAddJavaScript(boolean hasAddJavaScript) {
-        this.hasAddJavaScript = hasAddJavaScript;
+    public void setAddJavaScript() {
+        mRealWebView.setTag(R.id.growing_tracker_has_add_java_script, new Object());
     }
 
     public static SuperWebView<WebView> make(WebView webView) {
