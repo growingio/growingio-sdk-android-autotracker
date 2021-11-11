@@ -75,9 +75,12 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
     @SuppressLint("SetJavaScriptEnabled")
     public void bridgeForWebView(SuperWebView<?> webView) {
         webView.setJavaScriptEnabled(true);
-        if (webView.hasAddJavaScripted()) return;
+        if (webView.hasAddJavaScripted()) {
+            Logger.d(TAG, "JavascriptInterface has already been added to the WebView");
+            return;
+        }
         webView.addJavascriptInterface(new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration()), WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
-        webView.setAddJavaScript(true);
+        webView.setAddJavaScript();
     }
 
     public Disposable getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
