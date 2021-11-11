@@ -22,6 +22,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteFullException;
 import android.net.Uri;
 import android.os.RemoteException;
 
@@ -46,6 +47,7 @@ public class EventsSQLite {
 
     private final Context context;
     private final String eventsInfoAuthority;
+    private boolean mIgnoreOperations = false;
 
     EventsSQLite(Context context) {
         this.context = context;
@@ -53,6 +55,10 @@ public class EventsSQLite {
     }
 
     void insertEvent(GEvent gEvent) {
+        if (mIgnoreOperations) {
+            return;
+        }
+
         try {
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();
@@ -60,24 +66,41 @@ public class EventsSQLite {
             EventsInfo eventsInfo = new EventsInfo(gEvent.getEventType(), gEvent.getSendPolicy(), Serializer.objectSerialize(gEvent));
             ContentValues contentValues = putValues(eventsInfo);
             contentResolver.insert(uri, contentValues);
+        } catch (SQLiteFullException e) {
+            onDiskFull(e);
         } catch (Exception e) {
             // https://issuetracker.google.com/issues/37124513
-            Logger.e(TAG, e, "insertEvent failed: %s", e.getMessage());
+            Logger.e(TAG, e, "insertEvent failed");
         }
     }
 
     void removeOverdueEvents() {
-        long current = System.currentTimeMillis();
-        long sevenDayAgo = current - EVENT_VALID_PERIOD_MILLS;
+        if (mIgnoreOperations) {
+            return;
+        }
 
-        ContentResolver contentResolver = context.getContentResolver();
-        Uri uri = getContentUri();
-        int deleteNum = contentResolver.delete(uri, COLUMN_CREATE_TIME + "<=" + sevenDayAgo, null);
+        try {
+            long current = System.currentTimeMillis();
+            long sevenDayAgo = current - EVENT_VALID_PERIOD_MILLS;
 
-        Logger.e(TAG, "removeOverdueEvents: deleteNum: %d", deleteNum);
+            ContentResolver contentResolver = context.getContentResolver();
+            Uri uri = getContentUri();
+            int deleteNum = contentResolver.delete(uri, COLUMN_CREATE_TIME + "<=" + sevenDayAgo, null);
+
+            Logger.e(TAG, "removeOverdueEvents: deleteNum: %d", deleteNum);
+        } catch (SQLiteFullException e) {
+            onDiskFull(e);
+        } catch (Exception e) {
+            Logger.e(TAG, e, "removeOverdueEvents failed");
+        }
     }
 
     long queryEvents(int policy, int limit, List<GEvent> events) {
+        // query 判断磁盘空间是否已满，避免ignoreOperations的情况下，重复发送同一事件
+        if (mIgnoreOperations) {
+            return -1;
+        }
+
         Cursor cursor = null;
         long lastId = -1;
         ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(eventsInfoAuthority);
@@ -96,6 +119,8 @@ public class EventsSQLite {
                     removeEventById(client, delId);
                 }
             }
+        } catch (SQLiteFullException e) {
+            onDiskFull(e);
         } catch (Throwable t) {
             Logger.e(TAG, t, t.getMessage());
         } finally {
@@ -111,6 +136,10 @@ public class EventsSQLite {
 
 
     long queryEventsAndDelete(int policy, int limit, List<GEvent> events) {
+        if (mIgnoreOperations) {
+            return -1;
+        }
+
         Cursor cursor = null;
         long lastId = -1;
         ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(eventsInfoAuthority);
@@ -128,6 +157,8 @@ public class EventsSQLite {
                 long delId = cursor.getLong(cursor.getColumnIndex(EventsInfoTable.COLUMN_ID));
                 removeEventById(client, delId);
             }
+        } catch (SQLiteFullException e) {
+            onDiskFull(e);
         } catch (Throwable t) {
             Logger.e(TAG, t, t.getMessage());
         } finally {
@@ -172,11 +203,21 @@ public class EventsSQLite {
 
 
     void removeEvents(long lastId, int policy, String eventType) {
-        ContentResolver contentResolver = context.getContentResolver();
-        Uri uri = getContentUri();
-        contentResolver.delete(uri,
-                COLUMN_ID + "<=? AND " + COLUMN_EVENT_TYPE + "=? AND " + COLUMN_POLICY + "=?",
-                new String[]{String.valueOf(lastId), eventType, String.valueOf(policy)});
+        if (mIgnoreOperations) {
+            return;
+        }
+
+        try {
+            ContentResolver contentResolver = context.getContentResolver();
+            Uri uri = getContentUri();
+            contentResolver.delete(uri,
+                    COLUMN_ID + "<=? AND " + COLUMN_EVENT_TYPE + "=? AND " + COLUMN_POLICY + "=?",
+                    new String[]{String.valueOf(lastId), eventType, String.valueOf(policy)});
+        } catch (SQLiteFullException e) {
+            onDiskFull(e);
+        } catch (Exception e) {
+            Logger.e(TAG, e, "removeEvents failed");
+        }
     }
 
     private GEvent unpack(byte[] data) {
@@ -192,8 +233,23 @@ public class EventsSQLite {
 
     // 清库
     void removeAllEvents() {
-        ContentResolver contentResolver = context.getContentResolver();
-        Uri uri = getContentUri();
-        contentResolver.delete(uri, null, null);
+        if (mIgnoreOperations) {
+            return;
+        }
+
+        try {
+            ContentResolver contentResolver = context.getContentResolver();
+            Uri uri = getContentUri();
+            contentResolver.delete(uri, null, null);
+        } catch (SQLiteFullException e) {
+            onDiskFull(e);
+        } catch (Exception e) {
+            Logger.e(TAG, e, "removeAllEvents failed");
+        }
+    }
+
+    private void onDiskFull(SQLiteFullException e) {
+        Logger.e(TAG, e, "Disk full, all operations will be ignored");
+        mIgnoreOperations = true;
     }
 }
