@@ -51,22 +51,25 @@ public class HybridTest {
     public void webInjectTest() {
         RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().get();
         WebView webView = new WebView(activity);
-        WebViewInjector.webkitWebViewLoadData(webView, "<html></html>", "text", "UTF8");
         WebViewInjector.webkitWebViewLoadUrl(webView, "https://www.baidu.com/");
         WebViewInjector.webkitWebViewLoadUrl(webView, "https://www.baidu.com/", new HashMap<>());
+        WebViewInjector.webkitWebViewLoadData(webView, "<html></html>", "text", "UTF8");
         WebViewInjector.webkitWebViewLoadDataWithBaseURL(webView, "https://www.baidu.com/", "<p>", "text", "UTF8", "https://www/growingio.com/");
+        WebViewInjector.webkitWebViewPostUrl(webView, "https://www.baidu.com/", null);
 
         com.uc.webview.export.WebView ucWebView = new com.uc.webview.export.WebView(activity);
-        WebViewInjector.ucWebViewLoadData(ucWebView, "<html></html>", "text", "UTF8");
         WebViewInjector.ucWebViewLoadUrl(ucWebView, "https://www.baidu.com/");
         WebViewInjector.ucWebViewLoadUrl(ucWebView, "https://www.baidu.com/", new HashMap<>());
+        WebViewInjector.ucWebViewLoadData(ucWebView, "<html></html>", "text", "UTF8");
         WebViewInjector.ucWebViewLoadDataWithBaseURL(ucWebView, "https://www.baidu.com/", "<p>", "text", "UTF8", "https://www/growingio.com/");
+        WebViewInjector.ucWebViewPostUrl(ucWebView, "https://www.baidu.com/", null);
 
         com.tencent.smtt.sdk.WebView x5WebView = new com.tencent.smtt.sdk.WebView(activity);
-        WebViewInjector.x5WebViewLoadData(x5WebView, "<html></html>", "text", "UTF8");
         WebViewInjector.x5WebViewLoadUrl(x5WebView, "https://www.baidu.com/");
         WebViewInjector.x5WebViewLoadUrl(x5WebView, "https://www.baidu.com/", new HashMap<>());
+        WebViewInjector.x5WebViewLoadData(x5WebView, "<html></html>", "text", "UTF8");
         WebViewInjector.x5WebViewLoadDataWithBaseURL(x5WebView, "https://www.baidu.com/", "<p>", "text", "UTF8", "https://www/growingio.com/");
+        WebViewInjector.x5WebViewPostUrl(x5WebView, "https://www.baidu.com/", null);
 
     }
 }

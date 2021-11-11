@@ -35,6 +35,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Types;
 
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.Type;
@@ -205,7 +206,17 @@ public class InjectProcessor extends AbstractProcessor {
             Symbol.MethodSymbol methodSymbol = (Symbol.MethodSymbol) element;
             List<Symbol.VarSymbol> parameters = methodSymbol.getParameters();
             for (Symbol.VarSymbol parameter : parameters) {
-                injectParameters.add(parameter.asType().asElement().flatName().toString());
+                injectParameters.add(parameter.asType().accept(new Types.DefaultTypeVisitor<String, Void>() {
+                    @Override
+                    public String visitArrayType(com.sun.tools.javac.code.Type.ArrayType t, Void unused) {
+                        return t.elemtype.accept(this, null) + "[]";
+                    }
+
+                    @Override
+                    public String visitType(com.sun.tools.javac.code.Type type, Void unused) {
+                        return type.asElement().flatName().toString();
+                    }
+                }, null));
             }
             argumentTypes = new Type[injectParameters.size()];
             for (int i = 0; i < injectParameters.size(); i++) {
@@ -366,7 +377,11 @@ public class InjectProcessor extends AbstractProcessor {
     }
 
     private void generatePerfectJava(JavaFile javaFile) throws IOException {
-        String classPath = getProjectRootPath() + "/src/main/java/" + javaFile.packageName.replace(".", "/") + "/" + javaFile.typeSpec.name + ".java";
+        String rootDir = processingEnv.getOptions().get("GRADLE_PLUGIN_DIR");
+        if (rootDir == null) {
+            rootDir = getProjectRootPath();
+        }
+        String classPath = rootDir + "/src/main/java/" + javaFile.packageName.replace(".", "/") + "/" + javaFile.typeSpec.name + ".java";
         File file = new File(classPath);
         OutputStream out = new FileOutputStream(file);
 
