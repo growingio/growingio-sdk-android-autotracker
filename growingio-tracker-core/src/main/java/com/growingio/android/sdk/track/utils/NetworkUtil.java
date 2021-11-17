@@ -91,13 +91,15 @@ public class NetworkUtil {
         }
         switch (subType) {
             //如果是2g类型
+            case TelephonyManager.NETWORK_TYPE_GSM:
+            case TelephonyManager.NETWORK_TYPE_CDMA:
             case TelephonyManager.NETWORK_TYPE_GPRS:
             case TelephonyManager.NETWORK_TYPE_EDGE:
             case TelephonyManager.NETWORK_TYPE_1xRTT:
             case TelephonyManager.NETWORK_TYPE_IDEN:
                 return "2G";
             //如果是3g类型
-            case TelephonyManager.NETWORK_TYPE_CDMA:
+            case TelephonyManager.NETWORK_TYPE_TD_SCDMA:
             case TelephonyManager.NETWORK_TYPE_EVDO_A:
             case TelephonyManager.NETWORK_TYPE_UMTS:
             case TelephonyManager.NETWORK_TYPE_EVDO_0:
@@ -110,7 +112,10 @@ public class NetworkUtil {
                 return "3G";
             //如果是4g类型
             case TelephonyManager.NETWORK_TYPE_LTE:
+            case TelephonyManager.NETWORK_TYPE_IWLAN:
                 return "4G";
+            case TelephonyManager.NETWORK_TYPE_NR:
+                return "5G";
             default:
                 //中国移动 联通 电信 三种3G制式
                 if ("TD-SCDMA".equalsIgnoreCase(subtypeName)
