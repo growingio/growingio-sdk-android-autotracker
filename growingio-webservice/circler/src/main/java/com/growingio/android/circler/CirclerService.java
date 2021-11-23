@@ -17,6 +17,7 @@ package com.growingio.android.circler;
 
 
 import com.growingio.android.circler.screenshot.CircleScreenshot;
+import com.growingio.android.circler.screenshot.GrowingFlutterPlugin;
 import com.growingio.android.circler.screenshot.ScreenshotProvider;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
@@ -150,6 +151,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
                 exitCircler();
             }
         });
+        GrowingFlutterPlugin.getInstance().onNativeCircleStart();
     }
 
     @Override
@@ -170,6 +172,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
         safeTipView.setErrorMessage(R.string.growing_circler_connected_to_web_failed);
         Logger.e(TAG, "Start CirclerService Failed");
         safeTipView.showQuitedDialog(this::exitCircler);
+        GrowingFlutterPlugin.getInstance().onNativeCircleStop();
     }
 
     @Override
@@ -180,6 +183,7 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
         cancel();
         socketState.set(SOCKET_STATE_CLOSED);
         safeTipView.showQuitedDialog(this::exitCircler);
+        GrowingFlutterPlugin.getInstance().onNativeCircleStop();
     }
 
     /************************** Screenshot ************************/

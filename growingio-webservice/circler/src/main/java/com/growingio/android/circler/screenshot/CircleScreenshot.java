@@ -17,6 +17,7 @@
 package com.growingio.android.circler.screenshot;
 
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -47,6 +48,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -63,7 +65,6 @@ public class CircleScreenshot {
     private final long mSnapshotKey;
     private final List<ViewElement> mElements;
     private final List<PageElement> mPages;
-
     public CircleScreenshot(Builder builder) {
         mMsgType = MSG_TYPE;
         mScreenWidth = builder.mScreenWidth;
@@ -89,14 +90,32 @@ public class CircleScreenshot {
             for (ViewElement element : mElements) {
                 elementArray.put(element.toJSONObject());
             }
-            json.put("elements", elementArray);
+            Map<String, Object> flutterData = GrowingFlutterPlugin.getInstance().getFlutterData();
 
             JSONArray pageArray = new JSONArray();
             for (PageElement page : mPages) {
                 pageArray.put(page.toJSONObject());
             }
+
+            if (flutterData != null) {
+                JSONObject flutterjson = new JSONObject(flutterData);
+                JSONArray flutterElements = (JSONArray) flutterjson.get("elements");
+                if (flutterElements != null) {
+                    for (int i = 0; i < flutterElements.length(); i++) {
+                        elementArray.put(flutterElements.get(i));
+                    }
+                }
+                JSONArray flutterPages = (JSONArray) flutterjson.get("pages");
+                if (flutterPages != null) {
+                    for (int i = 0; i < flutterPages.length(); i++) {
+                        pageArray.put(flutterPages.get(i));
+                    }
+                }
+            }
+            json.put("elements", elementArray);
             json.put("pages", pageArray);
         } catch (JSONException ignored) {
+            Log.e("CircleScreenshot error", ignored.toString());
         }
         return json;
     }
@@ -113,7 +132,6 @@ public class CircleScreenshot {
         private int mViewCount = 0;
         private Callback<CircleScreenshot> mScreenshotResultCallback;
         private Disposable mBuildDisposable;
-
         public Builder setScale(float scale) {
             mScale = scale;
             return this;
@@ -202,7 +220,6 @@ public class CircleScreenshot {
             if (disposeWebView(topViewNode)) {
                 return;
             }
-
             traverseViewNode(topViewNode);
         }
 
