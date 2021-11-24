@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
  */
 package com.growingio.android.sdk.track.middleware;
 
@@ -22,11 +22,14 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.database.DatabaseDataLoader;
+import com.growingio.database.EventDataContentProvider;
+import com.growingio.database.EventV3Protocol;
 
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,14 +40,13 @@ import org.robolectric.annotation.Config;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class EventSenderTest {
 
-    private final ContentProviderController<EventsContentProvider> controller =
-            Robolectric.buildContentProvider(EventsContentProvider.class);
+    private final ContentProviderController<EventDataContentProvider> controller =
+            Robolectric.buildContentProvider(EventDataContentProvider.class);
     private final Application application = ApplicationProvider.getApplicationContext();
     private EventSender eventSender;
 
@@ -52,7 +54,7 @@ public class EventSenderTest {
     public void setup() {
         TrackerContext.init(application);
         ProviderInfo providerInfo = new ProviderInfo();
-        providerInfo.authority = application.getPackageName() + ".EventsContentProvider";
+        providerInfo.authority = application.getPackageName() + "." + EventDataContentProvider.class.getSimpleName();
 
         eventSender = new EventSender(application, null, 0, 10);
         controller.create(providerInfo).get();
@@ -62,12 +64,13 @@ public class EventSenderTest {
     public void eventSendTest() {
         eventSender.setEventNetSender(new IEventNetSender() {
             @Override
-            public SendResponse send(List<GEvent> events) {
-                Truth.assertThat(events.size()).isEqualTo(1);
-                GEvent gEvent = events.get(0);
-                if (gEvent instanceof BaseEvent) {
-                    JSONObject jsonObject = ((BaseEvent) gEvent).toJSONObject();
-                    Truth.assertThat(jsonObject.opt("eventName")).isEqualTo("cpacm");
+            public SendResponse send(byte[] events) {
+                try {
+                    EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(events);
+                    Truth.assertThat(list.getSerializedSize()).isEqualTo(1);
+                    Truth.assertThat(list.getValues(0).getEventName()).isEqualTo("cpacm");
+                } catch (InvalidProtocolBufferException e) {
+                    e.printStackTrace();
                 }
                 return new SendResponse(true, 1000L);
             }
@@ -81,33 +84,34 @@ public class EventSenderTest {
 
 
     @Test
-    public void eventCacheTest() {
+    public void eventCacheTest() throws InvalidProtocolBufferException {
+        TrackerContext.get().getRegistry().register(EventDatabase.class,EventDbResult.class,new DatabaseDataLoader.Factory(application));
+
         CustomEvent ce = new CustomEvent.Builder()
                 .setEventName("cpacm").build();
         eventSender.cacheEvent(ce);
         eventSender.cacheEvent(ce);
         eventSender.cacheEvent(ce);
-        List<GEvent> gEvents = eventSender.getGEventsFromPolicy(ce.getSendPolicy());
-        Truth.assertThat(gEvents.size()).isEqualTo(3);
+        EventDbResult dbResult = eventSender.getGEventsFromPolicy(ce.getSendPolicy());
+        EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(dbResult.getData());
+        Truth.assertThat(list.getValuesCount()).isEqualTo(3);
 
         eventSender.setEventNetSender(new IEventNetSender() {
             @Override
-            public SendResponse send(List<GEvent> events) {
-                Truth.assertThat(events.size()).isEqualTo(2);
-                events.forEach(new Consumer<GEvent>() {
-                    @Override
-                    public void accept(GEvent gEvent) {
-                        if (gEvent instanceof BaseEvent) {
-                            JSONObject jsonObject = ((BaseEvent) gEvent).toJSONObject();
-                            Truth.assertThat(jsonObject.opt("eventName")).isEqualTo("cpacm");
-                        }
-                    }
-                });
+            public SendResponse send(byte[] events) {
+                try {
+                    EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(events);
+                    Truth.assertThat(list.getValuesCount()).isEqualTo(2);
+                    Truth.assertThat(list.getValues(0).getEventName()).isEqualTo("cpacm");
+                } catch (InvalidProtocolBufferException e) {
+                    e.printStackTrace();
+                }
                 return new SendResponse(true, 1000L);
             }
         });
         eventSender.cacheEvent(ce);
         eventSender.cacheEvent(ce);
         eventSender.sendEvents(false);
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
     }
 }

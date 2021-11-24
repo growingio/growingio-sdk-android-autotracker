@@ -23,12 +23,10 @@ import android.webkit.WebView;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.growingio.android.sdk.track.middleware.EventsContentProvider;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -51,7 +49,6 @@ public class TrackerTest {
 
     @Test
     public void apiTest() {
-        Robolectric.buildContentProvider(EventsContentProvider.class).create();
         Tracker tracker = new Tracker(application);
         Map<String, String> valueMap = new HashMap<>();
         valueMap.put("user", "cpacm");

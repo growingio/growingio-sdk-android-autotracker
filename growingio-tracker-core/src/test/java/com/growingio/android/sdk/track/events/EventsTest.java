@@ -128,7 +128,7 @@ public class EventsTest {
                 .setXpath("/test/path")
                 .setPageShowTimestamp(System.currentTimeMillis())
                 .build();
-        Truth.assertThat(event.getEventType()).isNull();
+        Truth.assertThat(event.getEventType()).isEqualTo("");
         inRobolectric(event.toJSONObject());
     }
 

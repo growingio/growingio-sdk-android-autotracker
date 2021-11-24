@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.data.PersistentDataProvider;
+import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -36,7 +36,7 @@ import com.growingio.android.sdk.track.middleware.EventSender;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
-import com.growingio.android.sdk.track.http.EventHttpSender;
+import com.growingio.android.sdk.track.middleware.EventHttpSender;
 
 import java.util.ArrayList;
 import java.util.Iterator;

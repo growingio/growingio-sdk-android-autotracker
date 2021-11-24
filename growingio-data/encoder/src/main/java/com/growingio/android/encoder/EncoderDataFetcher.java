@@ -51,7 +51,6 @@ public class EncoderDataFetcher implements DataFetcher<EventEncoder> {
         long currentTimeMillis = eventUrl.getTime();
         byte[] compressData = Snappy.compress(eventUrl.getRequestBody());
         compressData = XORUtils.encrypt(compressData, (int) (currentTimeMillis & 0xFF));
-        eventUrl.setMediaType("application/json");
         eventUrl.setBodyData(compressData);
         eventUrl.addHeader("X-Compress-Codec", "2");
         eventUrl.addHeader("X-Crypt-Codec", "1");

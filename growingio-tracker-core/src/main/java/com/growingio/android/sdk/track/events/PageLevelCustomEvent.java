@@ -34,7 +34,7 @@ public class PageLevelCustomEvent extends CustomEvent {
     }
 
     public String getPath() {
-        return mPath;
+        return checkValueSafe(mPath);
     }
 
     public long getPageShowTimestamp() {

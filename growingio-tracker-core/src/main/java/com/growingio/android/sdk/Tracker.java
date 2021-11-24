@@ -28,7 +28,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.data.PersistentDataProvider;
+import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
