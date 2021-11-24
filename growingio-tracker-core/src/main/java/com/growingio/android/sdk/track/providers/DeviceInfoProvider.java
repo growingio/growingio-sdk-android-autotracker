@@ -25,7 +25,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.data.PersistentDataProvider;
+import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.DeviceUtil;

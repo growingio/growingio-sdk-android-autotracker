@@ -11,12 +11,12 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.3.2",
-                releaseVersionCode: 30302,
+                releaseVersion    : "3.3.3-SNAPSHOT",
+                releaseVersionCode: 30303,
         ]
 
         versions = [
-                'gradleTool': '3.5.0',
+                'gradleTool': '4.2.2',
         ]
         libraries = [
                 android    : [
@@ -53,6 +53,7 @@ buildscript {
 
                         'hybrid'          : "com.growingio.android:hybrid:$releaseConfiguration.releaseVersion",
                         'okhttp3'         : "com.growingio.android:okhttp3:$releaseConfiguration.releaseVersion",
+                        'database'        : "com.growingio.android:database:$releaseConfiguration.releaseVersion",
                         'volley'          : "com.growingio.android:volley:$releaseConfiguration.releaseVersion",
                         'urlconnection'   : "com.growingio.android:urlconnection:$releaseConfiguration.releaseVersion",
                         'debugger'        : "com.growingio.android:debugger:$releaseConfiguration.releaseVersion",
@@ -67,6 +68,12 @@ buildscript {
                 'google'   : [
                         'auto_service'            : 'com.google.auto.service:auto-service:1.0-rc7',
                         'auto_service_annotations': 'com.google.auto.service:auto-service-annotations:1.0-rc7',
+
+                        'protobuf_gradle_plugin'  : 'com.google.protobuf:protobuf-gradle-plugin:0.8.17',
+                        'protobuf_java'           : 'com.google.protobuf:protobuf-java:3.19.1',
+                        'protobuf_javalite'       : 'com.google.protobuf:protobuf-javalite:3.19.1',
+                        'protobufc'               : 'com.google.protobuf:protoc:3.9.1',
+                        'protobuf_java_util'      : 'com.google.protobuf:protobuf-java-util:3.19.1',
                 ],
 
                 'squareup' : [
@@ -128,6 +135,7 @@ buildscript {
         classpath "com.android.tools.build:gradle:${versions.gradleTool}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath libraries.google.protobuf_gradle_plugin
         classpath libraries.sonar.sonar
     }
 }

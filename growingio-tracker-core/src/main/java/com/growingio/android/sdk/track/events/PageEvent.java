@@ -51,19 +51,19 @@ public class PageEvent extends BaseEvent {
     }
 
     public String getPath() {
-        return mPath;
+        return checkValueSafe(mPath);
     }
 
     public String getOrientation() {
-        return mOrientation;
+        return checkValueSafe(mOrientation);
     }
 
     public String getTitle() {
-        return mTitle;
+        return checkValueSafe(mTitle);
     }
 
     public String getReferralPage() {
-        return mReferralPage;
+        return checkValueSafe(mReferralPage);
     }
 
     @Override

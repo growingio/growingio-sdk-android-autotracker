@@ -44,7 +44,7 @@ public class CustomEvent extends BaseAttributesEvent {
     }
 
     public String getEventName() {
-        return mEventName;
+        return checkValueSafe(mEventName);
     }
 
     public static class Builder extends BaseAttributesEvent.Builder<CustomEvent> {

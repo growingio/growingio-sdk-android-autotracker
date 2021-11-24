@@ -13,6 +13,8 @@ android {
 
         buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
+        buildConfigField("int", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
     }
 
     buildTypes {
@@ -52,6 +54,7 @@ android {
 }
 
 dependencies {
+
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
     testImplementation libraries.test.junit
@@ -60,6 +63,10 @@ dependencies {
     testImplementation libraries.test.robolectric
     testImplementation libraries.androidx.appcompat
     testImplementation libraries.androidx.recyclerview
+
+    testImplementation project(path: ':growingio-data:database')
+    testImplementation libraries.google.protobuf_javalite
+
     testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
     compileOnly libraries.androidx.appcompat

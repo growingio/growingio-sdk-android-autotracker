@@ -24,6 +24,7 @@ include ':growingio-webservice:circler'
 
 include ':growingio-data:json'
 include ':growingio-data:encoder'
+include ':growingio-data:database'
 include ':growingio-tools:crash'
 include ':growingio-tools:snappy'
 include ':growingio-tools:oaid'
@@ -33,3 +34,4 @@ include ':gio-sdk:tracker'
 include ':gio-sdk:autotracker'
 include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:autotracker-cdp'
+

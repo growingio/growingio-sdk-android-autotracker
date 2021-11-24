@@ -23,8 +23,8 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.data.EventSequenceId;
-import com.growingio.android.sdk.track.data.PersistentDataProvider;
+import com.growingio.android.sdk.track.ipc.EventSequenceId;
+import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
@@ -109,19 +109,19 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public String getDeviceId() {
-        return mDeviceId;
+        return checkValueSafe(mDeviceId);
     }
 
     public String getUserKey() {
-        return mUserKey;
+        return checkValueSafe(mUserKey);
     }
 
     public String getUserId() {
-        return mUserId;
+        return checkValueSafe(mUserId);
     }
 
     public String getSessionId() {
-        return mSessionId;
+        return checkValueSafe(mSessionId);
     }
 
     public long getTimestamp() {
@@ -129,15 +129,15 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public String getDomain() {
-        return mDomain;
+        return checkValueSafe(mDomain);
     }
 
     public String getUrlScheme() {
-        return mUrlScheme;
+        return checkValueSafe(mUrlScheme);
     }
 
     public String getAppState() {
-        return mAppState;
+        return checkValueSafe(mAppState);
     }
 
     public long getGlobalSequenceId() {
@@ -149,11 +149,11 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public String getNetworkState() {
-        return mNetworkState;
+        return checkValueSafe(mNetworkState);
     }
 
     public String getAppChannel() {
-        return mAppChannel;
+        return checkValueSafe(mAppChannel);
     }
 
     public int getScreenHeight() {
@@ -165,27 +165,27 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public String getDeviceBrand() {
-        return mDeviceBrand;
+        return checkValueSafe(mDeviceBrand);
     }
 
     public String getDeviceModel() {
-        return mDeviceModel;
+        return checkValueSafe(mDeviceModel);
     }
 
     public String getDeviceType() {
-        return mDeviceType;
+        return checkValueSafe(mDeviceType);
     }
 
     public String getAppName() {
-        return mAppName;
+        return checkValueSafe(mAppName);
     }
 
     public String getAppVersion() {
-        return mAppVersion;
+        return checkValueSafe(mAppVersion);
     }
 
     public String getLanguage() {
-        return mLanguage;
+        return checkValueSafe(mLanguage);
     }
 
     public double getLatitude() {
@@ -197,12 +197,28 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public String getSdkVersion() {
-        return mSdkVersion;
+        return checkValueSafe(mSdkVersion);
+    }
+
+    public String getPlatform() {
+        return checkValueSafe(mPlatform);
+    }
+
+    public String getPlatformVersion() {
+        return checkValueSafe(mPlatformVersion);
+    }
+
+    public Map<String, String> getExtraParams() {
+        return mExtraParams;
     }
 
     @Override
     public String getEventType() {
-        return mEventType;
+        return checkValueSafe(mEventType);
+    }
+
+    protected String checkValueSafe(String value) {
+        return TextUtils.isEmpty(value) ? "" : value;
     }
 
     public JSONObject toJSONObject() {

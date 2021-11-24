@@ -18,6 +18,8 @@ package com.growingio.android.sdk.track.events.helper;
 
 import androidx.annotation.IntDef;
 
+import com.growingio.android.sdk.track.events.AutotrackEventType;
+import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.lang.annotation.Retention;
@@ -65,10 +67,12 @@ public final class EventExcludeFilter {
     public static final int REENGAGE = 1 << 11;
     public static final int EVENT_MASK_TRIGGER = (VIEW_CLICK | VIEW_CHANGE | FORM_SUBMIT);
 
+    //"FORM_SUBMIT" from Hybrid Module
+    //"REENGAGE" is future's feature
     private static final ArrayList<String> EVENT_TYPE_LIST = new ArrayList<>(
-            Arrays.asList("VISIT", "CUSTOM", "VISITOR_ATTRIBUTES", "LOGIN_USER_ATTRIBUTES",
-                    "CONVERSION_VARIABLES", "APP_CLOSED", "PAGE", "PAGE_ATTRIBUTES", "VIEW_CLICK",
-                    "VIEW_CHANGE", "FORM_SUBMIT", "REENGAGE"));
+            Arrays.asList(TrackEventType.VISIT, TrackEventType.CUSTOM, TrackEventType.VISITOR_ATTRIBUTES, TrackEventType.LOGIN_USER_ATTRIBUTES,
+                    TrackEventType.CONVERSION_VARIABLES, TrackEventType.APP_CLOSED, AutotrackEventType.PAGE, AutotrackEventType.PAGE_ATTRIBUTES, AutotrackEventType.VIEW_CLICK,
+                    AutotrackEventType.VIEW_CHANGE, "FORM_SUBMIT", "REENGAGE"));
 
     private EventExcludeFilter() {
     }

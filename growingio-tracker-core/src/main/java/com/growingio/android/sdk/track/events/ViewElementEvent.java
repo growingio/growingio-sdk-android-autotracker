@@ -42,7 +42,7 @@ public class ViewElementEvent extends BaseEvent {
     }
 
     public String getPath() {
-        return mPath;
+        return checkValueSafe(mPath);
     }
 
     public long getPageShowTimestamp() {
@@ -50,11 +50,11 @@ public class ViewElementEvent extends BaseEvent {
     }
 
     public String getTextValue() {
-        return mTextValue;
+        return checkValueSafe(mTextValue);
     }
 
     public String getXpath() {
-        return mXpath;
+        return checkValueSafe(mXpath);
     }
 
     public int getIndex() {
