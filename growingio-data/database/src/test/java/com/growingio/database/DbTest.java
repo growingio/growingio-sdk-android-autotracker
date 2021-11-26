@@ -23,15 +23,21 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.growingio.android.json.JsonDataLoader;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.middleware.EventDatabase;
 import com.growingio.android.sdk.track.middleware.EventDbResult;
+import com.growingio.android.sdk.track.middleware.format.EventByteArray;
+import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.protobuf.ProtobufDataLoader;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,6 +86,7 @@ public class DbTest {
 
     @Test
     public void dataModuleTest() throws InvalidProtocolBufferException {
+        TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
         DatabaseLibraryModule module = new DatabaseLibraryModule();
         TrackerRegistry trackerRegistry = new TrackerRegistry();
         module.registerComponents(application, trackerRegistry);
@@ -92,26 +99,13 @@ public class DbTest {
         ModelLoader.LoadData<EventDbResult> loadData = modelLoader.buildLoadData(EventDatabase.insert(customEvent));
         DataFetcher<EventDbResult> dataFetcher = loadData.fetcher;
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventDbResult.class);
-        dataFetcher.loadData(new DataFetcher.DataCallback<EventDbResult>() {
-            @Override
-            public void onDataReady(EventDbResult data) {
-                Truth.assertThat(data.getSum()).isEqualTo(1);
-                Truth.assertThat(data.isSuccess()).isEqualTo(true);
-            }
-
-            @Override
-            public void onLoadFailed(Exception e) {
-                Truth.assertThat(true).isFalse();
-            }
-        });
-        dataFetcher.cleanup();
-        dataFetcher.cancel();
+        EventDbResult data = dataFetcher.executeData();
+        Truth.assertThat(data.getSum()).isEqualTo(1);
+        Truth.assertThat(data.isSuccess()).isEqualTo(true);
 
         EventDbResult dbResult = modelLoader.buildLoadData(EventDatabase.query(customEvent.getSendPolicy(), 10)).fetcher.executeData();
         Truth.assertThat(dbResult.getSum()).isEqualTo(1);
         Truth.assertThat(dbResult.isSuccess()).isEqualTo(true);
-        EventV3Protocol.EventV3List eventV3List = EventV3Protocol.EventV3List.parseFrom(dbResult.getData());
-        Truth.assertThat(eventV3List.getValues(0).toByteArray()).isEqualTo(EventProtocolTransfer.protocol(customEvent));
         Truth.assertThat(dbResult.getEventType()).isEqualTo(customEvent.getEventType());
 
         dbResult = modelLoader.buildLoadData(EventDatabase.delete(dbResult.getLastId(), customEvent.getSendPolicy(), dbResult.getEventType())).fetcher.executeData();
@@ -144,6 +138,7 @@ public class DbTest {
 
     @Test
     public void contentProviderTest() {
+        TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
         controller.create(providerInfo).get();
         sqLite.removeOverdueEvents();
         CustomEvent customEvent = new CustomEvent.Builder()
@@ -156,11 +151,11 @@ public class DbTest {
         EventDbResult dbResult = new EventDbResult();
         sqLite.queryEventsAndDelete(customEvent.getSendPolicy(), 10, dbResult);
         try {
-            EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(dbResult.getData());
+            JSONArray array = new JSONArray(new String(dbResult.getData()));
             assertThat(dbResult.getSum()).isEqualTo(4);
-            assertThat(list.getValuesCount()).isEqualTo(4);
-            assertThat(list.getValues(0).getEventName()).isEqualTo("contentProvider");
-        } catch (InvalidProtocolBufferException e) {
+            assertThat(array.length()).isEqualTo(4);
+            assertThat(array.getJSONObject(0).optString("eventName")).isEqualTo("contentProvider");
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         sqLite.removeAllEvents();

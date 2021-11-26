@@ -22,20 +22,21 @@ import com.google.common.truth.Truth;
 import com.growingio.android.json.JsonLibraryModule;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.http.EventData;
-import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.middleware.format.EventFormatData;
+import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.Collections;
+import java.util.ArrayList;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -47,9 +48,8 @@ public class JsonDataTest {
         TrackerContext.init(application);
     }
 
-
     @Test
-    public void dataTransfer() {
+    public void dataFormat() {
         JsonLibraryModule module = new JsonLibraryModule();
         TrackerRegistry trackerRegistry = new TrackerRegistry();
         module.registerComponents(application, trackerRegistry);
@@ -58,33 +58,58 @@ public class JsonDataTest {
                 .setEventName("jsonTest")
                 .build();
 
-        EventData eventData = new EventData(Collections.singletonList(customEvent));
-        DataFetcher<EventStream> dataFetcher =
-                trackerRegistry.getModelLoader(EventData.class, EventStream.class)
+        EventFormatData eventData = EventFormatData.format(customEvent);
+        DataFetcher<EventByteArray> dataFetcher =
+                trackerRegistry.getModelLoader(EventFormatData.class, EventByteArray.class)
                         .buildLoadData(eventData).fetcher;
-        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventStream.class);
-        dataFetcher.loadData(new DataFetcher.DataCallback<EventStream>() {
-            @Override
-            public void onDataReady(EventStream data) {
-                try {
-                    JSONArray jsonArray = new JSONArray(new String(data.getBodyData()));
-                    String eventName = jsonArray.getJSONObject(0).optString("eventName");
-                    String eventType = jsonArray.getJSONObject(0).optString("eventType");
-                    Truth.assertThat(eventType).isEqualTo("CUSTOM");
-                    Truth.assertThat(eventName).isEqualTo("jsonTest");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Truth.assertThat(true).isFalse();
-                }
-            }
+        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventByteArray.class);
+        EventByteArray data = dataFetcher.executeData();
+        try {
+            JSONObject jsonObject = new JSONObject(new String(data.getBodyData()));
+            String eventName = jsonObject.optString("eventName");
+            String eventType = jsonObject.optString("eventType");
+            Truth.assertThat(eventType).isEqualTo("CUSTOM");
+            Truth.assertThat(eventName).isEqualTo("jsonTest");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Truth.assertThat(true).isFalse();
+        }
+    }
 
-            @Override
-            public void onLoadFailed(Exception e) {
-                Truth.assertThat(true).isFalse();
-            }
-        });
-        dataFetcher.cleanup();
-        dataFetcher.cancel();
+    @Test
+    public void dataMerge() {
+        JsonLibraryModule module = new JsonLibraryModule();
+        TrackerRegistry trackerRegistry = new TrackerRegistry();
+        module.registerComponents(application, trackerRegistry);
+
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        CustomEvent customEvent = new CustomEvent.Builder()
+                .setEventName("merge")
+                .build();
+        CustomEvent customEvent2 = new CustomEvent.Builder()
+                .setEventName("cpacm")
+                .build();
+        arrayList.add(customEvent.toJSONObject().toString().getBytes());
+        arrayList.add(customEvent2.toJSONObject().toString().getBytes());
+
+        EventFormatData eventData = EventFormatData.merge(arrayList);
+        DataFetcher<EventByteArray> dataFetcher = trackerRegistry.getModelLoader(EventFormatData.class, EventByteArray.class)
+                .buildLoadData(eventData).fetcher;
+        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventByteArray.class);
+        EventByteArray data = dataFetcher.executeData();
+
+        try {
+            JSONArray jsonArray = new JSONArray(new String(data.getBodyData()));
+            Truth.assertThat(jsonArray.length()).isEqualTo(2);
+            JSONObject json1 = jsonArray.getJSONObject(0);
+            JSONObject json2 = jsonArray.getJSONObject(1);
+            Truth.assertThat(json1.opt("eventName")).isEqualTo("merge");
+            Truth.assertThat(json2.opt("eventName")).isEqualTo("cpacm");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Truth.assertThat(true).isFalse();
+        }
+
     }
 
 }

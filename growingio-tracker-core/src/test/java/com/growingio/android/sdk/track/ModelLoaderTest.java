@@ -66,25 +66,12 @@ public class ModelLoaderTest {
         @Override
         public LoadData<Integer> buildLoadData(String s) {
             return new LoadData<>(new DataFetcher<Integer>() {
-                @Override
-                public void loadData(DataCallback<? super Integer> callback) {
-                    callback.onDataReady(0);
-                }
 
                 @Override
                 public Integer executeData() {
                     return 0;
                 }
 
-                @Override
-                public void cleanup() {
-
-                }
-
-                @Override
-                public void cancel() {
-
-                }
 
                 @Override
                 public Class<Integer> getDataClass() {

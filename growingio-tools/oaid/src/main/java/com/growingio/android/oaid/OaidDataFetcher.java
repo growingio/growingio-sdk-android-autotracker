@@ -28,30 +28,10 @@ public class OaidDataFetcher implements DataFetcher<String> {
         this.mOaidHelper = oaidHelper;
     }
 
-    @Override
-    public void loadData(DataCallback<? super String> callback) {
-        if (callback == null) {
-            return;
-        }
-
-        try {
-            callback.onDataReady(executeData());
-        } catch (Exception e) {
-            callback.onLoadFailed(e);
-        }
-    }
 
     @Override
     public String executeData() {
         return mOaidHelper.getOaid();
-    }
-
-    @Override
-    public void cleanup() {
-    }
-
-    @Override
-    public void cancel() {
     }
 
     @Override

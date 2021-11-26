@@ -30,10 +30,13 @@ import static com.growingio.database.EventDataTable.TABLE_EVENTS;
 
 public class EventDataContentProvider extends ContentProvider {
 
+    public static final String CONTENT_PROVIDER_NAME = "EventDataContentProvider";
+
     private static final UriMatcher MATCHER;
     private static final String TAG = "EventContentProvider";
     //code
     private static final int EVENT_DATA_CODE = 1;
+
 
     static {
         MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
@@ -44,7 +47,7 @@ public class EventDataContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        String eventsInfoAuthority = this.getContext().getPackageName() + "." + this.getClass().getSimpleName();
+        String eventsInfoAuthority = this.getContext().getPackageName() + "." + CONTENT_PROVIDER_NAME;
         MATCHER.addURI(eventsInfoAuthority, TABLE_EVENTS, EVENT_DATA_CODE);
         this.dbHelper = new EventDataSQLiteOpenHelper(this.getContext());
         return true;

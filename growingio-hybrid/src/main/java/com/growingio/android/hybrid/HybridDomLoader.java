@@ -20,7 +20,7 @@ import android.view.View;
 import android.webkit.WebView;
 
 import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 import com.growingio.android.sdk.track.modelloader.data.HybridDom;
@@ -54,7 +54,7 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
     }
 
 
-    public static class HybridDataFetcher implements DataFetcher<HybridJson> {
+    public static class HybridDataFetcher implements LoadDataFetcher<HybridJson> {
         private static final String TAG = "HybridDataFetcher";
 
         private final HybridDom dom;
@@ -100,17 +100,10 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
 
         @Override
         public HybridJson executeData() {
-            // for register dom change listener
+            // debugger needn't register dom change listener
             return new HybridJson(new JSONObject());
         }
 
-        @Override
-        public void cleanup() {
-        }
-
-        @Override
-        public void cancel() {
-        }
 
         @Override
         public Class<HybridJson> getDataClass() {

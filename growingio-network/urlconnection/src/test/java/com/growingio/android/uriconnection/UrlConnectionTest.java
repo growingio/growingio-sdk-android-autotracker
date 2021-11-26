@@ -24,7 +24,8 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.http.EventResponse;
 import com.growingio.android.sdk.track.http.EventUrl;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
+import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.urlconnection.HttpException;
@@ -108,9 +109,9 @@ public class UrlConnectionTest {
         Truth.assertThat(response.getStream()).isInstanceOf(InputStream.class);
         Truth.assertThat(response.getUsedBytes()).isEqualTo(0L);
 
-        DataFetcher<EventResponse> dataFetcher = modelLoader.buildLoadData(eventUrl).fetcher;
+        HttpDataFetcher<EventResponse> dataFetcher = (HttpDataFetcher<EventResponse>) modelLoader.buildLoadData(eventUrl).fetcher;
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventResponse.class);
-        dataFetcher.loadData(new DataFetcher.DataCallback<EventResponse>() {
+        dataFetcher.loadData(new LoadDataFetcher.DataCallback<EventResponse>() {
             @Override
             public void onDataReady(EventResponse response) {
                 assertThat(response.isSucceeded()).isTrue();
@@ -127,7 +128,8 @@ public class UrlConnectionTest {
         });
 
         EventUrl eventUrl2 = initEventUrl("http://localhost:8010/");
-        modelLoader.buildLoadData(eventUrl2).fetcher.loadData(new DataFetcher.DataCallback<EventResponse>() {
+        HttpDataFetcher<EventResponse> dataFetcher2 = (HttpDataFetcher<EventResponse>) modelLoader.buildLoadData(eventUrl2).fetcher;
+        dataFetcher2.loadData(new LoadDataFetcher.DataCallback<EventResponse>() {
             @Override
             public void onDataReady(EventResponse response) {
 
@@ -140,7 +142,8 @@ public class UrlConnectionTest {
         });
 
         EventUrl eventUrl3 = new EventUrl("http://localhost:8910/", System.currentTimeMillis()).addPath("errorCode");
-        modelLoader.buildLoadData(eventUrl3).fetcher.loadData(new DataFetcher.DataCallback<EventResponse>() {
+        HttpDataFetcher<EventResponse> dataFetcher3 = (HttpDataFetcher<EventResponse>) modelLoader.buildLoadData(eventUrl3).fetcher;
+        dataFetcher3.loadData(new LoadDataFetcher.DataCallback<EventResponse>() {
             @Override
             public void onDataReady(EventResponse response) {
 
@@ -155,7 +158,8 @@ public class UrlConnectionTest {
 
         EventUrl eventUrl4 = new EventUrl("http://localhost:8910/", System.currentTimeMillis())
                 .addPath("redirect");
-        modelLoader.buildLoadData(eventUrl4).fetcher.loadData(new DataFetcher.DataCallback<EventResponse>() {
+        HttpDataFetcher<EventResponse> dataFetcher4 = (HttpDataFetcher<EventResponse>) modelLoader.buildLoadData(eventUrl4).fetcher;
+        dataFetcher4.loadData(new LoadDataFetcher.DataCallback<EventResponse>() {
             @Override
             public void onDataReady(EventResponse response) {
 

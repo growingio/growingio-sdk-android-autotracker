@@ -23,7 +23,6 @@ import androidx.test.core.app.ApplicationProvider;
 import com.growingio.android.sdk.monitor.event.EventBuilder;
 import com.growingio.android.sdk.track.log.Crash;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
@@ -52,19 +51,6 @@ public class CrashTest {
         trackerRegistry.register(Crash.class, Void.class, new CrashDataLoader.Factory(context, CrashConfig.DSN, CrashConfig.ALIAS));
         ModelLoader<Crash, Void> modelLoader = trackerRegistry.getModelLoader(Crash.class, Void.class);
         modelLoader.buildLoadData(new Crash()).fetcher.executeData();
-        modelLoader.buildLoadData(new Crash()).fetcher.loadData(new DataFetcher.DataCallback<Void>() {
-            @Override
-            public void onDataReady(Void data) {
-                assertThat(data).isNull();
-            }
-
-            @Override
-            public void onLoadFailed(Exception e) {
-
-            }
-        });
-        modelLoader.buildLoadData(new Crash()).fetcher.cleanup();
-        modelLoader.buildLoadData(new Crash()).fetcher.cancel();
         assertThat(Void.class).isEqualTo(modelLoader.buildLoadData(new Crash()).fetcher.getDataClass());
         CrashManager.sendMessage("cpacm");
         CrashManager.sendException(new IllegalStateException("cpacm"));

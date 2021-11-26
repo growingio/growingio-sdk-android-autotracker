@@ -36,24 +36,10 @@ class TestModelFactory<T, Y> implements ModelLoaderFactory<T, Y> {
             @Override
             public LoadData<Y> buildLoadData(T t) {
                 return new LoadData<>(new DataFetcher<Y>() {
-                    @Override
-                    public void loadData(DataCallback<? super Y> callback) {
-                        callback.onDataReady(result);
-                    }
 
                     @Override
                     public Y executeData() {
                         return result;
-                    }
-
-                    @Override
-                    public void cleanup() {
-
-                    }
-
-                    @Override
-                    public void cancel() {
-
                     }
 
                     @Override

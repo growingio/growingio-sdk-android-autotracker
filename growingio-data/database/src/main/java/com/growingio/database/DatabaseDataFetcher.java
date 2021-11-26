@@ -16,13 +16,11 @@
 
 package com.growingio.database;
 
-import android.net.Uri;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.EventDatabase;
 import com.growingio.android.sdk.track.middleware.EventDbResult;
-import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
 import static com.growingio.android.sdk.track.middleware.GEvent.SEND_POLICY_INSTANT;
@@ -42,21 +40,6 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
     public DatabaseDataFetcher(EventDataManager dataManager, EventDatabase eventDatabase) {
         this.eventDatabase = eventDatabase;
         this.dataManager = dataManager;
-    }
-
-    @Override
-    public void loadData(DataCallback<? super EventDbResult> callback) {
-        try {
-            EventDbResult dbResult = executeDatabase(eventDatabase);
-            if (dbResult.isSuccess()) {
-                callback.onDataReady(dbResult);
-            } else {
-                callback.onLoadFailed(new IllegalArgumentException("database operation failed"));
-            }
-        } catch (IllegalArgumentException e) {
-            Logger.e("DatabaseDataFetcher", e);
-            callback.onLoadFailed(e);
-        }
     }
 
     @Override
@@ -115,16 +98,6 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
 
     private void assertCondition(boolean condition, String msg) throws IllegalArgumentException {
         if (!condition) throw new IllegalArgumentException(msg);
-    }
-
-    @Override
-    public void cleanup() {
-
-    }
-
-    @Override
-    public void cancel() {
-
     }
 
     @Override

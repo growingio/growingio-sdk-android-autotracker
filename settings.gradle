@@ -22,6 +22,7 @@ include ':growingio-network:volley'
 include ':growingio-webservice:debugger'
 include ':growingio-webservice:circler'
 
+include ':growingio-data:protobuf'
 include ':growingio-data:json'
 include ':growingio-data:encoder'
 include ':growingio-data:database'
@@ -34,4 +35,3 @@ include ':gio-sdk:tracker'
 include ':gio-sdk:autotracker'
 include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:autotracker-cdp'
-

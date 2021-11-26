@@ -24,13 +24,9 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.http.EventData;
 import com.growingio.android.sdk.track.http.EventEncoder;
 import com.growingio.android.sdk.track.http.EventResponse;
-import com.growingio.android.sdk.track.http.EventStream;
 import com.growingio.android.sdk.track.http.EventUrl;
-import com.growingio.android.sdk.track.middleware.GEvent;
-import com.growingio.android.sdk.track.middleware.SendResponse;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +35,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)

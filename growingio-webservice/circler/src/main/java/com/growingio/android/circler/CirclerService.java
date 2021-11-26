@@ -22,7 +22,7 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.WebService;
@@ -40,7 +40,7 @@ import okhttp3.Request;
  *
  * @author cpacm 5/19/21
  */
-public class CirclerService implements DataFetcher<WebService>, IActivityLifecycle,
+public class CirclerService implements LoadDataFetcher<WebService>, IActivityLifecycle,
         ScreenshotProvider.OnScreenshotRefreshedListener,
         WebSocketHandler.OnWebSocketListener {
 
@@ -116,12 +116,10 @@ public class CirclerService implements DataFetcher<WebService>, IActivityLifecyc
         return new WebService();
     }
 
-    @Override
     public void cleanup() {
         cancel();
     }
 
-    @Override
     public void cancel() {
         socketState.set(SOCKET_STATE_CLOSED);
         if (webSocketHandler.getWebSocket() != null) {

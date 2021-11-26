@@ -52,14 +52,6 @@ public class HybridBridgeLoader implements ModelLoader<HybridBridge, Boolean> {
             this.bridge = eventData;
         }
 
-        @Override
-        public void loadData(DataCallback<? super Boolean> callback) {
-            try {
-                callback.onDataReady(executeData());
-            } catch (Exception e) {
-                callback.onLoadFailed(e);
-            }
-        }
 
         @Override
         public Boolean executeData() {
@@ -73,14 +65,6 @@ public class HybridBridgeLoader implements ModelLoader<HybridBridge, Boolean> {
                 return false;
             }
             return true;
-        }
-
-        @Override
-        public void cleanup() {
-        }
-
-        @Override
-        public void cancel() {
         }
 
         @Override

@@ -19,7 +19,7 @@ package com.growingio.android.okhttp3;
 import com.growingio.android.sdk.track.http.EventResponse;
 import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
 
 import java.io.IOException;
 import java.util.Map;
@@ -37,7 +37,7 @@ import okhttp3.ResponseBody;
  *
  * @author cpacm 2021/3/31
  */
-public class OkHttpDataFetcher implements DataFetcher<EventResponse>, Callback {
+public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callback {
     private static final String TAG = "OkHttpDataFetcher";
 
     private final Call.Factory client;

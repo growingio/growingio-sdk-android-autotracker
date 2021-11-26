@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.growingio.database;
+package com.growingio.protobuf;
 
 import android.app.Application;
 

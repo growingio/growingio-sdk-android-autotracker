@@ -29,7 +29,7 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
  *
  * @author cpacm 11/26/21
  */
-@GIOLibraryModule
+@GIOLibraryModule()
 public class DatabaseLibraryModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {

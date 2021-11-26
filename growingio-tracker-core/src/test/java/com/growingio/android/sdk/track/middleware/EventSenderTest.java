@@ -23,13 +23,19 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.growingio.android.json.JsonDataLoader;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.middleware.format.EventByteArray;
+import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.database.DatabaseDataLoader;
 import com.growingio.database.EventDataContentProvider;
-import com.growingio.database.EventV3Protocol;
+import com.growingio.protobuf.EventV3Protocol;
+import com.growingio.protobuf.ProtobufDataLoader;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +44,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ContentProviderController;
 import org.robolectric.annotation.Config;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE)
@@ -62,18 +67,15 @@ public class EventSenderTest {
 
     @Test
     public void eventSendTest() {
-        eventSender.setEventNetSender(new IEventNetSender() {
-            @Override
-            public SendResponse send(byte[] events) {
-                try {
-                    EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(events);
-                    Truth.assertThat(list.getSerializedSize()).isEqualTo(1);
-                    Truth.assertThat(list.getValues(0).getEventName()).isEqualTo("cpacm");
-                } catch (InvalidProtocolBufferException e) {
-                    e.printStackTrace();
-                }
-                return new SendResponse(true, 1000L);
+        eventSender.setEventNetSender(events -> {
+            try {
+                EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(events);
+                Truth.assertThat(list.getSerializedSize()).isEqualTo(1);
+                Truth.assertThat(list.getValues(0).getEventName()).isEqualTo("cpacm");
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
             }
+            return new SendResponse(true, 1000L);
         });
         eventSender.sendEvent(new CustomEvent.Builder()
                 .setEventName("cpacm")
@@ -84,8 +86,9 @@ public class EventSenderTest {
 
 
     @Test
-    public void eventCacheTest() throws InvalidProtocolBufferException {
-        TrackerContext.get().getRegistry().register(EventDatabase.class,EventDbResult.class,new DatabaseDataLoader.Factory(application));
+    public void eventCacheTestPb() throws InvalidProtocolBufferException {
+        TrackerContext.get().getRegistry().register(EventDatabase.class, EventDbResult.class, new DatabaseDataLoader.Factory(application));
+        TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
 
         CustomEvent ce = new CustomEvent.Builder()
                 .setEventName("cpacm").build();
@@ -96,18 +99,49 @@ public class EventSenderTest {
         EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(dbResult.getData());
         Truth.assertThat(list.getValuesCount()).isEqualTo(3);
 
-        eventSender.setEventNetSender(new IEventNetSender() {
-            @Override
-            public SendResponse send(byte[] events) {
-                try {
-                    EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(events);
-                    Truth.assertThat(list.getValuesCount()).isEqualTo(2);
-                    Truth.assertThat(list.getValues(0).getEventName()).isEqualTo("cpacm");
-                } catch (InvalidProtocolBufferException e) {
-                    e.printStackTrace();
-                }
-                return new SendResponse(true, 1000L);
+        eventSender.setEventNetSender(events -> {
+            try {
+                EventV3Protocol.EventV3List list1 = EventV3Protocol.EventV3List.parseFrom(events);
+                Truth.assertThat(list1.getValuesCount()).isEqualTo(2);
+                Truth.assertThat(list1.getValues(0).getEventName()).isEqualTo("cpacm");
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
             }
+            return new SendResponse(true, 1000L);
+        });
+        eventSender.cacheEvent(ce);
+        eventSender.cacheEvent(ce);
+        eventSender.sendEvents(false);
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void eventCacheTestJson() throws JSONException {
+        TrackerContext.get().getRegistry().register(EventDatabase.class, EventDbResult.class, new DatabaseDataLoader.Factory(application));
+        TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
+
+        CustomEvent ce = new CustomEvent.Builder()
+                .setEventName("cpacm").build();
+        eventSender.cacheEvent(ce);
+        eventSender.cacheEvent(ce);
+        eventSender.cacheEvent(ce);
+        EventDbResult dbResult = eventSender.getGEventsFromPolicy(ce.getSendPolicy());
+        String result = new String(dbResult.getData());
+        JSONArray jsonArray = new JSONArray(result);
+        Truth.assertThat(jsonArray.length()).isEqualTo(3);
+
+        eventSender.setEventNetSender(events -> {
+            try {
+                JSONArray array = new JSONArray(new String(events));
+                Truth.assertThat(array.length()).isEqualTo(2);
+
+                JSONObject obj1 = array.getJSONObject(0);
+                Truth.assertThat(obj1.opt("eventName")).isEqualTo("cpacm");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return new SendResponse(true, 1000L);
         });
         eventSender.cacheEvent(ce);
         eventSender.cacheEvent(ce);
