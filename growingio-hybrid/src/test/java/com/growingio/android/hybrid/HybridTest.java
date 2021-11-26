@@ -146,7 +146,7 @@ public class HybridTest {
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
         Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
 
-        webInterface.setNativeUserIdAndUserKey("cpacm","email");
+        webInterface.setNativeUserIdAndUserKey("cpacm", "email");
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
         Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("cpacm");
         Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("email");
