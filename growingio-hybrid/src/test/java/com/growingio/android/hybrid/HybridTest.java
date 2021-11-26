@@ -39,6 +39,7 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
 import com.growingio.android.sdk.track.modelloader.data.HybridDom;
 import com.growingio.android.sdk.track.modelloader.data.HybridJson;
+import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 import org.json.JSONObject;
 import org.junit.Before;
@@ -139,7 +140,22 @@ public class HybridTest {
         WebViewJavascriptBridgeConfiguration configuration = new WebViewJavascriptBridgeConfiguration("test", "test", "test", "test", 23);
         WebViewBridgeJavascriptInterface webInterface = new WebViewBridgeJavascriptInterface(configuration);
         webInterface.setNativeUserId("cpacm");
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("cpacm");
         webInterface.clearNativeUserId();
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
+
+        webInterface.setNativeUserIdAndUserKey("cpacm","email");
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("cpacm");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("email");
+
+        webInterface.clearNativeUserIdAndUserKey();
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("");
+
         String testJson = "{\"eventType\":\"LOGIN_USER_ATTRIBUTES\",\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
         webInterface.dispatchEvent(testJson);
         Truth.assertThat(webInterface.getConfiguration()).contains("23");
