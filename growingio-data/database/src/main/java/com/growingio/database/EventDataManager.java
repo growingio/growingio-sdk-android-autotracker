@@ -26,11 +26,15 @@ import android.database.sqlite.SQLiteFullException;
 import android.net.Uri;
 import android.os.RemoteException;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.EventDbResult;
+import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.middleware.GEvent;
+import com.growingio.android.sdk.track.modelloader.ModelLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.growingio.database.EventDataTable.COLUMN_DATA;
@@ -51,10 +55,20 @@ public class EventDataManager {
 
     EventDataManager(Context context) {
         this.context = context;
-        eventsInfoAuthority = context.getPackageName() + "." + EventDataContentProvider.class.getSimpleName();
+        eventsInfoAuthority = context.getPackageName() + "." + EventDataContentProvider.CONTENT_PROVIDER_NAME;
 
         DeprecatedEventSQLite deprecatedEventSQLite = new DeprecatedEventSQLite(context, this);
         deprecatedEventSQLite.migrateEvents();
+    }
+
+    private EventByteArray formatData(EventFormatData data) {
+        ModelLoader<EventFormatData, EventByteArray> modelLoader = TrackerContext.get().getRegistry().getModelLoader(EventFormatData.class, EventByteArray.class);
+        if (modelLoader == null) {
+            Logger.e(TAG, "please register eventformat component first");
+            return null;
+        }
+        ModelLoader.LoadData<EventByteArray> loadData = modelLoader.buildLoadData(data);
+        return loadData.fetcher.executeData();
     }
 
     int insertEvents(List<GEvent> events) {
@@ -75,8 +89,11 @@ public class EventDataManager {
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();
 
-            ContentValues contentValues = EventDataTable.putValues(EventProtocolTransfer.protocol(gEvent), gEvent.getEventType(), gEvent.getSendPolicy());
-            return contentResolver.insert(uri, contentValues);
+            EventByteArray data = formatData(EventFormatData.format(gEvent));
+            if (data != null && data.getBodyData() != null) {
+                ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), gEvent.getEventType(), gEvent.getSendPolicy());
+                return contentResolver.insert(uri, contentValues);
+            }
         } catch (SQLiteFullException e) {
             onDiskFull(e);
         } catch (Exception e) {
@@ -115,30 +132,32 @@ public class EventDataManager {
             return;
         }
         long lastId = -1;
-        EventV3Protocol.EventV3List.Builder eventBuilder = EventV3Protocol.EventV3List.newBuilder();
+        List<byte[]> queryList = new ArrayList<>();
         ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(eventsInfoAuthority);
         try (Cursor cursor = queryEvents(client, policy, limit)) {
             int count = 0;
             while (cursor.moveToNext()) {
                 count++;
-                String eventType = cursor.getString(cursor.getColumnIndex(COLUMN_EVENT_TYPE));
+                String eventType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EVENT_TYPE));
                 dbResult.setEventType(eventType);
                 if (cursor.isLast()) {
-                    lastId = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
+                    lastId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
                     dbResult.setLastId(lastId);
                 }
-                byte[] data = cursor.getBlob(cursor.getColumnIndex(COLUMN_DATA));
-                EventV3Protocol.EventV3Dto event = protocol(data);
-                if (event != null) {
-                    eventBuilder.addValues(event);
+                byte[] data = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DATA));
+                if (data != null) {
+                    queryList.add(data);
                 } else {
-                    long delId = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
+                    long delId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
                     removeEventById(client, delId);
                 }
             }
-            dbResult.setSum(count);
-            dbResult.setSuccess(true);
-            dbResult.setData(eventBuilder.build().toByteArray());
+            EventByteArray result = formatData(EventFormatData.merge(queryList));
+            if (result != null && result.getBodyData() != null) {
+                dbResult.setSum(count);
+                dbResult.setSuccess(true);
+                dbResult.setData(result.getBodyData());
+            }
         } catch (SQLiteFullException e) {
             dbResult.setSuccess(false);
             onDiskFull(e);
@@ -158,26 +177,28 @@ public class EventDataManager {
             dbResult.setSuccess(false);
             return;
         }
-        EventV3Protocol.EventV3List.Builder eventBuilder = EventV3Protocol.EventV3List.newBuilder();
         ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(eventsInfoAuthority);
+        List<byte[]> queryList = new ArrayList<>();
         try (Cursor cursor = queryEvents(client, policy, limit)) {
             int count = 0;
             while (cursor.moveToNext()) {
                 count++;
                 if (cursor.isLast()) {
-                    cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
+                    cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
                 }
-                byte[] data = cursor.getBlob(cursor.getColumnIndex(COLUMN_DATA));
-                EventV3Protocol.EventV3Dto event = protocol(data);
-                if (event != null) {
-                    eventBuilder.addValues(event);
+                byte[] data = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DATA));
+                if (data != null) {
+                    queryList.add(data);
                 }
-                long delId = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
+                long delId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
                 removeEventById(client, delId);
             }
-            dbResult.setSum(count);
-            dbResult.setSuccess(true);
-            dbResult.setData(eventBuilder.build().toByteArray());
+            EventByteArray result = formatData(EventFormatData.merge(queryList));
+            if (result != null && result.getBodyData() != null) {
+                dbResult.setSum(count);
+                dbResult.setSuccess(true);
+                dbResult.setData(result.getBodyData());
+            }
         } catch (SQLiteFullException e) {
             onDiskFull(e);
         } catch (Throwable t) {
@@ -230,7 +251,7 @@ public class EventDataManager {
             int sum = contentResolver.delete(uri,
                     COLUMN_ID + "<=? AND " + COLUMN_EVENT_TYPE + "=? AND " + COLUMN_POLICY + "=?",
                     new String[]{String.valueOf(lastId), eventType, String.valueOf(policy)});
-            Logger.d(TAG, "removeOverdueEvents: deleteNum: %d", sum);
+            Logger.d(TAG, "removeEvents: deleteNum: %d", sum);
             return sum;
         } catch (SQLiteFullException e) {
             onDiskFull(e);
@@ -239,15 +260,6 @@ public class EventDataManager {
             Logger.e(TAG, e, "removeEvents failed");
             return -1;
         }
-    }
-
-    private EventV3Protocol.EventV3Dto protocol(byte[] data) {
-        try {
-            return EventV3Protocol.EventV3Dto.parseFrom(data);
-        } catch (InvalidProtocolBufferException e) {
-            Logger.e(TAG, e, e.getMessage());
-        }
-        return null;
     }
 
     // 清库

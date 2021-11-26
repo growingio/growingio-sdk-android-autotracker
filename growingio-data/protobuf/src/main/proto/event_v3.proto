@@ -2,7 +2,7 @@ syntax = "proto3";
 
 
 package com.growingio.database;
-option java_package = "com.growingio.database";
+option java_package = "com.growingio.protobuf";
 option java_outer_classname = "EventV3Protocol";
 
 message EventV3Dto {

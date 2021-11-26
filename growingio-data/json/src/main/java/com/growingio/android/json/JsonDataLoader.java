@@ -16,8 +16,8 @@
 
 package com.growingio.android.json;
 
-import com.growingio.android.sdk.track.http.EventData;
-import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.middleware.format.EventFormatData;
+import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 
@@ -26,16 +26,16 @@ import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
  *
  * @author cpacm 2021/5/13
  */
-public class JsonDataLoader implements ModelLoader<EventData, EventStream> {
+public class JsonDataLoader implements ModelLoader<EventFormatData, EventByteArray> {
 
     @Override
-    public LoadData<EventStream> buildLoadData(EventData eventData) {
+    public LoadData<EventByteArray> buildLoadData(EventFormatData eventData) {
         return new LoadData<>(new JsonDataFetcher(eventData));
     }
 
-    public static class Factory implements ModelLoaderFactory<EventData, EventStream> {
+    public static class Factory implements ModelLoaderFactory<EventFormatData, EventByteArray> {
         @Override
-        public ModelLoader<EventData, EventStream> build() {
+        public ModelLoader<EventFormatData, EventByteArray> build() {
             return new JsonDataLoader();
         }
     }

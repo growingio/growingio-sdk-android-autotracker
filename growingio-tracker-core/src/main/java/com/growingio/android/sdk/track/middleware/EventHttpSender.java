@@ -79,7 +79,7 @@ public class EventHttpSender implements IEventNetSender {
         }
 
         ModelLoader.LoadData<EventResponse> loadData = getNetworkModelLoader().buildLoadData(eventUrl);
-        if (loadData.fetcher.getDataClass() != EventResponse.class) {
+        if (!loadData.fetcher.getDataClass().isAssignableFrom(EventResponse.class)) {
             Logger.e(TAG, new IllegalArgumentException("illegal data class for http response."));
             return new SendResponse(false, 0);
         }

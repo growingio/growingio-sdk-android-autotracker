@@ -26,7 +26,7 @@ import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
 import com.growingio.android.sdk.track.webservices.DeepLink;
@@ -102,7 +102,7 @@ public class DeepLinkProvider implements IActivityLifecycle {
                     params.put(parameterName, data.getQueryParameter(parameterName));
                 }
                 if (serviceType.equals(SERVICE_DEBUGGER_TYPE)) {
-                    TrackerContext.get().loadData(new Debugger(params), Debugger.class, WebService.class, new DataFetcher.DataCallback<WebService>() {
+                    TrackerContext.get().loadData(new Debugger(params), Debugger.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
                         @Override
                         public void onDataReady(WebService data) {
                             Logger.d(TAG, "start debugger success");
@@ -114,7 +114,7 @@ public class DeepLinkProvider implements IActivityLifecycle {
                         }
                     });
                 } else if (serviceType.equals(SERVICE_CIRCLE_TYPE)) {
-                    TrackerContext.get().loadData(new Circler(params), Circler.class, WebService.class, new DataFetcher.DataCallback<WebService>() {
+                    TrackerContext.get().loadData(new Circler(params), Circler.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
                         @Override
                         public void onDataReady(WebService data) {
                             Logger.d(TAG, "start circle choose success");
@@ -140,7 +140,7 @@ public class DeepLinkProvider implements IActivityLifecycle {
             for (String parameterName : data.getQueryParameterNames()) {
                 params.put(parameterName, data.getQueryParameter(parameterName));
             }
-            TrackerContext.get().loadData(new DeepLink(params), DeepLink.class, WebService.class, new DataFetcher.DataCallback<WebService>() {
+            TrackerContext.get().loadData(new DeepLink(params), DeepLink.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
                 @Override
                 public void onDataReady(WebService data) {
                     Logger.d(TAG, "open deep link.");

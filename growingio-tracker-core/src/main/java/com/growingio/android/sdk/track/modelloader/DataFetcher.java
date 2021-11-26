@@ -23,18 +23,7 @@ package com.growingio.android.sdk.track.modelloader;
  */
 public interface DataFetcher<T> {
 
-    interface DataCallback<T> {
-        void onDataReady(T data);
-
-        void onLoadFailed(Exception e);
-    }
-
-    void loadData(DataCallback<? super T> callback);
-
     T executeData();
-
-    void cleanup();
-    void cancel();
 
     Class<T> getDataClass();
 }

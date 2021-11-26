@@ -59,6 +59,7 @@ buildscript {
                         'debugger'        : "com.growingio.android:debugger:$releaseConfiguration.releaseVersion",
                         'circler'         : "com.growingio.android:circler:$releaseConfiguration.releaseVersion",
                         'json'            : "com.growingio.android:json:$releaseConfiguration.releaseVersion",
+                        'protobuf'        : "com.growingio.android:protobuf:$releaseConfiguration.releaseVersion",
                         'encoder'         : "com.growingio.android:encoder:$releaseConfiguration.releaseVersion",
                         'crash'           : "com.growingio.android:crash:$releaseConfiguration.releaseVersion",
                         'oaid'            : "com.growingio.android:oaid:$releaseConfiguration.releaseVersion",

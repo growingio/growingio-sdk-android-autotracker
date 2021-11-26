@@ -21,7 +21,7 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.track.http.EventResponse;
 import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * @author cpacm 2021/5/12
  */
-public class UrlConnectionFetcher implements DataFetcher<EventResponse> {
+public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
     private static final String TAG = "UrlConnectionFetcher";
 
     private static final int MAXIMUM_REDIRECTS = 2;

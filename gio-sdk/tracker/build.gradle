@@ -41,6 +41,9 @@ dependencies {
     debugApi project(':growingio-data:database')
     releaseApi libraries.growingio.database
 
+    debugApi project(':growingio-data:json')
+    releaseApi libraries.growingio.json
+
     debugApi project(':growingio-webservice:debugger')
     releaseApi libraries.growingio.debugger
 

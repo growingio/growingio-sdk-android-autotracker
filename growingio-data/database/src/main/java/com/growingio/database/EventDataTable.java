@@ -35,6 +35,7 @@ public class EventDataTable {
     public static final String COLUMN_EVENT_TYPE = "_event_type";
     public static final String COLUMN_POLICY = "_policy";
 
+
     private EventDataTable() {
     }
 
@@ -51,7 +52,7 @@ public class EventDataTable {
     public static final String DROP_TABLE_EVENTS = "DROP TABLE IF EXISTS " + TABLE_EVENTS + ";";
 
     public static Uri getContentUri() {
-        return Uri.parse("content://" + TrackerContext.get().getPackageName() + "." + EventDataContentProvider.class.getSimpleName() + File.separator + TABLE_EVENTS);
+        return Uri.parse("content://" + TrackerContext.get().getPackageName() + "." + EventDataContentProvider.CONTENT_PROVIDER_NAME + File.separator + TABLE_EVENTS);
     }
 
     public static ContentValues putValues(byte[] data, String eventType, Integer policy) {

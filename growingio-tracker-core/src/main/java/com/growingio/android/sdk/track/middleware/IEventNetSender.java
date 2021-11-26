@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.track.middleware;
 
-
 public interface IEventNetSender {
     SendResponse send(byte[] events);
 }

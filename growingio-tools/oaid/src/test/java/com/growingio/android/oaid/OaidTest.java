@@ -19,7 +19,6 @@ import android.content.Context;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.utils.OaidHelper;
@@ -43,19 +42,6 @@ public class OaidTest {
         module.registerComponents(context, trackerRegistry);
         trackerRegistry.register(OaidHelper.class, String.class, new OaidDataLoader.Factory(context));
         ModelLoader<OaidHelper, String> modelLoader = trackerRegistry.getModelLoader(OaidHelper.class, String.class);
-        modelLoader.buildLoadData(new OaidHelper()).fetcher.loadData(new DataFetcher.DataCallback<String>() {
-            @Override
-            public void onDataReady(String data) {
-                assertThat(data).isNull();
-            }
-
-            @Override
-            public void onLoadFailed(Exception e) {
-
-            }
-        });
-        modelLoader.buildLoadData(new OaidHelper()).fetcher.cleanup();
-        modelLoader.buildLoadData(new OaidHelper()).fetcher.cancel();
         assertThat(String.class).isEqualTo(modelLoader.buildLoadData(new OaidHelper()).fetcher.getDataClass());
 
     }

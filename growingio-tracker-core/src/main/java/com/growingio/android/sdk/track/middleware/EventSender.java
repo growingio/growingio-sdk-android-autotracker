@@ -34,9 +34,7 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static com.growingio.android.sdk.track.middleware.GEvent.SEND_POLICY_INSTANT;
 

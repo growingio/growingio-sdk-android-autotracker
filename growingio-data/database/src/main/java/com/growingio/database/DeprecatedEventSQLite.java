@@ -62,7 +62,7 @@ public class DeprecatedEventSQLite {
         }
     }
 
-    //超过10s后不再执行
+    //超过20s后不再执行
     public void migrateEvents() {
         long runningTime = System.currentTimeMillis();
         while (migrateEvent()) {
@@ -103,9 +103,9 @@ public class DeprecatedEventSQLite {
                     long lastId = 0;
                     while (cursor.moveToNext()) {
                         if (cursor.isLast()) {
-                            lastId = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
+                            lastId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
                         }
-                        byte[] data = cursor.getBlob(cursor.getColumnIndex(COLUMN_DATA));
+                        byte[] data = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DATA));
                         GEvent event = Serializer.unpack(data);
                         if (event != null) {
                             events.add(event);

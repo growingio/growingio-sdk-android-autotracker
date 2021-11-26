@@ -30,7 +30,7 @@ import com.growingio.android.sdk.autotrack.view.ViewUtil;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.async.UnsubscribedDisposable;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.data.HybridDom;
 import com.growingio.android.sdk.track.modelloader.data.HybridJson;
@@ -226,7 +226,8 @@ public class CircleScreenshot {
                 ModelLoader<HybridDom, HybridJson> modelLoader = ScreenshotProvider.get().getHybridModelLoader();
                 if (modelLoader == null) return false;
                 mWebViewCount.incrementAndGet();
-                modelLoader.buildLoadData(new HybridDom(viewNode.getView())).fetcher.loadData(new DataFetcher.DataCallback<HybridJson>() {
+                LoadDataFetcher<HybridJson> loadDataFetcher = (LoadDataFetcher<HybridJson>) modelLoader.buildLoadData(new HybridDom(viewNode.getView())).fetcher;
+                loadDataFetcher.loadData(new LoadDataFetcher.DataCallback<HybridJson>() {
                     @Override
                     public void onDataReady(HybridJson data) {
                         ViewElement.Builder elementBuilder = createViewElementBuilder(viewNode);
