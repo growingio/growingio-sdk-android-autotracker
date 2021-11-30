@@ -80,7 +80,7 @@ public class ProtobufDataFetcher implements FormatDataFetcher<EventByteArray> {
                 EventV3Protocol.EventV3Dto event = EventV3Protocol.EventV3Dto.parseFrom(data);
                 listBuilder.addValues(event);
             } catch (InvalidProtocolBufferException e) {
-                Logger.e(TAG, "Events in the database are not in the ProtbBuf format");
+                Logger.e(TAG, "Events in the database are not in the protobuf format");
             }
         }
         Logger.d(TAG, "----- merge pb data size:" + listBuilder.getValuesCount() + " ----");
