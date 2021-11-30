@@ -28,7 +28,7 @@ public class EventUrl {
     private final Map<String, String> mParams = new HashMap<>();
     private byte[] mBodyData;
     private final long mTime;
-    private String mMediaType = "application/protobuf"; //or "application/x-www-form-urlencoded" for data
+    private String mMediaType = "application/json"; //or "application/x-www-form-urlencoded" for data
 
     public EventUrl(String host, long time) {
         mHost = host;

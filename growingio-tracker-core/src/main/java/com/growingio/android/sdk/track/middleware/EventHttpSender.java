@@ -17,6 +17,7 @@
 package com.growingio.android.sdk.track.middleware;
 
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
@@ -51,7 +52,7 @@ public class EventHttpSender implements IEventNetSender {
     }
 
     @Override
-    public SendResponse send(byte[] events) {
+    public SendResponse send(byte[] events, String mediaType) {
         if (events == null || events.length == 0) {
             return new SendResponse(false, 0);
         }
@@ -59,24 +60,23 @@ public class EventHttpSender implements IEventNetSender {
             Logger.e(TAG, "please register http request component first");
             return new SendResponse(false, 0);
         }
-        byte[] data = events;
         long time = System.currentTimeMillis();
         EventUrl eventUrl = new EventUrl(mServerHost, time)
                 .addPath("v3")
                 .addPath("projects")
                 .addPath(mProjectId)
                 .addPath("collect")
-                .addParam("stm", String.valueOf(time));
-
-        eventUrl.setBodyData(data);
+                .addParam("stm", String.valueOf(time))
+                .setBodyData(events);
+        if (!TextUtils.isEmpty(mediaType)) eventUrl.setMediaType(mediaType);
         //data encoder - https://codes.growingio.com/w/api_v3_interface/
         EventEncoder encoder = TrackerContext.get().executeData(new EventEncoder(eventUrl), EventEncoder.class, EventEncoder.class);
         if (encoder != null) {
             eventUrl = encoder.getEventUrl();
-            data = eventUrl.getRequestBody();
-        } else {
-            eventUrl.setBodyData(data);
         }
+
+        byte[] data = eventUrl.getRequestBody();
+
 
         ModelLoader.LoadData<EventResponse> loadData = getNetworkModelLoader().buildLoadData(eventUrl);
         if (!loadData.fetcher.getDataClass().isAssignableFrom(EventResponse.class)) {

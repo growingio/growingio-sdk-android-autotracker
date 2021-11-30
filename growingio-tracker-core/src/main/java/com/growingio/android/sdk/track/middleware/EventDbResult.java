@@ -27,6 +27,7 @@ public class EventDbResult {
     private int sum;
     private byte[] data;
     private String eventType;
+    private String mediaType;
 
     public EventDbResult(boolean success) {
         this.success = success;
@@ -73,5 +74,13 @@ public class EventDbResult {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
     }
 }

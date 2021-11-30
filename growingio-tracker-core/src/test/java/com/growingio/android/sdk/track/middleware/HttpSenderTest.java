@@ -64,9 +64,9 @@ public class HttpSenderTest {
 
     @Test
     public void sendTest() throws IOException {
-        Truth.assertThat(eventHttpSender.send(null).isSucceeded()).isFalse();
+        Truth.assertThat(eventHttpSender.send(null, null).isSucceeded()).isFalse();
         GEvent gEvent = new CustomEvent.Builder().build();
-        Truth.assertThat(eventHttpSender.send(Serializer.objectSerialize(gEvent)).isSucceeded()).isFalse();
+        Truth.assertThat(eventHttpSender.send(Serializer.objectSerialize(gEvent), "").isSucceeded()).isFalse();
         TrackerContext.get().getRegistry()
                 .register(EventUrl.class, EventResponse.class, new TestModelFactory<>(new EventResponse(true)));
 
@@ -79,7 +79,7 @@ public class HttpSenderTest {
                 .setBodyData("cpacm".getBytes());
         TrackerContext.get().getRegistry()
                 .register(EventEncoder.class, EventEncoder.class, new TestModelFactory<>(new EventEncoder(eventUrl)));
-        SendResponse response = eventHttpSender.send(Serializer.objectSerialize(gEvent));
+        SendResponse response = eventHttpSender.send(Serializer.objectSerialize(gEvent), "");
         Truth.assertThat(response.getUsedBytes()).isEqualTo("cpacm".getBytes().length);
 
     }

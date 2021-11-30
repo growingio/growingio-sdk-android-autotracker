@@ -219,7 +219,7 @@ public class EventSender {
                 }
                 EventDbResult dbResult = databaseOperation(EventDatabase.query(policy, numOfMaxEventsPerRequest()));
                 if (dbResult.isSuccess() && dbResult.getSum() > 0) {
-                    SendResponse sendResponse = mEventNetSender.send(dbResult.getData());
+                    SendResponse sendResponse = mEventNetSender.send(dbResult.getData(), dbResult.getMediaType());
                     succeeded = sendResponse.isSucceeded();
                     if (succeeded) {
                         String eventType = dbResult.getEventType();
