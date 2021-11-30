@@ -97,6 +97,8 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
                         sb.append(",");
                     }
                 }
+            } else {
+                Logger.e(TAG, "Events in the database are not in the JSON format");
             }
         }
         sb.append("]");
