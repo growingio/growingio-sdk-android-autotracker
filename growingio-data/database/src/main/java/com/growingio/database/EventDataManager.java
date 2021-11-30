@@ -157,6 +157,7 @@ public class EventDataManager {
                 dbResult.setSum(count);
                 dbResult.setSuccess(true);
                 dbResult.setData(result.getBodyData());
+                dbResult.setMediaType(result.getMediaType());
             }
         } catch (SQLiteFullException e) {
             dbResult.setSuccess(false);
@@ -198,6 +199,7 @@ public class EventDataManager {
                 dbResult.setSum(count);
                 dbResult.setSuccess(true);
                 dbResult.setData(result.getBodyData());
+                dbResult.setMediaType(result.getMediaType());
             }
         } catch (SQLiteFullException e) {
             onDiskFull(e);
