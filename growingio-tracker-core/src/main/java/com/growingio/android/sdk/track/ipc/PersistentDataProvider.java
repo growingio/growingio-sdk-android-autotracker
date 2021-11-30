@@ -236,13 +236,12 @@ public class PersistentDataProvider {
 
         try {
             java.lang.Process process = Runtime.getRuntime().exec(cmd);
+            BufferedReader bis = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-            // 使用另一个进程处理，防止程序执行时被挂起
+            // 使用另一个线程处理，防止程序执行时被挂起
             new Thread(() -> {
                 try {
-                    BufferedReader bis = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     String line;
-
                     while ((line = bis.readLine()) != null) {
                         // 处理命令获取到的字符串，去除尾部空格，合并多个空格，再进行拆分
                         String[] s = line.trim().replaceAll(" +", " ").split(" ");
@@ -251,11 +250,23 @@ public class PersistentDataProvider {
                             myRunningProcess.add(Integer.parseInt(s[1]));
                         }
                     }
-                    // 关闭子进程输入流
-                    bis.close();
-                    process.getInputStream().close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    // 关闭子进程输入流
+                    try {
+                        bis.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (process.getInputStream() != null) {
+                        try {
+                            process.getInputStream().close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
             }).start();
