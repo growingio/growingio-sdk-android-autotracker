@@ -22,7 +22,6 @@ import android.content.pm.ProviderInfo;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.growingio.android.json.JsonDataLoader;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
@@ -85,7 +84,7 @@ public class DbTest {
     }
 
     @Test
-    public void dataModuleTest() throws InvalidProtocolBufferException {
+    public void dataModuleTest(){
         TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
         DatabaseLibraryModule module = new DatabaseLibraryModule();
         TrackerRegistry trackerRegistry = new TrackerRegistry();

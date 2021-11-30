@@ -92,7 +92,7 @@ public class EventDataManager {
             EventByteArray data = formatData(EventFormatData.format(gEvent));
             if (data != null && data.getBodyData() != null) {
                 ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), gEvent.getEventType(), gEvent.getSendPolicy());
-                //GioDatabase.insert(gEvent, insert);
+                //GioDatabase.insert(insert, gEvent);
                 return contentResolver.insert(uri, contentValues);
             }
         } catch (SQLiteFullException e) {
