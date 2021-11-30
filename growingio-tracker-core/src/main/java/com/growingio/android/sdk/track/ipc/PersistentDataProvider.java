@@ -28,6 +28,9 @@ import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -198,6 +201,16 @@ public class PersistentDataProvider {
     }
 
     private Set<Integer> getRunningProcess(Context context) {
+        Set<Integer> myRunningProcess = getPidByCmd();
+
+        // 如果通过命令行无法获取到pid，则使用系统服务获取
+        if (myRunningProcess.isEmpty()) {
+            return getPidBySystemService(context);
+        }
+        return myRunningProcess;
+    }
+
+    private Set<Integer> getPidBySystemService(Context context) {
         Set<Integer> myRunningProcess = new HashSet<>();
         try {
             ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -214,4 +227,46 @@ public class PersistentDataProvider {
         }
         return myRunningProcess;
     }
+
+    private Set<Integer> getPidByCmd() {
+        Set<Integer> myRunningProcess = new HashSet<>();
+
+        String uidName = "u0_a" + (Process.myUid() % 10000);
+        String cmd = "ps";
+
+        try {
+            java.lang.Process process = Runtime.getRuntime().exec(cmd);
+
+            // 使用另一个进程处理，防止程序执行时被挂起
+            new Thread(() -> {
+                try {
+                    BufferedReader bis = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String line;
+
+                    while ((line = bis.readLine()) != null) {
+                        // 处理命令获取到的字符串，去除尾部空格，合并多个空格，再进行拆分
+                        String[] s = line.trim().replaceAll(" +", " ").split(" ");
+                        // 判断进程pid是否需要添加，首先需要uid名称相同，然后因为会启动ps进程，需要根据进程NAME排除
+                        if (uidName.equals(s[0]) && !cmd.equals(s[s.length - 1])) {
+                            myRunningProcess.add(Integer.parseInt(s[1]));
+                        }
+                    }
+                    // 关闭子进程输入流
+                    bis.close();
+                    process.getInputStream().close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }).start();
+
+            //使用 waitFor() 等待命令执行结束
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return myRunningProcess;
+    }
+
 }
