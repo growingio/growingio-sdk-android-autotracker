@@ -45,6 +45,9 @@ import java.util.Locale;
 import java.util.Map;
 
 public abstract class BaseEvent extends GEvent {
+
+    private static final long serialVersionUID = -6563998911329703050L;
+
     private static final String APP_STATE_FOREGROUND = "FOREGROUND";
     private static final String APP_STATE_BACKGROUND = "BACKGROUND";
 
