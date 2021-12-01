@@ -21,6 +21,7 @@ import android.content.ContextWrapper;
 
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
@@ -72,10 +73,13 @@ public class TrackerContext extends ContextWrapper {
         return null;
     }
 
-    public <Model, Data> void loadData(Model model, Class<Model> modelClass, Class<Data> dataClass, DataFetcher.DataCallback<Data> callback) {
+    public <Model, Data> void loadData(Model model, Class<Model> modelClass, Class<Data> dataClass, LoadDataFetcher.DataCallback<Data> callback) {
         ModelLoader<Model, Data> modelLoader = getRegistry().getModelLoader(modelClass, dataClass);
         if (modelLoader != null) {
-            modelLoader.buildLoadData(model).fetcher.loadData(callback);
+            DataFetcher<Data> fetcher = modelLoader.buildLoadData(model).fetcher;
+            if (fetcher instanceof LoadDataFetcher) {
+                ((LoadDataFetcher<Data>) fetcher).loadData(callback);
+            }
         } else {
             callback.onLoadFailed(new NullPointerException(String.format("please register %s component first", modelClass.getSimpleName())));
         }

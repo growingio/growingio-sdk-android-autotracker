@@ -22,9 +22,8 @@ import android.text.TextUtils;
 import androidx.annotation.CallSuper;
 
 import com.growingio.android.sdk.Tracker;
-import com.growingio.android.sdk.track.cdp.CdpEventBuildInterceptor;
-import com.growingio.android.sdk.track.cdp.ResourceItem;
-import com.growingio.android.sdk.track.cdp.ResourceItemCustomEvent;
+import com.growingio.android.sdk.track.events.cdp.ResourceItem;
+import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 

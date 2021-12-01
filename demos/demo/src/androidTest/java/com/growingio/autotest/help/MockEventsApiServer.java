@@ -22,7 +22,6 @@ import android.text.TextUtils;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
-import com.growingio.android.hybrid.event.HybridEventType;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
@@ -197,7 +196,7 @@ public class MockEventsApiServer extends MockServer {
                         mOnReceivedEventListener.onReceivedPageAttributesEvents(jsonArray);
                     }
                     break;
-                case HybridEventType.FORM_SUBMIT:
+                case TrackEventType.FORM_SUBMIT:
                     if (mOnReceivedEventListener != null) {
                         mOnReceivedEventListener.onReceivedHybridFormSubmitEvents(jsonArray);
                     }

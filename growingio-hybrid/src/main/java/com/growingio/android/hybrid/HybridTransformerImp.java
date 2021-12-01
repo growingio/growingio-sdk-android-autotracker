@@ -20,11 +20,10 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.text.TextUtils;
 
-import com.growingio.android.hybrid.event.HybridCustomEvent;
-import com.growingio.android.hybrid.event.HybridEventType;
-import com.growingio.android.hybrid.event.HybridPageAttributesEvent;
-import com.growingio.android.hybrid.event.HybridPageEvent;
-import com.growingio.android.hybrid.event.HybridViewElementEvent;
+import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
+import com.growingio.android.sdk.track.events.hybrid.HybridPageAttributesEvent;
+import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
+import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.ConversionVariablesEvent;
 import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
@@ -97,7 +96,7 @@ public class HybridTransformerImp implements HybridTransformer {
                 return transformViewElementEventBuilder(eventJson)
                         .setEventType(type);
 
-            } else if (HybridEventType.FORM_SUBMIT.equals(type)) {
+            } else if (TrackEventType.FORM_SUBMIT.equals(type)) {
                 return transformViewElementEventBuilder(eventJson)
                         .setEventType(type);
 

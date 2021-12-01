@@ -21,7 +21,8 @@ import android.util.Log;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.http.EventResponse;
 import com.growingio.android.sdk.track.http.EventUrl;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
+import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
@@ -115,9 +116,9 @@ public class Okhttp3Test extends MockServer {
         Truth.assertThat(response.getStream()).isInstanceOf(InputStream.class);
         Truth.assertThat(response.getUsedBytes()).isEqualTo(0L);
 
-        DataFetcher<EventResponse> dataFetcher = modelLoader.buildLoadData(eventUrl).fetcher;
+        HttpDataFetcher<EventResponse> dataFetcher = (HttpDataFetcher<EventResponse>) modelLoader.buildLoadData(eventUrl).fetcher;
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventResponse.class);
-        dataFetcher.loadData(new DataFetcher.DataCallback<EventResponse>() {
+        dataFetcher.loadData(new LoadDataFetcher.DataCallback<EventResponse>() {
             @Override
             public void onDataReady(EventResponse response) {
                 assertThat(response.isSucceeded()).isTrue();

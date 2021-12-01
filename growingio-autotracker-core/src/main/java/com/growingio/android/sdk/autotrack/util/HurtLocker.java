@@ -25,6 +25,12 @@ import java.util.Set;
 
 /**
  * 该class通过一些技术手段绕过了Android 9 及其以后版本的 "针对非 SDK 接口的限制"，请谨慎使用
+ * 经测试，已在Android 11 以上失效。
+ *
+ * 如需允许访问非 SDK 接口，请使用以下 adb 命令：
+ * adb shell settings put global hidden_api_policy  1
+ * 如需将 API 强制执行策略重置为默认设置，请使用以下命令：
+ * adb shell settings delete global hidden_api_policy
  */
 public class HurtLocker {
     private HurtLocker() {

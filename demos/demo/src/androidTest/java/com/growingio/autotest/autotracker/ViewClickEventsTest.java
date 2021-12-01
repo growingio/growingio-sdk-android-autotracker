@@ -641,12 +641,16 @@ public class ViewClickEventsTest extends EventsTest {
 
     @Test
     public void noTitleAlertDialogClickEventTest() {
+        String xpath = "/AlertDialog/这是一个没有标题的AlertDialog/BUTTON_NEGATIVE";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            xpath = "/AlertDialog/BUTTON_NEGATIVE";
+        }
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPath("/DialogTestActivity")
-                        .setXpath("/AlertDialog/这是一个没有标题的AlertDialog/BUTTON_NEGATIVE")
+                        .setXpath(xpath)
                         .setTextValue("Cancel")
                         .setIndex(-1)
                         .build()

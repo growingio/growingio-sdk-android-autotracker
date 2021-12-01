@@ -19,12 +19,12 @@ package com.growingio.android.json;
 import android.os.Build;
 
 import com.growingio.android.sdk.track.events.base.BaseEvent;
-import com.growingio.android.sdk.track.http.EventData;
-import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.format.EventFormatData;
+import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.GEvent;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.middleware.format.FormatDataFetcher;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -35,60 +35,83 @@ import java.util.List;
  *
  * @author cpacm 2021/5/13
  */
-public class JsonDataFetcher implements DataFetcher<EventStream> {
+public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
     private static final String TAG = "JsonDataFetcher";
 
-    private final EventData eventData;
+    private final EventFormatData eventData;
 
-    public JsonDataFetcher(EventData eventData) {
+    public JsonDataFetcher(EventFormatData eventData) {
         this.eventData = eventData;
     }
 
-
     @Override
-    public void loadData(DataCallback<? super EventStream> callback) {
+    public EventByteArray executeData() {
         try {
-            callback.onDataReady(executeData());
-        } catch (Exception e) {
-            callback.onLoadFailed(e);
+            if (eventData.getEventOp() == EventFormatData.DATA_FORMAT_EVENT) {
+                assertCondition(eventData.getEvent() != null, "leak necessary event");
+                return format(eventData.getEvent());
+            } else if (eventData.getEventOp() == EventFormatData.DATA_FORMAT_MERGE) {
+                assertCondition(eventData.getEvents() != null, "leak necessary events");
+                return merge(eventData.getEvents());
+            }
+            return new EventByteArray(null);
+        } catch (IllegalArgumentException e) {
+            Logger.e(TAG, e);
+            return new EventByteArray(null);
         }
     }
 
     @Override
-    public EventStream executeData() {
-        byte[] data = marshall(eventData.getEvents());
-        return new EventStream(data, "application/json");
+    public EventByteArray format(GEvent gEvent) {
+        if (gEvent instanceof BaseEvent) {
+            JSONObject eventJson = ((BaseEvent) gEvent).toJSONObject();
+            return new EventByteArray(eventJson.toString().getBytes(), "application/json");
+        }
+        return new EventByteArray(null);
     }
 
-    public byte[] marshall(List<GEvent> events) {
-        if (events == null || events.isEmpty()) {
-            return null;
+    @Override
+    public EventByteArray merge(List<byte[]> events) {
+        String data = marshall(events);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return new EventByteArray(data.getBytes(StandardCharsets.UTF_8), "application/json");
+        } else {
+            return new EventByteArray(data.getBytes(), "application/json");
         }
-        JSONArray jsonArray = new JSONArray();
-        for (GEvent event : events) {
-            if (event instanceof BaseEvent) {
-                JSONObject eventJson = ((BaseEvent) event).toJSONObject();
-                jsonArray.put(eventJson);
+    }
+
+    private String marshall(List<byte[]> events) {
+        if (events == null || events.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder("[");
+        int length = events.size();
+        Logger.d(TAG, "----- merge json data size:" + length + " ----");
+        for (byte[] data : events) {
+            length -= 1;
+            if (data.length > 0) {
+                String event = new String(data);
+                if (event.startsWith("{") && event.endsWith("}")) { //ensure json format
+                    sb.append(event);
+                    if (length > 0) {
+                        sb.append(",");
+                    }
+                }
+            } else {
+                Logger.e(TAG, "Events in the database are not in the JSON format");
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return jsonArray.toString().getBytes(StandardCharsets.UTF_8);
-        } else {
-            return jsonArray.toString().getBytes();
-        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private void assertCondition(boolean condition, String msg) throws IllegalArgumentException {
+        if (!condition) throw new IllegalArgumentException(msg);
     }
 
     @Override
-    public void cleanup() {
-    }
-
-    @Override
-    public void cancel() {
-    }
-
-    @Override
-    public Class<EventStream> getDataClass() {
-        return EventStream.class;
+    public Class<EventByteArray> getDataClass() {
+        return EventByteArray.class;
     }
 
 }

@@ -25,9 +25,8 @@ import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.cdp.CdpEventBuildInterceptor;
-import com.growingio.android.sdk.track.cdp.ResourceItem;
-import com.growingio.android.sdk.track.cdp.ResourceItemCustomEvent;
+import com.growingio.android.sdk.track.events.cdp.ResourceItem;
+import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -58,7 +57,17 @@ public class CdpTest {
         TrackerContext.init(application);
         Tracker tracker = new Tracker(application);
         tracker.setLoginUserId("cpacm");
-        TrackMainThread.trackMain().addEventBuildInterceptor(new CdpEventBuildInterceptor("12345"));
+        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
+            @Override
+            public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
+                eventBuilder.addExtraParam("dataSourceId", "12345");
+            }
+
+            @Override
+            public void eventDidBuild(GEvent event) {
+
+            }
+        });
     }
 
     @Test

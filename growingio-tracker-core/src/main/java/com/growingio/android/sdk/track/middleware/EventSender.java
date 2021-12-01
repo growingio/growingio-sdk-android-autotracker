@@ -27,14 +27,14 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.ProcessLock;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static com.growingio.android.sdk.track.middleware.GEvent.SEND_POLICY_INSTANT;
 
@@ -49,7 +49,6 @@ public class EventSender {
     private static final int EVENTS_BULK_SIZE = 100;
 
     private final Context mContext;
-    private final EventsSQLite mEventsSQLite;
     private IEventNetSender mEventNetSender;
     private final SharedPreferences mSharedPreferences;
     private final SendHandler mSendHandler;
@@ -72,13 +71,26 @@ public class EventSender {
         mContext = context;
         mCellularDataLimit = cellularDataLimit * 1024L * 1024L;
         mDataUploadInterval = dataUploadInterval * 1000L;
-        mEventsSQLite = new EventsSQLite(context);
         mEventNetSender = sender;
         mProcessLock = new ProcessLock(context, EventSender.class.getName());
         mSharedPreferences = context.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
         HandlerThread thread = new HandlerThread(EventSender.class.getName());
         thread.start();
         mSendHandler = new SendHandler(thread.getLooper());
+    }
+
+    private ModelLoader<EventDatabase, EventDbResult> getDatabaseModelLoader() {
+        return TrackerContext.get().getRegistry().getModelLoader(EventDatabase.class, EventDbResult.class);
+    }
+
+    private EventDbResult databaseOperation(EventDatabase eventDatabase) {
+        ModelLoader<EventDatabase, EventDbResult> modelLoader = getDatabaseModelLoader();
+        if (modelLoader == null) {
+            Logger.e(TAG, "please register database component first");
+            return new EventDbResult(false);
+        }
+        ModelLoader.LoadData<EventDbResult> loadData = modelLoader.buildLoadData(eventDatabase);
+        return loadData.fetcher.executeData();
     }
 
     /**
@@ -90,11 +102,11 @@ public class EventSender {
     }
 
     public void cacheEvent(GEvent event) {
-        mEventsSQLite.insertEvent(event);
+        databaseOperation(EventDatabase.insert(event));
     }
 
     public void sendEvent(GEvent event) {
-        mEventsSQLite.insertEvent(event);
+        databaseOperation(EventDatabase.insert(event));
         if (event.getSendPolicy() == SEND_POLICY_INSTANT) {
             mSendHandler.uploadInstantEvents();
         } else {
@@ -113,7 +125,7 @@ public class EventSender {
 
     void removeAllEvents() {
         Logger.d(TAG, "action: removeAllEvents");
-        mEventsSQLite.removeAllEvents();
+        databaseOperation(EventDatabase.clear());
     }
 
     /**
@@ -150,7 +162,7 @@ public class EventSender {
 
     public void removeOverdueEvents() {
         try {
-            mEventsSQLite.removeOverdueEvents();
+            databaseOperation(EventDatabase.outDated());
         } catch (Exception e) {
             Logger.d(TAG, "action: removeOverdueEvents,failed");
         }
@@ -205,14 +217,13 @@ public class EventSender {
                     Logger.e(TAG, "Today's mobile data is exhausted");
                     break;
                 }
-                List<GEvent> resultEvents = new ArrayList<>();
-                long lastId = mEventsSQLite.queryEvents(policy, numOfMaxEventsPerRequest(), resultEvents);
-                if (!resultEvents.isEmpty()) {
-                    SendResponse sendResponse = mEventNetSender.send(resultEvents);
+                EventDbResult dbResult = databaseOperation(EventDatabase.query(policy, numOfMaxEventsPerRequest()));
+                if (dbResult.isSuccess() && dbResult.getSum() > 0) {
+                    SendResponse sendResponse = mEventNetSender.send(dbResult.getData(), dbResult.getMediaType());
                     succeeded = sendResponse.isSucceeded();
                     if (succeeded) {
-                        String eventType = resultEvents.get(0).getEventType();
-                        mEventsSQLite.removeEvents(lastId, policy, eventType);
+                        String eventType = dbResult.getEventType();
+                        databaseOperation(EventDatabase.delete(dbResult.getLastId(), policy, eventType));
                         if (networkState.isMobileData()) {
                             todayBytes(sendResponse.getUsedBytes());
                         }
@@ -222,8 +233,6 @@ public class EventSender {
                 }
             } while (succeeded);
         }
-
-        //mProcessLock.release();
     }
 
 
@@ -231,10 +240,8 @@ public class EventSender {
      * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
      * if you want modify it,please check adsdk first
      */
-    public List<GEvent> getGEventsFromPolicy(int policy) {
-        List<GEvent> resultEvents = new ArrayList<>();
-        long lastId = mEventsSQLite.queryEventsAndDelete(policy, numOfMaxEventsPerRequest(), resultEvents);
-        return resultEvents;
+    public EventDbResult getGEventsFromPolicy(int policy) {
+        return databaseOperation(EventDatabase.queryAndDelete(policy, numOfMaxEventsPerRequest()));
     }
 
     // 由于数据发送是耗时操作，网络端更有可能被block，所以这里另起一个线程处理

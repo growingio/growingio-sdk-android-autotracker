@@ -19,7 +19,7 @@ package com.growingio.android.sdk.track.providers;
 import android.app.Activity;
 
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.data.PersistentDataProvider;
+import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;

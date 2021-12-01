@@ -79,19 +79,19 @@ public final class VisitEvent extends BaseEvent {
     }
 
     public String getImei() {
-        return mImei;
+        return checkValueSafe(mImei);
     }
 
     public String getAndroidId() {
-        return mAndroidId;
+        return checkValueSafe(mAndroidId);
     }
 
     public String getOaid() {
-        return mOaid;
+        return checkValueSafe(mOaid);
     }
 
     public String getGoogleAdvertisingId() {
-        return mGoogleAdvertisingId;
+        return checkValueSafe(mGoogleAdvertisingId);
     }
 
     public Map<String, String> getExtraSdk() {
