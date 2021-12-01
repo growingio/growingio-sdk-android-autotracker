@@ -84,7 +84,7 @@ public class DbTest {
     }
 
     @Test
-    public void dataModuleTest(){
+    public void dataModuleTest() {
         TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
         DatabaseLibraryModule module = new DatabaseLibraryModule();
         TrackerRegistry trackerRegistry = new TrackerRegistry();
