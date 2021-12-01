@@ -67,7 +67,7 @@ public class EventSenderTest {
 
     @Test
     public void eventSendTest() {
-        eventSender.setEventNetSender(events -> {
+        eventSender.setEventNetSender((events, mediaType) -> {
             try {
                 EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(events);
                 Truth.assertThat(list.getSerializedSize()).isEqualTo(1);
@@ -99,7 +99,7 @@ public class EventSenderTest {
         EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(dbResult.getData());
         Truth.assertThat(list.getValuesCount()).isEqualTo(3);
 
-        eventSender.setEventNetSender(events -> {
+        eventSender.setEventNetSender((events, mediaType) -> {
             try {
                 EventV3Protocol.EventV3List list1 = EventV3Protocol.EventV3List.parseFrom(events);
                 Truth.assertThat(list1.getValuesCount()).isEqualTo(2);
@@ -130,7 +130,7 @@ public class EventSenderTest {
         JSONArray jsonArray = new JSONArray(result);
         Truth.assertThat(jsonArray.length()).isEqualTo(3);
 
-        eventSender.setEventNetSender(events -> {
+        eventSender.setEventNetSender((events, mediaType) -> {
             try {
                 JSONArray array = new JSONArray(new String(events));
                 Truth.assertThat(array.length()).isEqualTo(2);
