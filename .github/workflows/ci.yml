@@ -35,9 +35,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-#      - name: Set NDK path
-#        run: |
-#          echo "ndk.dir=$ANDROID_NDK_HOME" >> local.properties
+      - name: Set NDK path
+        run: |
+          echo "ndk.dir=$ANDROID_NDK_HOME" >> local.properties
 
       - name: Before script
         run: |
