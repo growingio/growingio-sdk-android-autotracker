@@ -18,6 +18,7 @@ package com.growingio.android.circler.screenshot;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -35,6 +36,8 @@ import com.growingio.android.sdk.track.view.ScreenshotUtil;
 import com.growingio.android.sdk.track.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.track.view.WindowHelper;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
+
+import com.growingio.android.circler.screenshot.GrowingFlutterPlugin;
 
 import java.io.IOException;
 import java.util.List;
@@ -104,7 +107,13 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
         topView.post(() -> {
             try {
-                String screenshotBase64 = ScreenshotUtil.getScreenshotBase64(mScale);
+                String screenshotBase64;
+                byte[] bitmapBytes = GrowingFlutterPlugin.getInstance().getSrceenshotBytes();
+                if (bitmapBytes != null && bitmapBytes.length > 0) {
+                    screenshotBase64 = "data:image/jpeg;base64," + Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
+                } else {
+                    screenshotBase64 = ScreenshotUtil.getScreenshotBase64(mScale);
+                }
                 sendScreenshotRefreshed(screenshotBase64, mScale);
             } catch (IOException e) {
                 Logger.e(TAG, e);

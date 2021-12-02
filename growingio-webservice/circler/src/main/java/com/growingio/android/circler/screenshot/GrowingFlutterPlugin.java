@@ -33,8 +33,19 @@ public class GrowingFlutterPlugin {
         return Instance;
     }
     public Boolean isStart;
+    private byte[] bitmapBytes;
     private OnNativeListener mlistener;
     private Map<String, Object> flutterData;
+
+    public byte[] getSrceenshotBytes() {
+        byte[] copyBytes = bitmapBytes;
+        bitmapBytes = null;
+        return copyBytes;
+    }
+
+    public void setSrceenshotBytes(byte[] bitmapBytes) {
+        this.bitmapBytes = bitmapBytes;
+    }
 
     public interface OnNativeListener {
         void onNativeCircleStart();
