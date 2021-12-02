@@ -20,8 +20,11 @@ import android.content.Context;
 
 import androidx.test.core.app.ApplicationProvider;
 
+import com.google.common.truth.Truth;
 import com.growingio.android.sdk.monitor.event.EventBuilder;
+import com.growingio.android.sdk.track.log.CacheLogger;
 import com.growingio.android.sdk.track.log.Crash;
+import com.growingio.android.sdk.track.log.LogItem;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
@@ -32,6 +35,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.google.common.truth.Truth.assertThat;
+
+import java.util.List;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -70,6 +75,15 @@ public class CrashTest {
         Logger.e("CrashTest", "crash[e]");
         Logger.wtf("CrashTest", "crash[wtf]");
 
+        CacheLogger cacheLogger = (CacheLogger) Logger.getLogger("CacheLogger");
+        Truth.assertThat(cacheLogger).isNotNull();
+        List<LogItem> logItemList =  cacheLogger.getCacheLogsAndClear();
+        Truth.assertThat(logItemList.get(0).getMessage()).isEqualTo("crash[i]");
+        Truth.assertThat(logItemList.get(1).getMessage()).isEqualTo("crash[w]");
+        Truth.assertThat(logItemList.get(2).getMessage()).isEqualTo("crash[v]");
+        Truth.assertThat(logItemList.get(3).getMessage()).isEqualTo("crash[d]");
+        Truth.assertThat(logItemList.get(4).getMessage()).isEqualTo("crash[e]");
+        Truth.assertThat(logItemList.get(5).getMessage()).isEqualTo("crash[wtf]");
     }
 
 }

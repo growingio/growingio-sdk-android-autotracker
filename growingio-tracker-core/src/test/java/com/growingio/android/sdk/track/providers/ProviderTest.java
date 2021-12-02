@@ -15,6 +15,7 @@
  */
 package com.growingio.android.sdk.track.providers;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.net.Uri;
@@ -118,20 +119,26 @@ public class ProviderTest {
 
         //debugger
         Intent intent = new Intent();
-        intent.setData(Uri.parse("UNKNOWN://growingio/webservice?serviceType=debugger"));
-        Robolectric.buildActivity(RobolectricActivity.class, intent).create().get();
+        String debuggerUri = "UNKNOWN://growingio/webservice?serviceType=debugger";
+        intent.setData(Uri.parse(debuggerUri));
+        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class, intent).create().get();
+        Truth.assertThat(activity.getIntent().getData().toString()).isEqualTo(debuggerUri);
         Robolectric.flushForegroundThreadScheduler();
 
         //circler
         Intent intent2 = new Intent();
-        intent2.setData(Uri.parse("UNKNOWN://growingio/webservice?serviceType=circle"));
-        Robolectric.buildActivity(RobolectricActivity.class, intent2).create().get();
+        String circlerUri = "UNKNOWN://growingio/webservice?serviceType=circle";
+        intent2.setData(Uri.parse(circlerUri));
+        Activity activity2 = Robolectric.buildActivity(RobolectricActivity.class, intent2).create().get();
+        Truth.assertThat(activity2.getIntent().getData().toString()).isEqualTo(circlerUri);
         Robolectric.flushForegroundThreadScheduler();
 
         //deeplink
         Intent intent3 = new Intent();
-        intent3.setData(Uri.parse("UNKNOWN://growingio/deeplink?name=cpacm"));
-        Robolectric.buildActivity(RobolectricActivity.class, intent3).create().get();
+        String deeplinkUri = "UNKNOWN://growingio/deeplink?name=cpacm";
+        intent3.setData(Uri.parse(deeplinkUri));
+        RobolectricActivity activity3 = Robolectric.buildActivity(RobolectricActivity.class, intent3).create().get();
+        Truth.assertThat(activity3.getIntent().getData().toString()).isEqualTo(deeplinkUri);
         Robolectric.flushForegroundThreadScheduler();
 
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);

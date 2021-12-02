@@ -90,8 +90,14 @@ public class IpcTest {
         MultiProcessDataSharer dataSharer = new MultiProcessDataSharer(application, "npe", 100);
         dataSharer.putLong("APP_CLOSED", 10L);
         dataSharer.putInt("APP_OPENED", 10);
-        System.out.println(dataSharer.getAndIncrementLong("APP_CLOSED", 0L));
-        System.out.println(dataSharer.getAndIncrementInt("APP_OPENED", 9));
-        System.out.println(dataSharer.getAndDecrementInt("APP_OPENED", 10));
+
+        System.out.println(dataSharer.getAndIncrementLong("APP_CLOSED", 100L));
+        Truth.assertThat(dataSharer.getLong("APP_CLOSED", 100L)).isEqualTo(11L);
+
+        System.out.println(dataSharer.getAndIncrementInt("APP_OPENED", 100));
+        Truth.assertThat(dataSharer.getInt("APP_OPENED", 100)).isEqualTo(11);
+
+        System.out.println(dataSharer.getAndDecrementInt("APP_OPENED", 100));
+        Truth.assertThat(dataSharer.getInt("APP_OPENED", 100)).isEqualTo(10);
     }
 }

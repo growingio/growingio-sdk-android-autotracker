@@ -48,6 +48,7 @@ class CrashLogger extends BaseLogger {
                         .withMessage(message)
                         .withLevel(Event.Level.ERROR)
                         .withMonitorInterface(new ExceptionInterface(t)));
+                break;
             default:
                 break;
         }
