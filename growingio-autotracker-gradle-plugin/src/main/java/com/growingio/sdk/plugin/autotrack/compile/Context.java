@@ -16,8 +16,6 @@
 
 package com.growingio.sdk.plugin.autotrack.compile;
 
-import org.objectweb.asm.Opcodes;
-
 public class Context {
     private final Log mLog;
     private final ClassLoader mClassLoader;
@@ -30,10 +28,6 @@ public class Context {
     public Context(Log log, ClassLoader classLoader) {
         mLog = log;
         mClassLoader = classLoader;
-    }
-
-    public int getASMVersion() {
-        return Opcodes.ASM6;
     }
 
     public ClassLoader getClassLoader() {

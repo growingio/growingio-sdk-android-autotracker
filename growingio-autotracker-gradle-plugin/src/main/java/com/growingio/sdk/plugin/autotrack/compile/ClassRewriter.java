@@ -38,6 +38,7 @@ public class ClassRewriter {
     private final Log mLog;
     private final ClassLoader mClassLoader;
     private final String[] mUserExcludePackages;
+    private final boolean mExcludeOfficial;
     private static final String[] EXCLUDED_PACKAGES = new String[]{
             "com/growingio/android/sdk/",
             "com/growingio/giokit/",
@@ -51,10 +52,22 @@ public class ClassRewriter {
             "android/taobao/windvane/webview",
     };
 
+    private static final String[] OFFICIAL_PACKAGES = new String[]{
+            "android/arch/",
+            "androidx/",
+            "com/android/",
+            "com/google/",
+            "com/squareup/",
+            "io/rectivex/rxjava",
+            "javax/",
+            "org/jetbrains/kotlin",
+    };
 
-    public ClassRewriter(final Log log, ClassLoader classLoader, String[] userExcludePackages) {
+
+    public ClassRewriter(final Log log, ClassLoader classLoader, String[] userExcludePackages, boolean excludeOfficial) {
         mLog = log;
         mClassLoader = classLoader;
+        mExcludeOfficial = excludeOfficial;
         if (userExcludePackages == null) {
             mUserExcludePackages = new String[0];
         } else {
@@ -73,6 +86,14 @@ public class ClassRewriter {
         }
 
         for (String exPackage : mUserExcludePackages) {
+            if (packageName.startsWith(exPackage)) {
+                return true;
+            }
+        }
+
+        if (!mExcludeOfficial) return false;
+
+        for (String exPackage : OFFICIAL_PACKAGES) {
             if (packageName.startsWith(exPackage)) {
                 return true;
             }
@@ -113,17 +134,17 @@ public class ClassRewriter {
         String className = null;
         try {
             ClassReader classReader = new ClassReader(bytes);
-            ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
+            AutotrackClassWriter classWriter = new AutotrackClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
             Context context = new Context(mLog, mClassLoader);
-            classReader.accept(new ContextClassVisitor(context), ClassReader.SKIP_DEBUG | ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES);
+            classReader.accept(new ContextClassVisitor(classWriter.getApi(), context), ClassReader.SKIP_DEBUG | ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES);
             className = context.getClassName();
             ClassVisitor classVisitor;
             if (className == null || this.isExcludedPackage(context.getClassName())) {
                 return null;
             }
-            DesugaringClassVisitor desugaringClassVisitor = new DesugaringClassVisitor(
-                    new InjectAroundClassVisitor(
-                            new InjectSuperClassVisitor(classWriter, context),
+            DesugaringClassVisitor desugaringClassVisitor = new DesugaringClassVisitor(classWriter.getApi(),
+                    new InjectAroundClassVisitor(classWriter.getApi(),
+                            new InjectSuperClassVisitor(classWriter.getApi(), classWriter, context),
                             context),
                     context);
             classVisitor = desugaringClassVisitor;
@@ -132,8 +153,8 @@ public class ClassRewriter {
                 // lambda 表达式需要特殊处理两次
                 mLog.debug(String.format("GIO: deal with lambda second time:  %s", className));
                 ClassReader lambdaReader = new ClassReader(classWriter.toByteArray());
-                classWriter = new ClassWriter(lambdaReader, ClassWriter.COMPUTE_MAXS);
-                lambdaReader.accept(new DesugaredClassVisitor(classWriter, context, desugaringClassVisitor.getNeedInjectTargetMethods()), ClassReader.SKIP_FRAMES | ClassReader.EXPAND_FRAMES);
+                classWriter = new AutotrackClassWriter(lambdaReader, ClassWriter.COMPUTE_MAXS);
+                lambdaReader.accept(new DesugaredClassVisitor(classWriter.getApi(), classWriter, context, desugaringClassVisitor.getNeedInjectTargetMethods()), ClassReader.SKIP_FRAMES | ClassReader.EXPAND_FRAMES);
             }
             if (context.isClassModified()) {
                 return classWriter.toByteArray();
