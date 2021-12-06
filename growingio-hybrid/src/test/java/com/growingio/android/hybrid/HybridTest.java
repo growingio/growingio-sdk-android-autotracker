@@ -126,6 +126,7 @@ public class HybridTest {
             @Override
             public void onSuccess(JSONObject result) {
                 System.out.println(result);
+                Truth.assertThat(result).isNotNull();
             }
 
             @Override
