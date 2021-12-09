@@ -25,6 +25,7 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageAttributesEvent;
