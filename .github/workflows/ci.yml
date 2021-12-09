@@ -57,6 +57,8 @@ jobs:
         with:
           api-level: 29
           profile: Pixel 5
+          target: google_apis
+          arch: x86_64
           # emulator-build: 7425822
           script: |
             adb shell logcat -c
