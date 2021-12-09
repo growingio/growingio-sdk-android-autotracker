@@ -47,15 +47,15 @@ jobs:
 
       - name: Run Gradle command
         run: |
-          bash ./gradle/publishAllToMavenLocal.sh
           bash ./config/checkstyle/checkstyle.sh
           ./gradlew lint
+          bash ./gradle/publishAllToMavenLocal.sh
           ./gradlew assembleDebug
 
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 28
+          api-level: 29
           profile: Pixel 5
           # emulator-build: 7425822
           script: |
