@@ -56,9 +56,9 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          profile: Pixel 5
+          profile: Nexus 6
           target: google_apis
-          arch: x86_64
+          arch: x86
           # emulator-build: 7425822
           script: |
             adb shell logcat -c
