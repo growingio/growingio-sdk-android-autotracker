@@ -1,3 +1,3 @@
-com/growingio/android/sdk/track/middleware/EventsContentProvider.class
-com/growingio/android/sdk/track/middleware/EventsInfoTable.class
-com/growingio/android/sdk/track/middleware/EventsSQLiteOpenHelper.class
+com/growingio/database/EventDataContentProvider.class
+com/growingio/database/EventDataTable.class
+com/growingio/database/EventDataSQLiteOpenHelper.class

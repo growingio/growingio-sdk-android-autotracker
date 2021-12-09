@@ -25,17 +25,17 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.growingio.android.hybrid.event.HybridCustomEvent;
-import com.growingio.android.hybrid.event.HybridPageAttributesEvent;
-import com.growingio.android.hybrid.event.HybridPageEvent;
-import com.growingio.android.hybrid.event.HybridViewElementEvent;
-import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
+import com.growingio.android.sdk.track.events.hybrid.HybridPageAttributesEvent;
+import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
+import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.events.ConversionVariablesEvent;
 import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
 import com.growingio.android.sdk.track.modelloader.data.HybridDom;
@@ -182,37 +182,14 @@ public class HybridTest {
 
         ModelLoader<HybridBridge, Boolean> modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridBridge.class, Boolean.class);
         DataFetcher<Boolean> dataFetcher = modelLoader.buildLoadData(new HybridBridge(webView)).fetcher;
-        dataFetcher.loadData(new DataFetcher.DataCallback<Boolean>() {
-            @Override
-            public void onDataReady(Boolean data) {
-                Truth.assertThat(data).isTrue();
-            }
-
-            @Override
-            public void onLoadFailed(Exception e) {
-
-            }
-        });
+        boolean result = dataFetcher.executeData();
+        Truth.assertThat(result).isTrue();
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(Boolean.class);
-        dataFetcher.cleanup();
-        dataFetcher.cancel();
-
         Truth.assertThat(modelLoader.buildLoadData(new HybridBridge(x5Wv)).fetcher.executeData()).isTrue();
         Truth.assertThat(modelLoader.buildLoadData(new HybridBridge(ucWv)).fetcher.executeData()).isTrue();
 
         TextView textView = new TextView(activity);
         Truth.assertThat(modelLoader.buildLoadData(new HybridBridge(textView)).fetcher.executeData()).isFalse();
-        modelLoader.buildLoadData(null).fetcher.loadData(new DataFetcher.DataCallback<Boolean>() {
-            @Override
-            public void onDataReady(Boolean data) {
-
-            }
-
-            @Override
-            public void onLoadFailed(Exception e) {
-                Truth.assertThat(e).isInstanceOf(NullPointerException.class);
-            }
-        });
     }
 
     @Test
@@ -226,8 +203,8 @@ public class HybridTest {
         modelLoader.buildLoadData(new HybridDom(() -> {
         })).fetcher.executeData();
 
-        DataFetcher<HybridJson> dataFetcher = modelLoader.buildLoadData(new HybridDom(webView)).fetcher;
-        dataFetcher.loadData(new DataFetcher.DataCallback<HybridJson>() {
+        LoadDataFetcher<HybridJson> dataFetcher = (LoadDataFetcher<HybridJson>) modelLoader.buildLoadData(new HybridDom(webView)).fetcher;
+        dataFetcher.loadData(new LoadDataFetcher.DataCallback<HybridJson>() {
             @Override
             public void onDataReady(HybridJson data) {
                 System.out.println(data.getJsonObject());
@@ -239,8 +216,6 @@ public class HybridTest {
             }
         });
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(HybridJson.class);
-        dataFetcher.cleanup();
-        dataFetcher.cancel();
     }
 
 }

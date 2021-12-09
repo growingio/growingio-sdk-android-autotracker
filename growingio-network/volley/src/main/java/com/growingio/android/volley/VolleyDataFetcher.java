@@ -29,7 +29,7 @@ import com.android.volley.toolbox.RequestFuture;
 import com.growingio.android.sdk.track.http.EventResponse;
 import com.growingio.android.sdk.track.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
+import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
 
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @author cpacm 2021/3/31
  */
-public class VolleyDataFetcher implements DataFetcher<EventResponse> {
+public class VolleyDataFetcher implements HttpDataFetcher<EventResponse> {
     private static final String TAG = "VolleyDataFetcher";
     public static final VolleyRequestFactory DEFAULT_REQUEST_FACTORY = GioRequest::new;
 

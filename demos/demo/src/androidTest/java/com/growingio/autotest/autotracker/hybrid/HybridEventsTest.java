@@ -33,7 +33,7 @@ import com.growingio.android.hybrid.OnDomChangedListener;
 import com.growingio.android.hybrid.SuperWebView;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.data.PersistentDataProvider;
+import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.utils.JsonUtil;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;

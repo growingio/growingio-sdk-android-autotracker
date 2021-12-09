@@ -26,4 +26,5 @@ public class TrackEventType {
     public static final String LOGIN_USER_ATTRIBUTES = "LOGIN_USER_ATTRIBUTES";
     public static final String CONVERSION_VARIABLES = "CONVERSION_VARIABLES";
     public static final String APP_CLOSED = "APP_CLOSED";
+    public static final String FORM_SUBMIT = "FORM_SUBMIT";
 }

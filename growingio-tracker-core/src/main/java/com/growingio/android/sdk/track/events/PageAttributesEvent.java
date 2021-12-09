@@ -36,7 +36,7 @@ public class PageAttributesEvent extends BaseAttributesEvent {
     }
 
     public String getPath() {
-        return mPath;
+        return checkValueSafe(mPath);
     }
 
     public long getPageShowTimestamp() {

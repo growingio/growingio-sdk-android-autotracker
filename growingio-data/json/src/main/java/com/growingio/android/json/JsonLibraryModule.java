@@ -18,8 +18,8 @@ package com.growingio.android.json;
 import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.http.EventData;
-import com.growingio.android.sdk.track.http.EventStream;
+import com.growingio.android.sdk.track.middleware.format.EventFormatData;
+import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
@@ -32,6 +32,6 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 public class JsonLibraryModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(EventData.class, EventStream.class, new JsonDataLoader.Factory());
+        registry.register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
     }
 }

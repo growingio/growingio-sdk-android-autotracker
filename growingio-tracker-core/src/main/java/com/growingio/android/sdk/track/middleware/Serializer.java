@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.track.middleware;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,5 +41,16 @@ public final class Serializer {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         return (T) objectInputStream.readObject();
+    }
+
+    public static GEvent unpack(byte[] data) {
+        try {
+            return Serializer.objectDeserialization(data);
+        } catch (IOException e) {
+            Logger.e("Serializer", e, e.getMessage());
+        } catch (ClassNotFoundException e) {
+            Logger.e("Serializer", e, e.getMessage());
+        }
+        return null;
     }
 }

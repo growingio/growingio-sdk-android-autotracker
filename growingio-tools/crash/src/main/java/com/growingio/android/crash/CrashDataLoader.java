@@ -35,24 +35,10 @@ public class CrashDataLoader implements ModelLoader<Crash, Void> {
     @Override
     public LoadData<Void> buildLoadData(Crash crash) {
         return new LoadData<>(new DataFetcher<Void>() {
-            @Override
-            public void loadData(DataCallback<? super Void> callback) {
-                callback.onDataReady(null);
-            }
 
             @Override
             public Void executeData() {
                 return null;
-            }
-
-            @Override
-            public void cleanup() {
-
-            }
-
-            @Override
-            public void cancel() {
-
             }
 
             @Override
