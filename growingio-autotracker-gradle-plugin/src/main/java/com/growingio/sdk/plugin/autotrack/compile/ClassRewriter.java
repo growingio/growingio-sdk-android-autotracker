@@ -90,7 +90,7 @@ public class ClassRewriter {
             }
         }
 
-        if (!mExcludeOfficial) return false;
+        if (mExcludeOfficial) return false;
 
         for (String exPackage : OFFICIAL_PACKAGES) {
             if (packageName.startsWith(exPackage)) {
