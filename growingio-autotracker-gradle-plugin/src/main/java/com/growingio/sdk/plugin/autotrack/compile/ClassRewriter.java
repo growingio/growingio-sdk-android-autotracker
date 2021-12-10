@@ -91,13 +91,13 @@ public class ClassRewriter {
             }
         }
 
-        if (!mExcludeOfficial) return false;
-
-        for (String exPackage : OFFICIAL_PACKAGES) {
-            if (packageName.startsWith(exPackage)) {
-                return true;
-            }
-        }
+//        if (!mExcludeOfficial) return false;
+//
+//        for (String exPackage : OFFICIAL_PACKAGES) {
+//            if (packageName.startsWith(exPackage)) {
+//                return true;
+//            }
+//        }
         return false;
     }
 

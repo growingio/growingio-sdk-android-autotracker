@@ -48,8 +48,8 @@ jobs:
       - name: Run Gradle command
         run: |
           bash ./gradle/publishAllToMavenLocal.sh
-          bash ./config/checkstyle/checkstyle.sh
-          ./gradlew lint
+#          bash ./config/checkstyle/checkstyle.sh
+#          ./gradlew lint
           ./gradlew assembleDebug
 
       - name: Run tests
@@ -63,24 +63,24 @@ jobs:
           script: |
             adb shell logcat -c
             adb shell logcat > ./uiTest.log &
-            ./gradlew jacocoTestReport
+            ./gradlew :demo:jacocoTestReport
             ./gradlew :demo:jacocoAllReport
 
-      - name: Upload logcat
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: uiTestLog
-          path: ./uiTest.log
-
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          files: ./demos/demo/build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml
+#      - name: Upload logcat
+#        uses: actions/upload-artifact@v2
+#        if: failure()
+#        with:
+#          name: uiTestLog
+#          path: ./uiTest.log
+#
+#      - name: Build and analyze
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        run: ./gradlew sonarqube
+#
+#      - name: Upload coverage to Codecov
+#        uses: codecov/codecov-action@v1
+#        with:
+#          files: ./demos/demo/build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml
 
