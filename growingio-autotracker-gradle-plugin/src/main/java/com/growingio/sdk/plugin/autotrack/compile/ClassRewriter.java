@@ -53,13 +53,9 @@ public class ClassRewriter {
     };
 
     private static final String[] OFFICIAL_PACKAGES = new String[]{
-            "android/arch/",
-            "com/google/",
             "com/squareup/",
             "io/rectivex/rxjava",
             "org/apache/",
-            "javax/",
-            "org/jetbrains/kotlin",
     };
 
 
@@ -90,7 +86,7 @@ public class ClassRewriter {
             }
         }
 
-        if (mExcludeOfficial) return false;
+        if (!mExcludeOfficial) return false;
 
         for (String exPackage : OFFICIAL_PACKAGES) {
             if (packageName.startsWith(exPackage)) {
