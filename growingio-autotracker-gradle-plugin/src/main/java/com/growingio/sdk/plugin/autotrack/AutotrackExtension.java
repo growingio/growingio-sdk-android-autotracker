@@ -45,4 +45,12 @@ public class AutotrackExtension {
     public void setExcludePackages(String[] excludePackages) {
         mExcludePackages = excludePackages;
     }
+
+    public boolean isExcludeOfficialPackages() {
+        return mExcludeOfficialPackages;
+    }
+
+    public void setExcludeOfficialPackages(boolean mExcludeOfficialPackages) {
+        this.mExcludeOfficialPackages = mExcludeOfficialPackages;
+    }
 }
