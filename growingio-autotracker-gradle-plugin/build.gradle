@@ -27,7 +27,7 @@ dependencies {
     testImplementation libraries.asm.asm_tree
 
     compileOnly gradleApi()
-    compileOnly libraries.android.gradle_plugin
+    implementation libraries.android.gradle_plugin
     //implementation "com.android.tools.build:gradle:7.0.3"
 }
 
