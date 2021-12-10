@@ -116,7 +116,7 @@ public class AutotrackTransform extends Transform {
         urlList.toArray(urlArray);
         URLClassLoader classLoader = new URLClassLoader(urlArray);
         mOutputProvider = outputProvider;
-        mClassRewriter = new ClassRewriter(mLog, classLoader, mAutotrackExtension.getExcludePackages(), mAutotrackExtension.isExcludeOfficialPackages());
+        mClassRewriter = new ClassRewriter(mLog, classLoader, mAutotrackExtension.getExcludePackages());
 
         if (!isIncremental) {
             // 1. 非增量模式下删除上次所有的编译产物

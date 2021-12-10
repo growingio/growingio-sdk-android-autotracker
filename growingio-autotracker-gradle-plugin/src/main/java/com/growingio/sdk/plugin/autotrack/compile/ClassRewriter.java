@@ -38,7 +38,6 @@ public class ClassRewriter {
     private final Log mLog;
     private final ClassLoader mClassLoader;
     private final String[] mUserExcludePackages;
-    private final boolean mExcludeOfficial;
     private static final String[] EXCLUDED_PACKAGES = new String[]{
             "com/growingio/android/sdk/",
             "com/growingio/giokit/",
@@ -52,22 +51,9 @@ public class ClassRewriter {
             "android/taobao/windvane/webview",
     };
 
-    private static final String[] OFFICIAL_PACKAGES = new String[]{
-            "android/arch/",
-            "androidx/",
-            "com/android/",
-            "com/google/",
-            "com/squareup/",
-            "io/rectivex/rxjava",
-            "javax/",
-            "org/jetbrains/kotlin",
-    };
-
-
-    public ClassRewriter(final Log log, ClassLoader classLoader, String[] userExcludePackages, boolean excludeOfficial) {
+    public ClassRewriter(final Log log, ClassLoader classLoader, String[] userExcludePackages) {
         mLog = log;
         mClassLoader = classLoader;
-        mExcludeOfficial = excludeOfficial;
         if (userExcludePackages == null) {
             mUserExcludePackages = new String[0];
         } else {
@@ -91,13 +77,6 @@ public class ClassRewriter {
             }
         }
 
-//        if (!mExcludeOfficial) return false;
-//
-//        for (String exPackage : OFFICIAL_PACKAGES) {
-//            if (packageName.startsWith(exPackage)) {
-//                return true;
-//            }
-//        }
         return false;
     }
 

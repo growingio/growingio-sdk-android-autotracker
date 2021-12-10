@@ -48,6 +48,8 @@ jobs:
       - name: Run Gradle command
         run: |
           bash ./gradle/publishAllToMavenLocal.sh
+          bash ./config/checkstyle/checkstyle.sh
+          ./gradlew lint
           ./gradlew assembleDebug
 
       - name: Run tests
@@ -61,7 +63,7 @@ jobs:
           script: |
             adb shell logcat -c
             adb shell logcat > ./uiTest.log &
-            ./gradlew :demo:jacocoTestReport
+            ./gradlew jacocoTestReport
             ./gradlew :demo:jacocoAllReport
 
       - name: Upload logcat
