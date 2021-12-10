@@ -53,9 +53,7 @@ public class ClassRewriter {
     };
 
     private static final String[] OFFICIAL_PACKAGES = new String[]{
-            "com/squareup/",
-            "io/rectivex/rxjava",
-            "org/apache/",
+
     };
 
 
