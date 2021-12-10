@@ -48,8 +48,6 @@ jobs:
       - name: Run Gradle command
         run: |
           bash ./gradle/publishAllToMavenLocal.sh
-#          bash ./config/checkstyle/checkstyle.sh
-#          ./gradlew lint
           ./gradlew assembleDebug
 
       - name: Run tests
