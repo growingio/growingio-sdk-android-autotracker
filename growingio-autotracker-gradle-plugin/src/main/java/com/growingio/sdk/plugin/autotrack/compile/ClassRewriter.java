@@ -53,7 +53,13 @@ public class ClassRewriter {
     };
 
     private static final String[] OFFICIAL_PACKAGES = new String[]{
-
+//            "android/arch/",
+//            "com/google/",
+            "com/squareup/",
+            "io/rectivex/rxjava",
+            "org/apache",
+//            "javax/",
+            "org/jetbrains/kotlin",
     };
 
 
