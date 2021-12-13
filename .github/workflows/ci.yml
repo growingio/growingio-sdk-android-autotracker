@@ -55,8 +55,10 @@ jobs:
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 27
+          api-level: 29
           profile: Nexus 6
+          target: google_apis
+          arch: x86
           # emulator-build: 7425822
           script: |
             adb shell logcat -c

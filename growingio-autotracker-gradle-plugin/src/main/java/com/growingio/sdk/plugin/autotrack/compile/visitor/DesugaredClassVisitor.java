@@ -34,8 +34,8 @@ public class DesugaredClassVisitor extends ClassVisitor {
     private final Log mLog;
     private final Set<TargetMethod> mNeedInjectTargetMethods;
 
-    public DesugaredClassVisitor(ClassVisitor cv, Context context, Set<TargetMethod> needInjectTargetMethods) {
-        super(context.getASMVersion(), cv);
+    public DesugaredClassVisitor(int api, ClassVisitor cv, Context context, Set<TargetMethod> needInjectTargetMethods) {
+        super(api, cv);
         mContext = context;
         mLog = context.getLog();
         mNeedInjectTargetMethods = needInjectTargetMethods;
@@ -44,7 +44,7 @@ public class DesugaredClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor methodVisitor = super.visitMethod(access, name, desc, signature, exceptions);
-        return new DesugaredMethodVisitor(mContext.getASMVersion(), methodVisitor, access, name, desc);
+        return new DesugaredMethodVisitor(api, methodVisitor, access, name, desc);
     }
 
     private TargetMethod findTargetMethod(String name, String desc) {

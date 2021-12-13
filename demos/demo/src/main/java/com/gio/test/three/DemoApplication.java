@@ -16,6 +16,7 @@
 
 package com.gio.test.three;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
@@ -86,7 +87,7 @@ public class DemoApplication extends MultiDexApplication {
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setDataCollectionEnabled(true)
-                    .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.EVENT_MASK_TRIGGER))
+                    .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.REENGAGE))
                     .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
                     .setPreloadComponent(new OaidLibraryGioModule());
         }
@@ -99,7 +100,7 @@ public class DemoApplication extends MultiDexApplication {
     }
 
     private boolean isMainProcess() {
-        ActivityManager am = ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE));
+        @SuppressLint("WrongConstant") ActivityManager am = ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE));
         List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
 
         if (processInfos == null) {

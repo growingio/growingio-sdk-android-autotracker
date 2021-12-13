@@ -69,6 +69,7 @@ public class DebuggerDataLoader implements ModelLoader<Debugger, WebService> {
 
         @Override
         public ModelLoader<Debugger, WebService> build() {
+            DebuggerEventWrapper.get().observeEventBuild();
             return new DebuggerDataLoader(getsInternalClient());
         }
     }
