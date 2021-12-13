@@ -25,6 +25,7 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageAttributesEvent;
@@ -40,6 +41,8 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
 import com.growingio.android.sdk.track.modelloader.data.HybridDom;
 import com.growingio.android.sdk.track.modelloader.data.HybridJson;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 import org.json.JSONObject;
 import org.junit.Before;
@@ -49,6 +52,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE, sdk = 23)
@@ -61,6 +65,7 @@ public class HybridTest {
     public void setup() {
         TrackerContext.init(application);
         TrackerContext.initSuccess();
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"), new HashMap<>());
     }
 
 
@@ -140,7 +145,24 @@ public class HybridTest {
         WebViewJavascriptBridgeConfiguration configuration = new WebViewJavascriptBridgeConfiguration("test", "test", "test", "test", 23);
         WebViewBridgeJavascriptInterface webInterface = new WebViewBridgeJavascriptInterface(configuration);
         webInterface.setNativeUserId("cpacm");
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("cpacm");
         webInterface.clearNativeUserId();
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
+
+        ConfigurationProvider.core().setIdMappingEnabled(true);
+        webInterface.setNativeUserIdAndUserKey("cpacm", "email");
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("cpacm");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("email");
+
+        webInterface.clearNativeUserIdAndUserKey();
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
+        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("");
+        ConfigurationProvider.core().setIdMappingEnabled(false);
+
         String testJson = "{\"eventType\":\"LOGIN_USER_ATTRIBUTES\",\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
         webInterface.dispatchEvent(testJson);
         Truth.assertThat(webInterface.getConfiguration()).contains("23");
