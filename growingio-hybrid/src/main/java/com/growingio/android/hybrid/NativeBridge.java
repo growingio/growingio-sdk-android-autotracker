@@ -49,4 +49,22 @@ class NativeBridge {
             }
         });
     }
+
+    void setNativeUserIdAndUserKey(String userId, String userKey) {
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                UserInfoProvider.get().setLoginUserId(userId, userKey);
+            }
+        });
+    }
+
+    void clearNativeUserIdAndUserKey() {
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                UserInfoProvider.get().setLoginUserId(null, null);
+            }
+        });
+    }
 }

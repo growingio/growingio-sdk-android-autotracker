@@ -68,4 +68,18 @@ class WebViewBridgeJavascriptInterface {
         mNativeBridge.clearNativeUserId();
     }
 
+    @JavascriptInterface
+    @com.uc.webview.export.JavascriptInterface
+    public void setNativeUserIdAndUserKey(String userId, String userKey) {
+        Logger.d(TAG, "setNativeUserIdAndUserKey: " + userId + ", " + userKey);
+        mNativeBridge.setNativeUserIdAndUserKey(userId, userKey);
+    }
+
+    @JavascriptInterface
+    @com.uc.webview.export.JavascriptInterface
+    public void clearNativeUserIdAndUserKey() {
+        Logger.d(TAG, "clearNativeUserIdAndUserKey: ");
+        mNativeBridge.clearNativeUserIdAndUserKey();
+    }
+
 }

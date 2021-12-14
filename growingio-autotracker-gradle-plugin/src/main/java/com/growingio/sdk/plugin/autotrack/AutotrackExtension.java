@@ -19,6 +19,7 @@ package com.growingio.sdk.plugin.autotrack;
 public class AutotrackExtension {
     private boolean mIsLogEnabled = false;
     private boolean mIsDevelopment = true;
+    private boolean mExcludeOfficialPackages = true;
     private String[] mExcludePackages;
 
     public boolean isLogEnabled() {
@@ -43,5 +44,13 @@ public class AutotrackExtension {
 
     public void setExcludePackages(String[] excludePackages) {
         mExcludePackages = excludePackages;
+    }
+
+    public boolean isExcludeOfficialPackages() {
+        return mExcludeOfficialPackages;
+    }
+
+    public void setExcludeOfficialPackages(boolean mExcludeOfficialPackages) {
+        this.mExcludeOfficialPackages = mExcludeOfficialPackages;
     }
 }

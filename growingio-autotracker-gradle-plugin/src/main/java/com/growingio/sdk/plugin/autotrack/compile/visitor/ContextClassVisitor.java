@@ -24,8 +24,8 @@ import org.objectweb.asm.Opcodes;
 public class ContextClassVisitor extends ClassVisitor {
     private final Context mContext;
 
-    public ContextClassVisitor(Context context) {
-        super(context.getASMVersion());
+    public ContextClassVisitor(int api, Context context) {
+        super(api);
         mContext = context;
     }
 
@@ -35,4 +35,5 @@ public class ContextClassVisitor extends ClassVisitor {
         mContext.setAbstract((access & Opcodes.ACC_ABSTRACT) != 0);
         super.visit(version, access, name, sig, superName, interfaces);
     }
+
 }
