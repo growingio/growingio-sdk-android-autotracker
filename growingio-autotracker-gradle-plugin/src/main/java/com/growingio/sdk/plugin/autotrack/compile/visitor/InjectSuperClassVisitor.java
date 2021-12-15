@@ -44,8 +44,8 @@ public class InjectSuperClassVisitor extends ClassVisitor {
     private final Set<TargetMethod> mOverrideMethods = new HashSet<>();
     private String mCurrentClass;
 
-    public InjectSuperClassVisitor(ClassVisitor classVisitor, Context context) {
-        super(context.getASMVersion(), classVisitor);
+    public InjectSuperClassVisitor(int api, ClassVisitor classVisitor, Context context) {
+        super(api, classVisitor);
         mContext = context;
         mLog = context.getLog();
     }

@@ -19,6 +19,7 @@ package com.growingio.sdk.plugin.autotrack.compile.visitor;
 import com.google.common.truth.Truth;
 import com.growingio.sdk.plugin.autotrack.ByteCodeClassLoader;
 import com.growingio.sdk.plugin.autotrack.ClassUtils;
+import com.growingio.sdk.plugin.autotrack.compile.AutotrackClassWriter;
 import com.growingio.sdk.plugin.autotrack.compile.Context;
 import com.growingio.sdk.plugin.autotrack.compile.SystemLog;
 import com.growingio.sdk.plugin.autotrack.hook.HookClassesConfig;
@@ -71,9 +72,9 @@ public class InjectSuperClassVisitorTest {
 
         InputStream resourceAsStream = ClassUtils.classToInputStream(SubExample.class);
         ClassReader cr = new ClassReader(resourceAsStream);
-        ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS);
+        AutotrackClassWriter cw = new AutotrackClassWriter(cr, ClassWriter.COMPUTE_MAXS);
         Context context = new Context(new SystemLog(), getClass().getClassLoader());
-        cr.accept(new InjectSuperClassVisitor(cw, context), ClassReader.SKIP_FRAMES | ClassReader.EXPAND_FRAMES);
+        cr.accept(new InjectSuperClassVisitor(cw.getApi(), cw, context), ClassReader.SKIP_FRAMES | ClassReader.EXPAND_FRAMES);
         Class<?> aClass = new ByteCodeClassLoader(getClass().getClassLoader()).defineClass(SubExample.class.getName(), cw.toByteArray());
         Object obj = aClass.newInstance();
         final SuperExample[] callbackResult = new SuperExample[1];

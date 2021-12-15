@@ -48,8 +48,8 @@ public class DesugaringClassVisitor extends ClassVisitor {
     private final HashMap<String, GenerateMethodBlock> mGenerateMethodBlocks = new HashMap<>();
     private int mGenerateMethodIndex = 0;
 
-    public DesugaringClassVisitor(ClassVisitor cv, Context context) {
-        super(context.getASMVersion(), cv);
+    public DesugaringClassVisitor(int api, ClassVisitor cv, Context context) {
+        super(api, cv);
         mContext = context;
         mLog = context.getLog();
     }
@@ -57,7 +57,7 @@ public class DesugaringClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor methodVisitor = super.visitMethod(access, name, desc, signature, exceptions);
-        return new DesugaringMethodVisitor(mContext.getASMVersion(), methodVisitor, access, name, desc);
+        return new DesugaringMethodVisitor(api, methodVisitor, access, name, desc);
     }
 
     @Override
@@ -148,6 +148,7 @@ public class DesugaringClassVisitor extends ClassVisitor {
 
         @Override
         public void visitInvokeDynamicInsn(String lambdaMethodName, String desc, Handle bsm, Object... bsmArgs) {
+            mLog.debug(String.format("DesugaringMethodVisitor(%s): on method %s", mContext.getClassName(), mName));
             int index = desc.lastIndexOf(")L");
             if (index == -1) {
                 super.visitInvokeDynamicInsn(lambdaMethodName, desc, bsm, bsmArgs);

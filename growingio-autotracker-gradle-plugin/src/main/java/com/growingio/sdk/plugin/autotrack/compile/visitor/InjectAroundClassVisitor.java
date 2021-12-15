@@ -37,8 +37,8 @@ public class InjectAroundClassVisitor extends ClassVisitor {
     private final Log mLog;
     private String mCurrentClass;
 
-    public InjectAroundClassVisitor(ClassVisitor classVisitor, Context context) {
-        super(context.getASMVersion(), classVisitor);
+    public InjectAroundClassVisitor(int api, ClassVisitor classVisitor, Context context) {
+        super(api, classVisitor);
         mContext = context;
         mLog = mContext.getLog();
     }
@@ -52,13 +52,13 @@ public class InjectAroundClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        return new AroundMethodVisitor(mv, access, name, desc);
+        return new AroundMethodVisitor(api, mv, access, name, desc);
     }
 
     private final class AroundMethodVisitor extends GeneratorAdapter {
 
-        AroundMethodVisitor(MethodVisitor mv, int access, String name, String desc) {
-            super(mContext.getASMVersion(), mv, access, name, desc);
+        AroundMethodVisitor(int api, MethodVisitor mv, int access, String name, String desc) {
+            super(api, mv, access, name, desc);
         }
 
         @Override
