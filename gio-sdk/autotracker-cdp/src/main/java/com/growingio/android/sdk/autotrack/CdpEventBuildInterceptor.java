@@ -66,7 +66,7 @@ public class CdpEventBuildInterceptor implements EventBuildInterceptor, OnUserId
     public void onUserIdChanged(@Nullable String newUserId) {
         String mLatestGioId = getGioId();
         Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestGioId = " + mLatestGioId);
-        if (!TextUtils.isEmpty(newUserId) && !newUserId.equals(mLatestGioId)) {
+        if (newUserId != null && newUserId.length() != 0 && !newUserId.equals(mLatestGioId)) {
             setGioId(newUserId);
         }
     }

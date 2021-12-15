@@ -61,8 +61,6 @@ public class IpcTest {
         Truth.assertThat(dataSharer.getLong("key4", 0L)).isEqualTo(124543454343L);
         Truth.assertThat(dataSharer.getString("key11", "error")).isEqualTo("error");
         Truth.assertThat(dataSharer.getAndAddLong("key4", 10, 0L)).isEqualTo(124543454353L);
-
-
     }
 
     @Test
