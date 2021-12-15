@@ -181,8 +181,9 @@ public class DbTest {
     public void dbHelperTest() throws IOException {
         EventDataSQLiteOpenHelper dbHelper = new EventDataSQLiteOpenHelper(application, "growing3.db");
         dbHelper.onUpgrade(dbHelper.getWritableDatabase(), 1, 2);
+        Truth.assertThat(dbHelper.getDatabaseName()).isEqualTo("growing3.db");
+        Truth.assertThat(dbHelper.getWritableDatabase().getVersion()).isEqualTo(1);
         dbHelper.close();
-
     }
 
     @Test
