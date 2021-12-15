@@ -85,8 +85,7 @@ public class MultiProcessDataSharer implements IDataSharer {
                 return;
             }
             File file = mContext.getFileStreamPath(mName);
-            try {
-                RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+            try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
                 mFileChannel = randomAccessFile.getChannel();
                 mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, (long) mMaxSize * SharedEntry.MAX_SIZE);
                 incrementLoadFromDisk();
