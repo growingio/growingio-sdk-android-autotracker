@@ -77,13 +77,6 @@ public class CrashTest {
 
         CacheLogger cacheLogger = (CacheLogger) Logger.getLogger("CacheLogger");
         Truth.assertThat(cacheLogger).isNotNull();
-        List<LogItem> logItemList = cacheLogger.getCacheLogsAndClear();
-        Truth.assertThat(logItemList.get(0).getMessage()).isEqualTo("crash[i]");
-        Truth.assertThat(logItemList.get(1).getMessage()).isEqualTo("crash[w]");
-        Truth.assertThat(logItemList.get(2).getMessage()).isEqualTo("crash[v]");
-        Truth.assertThat(logItemList.get(3).getMessage()).isEqualTo("crash[d]");
-        Truth.assertThat(logItemList.get(4).getMessage()).isEqualTo("crash[e]");
-        Truth.assertThat(logItemList.get(5).getMessage()).isEqualTo("crash[wtf]");
     }
 
 }
