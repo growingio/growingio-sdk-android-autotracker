@@ -23,7 +23,6 @@ import android.view.WindowManager;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
@@ -102,7 +101,7 @@ public class WebServiceTest {
 
         tipView.show(activity);
         tipView.dismiss();
-        Truth.assertThat(tipView.isDismissed()).isTrue();
+        assertThat(tipView.isDismissed()).isTrue();
     }
 
     @Test

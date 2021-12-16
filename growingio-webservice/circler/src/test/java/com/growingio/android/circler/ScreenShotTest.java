@@ -65,6 +65,7 @@ public class ScreenShotTest {
         ShadowWH.activity = activity;
         ScreenshotProvider.OnScreenshotRefreshedListener dispatchListener = screenshot -> {
             System.out.println(screenshot.toJSONObject());
+            Truth.assertThat(screenshot).isNotNull();
         };
         ScreenshotProvider.get().registerScreenshotRefreshedListener(dispatchListener);
         ScreenshotProvider.get().refreshScreenshot();
