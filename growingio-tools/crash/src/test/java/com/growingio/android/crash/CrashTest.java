@@ -15,7 +15,6 @@
  */
 package com.growingio.android.crash;
 
-
 import static com.google.common.truth.Truth.assertThat;
 
 import android.content.Context;
@@ -25,7 +24,6 @@ import androidx.test.core.app.ApplicationProvider;
 import com.growingio.android.sdk.monitor.event.EventBuilder;
 import com.growingio.android.sdk.track.log.CacheLogger;
 import com.growingio.android.sdk.track.log.Crash;
-import com.growingio.android.sdk.track.log.LogItem;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;

@@ -108,7 +108,7 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
     private void needSendVisit(String newUserId) {
         String mLatestNonNullUserId = PersistentDataProvider.get().getLatestNonNullUserId();
         Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
-        if (!TextUtils.isEmpty(newUserId)) {
+        if (newUserId != null && newUserId.length() != 0) {
             if (TextUtils.isEmpty(mLatestNonNullUserId)) {
                 SessionProvider.get().generateVisit();
             } else {
