@@ -29,9 +29,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 
 public final class AnnotationUtil {
     private AnnotationUtil() {
@@ -94,7 +92,7 @@ public final class AnnotationUtil {
     }
 
     private static String getClassFromAnnotationAttribute(Object attribute) {
-        if (attribute.getClass().getSimpleName().equals("UnresolvedClass")) {
+        if (attribute.getClass().isAssignableFrom(Attribute.UnresolvedClass.class)) {
             throw new IllegalArgumentException(
                     "Failed to parse class for: "
                             + attribute

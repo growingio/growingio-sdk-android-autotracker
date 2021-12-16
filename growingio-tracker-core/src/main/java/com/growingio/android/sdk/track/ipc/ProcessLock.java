@@ -102,6 +102,7 @@ public class ProcessLock {
     }
 
     public boolean isAcquired() {
-        return getFileLock() != null && getFileLock().isValid();
+        FileLock fileLock = getFileLock();
+        return fileLock != null && fileLock.isValid();
     }
 }
