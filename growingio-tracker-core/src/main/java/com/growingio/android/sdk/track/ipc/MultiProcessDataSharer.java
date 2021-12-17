@@ -42,6 +42,7 @@ public class MultiProcessDataSharer implements IDataSharer {
 
     private volatile boolean mLoaded;
     private MappedByteBuffer mMappedByteBuffer;
+    private RandomAccessFile randomAccessFile;
     private FileChannel mFileChannel;
     private final Map<String, SharedEntry> mSharedEntries = new HashMap<>();
     private int mCurrentPosition = 0;
@@ -65,7 +66,9 @@ public class MultiProcessDataSharer implements IDataSharer {
         }.start();
     }
 
-    private void awaitLoadedLocked() {
+    // synchronized 是可重入锁
+    // 加上synchronized 规避sonar检查wait() 在锁中调用
+    private synchronized void awaitLoadedLocked() {
         while (!mLoaded) {
             try {
                 Logger.d(TAG, "awaitLoadedLocked");
@@ -86,7 +89,7 @@ public class MultiProcessDataSharer implements IDataSharer {
             }
             File file = mContext.getFileStreamPath(mName);
             try {
-                RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+                randomAccessFile = new RandomAccessFile(file, "rw");
                 mFileChannel = randomAccessFile.getChannel();
                 mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, (long) mMaxSize * SharedEntry.MAX_SIZE);
                 incrementLoadFromDisk();
