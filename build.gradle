@@ -11,7 +11,7 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.3.3-SNAPSHOT",
+                releaseVersion    : "3.3.3",
                 releaseVersionCode: 30303,
         ]
 
