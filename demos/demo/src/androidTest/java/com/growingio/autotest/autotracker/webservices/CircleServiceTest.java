@@ -66,12 +66,12 @@ public class CircleServiceTest extends WebServicesTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig("growing.401dfd8bba45afda"));
+        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig("growing.47d2b990025d67f5"));
     }
 
     @Test
     public void circleServiceTest() {
-        String uri = "growing.401dfd8bba45afda://growingio/webservice?serviceType=circle&wsUrl=" + Uri.encode(getWsUrl());
+        String uri = "growing.47d2b990025d67f5://growingio/webservice?serviceType=circle&wsUrl=" + Uri.encode(getWsUrl());
         Intent intent = new Intent();
         intent.setData(Uri.parse(uri));
         ActivityScenario.launch(intent);
