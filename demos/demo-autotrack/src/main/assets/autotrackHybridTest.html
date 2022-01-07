@@ -287,12 +287,20 @@
             GrowingWebViewJavascriptBridge.dispatchEvent(JSON.stringify(event));
         }
 
-        function setUserId(name) {
-            GrowingWebViewJavascriptBridge.setNativeUserId(name);
+        function setUserId(userId) {
+            GrowingWebViewJavascriptBridge.setNativeUserId(userId);
+        }
+
+        function setUserIdAndUserKey(userId, userKey) {
+            GrowingWebViewJavascriptBridge.setNativeUserIdAndUserKey(userId, userKey);
         }
 
         function clearUserId() {
             GrowingWebViewJavascriptBridge.clearNativeUserId();
+        }
+
+        function clearUserIdAndUserKey() {
+            GrowingWebViewJavascriptBridge.clearNativeUserIdAndUserKey();
         }
 
         function mockDomChanged() {

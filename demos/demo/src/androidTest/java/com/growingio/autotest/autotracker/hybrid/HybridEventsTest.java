@@ -77,7 +77,8 @@ public class HybridEventsTest extends EventsTest {
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
-        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig());
+        DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig()
+        .setIdMappingEnabled(true));
     }
 
     @Override
@@ -426,6 +427,8 @@ public class HybridEventsTest extends EventsTest {
 
     @Test
     public void hybridUserIdChangeTest() {
+        getEventsApiServer().setCheckUserId(false);
+        getEventsApiServer().setCheckSessionId(false);
         WebView webView = launchMockWebView();
         String loginUserId = PersistentDataProvider.get().getLoginUserId();
         String newUserId = loginUserId + "hybrid";
@@ -436,6 +439,18 @@ public class HybridEventsTest extends EventsTest {
         TrackHelper.postToUiThread(() ->
                 webView.evaluateJavascript("javascript:clearUserId()", null));
         Awaiter.untilTrue(() -> TextUtils.isEmpty(PersistentDataProvider.get().getLoginUserId()));
+
+        String loginUserKey = PersistentDataProvider.get().getLoginUserKey();
+        String newUserKey = loginUserKey + "hybridUserKey";
+        TrackHelper.postToUiThread(() ->
+                webView.evaluateJavascript("javascript:setUserIdAndUserKey(\"" + newUserId + "\" , \"" + newUserKey  + "\")", null));
+        Awaiter.untilTrue(() -> newUserId.equals(PersistentDataProvider.get().getLoginUserId()) &&
+                newUserKey.equals(PersistentDataProvider.get().getLoginUserKey()));
+
+        TrackHelper.postToUiThread(() ->
+                webView.evaluateJavascript("javascript:clearUserIdAndUserKey()", null));
+        Awaiter.untilTrue(() -> TextUtils.isEmpty(PersistentDataProvider.get().getLoginUserId()) &&
+                TextUtils.isEmpty(PersistentDataProvider.get().getLoginUserKey()));
     }
 
     @Test
