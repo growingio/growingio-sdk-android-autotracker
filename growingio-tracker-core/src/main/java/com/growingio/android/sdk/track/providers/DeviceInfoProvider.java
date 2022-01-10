@@ -114,13 +114,17 @@ public class DeviceInfoProvider {
         return mScreenWidth;
     }
 
-    @SuppressLint({"MissingPermission", "HardwareIds"})
+    @SuppressLint("MissingPermission")
     public String getImei() {
         if (TextUtils.isEmpty(mImei)) {
             if (PermissionUtil.checkReadPhoneStatePermission()) {
                 try {
                     TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                    mImei = tm.getDeviceId();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        mImei = tm.getImei();
+                    } else {
+                        mImei = tm.getDeviceId();
+                    }
                 } catch (Throwable e) {
                     Logger.d(TAG, "don't have permission android.permission.READ_PHONE_STATE,initIMEI failed ");
                 }

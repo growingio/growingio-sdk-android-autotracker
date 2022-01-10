@@ -36,6 +36,7 @@ public class CoreConfiguration implements Configurable {
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
+    private boolean isMultiProcessEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
     @FieldToString(clazz = EventExcludeFilter.class, method = "getEventFilterLog", parameterTypes = {int.class})
     private int mExcludeEventFlag = EventExcludeFilter.NONE;
@@ -182,7 +183,16 @@ public class CoreConfiguration implements Configurable {
 
     public CoreConfiguration setIdMappingEnabled(boolean enabled) {
         this.mIdMappingEnabled = enabled;
-        return (CoreConfiguration) this;
+        return this;
+    }
+
+    public boolean isMultiProcessEnabled() {
+        return isMultiProcessEnabled;
+    }
+
+    public CoreConfiguration setMultiProcessEnabled(boolean enabled) {
+        this.isMultiProcessEnabled = enabled;
+        return this;
     }
 
 }
