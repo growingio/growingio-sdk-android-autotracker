@@ -88,10 +88,11 @@ public class DemoApplication extends Application {
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setDataCollectionEnabled(true)
+                    //.setRequireAppProcessesEnabled(true)
                     .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.REENGAGE))
-                    .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL));
-                    //.addConfiguration(new OaidConfig().setProvideOaid("cpacm"))
-                    //.addPreloadComponent(new OaidLibraryGioModule());
+                    .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
+                    //.addConfiguration(oaidConfig)
+                    .addPreloadComponent(new OaidLibraryGioModule());
         }
 
         enableStrictMode();

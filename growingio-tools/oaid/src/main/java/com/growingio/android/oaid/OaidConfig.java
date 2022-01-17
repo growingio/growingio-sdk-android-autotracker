@@ -24,14 +24,14 @@ import com.growingio.android.sdk.Configurable;
 /**
  * <p>
  * 请选择其中一种方式传入oaid，若多处设置，则按照以下优先级获取
- * provideOaid -> oaidApplyCallback
+ * provideOaid -> OnProvideOaidCallback
  * 请提供oaid需要的证书，默认将从asset下获取 context.getPackageName() + ".cert.pem" 名称的证书。若多处设置，则按照以下优先级获取
- * provideCertFile -> provideCertAsset -> certProvideCallback -> 默认
+ * provideCert -> provideCertAsset -> OnProvideCertCallback -> 默认
  *
  * @author cpacm 2022/1/14
  */
 public class OaidConfig implements Configurable {
-    private String provideOaid;//外部提供的oaid
+    private String provideOaid; //外部提供的oaid
     private OnProvideOaidCallback provideOaidCallback;
 
     private String provideCert;

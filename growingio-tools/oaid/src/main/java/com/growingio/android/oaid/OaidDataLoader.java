@@ -48,6 +48,11 @@ public class OaidDataLoader implements ModelLoader<OaidHelper, String> {
             initOaidSdk(context, config);
         }
 
+        protected Factory(Context context, OaidConfig config) {
+            this.mContext = context;
+            initOaidSdk(context, config);
+        }
+
         private void initOaidSdk(Context context, OaidConfig config) {
             //提前初始化，以便oaid sdk 加载so包
             if (sOaidHelper == null) {
@@ -57,7 +62,7 @@ public class OaidDataLoader implements ModelLoader<OaidHelper, String> {
                         if (config.getProvideOaidCallback() != null || (config.getProvideOaid() != null && !config.getProvideOaid().isEmpty())) {
                             sOaidHelper = new OaidDirectlyHelper(context, config);
                         } else {
-                            sOaidHelper = new OaidCertHelper(context,config);
+                            sOaidHelper = new OaidCertHelper(context, config);
                         }
                     }
                 }

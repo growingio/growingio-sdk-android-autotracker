@@ -38,14 +38,14 @@ public class OaidDirectlyHelper implements IOaidHelper {
         if (config.getProvideOaid() != null && !config.getProvideOaid().isEmpty()) {
             this.oaid = config.getProvideOaid();
             needPreload = false;
-        }else{
+        } else {
             preloadOaid(context);
         }
     }
 
     @Override
     public void preloadOaid(Context context) {
-        if (!needPreload || config.getProvideOaidCallback() != null) return;
+        if (!needPreload || config.getProvideOaidCallback() == null) return;
         synchronized (this) {
             TrackMainThread.trackMain().postActionToTrackMain(() -> {
                 this.oaid = config.getProvideOaidCallback().provideOaidJob(context);
