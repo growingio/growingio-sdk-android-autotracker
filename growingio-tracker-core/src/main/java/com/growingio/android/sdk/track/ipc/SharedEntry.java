@@ -106,7 +106,8 @@ class SharedEntry {
                 }
                 break;
             case VALUE_TYPE_BOOLEAN:
-                if (valueLength == (Byte.SIZE / Byte.SIZE)) {
+                int size = Byte.SIZE;
+                if (valueLength == (Byte.SIZE / size)) {
                     return byteBuffer.get() == 1;
                 }
                 break;
@@ -184,9 +185,10 @@ class SharedEntry {
     }
 
     public void putBoolean(ByteBuffer byteBuffer, boolean value) {
+        int size = Byte.SIZE;
         byteBuffer.position(mValuePosition);
         byteBuffer.put(VALUE_TYPE_BOOLEAN);
-        byteBuffer.putShort((short) (Byte.SIZE / Byte.SIZE));
+        byteBuffer.putShort((short) (Byte.SIZE / size));
         byteBuffer.put((byte) (value ? 1 : 0));
     }
 

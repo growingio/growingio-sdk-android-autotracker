@@ -181,7 +181,9 @@ public class DeviceInfoProvider {
         if (TextUtils.isEmpty(result)) {
             result = UUID.randomUUID().toString();
         }
-        PersistentDataProvider.get().setDeviceId(result);
+        if (result != null && result.length() != 0) {
+            PersistentDataProvider.get().setDeviceId(result);
+        }
         return result;
     }
 }

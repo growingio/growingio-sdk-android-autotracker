@@ -181,10 +181,6 @@ public class Tracker {
 
     public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
         if (!isInited) return;
-        if (activity == null) {
-            Logger.e(TAG, "activity is NULL");
-            return;
-        }
         ActivityStateProvider.get().onActivityNewIntent(activity, intent);
     }
 

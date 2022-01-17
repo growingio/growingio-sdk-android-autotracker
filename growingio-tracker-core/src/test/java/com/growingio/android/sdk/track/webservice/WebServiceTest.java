@@ -101,6 +101,7 @@ public class WebServiceTest {
 
         tipView.show(activity);
         tipView.dismiss();
+        assertThat(tipView.isDismissed()).isTrue();
     }
 
     @Test

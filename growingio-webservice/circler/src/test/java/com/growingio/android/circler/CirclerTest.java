@@ -137,6 +137,7 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
     public void socketHandlerTest() {
         Request request = new Request.Builder().url(getWsUrl()).build();
         client.newWebSocket(request, webSocketHandler);
+        Truth.assertThat(getWsUrl()).contains(String.valueOf(request.url().port()));
     }
 
     @Override
