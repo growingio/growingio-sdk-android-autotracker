@@ -170,7 +170,7 @@ public class PersistentDataProvider {
 
         mProcessLock.lockedRun(() -> {
             boolean isFirstProcess = false;
-            if (ConfigurationProvider.core().isMultiProcessEnabled() && ConfigurationProvider.core().isDataCollectionEnabled()) {
+            if (ConfigurationProvider.core().isRequireAppProcessesEnabled() && ConfigurationProvider.core().isDataCollectionEnabled()) {
                 List<Integer> alivePid = new ArrayList<>();
                 Set<Integer> runningProcess = getRunningProcess(mContext);
                 for (int pid : getAlivePid()) {

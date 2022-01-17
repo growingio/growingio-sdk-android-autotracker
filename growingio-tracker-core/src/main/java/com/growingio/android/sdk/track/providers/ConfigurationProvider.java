@@ -67,19 +67,23 @@ public class ConfigurationProvider {
 
     public static ConfigurationProvider get() {
         if (INSTANCE == null) {
-            Logger.e(TAG, "GrowingSDK hasn't config, please initialized before use API");
+            Logger.e(TAG, "GrowingSDK doesn't have config yet, please initialized before use API");
             return empty();
         }
         synchronized (ConfigurationProvider.class) {
             if (INSTANCE != null) {
                 return INSTANCE;
             }
-            Logger.e(TAG, "GrowingSDK hasn't config, please initialized before use API");
+            Logger.e(TAG, "GrowingSDK doesn't have config yet, please initialized before use API");
             return empty();
         }
     }
 
     public static void initWithConfig(CoreConfiguration coreConfiguration, Map<Class<? extends Configurable>, Configurable> moduleConfigs) {
+        if (INSTANCE != null) {
+            Logger.e(TAG, "Something error!! GrowingSDK already has the config, please don't initialized again!");
+            return;
+        }
         INSTANCE = new ConfigurationProvider(coreConfiguration, moduleConfigs);
     }
 
@@ -95,6 +99,9 @@ public class ConfigurationProvider {
 
     public String getAllConfigurationInfo() {
         StringBuilder info = new StringBuilder();
+        if (!core().isDebugEnabled()) {
+            return "GrowingSDK display config info only in debug environment.";
+        }
         info.append(ObjectUtils.reflectToString(core()));
         for (Configurable configurable : sModuleConfigs.values()) {
             info.append(ObjectUtils.reflectToString(configurable));

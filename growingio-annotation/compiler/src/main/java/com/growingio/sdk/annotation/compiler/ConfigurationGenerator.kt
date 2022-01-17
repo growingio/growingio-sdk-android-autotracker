@@ -88,7 +88,7 @@ internal class ConfigurationGenerator(
         val coreConfiguration = processEnv.elementUtils.getTypeElement(GIO_DEFAULT_CONFIGURATION)
             ?: throw IllegalStateException("Do you have import this class:$GIO_DEFAULT_CONFIGURATION?")
         val generatedCodePackageName = appModule.enclosingElement.toString()
-        val generateClass = ClassName.get(generatedCodePackageName,configName)
+        val generateClass = ClassName.get(generatedCodePackageName, configName)
         val coreConfigurationClass = ClassName.get(coreConfiguration)
         val configBuilder = TypeSpec.classBuilder(configName)
             .addJavadoc(
@@ -127,7 +127,7 @@ internal class ConfigurationGenerator(
             .addMethod(generateConstructor(coreConfigurationClass, gioConfigs))//构造方法
             .addMethod(generateCore(coreConfigurationClass))
             .addMethod(generateGetConfigModules(mapOfConfigAndClass))
-            .addMethod(generateAddConfiguration(configurableClass))
+            .addMethod(generateAddConfiguration(generateClass, configurableClass))
             .addMethod(generateGetConfiguration())
 
         methodMap.clear()
@@ -137,7 +137,7 @@ internal class ConfigurationGenerator(
             for (method in methods) {
                 processUtils.debugLog("${method.returnType} ${method.simpleName}(${method.parameters}){}")
                 val isCore = config == GIO_DEFAULT_CONFIGURATION
-                overriding(generateClass,configType, method, isCore)?.let {
+                overriding(generateClass, configType, method, isCore)?.let {
                     configBuilder.addMethod(it)
                 }
             }
@@ -209,13 +209,15 @@ internal class ConfigurationGenerator(
         return modulesMethod.build()
     }
 
-    private fun generateAddConfiguration(config: ClassName): MethodSpec {
+    private fun generateAddConfiguration(generateClass: ClassName, config: ClassName): MethodSpec {
         val addMethod = MethodSpec.methodBuilder("addConfiguration")
             .addParameter(config, "config")
             .addModifiers(Modifier.PUBLIC)
             .beginControlFlow("if (config != null)")
             .addStatement("MODULE_CONFIGURATIONS.put(config.getClass(), config)")
             .endControlFlow()
+            .returns(generateClass)
+            .addStatement("return this")
         return addMethod.build()
     }
 
@@ -239,7 +241,7 @@ internal class ConfigurationGenerator(
     }
 
     private fun overriding(
-        generateClass:ClassName,
+        generateClass: ClassName,
         config: TypeElement,
         method: ExecutableElement,
         isCore: Boolean = false
@@ -247,7 +249,7 @@ internal class ConfigurationGenerator(
         val enclosingClass = method.enclosingElement
         require(!enclosingClass.modifiers.contains(Modifier.ABSTRACT)) { "Cannot transform method on abstract class $enclosingClass" }
         var modifiers = method.modifiers
-        if (modifiers.contains(Modifier.PRIVATE)) {
+        if (modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)) {
             processUtils.debugLog("cannot transform method with modifiers: $modifiers")
             return null
         }
@@ -275,6 +277,9 @@ internal class ConfigurationGenerator(
         methodBuilder.varargs(method.isVarArgs)
         for (thrownType in method.thrownTypes) {
             methodBuilder.addException(TypeName.get(thrownType))
+        }
+        for (annotationMirror in method.annotationMirrors) {
+            methodBuilder.addAnnotation(AnnotationSpec.get(annotationMirror))
         }
 
         // getConfiguration(CrashConfig.class).setDNS(dns);
@@ -312,11 +317,9 @@ internal class ConfigurationGenerator(
                 methodBuilder.returns(generateClass)
                 methodBuilder.addStatement(stateSb.toString(), ClassName.get(config))
                 methodBuilder.addStatement("return this")
-
             } else {
                 methodBuilder.returns(TypeName.get(method.returnType))
                 methodBuilder.addStatement("return $stateSb", ClassName.get(config))
-
             }
         } else {
             methodBuilder.returns(TypeName.get(method.returnType))

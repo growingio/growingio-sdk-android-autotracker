@@ -18,9 +18,9 @@ package com.growingio.android.oaid;
 
 import android.content.Context;
 
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.OaidHelper;
 
 public class OaidDataLoader implements ModelLoader<OaidHelper, String> {
@@ -38,51 +38,27 @@ public class OaidDataLoader implements ModelLoader<OaidHelper, String> {
     }
 
     public static class Factory implements ModelLoaderFactory<OaidHelper, String> {
-        private static final String TAG = "OaidDataLoader.Factory";
         private final Context mContext;
         private static volatile IOaidHelper sOaidHelper;
 
         public Factory(Context context) {
             this.mContext = context;
+            OaidConfig config = ConfigurationProvider.get().getConfiguration(OaidConfig.class);
+            if (config == null) config = new OaidConfig();
+            initOaidSdk(context, config);
+        }
+
+        private void initOaidSdk(Context context, OaidConfig config) {
+            //提前初始化，以便oaid sdk 加载so包
             if (sOaidHelper == null) {
                 synchronized (Factory.class) {
                     if (sOaidHelper == null) {
-                        // 高版本可能包含低版本的类, 需要优先判断是否为高版本
-                        try {
-                            if (hasClass("com.bun.miitmdid.core.CertChecker")) {
-                                sOaidHelper = new OaidHelper1026();
-                            } else if (hasClass("com.bun.miitmdid.interfaces.IIdentifierListener")) {
-                                sOaidHelper = new OaidHelper1025();
-                            } else if (hasClass("com.bun.supplier.IIdentifierListener")) {
-                                sOaidHelper = new OaidHelper1013();
-                            } else if (hasClass("com.bun.miitmdid.core.IIdentifierListener")) {
-                                sOaidHelper = new OaidHelper1010();
-                            }
-                        } catch (Throwable throwable) {
-                            Logger.d(TAG, "not compatible with the version of oaid sdk");
-                        }
-
-                        if (sOaidHelper == null) {
-                            // 异常情况下使用空实现
-                            sOaidHelper = new IOaidHelper() {
-                                @Override
-                                public void preloadOaid(Context context) {
-                                }
-
-                                @Override
-                                public String getOaid() {
-                                    return null;
-                                }
-                            };
+                        // 用户直接提供oaid值情况下
+                        if (config.getProvideOaidCallback() != null || (config.getProvideOaid() != null && !config.getProvideOaid().isEmpty())) {
+                            sOaidHelper = new OaidDirectlyHelper(context, config);
                         } else {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    sOaidHelper.preloadOaid(context);
-                                }
-                            }, TAG).start();
+                            sOaidHelper = new OaidCertHelper(context,config);
                         }
-
                     }
                 }
             }
@@ -91,15 +67,6 @@ public class OaidDataLoader implements ModelLoader<OaidHelper, String> {
         @Override
         public ModelLoader<OaidHelper, String> build() {
             return new OaidDataLoader(mContext, sOaidHelper);
-        }
-
-        private static boolean hasClass(String className) {
-            try {
-                Class.forName(className);
-                return true;
-            } catch (Throwable e) {
-                return false;
-            }
         }
     }
 }
