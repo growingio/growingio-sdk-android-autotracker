@@ -28,7 +28,6 @@ import android.webkit.WebView;
 
 import androidx.annotation.RequiresApi;
 
-import com.growingio.android.oaid.OaidConfig;
 import com.growingio.android.oaid.OaidLibraryGioModule;
 import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
