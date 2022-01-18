@@ -24,6 +24,11 @@ ANDROID_API=android-31
 ANDROID_JAR_CLASSPATH="${ANDROID_HOME}/platforms/$ANDROID_API/android.jar"
 SDK_CORE=../../../growingio-tracker-core/build/intermediates/compile_library_classes_jar/debug/classes.jar
 IOAID=../build/intermediates/compile_library_classes_jar/debug/classes.jar
+
+if [ ! -d "classes" ];then
+  mkdir "classes"
+fi
+
 javac -d classes/ -classpath $ANDROID_JAR_CLASSPATH:miit_mdid_1.0.10.jar:$SDK_CORE:$IOAID OaidHelper1010.java -Xlint:unchecked
 javac -d classes/ -classpath $ANDROID_JAR_CLASSPATH:msa_mdid_1.0.13.jar:$SDK_CORE:$IOAID OaidHelper1013.java -Xlint:unchecked
 javac -d classes/ -classpath $ANDROID_JAR_CLASSPATH:oaid_sdk_1.0.25.jar:$SDK_CORE:$IOAID OaidHelper1025.java -Xlint:unchecked
