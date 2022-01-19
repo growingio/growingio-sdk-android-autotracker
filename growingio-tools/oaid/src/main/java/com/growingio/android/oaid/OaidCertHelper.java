@@ -91,14 +91,14 @@ public class OaidCertHelper implements IOaidHelper {
     }
 
     private IOaidHelper preloadOaid1010() {
-        return new OaidHelper1025();
+        return new OaidHelper1010();
     }
 
     private String getOaidCert(Context context) {
         if (config.getProvideCert() != null && !config.getProvideCert().isEmpty()) {
             return config.getProvideCert();
         }
-        if (config.getProvideCertAsset() != null && !config.getProvideCert().isEmpty()) {
+        if (config.getProvideCertAsset() != null && !config.getProvideCertAsset().isEmpty()) {
             return loadPemFromAssetFile(context, config.getProvideCertAsset());
         }
         if (config.getProvideCertCallback() != null) {
