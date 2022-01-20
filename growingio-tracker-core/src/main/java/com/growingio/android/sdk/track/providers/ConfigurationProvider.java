@@ -80,10 +80,7 @@ public class ConfigurationProvider {
     }
 
     public static void initWithConfig(CoreConfiguration coreConfiguration, Map<Class<? extends Configurable>, Configurable> moduleConfigs) {
-        if (INSTANCE != null) {
-            Logger.e(TAG, "Something error!! GrowingSDK already has the config, please don't initialized again!");
-            return;
-        }
+        Logger.w(TAG, "Warning!! GrowingSDK already has the config, please don't initialized again!");
         INSTANCE = new ConfigurationProvider(coreConfiguration, moduleConfigs);
     }
 
