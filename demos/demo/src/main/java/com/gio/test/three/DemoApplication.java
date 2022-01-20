@@ -81,8 +81,8 @@ public class DemoApplication extends Application {
         }
 
         if (sConfiguration == null) {
-            sConfiguration = new CdpAutotrackConfiguration("91eaf9b283361032", "growing.401dfd8bba45afda")
-                    .setDataSourceId("91373f31ba946d28")
+            sConfiguration = new CdpAutotrackConfiguration("bc675c65b3b0290e", "growing.47d2b990025d67f5")
+                    .setDataSourceId("939c0b26233d3ed1")
                     .setDataCollectionServerHost("http://uat-api.growingio.com")
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)

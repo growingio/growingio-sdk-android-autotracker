@@ -26,7 +26,7 @@ import android.webkit.WebViewClient;
 import com.gio.test.three.autotrack.R;
 
 public class WebViewActivity extends Activity {
-    private static String sLoadUrl = "http://10.20.50.26:8081/";
+    private static String sLoadUrl = "http://release-messages.growingio.cn/push/cdp/uat.html";
 
     private WebView mWebView;
 
