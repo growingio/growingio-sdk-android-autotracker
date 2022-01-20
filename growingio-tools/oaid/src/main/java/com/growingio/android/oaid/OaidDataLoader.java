@@ -39,7 +39,7 @@ public class OaidDataLoader implements ModelLoader<OaidHelper, String> {
 
     public static class Factory implements ModelLoaderFactory<OaidHelper, String> {
         private final Context mContext;
-        private static volatile IOaidHelper sOaidHelper;
+        private volatile IOaidHelper sOaidHelper;
 
         public Factory(Context context) {
             this.mContext = context;
