@@ -154,8 +154,8 @@ public class UtilsTest {
 
     @Test
     public void systemTest() {
-        Truth.assertThat(SystemUtil.getProcessName()).isNull();
-        Truth.assertThat(SystemUtil.isMainProcess(application)).isFalse();
+        Truth.assertThat(SystemUtil.getProcessName()).isEqualTo("com.growingio.android.sdk.track.test");
+        Truth.assertThat(SystemUtil.isMainProcess(application)).isTrue();
         //SystemUtil.killAppProcess(application);
 
         SysTrace.beginSection("test");
