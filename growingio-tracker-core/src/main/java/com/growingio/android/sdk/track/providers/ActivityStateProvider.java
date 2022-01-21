@@ -156,4 +156,5 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
     protected void singleAction(IActivityLifecycle listener, ActivityLifecycleEvent action) {
         listener.onActivityLifecycle(action);
     }
+
 }

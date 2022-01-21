@@ -18,11 +18,11 @@ package com.gio.test.three;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.os.Process;
 import android.os.StrictMode;
-import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.webkit.WebView;
 
@@ -38,7 +38,7 @@ import com.tencent.smtt.sdk.QbSdk;
 
 import java.util.List;
 
-public class DemoApplication extends MultiDexApplication {
+public class DemoApplication extends Application {
     private static final String TAG = "DemoApplication";
 
     private static boolean sIsAutotracker = true;
@@ -87,9 +87,11 @@ public class DemoApplication extends MultiDexApplication {
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setDataCollectionEnabled(true)
+                    //.setRequireAppProcessesEnabled(true)
                     .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.REENGAGE))
                     .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
-                    .setPreloadComponent(new OaidLibraryGioModule());
+                    //.addConfiguration(oaidConfig)
+                    .addPreloadComponent(new OaidLibraryGioModule());
         }
 
         enableStrictMode();

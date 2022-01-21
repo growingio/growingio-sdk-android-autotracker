@@ -15,7 +15,8 @@ GrowingIO Autotracker
 **GrowingIO Autotracker** 具备自动采集基本的用户行为事件，比如访问和行为数据等。目前支持代码埋点、无埋点、可视化圈选、数据监测等功能。
 
 ## 集成文档
-敬请期待……
+
+[SDK 3.0 集成文档](https://growingio.github.io/growingio-sdk-docs/)
 
 ## License
 ```

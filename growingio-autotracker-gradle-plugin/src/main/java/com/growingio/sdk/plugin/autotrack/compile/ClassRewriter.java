@@ -56,10 +56,11 @@ public class ClassRewriter {
             "android/arch/",
             "com/google/",
             "javax/",
-//            "com/squareup/",
             "io/rectivex/rxjava",
-//            "org/apache",
             "org/jetbrains/kotlin",
+
+//            "com/squareup/",
+//            "org/apache",
     };
 
 

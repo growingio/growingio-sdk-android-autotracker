@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.track.ipc;
 
+import static android.content.Context.ACTIVITY_SERVICE;
+
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Process;
@@ -26,7 +28,9 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.interfaces.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
+import com.growingio.android.sdk.track.utils.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -163,9 +167,10 @@ public class PersistentDataProvider {
     }
 
     private void repairPid() {
-        mProcessLock.lockedRun(new Runnable() {
-            @Override
-            public void run() {
+
+        mProcessLock.lockedRun(() -> {
+            boolean isFirstProcess = false;
+            if (ConfigurationProvider.core().isRequireAppProcessesEnabled() && ConfigurationProvider.core().isDataCollectionEnabled()) {
                 List<Integer> alivePid = new ArrayList<>();
                 Set<Integer> runningProcess = getRunningProcess(mContext);
                 for (int pid : getAlivePid()) {
@@ -173,18 +178,24 @@ public class PersistentDataProvider {
                         alivePid.add(pid);
                     }
                 }
-
                 if (alivePid.isEmpty()) {
-                    setActivityCount(0);
-                    setLatestPauseTime(System.currentTimeMillis());
-                    setLatestNonNullUserId(getLoginUserId());
-
-                    SessionProvider.get().refreshSessionId();
-                    SessionProvider.get().generateVisit();
+                    isFirstProcess = true;
                 }
-
                 alivePid.add(Process.myPid());
                 putAlivePid(alivePid);
+            } else {
+                isFirstProcess = SystemUtil.isMainProcess(mContext);
+                // 将主进程id加入alive pid 中
+                if (isFirstProcess) putAlivePid(new ArrayList<>(Process.myPid()));
+            }
+
+            if (isFirstProcess) {
+                setActivityCount(0);
+                setLatestPauseTime(System.currentTimeMillis());
+                setLatestNonNullUserId(getLoginUserId());
+
+                SessionProvider.get().refreshSessionId();
+                SessionProvider.get().generateVisit();
             }
         });
     }
@@ -200,7 +211,7 @@ public class PersistentDataProvider {
     private Set<Integer> getRunningProcess(Context context) {
         Set<Integer> myRunningProcess = new HashSet<>();
         try {
-            ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager manager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
             List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = manager.getRunningAppProcesses();
             int myUid = Process.myUid();
             for (ActivityManager.RunningAppProcessInfo info : runningAppProcesses) {

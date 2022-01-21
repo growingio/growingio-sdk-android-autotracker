@@ -76,7 +76,7 @@ public class Tracker {
 
         loadAnnotationGeneratedModules(application);
         // 支持配置中注册模块, 如加密模块等事件模块需要先于所有事件发送注册
-        for (LibraryGioModule component : ConfigurationProvider.core().getPreoloadComponents()) {
+        for (LibraryGioModule component : ConfigurationProvider.core().getPreloadComponents()) {
             component.registerComponents(application, TrackerContext.get().getRegistry());
         }
     }

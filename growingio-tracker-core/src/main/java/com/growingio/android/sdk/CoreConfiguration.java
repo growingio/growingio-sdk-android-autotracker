@@ -36,6 +36,7 @@ public class CoreConfiguration implements Configurable {
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
+    private boolean mRequireAppProcessesEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
     @FieldToString(clazz = EventExcludeFilter.class, method = "getEventFilterLog", parameterTypes = {int.class})
     private int mExcludeEventFlag = EventExcludeFilter.NONE;
@@ -163,16 +164,20 @@ public class CoreConfiguration implements Configurable {
         return mIgnoreFieldFlag;
     }
 
+    @Deprecated
     public CoreConfiguration setPreloadComponent(LibraryGioModule component) {
+        return addPreloadComponent(component);
+    }
+
+    public CoreConfiguration addPreloadComponent(LibraryGioModule component) {
         if (component == null) {
             return this;
         }
-
         mComponents.add(component);
         return this;
     }
 
-    public List<LibraryGioModule> getPreoloadComponents() {
+    protected List<LibraryGioModule> getPreloadComponents() {
         return mComponents;
     }
 
@@ -182,7 +187,16 @@ public class CoreConfiguration implements Configurable {
 
     public CoreConfiguration setIdMappingEnabled(boolean enabled) {
         this.mIdMappingEnabled = enabled;
-        return (CoreConfiguration) this;
+        return this;
+    }
+
+    public boolean isRequireAppProcessesEnabled() {
+        return mRequireAppProcessesEnabled;
+    }
+
+    public CoreConfiguration setRequireAppProcessesEnabled(boolean enabled) {
+        this.mRequireAppProcessesEnabled = enabled;
+        return this;
     }
 
 }

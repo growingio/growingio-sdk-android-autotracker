@@ -45,8 +45,10 @@ dependencies {
     testImplementation libraries.test.androidx_core
     testImplementation libraries.test.robolectric
     testImplementation libraries.androidx.appcompat
-    testImplementation files('resources/oaid_sdk_1.0.25.jar')
+    testImplementation files('resources/oaid_sdk_1.1.0.jar')
 
+    compileOnly files('resources/oaid_sdk_1.1.0.jar')
+    //compileOnly files('resources/oaid_sdk_1.0.26.jar')
     implementation files('libs/msa_helper.jar')
     implementation project(':growingio-tracker-core')
     implementation project(":growingio-annotation")

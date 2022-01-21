@@ -43,6 +43,7 @@ public class MainActivity extends ListActivity {
         Log.e(TAG, "onCreate: ");
         Intent intent = getIntent();
         Log.e(TAG, "onCreate: intent.getData() = " + intent.getData());
+
         super.onCreate(savedInstanceState);
         new LoadTask().execute();
     }

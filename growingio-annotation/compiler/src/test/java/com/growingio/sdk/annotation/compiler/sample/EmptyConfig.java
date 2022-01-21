@@ -18,4 +18,21 @@ package com.growingio.sdk.annotation.compiler.sample;
 import com.growingio.android.sdk.Configurable;
 
 public class EmptyConfig implements Configurable {
+
+    private String testValue;
+
+    @Deprecated
+    public EmptyConfig setTestValue(String testValue) {
+        this.testValue = testValue;
+        return this;
+    }
+
+    protected EmptyConfig replaceTestValue(String testValue) {
+        this.testValue = testValue;
+        return this;
+    }
+
+    public String getTestValue() {
+        return testValue;
+    }
 }

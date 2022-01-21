@@ -23,9 +23,8 @@ import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.utils.OaidHelper;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
-@GIOLibraryModule
+@GIOLibraryModule(config = OaidConfig.class)
 public class OaidLibraryGioModule extends LibraryGioModule {
-
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
         registry.register(OaidHelper.class, String.class, new OaidDataLoader.Factory(context));

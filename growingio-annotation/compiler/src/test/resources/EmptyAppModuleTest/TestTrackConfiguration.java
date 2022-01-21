@@ -45,10 +45,11 @@ public final class TestTrackConfiguration {
         return MODULE_CONFIGURATIONS;
     }
 
-    public void addConfiguration(Configurable config) {
+    public TestTrackConfiguration addConfiguration(Configurable config) {
         if (config != null) {
             MODULE_CONFIGURATIONS.put(config.getClass(), config);
         }
+        return this;
     }
 
     @SuppressWarnings("unchecked")
@@ -148,5 +149,15 @@ public final class TestTrackConfiguration {
     public final TestTrackConfiguration setOaidEnabled(boolean enabled) {
         core().setOaidEnabled(enabled);
         return this;
+    }
+
+    @Deprecated
+    public final TestTrackConfiguration setTestValue(String testValue) {
+        getConfiguration(EmptyConfig.class).setTestValue(testValue);
+        return this;
+    }
+
+    public final String getTestValue() {
+        return getConfiguration(EmptyConfig.class).getTestValue();
     }
 }

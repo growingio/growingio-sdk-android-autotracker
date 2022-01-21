@@ -168,6 +168,7 @@ public class EventSender {
         }
     }
 
+    @SuppressLint("WrongConstant")
     private ActivityManager.MemoryInfo getMemoryInfo() {
         ActivityManager activityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();

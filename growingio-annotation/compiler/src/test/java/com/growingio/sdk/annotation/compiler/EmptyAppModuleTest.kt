@@ -52,8 +52,6 @@ class EmptyAppModuleTest : CompilationProvider {
         assertThat(compilation!!).generatedSourceFile(TestUtil.subpackage("TestTrackConfiguration"))
             .hasSourceEquivalentTo(forResource("TestTrackConfiguration.java"))
 
-
-//            .hasSourceEquivalentTo(forResource("GeneratedGioModuleImpl.java"))
     }
 
     private fun forResource(name: String): JavaFileObject {
