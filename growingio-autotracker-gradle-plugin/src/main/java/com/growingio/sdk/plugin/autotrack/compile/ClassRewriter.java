@@ -136,7 +136,7 @@ public class ClassRewriter {
             ClassReader classReader = new ClassReader(bytes);
             AutotrackClassWriter classWriter = new AutotrackClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
             Context context = new Context(mLog, mClassLoader);
-            classReader.accept(new ContextClassVisitor(classWriter.getApi(), context), ClassReader.SKIP_DEBUG | ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES);
+            classReader.accept(new ContextClassVisitor(classWriter.getApi(), context), ClassReader.SKIP_DEBUG | ClassReader.SKIP_CODE);
             className = context.getClassName();
             ClassVisitor classVisitor;
             if (className == null || this.isExcludedPackage(context.getClassName())) {
@@ -148,13 +148,13 @@ public class ClassRewriter {
                             context),
                     context);
             classVisitor = desugaringClassVisitor;
-            classReader.accept(classVisitor, ClassReader.SKIP_FRAMES | ClassReader.EXPAND_FRAMES);
+            classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
             if (!desugaringClassVisitor.getNeedInjectTargetMethods().isEmpty()) {
                 // lambda 表达式需要特殊处理两次
                 mLog.debug(String.format("GIO: deal with lambda second time:  %s", className));
                 ClassReader lambdaReader = new ClassReader(classWriter.toByteArray());
                 classWriter = new AutotrackClassWriter(lambdaReader, ClassWriter.COMPUTE_MAXS);
-                lambdaReader.accept(new DesugaredClassVisitor(classWriter.getApi(), classWriter, context, desugaringClassVisitor.getNeedInjectTargetMethods()), ClassReader.SKIP_FRAMES | ClassReader.EXPAND_FRAMES);
+                lambdaReader.accept(new DesugaredClassVisitor(classWriter.getApi(), classWriter, context, desugaringClassVisitor.getNeedInjectTargetMethods()), ClassReader.EXPAND_FRAMES);
             }
             if (context.isClassModified()) {
                 return classWriter.toByteArray();
