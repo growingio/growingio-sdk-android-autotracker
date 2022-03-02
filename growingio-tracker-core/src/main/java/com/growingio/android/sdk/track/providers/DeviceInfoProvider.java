@@ -41,8 +41,6 @@ public class DeviceInfoProvider {
     private static final String DEVICE_TYPE_PHONE = "PHONE";
     private static final String DEVICE_TYPE_PAD = "PAD";
 
-    private static final String MAGIC_ANDROID_ID = "9774d56d682e549c";
-
     private final Context mContext;
 
     private String mOperatingSystemVersion;
@@ -52,8 +50,6 @@ public class DeviceInfoProvider {
     private int mScreenHeight;
     private int mScreenWidth;
 
-    private String mAndroidId;
-    private String mImei;
     private String mOaid;
     private String mGoogleAdId;
     private String mDeviceId;
@@ -114,32 +110,6 @@ public class DeviceInfoProvider {
         return mScreenWidth;
     }
 
-    @SuppressLint("MissingPermission")
-    public String getImei() {
-        if (TextUtils.isEmpty(mImei)) {
-            if (PermissionUtil.checkReadPhoneStatePermission()) {
-                try {
-                    TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        mImei = tm.getImei();
-                    } else {
-                        mImei = tm.getDeviceId();
-                    }
-                } catch (Throwable e) {
-                    Logger.d(TAG, "don't have permission android.permission.READ_PHONE_STATE,initIMEI failed ");
-                }
-            }
-        }
-        return null;
-    }
-
-    public String getAndroidId() {
-        if (TextUtils.isEmpty(mAndroidId)) {
-            mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
-        }
-        return mAndroidId;
-    }
-
     public String getOaid() {
         if (TextUtils.isEmpty(mOaid)) {
             mOaid = TrackerContext.get().executeData(null, OaidHelper.class, String.class);
@@ -167,16 +137,7 @@ public class DeviceInfoProvider {
 
     private String calculateDeviceId() {
         Logger.d(TAG, "first time calculate deviceId");
-        String adId = getAndroidId();
         String result = null;
-        if (!TextUtils.isEmpty(adId) && !MAGIC_ANDROID_ID.equals(adId)) {
-            result = UUID.nameUUIDFromBytes(adId.getBytes(Charset.forName("UTF-8"))).toString();
-        } else {
-            String imi = getImei();
-            if (!TextUtils.isEmpty(imi)) {
-                result = UUID.nameUUIDFromBytes(imi.getBytes(Charset.forName("UTF-8"))).toString();
-            }
-        }
 
         if (TextUtils.isEmpty(result)) {
             result = UUID.randomUUID().toString();

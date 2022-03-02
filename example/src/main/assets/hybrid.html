@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>first html5 page</title>
+
+    <!-- CDP 3.2-->
+    <script type="text/javascript">
+        window._gr_ignore_local_rule = true
+
+        !function(e,t,n,g,i){e[i]=e[i]||function(){
+            (e[i].q=e[i].q||[]).push(arguments)},
+            n=t.createElement("script"),
+            tag=t.getElementsByTagName("script")[0],
+            n.async=1,
+            n.src=g,tag.parentNode.insertBefore(n,tag)
+        }(window,document,"script","https://assets.giocdn.com/sdk/cdp/gio.js","gdp");
+        gdp('init', 'bc675c65b3b0290e', 'ae45f95742195faa',{
+            host: 'cdp-api.growingio.com',
+            debug: true,
+            scheme: 'https',
+            version: "1.2.1",
+            enableIdMapping: true,
+            compress: false,
+            hashtag: true,
+            autotrack: true,
+        });
+        gdp('send');
+    </script>
+
+    <style type="text/css">
+        body {
+            margin: 0 auto;
+            width: 100%;
+            background: #fff;
+            font: 100%/1.4 helvetica, arial, sans-serif;
+        }
+
+        header {
+            background: #ccc;
+            padding: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+    </style>
+    <script>
+        function setUserId1() {
+            gdp('setUserId','lisi', 'phone');
+        }
+        function setUserId2() {
+            gdp('setUserId','zhangsan2', 'email');
+        }
+        function setUserId3() {
+            gdp('setUserId','wangwu');
+        }
+        function clearUserId() {
+            gdp('clearUserId');
+        }
+        function sendCstm(){
+            gdp('track','cstm0915')
+        }
+        function sendAttributes(){
+            gdp('track', 'testEvent', {"goods": "鞋子", "brand": "鸿星尔克"}, {id: "123456", key: "order_id"})
+        }
+        function sendUserAttributes(){
+            gdp('setUserAttributes',{name:'用户属性', value:'123456'})
+        }
+        function enableDataCollect(){
+            gdp('setDataCollect', true)
+        }
+        function disableDatacollect(){
+            gdp('setDataCollect', false)
+        }
+        function autotrack(){
+            gdp('setAutoTrack', true)
+        }
+        function disableAutotrack(){
+            gdp('setAutoTrack', false)
+        }
+
+    </script>
+</head>
+
+<body>
+<header>
+    <h1>头部</h1>
+</header>
+<div id="second_item">
+    <form action="">
+        First Name:<br>
+        <input type="text" name="firstname">
+        <br>Last Name:<br>
+        <input type="text" name="lastname">
+        <br><br>
+        <button>Submit</button>
+    </form>
+</div>
+
+<div data-growing-idx="1">
+    <div class="right-container">
+        <h3 class="title">
+            触发事件
+        </h3>
+    </div>
+</div>
+<button onclick="setUserId1()">
+    设置userid为lisi，phone
+</button>
+<button onclick="setUserId2()">
+    设置userid为zhangsan2，邮箱
+</button>
+<button onclick="setUserId3()">
+    设置userid为wangwu
+</button>
+<button onclick="clearUserId()">
+    清除userid
+</button>
+<button onclick="sendCstm()">
+    发送cstm
+</button>
+<button onclick="sendAttributes()">
+    设置物品模型
+</button>
+<button onclick="sendUserAttributes()">
+    发送用户属性事件
+</button><br><br>
+<button onclick="enableDataCollect()">
+    开启数据sdk采集
+</button>
+<button onclick="disableDatacollect()">
+    关闭sdk数据采集
+</button>
+<button onclick="autotrack()">
+    开启autotrack
+</button>
+<button onclick="disableAutotrack()">
+    关闭autotrack
+</button><br><br>
+
+</body>
+</html>

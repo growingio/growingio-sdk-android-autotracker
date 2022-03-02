@@ -1,0 +1,160 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".InspectActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/inspect_btn_enableDataCollect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开启采集功能"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/inspect_btn_disableDataCollect"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/inspect_btn_disableDataCollect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关闭采集功能"
+            app:layout_constraintLeft_toRightOf="@id/inspect_btn_enableDataCollect"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <Button
+            android:id="@+id/inspect_btn_setUserId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置登录用户id"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/inspect_btn_clearUserId"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_disableDataCollect" />
+
+        <Button
+            android:id="@+id/inspect_btn_clearUserId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="清除登录用户id"
+            app:layout_constraintLeft_toRightOf="@id/inspect_btn_setUserId"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_disableDataCollect" />
+
+        <Button
+            android:id="@+id/inspect_btn_setLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置经纬度"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/inspect_btn_clearLocation"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_setUserId" />
+
+        <Button
+            android:id="@+id/inspect_btn_clearLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="清除经纬度"
+            app:layout_constraintLeft_toRightOf="@id/inspect_btn_setLocation"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_clearUserId" />
+
+        <Button
+            android:id="@+id/inspect_btn_trackCustom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发送自定义事件"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_clearLocation" />
+
+        <Button
+            android:id="@+id/inspect_btn_setUserAttributes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发送登录用户属性事件"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_trackCustom" />
+
+        <Button
+            android:id="@+id/inspect_btn_getDeviceId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="获取设备ID"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/inspect_tv_deviceId"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_setUserAttributes" />
+
+        <TextView
+            android:id="@+id/inspect_tv_deviceId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="设备ID"
+            app:layout_constraintLeft_toRightOf="@id/inspect_btn_getDeviceId"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_setUserAttributes"
+            app:layout_constraintBottom_toBottomOf="@id/inspect_btn_getDeviceId"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+        <Button
+            android:id="@+id/inspect_btn_setPageAlias"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置页面别名"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_getDeviceId" />
+
+        <Button
+            android:id="@+id/inspect_btn_ignorePage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="忽略页面"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_setPageAlias" />
+
+        <Button
+            android:id="@+id/inspect_btn_ignoreView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="忽略当前button view"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_ignorePage" />
+
+        <Button
+            android:id="@+id/inspect_btn_imp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置采集/忽略view的曝光事件"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_ignoreView" />
+
+        <Button
+            android:id="@+id/inspect_btn_setTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置view唯一标识"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_imp" />
+
+        <Button
+            android:id="@+id/inspect_btn_bridgeWebView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置WebView接口调用"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_setTag" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
+

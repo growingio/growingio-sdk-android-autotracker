@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.library'
+    id 'com.kezong.fat-aar'
 }
 
 android {
@@ -13,8 +14,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), "proguard-rules.pro"
         }
     }
     compileOptions {
@@ -30,29 +31,27 @@ android {
 dependencies {
     compileOnly libraries.android.fragment
     compileOnly libraries.androidx.fragment
+    compileOnly libraries.squareup.okhttp3
 
-    debugApi project(':growingio-autotracker-core')
-    releaseApi libraries.growingio.autotracker_core
+    embed project(path: ':growingio-autotracker-core', configuration: 'default')
 
-    debugApi project(':growingio-network:okhttp3')
-    releaseApi libraries.growingio.okhttp3
+    embed project(path: ':growingio-tracker-core', configuration: 'default')
 
-    debugApi project(':growingio-webservice:debugger')
-    releaseApi libraries.growingio.debugger
+    embed project(path: ':inject-annotation', configuration: 'default')
 
-    debugApi project(':growingio-data:database')
-    releaseApi libraries.growingio.database
+    embed project(path: ':growingio-network:okhttp3', configuration: 'default')
 
-    debugApi project(':growingio-data:json')
-    releaseApi libraries.growingio.json
+    embed project(path: ':growingio-data:database', configuration: 'default')
 
-    debugApi project(':growingio-webservice:circler')
-    releaseApi libraries.growingio.circler
+    embed project(path: ':growingio-data:json', configuration: 'default')
 
-    debugApi project(':growingio-hybrid')
-    releaseApi libraries.growingio.hybrid
+    embed project(path: ':growingio-hybrid', configuration: 'default')
 
-    implementation project(":growingio-annotation")
+    embed project(path: ':growingio-annotation', configuration: 'default')
+
+    embed project(path: ':growingio-data:encoder', configuration: 'default')
+
+    embed project(path: ':growingio-tools:snappy', configuration: 'default')
     annotationProcessor project(":growingio-annotation:compiler")
 }
 

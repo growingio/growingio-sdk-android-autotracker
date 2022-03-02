@@ -121,6 +121,10 @@ buildscript {
                         'asm_util'   : 'org.ow2.asm:asm-util:9.1',
                         'asm_tree'   : 'org.ow2.asm:asm-tree:9.1',
                 ],
+
+                'github'    : [
+                        'fat_aar': 'com.github.kezong:fat-aar:1.3.8',
+                ],
         ]
         kotlin_version = '1.4.32'
     }
@@ -138,6 +142,7 @@ buildscript {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
         classpath libraries.google.protobuf_gradle_plugin
         classpath libraries.sonar.sonar
+        classpath libraries.github.fat_aar
     }
 }
 

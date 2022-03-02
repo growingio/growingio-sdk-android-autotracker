@@ -1,0 +1,58 @@
+buildscript {
+    repositories {
+        google()
+        mavenLocal()
+        mavenCentral()
+        maven {url "https://s01.oss.sonatype.org/content/repositories/snapshots/"}
+    }
+    dependencies {
+        classpath "com.growingio.android:autotracker-gradle-plugin:3.3.4"
+    }
+}
+
+apply plugin: 'com.android.application'
+//添加 GrowingIO 插件
+apply plugin: 'com.growingio.android.autotracker'
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        applicationId "com.growingio.example"
+        minSdkVersion 17
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    implementation(name: 'autotracker-cdp-release', ext: 'aar')
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+}

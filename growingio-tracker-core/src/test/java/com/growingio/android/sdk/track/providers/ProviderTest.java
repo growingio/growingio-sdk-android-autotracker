@@ -146,13 +146,11 @@ public class ProviderTest {
 
     @Test
     public void deviceInfoProvider() {
-        Truth.assertThat(DeviceInfoProvider.get().getAndroidId()).isNull();
         Truth.assertThat(DeviceInfoProvider.get().getDeviceBrand()).isEqualTo("robolectric");
         Truth.assertThat(DeviceInfoProvider.get().getDeviceId()).isNotEmpty();
         Truth.assertThat(DeviceInfoProvider.get().getDeviceModel()).isEqualTo("robolectric");
         Truth.assertThat(DeviceInfoProvider.get().getDeviceType()).isEqualTo("PHONE");
         Truth.assertThat(DeviceInfoProvider.get().getGoogleAdId()).isNull();
-        Truth.assertThat(DeviceInfoProvider.get().getImei()).isNull();
         Truth.assertThat(DeviceInfoProvider.get().getOaid()).isNull();
         Truth.assertThat(DeviceInfoProvider.get().getOperatingSystemVersion()).isEqualTo("11");
         Truth.assertThat(DeviceInfoProvider.get().getScreenHeight()).isEqualTo(470);

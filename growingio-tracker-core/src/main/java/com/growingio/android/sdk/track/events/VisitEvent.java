@@ -29,16 +29,12 @@ import java.util.Map;
 public final class VisitEvent extends BaseEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mImei;
-    private final String mAndroidId;
     private final String mOaid;
     private final String mGoogleAdvertisingId;
     private final Map<String, String> mExtraSdk;
 
     protected VisitEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mImei = eventBuilder.mImei;
-        mAndroidId = eventBuilder.mAndroidId;
         mOaid = eventBuilder.mOaid;
         mGoogleAdvertisingId = eventBuilder.mGoogleAdvertisingId;
         mExtraSdk = eventBuilder.mExtraSdk;
@@ -53,12 +49,6 @@ public final class VisitEvent extends BaseEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
-            if (!TextUtils.isEmpty(getImei())) {
-                json.put("imei", getImei());
-            }
-            if (!TextUtils.isEmpty(getAndroidId())) {
-                json.put("androidId", getAndroidId());
-            }
             if (!TextUtils.isEmpty(getOaid())) {
                 json.put("oaid", getOaid());
             }
@@ -78,14 +68,6 @@ public final class VisitEvent extends BaseEvent {
         return serialVersionUID;
     }
 
-    public String getImei() {
-        return checkValueSafe(mImei);
-    }
-
-    public String getAndroidId() {
-        return checkValueSafe(mAndroidId);
-    }
-
     public String getOaid() {
         return checkValueSafe(mOaid);
     }
@@ -99,8 +81,6 @@ public final class VisitEvent extends BaseEvent {
     }
 
     public static final class Builder extends BaseBuilder<VisitEvent> {
-        private String mImei;
-        private String mAndroidId;
         private String mOaid;
         private String mGoogleAdvertisingId;
         private Map<String, String> mExtraSdk;
@@ -119,8 +99,6 @@ public final class VisitEvent extends BaseEvent {
             super.readPropertyInTrackThread();
 
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
-            mImei = deviceInfo.getImei();
-            mAndroidId = deviceInfo.getAndroidId();
             mOaid = deviceInfo.getOaid();
             mGoogleAdvertisingId = "";
         }
