@@ -12,22 +12,22 @@ sonarqube {
     }
 }
 
-if (!isExcludeDemos()) {
-    project(":demo") {
-        sonarqube {
-            skipProject = true
-        }
-    }
-
-    project(":demo-autotrack") {
-        sonarqube {
-            skipProject = true
-        }
-    }
-
-    project(":demo-core") {
-        sonarqube {
-            skipProject = true
-        }
-    }
-}
+//if (!isExcludeDemos()) {
+//    project(":demo") {
+//        sonarqube {
+//            skipProject = true
+//        }
+//    }
+//
+//    project(":demo-autotrack") {
+//        sonarqube {
+//            skipProject = true
+//        }
+//    }
+//
+//    project(":demo-core") {
+//        sonarqube {
+//            skipProject = true
+//        }
+//    }
+//}

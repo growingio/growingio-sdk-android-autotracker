@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 .append("版本: ").append("V3.3.4").append("\n")
                 .append("开发者: ").append("sdk-integration@growingio.com").append("\n")
                 .append("MD5: ").append("8B6A1C2C057771464141F88E0AC52B32").append("\n")
-                .append("编译时间: ").append("2022-03-02").append("\n")
+                .append("编译时间: ").append("2022-03-03").append("\n")
                 .append("送检功能: ").append("数据采集功能");
         return stringBuilder.toString();
     }
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 .append("版本: ").append("1.0").append("\n")
                 .append("送检方: ").append("北京易数科技有限公司").append("\n")
                 .append("Apk签名MD5（非apk文件MD5）: ").append(getApkMd5()).append("\n")
-                .append("打包时间: ").append("2022-03-02");
+                .append("打包时间: ").append("2022-03-03");
         return stringBuilder.toString();
     }
 

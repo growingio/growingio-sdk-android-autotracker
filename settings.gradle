@@ -1,8 +1,8 @@
 apply from: 'gradle/publicFun.gradle'
 
-if (!isExcludeDemos()) {
-    apply from: 'demos/settings-parent.gradle'
-}
+//if (!isExcludeDemos()) {
+//    apply from: 'demos/settings-parent.gradle'
+//}
 
 // tools
 include ':growingio-autotracker-gradle-plugin'
@@ -31,8 +31,8 @@ include ':growingio-tools:snappy'
 include ':growingio-tools:oaid'
 
 // sdks
-include ':gio-sdk:tracker'
-include ':gio-sdk:autotracker'
-include ':gio-sdk:tracker-cdp'
+//include ':gio-sdk:tracker'
+//include ':gio-sdk:autotracker'
+//include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:autotracker-cdp'
 include ':example'
