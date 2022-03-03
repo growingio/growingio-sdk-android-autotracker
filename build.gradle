@@ -146,35 +146,11 @@ buildscript {
     }
 }
 
-apply from: "${rootProject.projectDir}/gradle/sonarcloud.gradle"
-
 allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
         maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
         google()
-    }
-}
-
-apply from: "${rootProject.projectDir}/gradle/stagingMaven.gradle"
-
-subprojects { project ->
-    apply plugin: 'checkstyle'
-
-    task checkstyle(type: Checkstyle, group: 'check') {
-        configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
-        configProperties.checkstyleJavaHeader = file("${rootDir}/config/checkstyle/java.header")
-        source 'src/main/java', 'src/test/java', 'src/androidTest/java'
-        ignoreFailures false
-        showViolations true
-        include '**/*.java'
-        classpath = files()
-    }
-
-    afterEvaluate {
-        if (project.tasks.findByName('check')) {
-            check.dependsOn('checkstyle')
-        }
     }
 }

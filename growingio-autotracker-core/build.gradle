@@ -25,19 +25,6 @@ android {
         targetCompatibility buildConfiguration.targetCompatibility
     }
 
-    testOptions {
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-        }
-        unitTests {
-            returnDefaultValues = true
-            includeAndroidResources = true
-        }
-    }
-
     lintOptions {
         abortOnError false
     }
@@ -54,17 +41,6 @@ android {
 }
 
 dependencies {
-
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.androidx_fragment
-    testImplementation libraries.test.robolectric
-    testImplementation libraries.androidx.appcompat
-    testImplementation libraries.androidx.recyclerview
-    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    //noinspection GradleCompatible
-    testCompileOnly 'com.android.support:support-fragment:28.0.0'
 
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
@@ -83,6 +59,3 @@ dependencies {
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }
-
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
-apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"

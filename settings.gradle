@@ -1,11 +1,3 @@
-apply from: 'gradle/publicFun.gradle'
-
-//if (!isExcludeDemos()) {
-//    apply from: 'demos/settings-parent.gradle'
-//}
-
-// tools
-include ':growingio-autotracker-gradle-plugin'
 include ':inject-annotation'
 include ':inject-annotation:compiler'
 include ':growingio-annotation'
@@ -16,23 +8,11 @@ include ':growingio-autotracker-core'
 include ':growingio-hybrid'
 
 include ':growingio-network:okhttp3'
-include ':growingio-network:urlconnection'
-include ':growingio-network:volley'
 
-include ':growingio-webservice:debugger'
-include ':growingio-webservice:circler'
-
-include ':growingio-data:protobuf'
 include ':growingio-data:json'
 include ':growingio-data:encoder'
 include ':growingio-data:database'
-include ':growingio-tools:crash'
 include ':growingio-tools:snappy'
-include ':growingio-tools:oaid'
 
-// sdks
-//include ':gio-sdk:tracker'
-//include ':gio-sdk:autotracker'
-//include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:autotracker-cdp'
 include ':example'

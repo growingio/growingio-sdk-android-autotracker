@@ -54,5 +54,3 @@ dependencies {
     embed project(path: ':growingio-tools:snappy', configuration: 'default')
     annotationProcessor project(":growingio-annotation:compiler")
 }
-
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

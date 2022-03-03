@@ -3,7 +3,6 @@
 plugins {
     id 'java-library'
     id 'kotlin'
-    id 'jacoco'
 }
 
 java {
@@ -11,24 +10,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-//test {
-//    finalizedBy jacocoTestReport
-//}
-
-jacocoTestReport{
-    dependsOn test // report is always generated after tests run
-}
-
 dependencies {
-
-    // About test: we couldn't use compile-testing in android project unless import jre's rt.jar.
-    testImplementation libraries.test.junit
-    testImplementation("com.google.testing.compile:compile-testing:0.19") {
-        // We don't use this and including it requires us to list it separatel which would be
-        // confusing.
-        exclude group: "com.google.auto.value", module: "auto-value"
-    }
-    testImplementation files('libs/tracker-core-test.jar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
@@ -38,5 +20,3 @@ dependencies {
 
     implementation project(":growingio-annotation")
 }
-
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

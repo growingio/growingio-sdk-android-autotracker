@@ -22,27 +22,7 @@ android {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
     }
-
-    testOptions {
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-        }
-        unitTests {
-            returnDefaultValues = true
-            includeAndroidResources = true
-        }
-    }
 }
 
 dependencies {
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.truth
 }
-
-// snappy为工具库，固定版本为1.1.0，不再随着sdk版本迭代
-// apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
-apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"

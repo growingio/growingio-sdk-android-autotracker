@@ -64,6 +64,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    implementation(name: 'autotracker-cdp-release', ext: 'aar')
+    implementation(name: 'autotracker-cdp-release-3.3.4', ext: 'aar')
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
 }

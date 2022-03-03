@@ -33,19 +33,6 @@ android {
         targetCompatibility buildConfiguration.targetCompatibility
     }
 
-    testOptions {
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-        }
-        unitTests {
-            returnDefaultValues = true
-            includeAndroidResources = true
-        }
-    }
-
     lintOptions {
         abortOnError false
     }
@@ -56,20 +43,6 @@ dependencies {
 
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.robolectric
-    testImplementation libraries.androidx.appcompat
-    testImplementation libraries.androidx.recyclerview
-
-    testImplementation project(path: ':growingio-data:database')
-    testImplementation project(path: ':growingio-data:protobuf')
-    testImplementation project(path: ':growingio-data:json')
-    testImplementation libraries.google.protobuf_javalite
-
-    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
-
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
@@ -77,6 +50,3 @@ dependencies {
     //compileOnly libraries.others.x5_webview
 
 }
-
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
-apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"
