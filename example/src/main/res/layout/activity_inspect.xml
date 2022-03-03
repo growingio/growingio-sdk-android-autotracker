@@ -154,6 +154,27 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/inspect_btn_setTag" />
 
+        <EditText
+            android:id="@+id/inspect_et"
+            android:hint="失去焦点发送焦点事件"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="12"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_btn_bridgeWebView"/>
+
+        <EditText
+            android:hint="失去焦点发送焦点事件"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="12"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/inspect_et"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

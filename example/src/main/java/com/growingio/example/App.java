@@ -36,7 +36,7 @@ public class App extends Application {
                 .setSessionInterval(30)
                 // 是否获取进程号，用于判断是否是同一个应用的进程
                 // https://growingio.github.io/growingio-sdk-docs/docs/android/base/Configuration#%E9%85%8D%E7%BD%AE%E8%A1%A8%E6%A0%BC
-                .setRequireAppProcessesEnabled(true)
+                .setRequireAppProcessesEnabled(false)
                 // 是否开启采集，默认开启采集
                 // https://growingio.github.io/growingio-sdk-docs/docs/android/base/Configuration#7-setdatacollectionenabled
                 .setDataCollectionEnabled(true)

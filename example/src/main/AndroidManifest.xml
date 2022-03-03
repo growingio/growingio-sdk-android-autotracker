@@ -2,9 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.growingio.example">
 
-    <!-- 必要权限仅网络传输 -->
+    <!-- 必要权限仅网络传输及网络状态 -->
     <!-- https://growingio.github.io/growingio-sdk-docs/docs/android/base/Getting%20Started#%E6%B7%BB%E5%8A%A0url-scheme -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".App"
@@ -22,11 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".InspectActivity"/>
-        <activity android:name=".PageAliasActivity"/>
-        <activity android:name=".PageIgnoreActivity"/>
-        <activity android:name=".ImpActivity"/>
-        <activity android:name=".WebViewActivity"/>
+        <activity android:exported="false" android:name=".InspectActivity"/>
+        <activity android:exported="false" android:name=".PageAliasActivity"/>
+        <activity android:exported="false" android:name=".PageIgnoreActivity"/>
+        <activity android:exported="false" android:name=".ImpActivity"/>
+        <activity android:exported="false" android:name=".WebViewActivity"/>
     </application>
 
 </manifest>

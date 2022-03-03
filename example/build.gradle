@@ -27,10 +27,21 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // 该证书仅用于测试example，不涉及商业信息
+    signingConfigs {
+        release {
+            keyAlias 'example'
+            keyPassword '123456'
+            storeFile file('example.keystore')
+            storePassword '123456'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

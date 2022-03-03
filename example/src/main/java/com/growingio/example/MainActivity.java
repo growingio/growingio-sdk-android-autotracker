@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 .append("sdk名称: ").append("GrowingIO数据采集SDK").append("\n")
                 .append("版本: ").append("V3.3.4").append("\n")
                 .append("开发者: ").append("sdk-integration@growingio.com").append("\n")
-                .append("MD5: ").append("DBCFCBD4627F22208B41ECD81CD6B980").append("\n")
+                .append("MD5: ").append("8B6A1C2C057771464141F88E0AC52B32").append("\n")
                 .append("编译时间: ").append("2022-03-02").append("\n")
                 .append("送检功能: ").append("数据采集功能");
         return stringBuilder.toString();
