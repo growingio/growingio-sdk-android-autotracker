@@ -21,6 +21,8 @@ import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CustomEvent extends BaseAttributesEvent {
@@ -73,6 +75,44 @@ public class CustomEvent extends BaseAttributesEvent {
         @Override
         public CustomEvent build() {
             return new CustomEvent(this);
+        }
+    }
+
+    public static class AttributesBuilder {
+        Map<String, String> attributes;
+        private static final String LIST_SPLIT = "||";
+
+        private AttributesBuilder() {
+            attributes = new HashMap<>();
+        }
+
+        public static AttributesBuilder getAttributesBuilder() {
+            return new AttributesBuilder();
+        }
+
+        public AttributesBuilder addAttribute(String key, String value) {
+            if (key != null && value != null) {
+                attributes.put(key, value);
+            }
+
+            return this;
+        }
+
+        public <T> AttributesBuilder addAttribute(String key, List<T> value) {
+            if (key != null && value != null && !value.isEmpty()) {
+                StringBuilder valueBuilder = new StringBuilder();
+                valueBuilder.append(value.get(0));
+                for (int i = 1; i < value.size(); ++i) {
+                    valueBuilder.append(LIST_SPLIT).append(value.get(i));
+                }
+                attributes.put(key, valueBuilder.toString());
+            }
+
+            return this;
+        }
+
+        public Map<String, String> getAttributes() {
+            return attributes;
         }
     }
 }
