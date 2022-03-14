@@ -46,11 +46,20 @@ public class CdpAutotracker extends Autotracker {
         }
     }
 
+
+    /**
+     * 新版本仅需在属性中关联itemId, 参见维度表数据上报
+     */
+    @Deprecated
     public void trackCustomEvent(String eventName, String itemKey, String itemId) {
         if (!isInited) return;
         trackCustomEvent(eventName, null, itemKey, itemId);
     }
 
+    /**
+     * 新版本仅需在属性中关联itemId, 参见维度表数据上报
+     */
+    @Deprecated
     public void trackCustomEvent(String eventName, Map<String, String> attributes, String itemKey, String itemId) {
         if (!isInited) return;
         if (TextUtils.isEmpty(eventName) || TextUtils.isEmpty(itemKey) || TextUtils.isEmpty(itemId)) {
