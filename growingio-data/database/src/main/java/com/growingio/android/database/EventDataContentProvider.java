@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.growingio.database;
+package com.growingio.android.database;
+
+import static com.growingio.android.database.EventDataTable.TABLE_EVENTS;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -25,8 +27,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
-
-import static com.growingio.database.EventDataTable.TABLE_EVENTS;
 
 public class EventDataContentProvider extends ContentProvider {
 

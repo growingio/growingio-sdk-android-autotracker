@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.growingio.database" >
+    package="com.growingio.android.database" >
 
     <application>
         <provider
-            android:name="com.growingio.database.EventDataContentProvider"
+            android:name="com.growingio.android.database.EventDataContentProvider"
             android:authorities="${applicationId}.EventDataContentProvider"
             android:grantUriPermissions="true"
             android:exported="false" />
