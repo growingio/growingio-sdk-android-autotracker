@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.database;
+package com.growingio.android.database;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -33,9 +33,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.growingio.database.EventDataTable.COLUMN_DATA;
-import static com.growingio.database.EventDataTable.COLUMN_ID;
-import static com.growingio.database.EventDataTable.TABLE_EVENTS;
+import static com.growingio.android.database.EventDataTable.COLUMN_DATA;
+import static com.growingio.android.database.EventDataTable.COLUMN_ID;
+import static com.growingio.android.database.EventDataTable.TABLE_EVENTS;
 
 
 /**

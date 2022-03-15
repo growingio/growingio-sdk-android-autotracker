@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.database;
+package com.growingio.android.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

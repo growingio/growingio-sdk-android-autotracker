@@ -1,7 +1,8 @@
--keep class com.growingio.** {
-    *;
-}
--dontwarn com.growingio.**
+#-keep class com.growingio.** {
+#    *;
+#}
+#-dontwarn com.growingio.**
+
 -keepnames class * extends android.view.View
 -keepnames class * extends android.app.Fragment
 -keepnames class * extends android.support.v4.app.Fragment
@@ -18,3 +19,9 @@
 -keep class androidx.viewpager.widget.ViewPager$**{
     *;
 }
+
+-keep class * extends com.growingio.android.sdk.LibraryGioModule
+-keep class * extends com.growingio.android.sdk.GeneratedGioModule
+
+# Uncomment for DexGuard only
+#-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
