@@ -40,7 +40,7 @@ public class ClassRewriter {
     private final String[] mUserExcludePackages;
     private final boolean mExcludeOfficial;
     private static final String[] EXCLUDED_PACKAGES = new String[]{
-            "com/growingio/android/sdk/",
+            "com/growingio/android/",
             "com/growingio/giokit/",
             "com/alibaba/mobileim/extra/xblink/webview",
             "com/alibaba/sdk/android/feedback/xblink",
