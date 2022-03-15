@@ -22,6 +22,3 @@
 
 -keep class * extends com.growingio.android.sdk.LibraryGioModule
 -keep class * extends com.growingio.android.sdk.GeneratedGioModule
-
-# Uncomment for DexGuard only
-#-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
