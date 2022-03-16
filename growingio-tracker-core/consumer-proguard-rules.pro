@@ -1,8 +1,3 @@
-#-keep class com.growingio.** {
-#    *;
-#}
-#-dontwarn com.growingio.**
-
 -keepnames class * extends android.view.View
 -keepnames class * extends android.app.Fragment
 -keepnames class * extends android.support.v4.app.Fragment
@@ -22,3 +17,4 @@
 
 -keep class * extends com.growingio.android.sdk.LibraryGioModule
 -keep class * extends com.growingio.android.sdk.GeneratedGioModule
+-keep class com.growingio.android.sdk.Generated** {*;}
