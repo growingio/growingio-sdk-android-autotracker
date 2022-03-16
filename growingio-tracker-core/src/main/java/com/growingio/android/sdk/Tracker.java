@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
@@ -102,6 +103,16 @@ public class Tracker {
             attributes = new HashMap<>(attributes);
         }
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
+    }
+
+    public void trackCustomEventWithAttrBuilder(String eventName, CustomEvent.AttributesBuilder attributesBuilder) {
+        if (!isInited) return;
+        if (TextUtils.isEmpty(eventName)) {
+            Logger.e(TAG, "trackCustomEvent: eventName is NULL");
+            return;
+        }
+
+        TrackEventGenerator.generateCustomEvent(eventName, attributesBuilder.getAttributes());
     }
 
     public void setConversionVariables(Map<String, String> variables) {
