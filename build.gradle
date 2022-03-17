@@ -11,8 +11,8 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.3.4",
-                releaseVersionCode: 30304,
+                releaseVersion    : "3.3.5",
+                releaseVersionCode: 30305,
         ]
 
         versions = [
@@ -31,7 +31,7 @@ buildscript {
                         'navigation_ui'      : 'android.arch.navigation:navigation-ui:1.0.0',
                         'livedata'           : 'android.arch.lifecycle:livedata:1.1.1',
                         'viewmodel'          : 'android.arch.lifecycle:viewmodel:1.1.1',
-                        'volley'             : 'com.android.volley:volley:1.2.0',
+                        'volley'             : 'com.android.volley:volley:1.2.1',
                 ],
 
                 'androidx' : [
@@ -70,11 +70,11 @@ buildscript {
                         'auto_service'            : 'com.google.auto.service:auto-service:1.0-rc7',
                         'auto_service_annotations': 'com.google.auto.service:auto-service-annotations:1.0-rc7',
 
-                        'protobuf_gradle_plugin'  : 'com.google.protobuf:protobuf-gradle-plugin:0.8.17',
-                        'protobuf_java'           : 'com.google.protobuf:protobuf-java:3.19.1',
-                        'protobuf_javalite'       : 'com.google.protobuf:protobuf-javalite:3.19.1',
-                        'protobufc'               : 'com.google.protobuf:protoc:3.9.1',
-                        'protobuf_java_util'      : 'com.google.protobuf:protobuf-java-util:3.19.1',
+                        'protobuf_gradle_plugin'  : 'com.google.protobuf:protobuf-gradle-plugin:0.8.18',
+                        'protobuf_java'           : 'com.google.protobuf:protobuf-java:3.19.4',
+                        'protobuf_javalite'       : 'com.google.protobuf:protobuf-javalite:3.19.4',
+                        'protobufc'               : 'com.google.protobuf:protoc:3.19.4',
+                        'protobuf_java_util'      : 'com.google.protobuf:protobuf-java-util:3.19.4',
                 ],
 
                 'squareup' : [

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.growingio.database;
+package com.growingio.android.database;
 
 import android.annotation.SuppressLint;
 import android.content.ContentProviderClient;
@@ -37,12 +37,12 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.growingio.database.EventDataTable.COLUMN_DATA;
-import static com.growingio.database.EventDataTable.COLUMN_EVENT_TYPE;
-import static com.growingio.database.EventDataTable.COLUMN_ID;
-import static com.growingio.database.EventDataTable.COLUMN_POLICY;
-import static com.growingio.database.EventDataTable.TABLE_EVENTS;
-import static com.growingio.database.EventDataTable.getContentUri;
+import static com.growingio.android.database.EventDataTable.COLUMN_DATA;
+import static com.growingio.android.database.EventDataTable.COLUMN_EVENT_TYPE;
+import static com.growingio.android.database.EventDataTable.COLUMN_ID;
+import static com.growingio.android.database.EventDataTable.COLUMN_POLICY;
+import static com.growingio.android.database.EventDataTable.TABLE_EVENTS;
+import static com.growingio.android.database.EventDataTable.getContentUri;
 
 public class EventDataManager {
     private static final String TAG = "EventDataManager";

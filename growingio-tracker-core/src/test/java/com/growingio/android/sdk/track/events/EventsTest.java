@@ -30,7 +30,11 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -70,6 +74,30 @@ public class EventsTest {
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.CUSTOM);
         //TrackEventGenerator.generateCustomEvent("test", new HashMap<>());
         inRobolectric(event.toJSONObject());
+    }
+
+    @Test
+    public void eventCustomAttrBuilder() {
+        List<String> list = new ArrayList<>();
+        list.add("1111");
+        list.add("2222");
+        Map<String, String> map = CustomEvent.AttributesBuilder.getAttributesBuilder()
+                .addAttribute("key1", "value1")
+                .addAttribute("key2", Arrays.asList(1, 2, 3, 4))
+                .addAttribute(null, "value3")
+                .addAttribute(null, Arrays.asList(5, 4, 3, 2))
+                .addAttribute("key5", Arrays.asList())
+                .addAttribute(null, (List) null)
+                .addAttribute(null, (String) null)
+                .addAttribute("key8", "value8")
+                .addAttribute("key9", list)
+                .addAttribute("", Arrays.asList("", ""))
+                .getAttributes();
+        Truth.assertThat(map.size() == 4);
+        Truth.assertThat(!map.containsKey("key5"));
+        Truth.assertThat("1||2||3||4".equals(map.get("key2")));
+        Truth.assertThat("1111||2222".equals(map.get("key9")));
+        Truth.assertThat("||||".equals(map.get("")));
     }
 
 

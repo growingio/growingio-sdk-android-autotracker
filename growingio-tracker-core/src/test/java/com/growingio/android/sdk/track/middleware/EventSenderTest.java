@@ -28,8 +28,8 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
-import com.growingio.database.DatabaseDataLoader;
-import com.growingio.database.EventDataContentProvider;
+import com.growingio.android.database.DatabaseDataLoader;
+import com.growingio.android.database.EventDataContentProvider;
 import com.growingio.protobuf.EventV3Protocol;
 import com.growingio.protobuf.ProtobufDataLoader;
 
