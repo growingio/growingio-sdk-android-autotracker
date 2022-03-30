@@ -78,7 +78,7 @@ public class InjectSuperClassVisitor extends ClassVisitor {
             TargetMethod targetMethod = targetClass.getTargetMethod(name, desc);
             if (targetMethod != null) {
                 mOverrideMethods.add(targetMethod);
-                return new InjectSuperMethodVisitor(mv, access, name, desc, targetMethod.getInjectMethods());
+                return new InjectSuperMethodVisitor(api, mv, access, name, desc, targetMethod.getInjectMethods());
             }
         }
         return mv;
@@ -126,8 +126,8 @@ public class InjectSuperClassVisitor extends ClassVisitor {
         private final String mTargetMethodDesc;
         private final Set<InjectMethod> mInjectMethods;
 
-        protected InjectSuperMethodVisitor(MethodVisitor mv, int access, String name, String desc, Set<InjectMethod> injectMethods) {
-            super(ASM5, mv, access, name, desc);
+        protected InjectSuperMethodVisitor(int api, MethodVisitor mv, int access, String name, String desc, Set<InjectMethod> injectMethods) {
+            super(api, mv, access, name, desc);
             mTargetMethodName = name;
             mTargetMethodDesc = desc;
             mInjectMethods = injectMethods;

@@ -75,7 +75,7 @@ class WebSocketHandler extends WebSocketListener {
         if (TextUtils.isEmpty(text) || TextUtils.isEmpty(text.trim())) {
             return;
         }
-        Logger.d(TAG, "Received message is $text");
+        Logger.d(TAG, "Received message is " + text);
         try {
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");
