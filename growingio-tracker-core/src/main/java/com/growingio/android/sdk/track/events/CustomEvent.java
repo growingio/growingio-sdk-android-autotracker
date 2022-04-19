@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -101,9 +102,13 @@ public class CustomEvent extends BaseAttributesEvent {
         public <T> AttributesBuilder addAttribute(String key, List<T> value) {
             if (key != null && value != null && !value.isEmpty()) {
                 StringBuilder valueBuilder = new StringBuilder();
-                valueBuilder.append(value.get(0));
-                for (int i = 1; i < value.size(); ++i) {
-                    valueBuilder.append(LIST_SPLIT).append(value.get(i));
+                Iterator<T> iterator = value.iterator();
+                if (iterator.hasNext()) {
+                    valueBuilder.append(toString(iterator.next()));
+                    while (iterator.hasNext()) {
+                        valueBuilder.append(LIST_SPLIT);
+                        valueBuilder.append(toString(iterator.next()));
+                    }
                 }
                 attributes.put(key, valueBuilder.toString());
             }
@@ -112,7 +117,18 @@ public class CustomEvent extends BaseAttributesEvent {
         }
 
         public Map<String, String> getAttributes() {
+            if (attributes == null || attributes.isEmpty()) {
+                return null;
+            }
             return attributes;
+        }
+
+        private String toString(Object value) {
+            if (value == null) {
+                return "";
+            } else {
+                return String.valueOf(value);
+            }
         }
     }
 }

@@ -91,13 +91,15 @@ public class EventsTest {
                 .addAttribute(null, (String) null)
                 .addAttribute("key8", "value8")
                 .addAttribute("key9", list)
-                .addAttribute("", Arrays.asList("", ""))
+                .addAttribute("", Arrays.asList("", "", ""))
+                .addAttribute("key10", Arrays.asList(null, "1"))
                 .getAttributes();
-        Truth.assertThat(map.size() == 4);
-        Truth.assertThat(!map.containsKey("key5"));
-        Truth.assertThat("1||2||3||4".equals(map.get("key2")));
-        Truth.assertThat("1111||2222".equals(map.get("key9")));
-        Truth.assertThat("||||".equals(map.get("")));
+        Truth.assertThat(map.size()).isEqualTo(6);
+        Truth.assertThat(map.containsKey("key5")).isFalse();
+        Truth.assertThat("1||2||3||4").isEqualTo(map.get("key2"));
+        Truth.assertThat("1111||2222").isEqualTo(map.get("key9"));
+        Truth.assertThat("||||").isEqualTo(map.get(""));
+        Truth.assertThat("||1").isEqualTo(map.get("key10"));
     }
 
 
@@ -109,6 +111,32 @@ public class EventsTest {
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.LOGIN_USER_ATTRIBUTES);
         //TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>());
         inRobolectric(event.toJSONObject());
+    }
+
+    @Test
+    public void eventLoginUserBuilder() {
+        List<String> list = new ArrayList<>();
+        list.add("1111");
+        list.add("2222");
+        Map<String, String> map = LoginUserAttributesEvent.AttributesBuilder.getAttributesBuilder()
+                .addAttribute("key1", "value1")
+                .addAttribute("key2", Arrays.asList(1, 2, 3, 4))
+                .addAttribute(null, "value3")
+                .addAttribute(null, Arrays.asList(5, 4, 3, 2))
+                .addAttribute("key5", Arrays.asList())
+                .addAttribute(null, (List) null)
+                .addAttribute(null, (String) null)
+                .addAttribute("key8", "value8")
+                .addAttribute("key9", list)
+                .addAttribute("", Arrays.asList("", "", ""))
+                .addAttribute("key10", Arrays.asList(null, "1"))
+                .getAttributes();
+        Truth.assertThat(map.size()).isEqualTo(6);
+        Truth.assertThat(map.containsKey("key5")).isFalse();
+        Truth.assertThat("1||2||3||4").isEqualTo(map.get("key2"));
+        Truth.assertThat("1111||2222").isEqualTo(map.get("key9"));
+        Truth.assertThat("||||").isEqualTo(map.get(""));
+        Truth.assertThat("||1").isEqualTo(map.get("key10"));
     }
 
     @Test
