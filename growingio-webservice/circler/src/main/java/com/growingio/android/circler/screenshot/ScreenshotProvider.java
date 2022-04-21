@@ -23,7 +23,6 @@ import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
