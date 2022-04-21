@@ -28,8 +28,6 @@ import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.autotrack.view.ViewUtil;
 import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.async.Disposable;
-import com.growingio.android.sdk.track.async.UnsubscribedDisposable;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.data.HybridDom;
@@ -109,10 +107,9 @@ public class CircleScreenshot {
         private long mSnapshotKey;
         private final List<ViewElement> mViewElements = new ArrayList<>();
         private final List<PageElement> mPages = new ArrayList<>();
-        private final AtomicInteger mWebViewCount = new AtomicInteger(0);
+        private final AtomicInteger mScreenLock = new AtomicInteger(0);
         private int mViewCount = 0;
         private Callback<CircleScreenshot> mScreenshotResultCallback;
-        private Disposable mBuildDisposable;
 
         public Builder setScale(float scale) {
             mScale = scale;
@@ -129,19 +126,21 @@ public class CircleScreenshot {
             return this;
         }
 
-        public Disposable build(Callback<CircleScreenshot> callback) {
-            if (callback == null) {
-                return Disposable.EMPTY_DISPOSABLE;
-            }
+        public void build(Callback<CircleScreenshot> callback) {
             List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
-            return build(decorViews, callback);
+            build(decorViews, callback);
         }
 
-        public Disposable build(List<DecorView> decorViews, Callback<CircleScreenshot> callback) {
+        public void build(List<DecorView> decorViews, Callback<CircleScreenshot> callback) {
             if (callback == null) {
-                return Disposable.EMPTY_DISPOSABLE;
+                return;
             }
-            mBuildDisposable = new UnsubscribedDisposable();
+
+            if (decorViews == null || decorViews.isEmpty()) {
+                callResultOnFailed();
+                return;
+            }
+
             mScreenshotResultCallback = callback;
 
             DisplayMetrics displayMetrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
@@ -152,31 +151,16 @@ public class CircleScreenshot {
                 if (decorView.getView() instanceof TipView) {
                     continue;
                 }
+
+                if (isViewInvisible(decorView.getView())) {
+                    continue;
+                }
+
+                mScreenLock.incrementAndGet();
                 checkView2PageElement(decorView.getView());
                 checkView2ViewElement(decorView.getView());
             }
-            if (mWebViewCount.get() == 0) {
-                callResultOnSuccess();
-            }
-            return mBuildDisposable;
-        }
-
-        private void callResultOnSuccess() {
-            if (!mBuildDisposable.isDisposed()) {
-                mBuildDisposable.dispose();
-                if (mScreenshotResultCallback != null) {
-                    mScreenshotResultCallback.onSuccess(new CircleScreenshot(this));
-                }
-            }
-        }
-
-        private void callResultOnFailed() {
-            if (!mBuildDisposable.isDisposed()) {
-                mBuildDisposable.dispose();
-                if (mScreenshotResultCallback != null) {
-                    mScreenshotResultCallback.onFailed();
-                }
-            }
+            callResultOnSuccess();
         }
 
         private ViewElement.Builder createViewElementBuilder(ViewNode viewNode) {
@@ -199,14 +183,11 @@ public class CircleScreenshot {
 
         private void checkView2ViewElement(View view) {
             ViewNode topViewNode = ViewHelper.getTopViewNode(view, null);
-            if (disposeWebView(topViewNode)) {
-                return;
-            }
-
             traverseViewNode(topViewNode);
         }
 
         private void traverseViewNode(ViewNode viewNode) {
+            if (isViewInvisible(viewNode.getView())) return;
             if (!disposeWebView(viewNode) && ViewUtil.canCircle(viewNode.getView())) {
                 mViewElements.add(createViewElementBuilder(viewNode).build());
             }
@@ -225,26 +206,38 @@ public class CircleScreenshot {
             if (ClassExistHelper.isWebView(viewNode.getView())) {
                 ModelLoader<HybridDom, HybridJson> modelLoader = ScreenshotProvider.get().getHybridModelLoader();
                 if (modelLoader == null) return false;
-                mWebViewCount.incrementAndGet();
+                mScreenLock.incrementAndGet();
                 LoadDataFetcher<HybridJson> loadDataFetcher = (LoadDataFetcher<HybridJson>) modelLoader.buildLoadData(new HybridDom(viewNode.getView())).fetcher;
                 loadDataFetcher.loadData(new LoadDataFetcher.DataCallback<HybridJson>() {
                     @Override
                     public void onDataReady(HybridJson data) {
                         ViewElement.Builder elementBuilder = createViewElementBuilder(viewNode);
                         mViewElements.add(elementBuilder.setWebView(data.getJsonObject()).build());
-                        if (mWebViewCount.decrementAndGet() == 0) {
-                            callResultOnSuccess();
-                        }
+                        callResultOnSuccess();
                     }
 
                     @Override
                     public void onLoadFailed(Exception e) {
-                        callResultOnFailed();
+                        callResultOnSuccess();
                     }
                 });
                 return true;
             }
             return false;
+        }
+
+        private void callResultOnSuccess() {
+            if (mScreenLock.decrementAndGet() <= 0) {
+                if (mScreenshotResultCallback != null) {
+                    mScreenshotResultCallback.onSuccess(new CircleScreenshot(this));
+                }
+            }
+        }
+
+        private void callResultOnFailed() {
+            if (mScreenshotResultCallback != null) {
+                mScreenshotResultCallback.onFailed();
+            }
         }
 
         private void checkView2PageElement(View view) {
@@ -272,6 +265,10 @@ public class CircleScreenshot {
                     }
                 }
             }
+        }
+
+        private boolean isViewInvisible(View view) {
+            return view.getVisibility() == View.GONE || view.getWidth() <= 0 || view.getHeight() <= 0;
         }
     }
 }

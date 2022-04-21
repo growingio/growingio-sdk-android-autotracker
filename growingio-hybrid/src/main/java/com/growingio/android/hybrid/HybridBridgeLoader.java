@@ -22,6 +22,7 @@ import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
+import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 /**
  * <p>
@@ -57,9 +58,9 @@ public class HybridBridgeLoader implements ModelLoader<HybridBridge, Boolean> {
         public Boolean executeData() {
             if (bridge.getView() instanceof WebView) {
                 HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make((WebView) bridge.getView()));
-            } else if (bridge.getView() instanceof com.tencent.smtt.sdk.WebView) {
+            } else if (ClassExistHelper.instanceOfX5WebView(bridge.getView())) {
                 HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeX5((com.tencent.smtt.sdk.WebView) bridge.getView()));
-            } else if (bridge.getView() instanceof com.uc.webview.export.WebView) {
+            } else if (ClassExistHelper.instanceOfUcWebView(bridge.getView())) {
                 HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeUC((com.uc.webview.export.WebView) bridge.getView()));
             } else {
                 return false;

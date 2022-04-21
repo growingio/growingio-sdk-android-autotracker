@@ -88,12 +88,9 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
         if (callback == null) {
             return Disposable.EMPTY_DISPOSABLE;
         }
-        final Disposable disposable = new HandlerDisposable().schedule(new Runnable() {
-            @Override
-            public void run() {
-                Logger.e(TAG, "getWebViewDomTree timeout");
-                callback.onFailed();
-            }
+        final Disposable disposable = new HandlerDisposable().schedule(() -> {
+            Logger.e(TAG, "getWebViewDomTree timeout");
+            callback.onFailed();
         }, EVALUATE_JAVASCRIPT_TIMEOUT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -126,8 +123,8 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
             Logger.e(TAG, "You need use after Android 4.4 to getWebViewDomTree");
             if (!disposable.isDisposed()) {
                 disposable.dispose();
-                callback.onFailed();
             }
+            callback.onFailed();
         }
         return disposable;
     }
