@@ -73,6 +73,7 @@ dependencies {
 
     compileOnly libraries.androidx.appcompat
     compileOnly libraries.androidx.recyclerview
+    compileOnly libraries.androidx.swiperefreshlayout
     compileOnly libraries.android.appcompat
     compileOnly libraries.android.recyclerview
     //compileOnly libraries.others.x5_webview

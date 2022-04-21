@@ -140,29 +140,25 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
     }
 
     private long mSnapshotKey = 0;
-    private Disposable mCircleScreenshotDisposable;
 
     public void sendScreenshotRefreshed(String screenshotBase64, float scale) {
-        if (mCircleScreenshotDisposable != null) {
-            mCircleScreenshotDisposable.dispose();
-        }
-
-        mCircleScreenshotDisposable = new CircleScreenshot.Builder()
+        CircleScreenshot.Builder builder = new CircleScreenshot.Builder()
                 .setScale(scale)
                 .setScreenshot(screenshotBase64)
-                .setSnapshotKey(mSnapshotKey++)
-                .build(new Callback<CircleScreenshot>() {
-                    @Override
-                    public void onSuccess(CircleScreenshot result) {
-                        Logger.d(TAG, "Create circle screenshot successfully");
-                        sendScreenshot(result);
-                    }
+                .setSnapshotKey(mSnapshotKey++);
 
-                    @Override
-                    public void onFailed() {
-                        Logger.e(TAG, "Create circle screenshot failed");
-                    }
-                });
+        builder.build(new Callback<CircleScreenshot>() {
+            @Override
+            public void onSuccess(CircleScreenshot result) {
+                Logger.d(TAG, "Create circle screenshot successfully");
+                sendScreenshot(result);
+            }
+
+            @Override
+            public void onFailed() {
+                Logger.e(TAG, "Create circle screenshot failed");
+            }
+        });
     }
 
     public void sendScreenshot(CircleScreenshot result) {

@@ -25,6 +25,7 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 import com.growingio.android.sdk.track.modelloader.data.HybridDom;
 import com.growingio.android.sdk.track.modelloader.data.HybridJson;
+import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import org.json.JSONObject;
 
@@ -67,6 +68,7 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
         public void loadData(DataCallback<? super HybridJson> callback) {
             if (dom.getView() == null) {
                 callback.onLoadFailed(new NullPointerException("webview is null"));
+                return;
             }
             SuperWebView<? extends View> superWebView = getSuperWebView();
             if (superWebView == null) {
@@ -89,9 +91,9 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
         public SuperWebView<? extends View> getSuperWebView() {
             if (dom.getView() instanceof WebView) {
                 return SuperWebView.make((WebView) dom.getView());
-            } else if (dom.getView() instanceof com.tencent.smtt.sdk.WebView) {
+            } else if (ClassExistHelper.instanceOfX5WebView(dom.getView())) {
                 return SuperWebView.makeX5((com.tencent.smtt.sdk.WebView) dom.getView());
-            } else if (dom.getView() instanceof com.uc.webview.export.WebView) {
+            } else if (ClassExistHelper.instanceOfUcWebView(dom.getView())) {
                 return SuperWebView.makeUC((com.uc.webview.export.WebView) dom.getView());
             } else {
                 return null;
