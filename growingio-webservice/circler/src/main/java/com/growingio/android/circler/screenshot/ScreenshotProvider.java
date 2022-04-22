@@ -43,6 +43,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
     private static final float SCREENSHOT_STANDARD_WIDTH = 720F;
     private static final long MIN_REFRESH_INTERVAL = 500L;
+    private long lastSendTime = System.currentTimeMillis();// 记录上次发送的事件，用来避免当界面刷新频率过快时一直无法发送圈选的情况。
 
     private final float mScale;
     private final Handler mHandler;
@@ -62,7 +63,14 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
 
-        ViewTreeStatusProvider.get().register(changedEvent -> refreshScreenshot());
+        ViewTreeStatusProvider.get().register(changedEvent -> {
+            if (System.currentTimeMillis() - lastSendTime >= MIN_REFRESH_INTERVAL * 2) {
+                lastSendTime = System.currentTimeMillis();
+                mHandler.post(this::dispatchScreenshot);
+            } else {
+                refreshScreenshot();
+            }
+        });
 
         getHybridModelLoader();
     }
@@ -141,6 +149,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
     private long mSnapshotKey = 0;
 
     public void sendScreenshotRefreshed(String screenshotBase64, float scale) {
+        lastSendTime = System.currentTimeMillis();
         CircleScreenshot.Builder builder = new CircleScreenshot.Builder()
                 .setScale(scale)
                 .setScreenshot(screenshotBase64)
