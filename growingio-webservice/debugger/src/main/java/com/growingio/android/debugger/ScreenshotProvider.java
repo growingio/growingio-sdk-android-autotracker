@@ -44,7 +44,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
     private static final float SCREENSHOT_STANDARD_WIDTH = 720F;
     private static final long MIN_REFRESH_INTERVAL = 300L;
-    private long lastSendTime = 0L;// 记录上次发送的事件，用来避免当界面刷新频率过快时一直无法发送圈选事件。
+    private long lastSendTime = 0L; // 记录上次发送的事件，用来避免当界面刷新频率过快时一直无法发送圈选事件。
 
     private final float mScale;
     private final Handler mHandler;
