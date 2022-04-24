@@ -147,16 +147,14 @@ public class CircleScreenshot {
             mScreenWidth = displayMetrics.widthPixels;
             mScreenHeight = displayMetrics.heightPixels;
 
+            mScreenLock.incrementAndGet();
             for (DecorView decorView : decorViews) {
                 if (decorView.getView() instanceof TipView) {
                     continue;
                 }
-
                 if (isViewInvisible(decorView.getView())) {
                     continue;
                 }
-
-                mScreenLock.incrementAndGet();
                 checkView2PageElement(decorView.getView());
                 checkView2ViewElement(decorView.getView());
             }

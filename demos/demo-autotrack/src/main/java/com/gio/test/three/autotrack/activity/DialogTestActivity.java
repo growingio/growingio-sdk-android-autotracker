@@ -26,14 +26,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.gio.test.three.autotrack.R;
+import com.growingio.android.sdk.track.view.ScreenshotUtil;
 
 public class DialogTestActivity extends Activity {
     private static final String TAG = "DialogTestActivity";
+
+    private ImageView ssIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,8 @@ public class DialogTestActivity extends Activity {
                 showListDialog();
             }
         });
+
+        ssIv = findViewById(R.id.screenshot);
 
         Button showPopupWindow = findViewById(R.id.btn_show_popup_window);
         showPopupWindow.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +93,7 @@ public class DialogTestActivity extends Activity {
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        ssIv.setImageBitmap(ScreenshotUtil.getScreenshotBitmap());
                         return true;
                     }
                 });
@@ -108,13 +115,12 @@ public class DialogTestActivity extends Activity {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        ssIv.setImageBitmap(ScreenshotUtil.getScreenshotBitmap());
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                     }
                 }).create();
         dialog.show();
@@ -126,7 +132,7 @@ public class DialogTestActivity extends Activity {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        ssIv.setImageBitmap(ScreenshotUtil.getScreenshotBitmap());
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -145,6 +151,7 @@ public class DialogTestActivity extends Activity {
                 .setItems(new String[]{"科目一", "科目二", "科目三"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        ssIv.setImageBitmap(ScreenshotUtil.getScreenshotBitmap());
                         Toast.makeText(DialogTestActivity.this, "选择了第" + which + "个", Toast.LENGTH_SHORT).show();
                     }
                 })

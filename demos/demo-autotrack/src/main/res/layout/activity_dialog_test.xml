@@ -42,4 +42,10 @@
         android:layout_height="wrap_content"
         android:text="显示Activity Dialog" />
 
+    <ImageView
+        android:id="@+id/screenshot"
+        android:layout_width="match_parent"
+        android:background="@color/growing_tracker_orange"
+        android:layout_height="match_parent"/>
+
 </LinearLayout>

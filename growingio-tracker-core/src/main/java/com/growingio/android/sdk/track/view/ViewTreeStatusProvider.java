@@ -71,7 +71,6 @@ public class ViewTreeStatusProvider extends ListenerContainer<OnViewStateChanged
             root.getViewTreeObserver().removeOnGlobalLayoutListener(mViewStateObserver);
             root.getViewTreeObserver().removeOnGlobalFocusChangeListener(mViewStateObserver);
             root.getViewTreeObserver().removeOnScrollChangedListener(mViewStateObserver);
-            root.getViewTreeObserver().removeOnDrawListener(mViewStateObserver);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 root.getViewTreeObserver().removeOnWindowFocusChangeListener((ViewTreeObserver.OnWindowFocusChangeListener) mViewStateObserver);
             }
@@ -84,7 +83,6 @@ public class ViewTreeStatusProvider extends ListenerContainer<OnViewStateChanged
             root.getViewTreeObserver().addOnGlobalLayoutListener(mViewStateObserver);
             root.getViewTreeObserver().addOnScrollChangedListener(mViewStateObserver);
             root.getViewTreeObserver().addOnGlobalFocusChangeListener(mViewStateObserver);
-            root.getViewTreeObserver().addOnDrawListener(mViewStateObserver);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 root.getViewTreeObserver().addOnWindowFocusChangeListener((ViewTreeObserver.OnWindowFocusChangeListener) mViewStateObserver);
             }
@@ -95,8 +93,7 @@ public class ViewTreeStatusProvider extends ListenerContainer<OnViewStateChanged
 
     private static class DeprecatedViewStateObserver implements ViewTreeObserver.OnGlobalLayoutListener,
             ViewTreeObserver.OnScrollChangedListener,
-            ViewTreeObserver.OnGlobalFocusChangeListener,
-            ViewTreeObserver.OnDrawListener {
+            ViewTreeObserver.OnGlobalFocusChangeListener {
 
         @Override
         public void onGlobalFocusChanged(View oldFocus, View newFocus) {
@@ -111,11 +108,6 @@ public class ViewTreeStatusProvider extends ListenerContainer<OnViewStateChanged
         @Override
         public void onScrollChanged() {
             ViewTreeStatusProvider.get().dispatchActions(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.SCROLL_CHANGED));
-        }
-
-        @Override
-        public void onDraw() {
-            ViewTreeStatusProvider.get().dispatchActions(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.DRAW));
         }
     }
 
