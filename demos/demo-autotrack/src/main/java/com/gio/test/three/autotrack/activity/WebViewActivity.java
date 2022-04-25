@@ -19,24 +19,52 @@ package com.gio.test.three.autotrack.activity;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 
 import com.gio.test.three.autotrack.R;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 
 public class WebViewActivity extends Activity {
     private static String sLoadUrl = "http://release-messages.growingio.cn/push/cdp/uat.html";
 
     private WebView mWebView;
+    private Button buttonF, buttonF1;
+    private View tttt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
-        mWebView = findViewById(R.id.web_view);
+        mWebView = findViewById(R.id.myWebView);
         initWebView();
         mWebView.loadUrl(sLoadUrl);
+
+        buttonF = findViewById(R.id.f);
+        buttonF1 = findViewById(R.id.f1);
+        tttt = findViewById(R.id.tttt);
+        buttonF.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tttt.setVisibility(View.VISIBLE);
+            }
+        });
+
+        buttonF1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tttt.setVisibility(View.GONE);
+            }
+        });
+        tttt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GrowingAutotracker.get().trackCustomEvent("testview");
+            }
+        });
     }
 
     public static void setLoadUrl(String loadUrl) {

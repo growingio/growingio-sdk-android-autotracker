@@ -26,7 +26,7 @@ import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
 public class X5WebViewActivity extends Activity {
-    private static final String LOAD_URL = "http://10.20.20.53:9009/action.html?key1=vaue1&key2=value2";
+    private static final String LOAD_URL = "http://release-messages.growingio.cn/push/cdp/uat.html?key1=vaue1&key2=value2";
 
     private WebView mX5WebView;
 
