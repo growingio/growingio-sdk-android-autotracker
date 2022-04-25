@@ -26,8 +26,6 @@ import com.growingio.android.sdk.track.utils.DeviceUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * create screenshot server date from app's screenshot for debugger
  */
