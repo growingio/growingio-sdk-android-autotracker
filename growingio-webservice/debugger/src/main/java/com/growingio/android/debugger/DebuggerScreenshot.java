@@ -70,7 +70,6 @@ public class DebuggerScreenshot {
         private float mScale;
         private String mScreenshot;
         private long mSnapshotKey;
-        private final AtomicInteger mWebViewCount = new AtomicInteger(0);
         private Callback<DebuggerScreenshot> mScreenshotResultCallback;
         private Disposable mBuildDisposable;
 
@@ -100,9 +99,7 @@ public class DebuggerScreenshot {
             mScreenWidth = displayMetrics.widthPixels;
             mScreenHeight = displayMetrics.heightPixels;
 
-            if (mWebViewCount.get() == 0) {
-                callResultOnSuccess();
-            }
+            callResultOnSuccess();
             return mBuildDisposable;
         }
 
