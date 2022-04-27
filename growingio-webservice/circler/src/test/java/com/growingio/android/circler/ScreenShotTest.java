@@ -75,14 +75,14 @@ public class ScreenShotTest {
 
     @Test
     public void circlerScreenShotTest() {
-        ScreenshotProvider.get().sendScreenshotRefreshed("this test base64", 100);
-        ScreenshotProvider.OnScreenshotRefreshedListener baseListener = new ScreenshotProvider.OnScreenshotRefreshedListener() {
-            @Override
-            public void onScreenshotRefreshed(CircleScreenshot screenshot) {
-                Truth.assertThat(screenshot.toJSONObject().toString()).isEqualTo(
-                        "{\"screenWidth\":320,\"screenHeight\":470,\"scale\":100,\"screenshot\":\"this is test base64\",\"msgType\":\"refreshScreenshot\",\"snapshotKey\":0,\"elements\":[{\"xpath\":\"\\/CustomWindow\\/DecorView\\/ActionBarOverlayLayout[0]\\/FrameLayout[0]\\/LinearLayout[0]\\/TextView[0]\",\"left\":0,\"top\":0,\"width\":0,\"height\":0,\"nodeType\":\"TEXT\",\"content\":\"this is cpacm\",\"page\":\"\\/RobolectricActivity\",\"zLevel\":0}],\"pages\":[{\"path\":\"\\/RobolectricActivity\",\"left\":0,\"top\":0,\"width\":0,\"height\":0,\"isIgnored\":false}]}"
-                );
-            }
+        Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
+        ActivityStateProvider.get().onActivityResumed(activity);
+        ShadowWH.activity = activity;
+
+        ScreenshotProvider.OnScreenshotRefreshedListener baseListener = screenshot -> {
+            Truth.assertThat(screenshot.toJSONObject().toString()).isEqualTo(
+                    "{\"screenWidth\":320,\"screenHeight\":470,\"scale\":100,\"screenshot\":\"this is test base64\",\"msgType\":\"refreshScreenshot\",\"snapshotKey\":0,\"elements\":[],\"pages\":[]}"
+            );
         };
         ScreenshotProvider.get().registerScreenshotRefreshedListener(baseListener);
 
