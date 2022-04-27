@@ -120,7 +120,7 @@ public class IdMappingTest extends EventsTest {
      * 2. 设置userKey为null
      * 3. 关闭IdMapping开关，不能设置userKey
      */
-    @Test
+//    @Test
     public void test3SpecialValidation() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
         final AtomicBoolean receivedVisit = new AtomicBoolean(false);
