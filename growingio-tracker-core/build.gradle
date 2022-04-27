@@ -63,6 +63,7 @@ dependencies {
     testImplementation libraries.test.robolectric
     testImplementation libraries.androidx.appcompat
     testImplementation libraries.androidx.recyclerview
+    testImplementation libraries.androidx.swiperefreshlayout
 
     testImplementation project(path: ':growingio-data:database')
     testImplementation project(path: ':growingio-data:protobuf')
