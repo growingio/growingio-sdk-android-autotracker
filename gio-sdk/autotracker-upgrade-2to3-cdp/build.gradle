@@ -1,0 +1,40 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdkVersion buildConfiguration.compileVersion
+
+    defaultConfig {
+        minSdkVersion buildConfiguration.minSdkVersion
+        targetSdkVersion buildConfiguration.targetSdkVersion
+        versionName releaseConfiguration.releaseVersion
+        versionCode releaseConfiguration.releaseVersionCode
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled = true
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'consumer-proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility buildConfiguration.sourceCompatibility
+        targetCompatibility buildConfiguration.targetCompatibility
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    debugApi project(':gio-sdk:autotracker-cdp')
+    releaseApi libraries.growingio.autotracker_cdp
+}
+
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

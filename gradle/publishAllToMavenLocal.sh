@@ -22,6 +22,8 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :gio-sdk:tracker-cdp:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker-cdp:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :gio-sdk:tracker-upgrade-2to3-cdp:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :gio-sdk:autotracker-upgrade-2to3-cdp:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-autotracker-gradle-plugin:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew clean
 export IS_EXCLUDE_DEMOS=false
