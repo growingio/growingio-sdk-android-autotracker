@@ -14,24 +14,25 @@
  *   limitations under the License.
  */
 
-package com.growingio.sdk.plugin.autotrack.compile;
-
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
+package com.growingio.android.sdk.autotrack.inject;
 
 
-/**
- * <p>
- *     just for get asm version
- * @author cpacm 2021/12/6
- */
-public class AutotrackClassWriter extends ClassWriter {
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
-    public AutotrackClassWriter(final ClassReader classReader, final int flags) {
-        super(classReader, flags);
+
+public class DialogInjector {
+
+    private DialogInjector() {
     }
 
-    public int getApi() {
-        return api;
+    public static void alertDialogShow(AlertDialog alertDialog) {
+        ViewClickProvider.alertDialogShow(alertDialog);
+    }
+
+    public static void dialogOnClick(DialogInterface.OnClickListener listener, DialogInterface dialogInterface, int which) {
+        if (dialogInterface instanceof AlertDialog) {
+            ViewClickProvider.alertDialogOnClick((AlertDialog) dialogInterface, which);
+        }
     }
 }

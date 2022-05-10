@@ -5,9 +5,6 @@ if (!isExcludeDemos()) {
 }
 
 // tools
-include ':growingio-autotracker-gradle-plugin'
-include ':inject-annotation'
-include ':inject-annotation:compiler'
 include ':growingio-annotation'
 include ':growingio-annotation:compiler'
 

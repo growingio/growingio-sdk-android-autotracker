@@ -16,20 +16,19 @@
 
 package com.growingio.android.sdk.autotrack.inject;
 
-import android.view.View;
-import android.webkit.WebView;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
+import com.tencent.smtt.sdk.WebView;
 
 import java.util.Map;
 
-public class WebViewInjector {
-    private static final String TAG = "WebViewInjector";
+public class X5WebViewInjector {
+    private static final String TAG = "X5WebViewInjector";
 
-    private static void bridgeForWebView(View view) {
+    private static void bridgeForWebView(WebView view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
@@ -43,31 +42,31 @@ public class WebViewInjector {
         Logger.d(TAG, "bridgeForWebView: webView = " + view.getClass().getName() + ", result = " + result);
     }
 
-    private WebViewInjector() {
+    private X5WebViewInjector() {
     }
 
-    public static void webkitWebViewLoadUrl(WebView webView, String url) {
-        Logger.d(TAG, "webkitWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);
+    public static void x5WebViewLoadUrl(WebView webView, String url) {
+        Logger.d(TAG, "x5WebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);
         bridgeForWebView(webView);
     }
 
-    public static void webkitWebViewLoadUrl(WebView webView, String url, Map<String, String> additionalHttpHeaders) {
-        Logger.d(TAG, "webkitWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url + ", additionalHttpHeaders = " + additionalHttpHeaders);
+    public static void x5WebViewLoadUrl(WebView webView, String url, Map<String, String> additionalHttpHeaders) {
+        Logger.d(TAG, "x5WebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url + ", additionalHttpHeaders = " + additionalHttpHeaders);
         bridgeForWebView(webView);
     }
 
-    public static void webkitWebViewLoadData(WebView webView, String data, String mimeType, String encoding) {
-        Logger.d(TAG, "webkitWebViewLoadData: webView = " + webView.getClass().getName());
+    public static void x5WebViewLoadData(WebView webView, String data, String mimeType, String encoding) {
+        Logger.d(TAG, "x5WebViewLoadData: webView = " + webView.getClass().getName());
         bridgeForWebView(webView);
     }
 
-    public static void webkitWebViewLoadDataWithBaseURL(WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
-        Logger.d(TAG, "webkitWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
+    public static void x5WebViewLoadDataWithBaseURL(WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+        Logger.d(TAG, "x5WebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
         bridgeForWebView(webView);
     }
 
-    public static void webkitWebViewPostUrl(WebView webView, String url, byte[] postData) {
-        Logger.d(TAG, "webkitWebViewPostUrl: webView = " + webView.getClass().getName());
+    public static void x5WebViewPostUrl(WebView webView, String url, byte[] postData) {
+        Logger.d(TAG, "x5WebViewPostUrl: webView = " + webView.getClass().getName());
         bridgeForWebView(webView);
     }
 }

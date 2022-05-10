@@ -1,6 +1,5 @@
 
-./gradlew :growingio-autotracker-gradle-plugin:checkstyle \
-&& ./gradlew :growingio-annotation:checkstyle \
+./gradlew :growingio-annotation:checkstyle \
 && ./gradlew :growingio-annotation:compiler:checkstyle \
 && ./gradlew :growingio-tracker-core:checkstyle \
 && ./gradlew :growingio-autotracker-core:checkstyle \
