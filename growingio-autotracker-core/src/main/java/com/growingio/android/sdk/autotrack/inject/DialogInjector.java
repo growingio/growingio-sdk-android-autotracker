@@ -20,6 +20,8 @@ package com.growingio.android.sdk.autotrack.inject;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
+import com.growingio.android.sdk.track.utils.ClassExistHelper;
+
 
 public class DialogInjector {
 
@@ -27,12 +29,16 @@ public class DialogInjector {
     }
 
     public static void alertDialogShow(AlertDialog alertDialog) {
-        ViewClickProvider.alertDialogShow(alertDialog);
+        DialogClickProvider.alertDialogShow(alertDialog);
     }
 
     public static void dialogOnClick(DialogInterface.OnClickListener listener, DialogInterface dialogInterface, int which) {
         if (dialogInterface instanceof AlertDialog) {
-            ViewClickProvider.alertDialogOnClick((AlertDialog) dialogInterface, which);
+            DialogClickProvider.alertDialogOnClick((AlertDialog) dialogInterface, which);
+        } else if (ClassExistHelper.instanceOfAndroidXAlertDialog(dialogInterface)) {
+            DialogClickProvider.alertDialogXOnClick((androidx.appcompat.app.AlertDialog) dialogInterface, which);
+        } else if (ClassExistHelper.instanceOfSupportAlertDialog(dialogInterface)) {
+            DialogClickProvider.alertDialogSupportOnClick((android.support.v7.app.AlertDialog) dialogInterface, which);
         }
     }
 }
