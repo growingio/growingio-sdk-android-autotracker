@@ -63,6 +63,7 @@ dependencies {
     releaseApi libraries.growingio.tracker_core
 
     compileOnly libraries.androidx.appcompat
+    compileOnly libraries.androidx.material
     compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
     compileOnly libraries.android.recyclerview

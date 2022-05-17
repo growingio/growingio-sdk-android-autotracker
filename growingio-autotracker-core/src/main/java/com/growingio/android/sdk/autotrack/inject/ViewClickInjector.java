@@ -16,18 +16,14 @@
 
 package com.growingio.android.sdk.autotrack.inject;
 
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ActionMenuView;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
-import android.widget.PopupMenu;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.Toolbar;
 
 
 public class ViewClickInjector {
@@ -38,6 +34,10 @@ public class ViewClickInjector {
 
     public static void viewOnClick(View.OnClickListener listener, View view) {
         ViewClickProvider.viewOnClick(view);
+    }
+
+    public static void seekBarOnSeekBarChange(SeekBar.OnSeekBarChangeListener listener, SeekBar seekBar) {
+        ViewClickProvider.viewOnClick(seekBar);
     }
 
     public static void adapterViewOnItemClick(AdapterView.OnItemClickListener listener, AdapterView adapterView, View view, int position, long id) {
@@ -72,25 +72,5 @@ public class ViewClickInjector {
         if (fromUser) {
             ViewClickProvider.viewOnClick(ratingBar);
         }
-    }
-
-    public static void seekBarOnSeekBarChange(SeekBar.OnSeekBarChangeListener listener, SeekBar seekBar) {
-        ViewClickProvider.viewOnClick(seekBar);
-    }
-
-    public static void toolbarOnMenuItemClick(Toolbar.OnMenuItemClickListener listener, MenuItem item) {
-        ViewClickProvider.menuItemOnClick(item);
-    }
-
-    public static void actionMenuViewOnMenuItemClick(ActionMenuView.OnMenuItemClickListener listener, MenuItem item) {
-        ViewClickProvider.menuItemOnClick(item);
-    }
-
-    public static void popupMenuOnMenuItemClick(PopupMenu.OnMenuItemClickListener listener, MenuItem item) {
-        ViewClickProvider.menuItemOnClick(item);
-    }
-
-    public static void popupMenuOnMenuItemClick(androidx.appcompat.widget.PopupMenu.OnMenuItemClickListener listener, MenuItem item) {
-        ViewClickProvider.menuItemOnClick(item);
     }
 }
