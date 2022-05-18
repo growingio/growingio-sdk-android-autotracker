@@ -11,7 +11,7 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.4.0",
+                releaseVersion    : "3.4.0-SNAPSHOT",
                 releaseVersionCode: 30400,
         ]
 
@@ -124,7 +124,7 @@ buildscript {
                         'asm_tree'   : 'org.ow2.asm:asm-tree:9.1',
                 ],
         ]
-        kotlin_version = '1.4.32'
+        kotlin_version = '1.6.10'
     }
 
     repositories {
