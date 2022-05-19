@@ -11,8 +11,8 @@ buildscript {
         maven {url "https://s01.oss.sonatype.org/content/repositories/snapshots/"}
     }
     dependencies {
-        //classpath "com.growingio.android:autotracker-gradle-plugin:${releaseConfiguration.releaseVersion}"
-        classpath "com.growingio.android:autotracker-gradle-plugin:3.4.0"
+        classpath "com.growingio.android:autotracker-gradle-plugin:${releaseConfiguration.releaseVersion}"
+        //classpath "com.growingio.android:autotracker-gradle-plugin:3.4.0"
     }
 }
 
