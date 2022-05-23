@@ -22,8 +22,8 @@ import android.app.Application;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.track.http.EventResponse;
-import com.growingio.android.sdk.track.http.EventUrl;
+import com.growingio.android.sdk.track.middleware.http.EventResponse;
+import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;

@@ -21,8 +21,8 @@ import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.track.http.EventEncoder;
-import com.growingio.android.sdk.track.http.EventUrl;
+import com.growingio.android.sdk.track.middleware.http.EventEncoder;
+import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.snappy.Snappy;

@@ -21,7 +21,7 @@ import android.app.Activity;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
-import com.growingio.android.sdk.track.interfaces.TrackThread;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;

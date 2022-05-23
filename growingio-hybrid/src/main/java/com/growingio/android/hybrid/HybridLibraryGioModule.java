@@ -19,9 +19,9 @@ import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
-import com.growingio.android.sdk.track.modelloader.data.HybridDom;
-import com.growingio.android.sdk.track.modelloader.data.HybridJson;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**

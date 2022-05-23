@@ -14,19 +14,9 @@
  *   limitations under the License.
  */
 
-package com.growingio.android.sdk.track.modelloader.data;
+package com.growingio.android.sdk.track.listener;
 
-
-import android.view.View;
-
-public class HybridBridge {
-    private final View view;
-
-    public HybridBridge(View view) {
-        this.view = view;
-    }
-
-    public View getView() {
-        return view;
-    }
+public interface OnTrackMainInitSDKCallback {
+    @TrackThread
+    void onTrackMainInitSDK();
 }

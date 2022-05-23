@@ -14,33 +14,16 @@
  *   limitations under the License.
  */
 
-package com.growingio.android.sdk.track.modelloader.data;
+package com.growingio.android.sdk.track.middleware.http;
 
+public class EventEncoder {
+    private final EventUrl eventUrl;
 
-import android.view.View;
-
-public class HybridDom {
-    private View view;
-    private OnDomChangedListener onDomChangedListener;
-
-    public HybridDom(OnDomChangedListener onDomChangedListener) {
-        this.onDomChangedListener = onDomChangedListener;
+    public EventEncoder(EventUrl eventUrl) {
+        this.eventUrl = eventUrl;
     }
 
-    public HybridDom(View view) {
-        this.view = view;
+    public EventUrl getEventUrl() {
+        return eventUrl;
     }
-
-    public View getView() {
-        return view;
-    }
-
-    public OnDomChangedListener getOnDomChangedListener() {
-        return onDomChangedListener;
-    }
-
-    public interface OnDomChangedListener {
-        void onDomChanged();
-    }
-
 }

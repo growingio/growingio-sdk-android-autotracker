@@ -118,6 +118,7 @@ public class FirebaseAnalyticsTest {
         FirebaseAnalyticsAdapter adapter = FirebaseAnalyticsAdapter.get();
         Map<String, String> attr = adapter.parseBundle(bundle);
 
+        Assert.assertEquals(attr.toString().length(), BUNDLE_RESULT.length());
         Assert.assertEquals(attr.toString(), BUNDLE_RESULT);
     }
 

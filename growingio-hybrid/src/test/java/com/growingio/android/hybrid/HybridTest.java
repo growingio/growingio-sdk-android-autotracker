@@ -38,9 +38,9 @@ import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
-import com.growingio.android.sdk.track.modelloader.data.HybridDom;
-import com.growingio.android.sdk.track.modelloader.data.HybridJson;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 

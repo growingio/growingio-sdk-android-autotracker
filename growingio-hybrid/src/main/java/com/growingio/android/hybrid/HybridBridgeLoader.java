@@ -21,7 +21,7 @@ import android.webkit.WebView;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
-import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 /**
