@@ -236,6 +236,8 @@ class FirebaseAnalyticsAdapter {
                     attr.put(realKey, value.toString());
                 } else if (value instanceof SizeF) {
                     attr.put(realKey, value.toString());
+                } else{
+                    attr.put(realKey, value.toString());
                 }
             } else {
                 attr.put(realKey, value.toString());
