@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdkVersion buildConfiguration.compileVersion
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion buildConfiguration.targetSdkVersion
+        versionName releaseConfiguration.releaseVersion
+        versionCode releaseConfiguration.releaseVersionCode
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility buildConfiguration.sourceCompatibility
+        targetCompatibility buildConfiguration.targetCompatibility
+    }
+
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+                excludes = ['jdk.internal.*']
+            }
+        }
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+        }
+    }
+}
+
+
+dependencies {
+    testImplementation libraries.test.junit
+    testImplementation libraries.test.truth
+    testImplementation libraries.test.androidx_core
+    testImplementation libraries.test.robolectric
+
+    implementation project(':growingio-tracker-core')
+
+    implementation project(":growingio-annotation")
+    annotationProcessor project(":growingio-annotation:compiler")
+
+    implementation platform('com.google.firebase:firebase-bom:30.0.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+}
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"
