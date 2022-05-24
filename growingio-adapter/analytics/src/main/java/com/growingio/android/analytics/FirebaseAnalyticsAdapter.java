@@ -100,7 +100,7 @@ class FirebaseAnalyticsAdapter {
             public void onComplete(@NonNull Task<String> task) {
                 appInstanceId = task.getResult();
                 Map<String, String> attr = new HashMap<>();
-                attr.put("AppInstanceId", appInstanceId);
+                attr.put("app_instance_id", appInstanceId);
                 TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attr));
             }
         });
