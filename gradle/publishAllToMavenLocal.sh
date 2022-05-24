@@ -18,6 +18,7 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :growingio-webservice:circler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tools:crash:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tools:oaid:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-adapter:analytics:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker-cdp:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenAgentPublicationToMavenLocal \

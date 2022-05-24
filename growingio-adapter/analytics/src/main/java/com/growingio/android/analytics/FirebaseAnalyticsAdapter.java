@@ -127,6 +127,7 @@ class FirebaseAnalyticsAdapter {
     void setUserProperty(String name, String value) {
         if (!checkAnalyticsValid()) return;
         Map<String, String> attr = new HashMap<>();
+        if (value == null) value = "";
         attr.put(name, value);
         TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attr));
     }
@@ -236,7 +237,7 @@ class FirebaseAnalyticsAdapter {
                     attr.put(realKey, value.toString());
                 } else if (value instanceof SizeF) {
                     attr.put(realKey, value.toString());
-                } else{
+                } else {
                     attr.put(realKey, value.toString());
                 }
             } else {
