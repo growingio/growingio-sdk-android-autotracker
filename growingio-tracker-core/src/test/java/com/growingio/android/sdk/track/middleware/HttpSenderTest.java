@@ -24,9 +24,9 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.http.EventEncoder;
-import com.growingio.android.sdk.track.http.EventResponse;
-import com.growingio.android.sdk.track.http.EventUrl;
+import com.growingio.android.sdk.track.middleware.http.EventEncoder;
+import com.growingio.android.sdk.track.middleware.http.EventResponse;
+import com.growingio.android.sdk.track.middleware.http.EventUrl;
 
 import org.junit.Before;
 import org.junit.Test;

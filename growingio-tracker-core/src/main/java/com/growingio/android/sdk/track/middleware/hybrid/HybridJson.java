@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.growingio.android.sdk.track.modelloader.data;
+package com.growingio.android.sdk.track.middleware.hybrid;
 
 import org.json.JSONObject;
 

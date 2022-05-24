@@ -20,7 +20,7 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.ErrorLog;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
-import com.growingio.android.sdk.track.interfaces.TrackThread;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.log.Logger;

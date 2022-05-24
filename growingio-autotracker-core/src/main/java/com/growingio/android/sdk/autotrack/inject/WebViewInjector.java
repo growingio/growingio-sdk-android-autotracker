@@ -22,7 +22,7 @@ import android.webkit.WebView;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 
 import java.util.Map;
 

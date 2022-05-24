@@ -18,7 +18,7 @@ package com.growingio.android.encoder;
 import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.http.EventEncoder;
+import com.growingio.android.sdk.track.middleware.http.EventEncoder;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 

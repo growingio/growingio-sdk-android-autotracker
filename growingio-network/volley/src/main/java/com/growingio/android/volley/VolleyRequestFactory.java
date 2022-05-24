@@ -18,7 +18,7 @@ package com.growingio.android.volley;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.growingio.android.sdk.track.http.EventResponse;
+import com.growingio.android.sdk.track.middleware.http.EventResponse;
 
 import java.util.Map;
 

@@ -27,6 +27,8 @@ include ':growingio-tools:crash'
 include ':growingio-tools:snappy'
 include ':growingio-tools:oaid'
 
+include ':growingio-adapter:analytics'
+
 // sdks
 include ':gio-sdk:tracker'
 include ':gio-sdk:autotracker'
