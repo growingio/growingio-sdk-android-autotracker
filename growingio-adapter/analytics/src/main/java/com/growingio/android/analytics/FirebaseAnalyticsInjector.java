@@ -41,4 +41,8 @@ public class FirebaseAnalyticsInjector {
     public static void setUserProperty(String name, String value) {
         FirebaseAnalyticsAdapter.get().setUserProperty(name, value);
     }
+
+    public static void setAnalyticsCollectionEnabled(boolean enabled) {
+        FirebaseAnalyticsAdapter.get().setAnalyticsCollectionEnabled(enabled);
+    }
 }

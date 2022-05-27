@@ -26,16 +26,14 @@ import android.util.Size;
 import android.util.SizeF;
 import android.util.SparseArray;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 import java.util.ArrayList;
@@ -74,37 +72,41 @@ class FirebaseAnalyticsAdapter {
         }
     }
 
-    @SuppressLint("MissingPermission")
     private FirebaseAnalyticsAdapter() {
-        if (firebaseAnalytics == null) {
-            firebaseAnalytics = FirebaseAnalytics.getInstance(TrackerContext.get());
-        }
-        firebaseAnalytics.getAppInstanceId().addOnCompleteListener(new OnCompleteListener<String>() {
-            @Override
-            public void onComplete(@NonNull Task<String> task) {
-                appInstanceId = task.getResult();
-                Map<String, String> attr = new HashMap<>();
-                attr.put("app_instance_id", appInstanceId);
-                TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attr));
-            }
-        });
+        initFAdapter(TrackerContext.get());
+    }
+
+    private FirebaseAnalyticsAdapter(Context context) {
+        initFAdapter(context);
     }
 
     @SuppressLint("MissingPermission")
-    private FirebaseAnalyticsAdapter(Context context) {
+    private void initFAdapter(Context context) {
         if (firebaseAnalytics == null) {
             firebaseAnalytics = FirebaseAnalytics.getInstance(context);
         }
-        firebaseAnalytics.getAppInstanceId().addOnCompleteListener(new OnCompleteListener<String>() {
-            @Override
-            public void onComplete(@NonNull Task<String> task) {
-                appInstanceId = task.getResult();
-                Map<String, String> attr = new HashMap<>();
-                attr.put("app_instance_id", appInstanceId);
-                TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attr));
-            }
+        firebaseAnalytics.getAppInstanceId().addOnCompleteListener(task -> {
+            appInstanceId = task.getResult();
+            Map<String, String> attr = new HashMap<>();
+            attr.put("app_instance_id", appInstanceId);
+            TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attr));
         });
+
+        try {
+            setAnalyticsCollectionEnabled(FirebaseApp.getInstance().isDataCollectionDefaultEnabled());
+        } catch (IllegalStateException ignored) {
+        }
+
+//        if (readManifestScreenTrackEnabled(context)) {
+//            ActivityStateProvider.get().registerActivityLifecycleListener(event -> {
+//                Bundle bundle = new Bundle();
+//                bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, event.getActivity().getTitle().toString());
+//                bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, event.getActivity().getLocalClassName());
+//                logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
+//            });
+//        }
     }
+
 
     void logEvent(String name, Bundle bundle) {
         if (!checkAnalyticsValid()) return;
@@ -116,7 +118,21 @@ class FirebaseAnalyticsAdapter {
     }
 
     void setDefaultEventParameters(Bundle bundle) {
+        //参数通过google manager remote service 发送，无法hook.只能通过每次设置来更新
         defaultBundle = bundle;
+    }
+
+    void setAnalyticsCollectionEnabled(boolean enabled) {
+        TrackMainThread.trackMain().postActionToTrackMain(() -> {
+            if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
+                Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
+            } else {
+                ConfigurationProvider.core().setDataCollectionEnabled(enabled);
+                if (enabled) {
+                    SessionProvider.get().generateVisit();
+                }
+            }
+        });
     }
 
     void setUserId(String userId) {
@@ -256,5 +272,26 @@ class FirebaseAnalyticsAdapter {
         }
         return TrackerContext.initializedSuccessfully();
     }
+
+//    private boolean readManifestScreenTrackEnabled(Context context) {
+//        try {
+//            PackageManager packageManager = context.getPackageManager();
+//            if (packageManager != null) {
+//                ApplicationInfo applicationInfo =
+//                        packageManager.getApplicationInfo(
+//                                context.getPackageName(), PackageManager.GET_META_DATA);
+//                if (applicationInfo != null
+//                        && applicationInfo.metaData != null
+//                        && applicationInfo.metaData.containsKey(DATA_SCREEN_TRACK_ENABLED)) {
+//                    return applicationInfo.metaData.getBoolean(DATA_SCREEN_TRACK_ENABLED);
+//                }
+//            }
+//        } catch (PackageManager.NameNotFoundException e) {
+//            // This shouldn't happen since it's this app's package, but fall through to default if so.
+//        }
+//        return true;
+//    }
+//
+//    public static final String DATA_SCREEN_TRACK_ENABLED = "google_analytics_automatic_screen_reporting_enabled";
 
 }
