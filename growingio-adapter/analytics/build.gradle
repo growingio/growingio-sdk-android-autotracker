@@ -5,7 +5,7 @@ plugins {
 android {
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
-        minSdkVersion buildConfiguration.minSdkVersion
+        minSdkVersion 19
         targetSdkVersion buildConfiguration.targetSdkVersion
         versionName releaseConfiguration.releaseVersion
         versionCode releaseConfiguration.releaseVersionCode
@@ -43,6 +43,9 @@ dependencies {
     testImplementation libraries.test.truth
     testImplementation libraries.test.androidx_core
     testImplementation libraries.test.robolectric
+
+    testImplementation platform('com.google.firebase:firebase-bom:30.0.1')
+    testImplementation 'com.google.firebase:firebase-analytics-ktx'
 
     implementation project(':growingio-tracker-core')
 
