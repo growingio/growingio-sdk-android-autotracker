@@ -48,7 +48,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     private VisitEvent mLastVisitEvent = null;
     private PageEvent mLastPageEvent = null;
-    private long mLatestPauseTime = 0L;
     private long mSessionInterval = 30 * 1000L;
 
 
@@ -86,32 +85,22 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     @Override
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                Activity activity = event.getActivity();
-                if (activity == null) return;
-                if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
-                    if (mActivityList.size() == 0) {
-                        if (mLatestPauseTime != 0 && System.currentTimeMillis() - mLatestPauseTime >= mSessionInterval) {
-                            // 更新所有 Tracker 的 session，并补发相应vst事件
-                            for (TrackerInfo trackerInfo : mTrackers.values()) {
-                                trackerInfo.setSessionId(UUID.randomUUID().toString());
-                                TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
-                            }
-                        }
-                    }
-                    mActivityList.add(activity.toString());
-                } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
-                    if (mActivityList.contains(activity.toString())) {
-                        mActivityList.remove(activity.toString());
-                        if (mActivityList.size() == 0) {
-                            mLatestPauseTime = System.currentTimeMillis();
-                        }
+        long lastPauseTime = PersistentDataProvider.get().getLatestPauseTime();
+        if (PersistentDataProvider.get().getActivityCount() == 0
+                && lastPauseTime != 0
+                && (System.currentTimeMillis() - lastPauseTime >= mSessionInterval)) {
+            TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                @Override
+                public void run() {
+                    // 更新所有 Tracker 的 session，并补发相应vst事件
+                    for (TrackerInfo trackerInfo : mTrackers.values()) {
+                        trackerInfo.setSessionId(UUID.randomUUID().toString());
+                        TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
                     }
                 }
-            }
-        });
+            });
+        }
+
     }
 
     // 解析 GA3 配置xml
