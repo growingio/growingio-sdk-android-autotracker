@@ -191,7 +191,7 @@ public class PersistentDataProvider {
 
             if (isFirstProcess) {
                 setActivityCount(0);
-                setLatestPauseTime(System.currentTimeMillis());
+                setLatestPauseTime(0L);
                 setLatestNonNullUserId(getLoginUserId());
 
                 SessionProvider.get().refreshSessionId();

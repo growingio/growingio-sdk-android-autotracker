@@ -55,14 +55,6 @@ public class SessionProvider implements IActivityLifecycle {
         return SingleInstance.INSTANCE;
     }
 
-    @TrackThread
-    void checkAndSendVisit(long resumeTime) {
-        if (resumeTime - PersistentDataProvider.get().getLatestPauseTime() >= mSessionInterval) {
-            refreshSessionId();
-            generateVisit();
-        }
-    }
-
     /**
      * 刷新sessionId的场景:
      * 1. 第一个进程初始化时会刷新session
@@ -126,12 +118,16 @@ public class SessionProvider implements IActivityLifecycle {
         if (activity == null) return;
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
             if (PersistentDataProvider.get().getActivityCount() == 0) {
-                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-                    @Override
-                    public void run() {
-                        checkAndSendVisit(System.currentTimeMillis());
-                    }
-                });
+                long latestPauseTime = PersistentDataProvider.get().getLatestPauseTime();
+                if (latestPauseTime != 0 && (System.currentTimeMillis() - latestPauseTime >= mSessionInterval)) {
+                    TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshSessionId();
+                            generateVisit();
+                        }
+                    });
+                }
             }
             mActivityList.add(activity.toString());
             PersistentDataProvider.get().addActivityCount();
