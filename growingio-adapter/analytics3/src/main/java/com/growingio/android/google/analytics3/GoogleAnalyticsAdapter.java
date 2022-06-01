@@ -18,12 +18,14 @@ import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.VisitEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.SessionProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -248,27 +250,25 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         }
 
         String oldUserId = trackerInfo.getUserId();
+        // A -> A 直接返回
         if (userId.equals(oldUserId)) {
             return;
         }
         trackerInfo.setUserId(userId);
 
         String lastUserId = trackerInfo.getLastUserId();
-        // null -> A
-        // A -> null -> A 不做session变更
-        if (TextUtils.isEmpty(oldUserId)) {
-            if (TextUtils.isEmpty(lastUserId) || userId.equals(lastUserId)) {
-                trackerInfo.setLastUserId(userId);
-                // 补发vst事件
+        // null -> A 补发vst
+        // A -> null -> A 不做session变更, 与3.0保持一致，不补发vst
+        if (TextUtils.isEmpty(lastUserId)) {
+            SessionProvider.get().generateVisit();
+        } else {
+            if (!userId.equals(lastUserId)) {
+                // 更新session， 补发vst事件
+                trackerInfo.setSessionId(UUID.randomUUID().toString());
                 TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
-                return;
             }
         }
         trackerInfo.setLastUserId(userId);
-
-        // 更新session， 补发vst事件
-        trackerInfo.setSessionId(UUID.randomUUID().toString());
-        TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
     }
 
     private void setDefaultParam(TrackerInfo trackerInfo, String key, String value) {
