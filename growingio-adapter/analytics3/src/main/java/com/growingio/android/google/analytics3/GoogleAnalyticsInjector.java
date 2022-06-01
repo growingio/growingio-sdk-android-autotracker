@@ -1,5 +1,6 @@
 package com.growingio.android.google.analytics3;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
@@ -9,7 +10,7 @@ import java.util.Map;
 public class GoogleAnalyticsInjector {
     private static final String TAG = "GoogleAnalyticsInjector";
 
-    public static void newTracker(Tracker tracker, int resId) {
+    public static void newTracker(Tracker tracker, GoogleAnalytics googleAnalytics, int resId) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Tracker do not initialized successfully");
             return;
@@ -18,7 +19,7 @@ public class GoogleAnalyticsInjector {
         GoogleAnalyticsAdapter.get().newTracker(tracker, resId);
     }
 
-    public static void newTracker(Tracker tracker, String measurementId) {
+    public static void newTracker(Tracker tracker, GoogleAnalytics googleAnalytics, String measurementId) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Tracker do not initialized successfully");
             return;
