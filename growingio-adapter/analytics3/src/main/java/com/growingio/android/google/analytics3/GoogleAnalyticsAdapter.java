@@ -93,7 +93,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                 if (activity == null) return;
                 if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
                     if (mActivityList.size() == 0) {
-                        if (System.currentTimeMillis() - mLatestPauseTime >= mSessionInterval) {
+                        if (mLatestPauseTime != 0 && System.currentTimeMillis() - mLatestPauseTime >= mSessionInterval) {
                             // 更新所有 Tracker 的 session，并补发相应vst事件
                             for (TrackerInfo trackerInfo : mTrackers.values()) {
                                 trackerInfo.setSessionId(UUID.randomUUID().toString());
