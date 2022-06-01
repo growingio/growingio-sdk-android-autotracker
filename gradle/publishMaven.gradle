@@ -26,8 +26,22 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = releaseConfiguration.releaseVersion
+version = getModuleVersion()
 group = GROUP
+
+def getModuleVersion() {
+    def moduleId = POM_ARTIFACT_ID
+    def version = '3.0.0-SNAPSHOT'
+    libraries.growingio.each { key, value ->
+        def library = value.split(":")
+        def libraryId = library[1]
+        if (moduleId.equals(libraryId)) {
+            version = library[2]
+            return true
+        }
+    }
+    return version
+}
 
 @SuppressWarnings("GrMethodMayBeStatic")
 def isReleaseBuild() {

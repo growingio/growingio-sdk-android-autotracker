@@ -26,21 +26,25 @@ buildscript {
     }
 }
 
+def getModuleVersion() {
+    def moduleId = POM_ARTIFACT_ID
+    def version = 'SNAPSHOT'
+    libraries.growingio.each { key, value ->
+        def library = value.split(":")
+        def libraryId = library[1]
+        if (moduleId.equals(libraryId)) {
+            version = library[2]
+            return true
+        }
+    }
+    return version
+}
+
 //tasks.withType(PublishToMavenLocal)
-//tasks.withType(PublishToMavenRepository)
 tasks.withType(PublishToMavenRepository) {
     onlyIf {
         // CI_PUBLISH.toBoolean()
-        def moduleId = POM_ARTIFACT_ID
-        def version = 'SNAPSHOT'
-        libraries.growingio.each { key, value ->
-            def library = value.split(":")
-            def libraryId = library[1]
-            if (moduleId.equals(libraryId)) {
-                version = library[2]
-                return true
-            }
-        }
+        def version = getModuleVersion()
         //println moduleId + ":" + version
         // SNAPSHOT always should publish
         if (version.endsWith('SNAPSHOT')) {
