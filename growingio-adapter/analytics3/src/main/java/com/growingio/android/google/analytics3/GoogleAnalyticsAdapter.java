@@ -85,20 +85,20 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     @Override
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
-        long lastPauseTime = PersistentDataProvider.get().getLatestPauseTime();
-        if (PersistentDataProvider.get().getActivityCount() == 0
-                && lastPauseTime != 0
-                && (System.currentTimeMillis() - lastPauseTime >= mSessionInterval)) {
-            TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-                @Override
-                public void run() {
-                    // 更新所有 Tracker 的 session，并补发相应vst事件
-                    for (TrackerInfo trackerInfo : mTrackers.values()) {
-                        trackerInfo.setSessionId(UUID.randomUUID().toString());
-                        TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
+        if (PersistentDataProvider.get().getActivityCount() == 0) {
+            long latestPauseTime = PersistentDataProvider.get().getLatestPauseTime();
+            if (latestPauseTime != 0 && (System.currentTimeMillis() - latestPauseTime >= mSessionInterval)) {
+                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 更新所有 Tracker 的 session，并补发相应vst事件
+                        for (TrackerInfo trackerInfo : mTrackers.values()) {
+                            trackerInfo.setSessionId(UUID.randomUUID().toString());
+                            TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
     }
