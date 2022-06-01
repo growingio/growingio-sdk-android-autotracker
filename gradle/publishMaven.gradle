@@ -71,6 +71,10 @@ def configurePom(pom) {
             distribution = POM_LICENCE_DIST
         }
     }
+    pom.issueManagement {
+        system = 'GitHub Issues'
+        url = POM_SCM_ISSUES
+    }
 
     pom.developers {
         developer {
@@ -188,9 +192,11 @@ afterEvaluate { project ->
                                         def groupId = it.group
                                         def artifactId = it.name
                                         if (it instanceof ProjectDependency) {
-                                            def properties = it.getDependencyProject().getProperties()
-                                            groupId = properties.get("GROUP")
-                                            artifactId = properties.get("POM_ARTIFACT_ID")
+                                            // skip eg:implementation project(:module)
+                                            //def properties = it.getDependencyProject().getProperties()
+                                            //groupId = properties.get("GROUP")
+                                            //artifactId = properties.get("POM_ARTIFACT_ID")
+                                            return
                                         }
                                         println "dependencies:" + groupId + ":" + artifactId + ":" + it.version
                                         def dependencyNode = dependenciesNode.appendNode('dependency')
@@ -228,3 +234,5 @@ signing {
         sign publication
     }
 }
+
+apply from: "${rootProject.projectDir}/gradle/existDenpendices.gradle"
