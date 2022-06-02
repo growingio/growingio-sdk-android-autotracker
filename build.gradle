@@ -53,7 +53,8 @@ buildscript {
                         'annotation'      : "com.growingio.android:annotation:$releaseConfiguration.releaseVersion",
                         'compiler'        : "com.growingio.android:compiler:$releaseConfiguration.releaseVersion",
 
-                        'analytics'       : "com.growingio.android:analytics:$releaseConfiguration.releaseVersion",
+                        'analytics-fa'    : "com.growingio.android:analytics-fa:$releaseConfiguration.releaseVersion",
+                        'analytics-ga'    : "com.growingio.android:analytics-ga:$releaseConfiguration.releaseVersion",
                         'hybrid'          : "com.growingio.android:hybrid:$releaseConfiguration.releaseVersion",
                         'okhttp3'         : "com.growingio.android:okhttp3:$releaseConfiguration.releaseVersion",
                         'database'        : "com.growingio.android:database:$releaseConfiguration.releaseVersion",
