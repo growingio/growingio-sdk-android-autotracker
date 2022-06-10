@@ -272,11 +272,22 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
     }
 
     private String getMeasurementId(Tracker tracker) {
-        return tracker.get(MEASUREMENT_ID_KEY);
+        try {
+            // GA 未初始化完成可能抛出IllegalStateException
+            return tracker.get(MEASUREMENT_ID_KEY);
+        } catch (Exception e) {
+        }
+
+        return null;
     }
 
     private String getClientId(Tracker tracker) {
-        return tracker.get(CLIENT_ID_KEY);
+        try {
+            return tracker.get(CLIENT_ID_KEY);
+        } catch (Exception e) {
+        }
+
+        return null;
     }
 
     // 主动构造的事件需要执行readPropertyInTrackThread读取通用参数
