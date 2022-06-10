@@ -214,8 +214,9 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
             public void run() {
                 TrackerInfo trackerInfo = mTrackers.get(getMeasurementId(tracker));
                 if (trackerInfo != null) {
+                    String type = params.get("&t");
                     TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new CustomEvent.Builder()
-                            .setEventName("GAEvent")
+                            .setEventName(TextUtils.isEmpty(type) ? "GAEvent" : type)
                             .setAttributes(params), trackerInfo));
                 }
             }
