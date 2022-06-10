@@ -1,10 +1,25 @@
+/*
+ *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.growingio.android.analytics.google;
 
 import android.content.res.XmlResourceParser;
 import android.text.TextUtils;
 
 import com.google.android.gms.analytics.Tracker;
-import com.growingio.android.analytics.google.middleware.GoogleAnalyticsEventHttpSender;
 import com.growingio.android.analytics.google.model.AnalyticsEvent;
 import com.growingio.android.analytics.google.model.TrackerInfo;
 import com.growingio.android.sdk.TrackerContext;
@@ -26,9 +41,7 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,7 +54,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
     private static final String CLIENT_ID_KEY = "&cid";
     private static final String MEASUREMENT_ID_KEY = "&tid";
 
-    private final List<String> mActivityList = new ArrayList<>();
     private final Map<String, TrackerInfo> mTrackers = new HashMap<>();
     private final GoogleAnalyticsConfiguration mGoogleAnalyticsConfiguration;
 
@@ -72,10 +84,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                 }
             }
         });
-        // 设置了collectId，替换地址为采集云地址
-        if (!TextUtils.isEmpty(mGoogleAnalyticsConfiguration.getServerHost()) && !TextUtils.isEmpty(mGoogleAnalyticsConfiguration.getCollectId())) {
-            TrackMainThread.trackMain().getEventSender().setEventNetSender(new GoogleAnalyticsEventHttpSender(mGoogleAnalyticsConfiguration));
-        }
     }
 
     public static GoogleAnalyticsAdapter get() {
