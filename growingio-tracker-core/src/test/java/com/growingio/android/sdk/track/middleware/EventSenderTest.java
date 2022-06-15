@@ -61,7 +61,7 @@ public class EventSenderTest {
         ProviderInfo providerInfo = new ProviderInfo();
         providerInfo.authority = application.getPackageName() + "." + EventDataContentProvider.class.getSimpleName();
 
-        eventSender = new EventSender(application, null, 0, 10);
+        eventSender = new EventSender(null, 0, 10);
         controller.create(providerInfo).get();
     }
 

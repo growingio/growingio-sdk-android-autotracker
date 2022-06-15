@@ -27,7 +27,7 @@ public class GoogleAnalyticsConfiguration implements Configurable {
 
     public GoogleAnalyticsConfiguration setDatasourceIds(Map<String, String> map) {
         if (map != null) {
-            this.mDatasourceIds = map;
+            this.mDatasourceIds.putAll(map);
         }
         return this;
     }

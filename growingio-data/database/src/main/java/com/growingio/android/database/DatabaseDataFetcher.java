@@ -69,13 +69,13 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
             return dbResult;
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_QUERY) {
             assertCondition(database.getLimit() > 0
-                            && database.getPolicy() >= SEND_POLICY_INSTANT && database.getPolicy() <= SEND_POLICY_WIFI,
+                            && database.getPolicy() >= SEND_POLICY_INSTANT,
                     "leak necessary param");
             dataManager.queryEvents(database.getPolicy(), database.getLimit(), dbResult);
             return dbResult;
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_DELETE) {
             assertCondition(database.getLastId() > 0
-                    && database.getPolicy() >= SEND_POLICY_INSTANT && database.getPolicy() <= SEND_POLICY_WIFI
+                    && database.getPolicy() >= SEND_POLICY_INSTANT
                     && !TextUtils.isEmpty(database.getEventType()), "leak necessary param");
             int sum = dataManager.removeEvents(database.getLastId(), database.getPolicy(), database.getEventType());
             dbResult.setSum(sum);
@@ -83,7 +83,7 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
             return dbResult;
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_QUERY_DELETE) {
             assertCondition(database.getLimit() > 0
-                            && database.getPolicy() >= SEND_POLICY_INSTANT && database.getPolicy() <= SEND_POLICY_WIFI,
+                            && database.getPolicy() >= SEND_POLICY_INSTANT,
                     "leak necessary param");
             dataManager.queryEventsAndDelete(database.getPolicy(), database.getLimit(), dbResult);
             return dbResult;

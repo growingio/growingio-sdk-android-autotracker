@@ -62,18 +62,17 @@ public class EventSender {
     /**
      * 事件发送管理类
      *
-     * @param context            Context对象
      * @param sender             网络发送的sender
      * @param dataUploadInterval 发送事件的时间周期，单位 s
      * @param cellularDataLimit  事件发送的移动网络的流量限制，单位 MB
      */
-    public EventSender(Context context, IEventNetSender sender, long dataUploadInterval, long cellularDataLimit) {
-        mContext = context;
+    public EventSender(IEventNetSender sender, long dataUploadInterval, long cellularDataLimit) {
+        mContext = TrackerContext.get().getApplicationContext();
         mCellularDataLimit = cellularDataLimit * 1024L * 1024L;
         mDataUploadInterval = dataUploadInterval * 1000L;
         mEventNetSender = sender;
-        mProcessLock = new ProcessLock(context, EventSender.class.getName());
-        mSharedPreferences = context.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
+        mProcessLock = new ProcessLock(mContext, EventSender.class.getName());
+        mSharedPreferences = mContext.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
         HandlerThread thread = new HandlerThread(EventSender.class.getName());
         thread.start();
         mSendHandler = new SendHandler(thread.getLooper());
@@ -243,6 +242,7 @@ public class EventSender {
      * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
      * if you want modify it,please check adsdk first
      */
+    @Deprecated
     public EventDbResult getGEventsFromPolicy(int policy) {
         return databaseOperation(EventDatabase.queryAndDelete(policy, numOfMaxEventsPerRequest()));
     }
