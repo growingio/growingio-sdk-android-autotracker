@@ -23,7 +23,6 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 
 import com.growingio.android.sdk.CoreConfiguration;
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;

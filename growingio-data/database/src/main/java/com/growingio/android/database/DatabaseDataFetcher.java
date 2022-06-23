@@ -24,7 +24,6 @@ import com.growingio.android.sdk.track.middleware.EventDbResult;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
 import static com.growingio.android.sdk.track.middleware.GEvent.SEND_POLICY_INSTANT;
-import static com.growingio.android.sdk.track.middleware.GEvent.SEND_POLICY_WIFI;
 
 /**
  * <p>
