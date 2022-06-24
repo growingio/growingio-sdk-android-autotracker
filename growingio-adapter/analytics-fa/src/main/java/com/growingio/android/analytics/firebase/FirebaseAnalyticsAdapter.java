@@ -49,26 +49,26 @@ class FirebaseAnalyticsAdapter {
 
     private static final String TAG = "GrowingAdapter";
     private static final String DUEL_VECTOR_LINK = "_";
-    private static volatile FirebaseAnalyticsAdapter _gaAdapter;
+    private static volatile FirebaseAnalyticsAdapter sGaAdapter;
     private FirebaseAnalytics firebaseAnalytics;
     private String appInstanceId;
     private Bundle defaultBundle;
 
     public static FirebaseAnalyticsAdapter get() {
-        if (_gaAdapter == null) {
+        if (sGaAdapter == null) {
             return new FirebaseAnalyticsAdapter();
         }
         synchronized (FirebaseAnalyticsAdapter.class) {
-            if (_gaAdapter != null) {
-                return _gaAdapter;
+            if (sGaAdapter != null) {
+                return sGaAdapter;
             }
             return new FirebaseAnalyticsAdapter();
         }
     }
 
     public static void init(Context context) {
-        if (_gaAdapter == null) {
-            _gaAdapter = new FirebaseAnalyticsAdapter(context);
+        if (sGaAdapter == null) {
+            sGaAdapter = new FirebaseAnalyticsAdapter(context);
         }
     }
 

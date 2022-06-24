@@ -223,6 +223,7 @@ public class EventDataManager {
                 + COLUMN_EVENT_TYPE
                 + " FROM " + TABLE_EVENTS
                 + " WHERE " + COLUMN_EVENT_TYPE + "=(" + subSelect + ") AND " + COLUMN_POLICY + "=" + policy
+                + " ORDER BY " + COLUMN_ID + " ASC "
                 + " LIMIT " + limit + ";";
         if (client == null) {
             ContentResolver contentResolver = context.getContentResolver();

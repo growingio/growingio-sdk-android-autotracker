@@ -26,6 +26,9 @@ import android.os.Bundle;
  */
 public class FirebaseAnalyticsInjector {
 
+    private FirebaseAnalyticsInjector() {
+    }
+
     public static void logEvent(String name, Bundle bundle) {
         FirebaseAnalyticsAdapter.get().logEvent(name, bundle);
     }

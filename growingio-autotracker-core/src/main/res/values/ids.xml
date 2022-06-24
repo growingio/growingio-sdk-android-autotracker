@@ -7,4 +7,5 @@
     <item name="growing_tracker_ignore_policy" type="id" />
     <item name="growing_tracker_monitoring_focus_content" type="id" />
     <item name="growing_tracker_view_page" type="id" />
+    <item name="growing_tracker_duplicate_click_timestamp" type="id"/>
 </resources>

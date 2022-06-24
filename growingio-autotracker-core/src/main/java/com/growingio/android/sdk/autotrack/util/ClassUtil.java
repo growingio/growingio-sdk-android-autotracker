@@ -18,7 +18,11 @@ package com.growingio.android.sdk.autotrack.util;
 
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.os.SystemClock;
 import android.text.TextUtils;
+import android.view.View;
+
+import com.growingio.android.sdk.autotrack.R;
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
@@ -34,6 +38,24 @@ public class ClassUtil {
             name = ANONYMOUS_CLASS_NAME;
         }
         return name;
+    }
+
+    public static boolean isDuplicateClick(View view) {
+        if (view == null) {
+            return false;
+        }
+        try {
+            String timeStamp = (String) view.getTag(R.id.growing_tracker_duplicate_click_timestamp);
+            if (!TextUtils.isEmpty(timeStamp)) {
+                long lastTime = Long.parseLong(timeStamp);
+                if (SystemClock.elapsedRealtime() - lastTime <= 200) {
+                    return true;
+                }
+            }
+            view.setTag(R.id.growing_tracker_duplicate_click_timestamp, String.valueOf(SystemClock.elapsedRealtime()));
+        } catch (Exception ignored) {
+        }
+        return false;
     }
 }
 
