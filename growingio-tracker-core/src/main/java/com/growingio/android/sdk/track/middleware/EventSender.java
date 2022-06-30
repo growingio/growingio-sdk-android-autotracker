@@ -103,7 +103,9 @@ public class EventSender {
     public void cacheEvent(GEvent event) {
         databaseOperation(EventDatabase.insert(event));
         // 避免不触发非INSTANT事件时（如埋点SDK），cache事件不被发送
-        mSendHandler.uploadUninstantEvents();
+        if (mDataUploadInterval <= 0) {
+            mSendHandler.uploadUninstantEvents();
+        }
     }
 
     public void sendEvent(GEvent event) {

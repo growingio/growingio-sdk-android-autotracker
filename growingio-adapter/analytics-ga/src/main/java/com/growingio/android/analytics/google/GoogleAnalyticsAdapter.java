@@ -39,7 +39,6 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.providers.SessionProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,12 +59,16 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
     private VisitEvent mLastVisitEvent = null;
     private PageEvent mLastPageEvent = null;
     private long mSessionInterval = 30 * 1000L;
+    private boolean mEnterBackground = true;
 
 
     private static class SingleInstance {
         private static final GoogleAnalyticsAdapter INSTANCE = new GoogleAnalyticsAdapter();
     }
 
+    // 注意两个时机
+    // 1. cdp的gioId事件拦截必定在newTracker，但是需要给新构建的事件增加gioId以及通用属性读取（不会被拦截器处理）
+    // 2. activity的生命周期注册先于SessionProvider
     private GoogleAnalyticsAdapter() {
         mGoogleAnalyticsConfiguration = ConfigurationProvider.get().getConfiguration(GoogleAnalyticsConfiguration.class);
         mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000L;
@@ -92,22 +95,31 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     @Override
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
-        if (PersistentDataProvider.get().getActivityCount() == 0) {
-            long latestPauseTime = PersistentDataProvider.get().getLatestPauseTime();
-            if (latestPauseTime != 0 && (System.currentTimeMillis() - latestPauseTime >= mSessionInterval)) {
-                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 更新所有 Tracker 的 session，并补发相应vst事件
-                        for (TrackerInfo trackerInfo : mTrackers.values()) {
-                            trackerInfo.setSessionId(UUID.randomUUID().toString());
-                            TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
+        // 注意 该函数与SessionProvider中 latestPauseTime 与 activityCount的关系
+        // SessionProvider#init 先于 模块注册，即先执行SessionProvider中设置
+        if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
+            if (mEnterBackground) {
+                mEnterBackground = false;
+                long latestPauseTime = PersistentDataProvider.get().getLatestPauseTime();
+                if (latestPauseTime != 0 && (System.currentTimeMillis() - latestPauseTime >= mSessionInterval)) {
+                    TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            // 更新所有 Tracker 的 session，并补发相应vst事件
+                            for (TrackerInfo trackerInfo : mTrackers.values()) {
+                                trackerInfo.setSessionId(UUID.randomUUID().toString());
+                                TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
+        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
+             // SessionProvider 先执行已经将对应count减去相关值 并设置对应latestPauseTime
+             if (PersistentDataProvider.get().getActivityCount() == 0) {
+                 mEnterBackground = true;
+             }
         }
-
     }
 
     // 解析 GA3 配置xml
@@ -256,7 +268,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         // null -> A 补发vst
         // A -> null -> A 不做session变更, 与3.0保持一致，不补发vst
         if (TextUtils.isEmpty(lastUserId)) {
-            SessionProvider.get().generateVisit();
+            TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
         } else {
             if (!userId.equals(lastUserId)) {
                 // 更新session， 补发vst事件
@@ -291,9 +303,9 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
     }
 
     // 主动构造的事件需要执行readPropertyInTrackThread读取通用参数
+    // 不通过readPropertyInTrackThread方法直接读取参数，避免导致esid、gesid自增
     private <T extends BaseEvent> AnalyticsEvent newAnalyticsEvent(BaseEvent.BaseBuilder<T> baseBuilder, TrackerInfo trackerInfo) {
-        baseBuilder.readPropertyInTrackThread();
-        return new AnalyticsEvent(baseBuilder.build(), trackerInfo);
+        return new AnalyticsEvent(baseBuilder.build(), trackerInfo, true);
     }
 
     // 转发事件已经执行过readPropertyInTrackThread

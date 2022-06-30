@@ -137,10 +137,10 @@ public class SessionProvider implements IActivityLifecycle {
                     PersistentDataProvider.get().delActivityCount();
                 }
                 if (PersistentDataProvider.get().getActivityCount() == 0) {
+                    PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
                     TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
                         @Override
                         public void run() {
-                            PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
                             TrackEventGenerator.generateAppClosedEvent();
                         }
                     });
