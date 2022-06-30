@@ -19,6 +19,7 @@ package com.growingio.android.analytics.google;
 import android.content.res.XmlResourceParser;
 import android.text.TextUtils;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.growingio.android.analytics.google.model.AnalyticsEvent;
 import com.growingio.android.analytics.google.model.TrackerInfo;
@@ -108,7 +109,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                             // 更新所有 Tracker 的 session，并补发相应vst事件
                             for (TrackerInfo trackerInfo : mTrackers.values()) {
                                 trackerInfo.setSessionId(UUID.randomUUID().toString());
-                                TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
+                                newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
                             }
                         }
                     });
@@ -171,7 +172,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                                 AutotrackEventType.VIEW_CHANGE.equals(event.getEventType()) ||
                                 AutotrackEventType.VIEW_CLICK.equals(event.getEventType())) {
                                 if (event instanceof BaseEvent) {
-                                    TrackMainThread.trackMain().postGEventToTrackMain(transformAnalyticsEvent((BaseEvent) event, trackerInfo));
+                                    transformAnalyticsEvent((BaseEvent) event, trackerInfo);
                                 }
                             }
                         }
@@ -182,10 +183,10 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                     // 补发vst，page，更新时间为Tracker创建时间
                     // 直接入库，不经过Interceptor
                     if (mLastVisitEvent != null) {
-                        TrackMainThread.trackMain().postGEventToTrackMain(transformAnalyticsEvent(mLastVisitEvent, trackerInfo, System.currentTimeMillis()));
+                        transformAnalyticsEvent(mLastVisitEvent, trackerInfo, System.currentTimeMillis());
                     }
                     if (mLastPageEvent != null) {
-                        TrackMainThread.trackMain().postGEventToTrackMain(transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis()));
+                        transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis());
                     }
 
                     // 发送 用户属性事件 用于关联历史数据
@@ -193,8 +194,8 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                     if (!TextUtils.isEmpty(clientId)) {
                         Map<String, String> attributes = new HashMap<>();
                         attributes.put(CLIENT_ID_KEY, clientId);
-                        TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new LoginUserAttributesEvent.Builder()
-                                .setAttributes(attributes), trackerInfo));
+                        newAnalyticsEvent(new LoginUserAttributesEvent.Builder()
+                                .setAttributes(attributes), trackerInfo);
                     }
 
                     mTrackers.put(measurementId, trackerInfo);
@@ -212,8 +213,8 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                 if (trackerInfo != null) {
                     Map<String, String> attributes = new HashMap<>();
                     attributes.put(CLIENT_ID_KEY, clientId);
-                    TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new LoginUserAttributesEvent.Builder()
-                            .setAttributes(attributes), trackerInfo));
+                    newAnalyticsEvent(new LoginUserAttributesEvent.Builder()
+                            .setAttributes(attributes), trackerInfo);
                 }
             }
         });
@@ -226,9 +227,9 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
             public void run() {
                 TrackerInfo trackerInfo = mTrackers.get(getMeasurementId(tracker));
                 if (trackerInfo != null) {
-                    TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new CustomEvent.Builder()
+                    newAnalyticsEvent(new CustomEvent.Builder()
                             .setEventName("GAEvent")
-                            .setAttributes(params), trackerInfo));
+                            .setAttributes(params), trackerInfo);
                 }
             }
         });
@@ -265,18 +266,18 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         trackerInfo.setUserId(userId);
 
         String lastUserId = trackerInfo.getLastUserId();
+        trackerInfo.setLastUserId(userId);
         // null -> A 补发vst
         // A -> null -> A 不做session变更, 与3.0保持一致，不补发vst
         if (TextUtils.isEmpty(lastUserId)) {
-            TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
+            newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
         } else {
             if (!userId.equals(lastUserId)) {
                 // 更新session， 补发vst事件
                 trackerInfo.setSessionId(UUID.randomUUID().toString());
-                TrackMainThread.trackMain().postGEventToTrackMain(newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo));
+                newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
             }
         }
-        trackerInfo.setLastUserId(userId);
     }
 
     private void setDefaultParam(TrackerInfo trackerInfo, String key, String value) {
@@ -304,16 +305,22 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     // 主动构造的事件需要执行readPropertyInTrackThread读取通用参数
     // 不通过readPropertyInTrackThread方法直接读取参数，避免导致esid、gesid自增
-    private <T extends BaseEvent> AnalyticsEvent newAnalyticsEvent(BaseEvent.BaseBuilder<T> baseBuilder, TrackerInfo trackerInfo) {
-        return new AnalyticsEvent(baseBuilder.build(), trackerInfo, true);
+    private <T extends BaseEvent> void newAnalyticsEvent(BaseEvent.BaseBuilder<T> baseBuilder, TrackerInfo trackerInfo) {
+        if (!GoogleAnalytics.getInstance(TrackerContext.get()).getAppOptOut()) {
+            TrackMainThread.trackMain().postGEventToTrackMain(new AnalyticsEvent(baseBuilder.build(), trackerInfo, true));
+        }
     }
 
     // 转发事件已经执行过readPropertyInTrackThread
-    private AnalyticsEvent transformAnalyticsEvent(BaseEvent event, TrackerInfo trackerInfo, long timestamp) {
-        return new AnalyticsEvent(event, trackerInfo, timestamp);
+    private void transformAnalyticsEvent(BaseEvent event, TrackerInfo trackerInfo, long timestamp) {
+        if (!GoogleAnalytics.getInstance(TrackerContext.get()).getAppOptOut()) {
+            TrackMainThread.trackMain().postGEventToTrackMain(new AnalyticsEvent(event, trackerInfo, timestamp));
+        }
     }
 
-    private AnalyticsEvent transformAnalyticsEvent(BaseEvent event, TrackerInfo trackerInfo) {
-        return new AnalyticsEvent(event, trackerInfo);
+    private void transformAnalyticsEvent(BaseEvent event, TrackerInfo trackerInfo) {
+        if (!GoogleAnalytics.getInstance(TrackerContext.get()).getAppOptOut()) {
+            TrackMainThread.trackMain().postGEventToTrackMain(new AnalyticsEvent(event, trackerInfo));
+        }
     }
 }
