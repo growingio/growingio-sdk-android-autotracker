@@ -37,9 +37,11 @@ import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.SessionProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +64,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
     private long mSessionInterval = 30 * 1000L;
     private boolean mEnterBackground = true;
 
+    private boolean mOptOut;
 
     private static class SingleInstance {
         private static final GoogleAnalyticsAdapter INSTANCE = new GoogleAnalyticsAdapter();
@@ -71,6 +74,10 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
     // 1. cdp的gioId事件拦截必定在newTracker，但是需要给新构建的事件增加gioId以及通用属性读取（不会被拦截器处理）
     // 2. activity的生命周期注册先于SessionProvider
     private GoogleAnalyticsAdapter() {
+        // 初始化 使用 GA的 开关配置，忽略本身的配置项
+        // TODO: 初始化前 在 子线程修改 AppOptOut 可能导致状态异常， GA中仅保证optOut的可见性（volatile）
+        mOptOut = GoogleAnalytics.getInstance(TrackerContext.get()).getAppOptOut();
+        ConfigurationProvider.core().setDataCollectionEnabled(mOptOut);
         mGoogleAnalyticsConfiguration = ConfigurationProvider.get().getConfiguration(GoogleAnalyticsConfiguration.class);
         mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000L;
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
@@ -149,7 +156,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         }
     }
 
-    @TrackThread
     void newTracker(Tracker tracker, String measurementId) {
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
@@ -204,7 +210,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         });
     }
 
-    @TrackThread
     void setClientId(Tracker tracker, String clientId) {
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
@@ -220,7 +225,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         });
     }
 
-    @TrackThread
     void send(Tracker tracker, Map<String, String> params) {
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
@@ -235,7 +239,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         });
     }
 
-    @TrackThread
     void set(Tracker tracker, String key, String value) {
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
@@ -252,6 +255,44 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         });
     }
 
+    void setAppOptOut(boolean optOut) {
+        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+            @Override
+            public void run() {
+                // GA3 全局控制 控制原生部分开关
+                // 考虑 使用运行时 API 进行开关控制，可能导致与 GA 全局控制开关不同
+                if (optOut == ConfigurationProvider.core().isDataCollectionEnabled()) {
+                    Logger.e(TAG, "当前数据采集开关 = " + optOut + ", 请勿重复操作");
+                } else {
+                    ConfigurationProvider.core().setDataCollectionEnabled(optOut);
+                    if (optOut) {
+                        SessionProvider.get().generateVisit();
+                    }
+                }
+
+                // GA3 全局控制 控制Tracker部分开关
+                if (optOut == mOptOut) {
+                    Logger.e(TAG, "当前GA3数据采集开关 = " + optOut + ", 请勿重复操作");
+                } else {
+                    mOptOut = optOut;
+                    if (optOut) {
+                        for (TrackerInfo trackerInfo : mTrackers.values()) {
+                            // 补发vst，page，更新时间为Tracker创建时间
+                            // 直接入库，不经过Interceptor
+                            if (mLastVisitEvent != null) {
+                                transformAnalyticsEvent(mLastVisitEvent, trackerInfo, System.currentTimeMillis());
+                            }
+                            if (mLastPageEvent != null) {
+                                transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis());
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    @TrackThread
     private void setUserId(TrackerInfo trackerInfo, String userId) {
         if (TextUtils.isEmpty(userId)) {
             trackerInfo.setUserId(null);
@@ -280,10 +321,12 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         }
     }
 
+    @TrackThread
     private void setDefaultParam(TrackerInfo trackerInfo, String key, String value) {
         trackerInfo.addParam(key, value);
     }
 
+    @TrackThread
     private String getMeasurementId(Tracker tracker) {
         try {
             // GA 未初始化完成可能抛出IllegalStateException
@@ -294,6 +337,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         return null;
     }
 
+    @TrackThread
     private String getClientId(Tracker tracker) {
         try {
             return tracker.get(CLIENT_ID_KEY);
@@ -305,22 +349,27 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     // 主动构造的事件需要执行readPropertyInTrackThread读取通用参数
     // 不通过readPropertyInTrackThread方法直接读取参数，避免导致esid、gesid自增
+    @TrackThread
     private <T extends BaseEvent> void newAnalyticsEvent(BaseEvent.BaseBuilder<T> baseBuilder, TrackerInfo trackerInfo) {
-        if (!GoogleAnalytics.getInstance(TrackerContext.get()).getAppOptOut()) {
-            TrackMainThread.trackMain().postGEventToTrackMain(new AnalyticsEvent(baseBuilder.build(), trackerInfo, true));
-        }
+        postAnalyticsEvent(new AnalyticsEvent(baseBuilder.build(), trackerInfo, true));
     }
 
     // 转发事件已经执行过readPropertyInTrackThread
+    @TrackThread
     private void transformAnalyticsEvent(BaseEvent event, TrackerInfo trackerInfo, long timestamp) {
-        if (!GoogleAnalytics.getInstance(TrackerContext.get()).getAppOptOut()) {
-            TrackMainThread.trackMain().postGEventToTrackMain(new AnalyticsEvent(event, trackerInfo, timestamp));
-        }
+        postAnalyticsEvent(new AnalyticsEvent(event, trackerInfo, timestamp));
     }
 
+    @TrackThread
     private void transformAnalyticsEvent(BaseEvent event, TrackerInfo trackerInfo) {
-        if (!GoogleAnalytics.getInstance(TrackerContext.get()).getAppOptOut()) {
-            TrackMainThread.trackMain().postGEventToTrackMain(new AnalyticsEvent(event, trackerInfo));
+        postAnalyticsEvent(new AnalyticsEvent(event, trackerInfo));
+    }
+
+    @TrackThread
+    private void postAnalyticsEvent(AnalyticsEvent analyticsEvent) {
+        if (mOptOut) {
+            // 转发给 MobileDebugger 的 EventBuildInterceptor
+            TrackMainThread.trackMain().postGEventToTrackMain(analyticsEvent);
         }
     }
 }

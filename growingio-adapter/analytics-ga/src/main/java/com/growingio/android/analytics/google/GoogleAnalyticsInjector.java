@@ -47,6 +47,15 @@ public class GoogleAnalyticsInjector {
         GoogleAnalyticsAdapter.get().newTracker(tracker, measurementId);
     }
 
+    public static void setAppOptOut(GoogleAnalytics googleAnalytics, boolean optOut) {
+        if (!TrackerContext.initializedSuccessfully()) {
+            Logger.e(TAG, "Tracker do not initialized successfully");
+            return;
+        }
+
+        GoogleAnalyticsAdapter.get().setAppOptOut(optOut);
+    }
+
     public static void setClientId(Tracker tracker, String clientId) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Tracker do not initialized successfully");
