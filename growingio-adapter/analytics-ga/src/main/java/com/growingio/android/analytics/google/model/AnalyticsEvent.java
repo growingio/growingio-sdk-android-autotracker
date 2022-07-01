@@ -246,7 +246,7 @@ public class AnalyticsEvent extends BaseEvent {
                 }
             }
 
-            // 不直接返回 jsonObject, 避免影响mobile debugger
+            // 不直接返回 jsonObject, 避免 被 拦截器修改 mobile debugger
             return new JSONObject(mJsonObject.toString());
         } catch (JSONException ignored) {
         }
