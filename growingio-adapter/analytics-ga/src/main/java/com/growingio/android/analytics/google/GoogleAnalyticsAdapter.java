@@ -60,7 +60,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
     private final Map<String, TrackerInfo> mTrackers = new HashMap<>();
     private final GoogleAnalyticsConfiguration mGoogleAnalyticsConfiguration;
 
-    private PageEvent mLastPageEvent = null;
     private long mSessionInterval = 30 * 1000L;
     private boolean mEnterBackground = true;
 
@@ -83,18 +82,6 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         mGoogleAnalyticsConfiguration = ConfigurationProvider.get().getConfiguration(GoogleAnalyticsConfiguration.class);
         mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000L;
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
-            @Override
-            public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
-            }
-
-            @Override
-            public void eventDidBuild(GEvent event) {
-                if (event instanceof PageEvent) {
-                    mLastPageEvent = (PageEvent) event;
-                }
-            }
-        });
     }
 
     public static GoogleAnalyticsAdapter get() {
@@ -286,12 +273,9 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     @TrackThread
     private void sendNewTrackEvent(TrackerInfo trackerInfo) {
-        // 补发vst，page，更新时间为当前时间
+        // 补发vst
         // 直接入库，不经过Interceptor
         newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
-        if (mLastPageEvent != null) {
-            transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis());
-        }
 
         sendClientIdEvent(trackerInfo);
     }
