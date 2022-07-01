@@ -57,12 +57,13 @@ public class GoogleAnalyticsInjector {
     }
 
     public static void setClientId(Tracker tracker, String clientId) {
-        if (!TrackerContext.initializedSuccessfully()) {
-            Logger.e(TAG, "Tracker do not initialized successfully");
-            return;
-        }
-
-        GoogleAnalyticsAdapter.get().setClientId(tracker, clientId);
+        // setClientId 内部调用 set("&cid", clientId);
+//        if (!TrackerContext.initializedSuccessfully()) {
+//            Logger.e(TAG, "Tracker do not initialized successfully");
+//            return;
+//        }
+//
+//        GoogleAnalyticsAdapter.get().setClientId(tracker, clientId);
     }
 
     public static void send(Tracker tracker, Map<String, String> params) {

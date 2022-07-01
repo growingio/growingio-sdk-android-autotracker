@@ -200,18 +200,18 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         });
     }
 
-    void setClientId(Tracker tracker, String clientId) {
-        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                TrackerInfo trackerInfo = mTrackers.get(getMeasurementId(tracker));
-                if (trackerInfo != null) {
-                    trackerInfo.setClientId(clientId);
-                    sendClientIdEvent(trackerInfo);
-                }
-            }
-        });
-    }
+//    void setClientId(Tracker tracker, String clientId) {
+//        TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+//            @Override
+//            public void run() {
+//                TrackerInfo trackerInfo = mTrackers.get(getMeasurementId(tracker));
+//                if (trackerInfo != null) {
+//                    trackerInfo.setClientId(clientId);
+//                    sendClientIdEvent(trackerInfo);
+//                }
+//            }
+//        });
+//    }
 
     void send(Tracker tracker, Map<String, String> params) {
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
@@ -235,9 +235,12 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                 if (trackerInfo != null) {
                     if (USER_ID_KEY.equals(key)) {
                         setUserId(trackerInfo, value);
+                        return;
                     } else if (CLIENT_ID_KEY.equals(key)) {
+                        // setClientId 内部调用 set 方法
                         trackerInfo.setClientId(value);
                         sendClientIdEvent(trackerInfo);
+                        return;
                     }
                     setDefaultParam(trackerInfo, key, value);
                 }
