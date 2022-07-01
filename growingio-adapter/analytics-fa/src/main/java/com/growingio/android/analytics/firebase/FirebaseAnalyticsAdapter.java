@@ -26,7 +26,9 @@ import android.util.Size;
 import android.util.SizeF;
 import android.util.SparseArray;
 
-import com.google.firebase.FirebaseApp;
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.measurement.api.AppMeasurementSdk;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -52,7 +54,6 @@ class FirebaseAnalyticsAdapter {
     private static volatile FirebaseAnalyticsAdapter sGaAdapter;
     private FirebaseAnalytics firebaseAnalytics;
     private String appInstanceId;
-    private Bundle defaultBundle;
 
     public static FirebaseAnalyticsAdapter get() {
         if (sGaAdapter == null) {
@@ -73,11 +74,13 @@ class FirebaseAnalyticsAdapter {
     }
 
     private FirebaseAnalyticsAdapter() {
-        initFAdapter(TrackerContext.get());
+        //initFAdapter(TrackerContext.get());
+        //registerAppMeasureEvent(TrackerContext.get());
     }
 
     private FirebaseAnalyticsAdapter(Context context) {
         initFAdapter(context);
+        registerAppMeasureEvent(context);
     }
 
     @SuppressLint("MissingPermission")
@@ -91,22 +94,22 @@ class FirebaseAnalyticsAdapter {
             attr.put("app_instance_id", appInstanceId);
             TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attr));
         });
-
-        try {
-            setAnalyticsCollectionEnabled(FirebaseApp.getInstance().isDataCollectionDefaultEnabled());
-        } catch (IllegalStateException ignored) {
-        }
-
-//        if (readManifestScreenTrackEnabled(context)) {
-//            ActivityStateProvider.get().registerActivityLifecycleListener(event -> {
-//                Bundle bundle = new Bundle();
-//                bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, event.getActivity().getTitle().toString());
-//                bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, event.getActivity().getLocalClassName());
-//                logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
-//            });
-//        }
     }
 
+    @SuppressLint("MissingPermission")
+    private void registerAppMeasureEvent(Context context) {
+        AppMeasurementSdk.getInstance(context).registerOnMeasurementEventListener(new AppMeasurementSdk.OnEventListener() {
+            @Override
+            public void onEvent(@NonNull String type, @NonNull String eventName, @NonNull Bundle bundle, long timeMill) {
+                Logger.d("FA Event", type + ":" + eventName + ":" + bundle + ":" + timeMill);
+                if (type.equals("auto")) {
+                    // exclude auto event,like:_ab(应用进入后台),_e(设置页面名称) .etc.
+                    return;
+                }
+                logEvent(eventName, bundle);
+            }
+        });
+    }
 
     void logEvent(String name, Bundle bundle) {
         if (!checkAnalyticsValid()) return;
@@ -117,22 +120,23 @@ class FirebaseAnalyticsAdapter {
         TrackEventGenerator.generateCustomEvent(name, parseBundle(bundle));
     }
 
-    void setDefaultEventParameters(Bundle bundle) {
-        //参数通过google manager remote service 发送，无法hook.只能通过每次设置来更新
-        defaultBundle = bundle;
-    }
-
+    @SuppressLint("MissingPermission")
     void setAnalyticsCollectionEnabled(boolean enabled) {
-        TrackMainThread.trackMain().postActionToTrackMain(() -> {
-            if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
-                Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
-            } else {
-                ConfigurationProvider.core().setDataCollectionEnabled(enabled);
-                if (enabled) {
-                    SessionProvider.get().generateVisit();
+        try {
+            if (!checkAnalyticsValid()) return;
+            TrackMainThread.trackMain().postActionToTrackMain(() -> {
+                if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
+                    Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
+                } else {
+                    ConfigurationProvider.core().setDataCollectionEnabled(enabled);
+                    if (enabled) {
+                        SessionProvider.get().generateVisit();
+                        initFAdapter(TrackerContext.get());
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception ignored) {
+        }
     }
 
     void setUserId(String userId) {
@@ -152,17 +156,13 @@ class FirebaseAnalyticsAdapter {
      * 将 bundle 转化为扁平化Map
      */
     Map<String, String> parseBundle(Bundle bundle) {
-        if (defaultBundle != null) {
-            Map<String, String> defaultMap = duelVectorFoil("", defaultBundle);
-            defaultMap.putAll(duelVectorFoil("", bundle));
-            return defaultMap;
-        }
         return duelVectorFoil("", bundle);
     }
 
     private Map<String, String> duelVectorFoil(String prefix, Bundle bundle) {
         Map<String, String> attr = new HashMap<>();
         for (String key : bundle.keySet()) {
+            if (key.startsWith("_")) continue; // exclude Firebase generate params
             Object value = bundle.get(key);
             String realKey = prefix + key;
             if (value instanceof Bundle) {
@@ -265,11 +265,6 @@ class FirebaseAnalyticsAdapter {
 
     boolean checkAnalyticsValid() {
         if (firebaseAnalytics == null || TextUtils.isEmpty(appInstanceId)) return false;
-        try {
-            if (!FirebaseApp.getInstance().isDataCollectionDefaultEnabled()) return false;
-        } catch (IllegalStateException e) {
-            return false;
-        }
         return TrackerContext.initializedSuccessfully();
     }
 

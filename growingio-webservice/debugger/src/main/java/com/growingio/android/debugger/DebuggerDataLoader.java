@@ -65,6 +65,8 @@ public class DebuggerDataLoader implements ModelLoader<Debugger, WebService> {
         }
 
         public Factory() {
+            // in order to cache app start event，like:visit,first page event
+            DebuggerEventWrapper.get().observeEventBuild();
         }
 
         @Override
