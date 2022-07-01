@@ -43,6 +43,7 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -59,11 +60,11 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
     private final Map<String, TrackerInfo> mTrackers = new HashMap<>();
     private final GoogleAnalyticsConfiguration mGoogleAnalyticsConfiguration;
 
-    private VisitEvent mLastVisitEvent = null;
     private PageEvent mLastPageEvent = null;
     private long mSessionInterval = 30 * 1000L;
     private boolean mEnterBackground = true;
 
+    // true 为关闭采集，false 为开启采集
     private boolean mOptOut;
 
     private static class SingleInstance {
@@ -77,7 +78,8 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         // 初始化 使用 GA的 开关配置，忽略本身的配置项
         // TODO: 初始化前 在 子线程修改 AppOptOut 可能导致状态异常， GA中仅保证optOut的可见性（volatile）
         mOptOut = GoogleAnalytics.getInstance(TrackerContext.get()).getAppOptOut();
-        ConfigurationProvider.core().setDataCollectionEnabled(mOptOut);
+        // AppOptOut true/false 与 dataCollectionEnabled 相反
+        ConfigurationProvider.core().setDataCollectionEnabled(!mOptOut);
         mGoogleAnalyticsConfiguration = ConfigurationProvider.get().getConfiguration(GoogleAnalyticsConfiguration.class);
         mSessionInterval = ConfigurationProvider.core().getSessionInterval() * 1000L;
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
@@ -88,9 +90,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
             @Override
             public void eventDidBuild(GEvent event) {
-                if (event instanceof VisitEvent) {
-                    mLastVisitEvent = (VisitEvent) event;
-                } else if (event instanceof PageEvent) {
+                if (event instanceof PageEvent) {
                     mLastPageEvent = (PageEvent) event;
                 }
             }
@@ -188,9 +188,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
                     // 补发vst，page，更新时间为Tracker创建时间
                     // 直接入库，不经过Interceptor
-                    if (mLastVisitEvent != null) {
-                        transformAnalyticsEvent(mLastVisitEvent, trackerInfo, System.currentTimeMillis());
-                    }
+                    newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
                     if (mLastPageEvent != null) {
                         transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis());
                     }
@@ -261,27 +259,19 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
             public void run() {
                 // GA3 全局控制 控制原生部分开关
                 // 考虑 使用运行时 API 进行开关控制，可能导致与 GA 全局控制开关不同
-                if (optOut == ConfigurationProvider.core().isDataCollectionEnabled()) {
-                    Logger.e(TAG, "当前数据采集开关 = " + optOut + ", 请勿重复操作");
-                } else {
-                    ConfigurationProvider.core().setDataCollectionEnabled(optOut);
-                    if (optOut) {
-                        SessionProvider.get().generateVisit();
-                    }
-                }
+                setDataCollectionEnabled(!optOut);
 
                 // GA3 全局控制 控制Tracker部分开关
                 if (optOut == mOptOut) {
                     Logger.e(TAG, "当前GA3数据采集开关 = " + optOut + ", 请勿重复操作");
                 } else {
                     mOptOut = optOut;
-                    if (optOut) {
+                    // 关 -> 开
+                    if (!optOut) {
                         for (TrackerInfo trackerInfo : mTrackers.values()) {
-                            // 补发vst，page，更新时间为Tracker创建时间
+                            // 补发vst，page，更新时间为当前时间
                             // 直接入库，不经过Interceptor
-                            if (mLastVisitEvent != null) {
-                                transformAnalyticsEvent(mLastVisitEvent, trackerInfo, System.currentTimeMillis());
-                            }
+                            newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
                             if (mLastPageEvent != null) {
                                 transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis());
                             }
@@ -290,6 +280,18 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                 }
             }
         });
+    }
+
+    @TrackThread
+    private void setDataCollectionEnabled(boolean enabled) {
+        if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
+            Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
+        } else {
+            ConfigurationProvider.core().setDataCollectionEnabled(enabled);
+            if (enabled) {
+                SessionProvider.get().generateVisit();
+            }
+        }
     }
 
     @TrackThread
@@ -367,9 +369,36 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     @TrackThread
     private void postAnalyticsEvent(AnalyticsEvent analyticsEvent) {
-        if (mOptOut) {
+        if (!mOptOut) {
             // 转发给 MobileDebugger 的 EventBuildInterceptor
+            // MobileDebugger 默认 在 Tracker中 先于 第三方模块加载 直接调用 DebuggerEventWrapper 发送数据 / 缓存数据
+            sendToDebugger(analyticsEvent);
+
             TrackMainThread.trackMain().postGEventToTrackMain(analyticsEvent);
         }
+    }
+
+    private Object mDebuggerEventWrapper;
+    private Method mEventDidBuildMethod;
+    private boolean mDebuggerNotFind = false;
+
+    @TrackThread
+    private void sendToDebugger(AnalyticsEvent analyticsEvent) {
+        if (mDebuggerNotFind) return;
+
+        try {
+            if (mDebuggerEventWrapper == null || mEventDidBuildMethod == null) {
+                Class<?> clazz = Class.forName("com.growingio.android.debugger.DebuggerEventWrapper");
+                Method getMethod = clazz.getDeclaredMethod("get()");
+                mDebuggerEventWrapper = getMethod.invoke(null);
+                mEventDidBuildMethod = clazz.getDeclaredMethod("eventDidBuild", Class.forName("com.growingio.android.sdk.track.middleware.GEvent"));
+            }
+            mEventDidBuildMethod.invoke(mDebuggerEventWrapper, analyticsEvent);
+
+            return;
+        } catch (Exception ignored) {
+        }
+
+        mDebuggerNotFind = true;
     }
 }
