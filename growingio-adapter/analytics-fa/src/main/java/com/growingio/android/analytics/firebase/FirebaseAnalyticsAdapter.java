@@ -102,7 +102,7 @@ class FirebaseAnalyticsAdapter {
             @Override
             public void onEvent(@NonNull String type, @NonNull String eventName, @NonNull Bundle bundle, long timeMill) {
                 Logger.d("FA Event", type + ":" + eventName + ":" + bundle + ":" + timeMill);
-                if (type.equals("auto")) {
+                if ("auto".equals(type)) {
                     // exclude auto event,like:_ab(应用进入后台),_e(设置页面名称) .etc.
                     return;
                 }
