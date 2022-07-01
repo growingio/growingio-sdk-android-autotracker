@@ -30,11 +30,11 @@ public class FirebaseAnalyticsInjector {
     }
 
     public static void logEvent(String name, Bundle bundle) {
-        FirebaseAnalyticsAdapter.get().logEvent(name, bundle);
+        //FirebaseAnalyticsAdapter.get().logEvent(name, bundle);
     }
 
     public static void setDefaultEventParameters(Bundle bundle) {
-        FirebaseAnalyticsAdapter.get().setDefaultEventParameters(bundle);
+        //FirebaseAnalyticsAdapter.get().setDefaultEventParameters(bundle);
     }
 
     public static void setUserId(String userId) {

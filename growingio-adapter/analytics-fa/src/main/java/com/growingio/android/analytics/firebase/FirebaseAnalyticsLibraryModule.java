@@ -17,8 +17,10 @@ package com.growingio.android.analytics.firebase;
 
 import android.content.Context;
 
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
