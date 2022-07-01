@@ -33,6 +33,5 @@ public class DebuggerLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
         registry.register(Debugger.class, WebService.class, new DebuggerDataLoader.Factory());
-        DebuggerEventWrapper.get().observeEventBuild();
     }
 }
