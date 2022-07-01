@@ -186,21 +186,13 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                     // 增加对应Tracker拦截器
                     TrackMainThread.trackMain().addEventBuildInterceptor(trackerInfo.getEventBuildInterceptor());
 
-                    // 补发vst，page，更新时间为Tracker创建时间
-                    // 直接入库，不经过Interceptor
-                    newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
-                    if (mLastPageEvent != null) {
-                        transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis());
-                    }
-
                     // 发送 用户属性事件 用于关联历史数据
                     String clientId = getClientId(tracker);
                     if (!TextUtils.isEmpty(clientId)) {
-                        Map<String, String> attributes = new HashMap<>();
-                        attributes.put(CLIENT_ID_KEY, clientId);
-                        newAnalyticsEvent(new LoginUserAttributesEvent.Builder()
-                                .setAttributes(attributes), trackerInfo);
+                        trackerInfo.setClientId(clientId);
                     }
+
+                    sendNewTrackEvent(trackerInfo);
 
                     mTrackers.put(measurementId, trackerInfo);
                 }
@@ -214,10 +206,8 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
             public void run() {
                 TrackerInfo trackerInfo = mTrackers.get(getMeasurementId(tracker));
                 if (trackerInfo != null) {
-                    Map<String, String> attributes = new HashMap<>();
-                    attributes.put(CLIENT_ID_KEY, clientId);
-                    newAnalyticsEvent(new LoginUserAttributesEvent.Builder()
-                            .setAttributes(attributes), trackerInfo);
+                    trackerInfo.setClientId(clientId);
+                    sendClientIdEvent(trackerInfo);
                 }
             }
         });
@@ -245,7 +235,9 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                 if (trackerInfo != null) {
                     if (USER_ID_KEY.equals(key)) {
                         setUserId(trackerInfo, value);
-                        return;
+                    } else if (CLIENT_ID_KEY.equals(key)) {
+                        trackerInfo.setClientId(value);
+                        sendClientIdEvent(trackerInfo);
                     }
                     setDefaultParam(trackerInfo, key, value);
                 }
@@ -269,12 +261,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                     // 关 -> 开
                     if (!optOut) {
                         for (TrackerInfo trackerInfo : mTrackers.values()) {
-                            // 补发vst，page，更新时间为当前时间
-                            // 直接入库，不经过Interceptor
-                            newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
-                            if (mLastPageEvent != null) {
-                                transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis());
-                            }
+                            sendNewTrackEvent(trackerInfo);
                         }
                     }
                 }
@@ -291,6 +278,29 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
             if (enabled) {
                 SessionProvider.get().generateVisit();
             }
+        }
+    }
+
+    @TrackThread
+    private void sendNewTrackEvent(TrackerInfo trackerInfo) {
+        // 补发vst，page，更新时间为当前时间
+        // 直接入库，不经过Interceptor
+        newAnalyticsEvent(new VisitEvent.Builder(), trackerInfo);
+        if (mLastPageEvent != null) {
+            transformAnalyticsEvent(mLastPageEvent, trackerInfo, System.currentTimeMillis());
+        }
+
+        sendClientIdEvent(trackerInfo);
+    }
+
+    @TrackThread
+    private void sendClientIdEvent(TrackerInfo trackerInfo) {
+        // 发送 用户属性事件 用于关联历史数据
+        if (!TextUtils.isEmpty(trackerInfo.getClientId())) {
+            Map<String, String> attributes = new HashMap<>();
+            attributes.put(CLIENT_ID_KEY, trackerInfo.getClientId());
+            newAnalyticsEvent(new LoginUserAttributesEvent.Builder()
+                    .setAttributes(attributes), trackerInfo);
         }
     }
 
@@ -389,7 +399,7 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
         try {
             if (mDebuggerEventWrapper == null || mEventDidBuildMethod == null) {
                 Class<?> clazz = Class.forName("com.growingio.android.debugger.DebuggerEventWrapper");
-                Method getMethod = clazz.getDeclaredMethod("get()");
+                Method getMethod = clazz.getDeclaredMethod("get");
                 mDebuggerEventWrapper = getMethod.invoke(null);
                 mEventDidBuildMethod = clazz.getDeclaredMethod("eventDidBuild", Class.forName("com.growingio.android.sdk.track.middleware.GEvent"));
             }

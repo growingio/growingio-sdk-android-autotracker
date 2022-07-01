@@ -28,6 +28,7 @@ public class TrackerInfo {
     private String mDataSourceId;
     private String mUserId;
     private String mLastUserId;
+    private String mClientId;
     private Map<String, String> extraParams;
     private EventBuildInterceptor mEventBuildInterceptor;
 
@@ -67,6 +68,14 @@ public class TrackerInfo {
 
     public void setLastUserId(String mLastUserId) {
         this.mLastUserId = mLastUserId;
+    }
+
+    public String getClientId() {
+        return mClientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.mClientId = clientId;
     }
 
     public EventBuildInterceptor getEventBuildInterceptor() {
