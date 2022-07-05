@@ -29,7 +29,6 @@ import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
-import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.VisitEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
