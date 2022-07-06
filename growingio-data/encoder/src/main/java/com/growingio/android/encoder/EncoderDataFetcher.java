@@ -16,8 +16,8 @@
 
 package com.growingio.android.encoder;
 
-import com.growingio.android.sdk.track.http.EventEncoder;
-import com.growingio.android.sdk.track.http.EventUrl;
+import com.growingio.android.sdk.track.middleware.http.EventEncoder;
+import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.snappy.Snappy;
 import com.growingio.android.snappy.XORUtils;

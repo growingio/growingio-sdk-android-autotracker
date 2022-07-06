@@ -25,6 +25,8 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
+import com.growingio.android.sdk.autotrack.inject.DialogInjector;
+import com.growingio.android.sdk.autotrack.inject.ViewClickInjector;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
@@ -78,9 +80,8 @@ public class ViewClickTest {
                 })
                 .create();
         testDialog.show();
-        ViewClickInjector.alertDialogShow(testDialog);
-        ViewClickInjector.dialogOnClick((dialog, which) -> {
-
+        DialogInjector.alertDialogShow(testDialog);
+        DialogInjector.dialogOnClick((dialog, which) -> {
         }, testDialog, -1);
     }
 }

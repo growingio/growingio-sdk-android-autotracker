@@ -42,16 +42,6 @@ android {
     lintOptions {
         abortOnError false
     }
-
-    defaultConfig {
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [
-                        GRADLE_PLUGIN_DIR : ("$rootDir/growingio-autotracker-gradle-plugin".toString())
-                ]
-            }
-        }
-    }
 }
 
 dependencies {
@@ -72,10 +62,8 @@ dependencies {
     debugApi project(':growingio-tracker-core')
     releaseApi libraries.growingio.tracker_core
 
-    implementation project(':inject-annotation')
-    annotationProcessor project(':inject-annotation:compiler')
-
     compileOnly libraries.androidx.appcompat
+    compileOnly libraries.androidx.material
     compileOnly libraries.androidx.recyclerview
     compileOnly libraries.android.appcompat
     compileOnly libraries.android.recyclerview

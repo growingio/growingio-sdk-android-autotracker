@@ -22,8 +22,7 @@ import android.webkit.WebView;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.modelloader.data.HybridBridge;
-import com.growingio.sdk.inject.annotation.Before;
+import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 
 import java.util.Map;
 
@@ -47,93 +46,28 @@ public class WebViewInjector {
     private WebViewInjector() {
     }
 
-    @Before(clazz = WebView.class, method = "loadUrl", parameterTypes = {String.class})
     public static void webkitWebViewLoadUrl(WebView webView, String url) {
         Logger.d(TAG, "webkitWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);
         bridgeForWebView(webView);
     }
 
-    @Before(clazz = WebView.class, method = "loadUrl", parameterTypes = {String.class, Map.class})
     public static void webkitWebViewLoadUrl(WebView webView, String url, Map<String, String> additionalHttpHeaders) {
         Logger.d(TAG, "webkitWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url + ", additionalHttpHeaders = " + additionalHttpHeaders);
         bridgeForWebView(webView);
     }
 
-    @Before(clazz = WebView.class, method = "loadData", parameterTypes = {String.class, String.class, String.class})
     public static void webkitWebViewLoadData(WebView webView, String data, String mimeType, String encoding) {
         Logger.d(TAG, "webkitWebViewLoadData: webView = " + webView.getClass().getName());
         bridgeForWebView(webView);
     }
 
-    @Before(clazz = WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
     public static void webkitWebViewLoadDataWithBaseURL(WebView webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         Logger.d(TAG, "webkitWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
         bridgeForWebView(webView);
     }
 
-    @Before(clazz = WebView.class, method = "postUrl", parameterTypes = {String.class, byte[].class})
     public static void webkitWebViewPostUrl(WebView webView, String url, byte[] postData) {
         Logger.d(TAG, "webkitWebViewPostUrl: webView = " + webView.getClass().getName());
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadUrl", parameterTypes = {String.class})
-    public static void x5WebViewLoadUrl(View webView, String url) {
-        Logger.d(TAG, "x5WebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadUrl", parameterTypes = {String.class, Map.class})
-    public static void x5WebViewLoadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
-        Logger.d(TAG, "x5WebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url + ", additionalHttpHeaders = " + additionalHttpHeaders);
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadData", parameterTypes = {String.class, String.class, String.class})
-    public static void x5WebViewLoadData(View webView, String data, String mimeType, String encoding) {
-        Logger.d(TAG, "x5WebViewLoadData: webView = " + webView.getClass().getName());
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
-    public static void x5WebViewLoadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
-        Logger.d(TAG, "x5WebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.tencent.smtt.sdk.WebView.class, method = "postUrl", parameterTypes = {String.class, byte[].class})
-    public static void x5WebViewPostUrl(View webView, String url, byte[] postData) {
-        Logger.d(TAG, "x5WebViewPostUrl: webView = " + webView.getClass().getName());
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.uc.webview.export.WebView.class, method = "loadUrl", parameterTypes = {String.class})
-    public static void ucWebViewLoadUrl(View webView, String url) {
-        Logger.d(TAG, "ucWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url);
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.uc.webview.export.WebView.class, method = "loadUrl", parameterTypes = {String.class, Map.class})
-    public static void ucWebViewLoadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
-        Logger.d(TAG, "ucWebViewLoadUrl: webView = " + webView.getClass().getName() + ", url = " + url + ", additionalHttpHeaders = " + additionalHttpHeaders);
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.uc.webview.export.WebView.class, method = "loadData", parameterTypes = {String.class, String.class, String.class})
-    public static void ucWebViewLoadData(View webView, String data, String mimeType, String encoding) {
-        Logger.d(TAG, "ucWebViewLoadData: webView = " + webView.getClass().getName());
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.uc.webview.export.WebView.class, method = "loadDataWithBaseURL", parameterTypes = {String.class, String.class, String.class, String.class, String.class})
-    public static void ucWebViewLoadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
-        Logger.d(TAG, "ucWebViewLoadDataWithBaseURL: webView = " + webView.getClass().getName());
-        bridgeForWebView(webView);
-    }
-
-    @Before(clazz = com.uc.webview.export.WebView.class, method = "postUrl", parameterTypes = {String.class, byte[].class})
-    public static void ucWebViewPostUrl(View webView, String url, byte[] postData) {
-        Logger.d(TAG, "ucWebViewPostUrl: webView = " + webView.getClass().getName());
         bridgeForWebView(webView);
     }
 }

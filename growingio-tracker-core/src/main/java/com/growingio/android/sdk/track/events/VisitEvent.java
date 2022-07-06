@@ -105,7 +105,7 @@ public final class VisitEvent extends BaseEvent {
         private String mGoogleAdvertisingId;
         private Map<String, String> mExtraSdk;
 
-        Builder() {
+        public Builder() {
             super();
         }
 

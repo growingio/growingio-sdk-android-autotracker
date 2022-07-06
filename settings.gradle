@@ -5,9 +5,6 @@ if (!isExcludeDemos()) {
 }
 
 // tools
-include ':growingio-autotracker-gradle-plugin'
-include ':inject-annotation'
-include ':inject-annotation:compiler'
 include ':growingio-annotation'
 include ':growingio-annotation:compiler'
 
@@ -30,8 +27,12 @@ include ':growingio-tools:crash'
 include ':growingio-tools:snappy'
 include ':growingio-tools:oaid'
 
+include ':growingio-adapter:analytics-fa'
+include ':growingio-adapter:analytics-ga'
+
 // sdks
 include ':gio-sdk:tracker'
 include ':gio-sdk:autotracker'
 include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:autotracker-cdp'
+

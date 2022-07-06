@@ -16,8 +16,8 @@
 
 package com.growingio.android.urlconnection;
 
-import com.growingio.android.sdk.track.http.EventResponse;
-import com.growingio.android.sdk.track.http.EventUrl;
+import com.growingio.android.sdk.track.middleware.http.EventResponse;
+import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 

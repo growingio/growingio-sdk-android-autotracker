@@ -19,8 +19,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.track.http.EventResponse;
-import com.growingio.android.sdk.track.http.EventUrl;
+import com.growingio.android.sdk.track.middleware.http.EventResponse;
+import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;

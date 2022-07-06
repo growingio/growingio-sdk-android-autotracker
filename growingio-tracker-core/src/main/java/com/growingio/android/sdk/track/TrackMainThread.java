@@ -23,13 +23,12 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 
 import com.growingio.android.sdk.CoreConfiguration;
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
-import com.growingio.android.sdk.track.interfaces.OnTrackMainInitSDKCallback;
-import com.growingio.android.sdk.track.interfaces.TrackThread;
+import com.growingio.android.sdk.track.listener.OnTrackMainInitSDKCallback;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.EventSender;
@@ -58,7 +57,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     private TrackMainThread() {
         CoreConfiguration configuration = ConfigurationProvider.core();
         int uploadInterval = configuration.isDebugEnabled() ? 0 : configuration.getDataUploadInterval();
-        mEventSender = new EventSender(TrackerContext.get().getApplicationContext(), new EventHttpSender(), uploadInterval, configuration.getCellularDataLimit());
+        mEventSender = new EventSender(new EventHttpSender(), uploadInterval, configuration.getCellularDataLimit());
 
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();

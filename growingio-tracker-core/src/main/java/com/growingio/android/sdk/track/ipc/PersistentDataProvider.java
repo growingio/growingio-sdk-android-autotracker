@@ -26,7 +26,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.interfaces.TrackThread;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
@@ -191,7 +191,7 @@ public class PersistentDataProvider {
 
             if (isFirstProcess) {
                 setActivityCount(0);
-                setLatestPauseTime(System.currentTimeMillis());
+                setLatestPauseTime(0L);
                 setLatestNonNullUserId(getLoginUserId());
 
                 SessionProvider.get().refreshSessionId();

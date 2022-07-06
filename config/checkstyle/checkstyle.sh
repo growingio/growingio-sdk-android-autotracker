@@ -1,6 +1,5 @@
 
-./gradlew :growingio-autotracker-gradle-plugin:checkstyle \
-&& ./gradlew :growingio-annotation:checkstyle \
+./gradlew :growingio-annotation:checkstyle \
 && ./gradlew :growingio-annotation:compiler:checkstyle \
 && ./gradlew :growingio-tracker-core:checkstyle \
 && ./gradlew :growingio-autotracker-core:checkstyle \
@@ -17,6 +16,8 @@
 && ./gradlew :growingio-tools:crash:checkstyle \
 && ./gradlew :growingio-tools:oaid:checkstyle \
 && ./gradlew :growingio-tools:snappy:checkstyle \
+&& ./gradlew :growingio-adapter:analytics-fa:checkstyle \
+&& ./gradlew :growingio-adapter:analytics-ga:checkstyle \
 && ./gradlew :gio-sdk:tracker:checkstyle \
 && ./gradlew :gio-sdk:tracker-cdp:checkstyle \
 && ./gradlew :gio-sdk:autotracker:checkstyle \

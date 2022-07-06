@@ -32,6 +32,7 @@ import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
+import com.growingio.android.sdk.autotrack.inject.FragmentInjector;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 

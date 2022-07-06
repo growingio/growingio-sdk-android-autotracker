@@ -18,10 +18,11 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :growingio-webservice:circler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tools:crash:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tools:oaid:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-adapter:analytics-fa:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-adapter:analytics-ga:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker-cdp:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker-cdp:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :growingio-autotracker-gradle-plugin:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew clean
 export IS_EXCLUDE_DEMOS=false

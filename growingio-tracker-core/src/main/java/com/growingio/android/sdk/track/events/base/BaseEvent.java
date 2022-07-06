@@ -26,7 +26,7 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.EventSequenceId;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
-import com.growingio.android.sdk.track.interfaces.TrackThread;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;

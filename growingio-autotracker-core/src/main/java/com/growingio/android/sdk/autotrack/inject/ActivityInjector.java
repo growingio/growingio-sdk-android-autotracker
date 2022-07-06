@@ -16,36 +16,34 @@
 
 package com.growingio.android.sdk.autotrack.inject;
 
-import android.accounts.AccountAuthenticatorActivity;
 import android.app.Activity;
-import android.app.ActivityGroup;
-import android.app.AliasActivity;
 import android.app.ExpandableListActivity;
-import android.app.LauncherActivity;
 import android.app.ListActivity;
-import android.app.NativeActivity;
-import android.app.TabActivity;
 import android.content.Intent;
-import android.preference.PreferenceActivity;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ExpandableListView;
+import android.widget.ListView;
 
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.sdk.inject.annotation.BeforeSuper;
 
 public class ActivityInjector {
     private ActivityInjector() {
     }
 
-    @BeforeSuper(clazz = Activity.class,                     method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = AccountAuthenticatorActivity.class, method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = ActivityGroup.class,                method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = AliasActivity.class,                method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = ExpandableListActivity.class,       method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = LauncherActivity.class,             method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = ListActivity.class,                 method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = NativeActivity.class,               method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = TabActivity.class,                  method = "onNewIntent", parameterTypes = {Intent.class})
-    @BeforeSuper(clazz = PreferenceActivity.class,           method = "onNewIntent", parameterTypes = {Intent.class})
     public static void onActivityNewIntent(Activity activity, Intent intent) {
         ActivityStateProvider.get().onActivityNewIntent(activity, intent);
+    }
+
+    public static void menuItemOnOptionsItemSelected(Activity activity, MenuItem item) {
+        ViewClickProvider.menuItemOnClick(activity, item);
+    }
+
+    public static void expandableListActivityOnChildClick(ExpandableListActivity activity, ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+        ViewClickProvider.viewOnClick(v);
+    }
+
+    public static void listActivityOnListItemClick(ListActivity activity, ListView listView, View view, int position, long id) {
+        ViewClickProvider.viewOnClick(view);
     }
 }

@@ -21,7 +21,7 @@ import android.app.Activity;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
-import com.growingio.android.sdk.track.interfaces.TrackThread;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
@@ -53,14 +53,6 @@ public class SessionProvider implements IActivityLifecycle {
 
     public static SessionProvider get() {
         return SingleInstance.INSTANCE;
-    }
-
-    @TrackThread
-    void checkAndSendVisit(long resumeTime) {
-        if (resumeTime - PersistentDataProvider.get().getLatestPauseTime() >= mSessionInterval) {
-            refreshSessionId();
-            generateVisit();
-        }
     }
 
     /**
@@ -126,12 +118,16 @@ public class SessionProvider implements IActivityLifecycle {
         if (activity == null) return;
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
             if (PersistentDataProvider.get().getActivityCount() == 0) {
-                TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-                    @Override
-                    public void run() {
-                        checkAndSendVisit(System.currentTimeMillis());
-                    }
-                });
+                long latestPauseTime = PersistentDataProvider.get().getLatestPauseTime();
+                if (latestPauseTime != 0 && (System.currentTimeMillis() - latestPauseTime >= mSessionInterval)) {
+                    TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshSessionId();
+                            generateVisit();
+                        }
+                    });
+                }
             }
             mActivityList.add(activity.toString());
             PersistentDataProvider.get().addActivityCount();
@@ -141,10 +137,10 @@ public class SessionProvider implements IActivityLifecycle {
                     PersistentDataProvider.get().delActivityCount();
                 }
                 if (PersistentDataProvider.get().getActivityCount() == 0) {
+                    PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
                     TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
                         @Override
                         public void run() {
-                            PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
                             TrackEventGenerator.generateAppClosedEvent();
                         }
                     });

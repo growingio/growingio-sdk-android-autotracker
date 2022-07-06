@@ -1,11 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'jacoco'
 
-def withAutotrack = true
-
-if (withAutotrack) {
-    apply plugin: 'com.growingio.android.autotracker'
-}
+apply plugin: 'com.growingio.android.autotracker'
 
 buildscript {
     repositories {
@@ -16,7 +12,7 @@ buildscript {
     }
     dependencies {
         classpath "com.growingio.android:autotracker-gradle-plugin:${releaseConfiguration.releaseVersion}"
-        //classpath "com.growingio.android:autotracker-gradle-plugin:3.3.1"
+        //classpath "com.growingio.android:autotracker-gradle-plugin:3.4.0"
     }
 }
 
@@ -26,8 +22,6 @@ android {
         applicationId "com.gio.test.three"
         minSdkVersion 26
         targetSdkVersion buildConfiguration.targetSdkVersion
-
-        buildConfigField "boolean", "withAutotrack", "$withAutotrack"
 
         testInstrumentationRunner "com.growingio.autotest.TrackAndroidJUnitRunner"
 
@@ -76,9 +70,10 @@ android {
 }
 
 growingAutotracker {
-    development true
     logEnabled true
-//    excludePackages "com.gio.test.three.autotrack.fragments", "com.example"
+    skipDependencyCheck true
+    //includePackages "com.growingio.android.plugin"
+    //excludePackages "com.cpacm"
 }
 
 dependencies {
@@ -110,7 +105,7 @@ dependencies {
     compileOnly libraries.androidx.appcompat
 
     // leakcanary 避免发版前未使用Profiler进行内存泄漏检测
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 }
 
 apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"

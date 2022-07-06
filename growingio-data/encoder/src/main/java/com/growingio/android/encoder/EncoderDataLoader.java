@@ -16,7 +16,7 @@
 
 package com.growingio.android.encoder;
 
-import com.growingio.android.sdk.track.http.EventEncoder;
+import com.growingio.android.sdk.track.middleware.http.EventEncoder;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 
