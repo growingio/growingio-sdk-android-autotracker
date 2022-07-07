@@ -19,6 +19,8 @@ package com.growingio.android.sdk.track.utils;
 import android.os.Build;
 import android.os.Trace;
 
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+
 /**
  * Just Delegate to Trace
  */
@@ -28,13 +30,13 @@ public final class SysTrace {
     }
 
     public static void beginSection(String sectionName) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        if (ConfigurationProvider.core().isDebugEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection(sectionName);
         }
     }
 
     public static void endSection() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        if (ConfigurationProvider.core().isDebugEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.endSection();
         }
     }
