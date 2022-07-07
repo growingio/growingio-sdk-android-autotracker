@@ -118,8 +118,9 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
 
     // 解析 GA3 配置xml
     void newTracker(Tracker tracker, int resId) {
+        XmlResourceParser parser = null;
         try {
-            XmlResourceParser parser = TrackerContext.get().getResources().getXml(resId);
+            parser = TrackerContext.get().getResources().getXml(resId);
             boolean foundTag = false;
             while (parser.getEventType() != XmlResourceParser.END_DOCUMENT) {
                 if (parser.getEventType() == XmlResourceParser.START_TAG) {
@@ -139,6 +140,10 @@ public class GoogleAnalyticsAdapter implements IActivityLifecycle {
                 parser.next();
             }
         } catch (Exception ignored) {
+        } finally {
+            if (parser != null) {
+                parser.close();
+            }
         }
     }
 
