@@ -93,7 +93,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
 
     @TrackThread
     void initSDK() {
-        mEventSender.removeOverdueEvents();
+        //mEventSender.removeOverdueEvents();
         dispatchActions(null);
     }
 

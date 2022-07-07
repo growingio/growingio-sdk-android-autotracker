@@ -59,6 +59,9 @@ public class EventDataManager {
 
         DeprecatedEventSQLite deprecatedEventSQLite = new DeprecatedEventSQLite(context, this);
         deprecatedEventSQLite.migrateEvents();
+
+        // when sdk start,removeOverdueEvents
+        removeOverdueEvents();
     }
 
     private EventByteArray formatData(EventFormatData data) {
@@ -115,7 +118,7 @@ public class EventDataManager {
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();
             int deleteNum = contentResolver.delete(uri, EventDataTable.COLUMN_CREATE_TIME + "<=" + sevenDayAgo, null);
-            Logger.e(TAG, "removeOverdueEvents: deleteNum: %d", deleteNum);
+            Logger.d(TAG, "removeOverdueEvents: num: %d", deleteNum);
             return deleteNum;
         } catch (SQLiteFullException e) {
             onDiskFull(e);
@@ -241,6 +244,7 @@ public class EventDataManager {
         } else {
             client.delete(uri, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
         }
+        Logger.d(TAG, "removeEventById: id:" + id);
     }
 
 
@@ -255,7 +259,7 @@ public class EventDataManager {
             int sum = contentResolver.delete(uri,
                     COLUMN_ID + "<=? AND " + COLUMN_EVENT_TYPE + "=? AND " + COLUMN_POLICY + "=?",
                     new String[]{String.valueOf(lastId), eventType, String.valueOf(policy)});
-            Logger.d(TAG, "removeEvents: deleteNum: %d", sum);
+            Logger.d(TAG, "removeEvents: num: %d", sum);
             return sum;
         } catch (SQLiteFullException e) {
             onDiskFull(e);
@@ -276,6 +280,7 @@ public class EventDataManager {
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();
             contentResolver.delete(uri, null, null);
+            Logger.d(TAG, "removeAllEvents success");
         } catch (SQLiteFullException e) {
             onDiskFull(e);
         } catch (Exception e) {
