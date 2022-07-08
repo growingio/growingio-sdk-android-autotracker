@@ -1,8 +1,0 @@
-'use strict'
-
-module.exports = {
-  gitRawCommitsOpts : {
-    merges: null
-  }
-}
-// conventional-changelog -p angular -i CHANGELOG.md -s -r 0 -n `pwd`/changelog-option.js\ 注意命令行尾部空格

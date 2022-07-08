@@ -26,8 +26,22 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = releaseConfiguration.releaseVersion
+version = getModuleVersion()
 group = GROUP
+
+def getModuleVersion() {
+    def moduleId = POM_ARTIFACT_ID
+    def version = '3.0.0-SNAPSHOT'
+    libraries.growingio.each { key, value ->
+        def library = value.split(":")
+        def libraryId = library[1]
+        if (moduleId.equals(libraryId)) {
+            version = library[2]
+            return true
+        }
+    }
+    return version
+}
 
 @SuppressWarnings("GrMethodMayBeStatic")
 def isReleaseBuild() {
@@ -70,6 +84,11 @@ def configurePom(pom) {
             url = POM_LICENCE_URL
             distribution = POM_LICENCE_DIST
         }
+    }
+
+    pom.issueManagement {
+        system = 'GitHub Issues'
+        url = POM_SCM_ISSUES
     }
 
     pom.developers {
@@ -188,9 +207,11 @@ afterEvaluate { project ->
                                         def groupId = it.group
                                         def artifactId = it.name
                                         if (it instanceof ProjectDependency) {
-                                            def properties = it.getDependencyProject().getProperties()
-                                            groupId = properties.get("GROUP")
-                                            artifactId = properties.get("POM_ARTIFACT_ID")
+                                            // skip eg:implementation project(:module)
+                                            // def properties = it.getDependencyProject().getProperties()
+                                            // groupId = properties.get("GROUP")
+                                            // artifactId = properties.get("POM_ARTIFACT_ID")
+                                            return
                                         }
                                         println "dependencies:" + groupId + ":" + artifactId + ":" + it.version
                                         def dependencyNode = dependenciesNode.appendNode('dependency')
@@ -228,3 +249,5 @@ signing {
         sign publication
     }
 }
+
+apply from: "${rootProject.projectDir}/gradle/existDenpendices.gradle"
