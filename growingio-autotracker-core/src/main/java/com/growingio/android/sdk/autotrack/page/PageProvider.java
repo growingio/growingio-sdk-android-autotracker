@@ -487,7 +487,9 @@ public class PageProvider implements IActivityLifecycle {
             } else {
                 //一般不会进入，如果出现则新生成page返回
                 ActivityPage newPage = new ActivityPage(activity);
-                newPage.setTitle(activity.getTitle().toString());
+                if (!TextUtils.isEmpty(activity.getTitle())) {
+                    newPage.setTitle(activity.getTitle().toString());
+                }
                 return newPage;
             }
         }
