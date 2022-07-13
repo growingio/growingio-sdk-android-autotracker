@@ -46,7 +46,6 @@ class ViewClickProvider {
 
         // 为了防止click事件重复发送
         if (ClassUtil.isDuplicateClick(view)) {
-            view.hasOnClickListeners();
             Logger.e(TAG, "Duplicate Click");
             return;
         }

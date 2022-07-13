@@ -486,13 +486,16 @@ public class PageProvider implements IActivityLifecycle {
                 return ALL_PAGE_TREE.get(activity);
             } else {
                 //一般不会进入，如果出现则新生成page返回
+                //如穿山甲广告：会自己生成一个ActivityWrapper做代理并自己控制生命周期导致sdk的page无法命中，具体类为：PluginFragmentActivityWrapper
                 ActivityPage newPage = new ActivityPage(activity);
-                newPage.setTitle(activity.getTitle().toString());
+                if (!TextUtils.isEmpty(activity.getTitle())) {
+                    newPage.setTitle(activity.getTitle().toString());
+                } else {
+                    newPage.setTitle("WrapperActivity");
+                }
                 return newPage;
             }
         }
-
-        // TODO: 2020/6/10 这种情况需要观察
-        throw new NullPointerException("Page is NULL");
+        return null;
     }
 }
