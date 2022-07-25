@@ -41,7 +41,7 @@ public class DeviceInfoProvider {
     private static final String DEVICE_TYPE_PHONE = "PHONE";
     private static final String DEVICE_TYPE_PAD = "PAD";
 
-    private static final String MAGIC_ANDROID_ID = "9774d56d682e549c";
+    private static final String MAGIC_ANDROID_ID = "9774d56d682e549c";// Error AndroidID
 
     private final Context mContext;
 
@@ -134,10 +134,21 @@ public class DeviceInfoProvider {
     }
 
     public String getAndroidId() {
+        // ensure androidid call once in a process
         if (TextUtils.isEmpty(mAndroidId)) {
-            mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
+            try {
+//                mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
+                mAndroidId = null;
+                if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
+                    Logger.e(TAG, "get AndroidId error");
+                    mAndroidId = MAGIC_ANDROID_ID;
+                }
+            } catch (Throwable e) {
+                Logger.e(TAG, "get AndroidId error");
+                mAndroidId = MAGIC_ANDROID_ID;
+            }
         }
-        return mAndroidId;
+        return mAndroidId.equals(MAGIC_ANDROID_ID) ? null : mAndroidId;
     }
 
     public String getOaid() {
@@ -169,7 +180,7 @@ public class DeviceInfoProvider {
         Logger.d(TAG, "first time calculate deviceId");
         String adId = getAndroidId();
         String result = null;
-        if (!TextUtils.isEmpty(adId) && !MAGIC_ANDROID_ID.equals(adId)) {
+        if (!TextUtils.isEmpty(adId)) {
             result = UUID.nameUUIDFromBytes(adId.getBytes(Charset.forName("UTF-8"))).toString();
         } else {
             String imi = getImei();
