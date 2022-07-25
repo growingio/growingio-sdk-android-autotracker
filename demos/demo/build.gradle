@@ -71,7 +71,7 @@ android {
 
 growingAutotracker {
     logEnabled true
-    //skipDependencyCheck true
+    skipDependencyCheck true
     //includePackages "com.growingio.android.plugin"
     //excludePackages "com.cpacm"
 }
