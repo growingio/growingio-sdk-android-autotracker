@@ -41,7 +41,7 @@ public class DeviceInfoProvider {
     private static final String DEVICE_TYPE_PHONE = "PHONE";
     private static final String DEVICE_TYPE_PAD = "PAD";
 
-    private static final String MAGIC_ANDROID_ID = "9774d56d682e549c";// Error AndroidID
+    private static final String MAGIC_ANDROID_ID = "9774d56d682e549c"; // Error AndroidID
 
     private final Context mContext;
 
