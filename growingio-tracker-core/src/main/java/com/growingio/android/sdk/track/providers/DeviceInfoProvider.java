@@ -137,8 +137,7 @@ public class DeviceInfoProvider {
         // ensure androidid call once in a process
         if (TextUtils.isEmpty(mAndroidId)) {
             try {
-//                mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
-                mAndroidId = null;
+                mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
                 if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
                     Logger.e(TAG, "get AndroidId error");
                     mAndroidId = MAGIC_ANDROID_ID;
