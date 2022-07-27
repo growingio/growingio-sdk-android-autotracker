@@ -17,7 +17,18 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = releaseConfiguration.releaseVersion
+def getSelectVersion(){
+    def version = releaseConfiguration.bomVersion
+    if (project.hasProperty('CI_SELECT_MODULE') && project.hasProperty("CI_SELECT_VERSION")) {
+        def cmdModuleId = CI_SELECT_MODULE
+        def moduleId = POM_ARTIFACT_ID
+        if (cmdModuleId == moduleId && CI_SELECT_VERSION != "DEFAULT")
+            return CI_SELECT_VERSION
+    }
+    return version
+}
+
+version = getSelectVersion()
 group = GROUP
 
 @SuppressWarnings("GrMethodMayBeStatic")

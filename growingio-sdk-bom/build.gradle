@@ -53,6 +53,7 @@ dependencies {
         api libraries.growingio.crash
         api libraries.growingio.analytics_fa
         api libraries.growingio.analytics_ga
+        api libraries.growingio.analytics_sa
 
         // 2升3模块
         api 'com.growingio.android.sdk.upgrade:autotracker-upgrade-2to3-cdp:1.2.0'

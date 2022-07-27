@@ -12,7 +12,6 @@ buildscript {
     }
     dependencies {
         classpath "com.growingio.android:autotracker-gradle-plugin:${releaseConfiguration.pluginVersion}"
-        //classpath "com.growingio.android:autotracker-gradle-plugin:3.4.0"
     }
 }
 

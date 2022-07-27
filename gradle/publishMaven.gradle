@@ -26,12 +26,18 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = getModuleVersion()
+version = getPublishVersion()
 group = GROUP
 
-def getModuleVersion() {
+def getPublishVersion() {
     def moduleId = POM_ARTIFACT_ID
     def version = '3.0.0-SNAPSHOT'
+    if (project.hasProperty('CI_SELECT_MODULE') && project.hasProperty("CI_SELECT_VERSION")) {
+        def cmdModuleId = CI_SELECT_MODULE
+        if (cmdModuleId == moduleId && CI_SELECT_VERSION != "DEFAULT") {
+            return CI_SELECT_VERSION
+        }
+    }
     libraries.growingio.each { key, value ->
         def library = value.split(":")
         def libraryId = library[1]

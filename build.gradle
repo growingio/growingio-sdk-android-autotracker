@@ -13,6 +13,9 @@ buildscript {
         releaseConfiguration = [
 
                 // bom version
+                bomVersion        : "0.0.0.1",
+                bomVersionCode    : 00001,
+
                 releaseVersion    : "3.4.0",
                 releaseVersionCode: 30400,
 
@@ -37,6 +40,7 @@ buildscript {
 
                 analyticsFa       : "3.4.0",
                 analyticsGa       : "3.4.0",
+                analyticsSa       : "3.4.0",
                 oaid              : "3.4.0",
                 crash             : "3.4.0",
 
@@ -72,7 +76,7 @@ buildscript {
 
                 'growingio': [
                         // growingio autotrack bom platform
-                        'autotracker_bom' : "com.growingio.android:autotracker-bom:$releaseConfiguration.releaseVersion",
+                        'autotracker_bom' : "com.growingio.android:autotracker-bom:$releaseConfiguration.bomVersion",
 
                         // sdk
                         'tracker'         : "com.growingio.android:tracker:$releaseConfiguration.trackerVersion",
@@ -99,6 +103,7 @@ buildscript {
                         'oaid'            : "com.growingio.android:oaid:$releaseConfiguration.oaid",
                         'analytics_fa'    : "com.growingio.android:analytics-fa:$releaseConfiguration.analyticsFa",
                         'analytics_ga'    : "com.growingio.android:analytics-ga:$releaseConfiguration.analyticsGa",
+                        'analytics_sa'    : "com.growingio.android:analytics-ga:$releaseConfiguration.analyticsSa",
 
                         'crash'           : "com.growingio.android:crash:$releaseConfiguration.crash",
                         'snappy'          : "com.growingio.android:snappy:1.1.0",

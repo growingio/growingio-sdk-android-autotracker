@@ -26,8 +26,7 @@ buildscript {
     }
 }
 
-def getModuleVersion() {
-    def moduleId = POM_ARTIFACT_ID
+def getModuleVersion(moduleId) {
     def version = 'SNAPSHOT'
     libraries.growingio.each { key, value ->
         def library = value.split(":")
@@ -40,12 +39,24 @@ def getModuleVersion() {
     return version
 }
 
-//tasks.withType(PublishToMavenLocal)
-tasks.withType(PublishToMavenRepository) {
+tasks.withType(PublishToMavenLocal) {
+//tasks.withType(PublishToMavenRepository) {
     onlyIf {
-        // CI_PUBLISH.toBoolean()
-        def version = getModuleVersion()
-        //println moduleId + ":" + version
+        def moduleId = POM_ARTIFACT_ID
+        def version = getModuleVersion(moduleId)
+        if (project.hasProperty('CI_SELECT_MODULE') && project.hasProperty("CI_SELECT_VERSION")) {
+            def cmdModuleId = CI_SELECT_MODULE
+            if (cmdModuleId != moduleId) return {
+                println("can't match module:" + cmdModuleId)
+                false
+            }
+            if (CI_SELECT_VERSION != "DEFAULT") version = CI_SELECT_VERSION
+            moduleId = cmdModuleId
+        } else if (project.hasProperty('CI_SELECT_MODULE') || project.hasProperty("CI_SELECT_VERSION")) {
+            println("illegal ci params!!")
+            return false
+        }
+
         // SNAPSHOT always should publish
         if (version.endsWith('SNAPSHOT')) {
             return true
