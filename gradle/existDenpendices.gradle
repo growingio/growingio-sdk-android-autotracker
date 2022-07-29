@@ -39,8 +39,8 @@ def getModuleVersion(moduleId) {
     return version
 }
 
-tasks.withType(PublishToMavenLocal) {
-//tasks.withType(PublishToMavenRepository) {
+//tasks.withType(PublishToMavenLocal) {
+tasks.withType(PublishToMavenRepository) {
     onlyIf {
         def moduleId = POM_ARTIFACT_ID
         def version = getModuleVersion(moduleId)
