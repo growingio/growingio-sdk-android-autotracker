@@ -44,8 +44,6 @@ dependencies {
     testImplementation libraries.test.robolectric
     testImplementation project(':growingio-tracker-core')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
     compileOnly project(':growingio-tracker-core')
     compileOnly libraries.android.appcompat
 

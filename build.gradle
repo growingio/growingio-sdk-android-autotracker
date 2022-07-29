@@ -11,8 +11,40 @@ buildscript {
         ]
 
         releaseConfiguration = [
+
+                // bom version
+                bomVersion        : "0.0.0.1",
+                bomVersionCode    : 00001,
+
                 releaseVersion    : "3.4.0",
                 releaseVersionCode: 30400,
+
+                pluginVersion     : "3.4.0",
+
+                trackerVersion    : "3.4.0",
+                autotrackerVersion: "3.4.0",
+
+                trackerCore       : "3.4.0",
+                autotrackerCore   : "3.4.0",
+
+                hybrid            : "3.4.0",
+                okhttp3           : "3.4.0",
+                urlconnection     : "3.4.0",
+                volley            : "3.4.0",
+                database          : "3.4.0",
+                debugger          : "3.4.0",
+                circler           : "3.4.0",
+                json              : "3.4.0",
+                protobuf          : "3.4.0",
+                encoder           : "3.4.0",
+
+                analyticsFa       : "3.4.0",
+                analyticsGa       : "3.4.0",
+                analyticsSa       : "3.4.0",
+                oaid              : "3.4.0",
+                crash             : "3.4.0",
+
+                annotationVersion : "3.4.0",
         ]
 
         versions = [
@@ -43,29 +75,39 @@ buildscript {
                 ],
 
                 'growingio': [
-                        'gmonitor'        : 'com.growingio.android:gmonitor:1.5.0',
-                        'tracker_core'    : "com.growingio.android:tracker-core:$releaseConfiguration.releaseVersion",
-                        'tracker'         : "com.growingio.android:tracker:$releaseConfiguration.releaseVersion",
-                        'tracker_cdp'     : "com.growingio.android:tracker-cdp:$releaseConfiguration.releaseVersion",
-                        'autotracker_core': "com.growingio.android:autotracker-core:$releaseConfiguration.releaseVersion",
-                        'autotracker'     : "com.growingio.android:autotracker:$releaseConfiguration.releaseVersion",
-                        'autotracker_cdp' : "com.growingio.android:autotracker-cdp:$releaseConfiguration.releaseVersion",
-                        'annotation'      : "com.growingio.android:annotation:$releaseConfiguration.releaseVersion",
-                        'compiler'        : "com.growingio.android:compiler:$releaseConfiguration.releaseVersion",
+                        // growingio autotrack bom platform
+                        'autotracker_bom' : "com.growingio.android:autotracker-bom:$releaseConfiguration.bomVersion",
 
-                        'hybrid'          : "com.growingio.android:hybrid:$releaseConfiguration.releaseVersion",
-                        'okhttp3'         : "com.growingio.android:okhttp3:$releaseConfiguration.releaseVersion",
-                        'database'        : "com.growingio.android:database:$releaseConfiguration.releaseVersion",
-                        'volley'          : "com.growingio.android:volley:$releaseConfiguration.releaseVersion",
-                        'urlconnection'   : "com.growingio.android:urlconnection:$releaseConfiguration.releaseVersion",
-                        'debugger'        : "com.growingio.android:debugger:$releaseConfiguration.releaseVersion",
-                        'circler'         : "com.growingio.android:circler:$releaseConfiguration.releaseVersion",
-                        'json'            : "com.growingio.android:json:$releaseConfiguration.releaseVersion",
-                        'protobuf'        : "com.growingio.android:protobuf:$releaseConfiguration.releaseVersion",
-                        'encoder'         : "com.growingio.android:encoder:$releaseConfiguration.releaseVersion",
-                        'crash'           : "com.growingio.android:crash:$releaseConfiguration.releaseVersion",
-                        'oaid'            : "com.growingio.android:oaid:$releaseConfiguration.releaseVersion",
+                        // sdk
+                        'tracker'         : "com.growingio.android:tracker:$releaseConfiguration.trackerVersion",
+                        'tracker_cdp'     : "com.growingio.android:tracker-cdp:$releaseConfiguration.trackerVersion",
+                        'autotracker'     : "com.growingio.android:autotracker:$releaseConfiguration.autotrackerVersion",
+                        'autotracker_cdp' : "com.growingio.android:autotracker-cdp:$releaseConfiguration.autotrackerVersion",
+
+                        'tracker_core'    : "com.growingio.android:tracker-core:$releaseConfiguration.trackerCore",
+                        'autotracker_core': "com.growingio.android:autotracker-core:$releaseConfiguration.autotrackerCore",
+
+                        'annotation'      : "com.growingio.android:annotation:$releaseConfiguration.annotationVersion",
+                        'compiler'        : "com.growingio.android:compiler:$releaseConfiguration.annotationVersion",
+
+                        'hybrid'          : "com.growingio.android:hybrid:$releaseConfiguration.hybrid",
+                        'okhttp3'         : "com.growingio.android:okhttp3:$releaseConfiguration.okhttp3",
+                        'volley'          : "com.growingio.android:volley:$releaseConfiguration.volley",
+                        'urlconnection'   : "com.growingio.android:urlconnection:$releaseConfiguration.urlconnection",
+                        'database'        : "com.growingio.android:database:$releaseConfiguration.database",
+                        'debugger'        : "com.growingio.android:debugger:$releaseConfiguration.debugger",
+                        'circler'         : "com.growingio.android:circler:$releaseConfiguration.circler",
+                        'json'            : "com.growingio.android:json:$releaseConfiguration.json",
+                        'protobuf'        : "com.growingio.android:protobuf:$releaseConfiguration.protobuf",
+                        'encoder'         : "com.growingio.android:encoder:$releaseConfiguration.encoder",
+                        'oaid'            : "com.growingio.android:oaid:$releaseConfiguration.oaid",
+                        'analytics_fa'    : "com.growingio.android:analytics-fa:$releaseConfiguration.analyticsFa",
+                        'analytics_ga'    : "com.growingio.android:analytics-ga:$releaseConfiguration.analyticsGa",
+                        'analytics_sa'    : "com.growingio.android:analytics-ga:$releaseConfiguration.analyticsSa",
+
+                        'crash'           : "com.growingio.android:crash:$releaseConfiguration.crash",
                         'snappy'          : "com.growingio.android:snappy:1.1.0",
+                        'gmonitor'        : 'com.growingio.android:gmonitor:1.5.0',
                 ],
 
                 'google'   : [

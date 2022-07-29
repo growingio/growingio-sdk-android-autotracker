@@ -1,0 +1,75 @@
+/*
+ *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
+plugins {
+    id 'java-platform'
+    id 'maven-publish'
+}
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    constraints {
+
+        // sdk
+        api libraries.growingio.tracker
+        api libraries.growingio.tracker_cdp
+        api libraries.growingio.autotracker
+        api libraries.growingio.autotracker_cdp
+        api libraries.growingio.tracker_core
+        api libraries.growingio.autotracker_core
+
+        // custom module generate
+        api libraries.growingio.annotation
+        api libraries.growingio.compiler
+
+        // module
+        api libraries.growingio.hybrid
+        api libraries.growingio.database
+        api libraries.growingio.okhttp3
+        api libraries.growingio.volley
+        api libraries.growingio.urlconnection
+        api libraries.growingio.debugger
+        api libraries.growingio.circler
+        api libraries.growingio.json
+        api libraries.growingio.protobuf
+        api libraries.growingio.oaid
+        api libraries.growingio.encoder
+        api libraries.growingio.crash
+        api libraries.growingio.analytics_fa
+        api libraries.growingio.analytics_ga
+        api libraries.growingio.analytics_sa
+
+        // 2升3模块
+        api 'com.growingio.android.sdk.upgrade:autotracker-upgrade-2to3-cdp:1.2.0'
+
+        // giokit
+        api 'com.growingio.giokit:giokit:1.2.0'
+        api 'com.growingio.giokit:giokit-no-op:1.2.0'
+
+        // saas sdk
+        //api 'com.growingio.android:vds-android-agent:autotrack-2.9.13'
+        //api 'com.growingio.android:vds-android-agent:track-2.9.13'
+
+        // tool
+        //runtime "com.growingio.android:snappy:1.1.0"
+        //runtime 'com.growingio.android:gmonitor:1.5.0'
+    }
+}
+
+apply from: "publishMaven.gradle"
