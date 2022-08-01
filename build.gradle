@@ -16,8 +16,8 @@ buildscript {
                 bomVersion        : "1.0.0.0",
                 bomVersionCode    : 10000,
 
-                releaseVersion    : "3.4.0",
-                releaseVersionCode: 30400,
+                releaseVersion    : "3.4.1",
+                releaseVersionCode: 30401,
 
                 pluginVersion     : "3.4.0",
         ]
