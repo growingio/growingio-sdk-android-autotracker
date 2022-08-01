@@ -6,10 +6,10 @@ on:
         module:
           description: 'select publish module'
           required: true
-          default: 'autotracker_bom'
+          default: 'autotracker-bom'
           type: choice
           options:
-            - autotracker_bom
+            - autotracker-bom
             - hybrid
             - okhttp3
             - volley
