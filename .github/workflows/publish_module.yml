@@ -53,6 +53,13 @@ jobs:
           chmod +x gradlew
           chmod +x gradle/publishAllToMavenLocal.sh
 
+      # 构建项目
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew clean
+          ./gradlew build
+
       # 解码秘钥
       - name: Decode
         run: |
