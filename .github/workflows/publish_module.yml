@@ -56,9 +56,7 @@ jobs:
       # 构建项目
       - name: Build with Gradle
         run: |
-          chmod +x gradlew
-          ./gradlew clean
-          ./gradlew build
+          bash ./gradle/publishAllToMavenLocal.sh
 
       # 解码秘钥
       - name: Decode
