@@ -6,10 +6,10 @@ on:
         module:
           description: 'select publish module'
           required: true
-          default: 'autotracker_bom'
+          default: 'autotracker-bom'
           type: choice
           options:
-            - autotracker_bom
+            - autotracker-bom
             - hybrid
             - okhttp3
             - volley
@@ -52,6 +52,11 @@ jobs:
         run: |
           chmod +x gradlew
           chmod +x gradle/publishAllToMavenLocal.sh
+
+      # 构建项目
+      - name: Build with Gradle
+        run: |
+          bash ./gradle/publishAllToMavenLocal.sh
 
       # 解码秘钥
       - name: Decode

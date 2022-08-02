@@ -46,9 +46,9 @@ tasks.withType(PublishToMavenRepository) {
         def version = getModuleVersion(moduleId)
         if (project.hasProperty('CI_SELECT_MODULE') && project.hasProperty("CI_SELECT_VERSION")) {
             def cmdModuleId = CI_SELECT_MODULE
-            if (cmdModuleId != moduleId) return {
-                println("can't match module:" + cmdModuleId)
-                false
+            if (cmdModuleId != moduleId) {
+                println("can't match module:" + moduleId + " with ==> "+ cmdModuleId)
+                return false
             }
             if (CI_SELECT_VERSION != "DEFAULT") version = CI_SELECT_VERSION
             moduleId = cmdModuleId
@@ -66,6 +66,7 @@ tasks.withType(PublishToMavenRepository) {
             println String.format("%s:%s already exist in release maven repository, you should't publish it.", moduleId, version)
             return false
         }
+
         return true
 
     }
