@@ -29,7 +29,7 @@ import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
-import com.growingio.android.sdk.track.utils.OaidHelper;
+import com.growingio.android.sdk.track.middleware.OaidHelper;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
 import java.nio.charset.Charset;
