@@ -13,20 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.growingio.android.oaid;
+package com.growingio.android.advert;
 
 import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.track.middleware.advert.DeepLink;
+import com.growingio.android.sdk.track.middleware.advert.Activate;
+import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.middleware.OaidHelper;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
-@GIOLibraryModule(config = OaidConfig.class)
-public class OaidLibraryGioModule extends LibraryGioModule {
+/**
+ * <p>
+ *
+ * @author cpacm 2022/08/02
+ */
+@GIOLibraryModule
+public class AdvertLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(OaidHelper.class, String.class, new OaidDataLoader.Factory(context));
+        registry.register(DeepLink.class, AdvertResult.class, new AdvertDeepLinkDataLoader.Factory());
+        registry.register(Activate.class, AdvertResult.class, new AdvertActivateDataLoader.Factory());
     }
 }

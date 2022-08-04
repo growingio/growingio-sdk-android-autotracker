@@ -22,7 +22,7 @@ import androidx.test.core.app.ApplicationProvider;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.utils.OaidHelper;
+import com.growingio.android.sdk.track.middleware.OaidHelper;
 
 import org.junit.Before;
 import org.junit.Test;

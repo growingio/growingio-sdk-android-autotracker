@@ -18,6 +18,7 @@ package com.growingio.android.sdk.track.webservice;
 
 import android.app.Activity;
 import android.app.Application;
+import android.net.Uri;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
@@ -28,7 +29,7 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.webservices.DeepLink;
+import com.growingio.android.sdk.track.middleware.advert.DeepLink;
 import com.growingio.android.sdk.track.webservices.log.WsLogger;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.webservices.message.ReadyMessage;
@@ -110,9 +111,8 @@ public class WebServiceTest {
         assertThat(circler.getParams().size()).isEqualTo(0);
         Debugger debugger = new Debugger(new HashMap<>());
         assertThat(debugger.getParams().size()).isEqualTo(0);
-        DeepLink deepLink = new DeepLink(new HashMap<>());
-        deepLink.getParams().put("name", "cpacm");
-        assertThat(deepLink.toString()).isEqualTo("name=cpacm\n");
+        DeepLink deepLink = new DeepLink(Uri.parse("growingio://cpacm?name=cpacm"));
+        assertThat(deepLink.toString()).contains("name=cpacm");
     }
 
 }
