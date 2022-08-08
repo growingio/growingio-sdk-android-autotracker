@@ -18,6 +18,7 @@ package com.growingio.android.sdk.track.events.helper;
 
 import androidx.annotation.IntDef;
 
+import com.growingio.android.sdk.track.events.base.BaseField;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.lang.annotation.Retention;
@@ -53,7 +54,7 @@ public class FieldIgnoreFilter {
     public static final int FIELD_IGNORE_ALL = (NETWORK_STATE | SCREEN_HEIGHT | SCREEN_WIDTH | DEVICE_BRAND | DEVICE_MODEL | DEVICE_TYPE);
 
     private static final ArrayList<String> FIELD_NAME_LIST = new ArrayList<>(
-            Arrays.asList("networkState", "screenHeight", "screenWidth", "deviceBrand", "deviceModel", "deviceType"));
+            Arrays.asList(BaseField.NETWORK_STATE, BaseField.SCREEN_HEIGHT, BaseField.SCREEN_WIDTH, BaseField.DEVICE_BRAND, BaseField.DEVICE_MODEL, BaseField.DEVICE_TYPE));
 
     private FieldIgnoreFilter() {
     }
@@ -73,8 +74,17 @@ public class FieldIgnoreFilter {
         return FIELD_NAME_LIST.contains(typeName) ? (1 << FIELD_NAME_LIST.indexOf(typeName)) : 0;
     }
 
+    @Deprecated
     public static boolean isFieldFilter(String typeName) {
         int ignoreFieldsFlag = ConfigurationProvider.core().getIgnoreField();
+        if (ignoreFieldsFlag > 0) {
+            int fieldMask = valueOf(typeName);
+            return (ignoreFieldsFlag & fieldMask) > 0;
+        }
+        return false;
+    }
+
+    public static boolean isFieldFilter(String typeName, int ignoreFieldsFlag) {
         if (ignoreFieldsFlag > 0) {
             int fieldMask = valueOf(typeName);
             return (ignoreFieldsFlag & fieldMask) > 0;

@@ -55,12 +55,14 @@ public class FilterTest {
 
     @Test
     public void eventFilterTest() {
+        Truth.assertThat(EventExcludeFilter.isEventFilter("VIEW_CLICK", EventExcludeFilter.VIEW_CLICK)).isTrue();
         Truth.assertThat(EventExcludeFilter.isEventFilter("VIEW_CLICK")).isTrue();
         Truth.assertThat(EventExcludeFilter.isEventFilter("VIEW_CHANGE")).isTrue();
         Truth.assertThat(EventExcludeFilter.isEventFilter("PAGE")).isTrue();
         Truth.assertThat(EventExcludeFilter.isEventFilter("CUSTOM")).isFalse();
         Truth.assertThat(EventExcludeFilter.of(EventExcludeFilter.APP_CLOSED, EventExcludeFilter.PAGE)).isEqualTo(96);
         Truth.assertThat(EventExcludeFilter.isEventFilter("cpacm")).isFalse();
+        Truth.assertThat(EventExcludeFilter.isEventFilter("cpacm", EventExcludeFilter.VIEW_CLICK)).isFalse();
 
         String eventFilterLog = EventExcludeFilter.getEventFilterLog(12);
         Truth.assertThat(eventFilterLog).contains("VISITOR_ATTRIBUTES");
@@ -75,10 +77,12 @@ public class FilterTest {
     @Test
     public void filedFilterTest() {
         Truth.assertThat(FieldIgnoreFilter.isFieldFilter("screenWidth")).isTrue();
+        Truth.assertThat(FieldIgnoreFilter.isFieldFilter("screenWidth", FieldIgnoreFilter.SCREEN_WIDTH)).isTrue();
         Truth.assertThat(FieldIgnoreFilter.isFieldFilter("screenHeight")).isTrue();
         Truth.assertThat(FieldIgnoreFilter.isFieldFilter("deviceBrand")).isTrue();
         Truth.assertThat(FieldIgnoreFilter.isFieldFilter("deviceType")).isFalse();
         Truth.assertThat(FieldIgnoreFilter.isFieldFilter("getGIO")).isFalse();
+        Truth.assertThat(FieldIgnoreFilter.isFieldFilter("getGIO", FieldIgnoreFilter.SCREEN_WIDTH)).isFalse();
         Truth.assertThat(FieldIgnoreFilter.of(FieldIgnoreFilter.NETWORK_STATE, FieldIgnoreFilter.DEVICE_MODEL)).isEqualTo(17);
         Truth.assertThat((FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))).isEqualTo(63);
 

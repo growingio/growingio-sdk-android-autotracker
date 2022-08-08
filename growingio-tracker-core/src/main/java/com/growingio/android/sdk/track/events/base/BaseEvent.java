@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.track.events.base;
 
-
 import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.text.TextUtils;
@@ -25,7 +24,6 @@ import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.EventSequenceId;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
-import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -232,54 +230,64 @@ public abstract class BaseEvent extends GEvent {
             json = new JSONObject();
         }
         try {
-            json.put("platform", mPlatform);
-            json.put("platformVersion", mPlatformVersion);
-            json.put("deviceId", getDeviceId());
+            json.put(BaseField.PLATFORM, mPlatform);
+            json.put(BaseField.PLATFORM_VERSION, mPlatformVersion);
+            json.put(BaseField.DEVICE_ID, getDeviceId());
             if (!TextUtils.isEmpty(getUserKey())) {
-                json.put("userKey", getUserKey());
+                json.put(BaseField.USER_KEY, getUserKey());
             }
             if (!TextUtils.isEmpty(getUserId())) {
-                json.put("userId", getUserId());
+                json.put(BaseField.USER_ID, getUserId());
             }
-            json.put("sessionId", getSessionId());
-            json.put("eventType", getEventType());
-            json.put("timestamp", getTimestamp());
-            json.put("domain", getDomain());
-            json.put("urlScheme", getUrlScheme());
-            json.put("appState", getAppState());
-            json.put("globalSequenceId", getGlobalSequenceId());
-            json.put("eventSequenceId", getEventSequenceId());
+            json.put(BaseField.SESSION_ID, getSessionId());
+            json.put(BaseField.EVENT_TYPE, getEventType());
+            json.put(BaseField.TIMESTAMP, getTimestamp());
+            json.put(BaseField.GSID, getGlobalSequenceId());
+            json.put(BaseField.ESID, getEventSequenceId());
 
+            json.put(BaseField.DOMAIN, getDomain());
+            json.put(BaseField.URL_SCHEME, getUrlScheme());
+
+            if (!TextUtils.isEmpty(getAppState())) {
+                json.put(BaseField.APP_STATE, getAppState());
+            }
             if (!TextUtils.isEmpty(getNetworkState())) {
-                json.put("networkState", getNetworkState());
+                json.put(BaseField.NETWORK_STATE, getNetworkState());
             }
             if (!TextUtils.isEmpty(getAppChannel())) {
-                json.put("appChannel", getAppChannel());
+                json.put(BaseField.APP_CHANNEl, getAppChannel());
             }
             if (getScreenHeight() > 0) {
-                json.put("screenHeight", getScreenHeight());
+                json.put(BaseField.SCREEN_HEIGHT, getScreenHeight());
             }
             if (getScreenWidth() > 0) {
-                json.put("screenWidth", getScreenWidth());
+                json.put(BaseField.SCREEN_WIDTH, getScreenWidth());
             }
             if (!TextUtils.isEmpty(getDeviceBrand())) {
-                json.put("deviceBrand", getDeviceBrand());
+                json.put(BaseField.DEVICE_BRAND, getDeviceBrand());
             }
             if (!TextUtils.isEmpty(getDeviceModel())) {
-                json.put("deviceModel", getDeviceModel());
+                json.put(BaseField.DEVICE_MODEL, getDeviceModel());
             }
             if (!TextUtils.isEmpty(getDeviceType())) {
-                json.put("deviceType", getDeviceType());
+                json.put(BaseField.DEVICE_TYPE, getDeviceType());
             }
-            json.put("appName", getAppName());
-            json.put("appVersion", getAppVersion());
-            json.put("language", getLanguage());
+            if (!TextUtils.isEmpty(getAppName())) {
+                json.put(BaseField.APP_NAME, getAppName());
+            }
+            if (!TextUtils.isEmpty(getAppVersion())) {
+                json.put(BaseField.APP_VERSION, getAppVersion());
+            }
+            if (!TextUtils.isEmpty(getLanguage())) {
+                json.put(BaseField.LANGUAGE, getLanguage());
+            }
             if (getLatitude() != 0 || getLongitude() != 0) {
-                json.put("latitude", getLatitude());
-                json.put("longitude", getLongitude());
+                json.put(BaseField.LATITUDE, getLatitude());
+                json.put(BaseField.LONGITUDE, getLongitude());
             }
-            json.put("sdkVersion", getSdkVersion());
-
+            if (!TextUtils.isEmpty(getSdkVersion())) {
+                json.put(BaseField.SDK_VERSION, getSdkVersion());
+            }
         } catch (JSONException ignored) {
         }
         return json;
@@ -296,7 +304,7 @@ public abstract class BaseEvent extends GEvent {
         protected long mTimestamp;
         protected String mDomain;
         private final String mUrlScheme;
-        private final String mAppState;
+        private String mAppState;
         private long mGlobalSequenceId;
         private long mEventSequenceId;
         private final Map<String, String> mExtraParams = new HashMap<>();
@@ -324,6 +332,38 @@ public abstract class BaseEvent extends GEvent {
             mUrlScheme = ConfigurationProvider.core().getUrlScheme();
         }
 
+        protected Map<String, Boolean> mFilterField = new HashMap<>();
+
+        @TrackThread
+        public void filterFieldProperty(Map<String, Boolean> filterField) {
+            if (filterField == null) mFilterField.clear();
+            else {
+                mFilterField = filterField;
+            }
+        }
+
+        public Map<String, Boolean> getFilterMap() {
+            //mFilterField.put(BaseField.PLATFORM, true);
+            //mFilterField.put(BaseField.PLATFORM_VERSION, true);
+            //mFilterField.put(BaseField.DOMAIN, true);
+            //mFilterField.put(BaseField.URL_SCHEME, true);
+            mFilterField.put(BaseField.APP_STATE, true);
+            mFilterField.put(BaseField.NETWORK_STATE, true);
+            mFilterField.put(BaseField.SCREEN_HEIGHT, true);
+            mFilterField.put(BaseField.SCREEN_WIDTH, true);
+            mFilterField.put(BaseField.DEVICE_BRAND, true);
+            mFilterField.put(BaseField.DEVICE_MODEL, true);
+            mFilterField.put(BaseField.DEVICE_TYPE, true);
+            mFilterField.put(BaseField.APP_CHANNEl, true);
+            mFilterField.put(BaseField.APP_NAME, true);
+            mFilterField.put(BaseField.APP_VERSION, true);
+            mFilterField.put(BaseField.LANGUAGE, true);
+            mFilterField.put(BaseField.LATITUDE, true);
+            mFilterField.put(BaseField.LONGITUDE, true);
+            mFilterField.put(BaseField.SDK_VERSION, true);
+            return mFilterField;
+        }
+
         @TrackThread
         @CallSuper
         public void readPropertyInTrackThread() {
@@ -336,32 +376,44 @@ public abstract class BaseEvent extends GEvent {
             mGlobalSequenceId = sequenceId.getGlobalId();
             mEventSequenceId = sequenceId.getEventTypeId();
 
+            // filter field area
+            if (!getFieldDefault(BaseField.APP_STATE)) {
+                mAppState = null;
+            }
+
             Context context = TrackerContext.get().getApplicationContext();
-            mNetworkState = FieldIgnoreFilter.isFieldFilter("networkState") ? "" : NetworkUtil.getActiveNetworkState(context).getNetworkName();
+            mNetworkState = getFieldDefault(BaseField.NETWORK_STATE) ? NetworkUtil.getActiveNetworkState(context).getNetworkName() : null;
 
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
-            mScreenHeight = FieldIgnoreFilter.isFieldFilter("screenHeight") ? 0 : deviceInfo.getScreenHeight();
-            mScreenWidth = FieldIgnoreFilter.isFieldFilter("screenWidth") ? 0 : deviceInfo.getScreenWidth();
-            mDeviceBrand = FieldIgnoreFilter.isFieldFilter("deviceBrand") ? "" : deviceInfo.getDeviceBrand();
-            mDeviceModel = FieldIgnoreFilter.isFieldFilter("deviceModel") ? "" : deviceInfo.getDeviceModel();
-            mDeviceType = FieldIgnoreFilter.isFieldFilter("deviceType") ? "" : deviceInfo.getDeviceType();
+            mScreenHeight = getFieldDefault(BaseField.SCREEN_HEIGHT) ? deviceInfo.getScreenHeight() : 0;
+            mScreenWidth = getFieldDefault(BaseField.SCREEN_WIDTH) ? deviceInfo.getScreenWidth() : 0;
+            mDeviceBrand = getFieldDefault(BaseField.DEVICE_BRAND) ? deviceInfo.getDeviceBrand() : null;
+            mDeviceModel = getFieldDefault(BaseField.DEVICE_MODEL) ? deviceInfo.getDeviceModel() : null;
+            mDeviceType = getFieldDefault(BaseField.DEVICE_TYPE) ? deviceInfo.getDeviceType() : null;
 
             AppInfoProvider appInfo = AppInfoProvider.get();
-            mAppChannel = appInfo.getAppChannel();
-            mAppName = appInfo.getAppName();
-            mAppVersion = appInfo.getAppVersion();
+            mAppChannel = getFieldDefault(BaseField.APP_CHANNEl) ? appInfo.getAppChannel() : null;
+            mAppName = getFieldDefault(BaseField.APP_NAME) ? appInfo.getAppName() : null;
+            mAppVersion = getFieldDefault(BaseField.APP_VERSION) ? appInfo.getAppVersion() : null;
 
             SessionProvider session = SessionProvider.get();
-            mLatitude = session.getLatitude();
-            mLongitude = session.getLongitude();
+            mLatitude = getFieldDefault(BaseField.LATITUDE) ? session.getLatitude() : 0;
+            mLongitude = getFieldDefault(BaseField.LONGITUDE) ? session.getLongitude() : 0;
 
-            mSdkVersion = SDKConfig.SDK_VERSION;
-            mLanguage = Locale.getDefault().getLanguage();
+            mSdkVersion = getFieldDefault(BaseField.SDK_VERSION) ? SDKConfig.SDK_VERSION : null;
+            mLanguage = getFieldDefault(BaseField.LANGUAGE) ? Locale.getDefault().getLanguage() : null;
         }
 
         public BaseBuilder<?> addExtraParam(String key, String value) {
             mExtraParams.put(key, value);
             return this;
+        }
+
+        protected Boolean getFieldDefault(String key) {
+            if (mFilterField.containsKey(key)) {
+                return mFilterField.get(key);
+            }
+            return true;
         }
 
         public abstract String getEventType();
