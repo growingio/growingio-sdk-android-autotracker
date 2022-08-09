@@ -54,7 +54,7 @@ public class DefaultEventFilterInterceptor implements EventFilterInterceptor {
         fieldArea.put(BaseField.DEVICE_MODEL, !FieldIgnoreFilter.isFieldFilter(BaseField.DEVICE_MODEL, getIgnoreField()));
         fieldArea.put(BaseField.DEVICE_TYPE, !FieldIgnoreFilter.isFieldFilter(BaseField.DEVICE_TYPE, getIgnoreField()));
 
-        fieldArea.put(BaseField.APP_CHANNEl, !FieldIgnoreFilter.isFieldFilter(BaseField.APP_CHANNEl, getIgnoreField()));
+        fieldArea.put(BaseField.APP_CHANNEL, !FieldIgnoreFilter.isFieldFilter(BaseField.APP_CHANNEL, getIgnoreField()));
         fieldArea.put(BaseField.APP_NAME, !FieldIgnoreFilter.isFieldFilter(BaseField.APP_NAME, getIgnoreField()));
         fieldArea.put(BaseField.APP_VERSION, !FieldIgnoreFilter.isFieldFilter(BaseField.APP_VERSION, getIgnoreField()));
         fieldArea.put(BaseField.LANGUAGE, !FieldIgnoreFilter.isFieldFilter(BaseField.LANGUAGE, getIgnoreField()));

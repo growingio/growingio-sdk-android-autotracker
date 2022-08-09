@@ -21,7 +21,11 @@ package com.growingio.android.sdk.track.events.base;
  *
  * @author cpacm 2022/8/8
  */
-public class BaseField {
+public final class BaseField {
+
+    private BaseField() {
+    }
+
     final static String PLATFORM = "platform";
     final static String PLATFORM_VERSION = "platformVersion";
     final static String USER_KEY = "userKey";
@@ -36,7 +40,7 @@ public class BaseField {
     final static String ESID = "eventSequenceId";
     final static String DEVICE_ID = "deviceId";
     public final static String NETWORK_STATE = "networkState";
-    public final static String APP_CHANNEl = "appChannel";
+    public final static String APP_CHANNEL = "appChannel";
     public final static String SCREEN_HEIGHT = "screenHeight";
     public final static String SCREEN_WIDTH = "screenWidth";
     public final static String DEVICE_BRAND = "deviceBrand";

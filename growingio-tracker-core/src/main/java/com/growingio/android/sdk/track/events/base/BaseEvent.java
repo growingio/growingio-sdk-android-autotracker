@@ -255,7 +255,7 @@ public abstract class BaseEvent extends GEvent {
                 json.put(BaseField.NETWORK_STATE, getNetworkState());
             }
             if (!TextUtils.isEmpty(getAppChannel())) {
-                json.put(BaseField.APP_CHANNEl, getAppChannel());
+                json.put(BaseField.APP_CHANNEL, getAppChannel());
             }
             if (getScreenHeight() > 0) {
                 json.put(BaseField.SCREEN_HEIGHT, getScreenHeight());
@@ -354,7 +354,7 @@ public abstract class BaseEvent extends GEvent {
             mFilterField.put(BaseField.DEVICE_BRAND, true);
             mFilterField.put(BaseField.DEVICE_MODEL, true);
             mFilterField.put(BaseField.DEVICE_TYPE, true);
-            mFilterField.put(BaseField.APP_CHANNEl, true);
+            mFilterField.put(BaseField.APP_CHANNEL, true);
             mFilterField.put(BaseField.APP_NAME, true);
             mFilterField.put(BaseField.APP_VERSION, true);
             mFilterField.put(BaseField.LANGUAGE, true);
@@ -392,7 +392,7 @@ public abstract class BaseEvent extends GEvent {
             mDeviceType = getFieldDefault(BaseField.DEVICE_TYPE) ? deviceInfo.getDeviceType() : null;
 
             AppInfoProvider appInfo = AppInfoProvider.get();
-            mAppChannel = getFieldDefault(BaseField.APP_CHANNEl) ? appInfo.getAppChannel() : null;
+            mAppChannel = getFieldDefault(BaseField.APP_CHANNEL) ? appInfo.getAppChannel() : null;
             mAppName = getFieldDefault(BaseField.APP_NAME) ? appInfo.getAppName() : null;
             mAppVersion = getFieldDefault(BaseField.APP_VERSION) ? appInfo.getAppVersion() : null;
 

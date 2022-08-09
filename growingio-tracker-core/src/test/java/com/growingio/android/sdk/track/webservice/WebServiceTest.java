@@ -26,13 +26,9 @@ import android.view.WindowManager;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.log.LogItem;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.AppInfoProvider;
-import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
-import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
 import com.growingio.android.sdk.track.middleware.advert.DeepLink;

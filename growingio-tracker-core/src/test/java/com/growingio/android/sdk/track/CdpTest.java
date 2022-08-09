@@ -59,7 +59,7 @@ public class CdpTest {
         TrackerContext.init(application);
         Tracker tracker = new Tracker(application);
         tracker.setLoginUserId("cpacm");
-        trackMainThread = new TrackMainThread(new CoreConfiguration("CdpTest","growingio://cdp"));
+        trackMainThread = new TrackMainThread(new CoreConfiguration("CdpTest", "growingio://cdp"));
         trackMainThread.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {

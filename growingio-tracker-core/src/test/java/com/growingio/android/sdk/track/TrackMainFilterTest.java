@@ -39,9 +39,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -77,7 +75,7 @@ public class TrackMainFilterTest {
 
         @Override
         public boolean filterEventName(String eventName) {
-            return !eventName.equals("gio");
+            return !"gio".equals(eventName);
         }
     }
 
