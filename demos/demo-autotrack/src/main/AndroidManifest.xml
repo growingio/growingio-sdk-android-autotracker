@@ -24,36 +24,64 @@
     <application>
         <activity
             android:name=".activity.ActionMenuViewActivity"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".activity.ToolBarActivity"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".activity.ViewImpressionActivity" />
         <activity
             android:name=".activity.ui.login.LoginActivity"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name=".activity.ExpandableListSubActivity" />
-        <activity android:name=".activity.ExpandableListViewActivity" />
-        <activity android:name=".activity.ClickTestActivity" />
-        <activity android:name=".activity.RecyclerViewImpActivity" />
+        <activity
+            android:name=".activity.ExpandableListSubActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ExpandableListViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ClickTestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.RecyclerViewImpActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.AddPeopleDialogActivity"
+            android:exported="false"
             android:theme="@style/dialog_style" />
-        <activity android:name=".activity.LambdaActivity" />
-        <activity android:name=".activity.DialogTestActivity" />
-        <activity android:name=".activity.WebViewActivity" />
-        <activity android:name=".activity.X5WebViewActivity" />
+        <activity
+            android:name=".activity.LambdaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.DialogTestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.WebViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.X5WebViewActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.TabFragmentActivity"
+            android:exported="false"
             android:label="@string/title_activity_tab_fragment"
             android:theme="@style/Theme.App.NoActionBar" />
         <activity
             android:name=".activity.NavFragmentActivity"
+            android:exported="false"
             android:label="@string/title_activity_view_pager"
             android:theme="@style/Theme.App" />
-        <activity android:name=".activity.HideFragmentActivity" />
-        <activity android:name=".activity.NestedFragmentActivity" />
-        <activity android:name=".AutotrackEntryActivity">
+        <activity
+            android:name=".activity.HideFragmentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.NestedFragmentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AutotrackEntryActivity"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.gio.test.three.Entry" />
             </intent-filter>

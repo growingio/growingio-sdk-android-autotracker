@@ -23,6 +23,7 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.cdp.ResourceItem;
@@ -51,13 +52,15 @@ import java.util.concurrent.TimeUnit;
 public class CdpTest {
 
     Application application = ApplicationProvider.getApplicationContext();
+    private TrackMainThread trackMainThread;
 
     @Before
     public void setup() {
         TrackerContext.init(application);
         Tracker tracker = new Tracker(application);
         tracker.setLoginUserId("cpacm");
-        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
+        trackMainThread = new TrackMainThread(new CoreConfiguration("CdpTest","growingio://cdp"));
+        trackMainThread.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
                 eventBuilder.addExtraParam("dataSourceId", "12345");
@@ -98,26 +101,23 @@ public class CdpTest {
             }
         };
 
-        TrackMainThread.trackMain().addEventBuildInterceptor(testInterceptor);
+        trackMainThread.addEventBuildInterceptor(testInterceptor);
 
         Map<String, String> attrs = new HashMap<>();
         attrs.put("name", "cpacm");
-        TrackMainThread.trackMain().postEventToTrackMain(
+        trackMainThread.onGenerateGEvent(
                 new ResourceItemCustomEvent.Builder()
                         .setEventName("custom")
                         .setAttributes(attrs)
                         .setResourceItem(new ResourceItem("itemKey", "itemId"))
         );
-        Robolectric.flushForegroundThreadScheduler();
-        Uninterruptibles.sleepUninterruptibly(1000, TimeUnit.MILLISECONDS);
-
-        TrackMainThread.trackMain().removeEventBuildInterceptor(testInterceptor);
+        trackMainThread.removeEventBuildInterceptor(testInterceptor);
     }
 
     @Test
     public void adSdkTest() {
-        Truth.assertThat(TrackMainThread.trackMain().getEventSender()).isInstanceOf(EventSender.class);
-        TrackMainThread.trackMain().postGEventToTrackMain(new CustomEvent.Builder().build());
+        Truth.assertThat(trackMainThread.getEventSender()).isInstanceOf(EventSender.class);
+        trackMainThread.postGEventToTrackMain(new CustomEvent.Builder().build());
         Robolectric.flushForegroundThreadScheduler();
         Uninterruptibles.sleepUninterruptibly(1000, TimeUnit.MILLISECONDS);
     }

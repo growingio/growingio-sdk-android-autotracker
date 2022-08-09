@@ -23,6 +23,8 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import androidx.annotation.VisibleForTesting;
+
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
@@ -80,6 +82,24 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         mMainHandler = new H(mMainLooper);
         mMainHandler.sendEmptyMessage(MSG_INIT_SDK);
     }
+
+    @VisibleForTesting
+    TrackMainThread(CoreConfiguration configuration){
+        int uploadInterval = configuration.isDebugEnabled() ? 0 : configuration.getDataUploadInterval();
+        mEventSender = new EventSender(new EventHttpSender(), uploadInterval, configuration.getCellularDataLimit());
+        if (configuration.getEventFilterInterceptor() != null) {
+            eventFilterInterceptor = configuration.getEventFilterInterceptor();
+        } else {
+            eventFilterInterceptor = new DefaultEventFilterInterceptor();
+        }
+
+        HandlerThread handlerThread = new HandlerThread(TAG);
+        handlerThread.start();
+        mMainLooper = handlerThread.getLooper();
+        mMainHandler = new H(mMainLooper);
+        mMainHandler.sendEmptyMessage(MSG_INIT_SDK);
+    }
+
 
     /**
      * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)

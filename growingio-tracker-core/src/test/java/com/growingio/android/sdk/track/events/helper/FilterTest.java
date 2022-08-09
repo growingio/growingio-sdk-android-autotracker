@@ -24,7 +24,6 @@ import com.google.common.truth.Truth;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,8 +43,8 @@ public class FilterTest {
     public void setup() {
         TrackerContext.init(application);
         ConfigurationProvider.initWithConfig(
-                new CoreConfiguration("test", ConstantPool.UNKNOWN)
-                        .setProject("event", "filter")
+                new CoreConfiguration("FilterTest", "growingio://filter")
+                        .setProject("FilterTest", "growingio://filter")
                         .setExcludeEvent(EventExcludeFilter.VIEW_CLICK)
                         .setExcludeEvent(EventExcludeFilter.PAGE)
                         .setExcludeEvent(EventExcludeFilter.EVENT_MASK_TRIGGER)

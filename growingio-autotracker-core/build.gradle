@@ -10,9 +10,9 @@ android {
     }
 
     buildTypes {
-        debug {
-            testCoverageEnabled = true
-        }
+//        debug {
+//            testCoverageEnabled = true
+//        }
 
         release {
             minifyEnabled false
@@ -29,6 +29,7 @@ android {
     testOptions {
         unitTests.all {
             jacoco {
+                jvmArgs '-noverify'
                 includeNoLocationClasses = true
                 excludes = ['jdk.internal.*']
             }

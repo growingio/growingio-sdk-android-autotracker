@@ -14,27 +14,24 @@
  *   limitations under the License.
  */
 
-package com.growingio.android.sdk.track.events.helper;
+package com.growingio.android.sdk.track;
 
 import android.app.Application;
 
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.PageAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.base.BaseField;
+import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
+import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.middleware.GEvent;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +45,10 @@ import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
-public class FilterTest2 {
+public class TrackMainFilterTest {
 
     Application application = ApplicationProvider.getApplicationContext();
+    TrackMainThread trackMainThread;
     CustomEventFilterInterceptor eventFilterInterceptor;
 
     static class CustomEventFilterInterceptor extends DefaultEventFilterInterceptor {
@@ -87,102 +85,86 @@ public class FilterTest2 {
     public void setup() {
         TrackerContext.init(application);
         eventFilterInterceptor = new CustomEventFilterInterceptor();
-        ConfigurationProvider.initWithConfig(
-                new CoreConfiguration("test", ConstantPool.UNKNOWN)
-                        .setProject("event", "filter")
-                        .setEventFilterInterceptor(eventFilterInterceptor), new HashMap<>());
-
+        CoreConfiguration coreConfiguration = new CoreConfiguration("TrackMainFilterTest", "growingio://trackMainfilter").setEventFilterInterceptor(eventFilterInterceptor);
+        trackMainThread = new TrackMainThread(coreConfiguration);
     }
 
+
     @Test
-    public void filterEventType1() {
-        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
+    public void filterEventType() {
+        trackMainThread.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
-                Truth.assertThat(eventBuilder.getEventType()).isEqualTo(EventExcludeFilter.EVENT_PAGE);
             }
 
             @Override
             public void eventDidBuild(GEvent event) {
+                if (event instanceof CustomEvent) {
+                    CustomEvent customEvent = (CustomEvent) event;
+                    Truth.assertThat(customEvent.getEventName()).isEqualTo("cpacm");
+                }
+                Truth.assertThat(event instanceof PageEvent).isFalse();
             }
         });
-        TrackMainThread.trackMain().postEventToTrackMain(new PageEvent.Builder());
-    }
-
-    @Test
-    public void filterEventType2() {
-        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
-            @Override
-            public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
-                Truth.assertThat(eventBuilder.getEventType()).isEqualTo(EventExcludeFilter.EVENT_CUSTOM);
-            }
-
-            @Override
-            public void eventDidBuild(GEvent event) {
-                Truth.assertThat(event.getEventType()).isEqualTo(EventExcludeFilter.EVENT_CUSTOM);
-            }
-        });
-        TrackMainThread.trackMain().postEventToTrackMain(new CustomEvent.Builder().setEventName("cpacm"));
+        trackMainThread.onGenerateGEvent(new PageEvent.Builder());
+        trackMainThread.onGenerateGEvent(new CustomEvent.Builder().setEventName("cpacm"));
     }
 
     @Test
     public void filterEventPath() {
-        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
+        trackMainThread.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
-                Truth.assertThat(eventBuilder.getEventType()).isEqualTo(EventExcludeFilter.EVENT_PAGE_ATTRIBUTES);
             }
 
             @Override
             public void eventDidBuild(GEvent event) {
-                Truth.assertThat(event.getEventType()).isEqualTo(EventExcludeFilter.EVENT_PAGE_ATTRIBUTES);
-                Truth.assertThat(event.toString()).contains("/SubActivity");
+                if (event instanceof PageAttributesEvent) {
+                    Truth.assertThat(((PageAttributesEvent) event).getPath()).isEqualTo("/SubActivity");
+                }
             }
         });
-        TrackMainThread.trackMain().postEventToTrackMain(new PageAttributesEvent.Builder().setPath("/MainActivity"));
-        TrackMainThread.trackMain().postEventToTrackMain(new PageAttributesEvent.Builder().setPath("/SubActivity"));
+        trackMainThread.onGenerateGEvent(new PageAttributesEvent.Builder().setPath("/MainActivity"));
+        trackMainThread.onGenerateGEvent(new PageAttributesEvent.Builder().setPath("/SubActivity"));
     }
 
     @Test
     public void filterEventName() {
-        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
+        trackMainThread.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
-                Truth.assertThat(eventBuilder.getEventType()).isEqualTo(EventExcludeFilter.EVENT_CUSTOM);
             }
 
             @Override
             public void eventDidBuild(GEvent event) {
-                Truth.assertThat(event instanceof CustomEvent).isTrue();
-                CustomEvent customEvent = (CustomEvent) event;
-                Truth.assertThat(event.getEventType()).isEqualTo(EventExcludeFilter.EVENT_CUSTOM);
-                Truth.assertThat(customEvent.getEventName()).isEqualTo("cpacm");
+                if (event instanceof CustomEvent) {
+                    CustomEvent customEvent = (CustomEvent) event;
+                    Truth.assertThat(customEvent.getEventName()).isEqualTo("cpacm");
+                }
             }
         });
-        TrackMainThread.trackMain().postEventToTrackMain(new CustomEvent.Builder().setEventName("gio"));
-        TrackMainThread.trackMain().postEventToTrackMain(new CustomEvent.Builder().setEventName("cpacm"));
+        trackMainThread.onGenerateGEvent(new CustomEvent.Builder().setEventName("gio"));
+        trackMainThread.onGenerateGEvent(new CustomEvent.Builder().setEventName("cpacm"));
     }
 
     @Test
     public void filterEventField() {
-        TrackMainThread.trackMain().addEventBuildInterceptor(new EventBuildInterceptor() {
+        trackMainThread.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
-                Truth.assertThat(eventBuilder.getEventType()).isEqualTo(EventExcludeFilter.EVENT_CUSTOM);
             }
 
             @Override
             public void eventDidBuild(GEvent event) {
-                Truth.assertThat(event instanceof CustomEvent).isTrue();
-                CustomEvent customEvent = (CustomEvent) event;
-                Truth.assertThat(customEvent.getEventName()).isEqualTo("cpacm");
-                Truth.assertThat(customEvent.getScreenHeight()).isEqualTo(0);
-                Truth.assertThat(customEvent.getScreenWidth()).isEqualTo(0);
-                Truth.assertThat(customEvent.getDeviceBrand()).isNull();
+                if (event instanceof BaseEvent) {
+                    BaseEvent customEvent = (BaseEvent) event;
+                    Truth.assertThat(customEvent.getScreenHeight()).isEqualTo(0);
+                    Truth.assertThat(customEvent.getScreenWidth()).isEqualTo(0);
+                    Truth.assertThat(customEvent.getDeviceBrand()).isEmpty();
+                }
             }
         });
-        TrackMainThread.trackMain().postEventToTrackMain(new CustomEvent.Builder().setEventName("cpacm"));
-        //Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        trackMainThread.onGenerateGEvent(new CustomEvent.Builder().setEventName("cpacm"));
     }
 
 }

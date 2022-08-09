@@ -65,7 +65,7 @@ public class HybridTest {
     public void setup() {
         TrackerContext.init(application);
         TrackerContext.initSuccess();
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"), new HashMap<>());
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("HybridTest", "growingio://Hybrid"), new HashMap<>());
     }
 
 
