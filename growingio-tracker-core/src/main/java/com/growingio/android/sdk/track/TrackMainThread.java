@@ -61,37 +61,19 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     private final Looper mMainLooper;
     private final Handler mMainHandler;
     private final EventSender mEventSender;
+    private final CoreConfiguration coreConfiguration;
 
     private final List<EventBuildInterceptor> mEventBuildInterceptors = new ArrayList<>();
 
-    private final EventFilterInterceptor eventFilterInterceptor;
-
     private TrackMainThread() {
-        CoreConfiguration configuration = ConfigurationProvider.core();
-        int uploadInterval = configuration.isDebugEnabled() ? 0 : configuration.getDataUploadInterval();
-        mEventSender = new EventSender(new EventHttpSender(), uploadInterval, configuration.getCellularDataLimit());
-        if (configuration.getEventFilterInterceptor() != null) {
-            eventFilterInterceptor = configuration.getEventFilterInterceptor();
-        } else {
-            eventFilterInterceptor = new DefaultEventFilterInterceptor();
-        }
-
-        HandlerThread handlerThread = new HandlerThread(TAG);
-        handlerThread.start();
-        mMainLooper = handlerThread.getLooper();
-        mMainHandler = new H(mMainLooper);
-        mMainHandler.sendEmptyMessage(MSG_INIT_SDK);
+        this(ConfigurationProvider.core());
     }
 
     @VisibleForTesting
     TrackMainThread(CoreConfiguration configuration) {
+        this.coreConfiguration = configuration;
         int uploadInterval = configuration.isDebugEnabled() ? 0 : configuration.getDataUploadInterval();
         mEventSender = new EventSender(new EventHttpSender(), uploadInterval, configuration.getCellularDataLimit());
-        if (configuration.getEventFilterInterceptor() != null) {
-            eventFilterInterceptor = configuration.getEventFilterInterceptor();
-        } else {
-            eventFilterInterceptor = new DefaultEventFilterInterceptor();
-        }
 
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
@@ -139,7 +121,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                     return;
                 }
 
-                if (ConfigurationProvider.core().isDataCollectionEnabled()) {
+                if (coreConfiguration.isDataCollectionEnabled()) {
                     onGenerateGEvent(eventBuilder);
                 }
             }
@@ -155,7 +137,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
             @Override
             public void run() {
                 if (gEvent == null) return;
-                if (ConfigurationProvider.core().isDataCollectionEnabled()) {
+                if (coreConfiguration.isDataCollectionEnabled()) {
                     cacheEvent(gEvent);
                 }
             }
@@ -184,8 +166,22 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         saveEvent(event);
     }
 
+    private EventFilterInterceptor defaultFilterInterceptor;
+
+    EventFilterInterceptor getEventFilterInterceptor() {
+        if (coreConfiguration.getEventFilterInterceptor() != null) {
+            return coreConfiguration.getEventFilterInterceptor();
+        } else {
+            if (defaultFilterInterceptor == null) {
+                defaultFilterInterceptor = new DefaultEventFilterInterceptor();
+            }
+            return defaultFilterInterceptor;
+        }
+    }
+
     @TrackThread
     boolean filterEvent(BaseEvent.BaseBuilder<?> eventBuilder) {
+        EventFilterInterceptor eventFilterInterceptor = getEventFilterInterceptor();
         if (eventFilterInterceptor == null) return true;
         /*String eventGroup = "undefine";
         if (!eventFilterInterceptor.filterEventGroup(eventGroup)) {
