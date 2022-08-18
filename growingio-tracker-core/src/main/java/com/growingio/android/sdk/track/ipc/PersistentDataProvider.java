@@ -57,6 +57,7 @@ public class PersistentDataProvider {
     private final IDataSharer mDataSharer;
     private final ProcessLock mProcessLock;
     private final Context mContext;
+    private boolean isFirstProcess = true;
 
     private static class SingleInstance {
         private static final PersistentDataProvider INSTANCE = new PersistentDataProvider();
@@ -73,8 +74,15 @@ public class PersistentDataProvider {
     }
 
     @TrackThread
-    public void start() {
+    public void setup() {
         repairPid();
+    }
+
+    @TrackThread
+    public void start() {
+        if (isFirstProcess && !isSendVisitAfterRefreshSessionId()) {
+            SessionProvider.get().generateVisit();
+        }
     }
 
     public EventSequenceId getAndIncrement(String eventType) {
@@ -169,7 +177,7 @@ public class PersistentDataProvider {
     private void repairPid() {
 
         mProcessLock.lockedRun(() -> {
-            boolean isFirstProcess = false;
+            isFirstProcess = false;
             if (ConfigurationProvider.core().isRequireAppProcessesEnabled() && ConfigurationProvider.core().isDataCollectionEnabled()) {
                 List<Integer> alivePid = new ArrayList<>();
                 Set<Integer> runningProcess = getRunningProcess(mContext);
@@ -193,9 +201,7 @@ public class PersistentDataProvider {
                 setActivityCount(0);
                 setLatestPauseTime(0L);
                 setLatestNonNullUserId(getLoginUserId());
-
                 SessionProvider.get().refreshSessionId();
-                SessionProvider.get().generateVisit();
             }
         });
     }

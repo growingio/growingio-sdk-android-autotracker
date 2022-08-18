@@ -75,6 +75,7 @@ public class Tracker {
         application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         DeepLinkProvider.get().init();
         SessionProvider.get().init();
+        PersistentDataProvider.get().setup();
 
         loadAnnotationGeneratedModules(application);
         // 支持配置中注册模块, 如加密模块等事件模块需要先于所有事件发送注册
