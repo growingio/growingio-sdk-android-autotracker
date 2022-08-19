@@ -107,6 +107,13 @@ public class Tracker {
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
+    /**
+     * @see #trackCustomEvent(String, Map)
+     * <code>
+     * trackCustomEvent(eventName,new AttributesBuilder().build())
+     * </code>
+     */
+    @Deprecated
     public void trackCustomEventWithAttrBuilder(String eventName, CustomEvent.AttributesBuilder attributesBuilder) {
         if (!isInited) return;
         if (TextUtils.isEmpty(eventName)) {
@@ -135,6 +142,13 @@ public class Tracker {
         TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
     }
 
+    /**
+     * @see #setLoginUserAttributes(Map)
+     * <code>
+     * setLoginUserAttributes(new AttributesBuilder().build())
+     * </code>
+     */
+    @Deprecated
     public void setLoginUserAttributesWithAttrBuilder(LoginUserAttributesEvent.AttributesBuilder attributesBuilder) {
         if (!isInited) return;
         Map<String, String> attributes = attributesBuilder.getAttributes();
