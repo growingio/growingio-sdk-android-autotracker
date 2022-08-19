@@ -39,14 +39,17 @@ import com.growingio.android.sdk.track.providers.RobolectricActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
+import org.robolectric.annotation.Config;
 
 import java.util.Map;
 
+@Config
 @RunWith(RobolectricTestRunner.class)
 public class UtilsTest {
 
@@ -121,6 +124,11 @@ public class UtilsTest {
     }
 
     Application application = ApplicationProvider.getApplicationContext();
+
+    @Before
+    public void setup() {
+        TrackerContext.init(application);
+    }
 
     @Test
     public void networkTest() {

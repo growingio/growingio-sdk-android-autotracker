@@ -41,6 +41,7 @@ public class DeviceUtil {
 
     public static boolean isPhone(Context context) {
         TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (telephony == null) return true;
         int type = telephony.getPhoneType();
         return type != TelephonyManager.PHONE_TYPE_NONE;
     }

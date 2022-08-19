@@ -123,6 +123,10 @@ public class ViewElementEvent extends BaseEvent {
             return this;
         }
 
+        public String getPath() {
+            return mPath;
+        }
+
         @Override
         public ViewElementEvent build() {
             return new ViewElementEvent(this);

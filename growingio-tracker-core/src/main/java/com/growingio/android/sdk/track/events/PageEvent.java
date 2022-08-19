@@ -109,6 +109,10 @@ public class PageEvent extends BaseEvent {
             return this;
         }
 
+        public String getPath() {
+            return mPath;
+        }
+
         @Override
         public String getEventType() {
             return AutotrackEventType.PAGE;

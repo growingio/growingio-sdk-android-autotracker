@@ -111,4 +111,10 @@ public class EventDataContentProvider extends ContentProvider {
         }
         throw new IllegalArgumentException("UnKnow Uri:" + uri.toString());
     }
+
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        dbHelper.close();
+    }
 }
