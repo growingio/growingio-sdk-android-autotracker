@@ -67,6 +67,10 @@ public class PageAttributesEvent extends BaseAttributesEvent {
             return this;
         }
 
+        public String getPath() {
+            return mPath;
+        }
+
         public Builder setPageShowTimestamp(long pageShowTimestamp) {
             mPageShowTimestamp = pageShowTimestamp;
             return this;

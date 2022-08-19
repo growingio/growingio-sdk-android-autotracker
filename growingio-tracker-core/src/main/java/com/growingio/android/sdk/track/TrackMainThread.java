@@ -21,11 +21,20 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
+
+import androidx.annotation.VisibleForTesting;
 
 import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.events.EventFilterInterceptor;
+import com.growingio.android.sdk.track.events.PageAttributesEvent;
+import com.growingio.android.sdk.track.events.PageEvent;
+import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
+import com.growingio.android.sdk.track.events.ViewElementEvent;
+import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
-import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.listener.OnTrackMainInitSDKCallback;
 import com.growingio.android.sdk.track.listener.TrackThread;
@@ -40,6 +49,7 @@ import com.growingio.android.sdk.track.middleware.EventHttpSender;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * GrowingIO主线程
@@ -51,11 +61,17 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     private final Looper mMainLooper;
     private final Handler mMainHandler;
     private final EventSender mEventSender;
+    private final CoreConfiguration coreConfiguration;
 
     private final List<EventBuildInterceptor> mEventBuildInterceptors = new ArrayList<>();
 
     private TrackMainThread() {
-        CoreConfiguration configuration = ConfigurationProvider.core();
+        this(ConfigurationProvider.core());
+    }
+
+    @VisibleForTesting
+    TrackMainThread(CoreConfiguration configuration) {
+        this.coreConfiguration = configuration;
         int uploadInterval = configuration.isDebugEnabled() ? 0 : configuration.getDataUploadInterval();
         mEventSender = new EventSender(new EventHttpSender(), uploadInterval, configuration.getCellularDataLimit());
 
@@ -65,6 +81,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         mMainHandler = new H(mMainLooper);
         mMainHandler.sendEmptyMessage(MSG_INIT_SDK);
     }
+
 
     /**
      * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
@@ -93,7 +110,6 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
 
     @TrackThread
     void initSDK() {
-        //mEventSender.removeOverdueEvents();
         dispatchActions(null);
     }
 
@@ -105,15 +121,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                     return;
                 }
 
-                if (ConfigurationProvider.core().isDataCollectionEnabled()) {
-                    // 判断当前事件类型是否被过滤
-                    if (EventExcludeFilter.isEventFilter(eventBuilder.getEventType())) {
-                        return;
-                    }
-
-                    if (!PersistentDataProvider.get().isSendVisitAfterRefreshSessionId()) {
-                        SessionProvider.get().generateVisit();
-                    }
+                if (coreConfiguration.isDataCollectionEnabled()) {
                     onGenerateGEvent(eventBuilder);
                 }
             }
@@ -129,7 +137,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
             @Override
             public void run() {
                 if (gEvent == null) return;
-                if (ConfigurationProvider.core().isDataCollectionEnabled()) {
+                if (coreConfiguration.isDataCollectionEnabled()) {
                     cacheEvent(gEvent);
                 }
             }
@@ -147,12 +155,80 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
 
     @TrackThread
     void onGenerateGEvent(BaseEvent.BaseBuilder<?> gEvent) {
-        gEvent.readPropertyInTrackThread();
         dispatchEventWillBuild(gEvent);
+
+        if (!filterEvent(gEvent)) return;
+        gEvent.readPropertyInTrackThread();
+
         BaseEvent event = gEvent.build();
         dispatchEventDidBuild(event);
+
         saveEvent(event);
     }
+
+    private EventFilterInterceptor defaultFilterInterceptor;
+
+    EventFilterInterceptor getEventFilterInterceptor() {
+        if (coreConfiguration.getEventFilterInterceptor() != null) {
+            return coreConfiguration.getEventFilterInterceptor();
+        } else {
+            if (defaultFilterInterceptor == null) {
+                defaultFilterInterceptor = new DefaultEventFilterInterceptor();
+            }
+            return defaultFilterInterceptor;
+        }
+    }
+
+    @TrackThread
+    boolean filterEvent(BaseEvent.BaseBuilder<?> eventBuilder) {
+        EventFilterInterceptor eventFilterInterceptor = getEventFilterInterceptor();
+        if (eventFilterInterceptor == null) return true;
+        /*String eventGroup = "undefine";
+        if (!eventFilterInterceptor.filterEventGroup(eventGroup)) {
+            return false;
+        }*/
+
+        if (!eventFilterInterceptor.filterEventType(eventBuilder.getEventType())) return false;
+
+        String eventPath = getEventPath(eventBuilder);
+        if (!TextUtils.isEmpty(eventPath) && !eventFilterInterceptor.filterEventPath(eventPath)) {
+            return false;
+        }
+
+        String eventName = getEventName(eventBuilder);
+        if (!TextUtils.isEmpty(eventName) && !eventFilterInterceptor.filterEventName(eventName)) {
+            return false;
+        }
+
+        Map<String, Boolean> filterFields = eventFilterInterceptor.filterEventField(eventBuilder.getEventType(), eventBuilder.getFilterMap());
+        eventBuilder.filterFieldProperty(filterFields);
+
+        return true;
+    }
+
+    String getEventName(BaseEvent.BaseBuilder<?> eventBuilder) {
+        if (eventBuilder instanceof CustomEvent.Builder) {
+            return ((CustomEvent.Builder) eventBuilder).getEventName();
+        }
+        return null;
+    }
+
+    String getEventPath(BaseEvent.BaseBuilder<?> eventBuilder) {
+        if (eventBuilder instanceof PageEvent.Builder) {
+            return ((PageEvent.Builder) eventBuilder).getPath();
+        }
+        if (eventBuilder instanceof ViewElementEvent.Builder) {
+            return ((ViewElementEvent.Builder) eventBuilder).getPath();
+        }
+        if (eventBuilder instanceof PageLevelCustomEvent.Builder) {
+            return ((PageLevelCustomEvent.Builder) eventBuilder).getPath();
+        }
+        if (eventBuilder instanceof PageAttributesEvent.Builder) {
+            return ((PageAttributesEvent.Builder) eventBuilder).getPath();
+        }
+        return null;
+    }
+
 
     public void removeEventBuildInterceptor(EventBuildInterceptor interceptor) {
         synchronized (mEventBuildInterceptors) {
@@ -220,6 +296,10 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     private void saveEvent(GEvent event) {
         if (event instanceof BaseEvent) {
             Logger.printJson(TAG, "save: event, type is " + event.getEventType(), ((BaseEvent) event).toJSONObject().toString());
+        }
+        if (!PersistentDataProvider.get().isSendVisitAfterRefreshSessionId()) {
+            // we should resend visitEvent when sessionId refreshed
+            SessionProvider.get().generateVisit();
         }
         mEventSender.sendEvent(event);
     }

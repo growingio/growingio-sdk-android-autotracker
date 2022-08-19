@@ -81,6 +81,10 @@ public class PageLevelCustomEvent extends CustomEvent {
             return this;
         }
 
+        public String getPath() {
+            return mPath;
+        }
+
         @Override
         public PageLevelCustomEvent build() {
             return new PageLevelCustomEvent(this);

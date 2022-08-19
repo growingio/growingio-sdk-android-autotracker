@@ -31,7 +31,6 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
-import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -98,9 +97,9 @@ public class ProviderTest {
 
     @Test
     public void configProvider() {
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", ConstantPool.UNKNOWN), new HashMap<>());
-        Truth.assertThat(ConfigurationProvider.core().getUrlScheme()).isEqualTo(ConstantPool.UNKNOWN);
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"), new HashMap<>());
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("ProviderTest", "growingio://provider"), new HashMap<>());
+        Truth.assertThat(ConfigurationProvider.core().getUrlScheme()).isEqualTo("growingio://provider");
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("ProviderTest", "growingio://provider"), new HashMap<>());
         TestConfigurable testConfigurable = new TestConfigurable();
         ConfigurationProvider.get().addConfiguration(testConfigurable);
         Truth.assertThat((TestConfigurable) ConfigurationProvider.get().getConfiguration(TestConfigurable.class)).isEqualTo(testConfigurable);
@@ -154,7 +153,7 @@ public class ProviderTest {
         Truth.assertThat(DeviceInfoProvider.get().getGoogleAdId()).isNull();
         Truth.assertThat(DeviceInfoProvider.get().getImei()).isNull();
         Truth.assertThat(DeviceInfoProvider.get().getOaid()).isNull();
-        Truth.assertThat(DeviceInfoProvider.get().getOperatingSystemVersion()).isEqualTo("11");
+        Truth.assertThat(DeviceInfoProvider.get().getOperatingSystemVersion()).isEqualTo("12");
         Truth.assertThat(DeviceInfoProvider.get().getScreenHeight()).isEqualTo(470);
         Truth.assertThat(DeviceInfoProvider.get().getScreenWidth()).isEqualTo(320);
         PersistentDataProvider.get().setDeviceId("");

@@ -51,7 +51,7 @@ public class ImpressionTest {
         TrackerContext.init(application);
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
         map.put(AutotrackConfig.class, new AutotrackConfig());
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("test", "test"), map);
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
     }
 
     @Test

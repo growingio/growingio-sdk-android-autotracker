@@ -65,6 +65,10 @@ public class CustomEvent extends BaseAttributesEvent {
             return this;
         }
 
+        public String getEventName() {
+            return mEventName;
+        }
+
         @Override
         public Builder setAttributes(Map<String, String> attributes) {
             super.setAttributes(attributes);
