@@ -18,20 +18,21 @@ package com.growingio.android.advert;
 
 import android.text.TextUtils;
 
+import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
-import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * <p>
- *     唤醒事件
+ * 唤醒事件
+ *
  * @author cpacm 2022/8/3
  */
 public class ReengageEvent extends BaseEvent {
 
-    private static final String TYPE_NAME = "reengage";
+    private static final String TYPE_NAME = TrackEventType.REENGAGE;
 
     private final String linkId;
     private final String clickId;
@@ -94,7 +95,7 @@ public class ReengageEvent extends BaseEvent {
         }
 
         public Builder setAdvertData(AdvertData ad) {
-            if(ad==null) return this;
+            if (ad == null) return this;
             linkId = ad.linkID;
             clickId = ad.clickID;
             clickTm = ad.clickTM;

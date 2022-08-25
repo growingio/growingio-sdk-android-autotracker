@@ -18,7 +18,6 @@ package com.growingio.android.advert;
 import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.middleware.advert.DeepLink;
 import com.growingio.android.sdk.track.middleware.advert.Activate;
 import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
@@ -33,7 +32,7 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 public class AdvertLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(DeepLink.class, AdvertResult.class, new AdvertDeepLinkDataLoader.Factory());
+        //registry.register(DeepLink.class, AdvertResult.class, new AdvertDeepLinkDataLoader.Factory());
         registry.register(Activate.class, AdvertResult.class, new AdvertActivateDataLoader.Factory());
     }
 }
