@@ -18,6 +18,7 @@ package com.growingio.android.advert;
 
 import android.text.TextUtils;
 
+import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 
@@ -31,7 +32,7 @@ import org.json.JSONObject;
  */
 public class ActivateEvent extends BaseEvent {
 
-    private static final String TYPE_NAME = "activate";
+    private static final String TYPE_NAME = TrackEventType.ACTIVATE;
 
     private final String oaid;
     private final String googleId;
@@ -113,7 +114,7 @@ public class ActivateEvent extends BaseEvent {
         }
 
         public Builder setAdvertData(AdvertData ad) {
-            if(ad==null) return this;
+            if (ad == null) return this;
             linkId = ad.linkID;
             clickId = ad.clickID;
             clickTm = ad.clickTM;

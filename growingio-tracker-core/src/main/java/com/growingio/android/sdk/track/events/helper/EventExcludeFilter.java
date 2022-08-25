@@ -69,27 +69,12 @@ public final class EventExcludeFilter {
     public static final int EVENT_MASK_TRIGGER = (VIEW_CLICK | VIEW_CHANGE | FORM_SUBMIT);
 
 
-    public static final String EVENT_VISIT = TrackEventType.VISIT;
-    public static final String EVENT_CUSTOM = TrackEventType.CUSTOM;
-    public static final String EVENT_VISITOR_ATTRIBUTES = TrackEventType.VISITOR_ATTRIBUTES;
-    public static final String EVENT_LOGIN_USER_ATTRIBUTES = TrackEventType.LOGIN_USER_ATTRIBUTES;
-    public static final String EVENT_CONVERSION_VARIABLES = TrackEventType.CONVERSION_VARIABLES;
-    public static final String EVENT_APP_CLOSED = TrackEventType.APP_CLOSED;
-    public static final String EVENT_PAGE = AutotrackEventType.PAGE;
-    public static final String EVENT_PAGE_ATTRIBUTES = AutotrackEventType.PAGE_ATTRIBUTES;
-    public static final String EVENT_VIEW_CLICK = AutotrackEventType.VIEW_CLICK;
-    public static final String EVENT_VIEW_CHANGE = AutotrackEventType.VIEW_CHANGE;
-    public static final String EVENT_FORM_SUBMIT = "FORM_SUBMIT";
-    public static final String EVENT_REENGAGE = "REENGAGE";
-    public static final String EVENT_ACTIVATE = "ACTIVATE";
-
-
     //"FORM_SUBMIT" from Hybrid Module
     //"REENGAGE" is future's feature
     private static final ArrayList<String> EVENT_TYPE_LIST = new ArrayList<>(
             Arrays.asList(TrackEventType.VISIT, TrackEventType.CUSTOM, TrackEventType.VISITOR_ATTRIBUTES, TrackEventType.LOGIN_USER_ATTRIBUTES,
                     TrackEventType.CONVERSION_VARIABLES, TrackEventType.APP_CLOSED, AutotrackEventType.PAGE, AutotrackEventType.PAGE_ATTRIBUTES, AutotrackEventType.VIEW_CLICK,
-                    AutotrackEventType.VIEW_CHANGE, "FORM_SUBMIT", "REENGAGE", "ACTIVATE"));
+                    AutotrackEventType.VIEW_CHANGE, TrackEventType.FORM_SUBMIT, TrackEventType.REENGAGE, TrackEventType.ACTIVATE));
 
 
     private EventExcludeFilter() {

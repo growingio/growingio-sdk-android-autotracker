@@ -24,7 +24,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -45,7 +44,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -102,17 +100,20 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                 return;
             }
 
-            AdvertConfig config = ConfigurationProvider.get().getConfiguration(AdvertConfig.class);
-            if (config != null && config.isReadClipBoardEnable()) {
-                //Android 10 限制剪切板获取时机，只有输入法或者焦点APP才有权限获取剪切板
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && activity != null) {
-                    activity.getWindow().getDecorView().post(this::checkClipBoardAndSendActivateEvent);
-                } else {
-                    checkClipBoardAndSendActivateEvent();
-                }
-            } else {
-                submitActivateEvent(null);
-            }
+            // just send activate event
+            submitActivateEvent(null);
+
+//            AdvertConfig config = ConfigurationProvider.get().getConfiguration(AdvertConfig.class);
+//            if (config != null && config.isReadClipBoardEnable()) {
+//                //Android 10 限制剪切板获取时机，只有输入法或者焦点APP才有权限获取剪切板
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && activity != null) {
+//                    activity.getWindow().getDecorView().post(this::checkClipBoardAndSendActivateEvent);
+//                } else {
+//                    checkClipBoardAndSendActivateEvent();
+//                }
+//            } else {
+//                submitActivateEvent(null);
+//            }
         }
 
         private void checkClipBoardAndSendActivateEvent() {

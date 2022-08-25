@@ -33,6 +33,8 @@ import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.advert.Activate;
+import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -186,6 +188,8 @@ public class Tracker {
                     ConfigurationProvider.core().setDataCollectionEnabled(enabled);
                     if (enabled) {
                         SessionProvider.get().generateVisit();
+                        // check app whether activated
+                        TrackerContext.get().executeData(new Activate(null), Activate.class, AdvertResult.class);
                     }
                 }
             }

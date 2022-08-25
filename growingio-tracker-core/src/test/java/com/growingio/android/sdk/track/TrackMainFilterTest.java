@@ -27,10 +27,10 @@ import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.PageAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
+import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.base.BaseField;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
-import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.middleware.GEvent;
 
 import org.junit.Before;
@@ -53,10 +53,10 @@ public class TrackMainFilterTest {
 
         @Override
         public boolean filterEventType(String eventType) {
-            if (eventType.equals(EventExcludeFilter.EVENT_PAGE)) return false;
-            if (eventType.equals(EventExcludeFilter.EVENT_VIEW_CLICK)) return false;
-            if (eventType.equals(EventExcludeFilter.EVENT_VIEW_CHANGE)) return false;
-            if (eventType.equals(EventExcludeFilter.EVENT_FORM_SUBMIT)) return false;
+            if (eventType.equals("PAGE")) return false;
+            if (eventType.equals("VIEW_CLICK")) return false;
+            if (eventType.equals("VIEW_CHANGE")) return false;
+            if (eventType.equals(TrackEventType.FORM_SUBMIT)) return false;
             return true;
         }
 
