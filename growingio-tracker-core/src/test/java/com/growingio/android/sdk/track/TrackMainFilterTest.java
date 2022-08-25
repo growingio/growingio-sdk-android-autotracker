@@ -53,9 +53,9 @@ public class TrackMainFilterTest {
 
         @Override
         public boolean filterEventType(String eventType) {
-            if (eventType.equals("PAGE")) return false;
-            if (eventType.equals("VIEW_CLICK")) return false;
-            if (eventType.equals("VIEW_CHANGE")) return false;
+            if ("PAGE".equals(eventType)) return false;
+            if ("VIEW_CLICK".equals(eventType)) return false;
+            if ("VIEW_CHANGE".equals(eventType)) return false;
             if (eventType.equals(TrackEventType.FORM_SUBMIT)) return false;
             return true;
         }
