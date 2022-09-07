@@ -41,7 +41,8 @@ dependencies {
     debugApi project(':growingio-webservice:debugger')
     releaseApi libraries.growingio.debugger
 
-    implementation project(":growingio-annotation")
+    releaseImplementation libraries.growingio.annotation
+    debugImplementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }
 

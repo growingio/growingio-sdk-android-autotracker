@@ -47,7 +47,6 @@ dependencies {
     testImplementation libraries.test.androidx_core
     testImplementation libraries.test.robolectric
     testImplementation libraries.androidx.appcompat
-    testImplementation fileTree(include: ['*.jar'], dir: '../thirdLibs')
 
     compileOnly fileTree(include: ['*.jar'], dir: '../thirdLibs')
     implementation project(':growingio-tracker-core')
