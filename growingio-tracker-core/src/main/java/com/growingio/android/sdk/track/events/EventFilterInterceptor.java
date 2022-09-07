@@ -49,7 +49,7 @@ public interface EventFilterInterceptor {
      *
      * @param type      event's type
      * @param fieldArea event's field map
-     * @return map. if the value is true,the field will pass,and if the value is false, sdk will make thd field blank.
+     * @return map. if the value is true,the field will pass,and if the value is false, sdk will make the field blank.
      */
     Map<String, Boolean> filterEventField(String type, Map<String, Boolean> fieldArea);
 

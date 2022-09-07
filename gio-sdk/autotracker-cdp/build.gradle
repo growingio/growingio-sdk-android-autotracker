@@ -52,7 +52,8 @@ dependencies {
     debugApi project(':growingio-hybrid')
     releaseApi libraries.growingio.hybrid
 
-    implementation project(":growingio-annotation")
+    releaseImplementation libraries.growingio.annotation
+    debugImplementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }
 
