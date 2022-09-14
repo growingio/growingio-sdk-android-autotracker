@@ -77,6 +77,7 @@ public class Tracker {
         application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         DeepLinkProvider.get().init();
         SessionProvider.get().init();
+        PersistentDataProvider.get().setup();
 
         loadAnnotationGeneratedModules(application);
         // 支持配置中注册模块, 如加密模块等事件模块需要先于所有事件发送注册
@@ -108,6 +109,13 @@ public class Tracker {
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
+    /**
+     * @see #trackCustomEvent(String, Map)
+     * <code>
+     * trackCustomEvent(eventName,new AttributesBuilder().build())
+     * </code>
+     */
+    @Deprecated
     public void trackCustomEventWithAttrBuilder(String eventName, CustomEvent.AttributesBuilder attributesBuilder) {
         if (!isInited) return;
         if (TextUtils.isEmpty(eventName)) {
@@ -136,6 +144,13 @@ public class Tracker {
         TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
     }
 
+    /**
+     * @see #setLoginUserAttributes(Map)
+     * <code>
+     * setLoginUserAttributes(new AttributesBuilder().build())
+     * </code>
+     */
+    @Deprecated
     public void setLoginUserAttributesWithAttrBuilder(LoginUserAttributesEvent.AttributesBuilder attributesBuilder) {
         if (!isInited) return;
         Map<String, String> attributes = attributesBuilder.getAttributes();

@@ -21,8 +21,6 @@ import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -84,11 +82,10 @@ public class CustomEvent extends BaseAttributesEvent {
     }
 
     public static class AttributesBuilder {
-        Map<String, String> attributes;
-        private static final String LIST_SPLIT = "||";
+        private final com.growingio.android.sdk.track.events.AttributesBuilder builder;
 
         private AttributesBuilder() {
-            attributes = new HashMap<>();
+            builder = new com.growingio.android.sdk.track.events.AttributesBuilder();
         }
 
         public static AttributesBuilder getAttributesBuilder() {
@@ -96,43 +93,17 @@ public class CustomEvent extends BaseAttributesEvent {
         }
 
         public AttributesBuilder addAttribute(String key, String value) {
-            if (key != null && value != null) {
-                attributes.put(key, value);
-            }
-
+            builder.addAttribute(key, value);
             return this;
         }
 
         public <T> AttributesBuilder addAttribute(String key, List<T> value) {
-            if (key != null && value != null && !value.isEmpty()) {
-                StringBuilder valueBuilder = new StringBuilder();
-                Iterator<T> iterator = value.iterator();
-                if (iterator.hasNext()) {
-                    valueBuilder.append(toString(iterator.next()));
-                    while (iterator.hasNext()) {
-                        valueBuilder.append(LIST_SPLIT);
-                        valueBuilder.append(toString(iterator.next()));
-                    }
-                }
-                attributes.put(key, valueBuilder.toString());
-            }
-
+            builder.addAttribute(key, value);
             return this;
         }
 
         public Map<String, String> getAttributes() {
-            if (attributes == null || attributes.isEmpty()) {
-                return null;
-            }
-            return attributes;
-        }
-
-        private String toString(Object value) {
-            if (value == null) {
-                return "";
-            } else {
-                return String.valueOf(value);
-            }
+            return builder.build();
         }
     }
 }

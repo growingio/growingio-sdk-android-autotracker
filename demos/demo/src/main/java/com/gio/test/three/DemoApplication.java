@@ -99,6 +99,7 @@ public class DemoApplication extends Application {
         long startTime = System.currentTimeMillis();
         GrowingAutotracker.startWithConfiguration(this, sConfiguration);
         Log.d(TAG, "start time: " + (System.currentTimeMillis() - startTime));
+
     }
 
     private boolean isMainProcess() {
