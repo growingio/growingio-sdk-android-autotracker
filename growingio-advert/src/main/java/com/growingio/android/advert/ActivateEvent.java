@@ -18,37 +18,42 @@ package com.growingio.android.advert;
 
 import android.text.TextUtils;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.TrackEventType;
-import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
  *
  * @author cpacm 2022/8/3
  */
-public class ActivateEvent extends BaseEvent {
+public class ActivateEvent extends BaseAttributesEvent {
 
     private static final String TYPE_NAME = TrackEventType.ACTIVATE;
 
     private final String oaid;
     private final String googleId;
-    private final String linkId;
-    private final String clickId;
-    private final String clickTm;
-    private final String classification; // cl 类别
+    private final String ua;
 
     protected ActivateEvent(Builder eventBuilder) {
         super(eventBuilder);
         oaid = eventBuilder.oaid;
         googleId = eventBuilder.googleId;
-        linkId = eventBuilder.linkId;
-        clickId = eventBuilder.clickId;
-        clickTm = eventBuilder.clickTm;
-        classification = eventBuilder.classification;
+        ua = eventBuilder.ua;
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("ua", ua);
+        return map;
     }
 
     @Override
@@ -57,21 +62,11 @@ public class ActivateEvent extends BaseEvent {
         try {
 
             if (!TextUtils.isEmpty(googleId)) {
-                json.put("gaid", googleId);
+                json.put("googleAdvertisingId", googleId);
             }
             if (!TextUtils.isEmpty(oaid)) {
                 json.put("oaid", oaid);
             }
-            if (!TextUtils.isEmpty(linkId)) {
-                json.put("link_id", linkId);
-            }
-            if (!TextUtils.isEmpty(clickId)) {
-                json.put("click_id", clickId);
-            }
-            if (!TextUtils.isEmpty(clickTm)) {
-                json.put("tm_click", clickTm);
-            }
-            json.put("cl", checkValueSafe(classification));
         } catch (JSONException ignored) {
         }
         return json;
@@ -85,41 +80,13 @@ public class ActivateEvent extends BaseEvent {
         return googleId;
     }
 
-    public String getLinkId() {
-        return linkId;
-    }
-
-    public String getClickId() {
-        return clickId;
-    }
-
-    public String getClickTm() {
-        return clickTm;
-    }
-
-    public String getClassification() {
-        return classification;
-    }
-
-    public static final class Builder extends BaseBuilder<ActivateEvent> {
+    public static final class Builder extends BaseAttributesEvent.Builder<ActivateEvent> {
         private String oaid;
         private String googleId;
-        private String linkId;
-        private String clickId;
-        private String clickTm;
-        private String classification; // cl 类别
+        private String ua;
 
         public Builder() {
             super();
-        }
-
-        public Builder setAdvertData(AdvertData ad) {
-            if (ad == null) return this;
-            linkId = ad.linkID;
-            clickId = ad.clickID;
-            clickTm = ad.clickTM;
-            classification = "defer";
-            return this;
         }
 
         @Override
@@ -133,6 +100,7 @@ public class ActivateEvent extends BaseEvent {
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
             oaid = deviceInfo.getOaid();
             googleId = deviceInfo.getGoogleAdId();
+            ua = AdvertUtils.getUserAgent(TrackerContext.get());
         }
 
         @Override

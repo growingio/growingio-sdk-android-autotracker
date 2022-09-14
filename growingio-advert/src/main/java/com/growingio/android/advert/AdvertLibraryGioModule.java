@@ -32,7 +32,6 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 public class AdvertLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
-        //registry.register(DeepLink.class, AdvertResult.class, new AdvertDeepLinkDataLoader.Factory());
         registry.register(Activate.class, AdvertResult.class, new AdvertActivateDataLoader.Factory());
     }
 }

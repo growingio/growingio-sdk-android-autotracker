@@ -50,10 +50,8 @@ import java.util.Map;
 class AdvertUtils {
     private static final String PREF_FILE_NAME = "growing_profile";
     private static final String PREF_DEVICE_ACTIVATED = "pref_device_activated";
-    private static final String PREF_DEVICE_ACTIVATE_INFO = "pref_device_activate_info";
     private static String sUserAgent = null;
-    private static String IP = null;
-    private static String TAG = "Advert";
+    private static final String TAG = "Advert";
 
     private AdvertUtils() {
     }
@@ -77,33 +75,6 @@ class AdvertUtils {
         return sUserAgent;
     }
 
-    private static synchronized void initIp() {
-        if (PermissionUtil.hasInternetPermission()) {
-            try {
-                for (Enumeration<NetworkInterface> enNetI = NetworkInterface.getNetworkInterfaces(); enNetI.hasMoreElements(); ) {
-                    NetworkInterface netI = enNetI.nextElement();
-                    for (Enumeration<InetAddress> enumIpAddr = netI.getInetAddresses();
-                         enumIpAddr.hasMoreElements();
-                    ) {
-                        InetAddress inetAddress = enumIpAddr.nextElement();
-                        if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress()) {
-                            IP = inetAddress.getHostAddress() != null ? inetAddress.getHostAddress() : "";
-                        }
-                    }
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static String getIP() {
-        if (IP == null) {
-            initIp();
-        }
-        return IP;
-    }
-
     public static boolean isDeviceActivated() {
         return getSharedPreferences().getBoolean(PREF_DEVICE_ACTIVATED, false);
     }
@@ -115,69 +86,5 @@ class AdvertUtils {
     @SuppressLint("WrongConstant")
     public static SharedPreferences getSharedPreferences() {
         return TrackerContext.get().getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
-    }
-
-    public static void setActivateInfo(String activateInfo) {
-        getSharedPreferences().edit().putString(
-                PREF_DEVICE_ACTIVATE_INFO,
-                activateInfo
-        ).apply();
-    }
-
-    public static String getActivateInfo() {
-        return getSharedPreferences().getString(PREF_DEVICE_ACTIVATE_INFO, "");
-    }
-
-    public static String getAppLinkParamsUrl(String trackId, boolean isInApp) {
-        String ai = ConfigurationProvider.core().getProjectId();
-        String spn = TrackerContext.get().getPackageName();
-        String cl = isInApp ? "inapp" : "defer";
-        return "https://" +
-                "t.growingio.com" +
-//                "testlink.growingio.com" +
-                "/app/at6/" + cl + "/android/" +
-                ai + "/" + spn + "/" + trackId;
-    }
-
-    public static String decode(String original) {
-        if (original != null) {
-            try {
-                return URLDecoder.decode(original, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                Logger.d(TAG, e);
-            }
-        }
-        return "";
-    }
-
-    public static int parseJson(String json, Map<String, String> map) {
-        if (TextUtils.isEmpty(json)) {
-            map.clear();
-            return AdvertReceiveCallback.NO_QUERY;
-        }
-        try {
-            JSONObject jsonObject = new JSONObject(json);
-            Iterator<String> keys = jsonObject.keys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                if ("_gio_var".equals(key))
-                    continue;
-                map.put(key, jsonObject.getString(key));
-            }
-        } catch (JSONException jsonException) {
-            map.clear();
-            return AdvertReceiveCallback.PARSE_ERROR;
-        }
-        return AdvertReceiveCallback.SUCCESS;
-    }
-
-    static String parseTrackerId(String url) {
-        String schemePart;
-        if (url.startsWith("https://")) {
-            schemePart = "https://";
-        } else {
-            schemePart = "http://";
-        }
-        return url.substring(url.indexOf("/", schemePart.length()) + 1);
     }
 }
