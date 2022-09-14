@@ -52,7 +52,7 @@ public class ActivateEvent extends BaseAttributesEvent {
     @Override
     public Map<String, String> getAttributes() {
         HashMap<String, String> map = new HashMap<>();
-        map.put("ua", ua);
+        map.put("userAgent", ua);
         return map;
     }
 

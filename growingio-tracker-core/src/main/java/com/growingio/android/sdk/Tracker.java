@@ -189,7 +189,7 @@ public class Tracker {
                     if (enabled) {
                         SessionProvider.get().generateVisit();
                         // check app whether activated
-                        TrackerContext.get().executeData(new Activate(null), Activate.class, AdvertResult.class);
+                        TrackerContext.get().executeData(new Activate(null, true), Activate.class, AdvertResult.class);
                     }
                 }
             }

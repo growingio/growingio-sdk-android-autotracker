@@ -56,7 +56,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         @Override
         public AdvertResult executeData() {
             Activity activity = ActivityStateProvider.get().getForegroundActivity();
-            if (activity != null) {
+            if (activity != null || activate.isDataSwitch()) {
                 checkActivateStatus(activity);
             }
             return new AdvertResult();

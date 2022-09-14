@@ -28,6 +28,7 @@ android {
     testOptions {
         unitTests.all {
             jacoco {
+                jvmArgs '-noverify'
                 includeNoLocationClasses = true
                 excludes = ['jdk.internal.*']
             }
