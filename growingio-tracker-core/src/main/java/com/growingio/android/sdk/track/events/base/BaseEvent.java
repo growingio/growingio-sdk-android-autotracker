@@ -326,7 +326,6 @@ public abstract class BaseEvent extends GEvent {
         protected BaseBuilder() {
             mPlatform = ConstantPool.ANDROID;
             mPlatformVersion = DeviceInfoProvider.get().getOperatingSystemVersion();
-            mEventType = getEventType();
             mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
             mDomain = AppInfoProvider.get().getPackageName();
             mUrlScheme = ConfigurationProvider.core().getUrlScheme();
@@ -367,6 +366,7 @@ public abstract class BaseEvent extends GEvent {
         @TrackThread
         @CallSuper
         public void readPropertyInTrackThread() {
+            mEventType = getEventType();
             mTimestamp = (mTimestamp != 0) ? mTimestamp : System.currentTimeMillis();
             mDeviceId = DeviceInfoProvider.get().getDeviceId();
             mSessionId = PersistentDataProvider.get().getSessionId();

@@ -103,17 +103,17 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             // just send activate event
             submitActivateEvent(null);
 
-//            AdvertConfig config = ConfigurationProvider.get().getConfiguration(AdvertConfig.class);
-//            if (config != null && config.isReadClipBoardEnable()) {
-//                //Android 10 限制剪切板获取时机，只有输入法或者焦点APP才有权限获取剪切板
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && activity != null) {
-//                    activity.getWindow().getDecorView().post(this::checkClipBoardAndSendActivateEvent);
-//                } else {
-//                    checkClipBoardAndSendActivateEvent();
-//                }
-//            } else {
-//                submitActivateEvent(null);
-//            }
+            AdvertConfig config = ConfigurationProvider.get().getConfiguration(AdvertConfig.class);
+            if (config != null && config.isReadClipBoardEnable()) {
+                //Android 10 限制剪切板获取时机，只有输入法或者焦点APP才有权限获取剪切板
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && activity != null) {
+                    activity.getWindow().getDecorView().post(this::checkClipBoardAndSendActivateEvent);
+                } else {
+                    checkClipBoardAndSendActivateEvent();
+                }
+            } else {
+                submitActivateEvent(null);
+            }
         }
 
         private void checkClipBoardAndSendActivateEvent() {
