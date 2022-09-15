@@ -29,12 +29,7 @@ public final class VisitorAttributesEvent extends BaseAttributesEvent {
 
     public static final class Builder extends BaseAttributesEvent.Builder<VisitorAttributesEvent> {
         public Builder() {
-            super();
-        }
-
-        @Override
-        public String getEventType() {
-            return TrackEventType.VISITOR_ATTRIBUTES;
+            super(TrackEventType.VISITOR_ATTRIBUTES);
         }
 
         @Override

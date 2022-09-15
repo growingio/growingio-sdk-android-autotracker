@@ -86,7 +86,7 @@ public class PageEvent extends BaseEvent {
         private String mReferralPage = "";
 
         public Builder() {
-            super();
+            super(AutotrackEventType.PAGE);
         }
 
         public Builder setPath(String path) {
@@ -111,11 +111,6 @@ public class PageEvent extends BaseEvent {
 
         public String getPath() {
             return mPath;
-        }
-
-        @Override
-        public String getEventType() {
-            return AutotrackEventType.PAGE;
         }
 
         @Override

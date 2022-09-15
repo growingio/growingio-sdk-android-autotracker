@@ -89,16 +89,13 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setAttributes(JsonUtil.copyToMap(eventJson.getJSONObject(KEY_ATTRIBUTES)));
 
             } else if (AutotrackEventType.VIEW_CLICK.equals(type)) {
-                return transformViewElementEventBuilder(eventJson)
-                        .setEventType(type);
+                return transformViewElementEventBuilder(type, eventJson);
 
             } else if (AutotrackEventType.VIEW_CHANGE.equals(type)) {
-                return transformViewElementEventBuilder(eventJson)
-                        .setEventType(type);
+                return transformViewElementEventBuilder(type, eventJson);
 
             } else if (TrackEventType.FORM_SUBMIT.equals(type)) {
-                return transformViewElementEventBuilder(eventJson)
-                        .setEventType(type);
+                return transformViewElementEventBuilder(type, eventJson);
 
             } else if (TrackEventType.CUSTOM.equals(type)) {
                 return new HybridCustomEvent.Builder()
@@ -137,8 +134,8 @@ public class HybridTransformerImp implements HybridTransformer {
         return domain;
     }
 
-    private HybridViewElementEvent.Builder transformViewElementEventBuilder(JSONObject eventJson) throws JSONException {
-        return new HybridViewElementEvent.Builder()
+    private HybridViewElementEvent.Builder transformViewElementEventBuilder(String eventType, JSONObject eventJson) throws JSONException {
+        return new HybridViewElementEvent.Builder(eventType)
                 .setHyperlink(eventJson.optString(KEY_HYPERLINK))
                 .setDomain(getDomain(eventJson))
                 .setQuery(eventJson.optString(KEY_QUERY))

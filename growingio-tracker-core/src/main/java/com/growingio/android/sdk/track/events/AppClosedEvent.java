@@ -34,9 +34,8 @@ public class AppClosedEvent extends BaseEvent {
 
     public static final class Builder extends BaseBuilder<AppClosedEvent> {
 
-        @Override
-        public String getEventType() {
-            return TrackEventType.APP_CLOSED;
+        protected Builder() {
+            super(TrackEventType.APP_CLOSED);
         }
 
         @Override

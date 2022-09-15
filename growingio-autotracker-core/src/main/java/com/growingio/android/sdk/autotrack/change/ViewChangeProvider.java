@@ -94,8 +94,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             return;
         }
         TrackMainThread.trackMain().postEventToTrackMain(
-                new ViewElementEvent.Builder()
-                        .setEventType(AutotrackEventType.VIEW_CHANGE)
+                new ViewElementEvent.Builder(AutotrackEventType.VIEW_CHANGE)
                         .setPath(page.path())
                         .setPageShowTimestamp(page.getShowTimestamp())
                         .setXpath(viewNode.getXPath())

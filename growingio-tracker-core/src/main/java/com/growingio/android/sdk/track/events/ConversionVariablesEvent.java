@@ -29,12 +29,7 @@ public final class ConversionVariablesEvent extends BaseAttributesEvent {
 
     public static final class Builder extends BaseAttributesEvent.Builder<ConversionVariablesEvent> {
         public Builder() {
-            super();
-        }
-
-        @Override
-        public String getEventType() {
-            return TrackEventType.CONVERSION_VARIABLES;
+            super(TrackEventType.CONVERSION_VARIABLES);
         }
 
         @Override

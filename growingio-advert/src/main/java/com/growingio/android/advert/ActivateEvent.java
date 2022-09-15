@@ -36,8 +36,6 @@ import java.util.Map;
  */
 public class ActivateEvent extends BaseAttributesEvent {
 
-    private static final String TYPE_NAME = TrackEventType.ACTIVATE;
-
     private final String oaid;
     private final String googleId;
     private final String ua;
@@ -86,12 +84,7 @@ public class ActivateEvent extends BaseAttributesEvent {
         private String ua;
 
         public Builder() {
-            super();
-        }
-
-        @Override
-        public String getEventType() {
-            return TYPE_NAME;
+            super(TrackEventType.ACTIVATE);
         }
 
         @Override
