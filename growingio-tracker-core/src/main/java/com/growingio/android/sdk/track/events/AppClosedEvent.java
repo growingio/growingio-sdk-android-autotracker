@@ -34,7 +34,7 @@ public class AppClosedEvent extends BaseEvent {
 
     public static final class Builder extends BaseBuilder<AppClosedEvent> {
 
-        protected Builder() {
+        public Builder() {
             super(TrackEventType.APP_CLOSED);
         }
 

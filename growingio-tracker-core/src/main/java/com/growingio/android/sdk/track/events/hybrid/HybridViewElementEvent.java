@@ -61,16 +61,6 @@ public final class HybridViewElementEvent extends ViewElementEvent {
         }
 
         @Override
-        public String getEventType() {
-            return mEventType;
-        }
-
-        public Builder setEventType(String eventType) {
-            mEventType = eventType;
-            return this;
-        }
-
-        @Override
         public HybridViewElementEvent build() {
             return new HybridViewElementEvent(this);
         }

@@ -135,7 +135,7 @@ public class ProtocolTest {
         Truth.assertThat(protocol(hpEvent).getPath()).isEqualTo("");
 
 
-        HybridViewElementEvent hvEvent = new HybridViewElementEvent.Builder()
+        HybridViewElementEvent hvEvent = new HybridViewElementEvent.Builder("test")
                 .setHyperlink("www.cpacm.net")
                 .setTextValue("cpacm")
                 .build();
