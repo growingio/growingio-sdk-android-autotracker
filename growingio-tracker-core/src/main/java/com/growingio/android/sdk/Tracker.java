@@ -43,6 +43,7 @@ import com.growingio.android.sdk.track.providers.DeepLinkProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
+import com.growingio.android.sdk.track.timer.TimerCenter;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -123,7 +124,11 @@ public class Tracker {
             return;
         }
 
-        TrackEventGenerator.generateCustomEvent(eventName, attributesBuilder.getAttributes());
+        if (attributesBuilder == null) {
+            TrackEventGenerator.generateCustomEvent(eventName, null);
+        } else {
+            TrackEventGenerator.generateCustomEvent(eventName, attributesBuilder.getAttributes());
+        }
     }
 
     public void setConversionVariables(Map<String, String> variables) {
@@ -153,7 +158,7 @@ public class Tracker {
     @Deprecated
     public void setLoginUserAttributesWithAttrBuilder(LoginUserAttributesEvent.AttributesBuilder attributesBuilder) {
         if (!isInited) return;
-        Map<String, String> attributes = attributesBuilder.getAttributes();
+        Map<String, String> attributes = attributesBuilder == null ? null : attributesBuilder.getAttributes();
         if (attributes == null || attributes.isEmpty()) {
             Logger.e(TAG, "setLoginUserAttributesWithAttrBuilder: attributes is NULL");
             return;
@@ -190,6 +195,8 @@ public class Tracker {
                         SessionProvider.get().generateVisit();
                         // check app whether activated
                         TrackerContext.get().executeData(new Activate(null, true), Activate.class, AdvertResult.class);
+                    } else {
+                        TimerCenter.get().clearTimer();
                     }
                 }
             }
@@ -247,6 +254,55 @@ public class Tracker {
             result = modelLoader.buildLoadData(new HybridBridge(view)).fetcher.executeData();
         }
         Logger.d(TAG, "bridgeForWebView: webView = " + view.getClass().getName() + ", result = " + result);
+    }
+
+    public String trackTimerStart(final String eventName) {
+        if (!isInited || TextUtils.isEmpty(eventName)) {
+            return null;
+        }
+        return TimerCenter.get().startTimer(eventName);
+    }
+
+    public void trackTimerPause(final String timerId) {
+        if (!isInited || TextUtils.isEmpty(timerId)) {
+            return;
+        }
+        TimerCenter.get().updateTimer(timerId, false);
+    }
+
+    public void trackTimerResume(final String timerId) {
+        if (!isInited || TextUtils.isEmpty(timerId)) {
+            return;
+        }
+        TimerCenter.get().updateTimer(timerId, true);
+    }
+
+    public void trackTimerEnd(final String timerId) {
+        if (!isInited || TextUtils.isEmpty(timerId)) {
+            return;
+        }
+        TimerCenter.get().endTimer(timerId);
+    }
+
+    public void trackTimerEnd(final String timerId, Map<String, String> attributes) {
+        if (!isInited || TextUtils.isEmpty(timerId)) {
+            return;
+        }
+        TimerCenter.get().endTimer(timerId, attributes);
+    }
+
+    public void removeTimer(final String timerId) {
+        if (!isInited || TextUtils.isEmpty(timerId)) {
+            return;
+        }
+        TimerCenter.get().removeTimer(timerId);
+    }
+
+    public void clearTrackTimer() {
+        if (!isInited) {
+            return;
+        }
+        TimerCenter.get().clearTimer();
     }
 
     @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
