@@ -76,6 +76,7 @@ buildscript {
                         'protobuf'        : "com.growingio.android:protobuf:$releaseConfiguration.releaseVersion",
                         'encoder'         : "com.growingio.android:encoder:$releaseConfiguration.releaseVersion",
                         'oaid'            : "com.growingio.android:oaid:$releaseConfiguration.releaseVersion",
+                        'advert'          : "com.growingio.android:advert:$releaseConfiguration.releaseVersion",
                         'analytics_fa'    : "com.growingio.android:analytics-fa:$releaseConfiguration.releaseVersion",
                         'analytics_ga'    : "com.growingio.android:analytics-ga:$releaseConfiguration.releaseVersion",
                         'analytics_sa'    : "com.growingio.android:analytics-ga:$releaseConfiguration.releaseVersion",
