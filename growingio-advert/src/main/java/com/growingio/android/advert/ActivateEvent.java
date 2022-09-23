@@ -39,12 +39,16 @@ public class ActivateEvent extends BaseAttributesEvent {
     private final String oaid;
     private final String googleId;
     private final String ua;
+    private final String androidId;
+    private final String imei;
 
     protected ActivateEvent(Builder eventBuilder) {
         super(eventBuilder);
         oaid = eventBuilder.oaid;
         googleId = eventBuilder.googleId;
         ua = eventBuilder.ua;
+        androidId = eventBuilder.androidId;
+        imei = eventBuilder.imei;
     }
 
     @Override
@@ -65,6 +69,12 @@ public class ActivateEvent extends BaseAttributesEvent {
             if (!TextUtils.isEmpty(oaid)) {
                 json.put("oaid", oaid);
             }
+            if (!TextUtils.isEmpty(imei)) {
+                json.put("imei",imei);
+            }
+            if (!TextUtils.isEmpty(androidId)) {
+                json.put("androidId", androidId);
+            }
         } catch (JSONException ignored) {
         }
         return json;
@@ -82,6 +92,9 @@ public class ActivateEvent extends BaseAttributesEvent {
         private String oaid;
         private String googleId;
         private String ua;
+        private String androidId;
+        private String imei;
+
 
         public Builder() {
             super(TrackEventType.ACTIVATE);
@@ -94,6 +107,8 @@ public class ActivateEvent extends BaseAttributesEvent {
             oaid = deviceInfo.getOaid();
             googleId = deviceInfo.getGoogleAdId();
             ua = AdvertUtils.getUserAgent(TrackerContext.get());
+            androidId = deviceInfo.getAndroidId();
+            imei = deviceInfo.getImei();
         }
 
         @Override
