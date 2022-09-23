@@ -199,6 +199,8 @@ class EventProtocolTransfer {
         if (hasClass("com.growingio.android.advert.ActivateEvent")) {
             if (gEvent instanceof ActivateEvent) {
                 ActivateEvent activateEvent = (ActivateEvent) gEvent;
+                eventBuilder.setImei(activateEvent.getImei()); //46
+                eventBuilder.setAndroidId(activateEvent.getAndroidId()); //47
                 eventBuilder.setGoogleAdvertisingId(activateEvent.getGoogleId()); //47
                 eventBuilder.setOaid(activateEvent.getOaid()); //48
             }

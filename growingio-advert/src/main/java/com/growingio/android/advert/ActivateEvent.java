@@ -88,6 +88,14 @@ public class ActivateEvent extends BaseAttributesEvent {
         return googleId;
     }
 
+    public String getAndroidId() {
+        return androidId;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
     public static final class Builder extends BaseAttributesEvent.Builder<ActivateEvent> {
         private String oaid;
         private String googleId;
