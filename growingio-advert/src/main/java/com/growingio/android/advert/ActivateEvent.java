@@ -54,7 +54,7 @@ public class ActivateEvent extends BaseAttributesEvent {
     @Override
     public Map<String, String> getAttributes() {
         HashMap<String, String> map = new HashMap<>();
-        map.put("userAgent", ua);
+        if (!TextUtils.isEmpty(ua)) map.put("userAgent", ua);
         return map;
     }
 
@@ -70,7 +70,7 @@ public class ActivateEvent extends BaseAttributesEvent {
                 json.put("oaid", oaid);
             }
             if (!TextUtils.isEmpty(imei)) {
-                json.put("imei",imei);
+                json.put("imei", imei);
             }
             if (!TextUtils.isEmpty(androidId)) {
                 json.put("androidId", androidId);
@@ -81,19 +81,19 @@ public class ActivateEvent extends BaseAttributesEvent {
     }
 
     public String getOaid() {
-        return oaid;
+        return checkValueSafe(oaid);
     }
 
     public String getGoogleId() {
-        return googleId;
+        return checkValueSafe(googleId);
     }
 
     public String getAndroidId() {
-        return androidId;
+        return checkValueSafe(androidId);
     }
 
     public String getImei() {
-        return imei;
+        return checkValueSafe(imei);
     }
 
     public static final class Builder extends BaseAttributesEvent.Builder<ActivateEvent> {
