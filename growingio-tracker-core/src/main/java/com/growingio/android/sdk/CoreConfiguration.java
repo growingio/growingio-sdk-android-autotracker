@@ -88,10 +88,12 @@ public class CoreConfiguration implements Configurable {
         return this;
     }
 
+    @Deprecated
     public boolean isUploadExceptionEnabled() {
         return mUploadExceptionEnabled;
     }
 
+    @Deprecated
     public CoreConfiguration setUploadExceptionEnabled(boolean uploadExceptionEnabled) {
         this.mUploadExceptionEnabled = uploadExceptionEnabled;
         return this;
