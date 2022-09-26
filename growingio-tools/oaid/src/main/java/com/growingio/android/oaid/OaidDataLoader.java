@@ -21,7 +21,7 @@ import android.content.Context;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.utils.OaidHelper;
+import com.growingio.android.sdk.track.middleware.OaidHelper;
 
 public class OaidDataLoader implements ModelLoader<OaidHelper, String> {
     private final Context mContext;

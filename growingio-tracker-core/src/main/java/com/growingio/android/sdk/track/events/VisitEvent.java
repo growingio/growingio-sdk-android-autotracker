@@ -106,12 +106,7 @@ public final class VisitEvent extends BaseEvent {
         private Map<String, String> mExtraSdk;
 
         public Builder() {
-            super();
-        }
-
-        @Override
-        public String getEventType() {
-            return TrackEventType.VISIT;
+            super(TrackEventType.VISIT);
         }
 
         @Override

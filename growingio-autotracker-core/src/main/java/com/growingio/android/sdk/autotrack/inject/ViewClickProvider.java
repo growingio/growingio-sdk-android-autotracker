@@ -94,8 +94,7 @@ class ViewClickProvider {
             return;
         }
         TrackMainThread.trackMain().postEventToTrackMain(
-                new ViewElementEvent.Builder()
-                        .setEventType(AutotrackEventType.VIEW_CLICK)
+                new ViewElementEvent.Builder(AutotrackEventType.VIEW_CLICK)
                         .setPath(page.path())
                         .setPageShowTimestamp(page.getShowTimestamp())
                         .setXpath(viewNode.getXPath())

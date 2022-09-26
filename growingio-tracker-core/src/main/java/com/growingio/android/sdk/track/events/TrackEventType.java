@@ -27,4 +27,7 @@ public class TrackEventType {
     public static final String CONVERSION_VARIABLES = "CONVERSION_VARIABLES";
     public static final String APP_CLOSED = "APP_CLOSED";
     public static final String FORM_SUBMIT = "FORM_SUBMIT";
+
+    public static final String ACTIVATE = "ACTIVATE";
+    public static final String REENGAGE = "REENGAGE";
 }

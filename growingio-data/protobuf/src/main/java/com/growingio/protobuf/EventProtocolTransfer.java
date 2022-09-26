@@ -16,6 +16,7 @@
 
 package com.growingio.protobuf;
 
+import com.growingio.android.advert.ActivateEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.PageAttributesEvent;
@@ -70,6 +71,8 @@ class EventProtocolTransfer {
             return EventV3Protocol.EventType.VIEW_CHANGE; //9
         } else if (TrackEventType.FORM_SUBMIT.equals(eventType)) {
             return EventV3Protocol.EventType.FORM_SUBMIT; //10
+        } else if (TrackEventType.ACTIVATE.equals(eventType)) {
+            return EventV3Protocol.EventType.ACTIVATE;
         }
         return EventV3Protocol.EventType.CUSTOM; //1
     }
@@ -191,8 +194,29 @@ class EventProtocolTransfer {
                         .setId(resourceItem.getId()).setKey(resourceItem.getKey())); //25
             }
         }
+
+        // deal with module events
+        if (hasClass("com.growingio.android.advert.ActivateEvent")) {
+            if (gEvent instanceof ActivateEvent) {
+                ActivateEvent activateEvent = (ActivateEvent) gEvent;
+                eventBuilder.setImei(activateEvent.getImei()); //46
+                eventBuilder.setAndroidId(activateEvent.getAndroidId()); //47
+                eventBuilder.setGoogleAdvertisingId(activateEvent.getGoogleId()); //47
+                eventBuilder.setOaid(activateEvent.getOaid()); //48
+            }
+        }
+
         return eventBuilder.build().toByteArray();
 
+    }
+
+    private static boolean hasClass(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
     }
 }
 

@@ -30,8 +30,7 @@
         android:label="demos"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name="com.growingio.autotest.MainActivity"></activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name="com.growingio.autotest.MainActivity" android:exported="true" />
 
         <service
             android:name=".three.OtherProcessService"
@@ -39,7 +38,7 @@
             android:exported="true"
             android:process=":OtherProcess" />
 
-        <activity android:name=".three.MainActivity">
+        <activity android:name=".three.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -120,7 +119,8 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
-        <activity android:name=".three.core.TrackActivity">
+        <activity android:name=".three.core.TrackActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.gio.test.three.Entry" />
             </intent-filter>

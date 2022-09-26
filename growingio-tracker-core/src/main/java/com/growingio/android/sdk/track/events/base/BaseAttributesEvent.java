@@ -48,8 +48,8 @@ public abstract class BaseAttributesEvent extends BaseEvent {
     public abstract static class Builder<T extends BaseAttributesEvent> extends BaseBuilder<T> {
         private Map<String, String> mAttributes;
 
-        protected Builder() {
-            super();
+        protected Builder(String eventType) {
+            super(eventType);
         }
 
         public Builder<T> setAttributes(Map<String, String> attributes) {

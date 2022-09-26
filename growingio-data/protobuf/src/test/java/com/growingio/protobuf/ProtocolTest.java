@@ -102,9 +102,8 @@ public class ProtocolTest {
         Truth.assertThat(protocol(plcEnent).getAttributesOrDefault("user", "gio")).isEqualTo("cpacm");
         Truth.assertThat(protocol(plcEnent).getPath()).isEqualTo("PageLevelCustomEvent");
 
-        ViewElementEvent vEvent = new ViewElementEvent.Builder()
+        ViewElementEvent vEvent = new ViewElementEvent.Builder("VIEW_CHANGE")
                 .setXpath("xxxx")
-                .setEventType("VIEW_CHANGE")
                 .setIndex(0)
                 .build();
         Truth.assertThat(protocol(vEvent).getXpath()).isEqualTo("xxxx");
@@ -136,7 +135,7 @@ public class ProtocolTest {
         Truth.assertThat(protocol(hpEvent).getPath()).isEqualTo("");
 
 
-        HybridViewElementEvent hvEvent = new HybridViewElementEvent.Builder()
+        HybridViewElementEvent hvEvent = new HybridViewElementEvent.Builder("test")
                 .setHyperlink("www.cpacm.net")
                 .setTextValue("cpacm")
                 .build();

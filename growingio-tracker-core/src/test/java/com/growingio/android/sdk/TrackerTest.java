@@ -23,6 +23,8 @@ import android.webkit.WebView;
 
 import androidx.test.core.app.ApplicationProvider;
 
+import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
 import org.junit.Test;
@@ -72,12 +74,36 @@ public class TrackerTest {
         WebView webView = new WebView(application);
         tracker.bridgeWebView(webView);
 
+        tracker.setLoginUserId("cpacm");
+        tracker.setLoginUserId("cpacm", "username");
+        tracker.cleanLoginUserId();
+
+        tracker.setLoginUserAttributesWithAttrBuilder(LoginUserAttributesEvent.AttributesBuilder.getAttributesBuilder().addAttribute("age", "18"));
+        tracker.trackCustomEventWithAttrBuilder("custom", CustomEvent.AttributesBuilder.getAttributesBuilder().addAttribute("name", "custom"));
+
         TestLibraryGioModule testLibraryGioModule = new TestLibraryGioModule();
         testLibraryGioModule.registerComponents(application, TrackerContext.get().getRegistry());
         testLibraryGioModule.getConfiguration(TestLibraryGioModule.class);
 
         tracker.registerComponent(testLibraryGioModule);
     }
+
+    @Test
+    public void coreConfiguration() {
+        CoreConfiguration coreConfiguration = new CoreConfiguration("TrackerTest", "growingio://tracker");
+        coreConfiguration.setDataCollectionServerHost("https://www.growingio.com/");
+        coreConfiguration.setDataCollectionEnabled(true);
+        coreConfiguration.setChannel("origin");
+        coreConfiguration.setUploadExceptionEnabled(false);
+        coreConfiguration.setDebugEnabled(true);
+        coreConfiguration.setCellularDataLimit(100);
+        coreConfiguration.setDataUploadInterval(100);
+        coreConfiguration.setSessionInterval(100);
+        coreConfiguration.setRequireAppProcessesEnabled(false);
+        coreConfiguration.setIdMappingEnabled(false);
+        coreConfiguration.addPreloadComponent(null);
+    }
+
 
     public static class TestLibraryGioModule extends LibraryGioModule implements Configurable {
         @Override

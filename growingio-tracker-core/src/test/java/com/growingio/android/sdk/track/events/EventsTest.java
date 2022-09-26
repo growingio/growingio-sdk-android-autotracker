@@ -177,14 +177,14 @@ public class EventsTest {
 
     @Test
     public void eventViewElement() {
-        ViewElementEvent event = new ViewElementEvent.Builder()
+        ViewElementEvent event = new ViewElementEvent.Builder(AutotrackEventType.VIEW_CLICK)
                 .setPath("/blank")
                 .setIndex(1)
                 .setTextValue("this is a test element")
                 .setXpath("/test/path")
                 .setPageShowTimestamp(System.currentTimeMillis())
                 .build();
-        Truth.assertThat(event.getEventType()).isEqualTo("");
+        Truth.assertThat(event.getEventType()).isEqualTo(AutotrackEventType.VIEW_CLICK);
         inRobolectric(event.toJSONObject());
     }
 
