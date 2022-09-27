@@ -99,6 +99,9 @@ dependencies {
     implementation project(":demo-autotrack")
     debugImplementation project(":growingio-tools:oaid")
     releaseImplementation libraries.growingio.oaid
+
+    debugImplementation project(':growingio-apm')
+    releaseImplementation libraries.growingio.apm
     //implementation libraries.growingio.oaid
 
     compileOnly libraries.androidx.appcompat

@@ -1,0 +1,106 @@
+/*
+ *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
+package com.growingio.android.apm;
+
+import com.growingio.android.gmonitor.event.Breadcrumb;
+import com.growingio.android.sdk.track.events.CustomEvent;
+
+import java.util.HashMap;
+import java.util.Objects;
+
+/**
+ * <p>
+ *
+ * @author cpacm 2022/9/27
+ */
+public class ApmEventBuilder {
+
+    private static final String EVENT_ERROR_NAME = "Error";
+    private static final String EVENT_ERROR_TITLE = "error_title";
+    private static final String EVENT_ERROR_CONTENT = "error_content";
+
+    private static final String EVENT_APP_LAUNCHTIME_NAME = "AppLaunchTime";
+    private static final String EVENT_WARM_REBOOT = "warm_reboot";
+    private static final String EVENT_WARM_REBOOT_TIME = "warm_reboot_time";
+    private static final String EVENT_COLD_REBOOT = "cold_reboot";
+    private static final String EVENT_COLD_REBOOT_TIME = "cold_reboot_time";
+    private static final String EVENT_PAGE_NAME = "page_name";
+    private static final String EVENT_PAGE_DURATION = "page_load_duration";
+
+    static CustomEvent.Builder filterWithApmBreadcrumb(Breadcrumb breadcrumb) {
+        if (Objects.equals(breadcrumb.getType(), Breadcrumb.TYPE_ERROR)) {
+            String title = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_ERROR_TYPE));
+            String message = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_ERROR_MESSAGE));
+            return errorBuilder(title, message);
+        } else if (breadcrumb.getType().equals(Breadcrumb.TYPE_PERFORMANCE)) {
+            if (Objects.equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_APP)) {
+                boolean isCold = true;
+                Object isColdObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_APP_COLD);
+                if (isColdObj != null) {
+                    isCold = (boolean) isColdObj;
+                }
+                long duration = 0L;
+                Object durationObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_DURATION);
+                if (durationObj != null) {
+                    duration = (long) durationObj;
+                }
+                return appStartBuilder(isCold, duration);
+            } else if (Objects.equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_ACTIVITY) ||
+                    Objects.equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_FRAGMENT)) {
+                String name = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_PAGE_NAME));
+                long duration = 0L;
+                Object durationObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_DURATION);
+                if (durationObj != null) {
+                    duration = (long) durationObj;
+                }
+                return pageStartBuilder(name, duration);
+            }
+        }
+        return null;
+    }
+
+    static CustomEvent.Builder errorBuilder(String title, String errorContent) {
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(EVENT_ERROR_TITLE, title);
+        hashMap.put(EVENT_ERROR_CONTENT, errorContent);
+
+        return new CustomEvent.Builder().setEventName(EVENT_ERROR_NAME)
+                .setAttributes(hashMap);
+    }
+
+    static CustomEvent.Builder appStartBuilder(boolean isCold, long duration) {
+        HashMap<String, String> hashMap = new HashMap<>();
+        if (isCold) {
+            hashMap.put(EVENT_COLD_REBOOT, "true");
+            hashMap.put(EVENT_COLD_REBOOT_TIME, String.valueOf(duration));
+        } else {
+            hashMap.put(EVENT_WARM_REBOOT, "true");
+            hashMap.put(EVENT_WARM_REBOOT_TIME, String.valueOf(duration));
+        }
+
+        return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
+                .setAttributes(hashMap);
+    }
+
+    static CustomEvent.Builder pageStartBuilder(String pageName, long pageDuration) {
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(EVENT_PAGE_NAME, pageName);
+        hashMap.put(EVENT_PAGE_DURATION, String.valueOf(pageDuration));
+        return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
+                .setAttributes(hashMap);
+    }
+}
