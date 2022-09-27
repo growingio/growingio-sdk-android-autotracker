@@ -85,12 +85,12 @@ public class ViewElementEvent extends BaseEvent {
         private int mIndex = -1;
 
         public Builder() {
-            super();
+            super(AutotrackEventType.VIEW_CLICK);
         }
 
-        @Override
-        public String getEventType() {
-            return mEventType;
+
+        public Builder(String eventType) {
+            super(eventType);
         }
 
         public Builder setEventType(String eventType) {
@@ -121,6 +121,10 @@ public class ViewElementEvent extends BaseEvent {
         public Builder setIndex(int index) {
             mIndex = index;
             return this;
+        }
+
+        public String getPath() {
+            return mPath;
         }
 
         @Override

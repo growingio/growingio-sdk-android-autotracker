@@ -59,12 +59,16 @@ public class PageAttributesEvent extends BaseAttributesEvent {
         private long mPageShowTimestamp;
 
         public Builder() {
-            super();
+            super(AutotrackEventType.PAGE_ATTRIBUTES);
         }
 
         public Builder setPath(String path) {
             mPath = path;
             return this;
+        }
+
+        public String getPath() {
+            return mPath;
         }
 
         public Builder setPageShowTimestamp(long pageShowTimestamp) {
@@ -76,11 +80,6 @@ public class PageAttributesEvent extends BaseAttributesEvent {
         public Builder setAttributes(Map<String, String> attributes) {
             super.setAttributes(attributes);
             return this;
-        }
-
-        @Override
-        public String getEventType() {
-            return AutotrackEventType.PAGE_ATTRIBUTES;
         }
 
         @Override

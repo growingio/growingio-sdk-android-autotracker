@@ -217,6 +217,7 @@ afterEvaluate { project ->
                                             // def properties = it.getDependencyProject().getProperties()
                                             // groupId = properties.get("GROUP")
                                             // artifactId = properties.get("POM_ARTIFACT_ID")
+                                            // if (!artifactId.equals("annotation")) {return}
                                             return
                                         }
                                         println "dependencies:" + groupId + ":" + artifactId + ":" + it.version

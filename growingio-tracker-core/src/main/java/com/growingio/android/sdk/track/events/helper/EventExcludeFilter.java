@@ -65,14 +65,17 @@ public final class EventExcludeFilter {
     public static final int VIEW_CHANGE = 1 << 9;
     public static final int FORM_SUBMIT = 1 << 10;
     public static final int REENGAGE = 1 << 11;
+    public static final int ACTIVATE = 1 << 12;
     public static final int EVENT_MASK_TRIGGER = (VIEW_CLICK | VIEW_CHANGE | FORM_SUBMIT);
+
 
     //"FORM_SUBMIT" from Hybrid Module
     //"REENGAGE" is future's feature
     private static final ArrayList<String> EVENT_TYPE_LIST = new ArrayList<>(
             Arrays.asList(TrackEventType.VISIT, TrackEventType.CUSTOM, TrackEventType.VISITOR_ATTRIBUTES, TrackEventType.LOGIN_USER_ATTRIBUTES,
                     TrackEventType.CONVERSION_VARIABLES, TrackEventType.APP_CLOSED, AutotrackEventType.PAGE, AutotrackEventType.PAGE_ATTRIBUTES, AutotrackEventType.VIEW_CLICK,
-                    AutotrackEventType.VIEW_CHANGE, "FORM_SUBMIT", "REENGAGE"));
+                    AutotrackEventType.VIEW_CHANGE, TrackEventType.FORM_SUBMIT, TrackEventType.REENGAGE, TrackEventType.ACTIVATE));
+
 
     private EventExcludeFilter() {
     }
@@ -92,8 +95,17 @@ public final class EventExcludeFilter {
         return EVENT_TYPE_LIST.contains(typeName) ? (1 << EVENT_TYPE_LIST.indexOf(typeName)) : 0;
     }
 
+
+    @Deprecated
     public static boolean isEventFilter(String typeName) {
         int filterFlag = ConfigurationProvider.core().getExcludeEvent();
+        if (filterFlag > 0) {
+            return (filterFlag & valueOf(typeName)) > 0;
+        }
+        return false;
+    }
+
+    public static boolean isEventFilter(String typeName, int filterFlag) {
         if (filterFlag > 0) {
             return (filterFlag & valueOf(typeName)) > 0;
         }

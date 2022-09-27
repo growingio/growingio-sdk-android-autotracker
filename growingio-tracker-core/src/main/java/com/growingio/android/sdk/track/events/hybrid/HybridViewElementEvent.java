@@ -56,18 +56,8 @@ public final class HybridViewElementEvent extends ViewElementEvent {
         private String mQuery;
         private String mHyperlink;
 
-        public Builder() {
-            super();
-        }
-
-        @Override
-        public String getEventType() {
-            return mEventType;
-        }
-
-        public Builder setEventType(String eventType) {
-            mEventType = eventType;
-            return this;
+        public Builder(String eventType) {
+            super(eventType);
         }
 
         @Override

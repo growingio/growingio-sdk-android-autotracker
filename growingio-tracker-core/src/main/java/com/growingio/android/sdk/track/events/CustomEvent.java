@@ -52,17 +52,16 @@ public class CustomEvent extends BaseAttributesEvent {
         private String mEventName;
 
         public Builder() {
-            super();
-        }
-
-        @Override
-        public String getEventType() {
-            return TrackEventType.CUSTOM;
+            super(TrackEventType.CUSTOM);
         }
 
         public Builder setEventName(String eventName) {
             mEventName = eventName;
             return this;
+        }
+
+        public String getEventName() {
+            return mEventName;
         }
 
         @Override

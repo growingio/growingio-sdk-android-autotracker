@@ -83,4 +83,5 @@ enum EventType {
     VIEW_CLICK = 8;
     VIEW_CHANGE = 9;
     FORM_SUBMIT = 10;
+    ACTIVATE = 11;
 }

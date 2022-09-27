@@ -30,12 +30,7 @@ public final class LoginUserAttributesEvent extends BaseAttributesEvent {
 
     public static final class Builder extends BaseAttributesEvent.Builder<LoginUserAttributesEvent> {
         public Builder() {
-            super();
-        }
-
-        @Override
-        public String getEventType() {
-            return TrackEventType.LOGIN_USER_ATTRIBUTES;
+            super(TrackEventType.LOGIN_USER_ATTRIBUTES);
         }
 
         @Override

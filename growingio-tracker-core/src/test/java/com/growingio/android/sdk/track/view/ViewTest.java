@@ -52,7 +52,6 @@ public class ViewTest {
         ActivityStateProvider.get().onActivityResumed(activity);
         Truth.assertThat(WindowHelper.get().getTopActivityDecorView()).isEqualTo(activity.getWindow().getDecorView());
         List<DecorView> views = WindowHelper.get().getTopActivityViews();
-        System.out.println(views.size());
         views.forEach(new Consumer<DecorView>() {
             @Override
             public void accept(DecorView decorView) {

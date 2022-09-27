@@ -16,24 +16,30 @@
 
 package com.growingio.android.sdk.track.webservice;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
+import android.net.Uri;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
 import androidx.test.core.app.ApplicationProvider;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.log.LogItem;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.webservices.DeepLink;
+import com.growingio.android.sdk.track.middleware.advert.DeepLink;
+import com.growingio.android.sdk.track.webservices.log.LoggerDataMessage;
 import com.growingio.android.sdk.track.webservices.log.WsLogger;
+import com.growingio.android.sdk.track.webservices.message.ClientInfoMessage;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.webservices.message.ReadyMessage;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +47,9 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -54,6 +62,7 @@ public class WebServiceTest {
     public void logTest() {
         WsLogger wsLogger = new WsLogger();
         wsLogger.setCallback(new WsLogger.Callback() {
+            @SuppressLint("CheckResult")
             @Override
             public void disposeLog(String logMessage) {
                 assertThat(logMessage.contains("this is test log"));
@@ -64,19 +73,32 @@ public class WebServiceTest {
         wsLogger.closeLog();
         wsLogger.printOut();
         wsLogger.setCallback(null);
+
     }
 
     Application application = ApplicationProvider.getApplicationContext();
 
     @Test
-    public void messageTest() {
+    public void messageTest() throws JSONException {
         JSONObject quit = new QuitMessage().toJSONObject();
         assertThat(quit.opt("msgType")).isEqualTo("quit");
 
         TrackerContext.init(application);
         JSONObject ready = ReadyMessage.createMessage().toJSONObject();
         assertThat(ready.opt("msgType")).isEqualTo("ready");
+
+        ClientInfoMessage info = ClientInfoMessage.createMessage();
+        assertThat(info.toJSONObject().opt("msgType")).isEqualTo("client_info");
+
+        LogItem logItem = new LogItem.Builder().setMessage("webService")
+                .setPriority(0).setTag("webservice").setThrowable(null).setTimeStamp(0L).build();
+        List<LogItem> list = new ArrayList<>();
+        list.add(logItem);
+        LoggerDataMessage message = LoggerDataMessage
+                .createTrackMessage(list);
+        assertThat(message.toJSONObject().optJSONArray("data").getJSONObject(0).opt("message")).isEqualTo("webService");
     }
+
 
     @Test
     public void tipTest() {
@@ -87,7 +109,6 @@ public class WebServiceTest {
         windowManager.addView(tipView, new WindowManager.LayoutParams());
         tipView.setContent("this is test tip");
         tipView.setErrorMessage("this is test error");
-        int height = tipView.getStatusBarHeight();
 
         tipView.onTouchEvent(MotionEvent.obtain(System.currentTimeMillis(),
                 System.currentTimeMillis() + 100L,
@@ -110,9 +131,8 @@ public class WebServiceTest {
         assertThat(circler.getParams().size()).isEqualTo(0);
         Debugger debugger = new Debugger(new HashMap<>());
         assertThat(debugger.getParams().size()).isEqualTo(0);
-        DeepLink deepLink = new DeepLink(new HashMap<>());
-        deepLink.getParams().put("name", "cpacm");
-        assertThat(deepLink.toString()).isEqualTo("name=cpacm\n");
+        DeepLink deepLink = new DeepLink(Uri.parse("growingio://cpacm?name=cpacm"));
+        assertThat(deepLink.getUri().toString()).contains("name=cpacm");
     }
 
 }

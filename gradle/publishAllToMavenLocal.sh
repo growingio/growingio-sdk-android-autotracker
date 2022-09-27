@@ -14,6 +14,7 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :growingio-network:urlconnection:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-network:volley:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-hybrid:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-advert:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:debugger:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:circler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tools:crash:publishMavenAgentPublicationToMavenLocal \
