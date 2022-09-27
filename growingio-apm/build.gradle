@@ -48,8 +48,8 @@ dependencies {
     testImplementation libraries.test.robolectric
     testImplementation libraries.androidx.appcompat
 
+    compileOnly project(':growingio-tracker-core')
     implementation libraries.growingio.gmonitor
-    implementation project(':growingio-tracker-core')
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }

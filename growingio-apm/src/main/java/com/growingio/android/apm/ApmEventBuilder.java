@@ -20,7 +20,6 @@ import com.growingio.android.gmonitor.event.Breadcrumb;
 import com.growingio.android.sdk.track.events.CustomEvent;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * <p>
@@ -45,12 +44,12 @@ public class ApmEventBuilder {
     private static final String EVENT_PAGE_DURATION = "page_load_duration";
 
     static CustomEvent.Builder filterWithApmBreadcrumb(Breadcrumb breadcrumb) {
-        if (Objects.equals(breadcrumb.getType(), Breadcrumb.TYPE_ERROR)) {
+        if (equals(breadcrumb.getType(), Breadcrumb.TYPE_ERROR)) {
             String title = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_ERROR_TYPE));
             String message = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_ERROR_MESSAGE));
             return errorBuilder(title, message);
         } else if (breadcrumb.getType().equals(Breadcrumb.TYPE_PERFORMANCE)) {
-            if (Objects.equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_APP)) {
+            if (equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_APP)) {
                 boolean isCold = true;
                 Object isColdObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_APP_COLD);
                 if (isColdObj != null) {
@@ -62,8 +61,8 @@ public class ApmEventBuilder {
                     duration = (long) durationObj;
                 }
                 return appStartBuilder(isCold, duration);
-            } else if (Objects.equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_ACTIVITY) ||
-                    Objects.equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_FRAGMENT)) {
+            } else if (equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_ACTIVITY) ||
+                    equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_FRAGMENT)) {
                 String name = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_PAGE_NAME));
                 long duration = 0L;
                 Object durationObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_DURATION);
@@ -76,7 +75,7 @@ public class ApmEventBuilder {
         return null;
     }
 
-    static CustomEvent.Builder errorBuilder(String title, String errorContent) {
+    private static CustomEvent.Builder errorBuilder(String title, String errorContent) {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(EVENT_ERROR_TITLE, title);
         hashMap.put(EVENT_ERROR_CONTENT, errorContent);
@@ -85,7 +84,7 @@ public class ApmEventBuilder {
                 .setAttributes(hashMap);
     }
 
-    static CustomEvent.Builder appStartBuilder(boolean isCold, long duration) {
+    private static CustomEvent.Builder appStartBuilder(boolean isCold, long duration) {
         HashMap<String, String> hashMap = new HashMap<>();
         if (isCold) {
             hashMap.put(EVENT_COLD_REBOOT, "true");
@@ -99,11 +98,15 @@ public class ApmEventBuilder {
                 .setAttributes(hashMap);
     }
 
-    static CustomEvent.Builder pageStartBuilder(String pageName, long pageDuration) {
+    private static CustomEvent.Builder pageStartBuilder(String pageName, long pageDuration) {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(EVENT_PAGE_NAME, pageName);
         hashMap.put(EVENT_PAGE_DURATION, String.valueOf(pageDuration));
         return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
                 .setAttributes(hashMap);
+    }
+
+    private static boolean equals(Object a, Object b) {
+        return (a == b) || (a != null && a.equals(b));
     }
 }
