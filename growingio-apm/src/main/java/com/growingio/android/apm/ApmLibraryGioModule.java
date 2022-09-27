@@ -20,8 +20,6 @@ import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.middleware.apm.EventApm;
-import com.growingio.android.sdk.track.middleware.http.EventResponse;
-import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 

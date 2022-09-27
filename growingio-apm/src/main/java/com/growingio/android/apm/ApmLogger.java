@@ -55,6 +55,8 @@ class ApmLogger implements ILogger {
             Logger.e(TAG, throwable, s, objects);
         } else if (i == Log.WARN) {
             Logger.w(TAG, throwable, s, objects);
-        } else Logger.d(TAG, throwable, s, objects);
+        } else {
+            Logger.d(TAG, throwable, s, objects);
+        }
     }
 }

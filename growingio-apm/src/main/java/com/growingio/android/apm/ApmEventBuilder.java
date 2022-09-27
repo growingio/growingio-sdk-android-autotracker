@@ -29,6 +29,9 @@ import java.util.Objects;
  */
 public class ApmEventBuilder {
 
+    private ApmEventBuilder() {
+    }
+
     private static final String EVENT_ERROR_NAME = "Error";
     private static final String EVENT_ERROR_TITLE = "error_title";
     private static final String EVENT_ERROR_CONTENT = "error_content";
