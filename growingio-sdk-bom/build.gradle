@@ -31,9 +31,10 @@ dependencies {
                     !it.name.startsWith("demo") &&
                             it.name != project.name &&
                             it.name != "gio-sdk" &&
-                            it.name != "tools" &&
-                            it.name != "network" && it.name != "webservice"
-                    it.name != "data"
+                            it.name != "growingio-tools" &&
+                            it.name != "growingio-network" &&
+                            it.name != "growingio-webservice" &&
+                            it.name != "growingio-data"
                 }
                 .map {
                     it.name.replace("growingio-", "")
