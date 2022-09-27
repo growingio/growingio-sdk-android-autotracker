@@ -75,7 +75,7 @@ buildscript {
 
                         'apm'             : "com.growingio.android:apm:$releaseConfiguration.releaseVersion",
                         'snappy'          : "com.growingio.android:snappy:1.1.0",
-                        'gmonitor'        : 'com.growingio.android:gmonitor:1.5.0',
+                        'gmonitor'        : 'com.growingio.android:gmonitor:2.0.0-SNAPSHOT'
                 ],
 
                 'google'   : [
