@@ -73,7 +73,7 @@ buildscript {
                         'oaid'            : "com.growingio.android:oaid:$releaseConfiguration.releaseVersion",
                         'advert'          : "com.growingio.android:advert:$releaseConfiguration.releaseVersion",
 
-                        'crash'           : "com.growingio.android:crash:$releaseConfiguration.releaseVersion",
+                        'apm'             : "com.growingio.android:apm:$releaseConfiguration.releaseVersion",
                         'snappy'          : "com.growingio.android:snappy:1.1.0",
                         'gmonitor'        : 'com.growingio.android:gmonitor:1.5.0',
                 ],
