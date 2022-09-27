@@ -50,7 +50,7 @@ dependencies {
         api libraries.growingio.protobuf
         api libraries.growingio.oaid
         api libraries.growingio.encoder
-        api libraries.growingio.crash
+        api libraries.growingio.apm
         api libraries.growingio.analytics_fa
         api libraries.growingio.analytics_ga
         api libraries.growingio.analytics_sa

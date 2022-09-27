@@ -81,7 +81,7 @@ buildscript {
                         'analytics_ga'    : "com.growingio.android:analytics-ga:$releaseConfiguration.releaseVersion",
                         'analytics_sa'    : "com.growingio.android:analytics-ga:$releaseConfiguration.releaseVersion",
 
-                        'crash'           : "com.growingio.android:crash:$releaseConfiguration.releaseVersion",
+                        'apm'             : "com.growingio.android:apm:$releaseConfiguration.releaseVersion",
                         'snappy'          : "com.growingio.android:snappy:1.1.0",
                         'gmonitor'        : 'com.growingio.android:gmonitor:1.5.0',
                 ],
