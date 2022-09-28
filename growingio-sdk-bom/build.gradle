@@ -26,34 +26,28 @@ javaPlatform {
 dependencies {
     constraints {
 
-        // sdk
-        api libraries.growingio.tracker
-        api libraries.growingio.tracker_cdp
-        api libraries.growingio.autotracker
-        api libraries.growingio.autotracker_cdp
-        api libraries.growingio.tracker_core
-        api libraries.growingio.autotracker_core
+        project.rootProject.subprojects.stream()
+                .filter {
+                    !it.name.startsWith("demo") &&
+                            it.name != project.name &&
+                            it.name != "gio-sdk" &&
+                            it.name != "growingio-tools" &&
+                            it.name != "growingio-network" &&
+                            it.name != "growingio-webservice" &&
+                            it.name != "growingio-data" &&
+                            it.name != "snappy"
+                }
+                .map {
+                    it.name.replace("growingio-", "")
+                }
+                .forEach {
+                    System.out.println("com.growingio.android:" + it + ":" + releaseConfiguration.releaseVersion)
+                    api "com.growingio.android:" + it + ":" + releaseConfiguration.releaseVersion
+                }
 
-        // custom module generate
-        api libraries.growingio.annotation
-        api libraries.growingio.compiler
-
-        // module
-        api libraries.growingio.hybrid
-        api libraries.growingio.database
-        api libraries.growingio.okhttp3
-        api libraries.growingio.volley
-        api libraries.growingio.urlconnection
-        api libraries.growingio.debugger
-        api libraries.growingio.circler
-        api libraries.growingio.json
-        api libraries.growingio.protobuf
-        api libraries.growingio.oaid
-        api libraries.growingio.encoder
-        api libraries.growingio.crash
-        api libraries.growingio.analytics_fa
-        api libraries.growingio.analytics_ga
-        api libraries.growingio.analytics_sa
+        api "com.growingio.android:analytics-fa:3.4.1"
+        api "com.growingio.android:analytics-ga:3.4.1"
+        api "com.growingio.android:analytics-sa:3.4.1"
 
         // 2升3模块
         api 'com.growingio.android.sdk.upgrade:autotracker-upgrade-2to3-cdp:1.2.0'
