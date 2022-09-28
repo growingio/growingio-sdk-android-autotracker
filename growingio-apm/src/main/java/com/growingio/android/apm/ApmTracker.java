@@ -18,20 +18,39 @@ package com.growingio.android.apm;
 
 import com.growingio.android.gmonitor.ITracker;
 import com.growingio.android.gmonitor.event.Breadcrumb;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.log.CircularFifoQueue;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 /**
  * <p>
+ * if sdk does't init or enable,push breadcrumb into fifoqueue
  *
  * @author cpacm 2022/9/27
  */
 class ApmTracker implements ITracker {
 
+    private final CircularFifoQueue<Breadcrumb> caches = new CircularFifoQueue<>(100);
+
     @Override
     public void trackBreadcrumb(Breadcrumb breadcrumb) {
-        CustomEvent.Builder builder = ApmEventBuilder.filterWithApmBreadcrumb(breadcrumb);
-        TrackMainThread.trackMain().postEventToTrackMain(builder);
+        caches.add(breadcrumb);
+        if (!TrackerContext.initializedSuccessfully() || !ConfigurationProvider.core().isDataCollectionEnabled()) {
+            return;
+        }
+        releaseCaches();
+    }
+
+    public void releaseCaches() {
+        if (caches.size() > 0 && TrackerContext.initializedSuccessfully() && ConfigurationProvider.core().isDataCollectionEnabled()) {
+            for (Breadcrumb bc : caches) {
+                CustomEvent.Builder builder = ApmEventBuilder.filterWithApmBreadcrumb(bc);
+                TrackMainThread.trackMain().postEventToTrackMain(builder);
+            }
+            caches.clear();
+        }
     }
 
     @Override

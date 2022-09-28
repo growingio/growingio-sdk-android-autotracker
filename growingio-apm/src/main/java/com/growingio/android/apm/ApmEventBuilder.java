@@ -61,8 +61,18 @@ public class ApmEventBuilder {
                     duration = (long) durationObj;
                 }
                 return appStartBuilder(isCold, duration);
-            } else if (equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_ACTIVITY) ||
-                    equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_FRAGMENT)) {
+            } else if (equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_ACTIVITY)) {
+                String name = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_PAGE_NAME));
+                long duration = 0L;
+                Object durationObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_DURATION);
+                if (durationObj != null) {
+                    duration = (long) durationObj;
+                }
+                if (breadcrumb.getData().contains(Breadcrumb.ATTR_PERFORMANCE_APP_COLD)) {
+                    return pageStartBuilderWithHot(name, duration);
+                }
+                return pageStartBuilder(name, duration);
+            } else if (equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_FRAGMENT)) {
                 String name = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_PAGE_NAME));
                 long duration = 0L;
                 Object durationObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_DURATION);
@@ -102,6 +112,16 @@ public class ApmEventBuilder {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(EVENT_PAGE_NAME, pageName);
         hashMap.put(EVENT_PAGE_DURATION, String.valueOf(pageDuration));
+        return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
+                .setAttributes(hashMap);
+    }
+
+    private static CustomEvent.Builder pageStartBuilderWithHot(String pageName, long pageDuration) {
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(EVENT_PAGE_NAME, pageName);
+        hashMap.put(EVENT_PAGE_DURATION, String.valueOf(pageDuration));
+        hashMap.put(EVENT_WARM_REBOOT, "true");
+        hashMap.put(EVENT_WARM_REBOOT_TIME, String.valueOf(pageDuration));
         return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
                 .setAttributes(hashMap);
     }

@@ -42,21 +42,21 @@ public class ApmDataLoader implements ModelLoader<EventApm, Void> {
     public static class Factory implements ModelLoaderFactory<EventApm, Void> {
 
         protected Factory(Context context) {
-            CoreConfiguration core = ConfigurationProvider.core();
-            ApmConfig apmConfig = ConfigurationProvider.get().getConfiguration(ApmConfig.class);
-            if (apmConfig == null) apmConfig = new ApmConfig();
+            if (GMonitor.getInstance() == null) {
+                CoreConfiguration core = ConfigurationProvider.core();
+                ApmConfig apmConfig = ConfigurationProvider.get().getConfiguration(ApmConfig.class);
+                if (apmConfig == null) apmConfig = new ApmConfig();
 
-            GMonitorOption option = new GMonitorOption();
-            option.setDebug(core.isDebugEnabled());
-            option.setAvoidRunningAppProcesses(!core.isRequireAppProcessesEnabled());
-            option.setEnableActivityLifecycleTracing(apmConfig.isActivityLifecycleTracing());
-            option.setEnableFragmentLifecycleTracing(apmConfig.isFragmentLifecycleTracing());
-            option.setEnableUncaughtExceptionHandler(apmConfig.isUncaughtException());
-            option.setPrintUncaughtStackTrace(apmConfig.isPrintUncaughtException());
+                GMonitorOption option = new GMonitorOption();
+                option.setDebug(core.isDebugEnabled());
+                option.setAvoidRunningAppProcesses(!core.isRequireAppProcessesEnabled());
+                option.setEnableActivityLifecycleTracing(apmConfig.isActivityLifecycleTracing());
+                option.setEnableFragmentLifecycleTracing(apmConfig.isFragmentLifecycleTracing());
+                option.setEnableUncaughtExceptionHandler(apmConfig.isUncaughtException());
+                option.setPrintUncaughtStackTrace(apmConfig.isPrintUncaughtException());
 
-            GMonitor.Companion.init(
-                    context,
-                    new ApmLogger(), option, new ApmTracker());
+                GMonitor.init(context, new ApmLogger(), option, new ApmTracker());
+            }
         }
 
         @Override
