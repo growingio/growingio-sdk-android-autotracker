@@ -26,7 +26,9 @@ import com.growingio.android.sdk.Configurable;
 class ApmConfig implements Configurable {
 
     private boolean activityLifecycleTracing = true;
-    private boolean fragmentLifecycleTracing = true;
+    private boolean fragmentXLifecycleTracing = true;
+    private boolean fragmentSupportLifecycleTracing = false;
+    private boolean fragmentSystemLifecycleTracing = false;
     private boolean uncaughtException = true;
     private boolean printUncaughtException = false;
     private boolean anrTracing = false;
@@ -41,12 +43,28 @@ class ApmConfig implements Configurable {
         this.activityLifecycleTracing = activityLifecycleTracing;
     }
 
-    public boolean isFragmentLifecycleTracing() {
-        return fragmentLifecycleTracing;
+    public boolean isFragmentXLifecycleTracing() {
+        return fragmentXLifecycleTracing;
     }
 
-    public void setFragmentLifecycleTracing(boolean fragmentLifecycleTracing) {
-        this.fragmentLifecycleTracing = fragmentLifecycleTracing;
+    public void setFragmentXLifecycleTracing(boolean fragmentXLifecycleTracing) {
+        this.fragmentXLifecycleTracing = fragmentXLifecycleTracing;
+    }
+
+    public boolean isFragmentSupportLifecycleTracing() {
+        return fragmentSupportLifecycleTracing;
+    }
+
+    public void setFragmentSupportLifecycleTracing(boolean fragmentSupportLifecycleTracing) {
+        this.fragmentSupportLifecycleTracing = fragmentSupportLifecycleTracing;
+    }
+
+    public boolean isFragmentSystemLifecycleTracing() {
+        return fragmentSystemLifecycleTracing;
+    }
+
+    public void setFragmentSystemLifecycleTracing(boolean fragmentSystemLifecycleTracing) {
+        this.fragmentSystemLifecycleTracing = fragmentSystemLifecycleTracing;
     }
 
     public boolean isUncaughtException() {

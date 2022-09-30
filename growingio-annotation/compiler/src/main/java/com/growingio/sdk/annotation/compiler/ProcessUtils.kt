@@ -150,6 +150,7 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
         const val GIO_DEFAULT_TRACKER = "com.growingio.android.sdk.Tracker"
         const val GIO_DEFAULT_CONFIGURATION = "com.growingio.android.sdk.CoreConfiguration"
         const val GIO_DEFAULT_CONFIGURABLE = "com.growingio.android.sdk.Configurable"
+        const val GIO_DEFAULT_LIBRARY_MODULE = "com.growingio.android.sdk.LibraryGioModule"
         const val GIO_DEFAULT_LOGGER = "com.growingio.android.sdk.track.log.Logger"
         const val GIO_CONFIGURATION_PROVIDER="com.growingio.android.sdk.track.providers.ConfigurationProvider"
 

@@ -41,7 +41,7 @@ dependencies {
                     it.name.replace("growingio-", "")
                 }
                 .forEach {
-                    System.out.println("com.growingio.android:" + it + ":" + releaseConfiguration.releaseVersion)
+                    //System.out.println("com.growingio.android:" + it + ":" + releaseConfiguration.releaseVersion)
                     api "com.growingio.android:" + it + ":" + releaseConfiguration.releaseVersion
                 }
 

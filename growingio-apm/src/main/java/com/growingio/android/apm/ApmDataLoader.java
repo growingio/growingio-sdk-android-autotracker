@@ -51,7 +51,11 @@ public class ApmDataLoader implements ModelLoader<EventApm, Void> {
                 option.setDebug(core.isDebugEnabled());
                 option.setAvoidRunningAppProcesses(!core.isRequireAppProcessesEnabled());
                 option.setEnableActivityLifecycleTracing(apmConfig.isActivityLifecycleTracing());
-                option.setEnableFragmentLifecycleTracing(apmConfig.isFragmentLifecycleTracing());
+
+                option.setEnableFragmentXLifecycleTracing(apmConfig.isFragmentXLifecycleTracing());
+                option.setEnableFragmentSupportLifecycleTracing(apmConfig.isFragmentSupportLifecycleTracing());
+                option.setEnableFragmentSystemLifecycleTracing(apmConfig.isFragmentSystemLifecycleTracing());
+
                 option.setEnableUncaughtExceptionHandler(apmConfig.isUncaughtException());
                 option.setPrintUncaughtStackTrace(apmConfig.isPrintUncaughtException());
 
