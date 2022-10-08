@@ -28,6 +28,7 @@ android {
     testOptions {
         unitTests.all {
             jacoco {
+                jvmArgs '-noverify'
                 includeNoLocationClasses = true
                 excludes = ['jdk.internal.*']
             }
@@ -47,6 +48,7 @@ dependencies {
     testImplementation libraries.test.androidx_core
     testImplementation libraries.test.robolectric
     testImplementation libraries.androidx.appcompat
+    testImplementation project(path: ':growingio-tracker-core')
 
     compileOnly project(':growingio-tracker-core')
     implementation libraries.growingio.gmonitor

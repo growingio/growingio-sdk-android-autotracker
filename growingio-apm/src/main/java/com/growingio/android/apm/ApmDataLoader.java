@@ -59,6 +59,10 @@ public class ApmDataLoader implements ModelLoader<EventApm, Void> {
                 option.setEnableUncaughtExceptionHandler(apmConfig.isUncaughtException());
                 option.setPrintUncaughtStackTrace(apmConfig.isPrintUncaughtException());
 
+                option.setAnrInDebug(apmConfig.isAnrInDebug());
+                option.setEnableAnr(apmConfig.isAnrTracing());
+                option.setAnrTimeoutIntervalMillis(apmConfig.getAnrTimeoutIntervalMillis());
+
                 GMonitor.init(context, new ApmLogger(), option, new ApmTracker());
             }
         }

@@ -31,55 +31,75 @@ class ApmConfig implements Configurable {
     private boolean fragmentSystemLifecycleTracing = false;
     private boolean uncaughtException = true;
     private boolean printUncaughtException = false;
-    private boolean anrTracing = false;
-    private long anrTimeoutIntervalMillis = 5000L;
-    private boolean anrInDebug = false;
+    private final boolean anrTracing = false;
+    private final long anrTimeoutIntervalMillis = 5000L;
+    private final boolean anrInDebug = false;
 
     public boolean isActivityLifecycleTracing() {
         return activityLifecycleTracing;
     }
 
-    public void setActivityLifecycleTracing(boolean activityLifecycleTracing) {
+    public ApmConfig setActivityLifecycleTracing(boolean activityLifecycleTracing) {
         this.activityLifecycleTracing = activityLifecycleTracing;
+        return this;
     }
 
     public boolean isFragmentXLifecycleTracing() {
         return fragmentXLifecycleTracing;
     }
 
-    public void setFragmentXLifecycleTracing(boolean fragmentXLifecycleTracing) {
+    public ApmConfig setFragmentXLifecycleTracing(boolean fragmentXLifecycleTracing) {
         this.fragmentXLifecycleTracing = fragmentXLifecycleTracing;
+        return this;
     }
 
     public boolean isFragmentSupportLifecycleTracing() {
         return fragmentSupportLifecycleTracing;
     }
 
-    public void setFragmentSupportLifecycleTracing(boolean fragmentSupportLifecycleTracing) {
+    public ApmConfig setFragmentSupportLifecycleTracing(boolean fragmentSupportLifecycleTracing) {
         this.fragmentSupportLifecycleTracing = fragmentSupportLifecycleTracing;
+        return this;
     }
 
     public boolean isFragmentSystemLifecycleTracing() {
         return fragmentSystemLifecycleTracing;
     }
 
-    public void setFragmentSystemLifecycleTracing(boolean fragmentSystemLifecycleTracing) {
+    public ApmConfig setFragmentSystemLifecycleTracing(boolean fragmentSystemLifecycleTracing) {
         this.fragmentSystemLifecycleTracing = fragmentSystemLifecycleTracing;
+        return this;
     }
 
     public boolean isUncaughtException() {
         return uncaughtException;
     }
 
-    public void setUncaughtException(boolean uncaughtException) {
+    public ApmConfig setUncaughtException(boolean uncaughtException) {
         this.uncaughtException = uncaughtException;
+        return this;
     }
 
     public boolean isPrintUncaughtException() {
         return printUncaughtException;
     }
 
-    public void setPrintUncaughtException(boolean printUncaughtException) {
+    public ApmConfig setPrintUncaughtException(boolean printUncaughtException) {
         this.printUncaughtException = printUncaughtException;
+        return this;
     }
+
+    public boolean isAnrTracing() {
+        return anrTracing;
+    }
+
+    public long getAnrTimeoutIntervalMillis() {
+        return anrTimeoutIntervalMillis;
+    }
+
+    public boolean isAnrInDebug() {
+        return anrInDebug;
+    }
+
+
 }

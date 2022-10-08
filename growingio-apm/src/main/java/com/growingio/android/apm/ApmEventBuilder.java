@@ -31,11 +31,11 @@ public class ApmEventBuilder {
     private ApmEventBuilder() {
     }
 
-    private static final String EVENT_ERROR_NAME = "Error";
+    static final String EVENT_ERROR_NAME = "Error";
     private static final String EVENT_ERROR_TITLE = "error_title";
     private static final String EVENT_ERROR_CONTENT = "error_content";
 
-    private static final String EVENT_APP_LAUNCHTIME_NAME = "AppLaunchTime";
+    static final String EVENT_APP_LAUNCHTIME_NAME = "AppLaunchTime";
     private static final String EVENT_WARM_REBOOT = "warm_reboot";
     private static final String EVENT_WARM_REBOOT_TIME = "warm_reboot_time";
     private static final String EVENT_COLD_REBOOT = "cold_reboot";
@@ -68,7 +68,7 @@ public class ApmEventBuilder {
                 if (durationObj != null) {
                     duration = (long) durationObj;
                 }
-                if (breadcrumb.getData().contains(Breadcrumb.ATTR_PERFORMANCE_APP_COLD)) {
+                if (breadcrumb.getData().containsKey(Breadcrumb.ATTR_PERFORMANCE_APP_COLD)) {
                     return pageStartBuilderWithHot(name, duration);
                 }
                 return pageStartBuilder(name, duration);

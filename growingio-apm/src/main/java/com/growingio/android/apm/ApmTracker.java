@@ -26,7 +26,7 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 /**
  * <p>
- * if sdk does't init or enable,push breadcrumb into fifoqueue
+ * if sdk doesn't init or enable,push breadcrumb into fifo queue
  *
  * @author cpacm 2022/9/27
  */
