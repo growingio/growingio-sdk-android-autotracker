@@ -43,6 +43,7 @@ public class PersistentDataProvider {
     private static final String SHARER_NAME = "PersistentSharerDataProvider";
     private static final int SHARER_MAX_SIZE = 50;
 
+    // Key长度校验 0 <= len < 50, 判断文件读取是否合法
     private static final String KEY_TYPE_GLOBAL = "TYPE_GLOBAL";
     private static final String KEY_LOGIN_USER_KEY = "LOGIN_USER_KEY";
     private static final String KEY_LOGIN_USER_ID = "LOGIN_USER_ID";
