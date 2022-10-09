@@ -57,7 +57,8 @@ class SharedEntry {
         mPosition = position;
         byteBuffer.position(mPosition);
         short keyLength = byteBuffer.getShort();
-        if (keyLength == 0) {
+        // 低概率抛出异常 java.lang.NegativeArraySizeException -22345
+        if (keyLength <= 0 || keyLength > 50) {
             throw new IllegalArgumentException("This position is not valid");
         }
         byte[] bytes = new byte[keyLength];

@@ -124,7 +124,7 @@ public class MultiProcessDataSharer implements IDataSharer {
         }
     }
 
-    //位置校验，在SharedEntry构造函数中，如果该位置没值则会抛出异常
+    // 位置校验，在SharedEntry构造函数中，如果该位置没值或值非法则会抛出异常
     private void incrementLoadFromDisk() {
         int surplus = mMaxSize - mSharedEntries.size();
         for (int i = 0; i < surplus; i++) {
