@@ -23,7 +23,7 @@ import com.growingio.android.sdk.Configurable;
  *
  * @author cpacm 2022/9/27
  */
-class ApmConfig implements Configurable {
+public class ApmConfig implements Configurable {
 
     private boolean activityLifecycleTracing = true;
     private boolean fragmentXLifecycleTracing = true;
