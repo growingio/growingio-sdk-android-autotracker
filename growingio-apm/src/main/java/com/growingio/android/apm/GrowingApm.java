@@ -27,6 +27,10 @@ import com.growingio.android.gmonitor.GMonitorOption;
  * @author cpacm 2022/9/29
  */
 public class GrowingApm {
+
+    private GrowingApm() {
+    }
+
     public static void startWithConfiguration(Context context, ApmConfig apmConfig) {
         if (GMonitor.getInstance() == null) {
             GMonitorOption option = new GMonitorOption();
