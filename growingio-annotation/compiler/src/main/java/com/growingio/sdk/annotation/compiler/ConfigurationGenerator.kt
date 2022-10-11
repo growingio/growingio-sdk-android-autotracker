@@ -226,6 +226,10 @@ internal class ConfigurationGenerator(
         val addMethod = MethodSpec.methodBuilder("addConfiguration")
             .addParameter(config, "config")
             .addModifiers(Modifier.PUBLIC)
+            .addAnnotation(
+                AnnotationSpec.builder(java.lang.Deprecated::class.java)
+                    .build()
+            )
             .beginControlFlow("if (config != null)")
             .addStatement("MODULE_CONFIGURATIONS.put(config.getClass(), config)")
             .endControlFlow()

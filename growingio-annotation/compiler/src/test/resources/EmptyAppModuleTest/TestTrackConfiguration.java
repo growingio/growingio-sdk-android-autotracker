@@ -50,6 +50,7 @@ public final class TestTrackConfiguration {
         return MODULE_CONFIGURATIONS;
     }
 
+    @Deprecated
     public TestTrackConfiguration addConfiguration(Configurable config) {
         if (config != null) {
             MODULE_CONFIGURATIONS.put(config.getClass(), config);
