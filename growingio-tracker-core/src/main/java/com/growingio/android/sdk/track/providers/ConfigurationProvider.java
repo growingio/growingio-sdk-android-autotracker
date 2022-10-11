@@ -88,7 +88,7 @@ public class ConfigurationProvider {
         return new ConfigurationProvider(new CoreConfiguration(ConstantPool.UNKNOWN, ConstantPool.UNKNOWN), null);
     }
 
-    void addConfiguration(Configurable config) {
+    public void addConfiguration(Configurable config) {
         if (config != null) {
             sModuleConfigs.put(config.getClass(), config);
         }

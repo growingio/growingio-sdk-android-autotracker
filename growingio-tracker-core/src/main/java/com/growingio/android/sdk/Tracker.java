@@ -344,6 +344,12 @@ public class Tracker {
         module.registerComponents(TrackerContext.get(), TrackerContext.get().getRegistry());
     }
 
+    public void registerComponent(LibraryGioModule module, Configurable config) {
+        if (!isInited || module == null || config == null) return;
+        ConfigurationProvider.get().addConfiguration(config);
+        module.registerComponents(TrackerContext.get(), TrackerContext.get().getRegistry());
+    }
+
     private void throwIncorrectGioModule(Exception e) {
         throw new IllegalStateException(
                 "GeneratedGioModuleImpl is implemented incorrectly."

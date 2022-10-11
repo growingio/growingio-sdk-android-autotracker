@@ -43,6 +43,8 @@ android {
 
 dependencies {
 
+    implementation libraries.growingio.gmonitor
+
     testImplementation libraries.test.junit
     testImplementation libraries.test.truth
     testImplementation libraries.test.androidx_core
@@ -51,7 +53,6 @@ dependencies {
     testImplementation project(path: ':growingio-tracker-core')
 
     compileOnly project(':growingio-tracker-core')
-    implementation libraries.growingio.gmonitor
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }
