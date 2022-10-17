@@ -47,7 +47,12 @@ class ApmTracker implements ITracker {
         if (caches.size() > 0 && TrackerContext.initializedSuccessfully() && ConfigurationProvider.core().isDataCollectionEnabled()) {
             for (Breadcrumb bc : caches) {
                 CustomEvent.Builder builder = ApmEventBuilder.filterWithApmBreadcrumb(bc);
-                TrackMainThread.trackMain().postEventToTrackMain(builder);
+                if (bc.getType().equals(Breadcrumb.TYPE_ERROR)) {
+                    // 遇到异常时，不能通过Handler保存事件.
+                    TrackMainThread.trackMain().buildEventSendRunnable(builder).run();
+                } else {
+                    TrackMainThread.trackMain().postEventToTrackMain(builder);
+                }
             }
             caches.clear();
         }
