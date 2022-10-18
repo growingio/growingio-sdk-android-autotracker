@@ -28,7 +28,7 @@ import com.growingio.android.sdk.track.log.Logger;
  */
 class ApmLogger implements ILogger {
 
-    private static final String TAG = "TRACKER-AMP";
+    private static final String TAG = "TRACKER-APM";
 
     @Override
     public boolean isEnabled(int i) {
