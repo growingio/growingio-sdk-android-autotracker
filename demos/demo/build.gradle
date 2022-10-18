@@ -98,8 +98,6 @@ dependencies {
     implementation project(':demo-core')
     implementation project(":demo-autotrack")
 
-    implementation project(":growingio-advert")
-
     debugImplementation project(":growingio-tools:oaid")
     releaseImplementation libraries.growingio.oaid
 
