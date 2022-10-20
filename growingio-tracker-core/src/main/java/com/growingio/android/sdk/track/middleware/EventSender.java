@@ -188,13 +188,13 @@ public class EventSender {
     }
 
     /**
-     * 发送事件
+     * 发送事件，为了保证单进程发送数据，获取进程锁后不再释放 mProcessLock.release();
      *
      * @param onlyInstant true -- 仅发送实时消息
      */
     void sendEvents(boolean onlyInstant) {
         if (!mProcessLock.isAcquired()) {
-            Logger.e(TAG, "sendEvents: this process can not get lock");
+            Logger.w(TAG, "sdk sendEvents will in main process,not in sub process.");
             return;
         }
 
@@ -237,8 +237,6 @@ public class EventSender {
                 }
             } while (succeeded);
         }
-
-        mProcessLock.release();
     }
 
 
