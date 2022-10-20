@@ -237,6 +237,8 @@ public class EventSender {
                 }
             } while (succeeded);
         }
+
+        mProcessLock.release();
     }
 
 
