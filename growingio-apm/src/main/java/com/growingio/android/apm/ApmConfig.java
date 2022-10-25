@@ -18,6 +18,8 @@ package com.growingio.android.apm;
 
 import com.growingio.android.sdk.Configurable;
 
+import java.util.Map;
+
 /**
  * <p>
  *
@@ -62,10 +64,16 @@ public class ApmConfig implements Configurable {
         return this;
     }
 
+    @Deprecated
     public boolean isFragmentSystemLifecycleTracing() {
         return fragmentSystemLifecycleTracing;
     }
 
+    /**
+     * don't suggest use System Fragment.
+     * @deprecated Use {@link #setFragmentXLifecycleTracing(boolean)}
+     */
+    @Deprecated
     public ApmConfig setFragmentSystemLifecycleTracing(boolean fragmentSystemLifecycleTracing) {
         this.fragmentSystemLifecycleTracing = fragmentSystemLifecycleTracing;
         return this;

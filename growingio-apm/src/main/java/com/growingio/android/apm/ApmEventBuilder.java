@@ -50,17 +50,19 @@ public class ApmEventBuilder {
             return errorBuilder(title, message);
         } else if (breadcrumb.getType().equals(Breadcrumb.TYPE_PERFORMANCE)) {
             if (equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_APP)) {
-                boolean isCold = true;
-                Object isColdObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_APP_COLD);
-                if (isColdObj != null) {
-                    isCold = (boolean) isColdObj;
-                }
-                long duration = 0L;
-                Object durationObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_DURATION);
-                if (durationObj != null) {
-                    duration = (long) durationObj;
-                }
-                return appStartBuilder(isCold, duration);
+                // ignore app_start_interval
+                return null;
+//                boolean isCold = true;
+//                Object isColdObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_APP_COLD);
+//                if (isColdObj != null) {
+//                    isCold = (boolean) isColdObj;
+//                }
+//                long duration = 0L;
+//                Object durationObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_DURATION);
+//                if (durationObj != null) {
+//                    duration = (long) durationObj;
+//                }
+//                return appStartBuilder(isCold, duration);
             } else if (equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_ACTIVITY)) {
                 String name = String.valueOf(breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_PAGE_NAME));
                 long duration = 0L;
@@ -69,7 +71,17 @@ public class ApmEventBuilder {
                     duration = (long) durationObj;
                 }
                 if (breadcrumb.getData().containsKey(Breadcrumb.ATTR_PERFORMANCE_APP_COLD)) {
-                    return pageStartBuilderWithHot(name, duration);
+                    boolean isCold = true;
+                    Object isColdObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_APP_COLD);
+                    if (isColdObj != null) {
+                        isCold = (boolean) isColdObj;
+                    }
+                    long appDuration = 0L;
+                    Object appDurationObj = breadcrumb.getData().get(Breadcrumb.ATTR_PERFORMANCE_APP_DURATION);
+                    if (appDurationObj != null) {
+                        appDuration = (long) appDurationObj;
+                    }
+                    return pageStartBuilderWithHot(name, duration, isCold, appDuration);
                 }
                 return pageStartBuilder(name, duration);
             } else if (equals(breadcrumb.getCategory(), Breadcrumb.CATEGORY_PERFORMANCE_FRAGMENT)) {
@@ -116,12 +128,17 @@ public class ApmEventBuilder {
                 .setAttributes(hashMap);
     }
 
-    private static CustomEvent.Builder pageStartBuilderWithHot(String pageName, long pageDuration) {
+    private static CustomEvent.Builder pageStartBuilderWithHot(String pageName, long pageDuration, boolean isCold, long appDuration) {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(EVENT_PAGE_NAME, pageName);
         hashMap.put(EVENT_PAGE_DURATION, String.valueOf(pageDuration));
-        hashMap.put(EVENT_WARM_REBOOT, "true");
-        hashMap.put(EVENT_WARM_REBOOT_TIME, String.valueOf(pageDuration));
+        if (isCold) {
+            hashMap.put(EVENT_COLD_REBOOT, "true");
+            hashMap.put(EVENT_COLD_REBOOT_TIME, String.valueOf(appDuration));
+        } else {
+            hashMap.put(EVENT_WARM_REBOOT, "true");
+            hashMap.put(EVENT_WARM_REBOOT_TIME, String.valueOf(appDuration == 0L ? pageDuration : appDuration));
+        }
         return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
                 .setAttributes(hashMap);
     }
