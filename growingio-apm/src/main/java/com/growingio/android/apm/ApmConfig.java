@@ -18,8 +18,6 @@ package com.growingio.android.apm;
 
 import com.growingio.android.sdk.Configurable;
 
-import java.util.Map;
-
 /**
  * <p>
  *
