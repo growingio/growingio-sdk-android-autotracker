@@ -28,6 +28,7 @@ import android.webkit.WebView;
 
 import androidx.annotation.RequiresApi;
 
+import com.growingio.android.advert.AdvertLibraryGioModule;
 import com.growingio.android.apm.ApmLibraryGioModule;
 import com.growingio.android.oaid.OaidLibraryGioModule;
 import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
@@ -88,10 +89,12 @@ public class DemoApplication extends Application {
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setDataCollectionEnabled(true)
+                    .setIdMappingEnabled(true)
                     //.setRequireAppProcessesEnabled(true)
                     .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.REENGAGE))
                     .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
                     //.addConfiguration(oaidConfig)
+                    .addPreloadComponent(new AdvertLibraryGioModule())
                     .addPreloadComponent(new ApmLibraryGioModule())
                     .addPreloadComponent(new OaidLibraryGioModule());
         }
