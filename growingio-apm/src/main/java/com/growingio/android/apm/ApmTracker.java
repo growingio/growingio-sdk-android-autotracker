@@ -21,6 +21,7 @@ import com.growingio.android.gmonitor.event.Breadcrumb;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.log.CircularFifoQueue;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
@@ -30,7 +31,7 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
  *
  * @author cpacm 2022/9/27
  */
-class ApmTracker implements ITracker {
+class ApmTracker implements ITracker, OnConfigurationChangeListener {
 
     private final CircularFifoQueue<Breadcrumb> caches = new CircularFifoQueue<>(100);
 
@@ -61,5 +62,12 @@ class ApmTracker implements ITracker {
     @Override
     public ITracker clone() {
         return new ApmTracker();
+    }
+
+    @Override
+    public void onDataCollectionChanged(boolean isEnable) {
+        if (isEnable) {
+            releaseCaches();
+        }
     }
 }

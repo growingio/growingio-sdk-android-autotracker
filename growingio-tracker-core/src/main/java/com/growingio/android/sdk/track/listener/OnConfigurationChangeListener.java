@@ -14,25 +14,15 @@
  *   limitations under the License.
  */
 
-package com.growingio.android.sdk.track.middleware.advert;
-
-import android.net.Uri;
+package com.growingio.android.sdk.track.listener;
 
 /**
  * <p>
- * try send Activate Event.
- *
- * @author cpacm 5/17/21
+ *     configuration change listener
+ * @author cpacm 2022/10/26
  */
-public class Activate {
+public interface OnConfigurationChangeListener {
 
-    final Uri uri;
+    void onDataCollectionChanged(boolean isEnable);
 
-    public Activate(Uri uri) {
-        this.uri = uri;
-    }
-
-    public Uri getUri() {
-        return uri;
-    }
 }

@@ -63,7 +63,10 @@ public class ApmDataLoader implements ModelLoader<EventApm, Void> {
                 option.setEnableAnr(apmConfig.isAnrTracing());
                 option.setAnrTimeoutIntervalMillis(apmConfig.getAnrTimeoutIntervalMillis());
 
-                GMonitor.init(context, new ApmLogger(), option, new ApmTracker());
+                ApmTracker apmTracker = new ApmTracker();
+                ConfigurationProvider.get().addConfigurationListener(apmTracker);
+
+                GMonitor.init(context, new ApmLogger(), option, apmTracker);
             }
         }
 

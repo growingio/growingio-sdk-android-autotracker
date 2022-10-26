@@ -191,10 +191,10 @@ public class Tracker {
                     Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
                 } else {
                     ConfigurationProvider.core().setDataCollectionEnabled(enabled);
+                    // use for modules
+                    ConfigurationProvider.get().onDataCollectionChanged(enabled);
                     if (enabled) {
                         SessionProvider.get().generateVisit();
-                        // check app whether activated
-                        TrackerContext.get().executeData(new Activate(null, true), Activate.class, AdvertResult.class);
                     } else {
                         TimerCenter.get().clearTimer();
                     }

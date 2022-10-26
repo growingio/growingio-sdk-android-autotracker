@@ -20,6 +20,8 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.track.listener.ListenerDispatcher;
+import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ConstantPool;
@@ -29,7 +31,7 @@ import com.growingio.android.sdk.track.utils.ThreadUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ConfigurationProvider {
+public class ConfigurationProvider extends ListenerDispatcher<OnConfigurationChangeListener> {
     private static final String TAG = "ConfigurationProvider";
     private final CoreConfiguration mCoreConfiguration;
     private final Map<Class<? extends Configurable>, Configurable> sModuleConfigs = new HashMap<>();
@@ -63,6 +65,7 @@ public class ConfigurationProvider {
         if (coreConfiguration.isDebugEnabled()) {
             Logger.addLogger(new DebugLogger());
         }
+        mListeners.clear();
     }
 
     public static ConfigurationProvider get() {
@@ -116,5 +119,24 @@ public class ConfigurationProvider {
 
     public static CoreConfiguration core() {
         return get().mCoreConfiguration;
+    }
+
+
+    public void addConfigurationListener(OnConfigurationChangeListener listener) {
+        register(listener);
+    }
+
+    public void removeConfigurationListener(OnConfigurationChangeListener listener) {
+        unregister(listener);
+    }
+
+    public void onDataCollectionChanged(boolean enable) {
+        synchronized (mListeners) {
+            for (OnConfigurationChangeListener listener : mListeners) {
+                if (null != listener) {
+                    listener.onDataCollectionChanged(enable);
+                }
+            }
+        }
     }
 }
