@@ -191,13 +191,13 @@ public class Tracker {
                     Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
                 } else {
                     ConfigurationProvider.core().setDataCollectionEnabled(enabled);
-                    // use for modules
-                    ConfigurationProvider.get().onDataCollectionChanged(enabled);
                     if (enabled) {
                         SessionProvider.get().generateVisit();
                     } else {
                         TimerCenter.get().clearTimer();
                     }
+                    // use for modules
+                    ConfigurationProvider.get().onDataCollectionChanged(enabled);
                 }
             }
         });
