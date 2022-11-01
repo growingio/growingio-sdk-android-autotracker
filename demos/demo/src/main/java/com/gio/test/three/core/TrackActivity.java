@@ -45,12 +45,12 @@ public class TrackActivity extends Activity {
     private static final String SET_LOCATION = "设置位置";
     private static final String CLOSE_DATA_COLLECTION = "关闭数据收集";
     private static final String OPEN_DATA_COLLECTION = "开启数据收集";
-    private static final String Track_Timer_Start = "start timer";
-    private static final String Track_Timer_Pause = "pause timerId";
-    private static final String Track_Timer_Resume = "resume timerId";
-    private static final String Track_Timer_End = "end timerId";
-    private static final String Remove_Timer = "remove timer";
-    private static final String Clear_Track_Timer = "clear all timer";
+    private static final String TRACK_TIMER_START = "start timer";
+    private static final String TRACK_TIMER_PAUSE = "pause timerId";
+    private static final String TRACK_TIMER_RESUME = "resume timerId";
+    private static final String TRACK_TIMER_END = "end timerId";
+    private static final String REMOVE_TIMER = "remove timer";
+    private static final String CLEAR_TRACK_TIMER = "clear all timer";
     private String timerId1 = "";
     private String timerId2 = "";
 
@@ -62,12 +62,12 @@ public class TrackActivity extends Activity {
             SET_LOCATION,
             OPEN_DATA_COLLECTION,
             CLOSE_DATA_COLLECTION,
-            Track_Timer_Start,
-            Track_Timer_Pause,
-            Track_Timer_Resume,
-            Track_Timer_End,
-            Remove_Timer,
-            Clear_Track_Timer
+            TRACK_TIMER_START,
+            TRACK_TIMER_PAUSE,
+            TRACK_TIMER_RESUME,
+            TRACK_TIMER_END,
+            REMOVE_TIMER,
+            CLEAR_TRACK_TIMER
     };
 
     @Override
@@ -122,7 +122,7 @@ public class TrackActivity extends Activity {
             case CLOSE_DATA_COLLECTION:
                 GrowingAutotracker.get().setDataCollectionEnabled(false);
                 break;
-            case Track_Timer_Start:
+            case TRACK_TIMER_START:
                 timerId1 = GrowingAutotracker.get().trackTimerStart("event_1");
                 timerId2 = GrowingAutotracker.get().trackTimerStart("event_2");
                 GrowingAutotracker.get().trackTimerStart("event_3");
@@ -130,13 +130,13 @@ public class TrackActivity extends Activity {
                 GrowingAutotracker.get().trackTimerStart("event_5");
                 GrowingAutotracker.get().trackTimerStart("event_6");
                 break;
-            case Track_Timer_Pause:
+            case TRACK_TIMER_PAUSE:
                 GrowingAutotracker.get().trackTimerPause(timerId1);
                 break;
-            case Track_Timer_Resume:
+            case TRACK_TIMER_RESUME:
                 GrowingAutotracker.get().trackTimerResume(timerId1);
                 break;
-            case Track_Timer_End:
+            case TRACK_TIMER_END:
                 Map<String, String> map2 = new HashMap<>();
                 map2.put("name", "June");
                 map2.put("age", "12");
@@ -162,10 +162,10 @@ public class TrackActivity extends Activity {
                 GrowingAutotracker.get().trackTimerEnd(timerId2, map3);
 
                 break;
-            case Remove_Timer:
+            case REMOVE_TIMER:
                 GrowingAutotracker.get().removeTimer(timerId1);
                 break;
-            case Clear_Track_Timer:
+            case CLEAR_TRACK_TIMER:
                 GrowingAutotracker.get().clearTrackTimer();
                 break;
             default:
