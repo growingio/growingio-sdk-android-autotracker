@@ -117,13 +117,13 @@ public class ViewNode {
 
     public ViewNode appendNode(View view) {
         if (mView instanceof ViewGroup) {
-            return appendNode(view, ((ViewGroup) mView).indexOfChild(view));
+            return appendNode(view, ((ViewGroup) mView).indexOfChild(view), false);
         }
 
         return this;
     }
 
-    public ViewNode appendNode(View view, int index) {
+    public ViewNode appendNode(View view, int index, boolean calculatePage) {
         boolean hasListParent = mHasListParent || ClassExistHelper.isListView(view);
         return ViewNodeBuilder.newViewNode()
                 .setView(view)
@@ -135,6 +135,7 @@ public class ViewNode {
                 .setPrefixPage(mPrefixPage)
                 .setViewPosition(index)
                 .needRecalculate(true)
+                .needCalculatePage(calculatePage)
                 .build();
     }
 
@@ -149,6 +150,7 @@ public class ViewNode {
         private int mIndex;
 
         private boolean mNeedRecalculate = false;
+        private boolean mNeedCalculatePage = false;
         private int mViewPosition;
 
         private ViewNodeBuilder() {
@@ -160,6 +162,11 @@ public class ViewNode {
 
         public ViewNodeBuilder needRecalculate(boolean needRecalculate) {
             this.mNeedRecalculate = needRecalculate;
+            return this;
+        }
+
+        public ViewNodeBuilder needCalculatePage(boolean needCalculatePage) {
+            this.mNeedCalculatePage = needCalculatePage;
             return this;
         }
 
@@ -263,7 +270,13 @@ public class ViewNode {
                 mXPath = mOriginalXPath;
                 return;
             } else if (page != null) {
-                mOriginalXPath = "/Page";
+                // 圈选为bfs，需要考虑page是否被忽略
+                // 点击为dfs，计算时所有page均为忽略
+                if (mNeedCalculatePage && !page.isIgnored()) {
+                    mOriginalXPath = "/Page";
+                } else {
+                    mOriginalXPath = mPrefixPage + "/" + page.getName();
+                }
                 mXPath = mOriginalXPath;
                 mPrefixPage = mOriginalXPath;
                 return;
