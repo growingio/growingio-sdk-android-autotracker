@@ -105,7 +105,7 @@ public class ViewClickEventsTest extends EventsTest {
         scenario.close();
     }
 
-    @Test
+/*    @Test
     public void spinnerClickEventTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
@@ -138,7 +138,7 @@ public class ViewClickEventsTest extends EventsTest {
         Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
-    }
+    }*/
 
     @Test
     public void checkBoxClickEventTest() {
