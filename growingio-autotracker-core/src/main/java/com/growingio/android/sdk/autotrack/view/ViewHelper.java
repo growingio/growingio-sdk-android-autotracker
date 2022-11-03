@@ -200,13 +200,15 @@ public class ViewHelper {
                 Page<?> page = ViewAttributeUtil.getViewPage(parent);
                 // 找到page直接迭代page
                 if (page != null) {
+                    View pageView = parent;
                     do {
-                        viewTreeList.add(page.getView());
+                        viewTreeList.add(pageView);
                         if (!page.isIgnored()) {
                             break;
                         }
                         page = page.getParent();
-                    } while (page != null);
+                        pageView = page.getView();
+                    } while (page != null && pageView != null);
                     break;
                 } else {
                     viewTreeList.add(parent);
