@@ -3,9 +3,9 @@
 buildscript {
     ext {
         buildConfiguration = [
-                compileVersion     : 32,
+                compileVersion     : 30,
                 minSdkVersion      : 17,
-                targetSdkVersion   : 32,
+                targetSdkVersion   : 30,
                 sourceCompatibility: JavaVersion.VERSION_1_8,
                 targetCompatibility: JavaVersion.VERSION_1_8,
         ]
