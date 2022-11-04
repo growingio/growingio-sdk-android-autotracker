@@ -207,7 +207,9 @@ public class ViewHelper {
                             break;
                         }
                         page = page.getParent();
-                        pageView = page.getView();
+                        if (page != null) {
+                            pageView = page.getView();
+                        }
                     } while (page != null && pageView != null);
                     break;
                 } else {
