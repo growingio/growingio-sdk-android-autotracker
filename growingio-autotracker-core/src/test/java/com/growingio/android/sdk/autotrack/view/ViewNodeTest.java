@@ -75,7 +75,7 @@ public class ViewNodeTest {
         Truth.assertThat(viewNode.getNodeType()).isEqualTo("TEXT");
         Truth.assertThat(viewNode.getClickableParentXPath()).isNull();
         Truth.assertThat(viewNode.getIndex()).isEqualTo(-1);
-        ViewNode newNode = viewNode.appendNode(activity.getImageView(), 0);
+        ViewNode newNode = viewNode.appendNode(activity.getImageView(), 0, true);
         Truth.assertThat(newNode.getXPath()).endsWith("/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]/ImageView[0]");
 
         RecyclerView recyclerView = activity.getRecyclerView();
