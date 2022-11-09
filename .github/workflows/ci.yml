@@ -45,7 +45,7 @@ jobs:
       - name: Run Gradle command
         run: |
           bash ./gradle/publishAllToMavenLocal.sh
-#          bash ./config/checkstyle/checkstyle.sh
+          bash ./config/checkstyle/checkstyle.sh
 #          ./gradlew lint
 #          ./gradlew assembleDebug
 
@@ -84,4 +84,3 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./demos/demo/build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml
-
