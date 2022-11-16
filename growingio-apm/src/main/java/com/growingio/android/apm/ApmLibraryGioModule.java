@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package com.growingio.android.crash;
+package com.growingio.android.apm;
 
 import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.track.middleware.apm.EventApm;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
  * <p>
  *
- * @author cpacm 5/19/21
+ * @author cpacm 4/28/21
  */
-@GIOLibraryModule(config = CrashConfig.class)
-public class CrashLibraryGioModule extends LibraryGioModule {
+@GIOLibraryModule
+public class ApmLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
-        //registry.register(Crash::class.java, Void::class.java, CrashDataLoader.Factory(context))
-        //just start
-        CrashConfig crashConfig = getConfiguration(CrashConfig.class);
-        if (crashConfig == null) {
-            crashConfig = new CrashConfig();
-        }
-        new CrashDataLoader.Factory(context, crashConfig.getCrashDsn(), crashConfig.getCrashAlias()).build();
-
+        registry.register(EventApm.class, Void.class, new ApmDataLoader.Factory(context));
     }
 }

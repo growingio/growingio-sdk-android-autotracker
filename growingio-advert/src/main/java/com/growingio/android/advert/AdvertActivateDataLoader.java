@@ -19,6 +19,7 @@ package com.growingio.android.advert;
 import android.app.Activity;
 
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.middleware.advert.Activate;
 import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
@@ -32,13 +33,28 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
  *
  * @author cpacm 2022/8/2
  */
-public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertResult> {
+public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertResult>, OnConfigurationChangeListener {
+
+    AdvertActivateDataLoader() {
+        ConfigurationProvider.get().addConfigurationListener(this);
+    }
+
     @Override
     public LoadData<AdvertResult> buildLoadData(Activate activate) {
         return new LoadData<>(new ActivateDataFetcher(activate));
     }
 
+    @Override
+    public void onDataCollectionChanged(boolean isEnable) {
+        // check app whether activated
+        if (isEnable) {
+            ActivateDataFetcher fetcher = new ActivateDataFetcher(null);
+            fetcher.checkActivateStatus(null);
+        }
+    }
+
     public static class Factory implements ModelLoaderFactory<Activate, AdvertResult> {
+
         @Override
         public ModelLoader<Activate, AdvertResult> build() {
             return new AdvertActivateDataLoader();
@@ -56,7 +72,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         @Override
         public AdvertResult executeData() {
             Activity activity = ActivityStateProvider.get().getForegroundActivity();
-            if (activity != null || activate.isDataSwitch()) {
+            if (activity != null) {
                 checkActivateStatus(activity);
             }
             return new AdvertResult();
@@ -71,7 +87,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
          * 发送激活事件(ui主线程)
          * 剪贴板数据受隐私政策影响，支持隐私政策不申明时禁止读取剪切板数据
          */
-        private void checkActivateStatus(Activity activity) {
+        void checkActivateStatus(Activity activity) {
             if (!ConfigurationProvider.core().isDataCollectionEnabled()) {
                 return;
             }

@@ -27,8 +27,11 @@ import android.widget.ListView;
 import com.gio.test.R;
 import com.gio.test.three.ModuleEntry;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-
+import com.growingio.android.sdk.track.events.CustomEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ModuleEntry("埋点SDK测试")
@@ -38,10 +41,18 @@ public class TrackActivity extends Activity {
     private static final String TRACK_CUSTOM_EVENT = "TrackCustomEvent";
     private static final String SET_USER_ID_ZHANGSAN = "设置账号为张三";
     private static final String SET_USER_ID_NULL = "清除账号设置";
-    private static final String SET_USER_ID_LISI = "设置账号为李四";
+    private static final String SET_USER_ID_LISI = "设置账号为李四,手机号";
     private static final String SET_LOCATION = "设置位置";
     private static final String CLOSE_DATA_COLLECTION = "关闭数据收集";
     private static final String OPEN_DATA_COLLECTION = "开启数据收集";
+    private static final String TRACK_TIMER_START = "start timer";
+    private static final String TRACK_TIMER_PAUSE = "pause timerId";
+    private static final String TRACK_TIMER_RESUME = "resume timerId";
+    private static final String TRACK_TIMER_END = "end timerId";
+    private static final String REMOVE_TIMER = "remove timer";
+    private static final String CLEAR_TRACK_TIMER = "clear all timer";
+    private String timerId1 = "";
+    private String timerId2 = "";
 
     private static final String[] ITEMS = {
             TRACK_CUSTOM_EVENT,
@@ -50,7 +61,13 @@ public class TrackActivity extends Activity {
             SET_USER_ID_LISI,
             SET_LOCATION,
             OPEN_DATA_COLLECTION,
-            CLOSE_DATA_COLLECTION
+            CLOSE_DATA_COLLECTION,
+            TRACK_TIMER_START,
+            TRACK_TIMER_PAUSE,
+            TRACK_TIMER_RESUME,
+            TRACK_TIMER_END,
+            REMOVE_TIMER,
+            CLEAR_TRACK_TIMER
     };
 
     @Override
@@ -94,7 +111,7 @@ public class TrackActivity extends Activity {
                 GrowingAutotracker.get().cleanLoginUserId();
                 break;
             case SET_USER_ID_LISI:
-                GrowingAutotracker.get().setLoginUserId("lisi");
+                GrowingAutotracker.get().setLoginUserId("lisi", "123456789asd");
                 break;
             case SET_LOCATION:
                 GrowingAutotracker.get().setLocation(100.0, 100.0);
@@ -104,6 +121,52 @@ public class TrackActivity extends Activity {
                 break;
             case CLOSE_DATA_COLLECTION:
                 GrowingAutotracker.get().setDataCollectionEnabled(false);
+                break;
+            case TRACK_TIMER_START:
+                timerId1 = GrowingAutotracker.get().trackTimerStart("event_1");
+                timerId2 = GrowingAutotracker.get().trackTimerStart("event_2");
+                GrowingAutotracker.get().trackTimerStart("event_3");
+                GrowingAutotracker.get().trackTimerStart("event_4");
+                GrowingAutotracker.get().trackTimerStart("event_5");
+                GrowingAutotracker.get().trackTimerStart("event_6");
+                break;
+            case TRACK_TIMER_PAUSE:
+                GrowingAutotracker.get().trackTimerPause(timerId1);
+                break;
+            case TRACK_TIMER_RESUME:
+                GrowingAutotracker.get().trackTimerResume(timerId1);
+                break;
+            case TRACK_TIMER_END:
+                Map<String, String> map2 = new HashMap<>();
+                map2.put("name", "June");
+                map2.put("age", "12");
+                GrowingAutotracker.get().trackTimerEnd(timerId1, map2);
+
+                List<String> list1 = new ArrayList<>();
+                list1.add("aaaa");
+                list1.add("bbbb");
+                Map<String, String> map3 = CustomEvent.AttributesBuilder.getAttributesBuilder()
+                        .addAttribute("key1", "value1")
+                        .addAttribute("key2", Arrays.asList(1, 2, 3, 4))
+                        .addAttribute(null, "value3")
+                        .addAttribute(null, Arrays.asList(5, 4, 3, 2))
+                        .addAttribute("key5", Arrays.asList())
+                        .addAttribute(null, (List) null)
+                        .addAttribute(null, (String) null)
+                        .addAttribute("key8", "value8")
+                        .addAttribute("key9", list1)
+                        .addAttribute("", Arrays.asList("", ""))
+                        .addAttribute("key10", Arrays.asList(null, "1"))
+                        .getAttributes();
+
+                GrowingAutotracker.get().trackTimerEnd(timerId2, map3);
+
+                break;
+            case REMOVE_TIMER:
+                GrowingAutotracker.get().removeTimer(timerId1);
+                break;
+            case CLEAR_TRACK_TIMER:
+                GrowingAutotracker.get().clearTrackTimer();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + itemString);

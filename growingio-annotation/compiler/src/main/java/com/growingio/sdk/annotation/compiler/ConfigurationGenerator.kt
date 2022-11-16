@@ -18,6 +18,7 @@ package com.growingio.sdk.annotation.compiler
 import com.growingio.sdk.annotation.GIOAppModule
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_CONFIGURABLE
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_CONFIGURATION
+import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_LIBRARY_MODULE
 import com.squareup.javapoet.*
 import java.lang.StringBuilder
 import java.util.*
@@ -108,6 +109,11 @@ internal class ConfigurationGenerator(
                 Modifier.PRIVATE,
                 Modifier.FINAL
             )
+        val libraryModuleClass = ClassName.get(
+            processEnv.elementUtils.getTypeElement(
+                GIO_DEFAULT_LIBRARY_MODULE
+            )
+        )
         //private final Map<Class<? extends Configurable>, Configurable> MODULE_CONFIGURATIONS = new HashMap<>();
         val configurable = processEnv.elementUtils.getTypeElement(GIO_DEFAULT_CONFIGURABLE)
         val configurableClass = ClassName.get(configurable)
@@ -128,6 +134,13 @@ internal class ConfigurationGenerator(
             .addMethod(generateCore(coreConfigurationClass))
             .addMethod(generateGetConfigModules(mapOfConfigAndClass))
             .addMethod(generateAddConfiguration(generateClass, configurableClass))
+            .addMethod(
+                generateAddModuleWithConfiguration(
+                    generateClass,
+                    libraryModuleClass,
+                    configurableClass,
+                )
+            )
             .addMethod(generateGetConfiguration())
 
         methodMap.clear()
@@ -213,7 +226,29 @@ internal class ConfigurationGenerator(
         val addMethod = MethodSpec.methodBuilder("addConfiguration")
             .addParameter(config, "config")
             .addModifiers(Modifier.PUBLIC)
+            .addAnnotation(
+                AnnotationSpec.builder(java.lang.Deprecated::class.java)
+                    .build()
+            )
             .beginControlFlow("if (config != null)")
+            .addStatement("MODULE_CONFIGURATIONS.put(config.getClass(), config)")
+            .endControlFlow()
+            .returns(generateClass)
+            .addStatement("return this")
+        return addMethod.build()
+    }
+
+    private fun generateAddModuleWithConfiguration(
+        generateClass: ClassName,
+        libraryModule: ClassName,
+        config: ClassName
+    ): MethodSpec {
+        val addMethod = MethodSpec.methodBuilder("addPreloadComponent")
+            .addParameter(libraryModule, "module")
+            .addParameter(config, "config")
+            .addModifiers(Modifier.PUBLIC)
+            .beginControlFlow("if (module != null && config != null)")
+            .addStatement("coreConfiguration.addPreloadComponent(module)")
             .addStatement("MODULE_CONFIGURATIONS.put(config.getClass(), config)")
             .endControlFlow()
             .returns(generateClass)

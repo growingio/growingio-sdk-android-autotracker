@@ -19,28 +19,14 @@ package com.growingio.android.advert;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
-import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.URLDecoder;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <p>

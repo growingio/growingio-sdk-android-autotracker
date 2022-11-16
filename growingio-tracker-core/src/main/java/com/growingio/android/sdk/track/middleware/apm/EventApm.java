@@ -14,25 +14,13 @@
  *   limitations under the License.
  */
 
-package com.growingio.android.sdk.track.middleware.advert;
-
-import android.net.Uri;
+package com.growingio.android.sdk.track.middleware.apm;
 
 /**
  * <p>
- * try send Activate Event.
  *
- * @author cpacm 5/17/21
+ * @author cpacm 2022/9/27
  */
-public class Activate {
+public class EventApm {
 
-    final Uri uri;
-
-    public Activate(Uri uri) {
-        this.uri = uri;
-    }
-
-    public Uri getUri() {
-        return uri;
-    }
 }

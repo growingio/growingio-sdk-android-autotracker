@@ -114,7 +114,17 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     }
 
     public void postEventToTrackMain(final BaseEvent.BaseBuilder<?> eventBuilder) {
-        postActionToTrackMain(new Runnable() {
+        postActionToTrackMain(buildEventSendRunnable(eventBuilder));
+    }
+
+    /**
+     * generate event send runnable
+     *
+     * @param eventBuilder the event whether to be send
+     * @return runnable
+     */
+    public Runnable buildEventSendRunnable(final BaseEvent.BaseBuilder<?> eventBuilder) {
+        return new Runnable() {
             @Override
             public void run() {
                 if (eventBuilder == null) {
@@ -125,7 +135,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
                     onGenerateGEvent(eventBuilder);
                 }
             }
-        });
+        };
     }
 
     /**
