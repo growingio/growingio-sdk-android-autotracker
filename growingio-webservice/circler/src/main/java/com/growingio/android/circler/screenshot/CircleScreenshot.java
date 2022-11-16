@@ -193,7 +193,7 @@ public class CircleScreenshot {
                 ViewGroup viewGroup = (ViewGroup) viewNode.getView();
                 if (viewGroup.getChildCount() > 0) {
                     for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                        ViewNode childViewNode = viewNode.appendNode(viewGroup.getChildAt(index), index);
+                        ViewNode childViewNode = viewNode.appendNode(viewGroup.getChildAt(index), index, true);
                         traverseViewNode(childViewNode);
                     }
                 }
