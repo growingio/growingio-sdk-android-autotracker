@@ -191,23 +191,29 @@ public class ViewHelper {
             viewTreeList = new ArrayList<>(8);
         }
         View parent = view;
-        boolean findPage = false;
         do {
+            // 存在 customId直接截断整个viewTree
             if (ViewAttributeUtil.getCustomId(parent) != null) {
                 viewTreeList.add(parent);
                 break;
             } else {
                 Page<?> page = ViewAttributeUtil.getViewPage(parent);
+                // 找到page直接迭代page
                 if (page != null) {
-                    findPage = true;
-                    viewTreeList.add(parent);
-                    if (!page.isIgnored()) {
-                        break;
-                    }
+                    View pageView = parent;
+                    do {
+                        viewTreeList.add(pageView);
+                        if (!page.isIgnored()) {
+                            break;
+                        }
+                        page = page.getParent();
+                        if (page != null) {
+                            pageView = page.getView();
+                        }
+                    } while (page != null && pageView != null);
+                    break;
                 } else {
-                    if (!findPage) {
-                        viewTreeList.add(parent);
-                    }
+                    viewTreeList.add(parent);
                 }
 
                 if (parent.getParent() instanceof View) {
