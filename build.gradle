@@ -11,10 +11,10 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.4.3",
-                releaseVersionCode: 30403,
+                releaseVersion    : "3.4.4",
+                releaseVersionCode: 30404,
 
-                pluginVersion     : "3.4.2",
+                pluginVersion     : "3.4.4",
         ]
 
         versions = [
@@ -75,7 +75,7 @@ buildscript {
 
                         'apm'             : "com.growingio.android:apm:$releaseConfiguration.releaseVersion",
                         'snappy'          : "com.growingio.android:snappy:1.1.0",
-                        'gmonitor'        : 'com.growingio.android:gmonitor:2.0.0-SNAPSHOT',
+                        'gmonitor'        : 'com.growingio.android:gmonitor:2.0.0',
                 ],
 
                 'google'   : [
