@@ -67,7 +67,7 @@ public class ClassExistHelper {
     private ClassExistHelper() {
     }
 
-    private static boolean hasClass(String className) {
+    public static boolean hasClass(String className) {
         try {
             Class.forName(className);
             return true;

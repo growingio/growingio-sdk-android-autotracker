@@ -27,23 +27,12 @@ import android.net.Uri;
 public class Activate {
 
     final Uri uri;
-    final boolean dataSwitch;
 
     public Activate(Uri uri) {
         this.uri = uri;
-        this.dataSwitch = false;
-    }
-
-    public Activate(Uri uri, boolean dataSwitch) {
-        this.uri = uri;
-        this.dataSwitch = dataSwitch;
     }
 
     public Uri getUri() {
         return uri;
-    }
-
-    public boolean isDataSwitch() {
-        return dataSwitch;
     }
 }

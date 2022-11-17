@@ -17,6 +17,7 @@
 package com.growingio.android.advert;
 
 import android.app.Application;
+import android.app.ListActivity;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -25,6 +26,7 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.middleware.advert.Activate;
 import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,8 +55,8 @@ public class ActivateTest {
         boolean isActivated = AdvertUtils.isDeviceActivated();
         Truth.assertThat(isActivated).isFalse();
 
-        TrackerContext.get().executeData(new Activate(null, true), Activate.class, AdvertResult.class);
-
+        ActivityStateProvider.get().onActivityCreated(new ListActivity(), null);
+        TrackerContext.get().executeData(new Activate(null), Activate.class, AdvertResult.class);
         Truth.assertThat(AdvertUtils.isDeviceActivated()).isTrue();
 
     }

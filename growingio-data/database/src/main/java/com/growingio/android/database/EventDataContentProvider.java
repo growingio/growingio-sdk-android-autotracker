@@ -28,6 +28,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
+import com.growingio.android.sdk.track.utils.ClassExistHelper;
+
 public class EventDataContentProvider extends ContentProvider {
 
     public static final String CONTENT_PROVIDER_NAME = "EventDataContentProvider";
@@ -47,10 +49,17 @@ public class EventDataContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        trackAppStart();
         String eventsInfoAuthority = this.getContext().getPackageName() + "." + CONTENT_PROVIDER_NAME;
         MATCHER.addURI(eventsInfoAuthority, TABLE_EVENTS, EVENT_DATA_CODE);
         this.dbHelper = new EventDataSQLiteOpenHelper(this.getContext());
         return true;
+    }
+
+    private void trackAppStart() {
+        if (ClassExistHelper.hasClass("com.growingio.android.gmonitor.GMonitor")) {
+            com.growingio.android.gmonitor.GMonitor.appStart();
+        }
     }
 
 

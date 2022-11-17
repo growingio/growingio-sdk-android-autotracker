@@ -105,7 +105,7 @@ public class ViewClickEventsTest extends EventsTest {
         scenario.close();
     }
 
-    @Test
+/*    @Test
     public void spinnerClickEventTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
@@ -138,7 +138,7 @@ public class ViewClickEventsTest extends EventsTest {
         Awaiter.untilTrue(receivedEvent);
 
         scenario.close();
-    }
+    }*/
 
     @Test
     public void checkBoxClickEventTest() {
@@ -506,7 +506,7 @@ public class ViewClickEventsTest extends EventsTest {
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPath("/NestedFragmentActivity/GreenFragment[fragment1]/OrangeFragment[TestTag]")
-                        .setXpath("/Page/TextView[0]#fragment_title")
+                        .setXpath("/Page/RedFragment[small]/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
                         .build()
@@ -530,7 +530,7 @@ public class ViewClickEventsTest extends EventsTest {
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPath("/NestedFragmentActivity/GreenFragment[fragment1]")
-                        .setXpath("/Page/TextView[0]#fragment_title")
+                        .setXpath("/Page/OrangeFragment[TestTag]/RedFragment[small]/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
                         .build()
@@ -554,7 +554,7 @@ public class ViewClickEventsTest extends EventsTest {
                 receivedEvent,
                 new ViewElementEvent.Builder()
                         .setPath("/NestedFragmentActivity")
-                        .setXpath("/Page/TextView[0]#fragment_title")
+                        .setXpath("/Page/GreenFragment[fragment1]/OrangeFragment[TestTag]/RedFragment[small]/TextView[0]#fragment_title")
                         .setTextValue("small RedFragment")
                         .setIndex(-1)
                         .build()

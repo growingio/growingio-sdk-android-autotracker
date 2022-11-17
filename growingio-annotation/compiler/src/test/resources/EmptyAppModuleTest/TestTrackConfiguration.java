@@ -18,7 +18,12 @@ package com.growingio.android.sdk.test;
 
 import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.track.events.EventFilterInterceptor;
+import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
+import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.sdk.annotation.compiler.sample.EmptyConfig;
+
 import java.util.HashMap;
 
 /**
@@ -33,7 +38,7 @@ public final class TestTrackConfiguration {
     private final HashMap<Class<? extends Configurable>, Configurable> MODULE_CONFIGURATIONS = new HashMap<Class<? extends Configurable>, Configurable>();
 
     public TestTrackConfiguration(String projectId, String urlScheme) {
-        this.coreConfiguration = new CoreConfiguration(projectId,urlScheme);
+        this.coreConfiguration = new CoreConfiguration(projectId, urlScheme);
         addConfiguration(new EmptyConfig());
     }
 
@@ -45,8 +50,17 @@ public final class TestTrackConfiguration {
         return MODULE_CONFIGURATIONS;
     }
 
+    @Deprecated
     public TestTrackConfiguration addConfiguration(Configurable config) {
         if (config != null) {
+            MODULE_CONFIGURATIONS.put(config.getClass(), config);
+        }
+        return this;
+    }
+
+    public TestTrackConfiguration addPreloadComponent(LibraryGioModule module, Configurable config) {
+        if (module != null && config != null) {
+            coreConfiguration.addPreloadComponent(module);
             MODULE_CONFIGURATIONS.put(config.getClass(), config);
         }
         return this;
@@ -88,10 +102,12 @@ public final class TestTrackConfiguration {
         return this;
     }
 
+    @Deprecated
     public final boolean isUploadExceptionEnabled() {
         return core().isUploadExceptionEnabled();
     }
 
+    @Deprecated
     public final TestTrackConfiguration setUploadExceptionEnabled(boolean uploadExceptionEnabled) {
         core().setUploadExceptionEnabled(uploadExceptionEnabled);
         return this;
@@ -142,12 +158,60 @@ public final class TestTrackConfiguration {
         return this;
     }
 
-    public final boolean isOaidEnabled() {
-        return core().isOaidEnabled();
+    public final EventFilterInterceptor getEventFilterInterceptor() {
+        return core().getEventFilterInterceptor();
     }
 
-    public final TestTrackConfiguration setOaidEnabled(boolean enabled) {
-        core().setOaidEnabled(enabled);
+    public final TestTrackConfiguration setEventFilterInterceptor(
+            EventFilterInterceptor eventFilterInterceptor) {
+        core().setEventFilterInterceptor(eventFilterInterceptor);
+        return this;
+    }
+
+    @Deprecated
+    public final TestTrackConfiguration setExcludeEvent(
+            @EventExcludeFilter.EventFilterLimit int filterEventFlag) {
+        core().setExcludeEvent(filterEventFlag);
+        return this;
+    }
+
+    @Deprecated
+    public final int getExcludeEvent() {
+        return core().getExcludeEvent();
+    }
+
+    @Deprecated
+    public final TestTrackConfiguration setIgnoreField(
+            @FieldIgnoreFilter.FieldFilterType int ignoreFieldFlag) {
+        core().setIgnoreField(ignoreFieldFlag);
+        return this;
+    }
+
+    @Deprecated
+    public final int getIgnoreField() {
+        return core().getIgnoreField();
+    }
+
+    public final TestTrackConfiguration addPreloadComponent(LibraryGioModule component) {
+        core().addPreloadComponent(component);
+        return this;
+    }
+
+    public final boolean isIdMappingEnabled() {
+        return core().isIdMappingEnabled();
+    }
+
+    public final TestTrackConfiguration setIdMappingEnabled(boolean enabled) {
+        core().setIdMappingEnabled(enabled);
+        return this;
+    }
+
+    public final boolean isRequireAppProcessesEnabled() {
+        return core().isRequireAppProcessesEnabled();
+    }
+
+    public final TestTrackConfiguration setRequireAppProcessesEnabled(boolean enabled) {
+        core().setRequireAppProcessesEnabled(enabled);
         return this;
     }
 

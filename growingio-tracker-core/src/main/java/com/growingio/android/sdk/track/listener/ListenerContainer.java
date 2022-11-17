@@ -18,56 +18,11 @@ package com.growingio.android.sdk.track.listener;
 
 import com.growingio.android.sdk.track.log.Logger;
 
-import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.List;
 
-public abstract class ListenerContainer<L, A> {
+public abstract class ListenerContainer<L, A> extends ListenerDispatcher<L> {
     private static final String TAG = "ListenerContainer";
-
-    private final List<L> mListeners = new ArrayList<>();
-
-
-    /**
-     * please avoid call this method in {@link #dispatchActions}
-     */
-    public void register(L listener) {
-        synchronized (mListeners) {
-            boolean needsAdd = true;
-            Iterator<L> refIter = mListeners.iterator();
-            while (refIter.hasNext()) {
-                try {
-                    L storedListener = refIter.next();
-                    if (null == storedListener) {
-                        refIter.remove();
-                    } else if (storedListener == listener) {
-                        needsAdd = false;
-                    }
-                } catch (ConcurrentModificationException e) {
-                    Logger.e(TAG, "Please avoid call register method in dispatchActions");
-                    throw e;
-                }
-            }
-            if (needsAdd) {
-                mListeners.add(listener);
-            }
-        }
-    }
-
-    public void unregister(L listener) {
-        synchronized (mListeners) {
-            Iterator<L> refIter = mListeners.iterator();
-            while (refIter.hasNext()) {
-                L storedListener = refIter.next();
-                if (null == storedListener) {
-                    refIter.remove();
-                } else if (storedListener == listener) {
-                    refIter.remove();
-                }
-            }
-        }
-    }
 
     protected void dispatchActions(A action) {
         synchronized (mListeners) {
@@ -90,10 +45,15 @@ public abstract class ListenerContainer<L, A> {
         }
     }
 
-    protected int getListenerCount() {
-        return mListeners.size();
+    @Override
+    public void register(L listener) {
+        super.register(listener);
     }
 
+    @Override
+    public void unregister(L listener) {
+        super.unregister(listener);
+    }
 
     abstract protected void singleAction(L listener, A action);
 }
