@@ -52,11 +52,11 @@ class AdvertUtils {
     private static final String TAG = "Advert";
     private static final String PREF_DEVICE_ACTIVATE_INFO = "pref_device_activate_info";
 
-    static final String DEEP_LINK_TYPE = "deep_type";//defer or inapp
-    static final String DEEP_LINK_ID = "deep_link_id";//eg: d1zMK
-    static final String DEEP_CLICK_ID = "deep_click_id";//eg:afcde4b0-a703-45fd-9834-175b1778c2d9
-    static final String DEEP_CLICK_TIME = "deep_click_time";//timestamp
-    static final String DEEP_PARAMS = "deep_params";//{}
+    static final String DEEP_LINK_TYPE = "deep_type"; //defer or inapp
+    static final String DEEP_LINK_ID = "deep_link_id"; //eg: d1zMK
+    static final String DEEP_CLICK_ID = "deep_click_id"; //eg:afcde4b0-a703-45fd-9834-175b1778c2d9
+    static final String DEEP_CLICK_TIME = "deep_click_time"; //timestamp
+    static final String DEEP_PARAMS = "deep_params"; //{}
 
 
     static final String DEEPLINK_PARAMS_REQUEST_URL = "https://%1$s/deep/v1/%2$s/android/%3$s/%4$s/%5$s";

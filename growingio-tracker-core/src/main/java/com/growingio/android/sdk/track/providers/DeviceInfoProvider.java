@@ -117,7 +117,7 @@ public class DeviceInfoProvider {
         return mScreenWidth;
     }
 
-    @SuppressLint({"MissingPermission", "HardwareIds","WrongConstant"})
+    @SuppressLint({"MissingPermission", "HardwareIds", "WrongConstant"})
     public String getImei() {
         if (TextUtils.isEmpty(mImei)) {
             if (PermissionUtil.checkReadPhoneStatePermission()) {

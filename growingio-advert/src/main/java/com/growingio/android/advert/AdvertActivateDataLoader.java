@@ -230,7 +230,8 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                         InputStream inputStream = data.getStream();
                         byte[] buffer = new byte[1024];
-                        for (int len; (len = inputStream.read(buffer)) != -1; ) {
+                        int len;
+                        while ((len = inputStream.read(buffer)) != -1) {
                             outputStream.write(buffer, 0, len);
                         }
                         AdvertData advertData = AdvertUtils.parseDeeplinkResponse(outputStream.toString("UTF-8"));
