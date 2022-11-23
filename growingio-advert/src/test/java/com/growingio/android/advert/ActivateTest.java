@@ -37,7 +37,7 @@ import org.robolectric.annotation.Config;
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class ActivateTest {
-    private Application context = ApplicationProvider.getApplicationContext();
+    private final Application context = ApplicationProvider.getApplicationContext();
 
     @Before
     public void setup() {
@@ -56,7 +56,7 @@ public class ActivateTest {
         Truth.assertThat(isActivated).isFalse();
 
         ActivityStateProvider.get().onActivityCreated(new ListActivity(), null);
-        TrackerContext.get().executeData(new Activate(null), Activate.class, AdvertResult.class);
+        TrackerContext.get().executeData(Activate.activate(), Activate.class, AdvertResult.class);
         Truth.assertThat(AdvertUtils.isDeviceActivated()).isTrue();
 
     }

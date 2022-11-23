@@ -74,8 +74,6 @@ dependencies {
 
     implementation project(':growingio-tracker-core')
 
-    compileOnly project(':growingio-advert')
-
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }

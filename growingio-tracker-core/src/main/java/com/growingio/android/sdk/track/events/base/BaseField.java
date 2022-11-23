@@ -39,6 +39,8 @@ public final class BaseField {
     final static String GSID = "globalSequenceId";
     final static String ESID = "eventSequenceId";
     final static String DEVICE_ID = "deviceId";
+    final static String DATA_SOURCE_ID = "dataSourceId";
+    final static String GIO_ID = "gioId";
     public final static String NETWORK_STATE = "networkState";
     public final static String APP_CHANNEL = "appChannel";
     public final static String SCREEN_HEIGHT = "screenHeight";

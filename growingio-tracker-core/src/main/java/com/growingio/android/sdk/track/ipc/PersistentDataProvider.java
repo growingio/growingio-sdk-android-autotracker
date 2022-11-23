@@ -44,6 +44,7 @@ public class PersistentDataProvider {
     private static final int SHARER_MAX_SIZE = 50;
 
     // Key长度校验 0 <= len < 50, 判断文件读取是否合法
+    private static final String KEY_GIO_ID = "GIO_ID";
     private static final String KEY_TYPE_GLOBAL = "TYPE_GLOBAL";
     private static final String KEY_LOGIN_USER_KEY = "LOGIN_USER_KEY";
     private static final String KEY_LOGIN_USER_ID = "LOGIN_USER_ID";
@@ -164,6 +165,14 @@ public class PersistentDataProvider {
 
     public void setSendVisitAfterRefreshSessionId(boolean sendVisitAfterRefreshSessionId) {
         mDataSharer.putBoolean(KEY_SEND_VISIT_AFTER_REFRESH_SESSION_ID, sendVisitAfterRefreshSessionId);
+    }
+
+    public String getGioId() {
+        return getString(KEY_GIO_ID, null);
+    }
+
+    public void setGioId(String gioId) {
+        putString(KEY_GIO_ID, gioId);
     }
 
     public void putString(String key, @Nullable String value) {

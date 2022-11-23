@@ -33,6 +33,7 @@ import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -52,7 +53,7 @@ public class Tracker {
 
     private static final String TAG = "GrowingIO Track SDK";
 
-    protected volatile boolean isInited = false;
+    protected volatile boolean isInited;
 
     public Tracker(Application application) {
         if (application == null) {
@@ -301,6 +302,10 @@ public class Tracker {
             return;
         }
         TimerCenter.get().clearTimer();
+    }
+
+    public boolean doDeepLinkByUrl(String url, DeepLinkCallback callback) {
+        return DeepLinkProvider.get().doDeepLinkByUrl(url, callback);
     }
 
     @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})

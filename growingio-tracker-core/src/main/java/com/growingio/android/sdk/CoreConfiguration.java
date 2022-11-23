@@ -29,6 +29,7 @@ import java.util.List;
 public class CoreConfiguration implements Configurable {
     private String mProjectId;
     private String mUrlScheme;
+    private String mDataSourceId;
 
     private String mChannel;
     private boolean mDebugEnabled = false;
@@ -39,7 +40,6 @@ public class CoreConfiguration implements Configurable {
     private boolean mUploadExceptionEnabled = true;
     private boolean mRequireAppProcessesEnabled = true;
     private String mDataCollectionServerHost = "http://api.growingio.com";
-
 
     private EventFilterInterceptor mEventFilterInterceptor;
     @FieldToString(clazz = EventExcludeFilter.class, method = "getEventFilterLog", parameterTypes = {int.class})
@@ -85,6 +85,20 @@ public class CoreConfiguration implements Configurable {
 
     public CoreConfiguration setChannel(String channel) {
         this.mChannel = channel;
+        return this;
+    }
+    public String getDataSourceId() {
+        return mDataSourceId;
+    }
+
+    /**
+     * 设置dataSourceId
+     *
+     * @param dataSourceId 设置APP的DataSourceId
+     * @return this
+     */
+    public CoreConfiguration setDataSourceId(String dataSourceId) {
+        mDataSourceId = dataSourceId;
         return this;
     }
 

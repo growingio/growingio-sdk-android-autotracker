@@ -27,10 +27,10 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.Activate;
 import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
+import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.middleware.advert.DeepLink;
 import com.growingio.android.sdk.track.webservices.WebService;
 
 
@@ -81,7 +81,7 @@ public class DeepLinkProvider implements IActivityLifecycle {
                 }
                 if (lastIntentRef.get() == event.getIntent()) return;
                 lastIntentRef = new WeakReference<>(event.getIntent());
-                AdvertResult result = TrackerContext.get().executeData(new DeepLink(data), DeepLink.class, AdvertResult.class);
+                AdvertResult result = TrackerContext.get().executeData(Activate.deeplink(data), Activate.class, AdvertResult.class);
                 if (result != null && result.hasDealWithDeepLink()) {
                     event.getIntent().setData(null);
                 }
@@ -89,10 +89,18 @@ public class DeepLinkProvider implements IActivityLifecycle {
         }
         if (event.eventType == ON_RESUMED) {
             if (event.getIntent() != null) {
-                Uri data = event.getIntent().getData();
-                TrackerContext.get().executeData(new Activate(data), Activate.class, AdvertResult.class);
+                TrackerContext.get().executeData(Activate.activate(), Activate.class, AdvertResult.class);
             }
         }
+    }
+
+    public boolean doDeepLinkByUrl(String url, DeepLinkCallback callback) {
+        if (!TrackerContext.initializedSuccessfully() || url == null) {
+            return false;
+        }
+        Uri uri = Uri.parse(url);
+        AdvertResult result = TrackerContext.get().executeData(Activate.handleDeeplink(uri, callback), Activate.class, AdvertResult.class);
+        return result.hasDealWithDeepLink();
     }
 
     private boolean checkIsValid(Intent intent) {

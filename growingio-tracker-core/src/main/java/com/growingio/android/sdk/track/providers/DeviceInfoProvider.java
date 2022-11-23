@@ -23,6 +23,8 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
@@ -52,6 +54,7 @@ public class DeviceInfoProvider {
     private int mScreenHeight;
     private int mScreenWidth;
 
+    private String mUserAgent;
     private String mAndroidId;
     private String mImei;
     private String mOaid;
@@ -114,7 +117,7 @@ public class DeviceInfoProvider {
         return mScreenWidth;
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint({"MissingPermission", "HardwareIds","WrongConstant"})
     public String getImei() {
         if (TextUtils.isEmpty(mImei)) {
             if (PermissionUtil.checkReadPhoneStatePermission()) {
@@ -195,5 +198,24 @@ public class DeviceInfoProvider {
             PersistentDataProvider.get().setDeviceId(result);
         }
         return result;
+    }
+
+    public String getUserAgent() {
+        if (!TextUtils.isEmpty(mUserAgent)) return mUserAgent;
+        mUserAgent = System.getProperty("http.agent");
+        if (TextUtils.isEmpty(mUserAgent)
+                && PermissionUtil.hasInternetPermission()) {
+            try {
+                mUserAgent = new WebView(mContext).getSettings().getUserAgentString();
+            } catch (Exception e) {
+                Logger.e(TAG, e.getMessage());
+                try {
+                    mUserAgent = WebSettings.getDefaultUserAgent(mContext);
+                } catch (Exception badException) {
+                    Logger.e(TAG, badException.getMessage());
+                }
+            }
+        }
+        return mUserAgent;
     }
 }
