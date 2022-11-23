@@ -143,8 +143,8 @@ public class ActivateEvent extends BaseAttributesEvent {
             eventName = EVENT_ACTIVATE;
         }
 
-        public Builder reengage(String cl) {
-            this.classification = cl;
+        public Builder reengage(boolean isInApp) {
+            if (isInApp) this.classification = "inapp";
             this.eventName = EVENT_REENGAGE;
             return this;
         }

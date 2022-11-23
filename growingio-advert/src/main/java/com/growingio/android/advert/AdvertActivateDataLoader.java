@@ -32,6 +32,7 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.ActivateEvent;
+import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.Activate;
 import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
@@ -58,7 +59,7 @@ import java.util.Map;
  *
  * @author cpacm 2022/11/23
  */
-public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertResult> {
+public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertResult>, OnConfigurationChangeListener {
 
 
     private final static int DEEPLINK_TYPE_NONE = 0; //doesn't contain deeplink.
@@ -66,6 +67,14 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
     private final static int DEEPLINK_TYPE_SHORT = 2; //short scheme,doesn't contain data.
 
     AdvertActivateDataLoader() {
+        ConfigurationProvider.get().addConfigurationListener(this);
+    }
+
+    @Override
+    public void onDataCollectionChanged(boolean isEnable) {
+        if (isEnable) {
+            buildLoadData(Activate.activate());
+        }
     }
 
     @Override
@@ -97,13 +106,13 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         private final Uri uri;
         private final DeepLinkCallback deepLinkCallback;
         private final String deepLinkHost;
-        private final boolean inApp;
+        private final boolean isInApp;
 
-        public ActivateDataFetcher(Uri uri, String adHost, DeepLinkCallback callback, boolean inApp) {
+        public ActivateDataFetcher(Uri uri, String adHost, DeepLinkCallback callback, boolean isInApp) {
             this.deepLinkHost = adHost;
             this.uri = uri;
             this.deepLinkCallback = callback;
-            this.inApp = inApp;
+            this.isInApp = isInApp;
         }
 
         @Override
@@ -125,7 +134,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                     } else if (checkDeepLinkType == DEEPLINK_TYPE_SHORT) {
                         result.setHasDealWithDeepLink(true);
                         Logger.d(TAG, "step 4-2. deal with short url link");
-                        dealWithShortLink(uri, inApp);
+                        dealWithShortLink(uri);
                     }
                 } else {
                     Logger.d(TAG, "step 3-2. check clipboard if the deeplink data is included and send activate");
@@ -169,7 +178,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             onParseDeeplinkArgs(data);
         }
 
-        private void dealWithShortLink(Uri data, boolean isInApp) {
+        private void dealWithShortLink(Uri data) {
             if (TextUtils.isEmpty(data.getPath())) {
                 Logger.e(TAG, "onValidSchemaUrlIntent, but not valid applink, return");
                 return;
@@ -320,7 +329,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             if (TextUtils.isEmpty(data.customParams)) {
                 data.customParams = "{}";
             }
-            TrackMainThread.trackMain().postEventToTrackMain(new ActivateEvent.Builder().reengage("defer").setAdvertData(data.linkID, data.clickID, data.clickTM, data.customParams));
+            TrackMainThread.trackMain().postEventToTrackMain(new ActivateEvent.Builder().reengage(isInApp).setAdvertData(data.linkID, data.clickID, data.clickTM, data.customParams));
         }
 
         private final static String TAG = "AdvertModule";
