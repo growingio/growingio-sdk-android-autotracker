@@ -17,14 +17,12 @@
 package com.growingio.android.sdk.autotrack;
 
 import android.app.Application;
-import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.cdp.ResourceItem;
 import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,17 +33,6 @@ public class CdpAutotracker extends Autotracker {
     public CdpAutotracker(Application application) {
         super(application);
     }
-
-    @Override
-    @CallSuper
-    protected void setup(Application application) {
-        super.setup(application);
-        CdpAutotrackConfig config = ConfigurationProvider.get().getConfiguration(CdpAutotrackConfig.class);
-        if (config != null) {
-            TrackMainThread.trackMain().addEventBuildInterceptor(new CdpEventBuildInterceptor(config.getDataSourceId()));
-        }
-    }
-
 
     /**
      * 新版本仅需在属性中关联itemId, 参见维度表数据上报

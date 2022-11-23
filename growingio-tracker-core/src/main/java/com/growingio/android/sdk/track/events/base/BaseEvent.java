@@ -386,6 +386,15 @@ public abstract class BaseEvent extends GEvent {
             mGlobalSequenceId = sequenceId.getGlobalId();
             mEventSequenceId = sequenceId.getEventTypeId();
 
+            String mDataSourceId = ConfigurationProvider.core().getDataSourceId();
+            if (!TextUtils.isEmpty(mDataSourceId)) {
+                addExtraParam(BaseField.DATA_SOURCE_ID, mDataSourceId);
+                String mLatestGioId = PersistentDataProvider.get().getGioId();
+                if (!TextUtils.isEmpty(mLatestGioId)) {
+                    addExtraParam(BaseField.GIO_ID, mLatestGioId);
+                }
+            }
+
             // filter field area
             if (!getFieldDefault(BaseField.APP_STATE)) {
                 mAppState = null;

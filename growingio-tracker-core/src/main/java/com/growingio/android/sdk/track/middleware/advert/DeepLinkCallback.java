@@ -16,43 +16,27 @@
 
 package com.growingio.android.sdk.track.middleware.advert;
 
-import android.net.Uri;
+import java.util.Map;
 
 /**
  * <p>
- * try send Activate Event.
  *
- * @author cpacm 5/17/21
+ * @author cpacm 2022/11/23
  */
-public class Activate {
+public interface DeepLinkCallback {
+    int SUCCESS = 0x0;
+    int PARSE_ERROR = 0x1;
+    int ILLEGAL_URI = 0X2;
+    int NO_QUERY = 0X3;
 
-    final Uri uri;
-    final DeepLinkCallback callback;
+    int ERROR_NET_FAIL = 0x5;
+    int ERROR_EXCEPTION = 0x6;
 
-    private Activate(Uri uri, DeepLinkCallback callback) {
-        this.uri = uri;
-        this.callback = null;
-    }
+    int ERROR_UNKNOWN = 400;
+    int ERROR_LINK_NOT_EXIST = 404;
+    int ERROR_TIMEOUT = 408;
+    int ERROR_APP_NOT_ACCEPT = 406;
+    int ERROR_URL_FORMAT_ERROR = 412;
 
-    public Uri getUri() {
-        return uri;
-    }
-
-    public DeepLinkCallback getCallback() {
-        return callback;
-    }
-
-    public static Activate activate() {
-        return new Activate(null, null);
-    }
-
-    public static Activate deeplink(Uri uri) {
-        return new Activate(uri, null);
-    }
-
-    public static Activate handleDeeplink(Uri uri, DeepLinkCallback callback) {
-        return new Activate(uri, callback);
-    }
-
-
+    void onReceive(Map<String, String> params, int error, long appAwakePassedTime);
 }

@@ -76,17 +76,20 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
             return;
         }
 
-        // to non-null
-        if (ObjectUtils.equals(userId, getLoginUserId())) {
+        String lastUserId = getLoginUserId();
+        if (ObjectUtils.equals(userId, lastUserId)) {
             if (!ObjectUtils.equals(getLoginUserKey(), userKey)) {
+                Logger.d(TAG, "setUserId, the userId is same as the old userId, but userKey different.");
                 PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, userKey);
+            } else {
+                Logger.d(TAG, "setUserId, the userId is same as the old userId,just return");
             }
-            Logger.d(TAG, "setUserId, but the userId is same as the old userId, just return");
             return;
         }
 
-        // 回调中通过getUserId获取oldUserId, 通过参数获取newUserId
+        Logger.d(TAG, "userIdChange: newUserId = " + userId + ", latestUserId = " + lastUserId);
         dispatchActions(userId);
+        PersistentDataProvider.get().setGioId(userId);
         PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, (TextUtils.isEmpty(userKey) ? null : userKey));
         needSendVisit(userId);
     }

@@ -16,7 +16,7 @@
 
 package com.growingio.protobuf;
 
-import com.growingio.android.advert.ActivateEvent;
+import com.growingio.android.sdk.track.events.ActivateEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.PageAttributesEvent;
@@ -195,28 +195,17 @@ class EventProtocolTransfer {
             }
         }
 
-        // deal with module events
-        if (hasClass("com.growingio.android.advert.ActivateEvent")) {
-            if (gEvent instanceof ActivateEvent) {
-                ActivateEvent activateEvent = (ActivateEvent) gEvent;
-                eventBuilder.setImei(activateEvent.getImei()); //46
-                eventBuilder.setAndroidId(activateEvent.getAndroidId()); //47
-                eventBuilder.setGoogleAdvertisingId(activateEvent.getGoogleId()); //47
-                eventBuilder.setOaid(activateEvent.getOaid()); //48
-            }
+        // deal with advert events
+        if (gEvent instanceof ActivateEvent) {
+            ActivateEvent activateEvent = (ActivateEvent) gEvent;
+            eventBuilder.setEventName(activateEvent.getEventName());//22
+            eventBuilder.setImei(activateEvent.getImei()); //46
+            eventBuilder.setAndroidId(activateEvent.getAndroidId()); //47
+            eventBuilder.setGoogleAdvertisingId(activateEvent.getGoogleId()); //49
+            eventBuilder.setOaid(activateEvent.getOaid()); //48
         }
 
         return eventBuilder.build().toByteArray();
-
-    }
-
-    private static boolean hasClass(String className) {
-        try {
-            Class.forName(className);
-            return true;
-        } catch (Throwable e) {
-            return false;
-        }
     }
 }
 

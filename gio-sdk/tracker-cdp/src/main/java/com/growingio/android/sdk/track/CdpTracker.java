@@ -19,13 +19,10 @@ package com.growingio.android.sdk.track;
 import android.app.Application;
 import android.text.TextUtils;
 
-import androidx.annotation.CallSuper;
-
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.track.events.cdp.ResourceItem;
 import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,21 +34,13 @@ public class CdpTracker extends Tracker {
         super(application);
     }
 
-    @Override
-    @CallSuper
-    protected void setup(Application application) {
-        super.setup(application);
-        CdpConfig cdpConfig = ConfigurationProvider.get().getConfiguration(CdpConfig.class);
-        if (cdpConfig != null) {
-            TrackMainThread.trackMain().addEventBuildInterceptor(new CdpEventBuildInterceptor(cdpConfig.getDataSourceId()));
-        }
-    }
-
+    @Deprecated
     public void trackCustomEvent(String eventName, String itemKey, String itemId) {
         if (!isInited) return;
         trackCustomEvent(eventName, null, itemKey, itemId);
     }
 
+    @Deprecated
     public void trackCustomEvent(String eventName, Map<String, String> attributes, String itemKey, String itemId) {
         if (!isInited) return;
         if (TextUtils.isEmpty(eventName) || TextUtils.isEmpty(itemKey) || TextUtils.isEmpty(itemId)) {
