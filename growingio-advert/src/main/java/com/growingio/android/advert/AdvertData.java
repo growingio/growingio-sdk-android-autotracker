@@ -47,7 +47,7 @@ class AdvertData implements Serializable {
     public String clickTM;
     public String customParams;
     public long tm = 0L;
-    public Map<String,String> params;
+    public Map<String, String> params;
 
     public void copy(AdvertData another) {
         this.errorCode = another.errorCode;

@@ -187,7 +187,7 @@ class EventProtocolTransfer {
         // deal with advert events
         if (gEvent instanceof ActivateEvent) {
             ActivateEvent activateEvent = (ActivateEvent) gEvent;
-            eventBuilder.setEventName(activateEvent.getEventName());//22
+            eventBuilder.setEventName(activateEvent.getEventName()); //22
             eventBuilder.setImei(activateEvent.getImei()); //46
             eventBuilder.setAndroidId(activateEvent.getAndroidId()); //47
             eventBuilder.setGoogleAdvertisingId(activateEvent.getGoogleId()); //49
