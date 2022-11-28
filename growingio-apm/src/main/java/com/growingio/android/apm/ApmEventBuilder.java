@@ -31,17 +31,17 @@ public class ApmEventBuilder {
     private ApmEventBuilder() {
     }
 
-    static final String EVENT_ERROR_NAME = "Error";
-    private static final String EVENT_ERROR_TITLE = "error_title";
-    private static final String EVENT_ERROR_CONTENT = "error_content";
+    static final String EVENT_ERROR_NAME = "$apm_system_error";
+    private static final String EVENT_ERROR_TITLE = "$error_type";
+    private static final String EVENT_ERROR_CONTENT = "$error_content";
 
-    static final String EVENT_APP_LAUNCHTIME_NAME = "AppLaunchTime";
-    private static final String EVENT_WARM_REBOOT = "warm_reboot";
-    private static final String EVENT_WARM_REBOOT_TIME = "warm_reboot_time";
-    private static final String EVENT_COLD_REBOOT = "cold_reboot";
-    private static final String EVENT_COLD_REBOOT_TIME = "cold_reboot_time";
-    private static final String EVENT_PAGE_NAME = "page_name";
-    private static final String EVENT_PAGE_DURATION = "page_load_duration";
+    static final String EVENT_APP_LAUNCHTIME_NAME = "$apm_app_launch";
+    private static final String EVENT_WARM_REBOOT = "$warm_reboot";
+    private static final String EVENT_WARM_REBOOT_TIME = "$warm_reboot_time";
+    private static final String EVENT_COLD_REBOOT = "$cold_reboot";
+    private static final String EVENT_COLD_REBOOT_TIME = "$cold_reboot_time";
+    private static final String EVENT_PAGE_NAME = "$title";
+    private static final String EVENT_PAGE_DURATION = "$page_launch_duration";
 
     static CustomEvent.Builder filterWithApmBreadcrumb(Breadcrumb breadcrumb) {
         if (equals(breadcrumb.getType(), Breadcrumb.TYPE_ERROR)) {
