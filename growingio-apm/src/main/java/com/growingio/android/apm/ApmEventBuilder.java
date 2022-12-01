@@ -36,10 +36,8 @@ public class ApmEventBuilder {
     private static final String EVENT_ERROR_CONTENT = "$error_content";
 
     static final String EVENT_APP_LAUNCHTIME_NAME = "$apm_app_launch";
-    private static final String EVENT_WARM_REBOOT = "$warm_reboot";
-    private static final String EVENT_WARM_REBOOT_TIME = "$warm_reboot_time";
-    private static final String EVENT_COLD_REBOOT = "$cold_reboot";
-    private static final String EVENT_COLD_REBOOT_TIME = "$cold_reboot_time";
+    private static final String EVENT_REBOOT_MODE = "$reboot_mode";
+    private static final String EVENT_REBOOT_TIME = "$reboot_duration";
     private static final String EVENT_PAGE_NAME = "$title";
     private static final String EVENT_PAGE_DURATION = "$page_launch_duration";
 
@@ -109,11 +107,11 @@ public class ApmEventBuilder {
     private static CustomEvent.Builder appStartBuilder(boolean isCold, long duration) {
         HashMap<String, String> hashMap = new HashMap<>();
         if (isCold) {
-            hashMap.put(EVENT_COLD_REBOOT, "true");
-            hashMap.put(EVENT_COLD_REBOOT_TIME, String.valueOf(duration));
+            hashMap.put(EVENT_REBOOT_MODE, "cold");
+            hashMap.put(EVENT_REBOOT_TIME, String.valueOf(duration));
         } else {
-            hashMap.put(EVENT_WARM_REBOOT, "true");
-            hashMap.put(EVENT_WARM_REBOOT_TIME, String.valueOf(duration));
+            hashMap.put(EVENT_REBOOT_MODE, "warm");
+            hashMap.put(EVENT_REBOOT_TIME, String.valueOf(duration));
         }
 
         return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
@@ -133,11 +131,11 @@ public class ApmEventBuilder {
         hashMap.put(EVENT_PAGE_NAME, pageName);
         hashMap.put(EVENT_PAGE_DURATION, String.valueOf(pageDuration));
         if (isCold) {
-            hashMap.put(EVENT_COLD_REBOOT, "true");
-            hashMap.put(EVENT_COLD_REBOOT_TIME, String.valueOf(appDuration));
+            hashMap.put(EVENT_REBOOT_MODE, "true");
+            hashMap.put(EVENT_REBOOT_TIME, String.valueOf(appDuration));
         } else {
-            hashMap.put(EVENT_WARM_REBOOT, "true");
-            hashMap.put(EVENT_WARM_REBOOT_TIME, String.valueOf(appDuration == 0L ? pageDuration : appDuration));
+            hashMap.put(EVENT_REBOOT_MODE, "true");
+            hashMap.put(EVENT_REBOOT_TIME, String.valueOf(appDuration == 0L ? pageDuration : appDuration));
         }
         return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
                 .setAttributes(hashMap);
