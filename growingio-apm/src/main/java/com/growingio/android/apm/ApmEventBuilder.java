@@ -131,10 +131,10 @@ public class ApmEventBuilder {
         hashMap.put(EVENT_PAGE_NAME, pageName);
         hashMap.put(EVENT_PAGE_DURATION, String.valueOf(pageDuration));
         if (isCold) {
-            hashMap.put(EVENT_REBOOT_MODE, "true");
+            hashMap.put(EVENT_REBOOT_MODE, "cold");
             hashMap.put(EVENT_REBOOT_TIME, String.valueOf(appDuration));
         } else {
-            hashMap.put(EVENT_REBOOT_MODE, "true");
+            hashMap.put(EVENT_REBOOT_MODE, "warm");
             hashMap.put(EVENT_REBOOT_TIME, String.valueOf(appDuration == 0L ? pageDuration : appDuration));
         }
         return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
