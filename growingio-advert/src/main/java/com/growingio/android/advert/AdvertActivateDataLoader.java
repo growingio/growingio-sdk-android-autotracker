@@ -80,6 +80,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
     @Override
     public LoadData<AdvertResult> buildLoadData(Activate activate) {
         AdvertConfig config = ConfigurationProvider.get().getConfiguration(AdvertConfig.class);
+        if (config == null) config = new AdvertConfig();
         String deepLinkHost = config.getDeepLinkHost();
         if (deepLinkHost == null || deepLinkHost.isEmpty()) {
             deepLinkHost = ConfigurationProvider.core().getDataCollectionServerHost();
