@@ -168,7 +168,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             String scheme = uri.getScheme();
             if (host == null || scheme == null) return false;
             if (!"http".equals(scheme) && !"https".equals(scheme)) return false;
-            return deepLinkHost.equals(host) || host.endsWith(deepLinkHost);
+            return deepLinkHost.equals(host) || deepLinkHost.endsWith(host);
         }
 
         private void dealWithUriLink(Uri data) {
