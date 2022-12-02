@@ -84,6 +84,7 @@ public class ActivateEvent extends BaseAttributesEvent {
     public JSONObject toJSONObject() {
         JSONObject json = super.toJSONObject();
         try {
+            json.put("eventName", eventName);
             if (!TextUtils.isEmpty(googleId)) {
                 json.put("googleAdvertisingId", googleId);
             }
