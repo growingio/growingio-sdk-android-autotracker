@@ -79,7 +79,7 @@ public class DeepLinkProvider implements IActivityLifecycle {
                     TrackMainThread.trackMain().postActionToTrackMain(() -> dispatchWebServiceUri(data));
                     return;
                 }
-                if (lastIntentRef.get() == event.getIntent()) return;
+                if (lastIntentRef != null && lastIntentRef.get() == event.getIntent()) return;
                 lastIntentRef = new WeakReference<>(event.getIntent());
                 AdvertResult result = TrackerContext.get().executeData(Activate.deeplink(data), Activate.class, AdvertResult.class);
                 if (result != null && result.hasDealWithDeepLink()) {
