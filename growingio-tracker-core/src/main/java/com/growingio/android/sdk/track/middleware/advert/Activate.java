@@ -31,7 +31,7 @@ public class Activate {
 
     private Activate(Uri uri, DeepLinkCallback callback) {
         this.uri = uri;
-        this.callback = null;
+        this.callback = callback;
     }
 
     public Uri getUri() {
