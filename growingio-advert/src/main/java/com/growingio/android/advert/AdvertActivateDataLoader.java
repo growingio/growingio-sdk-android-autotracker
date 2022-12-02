@@ -218,7 +218,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         }
 
         private void requestDeepLinkParamsByTrackId(String trackId, long wakeTime, boolean isInApp) {
-            String host = ConfigurationProvider.core().getDataCollectionServerHost();
+            String host = Uri.parse(deepLinkHost).getHost();
             String projectId = ConfigurationProvider.core().getProjectId();
             String dataSourceId = ConfigurationProvider.core().getDataSourceId();
             String deepType = isInApp ? "inapp" : "defer";
