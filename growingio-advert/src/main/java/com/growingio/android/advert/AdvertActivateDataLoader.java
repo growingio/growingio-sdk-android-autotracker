@@ -106,11 +106,11 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
 
         private final Uri uri;
         private final DeepLinkCallback deepLinkCallback;
-        private final String deepLinkHost;
+        private final Uri deepLinkHost;
         private final boolean isInApp;
 
         public ActivateDataFetcher(Uri uri, String adHost, DeepLinkCallback callback, boolean isInApp) {
-            this.deepLinkHost = adHost;
+            this.deepLinkHost = Uri.parse(adHost);
             this.uri = uri;
             this.deepLinkCallback = callback;
             this.isInApp = isInApp;
@@ -168,7 +168,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             String scheme = uri.getScheme();
             if (host == null || scheme == null) return false;
             if (!"http".equals(scheme) && !"https".equals(scheme)) return false;
-            return deepLinkHost.equals(host) || deepLinkHost.endsWith(host);
+            return deepLinkHost.getHost().equals(host);
         }
 
         private void dealWithUriLink(Uri data) {
@@ -218,14 +218,10 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         }
 
         private void requestDeepLinkParamsByTrackId(String trackId, long wakeTime, boolean isInApp) {
-            Uri deepLinkUri = Uri.parse(deepLinkHost);
-            String host = deepLinkUri.getHost();
-            String scheme = deepLinkUri.getScheme();
-            if (scheme == null || scheme.isEmpty()) scheme = "https";
             String projectId = ConfigurationProvider.core().getProjectId();
             String dataSourceId = ConfigurationProvider.core().getDataSourceId();
             String deepType = isInApp ? "inapp" : "defer";
-            String url = AdvertUtils.getRequestDeepLinkUrl(scheme, host, deepType, projectId, dataSourceId, trackId);
+            String url = AdvertUtils.getRequestDeepLinkUrl(deepLinkHost.toString(), deepType, projectId, dataSourceId, trackId);
             EventUrl eventUrl = new EventUrl(url, System.currentTimeMillis()).addHeader("ua", DeviceInfoProvider.get().getUserAgent());
             //.addHeader("ip", AdvertUtils.getIP());
             TrackerContext.get().loadData(eventUrl, EventUrl.class, EventResponse.class, new LoadDataFetcher.DataCallback<EventResponse>() {
