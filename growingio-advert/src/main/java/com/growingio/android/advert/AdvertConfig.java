@@ -45,6 +45,12 @@ public class AdvertConfig implements Configurable {
     }
 
     public AdvertConfig setDeepLinkHost(String deeplinkHost) {
+        if(deeplinkHost == null || deeplinkHost.isEmpty()){
+            throw new IllegalArgumentException("deepLink must not be empty");
+        }
+        if (!deeplinkHost.startsWith("http")) {
+            deeplinkHost = "https://" + deeplinkHost;
+        }
         this.deepLinkHost = deeplinkHost;
         return this;
     }
