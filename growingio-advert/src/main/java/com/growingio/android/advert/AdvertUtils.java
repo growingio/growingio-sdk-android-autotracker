@@ -59,10 +59,10 @@ class AdvertUtils {
     static final String DEEP_PARAMS = "deep_params"; //{}
 
 
-    static final String DEEPLINK_PARAMS_REQUEST_URL = "https://%1$s/deep/v1/%2$s/android/%3$s/%4$s/%5$s";
+    static final String DEEPLINK_PARAMS_REQUEST_URL = "%1$s://%2$s/deep/v1/%3$s/android/%4$s/%5$s/%6$s";
 
-    static String getRequestDeepLinkUrl(String host, String deepType, String projectId, String datasourceId, String trackId) {
-        return String.format(DEEPLINK_PARAMS_REQUEST_URL, host, deepType, projectId, datasourceId, trackId);
+    static String getRequestDeepLinkUrl(String scheme, String host, String deepType, String projectId, String datasourceId, String trackId) {
+        return String.format(DEEPLINK_PARAMS_REQUEST_URL, scheme, host, deepType, projectId, datasourceId, trackId);
     }
 
     static AdvertData parseDeeplinkResponse(String body) {
