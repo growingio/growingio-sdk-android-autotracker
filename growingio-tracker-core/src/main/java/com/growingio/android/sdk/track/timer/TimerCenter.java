@@ -31,8 +31,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class TimerCenter implements IActivityLifecycle {
-    private boolean mEnterBackground = false;
+    public static final String ATTR_EVENT_DURATION = "$event_duration";
     private final Map<String, Timer> mTimers = new HashMap<>();
+    private boolean mEnterBackground = false;
 
     private static class SingleInstance {
         private static final TimerCenter INSTANCE = new TimerCenter();
@@ -83,7 +84,7 @@ public class TimerCenter implements IActivityLifecycle {
             Timer timer = mTimers.get(timerId);
             if (timer != null) {
                 attributes = (attributes == null) ? new HashMap<>() : new HashMap<>(attributes);
-                attributes.put("eventDuration", timer.computeElapsedTime(currentTime));
+                attributes.put(ATTR_EVENT_DURATION, timer.computeElapsedTime(currentTime));
                 TrackMainThread.trackMain().postEventToTrackMain(
                         new CustomEvent.Builder()
                                 .setEventName(timer.getEventName())
