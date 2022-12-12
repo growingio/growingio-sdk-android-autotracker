@@ -191,11 +191,11 @@
             sendMockEvent(event);
         }
 
-        function sendMockPageAttributesEvent() {
+        function sendMockPageWithAttributesEvent() {
             let event = {
                 "deviceId": "7196f014-d7bc-4bd8-b920-757cb2375ff6",
                 "sessionId": "d5cbcf77-b38b-4223-954f-c6a2fdc0c098",
-                "eventType": "PAGE_ATTRIBUTES",
+                "eventType": "PAGE",
                 "platform": "Web",
                 "timestamp": 1602485628504,
                 "domain": "test-browser.growingio.com",
@@ -203,9 +203,9 @@
                 "query": "a=1&b=2",
                 "title": "Hybrid测试页面",
                 "referralPage": "http://test-browser.growingio.com/push",
+                "protocolType": "https",
                 "globalSequenceId": 99,
                 "eventSequenceId": 3,
-                "pageShowTimestamp": 1602485626878,
                 "attributes": {
                     "key1": "value1",
                     "key2": "value2",
