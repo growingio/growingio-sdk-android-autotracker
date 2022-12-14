@@ -140,17 +140,6 @@ public class EventsTest {
     }
 
     @Test
-    public void eventPageAttr() {
-        PageAttributesEvent event = new PageAttributesEvent.Builder()
-                .setPath("/blank")
-                .setPageShowTimestamp(System.currentTimeMillis())
-                .setAttributes(new HashMap<>())
-                .build();
-        Truth.assertThat(event.getEventType()).isEqualTo(AutotrackEventType.PAGE_ATTRIBUTES);
-        inRobolectric(event.toJSONObject());
-    }
-
-    @Test
     public void eventPage() {
         PageEvent event = new PageEvent.Builder()
                 .setPath("/blank")

@@ -25,7 +25,6 @@ import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
-import com.growingio.android.sdk.track.events.PageAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -125,8 +124,8 @@ public class PageProvider implements IActivityLifecycle {
         }
         if (!page.isIgnored()) {
             Logger.d(TAG, "sendPage: path = " + page.path());
+            useCachePageAttributesIfNeeded(page);
             generatePageEvent(context, page);
-            reissuePageAttributes(page);
         } else {
             Logger.e(TAG, "sendPage: path = " + page.path() + " is ignored");
         }
@@ -141,6 +140,7 @@ public class PageProvider implements IActivityLifecycle {
                         .setTitle(page.getTitle())
                         .setTimestamp(page.getShowTimestamp())
                         .setOrientation(orientation)
+                        .setAttributes(page.getAttributes())
         );
     }
 
@@ -384,7 +384,7 @@ public class PageProvider implements IActivityLifecycle {
         return null;
     }
 
-    private void reissuePageAttributes(Page<?> page) {
+    private void useCachePageAttributesIfNeeded(Page<?> page) {
         Map<String, String> attributes = null;
         if (page.getCarrier() instanceof Activity) {
             attributes = PAGE_ATTRIBUTES_CACHE.remove(page.getCarrier());
@@ -394,20 +394,6 @@ public class PageProvider implements IActivityLifecycle {
 
         if (attributes != null) {
             setPageAttributes(page, attributes, false);
-            return;
-        }
-
-        attributes = page.getAttributes();
-        if (attributes != null) {
-            setPageAttributes(page, attributes, false);
-            return;
-        }
-
-        if (page.getParent() != null) {
-            attributes = page.getParent().getAttributes();
-            if (attributes != null) {
-                setPageAttributes(page, attributes, false);
-            }
         }
     }
 
@@ -438,27 +424,6 @@ public class PageProvider implements IActivityLifecycle {
         }
 
         page.setAttributes(attributes);
-
-        if (!page.isIgnored()) {
-            Logger.d(TAG, "setPageAttributes: page = " + page.path() + ", attributes = " + attributes.toString());
-            generatePageAttributesEvent(page);
-        }
-
-        if (!page.getAllChildren().isEmpty()) {
-            for (Page<?> child : page.getAllChildren()) {
-                if (child.getShowTimestamp() >= page.getShowTimestamp()) {
-                    setPageAttributes(child, attributes, checkEquals);
-                }
-            }
-        }
-    }
-
-    private void generatePageAttributesEvent(Page<?> page) {
-        TrackMainThread.trackMain().postEventToTrackMain(
-                new PageAttributesEvent.Builder()
-                        .setPath(page.path())
-                        .setPageShowTimestamp(page.getShowTimestamp())
-                        .setAttributes(page.getAttributes()));
     }
 
     public Page<?> findPage(Activity activity) {

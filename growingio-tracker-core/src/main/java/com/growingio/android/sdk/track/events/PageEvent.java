@@ -18,15 +18,16 @@ package com.growingio.android.sdk.track.events;
 
 import androidx.annotation.StringDef;
 
-import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Map;
 
-public class PageEvent extends BaseEvent {
+public class PageEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
     public static final String ORIENTATION_PORTRAIT = "PORTRAIT";
@@ -79,7 +80,7 @@ public class PageEvent extends BaseEvent {
         return json;
     }
 
-    public static class Builder extends BaseBuilder<PageEvent> {
+    public static class Builder extends BaseAttributesEvent.Builder<PageEvent> {
         private String mPath;
         private String mOrientation = ORIENTATION_PORTRAIT;
         private String mTitle;
@@ -125,6 +126,12 @@ public class PageEvent extends BaseEvent {
 
         public Builder setTimestamp(long timestamp) {
             mTimestamp = timestamp;
+            return this;
+        }
+
+        @Override
+        public Builder setAttributes(Map<String, String> attributes) {
+            super.setAttributes(attributes);
             return this;
         }
     }

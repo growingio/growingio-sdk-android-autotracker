@@ -102,56 +102,41 @@ public class Autotracker extends Tracker {
 
     public void setPageAttributes(final Activity page, final Map<String, String> attributes) {
         if (!isInited) return;
-        if (page == null || attributes == null || attributes.isEmpty()) {
+        if (page == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(page, new HashMap<>(attributes)));
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(page, attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
     }
 
     public void setPageAttributes(final android.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
-        if (page == null || attributes == null || attributes.isEmpty()) {
+        if (page == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
 
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().setPageAttributes(SuperFragment.make(page), new HashMap<>(attributes));
-            }
-        });
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.make(page), attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
     }
 
     public void setPageAttributesSupport(final android.support.v4.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
-        if (page == null || attributes == null || attributes.isEmpty()) {
+        if (page == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
 
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().setPageAttributes(SuperFragment.makeSupport(page), new HashMap<>(attributes));
-            }
-        });
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.makeSupport(page), attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
     }
 
     public void setPageAttributesX(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
-        if (page == null || attributes == null || attributes.isEmpty()) {
+        if (page == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
 
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().setPageAttributes(SuperFragment.makeX(page), new HashMap<>(attributes));
-            }
-        });
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.makeX(page), attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
     }
 
     public void trackViewImpression(View view, String impressionEventName) {
