@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class TimerCenter implements IActivityLifecycle {
-    public static final String ATTR_EVENT_DURATION = "$event_duration";
+    public static final String ATTR_EVENT_DURATION = "event_duration";
     private final Map<String, Timer> mTimers = new HashMap<>();
     private boolean mEnterBackground = false;
 
