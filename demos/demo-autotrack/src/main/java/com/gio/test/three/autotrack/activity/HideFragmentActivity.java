@@ -24,11 +24,16 @@ import android.view.View;
 import com.gio.test.three.autotrack.R;
 import com.gio.test.three.autotrack.fragments.GreenFragment;
 import com.gio.test.three.autotrack.fragments.RedFragment;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 public class HideFragmentActivity extends FragmentActivity {
     private final Stack<Fragment> mAllFragments = new Stack<>();
+    private static final String TAG = "HideFragmentActivity";
+    private int i = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +81,15 @@ public class HideFragmentActivity extends FragmentActivity {
     private Fragment createdFragment() {
         if (mAllFragments.isEmpty()) {
             Fragment fragment = new RedFragment();
+            if (i % 2 == 0) {
+                Map<String, String> map = new HashMap<>();
+                map.put("name", "HideFragmentActivity-RedFragment");
+                GrowingAutotracker.get().setPageAttributesSupport(fragment, map);
+                i++;
+            } else {
+                i++;
+            }
+//            GrowingAutotracker.get().setPageAttributesSupport(fragment, null);
             mAllFragments.add(fragment);
             return fragment;
         }

@@ -27,7 +27,6 @@ import com.growingio.android.sdk.track.events.AppClosedEvent;
 import com.growingio.android.sdk.track.events.ConversionVariablesEvent;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
-import com.growingio.android.sdk.track.events.PageAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
@@ -35,7 +34,6 @@ import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.events.cdp.ResourceItem;
 import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
-import com.growingio.android.sdk.track.events.hybrid.HybridPageAttributesEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
 import com.growingio.android.sdk.track.middleware.GEvent;
@@ -79,15 +77,6 @@ public class ProtocolTest {
         Truth.assertThat(protocol(pageEvent).getReferralPage()).isEqualTo("test");
         Truth.assertThat(protocol(pageEvent).getOrientation()).isEqualTo("vertical");
 
-        PageAttributesEvent paEvent = new PageAttributesEvent.Builder()
-                .setPath("database")
-                .setPageShowTimestamp(1000L)
-                .setAttributes(defaultMap)
-                .build();
-        Truth.assertThat(protocol(paEvent).getPath()).isEqualTo("database");
-        Truth.assertThat(protocol(paEvent).getPageShowTimestamp()).isEqualTo(1000L);
-        Truth.assertThat(protocol(paEvent).getAttributesOrDefault("user", "gio")).isEqualTo("cpacm");
-
         CustomEvent customEvent = new CustomEvent.Builder()
                 .setEventName("databaseTest")
                 .build();
@@ -116,17 +105,6 @@ public class ProtocolTest {
                 .build();
         Truth.assertThat(protocol(hcEvent).getAttributesOrDefault("user", "gio")).isEqualTo("cpacm");
         Truth.assertThat(protocol(hcEvent).getEventName()).isEqualTo("hybrid");
-
-        HybridPageAttributesEvent hpaEvent = new HybridPageAttributesEvent.Builder()
-                .setDomain("growingio.com")
-                .setQuery("aaaa")
-                .setAttributes(defaultMap)
-                .setPath("test")
-                .build();
-        Truth.assertThat(protocol(hpaEvent).getAttributesOrDefault("user", "gio")).isEqualTo("cpacm");
-        Truth.assertThat(protocol(hpaEvent).getQuery()).isEqualTo("aaaa");
-        Truth.assertThat(protocol(hpaEvent).getDomain()).isEqualTo("growingio.com");
-        Truth.assertThat(protocol(hpaEvent).getPath()).isEqualTo("test");
 
         HybridPageEvent hpEvent = new HybridPageEvent.Builder()
                 .setProtocolType("protobuf")

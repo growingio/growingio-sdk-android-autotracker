@@ -39,6 +39,7 @@ import com.gio.test.three.autotrack.fragments.GreenFragment;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
+import com.growingio.android.sdk.track.utils.JsonUtil;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;
@@ -68,6 +69,12 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 @LargeTest
 public class PageEventsTest extends EventsTest {
     private static final String TAG = "PageEventsTest";
+    private static final HashMap<String, String> TEST_ATTRIBUTES = new HashMap<String, String>() {{
+        put("key1", "value1");
+        put("key2", "value2");
+        put("key3", "");
+        put("key4", null);
+    }};
 
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {
@@ -257,6 +264,33 @@ public class PageEventsTest extends EventsTest {
     }
 
     @Test
+    public void setActivityPageAttributesTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                if (jsonObject.getString("path").equals("/MainActivity")
+                        && jsonObject.getString("orientation").equals("PORTRAIT")
+                        && jsonObject.getString("title").equals("demos")
+                        && TEST_ATTRIBUTES.equals(JsonUtil.copyToMap(jsonObject.getJSONObject("attributes")))) {
+                    receivedEvent.set(true);
+                }
+            }
+        });
+        ActivityLifecycleCallback activityLifecycleCallback = (activity, stage) -> {
+            if (stage == Stage.CREATED && activity.getClass() == MainActivity.class) {
+                GrowingAutotracker.get().setPageAttributes(activity, TEST_ATTRIBUTES);
+            }
+        };
+        ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback(activityLifecycleCallback);
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+        Awaiter.untilTrue(receivedEvent);
+        ActivityLifecycleMonitorRegistry.getInstance().removeLifecycleCallback(activityLifecycleCallback);
+        scenario.close();
+    }
+
+    @Test
     public void setFragmentPageAliasTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedPageEventsListener(receivedEvent,
@@ -284,6 +318,37 @@ public class PageEventsTest extends EventsTest {
         ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
         Awaiter.untilTrue(receivedEvent);
         ActivityLifecycleMonitorRegistry.getInstance().removeLifecycleCallback(activityLifecycleCallback);
+        FragmentLifecycleMonitor.get().removeLifecycleCallback(fragmentLifecycleCallback);
+        scenario.close();
+    }
+
+    @Test
+    public void setFragmentPageAttributesTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String path = jsonObject.getString("path");
+                    if ("/NestedFragmentActivity/GreenFragment[fragment1]".equals(path)) {
+                        if (TEST_ATTRIBUTES.equals(JsonUtil.copyToMap(jsonObject.getJSONObject("attributes")))) {
+                            receivedEvent.set(true);
+                        }
+                    }
+                }
+            }
+        });
+
+        FragmentLifecycleCallback fragmentLifecycleCallback = (fragment, stage) -> {
+            if (stage == FragmentLifecycleCallback.Stage.CREATED && fragment.getClass() == GreenFragment.class) {
+                GrowingAutotracker.get().setPageAttributesSupport(fragment, TEST_ATTRIBUTES);
+            }
+        };
+        FragmentLifecycleMonitor.get().addLifecycleCallback(fragmentLifecycleCallback);
+
+        ActivityScenario<NestedFragmentActivity> scenario = ActivityScenario.launch(NestedFragmentActivity.class);
+        Awaiter.untilTrue(receivedEvent);
         FragmentLifecycleMonitor.get().removeLifecycleCallback(fragmentLifecycleCallback);
         scenario.close();
     }

@@ -19,7 +19,6 @@ package com.growingio.protobuf;
 import com.growingio.android.sdk.track.events.ActivateEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.events.PageAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
@@ -30,7 +29,6 @@ import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.cdp.ResourceItem;
 import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
-import com.growingio.android.sdk.track.events.hybrid.HybridPageAttributesEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
 import com.growingio.android.sdk.track.middleware.GEvent;
@@ -136,11 +134,6 @@ class EventProtocolTransfer {
             CustomEvent customEvent = (CustomEvent) gEvent;
             eventBuilder.setEventName(customEvent.getEventName()); //22
         }
-        if (gEvent instanceof PageAttributesEvent) {
-            PageAttributesEvent paEvent = (PageAttributesEvent) gEvent;
-            eventBuilder.setPath(paEvent.getPath()); //10
-            eventBuilder.setPageShowTimestamp(paEvent.getPageShowTimestamp()); //23
-        }
         if (gEvent instanceof PageLevelCustomEvent) {
             PageLevelCustomEvent plEvent = (PageLevelCustomEvent) gEvent;
             eventBuilder.setPath(plEvent.getPath()); //10
@@ -169,10 +162,6 @@ class EventProtocolTransfer {
         if (gEvent instanceof HybridCustomEvent) {
             HybridCustomEvent hcEvent = (HybridCustomEvent) gEvent;
             eventBuilder.setQuery(hcEvent.getQuery()); //11
-        }
-        if (gEvent instanceof HybridPageAttributesEvent) {
-            HybridPageAttributesEvent hpaEvent = (HybridPageAttributesEvent) gEvent;
-            eventBuilder.setQuery(hpaEvent.getQuery()); //11
         }
         if (gEvent instanceof HybridPageEvent) {
             HybridPageEvent hpEvent = (HybridPageEvent) gEvent;
