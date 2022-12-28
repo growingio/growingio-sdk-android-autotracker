@@ -16,8 +16,11 @@
 
 package com.growingio.android.advert;
 
+import static org.robolectric.Shadows.shadowOf;
+
+import android.app.Activity;
 import android.app.Application;
-import android.app.ListActivity;
+import android.os.Looper;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -31,21 +34,26 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.LooperMode;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class ActivateTest {
     private final Application context = ApplicationProvider.getApplicationContext();
+    private Activity tempActivity;
 
     @Before
     public void setup() {
         TrackerContext.init(context);
+        tempActivity = Robolectric.buildActivity(RobolectricActivity.class).setup().create().get();
     }
 
 
     @Test
+    @LooperMode(LooperMode.Mode.PAUSED)
     public void activate() {
 
         AdvertLibraryGioModule module = new AdvertLibraryGioModule();
@@ -55,8 +63,10 @@ public class ActivateTest {
         boolean isActivated = AdvertUtils.isDeviceActivated();
         Truth.assertThat(isActivated).isFalse();
 
-        ActivityStateProvider.get().onActivityCreated(new ListActivity(), null);
+        ActivityStateProvider.get().onActivityCreated(tempActivity, null);
         TrackerContext.get().executeData(Activate.activate(), Activate.class, AdvertResult.class);
+        // 等待 view.post 完成
+        shadowOf(Looper.getMainLooper()).idle();
         Truth.assertThat(AdvertUtils.isDeviceActivated()).isTrue();
 
     }
