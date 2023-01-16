@@ -75,6 +75,7 @@ public class CircleScreenshot {
 
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
+
         try {
             json.put("screenWidth", mScreenWidth);
             json.put("screenHeight", mScreenHeight);
@@ -111,6 +112,22 @@ public class CircleScreenshot {
         private int mViewCount = 0;
         private Callback<CircleScreenshot> mScreenshotResultCallback;
 
+        public Builder() {
+            DisplayMetrics displayMetrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
+            mScreenWidth = displayMetrics.widthPixels;
+            mScreenHeight = displayMetrics.heightPixels;
+        }
+
+        public Builder setScreenWidth(int screenWidth) {
+            this.mScreenWidth = screenWidth;
+            return this;
+        }
+
+        public Builder setScreenHeight(int screenHeight) {
+            this.mScreenHeight = screenHeight;
+            return this;
+        }
+
         public Builder setScale(float scale) {
             mScale = scale;
             return this;
@@ -123,6 +140,16 @@ public class CircleScreenshot {
 
         public Builder setSnapshotKey(long snapshotKey) {
             mSnapshotKey = snapshotKey;
+            return this;
+        }
+
+        public Builder addElements(List<ViewElement> elements) {
+            mViewElements.addAll(elements);
+            return this;
+        }
+
+        public Builder addPages(List<PageElement> pages) {
+            mPages.addAll(pages);
             return this;
         }
 
@@ -142,10 +169,6 @@ public class CircleScreenshot {
             }
 
             mScreenshotResultCallback = callback;
-
-            DisplayMetrics displayMetrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
-            mScreenWidth = displayMetrics.widthPixels;
-            mScreenHeight = displayMetrics.heightPixels;
 
             mScreenLock.incrementAndGet();
             for (DecorView decorView : decorViews) {

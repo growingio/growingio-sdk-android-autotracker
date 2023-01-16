@@ -44,6 +44,7 @@ def coverageClassDirs = [
         "$rootDir/growingio-network/volley/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-network/urlconnection/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-apm/build/intermediates/javac/debug/classes",
+        "$rootDir/growingio-flutter/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-tools/snappy/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-tools/oaid/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-webservice/circler/build/intermediates/javac/debug/classes",

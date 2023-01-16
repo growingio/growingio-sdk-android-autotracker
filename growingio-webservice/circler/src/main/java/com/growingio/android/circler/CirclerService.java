@@ -22,9 +22,11 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.EventFlutter;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
+import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.WebService;
 import com.growingio.android.sdk.track.webservices.message.ClientInfoMessage;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
@@ -54,13 +56,17 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
     private final ThreadSafeTipView safeTipView;
     private final WebSocketHandler webSocketHandler;
     private Map<String, String> params;
+    private int circleDataType;
     protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
 
-
-    void init(Map<String, String> params) {
-        this.params = params;
+    void sendCircleData(Circler circler) {
+        circleDataType = circler.circleDataType;
+        if (circleDataType == Circler.CIRCLE_INIT) {
+            this.params = circler.getParams();
+        } else if (circleDataType == Circler.CIRCLE_DATA) {
+            ScreenshotProvider.get().generateCircleData(circler.getCirclerData());
+        }
     }
-
 
     public CirclerService(OkHttpClient client) {
         this.client = client;
@@ -75,6 +81,12 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
         if (socketState.get() == SOCKET_STATE_READIED) {
             if (callback != null) {
                 callback.onDataReady(new WebService());
+            }
+            return;
+        }
+        if (circleDataType != Circler.CIRCLE_INIT) {
+            if (callback != null) {
+                callback.onLoadFailed(new IllegalStateException("WebSocketService isn't ready"));
             }
             return;
         }
@@ -148,6 +160,8 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
                 exitCircler();
             }
         });
+
+        TrackerContext.get().executeData(new EventFlutter(true), EventFlutter.class, Void.class);
     }
 
     @Override
@@ -155,6 +169,7 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
     }
 
     protected void exitCircler() {
+        TrackerContext.get().executeData(new EventFlutter(false), EventFlutter.class, Void.class);
         sendMessage(new QuitMessage().toJSONObject().toString());
         cleanup();
     }

@@ -16,18 +16,25 @@
 
 package com.growingio.android.sdk.track.webservices;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * <p>
- *     start circler module.
+ * start circler module.
+ *
  * @author cpacm 5/10/21
  */
 public class Circler {
 
-    final Map<String, String> params;
+    public final static int CIRCLE_INIT = 0;
+    public final static int CIRCLE_DATA = 1;
+
+    public final int circleDataType;
+    private Map<String, String> params;
 
     public Circler(Map<String, String> params) {
+        circleDataType = CIRCLE_INIT;
         this.params = params;
     }
 
@@ -35,4 +42,80 @@ public class Circler {
         return params;
     }
 
+    private CirclerData circlerData;
+
+    public Circler(CirclerData circlerData) {
+        circleDataType = CIRCLE_DATA;
+        this.circlerData = circlerData;
+    }
+
+    public CirclerData getCirclerData() {
+        return circlerData;
+    }
+
+    public static class CirclerData {
+        private List<Map<String, Object>> elements;
+        private List<Map<String, Object>> pages;
+        private boolean forceUpdate;
+        private String screenshot;
+        private double scale;
+        private double width;
+        private double height;
+
+        public List<Map<String, Object>> getElements() {
+            return elements;
+        }
+
+        public void setElements(List<Map<String, Object>> elements) {
+            this.elements = elements;
+        }
+
+        public List<Map<String, Object>> getPages() {
+            return pages;
+        }
+
+        public void setPages(List<Map<String, Object>> pages) {
+            this.pages = pages;
+        }
+
+        public boolean isForceUpdate() {
+            return forceUpdate;
+        }
+
+        public void setForceUpdate(boolean forceUpdate) {
+            this.forceUpdate = forceUpdate;
+        }
+
+        public String getScreenshot() {
+            return screenshot;
+        }
+
+        public void setScreenshot(String screenshot) {
+            this.screenshot = screenshot;
+        }
+
+        public double getScale() {
+            return scale;
+        }
+
+        public void setScale(double scale) {
+            this.scale = scale;
+        }
+
+        public double getWidth() {
+            return width;
+        }
+
+        public void setWidth(double width) {
+            this.width = width;
+        }
+
+        public double getHeight() {
+            return height;
+        }
+
+        public void setHeight(double height) {
+            this.height = height;
+        }
+    }
 }
