@@ -235,7 +235,9 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                             outputStream.write(buffer, 0, len);
                         }
                         AdvertData advertData = AdvertUtils.parseDeeplinkResponse(outputStream.toString("UTF-8"));
-                        sendReengage(advertData);
+                        if (advertData.errorCode == DeepLinkCallback.SUCCESS) {
+                            sendReengage(advertData);
+                        }
                         sendDeepLinkCallback(advertData.errorCode, advertData.params, wakeTime);
                     } catch (IOException e) {
                         e.printStackTrace();
