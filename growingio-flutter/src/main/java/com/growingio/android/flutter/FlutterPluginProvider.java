@@ -122,7 +122,6 @@ public class FlutterPluginProvider {
     public void trackCircleData(Map args, byte[] screenshot) {
         if (!TrackerContext.initializedSuccessfully()) return;
         try {
-            boolean forceUpdate = (Boolean) args.get("forceUpdate");
             List<Map<String, Object>> elements = (List<Map<String, Object>>) args.get("elements");
             List<Map<String, Object>> pages = (List<Map<String, Object>>) args.get("pages");
             double scale = (double) args.get("scale");
@@ -136,7 +135,6 @@ public class FlutterPluginProvider {
             circlerData.setElements(elements);
             circlerData.setPages(pages);
             circlerData.setScreenshot(screenshotBase64);
-            circlerData.setForceUpdate(forceUpdate);
             circlerData.setScale(scale);
             circlerData.setHeight(height);
             circlerData.setWidth(width);

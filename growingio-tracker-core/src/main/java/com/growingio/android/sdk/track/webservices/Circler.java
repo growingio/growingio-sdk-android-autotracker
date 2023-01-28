@@ -56,7 +56,6 @@ public class Circler {
     public static class CirclerData {
         private List<Map<String, Object>> elements;
         private List<Map<String, Object>> pages;
-        private boolean forceUpdate;
         private String screenshot;
         private double scale;
         private double width;
@@ -76,14 +75,6 @@ public class Circler {
 
         public void setPages(List<Map<String, Object>> pages) {
             this.pages = pages;
-        }
-
-        public boolean isForceUpdate() {
-            return forceUpdate;
-        }
-
-        public void setForceUpdate(boolean forceUpdate) {
-            this.forceUpdate = forceUpdate;
         }
 
         public String getScreenshot() {
