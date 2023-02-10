@@ -148,28 +148,11 @@ class AdvertUtils {
             if (clipData.getItemCount() == 0) return false;
             ClipData.Item item = clipData.getItemAt(0);
             CharSequence charSequence = item.coerceToText(TrackerContext.get());
-            if (charSequence == null || charSequence.length() == 0) return false;
-            char zero = (char) 8204;
-            StringBuilder binaryList = new StringBuilder();
-            for (int i = 0; i < charSequence.length(); i++) {
-                binaryList.append(charSequence.charAt(i) == zero ? 0 : 1);
-            }
-            final int singleCharLength = 16;
-            if (binaryList.length() % 16 != 0) {
-                return false;
-            }
-            ArrayList<String> bs = new ArrayList<>();
-            int i = 0;
-            while (i < binaryList.length()) {
-                bs.add(binaryList.substring(i, i + singleCharLength));
-                i += singleCharLength;
-            }
-            StringBuilder listString = new StringBuilder();
-            for (String s : bs) {
-                listString.append((char) Integer.parseInt(s, 2));
-            }
 
-            String data = listString.toString();
+            if (charSequence == null || charSequence.length() == 0) return false;
+            String data = parseZwsData(charSequence);
+            if (data == null) return false;
+
             AdvertData advertData = parseClipBoardInfo(data);
             if (advertData != null) {
                 info.copy(advertData);
@@ -192,7 +175,38 @@ class AdvertUtils {
         }
     }
 
+    /**
+     * 不可见字符 → 二进制字符串 → CharCode → 原始数据
+     */
+    static String parseZwsData(CharSequence charSequence) {
+        char zero = (char) 8204;
+        StringBuilder binaryList = new StringBuilder();
+        for (int i = 0; i < charSequence.length(); i++) {
+            binaryList.append(charSequence.charAt(i) == zero ? 0 : 1);
+        }
+        final int singleCharLength = 16;
+        if (binaryList.length() % 16 != 0) {
+            return null;
+        }
+        ArrayList<String> bs = new ArrayList<>();
+        int i = 0;
+        while (i < binaryList.length()) {
+            bs.add(binaryList.substring(i, i + singleCharLength));
+            i += singleCharLength;
+        }
+        StringBuilder listString = new StringBuilder();
+        for (String s : bs) {
+            listString.append((char) Integer.parseInt(s, 2));
+        }
+        return listString.toString();
+    }
+
     private AdvertUtils() {
+    }
+
+    static void clearAdvertSharedPreferences() {
+        getSharedPreferences().edit().putBoolean(PREF_DEVICE_ACTIVATED, false).apply();
+        getSharedPreferences().edit().putString(PREF_DEVICE_ACTIVATE_INFO, "").apply();
     }
 
     static boolean isDeviceActivated() {
@@ -209,10 +223,7 @@ class AdvertUtils {
     }
 
     static void setActivateInfo(String activateInfo) {
-        getSharedPreferences().edit().putString(
-                PREF_DEVICE_ACTIVATE_INFO,
-                activateInfo
-        ).apply();
+        getSharedPreferences().edit().putString(PREF_DEVICE_ACTIVATE_INFO, activateInfo).apply();
     }
 
     static String getActivateInfo() {
@@ -241,8 +252,7 @@ class AdvertUtils {
             Iterator<String> keys = jsonObject.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                if ("_gio_var".equals(key))
-                    continue;
+                if ("_gio_var".equals(key)) continue;
                 map.put(key, jsonObject.getString(key));
             }
         } catch (JSONException jsonException) {
