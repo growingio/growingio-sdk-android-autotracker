@@ -32,7 +32,6 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.ActivateEvent;
-import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.Activate;
 import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
