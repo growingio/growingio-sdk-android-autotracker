@@ -28,7 +28,6 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
-import com.growingio.android.sdk.track.events.hybrid.HybridPageAttributesEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
 import com.growingio.android.sdk.track.async.Callback;
@@ -105,11 +104,6 @@ public class HybridTest {
         HybridViewElementEvent viewClickEvent = (HybridViewElementEvent) hybridTransformerImp.transform(viewClickJson).build();
         Truth.assertThat(viewClickEvent.getIndex()).isEqualTo(1);
         Truth.assertThat(viewClickEvent.getPath()).isEqualTo("urlscheme");
-
-        String pageAttrJson = "{\"eventType\":\"PAGE_ATTRIBUTES\",\"domain\":\"growingio.com\",\"query\":\"something\",\"index\":1,\"textValue\":\"test\",\"path\":\"urlscheme\",\"pageShowTimestamp\":1234567890,\"attributes\":{\"name\":\"cpacm\",\"age\":\"18\"}}";
-        HybridPageAttributesEvent pageAttrEvent = (HybridPageAttributesEvent) hybridTransformerImp.transform(pageAttrJson).build();
-        Truth.assertThat(pageAttrEvent.getQuery()).isEqualTo("something");
-        Truth.assertThat(pageAttrEvent.toJSONObject().toString()).contains("growingio.com");
 
         String pageJson = "{\"eventType\":\"PAGE\",\"domain\":\"growingio.com\",\"protocolType\":\"webview\",\"query\":\"something\",\"index\":1,\"textValue\":\"test\",\"path\":\"urlscheme\",\"referralPage\":\"/home/product/\",\"timestamp\":123456789,\"title\":\"this is a test page.\"}";
         HybridPageEvent pageEvent = (HybridPageEvent) hybridTransformerImp.transform(pageJson).build();

@@ -21,7 +21,6 @@ import android.content.res.Configuration;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
-import com.growingio.android.sdk.track.events.hybrid.HybridPageAttributesEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
@@ -78,15 +77,8 @@ public class HybridTransformerImp implements HybridTransformer {
                         .setReferralPage(eventJson.optString(KEY_REFERRAL_PAGE))
                         .setTitle(eventJson.optString(KEY_TITLE))
                         .setTimestamp(eventJson.getLong(KEY_TIMESTAMP))
-                        .setOrientation(orientation);
-
-            } else if (AutotrackEventType.PAGE_ATTRIBUTES.equals(type)) {
-                return new HybridPageAttributesEvent.Builder()
-                        .setDomain(getDomain(eventJson))
-                        .setQuery(eventJson.optString(KEY_QUERY))
-                        .setPath(eventJson.getString(KEY_PATH))
-                        .setPageShowTimestamp(eventJson.getLong(KEY_PAGE_SHOW_TIMESTAMP))
-                        .setAttributes(JsonUtil.copyToMap(eventJson.getJSONObject(KEY_ATTRIBUTES)));
+                        .setOrientation(orientation)
+                        .setAttributes(JsonUtil.copyToMap(eventJson.optJSONObject(KEY_ATTRIBUTES)));
 
             } else if (AutotrackEventType.VIEW_CLICK.equals(type)) {
                 return transformViewElementEventBuilder(type, eventJson);

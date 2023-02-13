@@ -28,7 +28,6 @@ import androidx.annotation.VisibleForTesting;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
-import com.growingio.android.sdk.track.events.PageAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
@@ -232,9 +231,6 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         }
         if (eventBuilder instanceof PageLevelCustomEvent.Builder) {
             return ((PageLevelCustomEvent.Builder) eventBuilder).getPath();
-        }
-        if (eventBuilder instanceof PageAttributesEvent.Builder) {
-            return ((PageAttributesEvent.Builder) eventBuilder).getPath();
         }
         return null;
     }

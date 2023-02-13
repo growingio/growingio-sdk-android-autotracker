@@ -268,6 +268,35 @@ public class HybridEventsTest extends EventsTest {
     }
 
     @Test
+    public void hybridPageEventWithAttributesTest() {
+        AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        WebView webView = launchMockWebView();
+        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
+            @Override
+            protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    if (jsonObject.getString("path").equals("/push/web.html")) {
+                        Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
+                        Truth.assertThat(jsonObject.getString("title")).isEqualTo("Hybrid测试页面");
+                        Truth.assertThat(jsonObject.getString("referralPage")).isEqualTo("http://test-browser.growingio.com/push");
+                        Truth.assertThat(jsonObject.getString("protocolType")).isEqualTo("https");
+                        Truth.assertThat(jsonObject.getLong("timestamp")).isEqualTo(1602485628504L);
+                        HashMap<String, String> attributes = (HashMap<String, String>) JsonUtil.copyToMap(jsonObject.getJSONObject("attributes"));
+                        if (attributes.equals(TEST_ATTRIBUTES)) {
+                            receivedEvent.set(true);
+                        }
+                    }
+                }
+            }
+        });
+
+        TrackHelper.postToUiThread(() ->
+                webView.evaluateJavascript("javascript:sendMockPageWithAttributesEvent()", null));
+        Awaiter.untilTrue(receivedEvent);
+    }
+
+    @Test
     public void hybridPageEventWithQueryTest() {
         AtomicBoolean receivedEvent = new AtomicBoolean(false);
         WebView webView = launchMockWebView();
@@ -316,31 +345,6 @@ public class HybridEventsTest extends EventsTest {
 
         TrackHelper.postToUiThread(() ->
                 webView.evaluateJavascript("javascript:sendMockFilePageEvent()", null));
-        Awaiter.untilTrue(receivedEvent);
-    }
-
-    @Test
-    public void hybridPageAttributesEventTest() {
-        AtomicBoolean receivedEvent = new AtomicBoolean(false);
-        WebView webView = launchMockWebView();
-        getEventsApiServer().setOnReceivedEventListener(new MockEventsApiServer.OnReceivedEventListener() {
-            @Override
-            protected void onReceivedPageAttributesEvents(JSONArray jsonArray) throws JSONException {
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    if (jsonObject.getString("path").equals("/push/web.html")) {
-                        Truth.assertThat(jsonObject.getString("domain")).isEqualTo("test-browser.growingio.com");
-                        Truth.assertThat(jsonObject.getLong("pageShowTimestamp")).isEqualTo(1602485626878L);
-                        HashMap<String, String> attributes = (HashMap<String, String>) JsonUtil.copyToMap(jsonObject.getJSONObject("attributes"));
-                        Truth.assertThat(attributes).isEqualTo(TEST_ATTRIBUTES);
-                        receivedEvent.set(true);
-                    }
-                }
-            }
-        });
-
-        TrackHelper.postToUiThread(() ->
-                webView.evaluateJavascript("javascript:sendMockPageAttributesEvent()", null));
         Awaiter.untilTrue(receivedEvent);
     }
 

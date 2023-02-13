@@ -191,11 +191,6 @@ public class MockEventsApiServer extends MockServer {
                         mOnReceivedEventListener.onReceivedPageEvents(jsonArray);
                     }
                     break;
-                case AutotrackEventType.PAGE_ATTRIBUTES:
-                    if (mOnReceivedEventListener != null) {
-                        mOnReceivedEventListener.onReceivedPageAttributesEvents(jsonArray);
-                    }
-                    break;
                 case TrackEventType.FORM_SUBMIT:
                     if (mOnReceivedEventListener != null) {
                         mOnReceivedEventListener.onReceivedHybridFormSubmitEvents(jsonArray);
@@ -248,10 +243,6 @@ public class MockEventsApiServer extends MockServer {
         }
 
         protected void onReceivedPageEvents(JSONArray jsonArray) throws JSONException {
-
-        }
-
-        protected void onReceivedPageAttributesEvents(JSONArray jsonArray) throws JSONException {
 
         }
 

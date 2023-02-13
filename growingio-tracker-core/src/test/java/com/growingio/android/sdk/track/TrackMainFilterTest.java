@@ -25,7 +25,6 @@ import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
-import com.growingio.android.sdk.track.events.PageAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -106,24 +105,6 @@ public class TrackMainFilterTest {
         });
         trackMainThread.onGenerateGEvent(new PageEvent.Builder());
         trackMainThread.onGenerateGEvent(new CustomEvent.Builder().setEventName("cpacm"));
-    }
-
-    @Test
-    public void filterEventPath() {
-        trackMainThread.addEventBuildInterceptor(new EventBuildInterceptor() {
-            @Override
-            public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
-            }
-
-            @Override
-            public void eventDidBuild(GEvent event) {
-                if (event instanceof PageAttributesEvent) {
-                    Truth.assertThat(((PageAttributesEvent) event).getPath()).isEqualTo("/SubActivity");
-                }
-            }
-        });
-        trackMainThread.onGenerateGEvent(new PageAttributesEvent.Builder().setPath("/MainActivity"));
-        trackMainThread.onGenerateGEvent(new PageAttributesEvent.Builder().setPath("/SubActivity"));
     }
 
     @Test
