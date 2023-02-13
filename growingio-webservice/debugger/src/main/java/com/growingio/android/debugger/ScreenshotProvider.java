@@ -18,6 +18,7 @@ package com.growingio.android.debugger;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -121,6 +122,19 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
     public void refreshScreenshot() {
         mHandler.removeCallbacks(mRefreshScreenshotRunnable);
         mHandler.postDelayed(mRefreshScreenshotRunnable, MIN_REFRESH_INTERVAL);
+    }
+
+    public void generateDebuggerData(String screenshotBase64) {
+        if (getListenerCount() == 0) return;
+        mHandler.removeMessages(0);
+        Message message = Message.obtain(mHandler, new Runnable() {
+            @Override
+            public void run() {
+                sendScreenshotRefreshed(screenshotBase64, mScale);
+            }
+        });
+        message.what = 0;
+        mHandler.sendMessageDelayed(message, MIN_REFRESH_INTERVAL);
     }
 
     public static ScreenshotProvider get() {

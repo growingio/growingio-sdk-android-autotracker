@@ -25,7 +25,6 @@ import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 
 /**
  * <p>
- * when register apm module,init gmonitor sdk.
  *
  * @author cpacm 2022/9/27
  */
@@ -38,8 +37,11 @@ public class FlutterDataLoader implements ModelLoader<EventFlutter, Void> {
             public Void executeData() {
                 if (eventFlutter.isCircleEnabled()) {
                     FlutterPluginProvider.get().startFlutterCircle();
+                } else if (eventFlutter.isDebuggerEnabled()) {
+                    FlutterPluginProvider.get().startFlutterDebugger();
                 } else {
                     FlutterPluginProvider.get().stopFlutterCircle();
+                    FlutterPluginProvider.get().stopFlutterDebugger();
                 }
                 return null;
             }

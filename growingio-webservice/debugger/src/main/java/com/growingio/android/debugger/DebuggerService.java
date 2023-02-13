@@ -15,13 +15,17 @@
  */
 package com.growingio.android.debugger;
 
+import android.util.Base64;
+
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.EventFlutter;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
+import com.growingio.android.sdk.track.webservices.Debugger;
 import com.growingio.android.sdk.track.webservices.WebService;
 import com.growingio.android.sdk.track.webservices.message.ClientInfoMessage;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
@@ -53,10 +57,21 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
     private final ThreadSafeTipView safeTipView;
     private final WebSocketHandler webSocketHandler;
     private Map<String, String> params;
+
+    private int debuggerDataType;
     protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
 
-    void init(Map<String, String> params) {
-        this.params = params;
+    void sendDebuggerData(Debugger debugger) {
+        debuggerDataType = debugger.debuggerDataType;
+        if (debuggerDataType == Debugger.DEBUGGER_INIT) {
+            this.params = debugger.getParams();
+        } else if (debuggerDataType == Debugger.DEBUGGER_SCREENSHOT) {
+            byte[] screenshot = debugger.getScreenshot();
+            if (screenshot != null) {
+                String screenshotBase64 = "data:image/jpeg;base64," + Base64.encodeToString(screenshot, Base64.DEFAULT);
+                ScreenshotProvider.get().generateDebuggerData(screenshotBase64);
+            }
+        }
     }
 
     public DebuggerService(OkHttpClient client) {
@@ -78,6 +93,12 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
         if (socketState.get() == SOCKET_STATE_READIED) {
             if (callback != null) {
                 callback.onDataReady(new WebService());
+            }
+            return;
+        }
+        if (debuggerDataType != Debugger.DEBUGGER_INIT) {
+            if (callback != null) {
+                callback.onLoadFailed(new IllegalStateException("WebSocketService isn't ready"));
             }
             return;
         }
@@ -125,6 +146,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
     }
 
     public void cancel() {
+        Logger.e(TAG, "end DebuggerService");
         socketState.set(SOCKET_STATE_CLOSED);
         if (webSocketHandler.getWebSocket() != null) {
             webSocketHandler.getWebSocket().cancel();
@@ -144,15 +166,12 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
     @Override
     public void onReady() {
         sendMessage(ClientInfoMessage.createMessage().toJSONObject().toString());
-        DebuggerEventWrapper.get().registerDebuggerEventListener(new DebuggerEventWrapper.OnDebuggerEventListener() {
-            @Override
-            public void onDebuggerMessage(String message) {
-                sendMessage(message);
-            }
-        });
+        DebuggerEventWrapper.get().registerDebuggerEventListener(this::sendMessage);
         socketState.set(SOCKET_STATE_READIED);
         DebuggerEventWrapper.get().ready();
         safeTipView.onReady(this::exitDebugger);
+
+        TrackerContext.get().executeData(EventFlutter.flutterDebugger(true), EventFlutter.class, Void.class);
     }
 
     @Override
@@ -171,6 +190,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
     }
 
     protected void exitDebugger() {
+        TrackerContext.get().executeData(EventFlutter.flutterDebugger(false), EventFlutter.class, Void.class);
         sendMessage(new QuitMessage().toJSONObject().toString());
         cleanup();
     }

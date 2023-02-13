@@ -26,6 +26,7 @@ import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.webservices.Circler;
+import com.growingio.android.sdk.track.webservices.Debugger;
 import com.growingio.android.sdk.track.webservices.WebService;
 
 import java.util.List;
@@ -67,6 +68,18 @@ public class FlutterPluginProvider {
     public void stopFlutterCircle() {
         if (flutterMethodInterface != null) {
             flutterMethodInterface.stopFlutterCircle();
+        }
+    }
+
+    public void startFlutterDebugger() {
+        if (flutterMethodInterface != null) {
+            flutterMethodInterface.startFlutterDebugger();
+        }
+    }
+
+    public void stopFlutterDebugger() {
+        if (flutterMethodInterface != null) {
+            flutterMethodInterface.stopFlutterDebugger();
         }
     }
 
@@ -154,5 +167,19 @@ public class FlutterPluginProvider {
         } catch (Exception e) {
             Logger.e(TAG, e);
         }
+    }
+
+    public void trackDebuggerData(byte[] screenshot) {
+        TrackerContext.get().loadData(new Debugger(screenshot), Debugger.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
+            @Override
+            public void onDataReady(WebService data) {
+                Logger.d(TAG, "send circle data success");
+            }
+
+            @Override
+            public void onLoadFailed(Exception e) {
+                Logger.e(TAG, e.getMessage());
+            }
+        });
     }
 }

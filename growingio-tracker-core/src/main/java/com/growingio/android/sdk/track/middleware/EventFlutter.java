@@ -26,9 +26,24 @@ public class EventFlutter {
         return circleEnabled;
     }
 
-    private boolean circleEnabled;
+    public boolean isDebuggerEnabled() {
+        return debuggerEnabled;
+    }
 
-    public EventFlutter(boolean circleEnabled) {
+    private final boolean circleEnabled;
+
+    private final boolean debuggerEnabled;
+
+    public EventFlutter(boolean circleEnabled, boolean debuggerEnabled) {
         this.circleEnabled = circleEnabled;
+        this.debuggerEnabled = debuggerEnabled;
+    }
+
+    public static EventFlutter flutterCircle(boolean circleEnabled) {
+        return new EventFlutter(circleEnabled, false);
+    }
+
+    public static EventFlutter flutterDebugger(boolean debuggerEnabled) {
+        return new EventFlutter(false, debuggerEnabled);
     }
 }

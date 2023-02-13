@@ -26,4 +26,8 @@ public interface FlutterMethodInterface {
     void startFlutterCircle();
 
     void stopFlutterCircle();
+
+    void startFlutterDebugger();
+
+    void stopFlutterDebugger();
 }

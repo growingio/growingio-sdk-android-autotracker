@@ -161,7 +161,7 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
             }
         });
 
-        TrackerContext.get().executeData(new EventFlutter(true), EventFlutter.class, Void.class);
+        TrackerContext.get().executeData(EventFlutter.flutterCircle(true), EventFlutter.class, Void.class);
     }
 
     @Override
@@ -169,7 +169,7 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
     }
 
     protected void exitCircler() {
-        TrackerContext.get().executeData(new EventFlutter(false), EventFlutter.class, Void.class);
+        TrackerContext.get().executeData(EventFlutter.flutterCircle(false), EventFlutter.class, Void.class);
         sendMessage(new QuitMessage().toJSONObject().toString());
         cleanup();
     }
