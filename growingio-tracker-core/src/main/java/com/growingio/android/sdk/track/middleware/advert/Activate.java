@@ -27,12 +27,32 @@ import android.net.Uri;
 public class Activate {
 
     final Uri uri;
+    final DeepLinkCallback callback;
 
-    public Activate(Uri uri) {
+    private Activate(Uri uri, DeepLinkCallback callback) {
         this.uri = uri;
+        this.callback = callback;
     }
 
     public Uri getUri() {
         return uri;
     }
+
+    public DeepLinkCallback getCallback() {
+        return callback;
+    }
+
+    public static Activate activate() {
+        return new Activate(null, null);
+    }
+
+    public static Activate deeplink(Uri uri) {
+        return new Activate(uri, null);
+    }
+
+    public static Activate handleDeeplink(Uri uri, DeepLinkCallback callback) {
+        return new Activate(uri, callback);
+    }
+
+
 }

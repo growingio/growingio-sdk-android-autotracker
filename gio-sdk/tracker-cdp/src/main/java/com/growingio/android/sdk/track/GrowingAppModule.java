@@ -27,7 +27,7 @@ import com.growingio.sdk.annotation.GIOTracker;
  *
  * @author cpacm 4/28/21
  */
-@GIOAppModule(config = CdpConfig.class, configName = "CdpTrack")
+@GIOAppModule(configName = "CdpTrackConfiguration")
 public final class GrowingAppModule extends AppGioModule {
 
     @GIOTracker(path = CdpTracker.class)

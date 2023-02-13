@@ -23,14 +23,15 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
+import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.Activate;
 import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
+import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.middleware.advert.DeepLink;
 import com.growingio.android.sdk.track.webservices.WebService;
 
 
@@ -48,11 +49,13 @@ import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEv
  *
  * @author cpacm 2021/3/25
  */
-public class DeepLinkProvider implements IActivityLifecycle {
+public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChangeListener {
 
     private static final String TAG = "DeepLinkProvider";
 
     private WeakReference<Intent> lastIntentRef; //intent 去重，防止多发deeplink
+    private Uri needResendUri = null;
+    private boolean needResendActivate = false;
 
     private static class SingleInstance {
         private static final DeepLinkProvider INSTANCE = new DeepLinkProvider();
@@ -61,8 +64,21 @@ public class DeepLinkProvider implements IActivityLifecycle {
     private DeepLinkProvider() {
     }
 
+    @Override
+    public void onDataCollectionChanged(boolean isEnable) {
+        if (isEnable) {
+            if (needResendUri != null) {
+                handleDeepLink(needResendUri);
+            }
+            if (needResendActivate) {
+                handleDeepLink(null);
+            }
+        }
+    }
+
     public void init() {
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
+        ConfigurationProvider.get().addConfigurationListener(this);
     }
 
     public static DeepLinkProvider get() {
@@ -79,9 +95,9 @@ public class DeepLinkProvider implements IActivityLifecycle {
                     TrackMainThread.trackMain().postActionToTrackMain(() -> dispatchWebServiceUri(data));
                     return;
                 }
-                if (lastIntentRef.get() == event.getIntent()) return;
+                if (lastIntentRef != null && lastIntentRef.get() == event.getIntent()) return;
                 lastIntentRef = new WeakReference<>(event.getIntent());
-                AdvertResult result = TrackerContext.get().executeData(new DeepLink(data), DeepLink.class, AdvertResult.class);
+                AdvertResult result = handleDeepLink(data);
                 if (result != null && result.hasDealWithDeepLink()) {
                     event.getIntent().setData(null);
                 }
@@ -89,10 +105,37 @@ public class DeepLinkProvider implements IActivityLifecycle {
         }
         if (event.eventType == ON_RESUMED) {
             if (event.getIntent() != null) {
-                Uri data = event.getIntent().getData();
-                TrackerContext.get().executeData(new Activate(data), Activate.class, AdvertResult.class);
+                handleDeepLink(null);
             }
         }
+    }
+
+    private AdvertResult handleDeepLink(Uri data) {
+        if (ConfigurationProvider.core().isDataCollectionEnabled()) {
+            if (data != null) {
+                needResendUri = null;
+                return TrackerContext.get().executeData(Activate.deeplink(data), Activate.class, AdvertResult.class);
+            } else {
+                needResendActivate = false;
+                return TrackerContext.get().executeData(Activate.activate(), Activate.class, AdvertResult.class);
+            }
+        } else {
+            if (data != null) {
+                needResendUri = data;
+            } else {
+                needResendActivate = true;
+            }
+        }
+        return null;
+    }
+
+    public boolean doDeepLinkByUrl(String url, DeepLinkCallback callback) {
+        if (!TrackerContext.initializedSuccessfully() || url == null) {
+            return false;
+        }
+        Uri uri = Uri.parse(url);
+        AdvertResult result = TrackerContext.get().executeData(Activate.handleDeeplink(uri, callback), Activate.class, AdvertResult.class);
+        return result.hasDealWithDeepLink();
     }
 
     private boolean checkIsValid(Intent intent) {
