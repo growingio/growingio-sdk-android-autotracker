@@ -32,7 +32,6 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.ActivateEvent;
-import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.Activate;
 import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
@@ -59,23 +58,12 @@ import java.util.Map;
  *
  * @author cpacm 2022/11/23
  */
-public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertResult>, OnConfigurationChangeListener {
+public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertResult> {
 
 
     private final static int DEEPLINK_TYPE_NONE = 0; //doesn't contain deeplink.
     private final static int DEEPLINK_TYPE_URI = 1; //web jump,contains ads params.
     private final static int DEEPLINK_TYPE_SHORT = 2; //short scheme,doesn't contain data.
-
-    AdvertActivateDataLoader() {
-        ConfigurationProvider.get().addConfigurationListener(this);
-    }
-
-    @Override
-    public void onDataCollectionChanged(boolean isEnable) {
-        if (isEnable) {
-            buildLoadData(Activate.activate());
-        }
-    }
 
     @Override
     public LoadData<AdvertResult> buildLoadData(Activate activate) {
@@ -119,29 +107,28 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         @Override
         public AdvertResult executeData() {
             AdvertResult result = new AdvertResult();
-            Logger.d(TAG, "step1. check sdk data collect if it is enabled");
-            if (ConfigurationProvider.core().isDataCollectionEnabled()) {
-                int checkDeepLinkType = checkDeepLinkType();
-                boolean isActivated = AdvertUtils.isDeviceActivated();
-                Logger.d(TAG, "step2. get deeplink type:" + checkDeepLinkType + " & device activate status:" + isActivated);
-                // step3-1. uri not null and contain deeplink
-                if (checkDeepLinkType != DEEPLINK_TYPE_NONE) {
-                    //tip: deeplink doesn't deal with activate
-                    Logger.d(TAG, "step3-1. deal with deeplink");
-                    if (checkDeepLinkType == DEEPLINK_TYPE_URI) {
-                        result.setHasDealWithDeepLink(true);
-                        Logger.d(TAG, "step 4-1. deal with uri link");
-                        dealWithUriLink(uri);
-                    } else if (checkDeepLinkType == DEEPLINK_TYPE_SHORT) {
-                        result.setHasDealWithDeepLink(true);
-                        Logger.d(TAG, "step 4-2. deal with short url link");
-                        dealWithShortLink(uri);
-                    }
-                } else {
-                    Logger.d(TAG, "step 3-2. check clipboard if the deeplink data is included and send activate");
-                    if (!isActivated) activateDeviceWithClipBoard();
+            Logger.d(TAG, "step1. start checkDeeplink type");
+            int checkDeepLinkType = checkDeepLinkType();
+            boolean isActivated = AdvertUtils.isDeviceActivated();
+            Logger.d(TAG, "step2. get deeplink type:" + checkDeepLinkType + " & device activate status:" + isActivated);
+            // step3-1. uri not null and contain deeplink
+            if (checkDeepLinkType != DEEPLINK_TYPE_NONE) {
+                //tip: deeplink doesn't deal with activate
+                Logger.d(TAG, "step3-1. deal with deeplink");
+                if (checkDeepLinkType == DEEPLINK_TYPE_URI) {
+                    result.setHasDealWithDeepLink(true);
+                    Logger.d(TAG, "step 4-1. deal with uri link");
+                    dealWithUriLink(uri);
+                } else if (checkDeepLinkType == DEEPLINK_TYPE_SHORT) {
+                    result.setHasDealWithDeepLink(true);
+                    Logger.d(TAG, "step 4-2. deal with short url link");
+                    dealWithShortLink(uri);
                 }
+            } else {
+                Logger.d(TAG, "step 3-2. check clipboard if the deeplink data is included and send activate");
+                if (!isActivated) activateDeviceWithClipBoard();
             }
+
             // step final. over
             Logger.d(TAG, "step final. over");
             return result;
@@ -235,7 +222,9 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                             outputStream.write(buffer, 0, len);
                         }
                         AdvertData advertData = AdvertUtils.parseDeeplinkResponse(outputStream.toString("UTF-8"));
-                        sendReengage(advertData);
+                        if (advertData.errorCode == DeepLinkCallback.SUCCESS) {
+                            sendReengage(advertData);
+                        }
                         sendDeepLinkCallback(advertData.errorCode, advertData.params, wakeTime);
                     } catch (IOException e) {
                         e.printStackTrace();
