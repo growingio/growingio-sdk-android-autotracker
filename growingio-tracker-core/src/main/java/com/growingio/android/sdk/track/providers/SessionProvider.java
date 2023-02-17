@@ -117,6 +117,7 @@ public class SessionProvider implements IActivityLifecycle {
         Activity activity = event.getActivity();
         if (activity == null) return;
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
+            if (mActivityList.contains(activity.toString())) return;
             if (PersistentDataProvider.get().getActivityCount() == 0) {
                 long latestPauseTime = PersistentDataProvider.get().getLatestPauseTime();
                 if (latestPauseTime != 0 && (System.currentTimeMillis() - latestPauseTime >= mSessionInterval)) {
