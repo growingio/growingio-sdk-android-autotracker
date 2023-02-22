@@ -14,7 +14,7 @@ buildscript {
                 releaseVersion    : "3.4.6",
                 releaseVersionCode: 30406,
 
-                pluginVersion     : "3.4.6",
+                pluginVersion     : "3.4.5",
         ]
 
         versions = [
