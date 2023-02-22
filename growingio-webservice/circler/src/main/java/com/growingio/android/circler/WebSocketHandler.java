@@ -17,7 +17,6 @@
 package com.growingio.android.circler;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
