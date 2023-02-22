@@ -185,7 +185,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
         mHandler.removeMessages(0);
         Message message = Message.obtain(mHandler, new CircleDataThread(data));
         message.what = 0;
-        mHandler.sendMessageDelayed(message, MIN_REFRESH_INTERVAL);
+        mHandler.sendMessageDelayed(message, 100L);
     }
 
     private class CircleDataThread implements Runnable {

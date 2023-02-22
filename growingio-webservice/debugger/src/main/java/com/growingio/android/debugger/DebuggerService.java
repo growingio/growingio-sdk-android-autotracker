@@ -149,7 +149,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
         Logger.e(TAG, "end DebuggerService");
         socketState.set(SOCKET_STATE_CLOSED);
         if (webSocketHandler.getWebSocket() != null) {
-            webSocketHandler.getWebSocket().cancel();
+            webSocketHandler.getWebSocket().close(1000, "exit");
         }
         DebuggerEventWrapper.get().end();
         safeTipView.dismiss();

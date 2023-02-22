@@ -135,7 +135,7 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
     public void cancel() {
         socketState.set(SOCKET_STATE_CLOSED);
         if (webSocketHandler.getWebSocket() != null) {
-            webSocketHandler.getWebSocket().cancel();
+            webSocketHandler.getWebSocket().close(1000, "exit");
         }
         ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
         safeTipView.dismiss();
@@ -154,12 +154,7 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
         sendMessage(ClientInfoMessage.createMessage().toJSONObject().toString());
         socketState.set(SOCKET_STATE_READIED);
         ScreenshotProvider.get().registerScreenshotRefreshedListener(this);
-        safeTipView.onReady(new ThreadSafeTipView.OnExitListener() {
-            @Override
-            public void onExitDebugger() {
-                exitCircler();
-            }
-        });
+        safeTipView.onReady(this::exitCircler);
 
         TrackerContext.get().executeData(EventFlutter.flutterCircle(true), EventFlutter.class, Void.class);
     }
