@@ -28,6 +28,7 @@ import com.gio.test.R;
 import com.gio.test.three.ModuleEntry;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ public class TrackActivity extends Activity {
     private static final String TRACK_TIMER_END = "end timerId";
     private static final String REMOVE_TIMER = "remove timer";
     private static final String CLEAR_TRACK_TIMER = "clear all timer";
+    private static final String DO_DEEPLINK = "doDeepLinkByUrl";
     private String timerId1 = "";
     private String timerId2 = "";
 
@@ -67,7 +69,8 @@ public class TrackActivity extends Activity {
             TRACK_TIMER_RESUME,
             TRACK_TIMER_END,
             REMOVE_TIMER,
-            CLEAR_TRACK_TIMER
+            CLEAR_TRACK_TIMER,
+            DO_DEEPLINK
     };
 
     @Override
@@ -121,6 +124,14 @@ public class TrackActivity extends Activity {
                 break;
             case CLOSE_DATA_COLLECTION:
                 GrowingAutotracker.get().setDataCollectionEnabled(false);
+                break;
+            case DO_DEEPLINK:
+                GrowingAutotracker.get().doDeepLinkByUrl("https://ads-uat.growingio.cn/k4vsdOx", new DeepLinkCallback() {
+                    @Override
+                    public void onReceive(Map<String, String> params, int error, long appAwakePassedTime) {
+                        Log.e(TAG, String.valueOf(params));
+                    };
+                });
                 break;
             case TRACK_TIMER_START:
                 timerId1 = GrowingAutotracker.get().trackTimerStart("event_1");

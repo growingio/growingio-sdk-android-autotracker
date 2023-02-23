@@ -38,88 +38,53 @@
             android:exported="true"
             android:process=":OtherProcess" />
 
-        <activity android:name=".three.MainActivity" android:exported="true">
+        <activity
+            android:name=".three.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <data android:scheme="growing.47d2b990025d67f5" />
-
+                <data android:scheme="growing.ff8a70351000af43" />
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
+            <!-- GIO APPLinks 配置，广告监测用途，APP 用户点击广告监测短链直接跳转 APP-->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
-                    android:host="gio.ren"
-                    android:pathPattern="/v8rud.*"
+                    android:host="ads-test.growingio.cn"
+                    android:pathPattern="/k4gud.*"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
-                    android:host="gio.ren"
-                    android:pathPattern="/v8r.*id.*"
+                    android:host="ads-test.growingio.cn"
+                    android:pathPattern="/k4g.*id.*"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
-                    android:host="gio.ren"
-                    android:pathPattern="/v8r.*td.*"
+                    android:host="ads-uat.growingio.cn"
+                    android:pathPattern="/k4vsd.*"
                     android:scheme="https" />
             </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="datayi.cn"
-                    android:pathPattern="/v8rud.*"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="datayi.cn"
-                    android:pathPattern="/v8r.*id.*"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="datayi.cn"
-                    android:pathPattern="/v8r.*td.*"
-                    android:scheme="https" />
-            </intent-filter>
         </activity>
-        <activity android:name=".three.core.TrackActivity"
+        <activity
+            android:name=".three.core.TrackActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.gio.test.three.Entry" />
