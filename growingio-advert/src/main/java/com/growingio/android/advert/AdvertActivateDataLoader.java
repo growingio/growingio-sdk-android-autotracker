@@ -45,6 +45,7 @@ import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -251,7 +252,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             // just send activate event
             final ActivateEvent.Builder builder = new ActivateEvent.Builder().
                     activate();
-            TrackMainThread.trackMain().postEventToTrackMain(builder);
+            sendEventToMain(builder);
             AdvertUtils.setDeviceActivated();
         }
 
@@ -310,7 +311,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             final ActivateEvent.Builder builder = new ActivateEvent.Builder()
                     .clipDefer()
                     .setAdvertData(data.linkID, data.clickID, data.clickTM, data.customParams);
-            TrackMainThread.trackMain().postEventToTrackMain(builder);
+            sendEventToMain(builder);
             AdvertUtils.setDeviceActivated();
             AdvertUtils.setActivateInfo(""); //清空剪贴板数据
         }
@@ -319,10 +320,15 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             if (TextUtils.isEmpty(data.customParams)) {
                 data.customParams = "{}";
             }
-            TrackMainThread.trackMain().postEventToTrackMain(new ActivateEvent.Builder().reengage(isInApp).setAdvertData(data.linkID, data.clickID, data.clickTM, data.customParams));
+            sendEventToMain(new ActivateEvent.Builder().reengage(isInApp).setAdvertData(data.linkID, data.clickID, data.clickTM, data.customParams));
         }
 
         private final static String TAG = "AdvertModule";
+
+        private void sendEventToMain(ActivateEvent.Builder eventBuilder) {
+            SessionProvider.get().checkSessionIntervalAndSendVisit();
+            TrackMainThread.trackMain().postEventToTrackMain(eventBuilder);
+        }
 
     }
 
