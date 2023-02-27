@@ -120,9 +120,8 @@ public class SessionProvider implements IActivityLifecycle {
                     refreshSessionId();
                     generateVisit();
                 });
-                PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
+                return true;
             }
-            return true;
         }
         return false;
     }
