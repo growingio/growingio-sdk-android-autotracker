@@ -21,6 +21,7 @@ import android.util.Base64;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.events.AttributesBuilder;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.log.Logger;
@@ -31,6 +32,7 @@ import com.growingio.android.sdk.track.webservices.WebService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -89,7 +91,20 @@ public class FlutterPluginProvider {
         try {
             String title = (String) args.get("title");
             String path = (String) args.get("path");
-            Map<String, String> attributes = (Map<String, String>) args.get("attributes");
+            Map<String, Object> attributes = (Map<String, Object>) args.get("attributes");
+            AttributesBuilder builder = new AttributesBuilder();
+            for (String key : attributes.keySet()) {
+                Object value = attributes.get(key);
+                if (value instanceof List) {
+                    builder.addAttribute(key, (List) value);
+                } else if (value instanceof String[]) {
+                    builder.addAttribute(key, (String[]) value);
+                } else if (value instanceof Set) {
+                    builder.addAttribute(key, (Set) value);
+                } else {
+                    builder.addAttribute(key, String.valueOf(value));
+                }
+            }
             long timeStamp = (Long) args.get("timestamp");
             String orientation = TrackerContext.get().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                     ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
@@ -100,7 +115,7 @@ public class FlutterPluginProvider {
                             .setTitle(title)
                             .setTimestamp(timeStamp)
                             .setOrientation(orientation)
-                            .setAttributes(attributes)
+                            .setAttributes(builder.build())
             );
         } catch (Exception e) {
             Logger.e(TAG, e);
