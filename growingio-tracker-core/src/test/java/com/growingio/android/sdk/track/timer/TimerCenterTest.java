@@ -90,7 +90,7 @@ public class TimerCenterTest {
                 if (event instanceof CustomEvent) {
                     CustomEvent timerEvent = (CustomEvent) event;
                     Truth.assertThat(timerEvent.getEventName()).isEqualTo(timerResult.eventName);
-                    Truth.assertThat(timerEvent.getAttributes().get("eventDuration")).isEqualTo(String.valueOf(timerResult.elapsedTime));
+                    Truth.assertThat(timerEvent.getAttributes().get(TimerCenter.ATTR_EVENT_DURATION)).isEqualTo(String.valueOf(timerResult.elapsedTime));
                     countDownLatch.countDown();
                 }
             }
@@ -137,7 +137,7 @@ public class TimerCenterTest {
                 if (event instanceof CustomEvent) {
                     CustomEvent timerEvent = (CustomEvent) event;
                     Truth.assertThat(timerEvent.getEventName()).isEqualTo(timerResult.eventName);
-                    Truth.assertThat(timerEvent.getAttributes().get("eventDuration")).isEqualTo(String.valueOf(timerResult.elapsedTime));
+                    Truth.assertThat(timerEvent.getAttributes().get(TimerCenter.ATTR_EVENT_DURATION)).isEqualTo(String.valueOf(timerResult.elapsedTime));
                     countDownLatch.countDown();
                 }
             }

@@ -11,8 +11,8 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.4.5",
-                releaseVersionCode: 30405,
+                releaseVersion    : "3.4.6",
+                releaseVersionCode: 30406,
 
                 pluginVersion     : "3.4.5",
         ]

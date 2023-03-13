@@ -28,7 +28,9 @@ import android.webkit.WebView;
 
 import androidx.annotation.RequiresApi;
 
+import com.growingio.android.advert.AdvertConfig;
 import com.growingio.android.advert.AdvertLibraryGioModule;
+import com.growingio.android.apm.ApmConfig;
 import com.growingio.android.apm.ApmLibraryGioModule;
 import com.growingio.android.oaid.OaidLibraryGioModule;
 import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
@@ -36,9 +38,11 @@ import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
 import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.tencent.smtt.sdk.QbSdk;
 
 import java.util.List;
+import java.util.Map;
 
 public class DemoApplication extends Application {
     private static final String TAG = "DemoApplication";
@@ -82,20 +86,40 @@ public class DemoApplication extends Application {
 //            startService(new Intent(this, OtherProcessService.class));
         }
 
+        AdvertConfig advertConfig = new AdvertConfig();
+        advertConfig.setDeepLinkCallback(new DeepLinkCallback() {
+            @Override
+            public void onReceive(Map<String, String> params, int error, long appAwakePassedTime) {
+                Log.e(TAG, "DeepLinkCallback");
+                Log.e(TAG, String.valueOf(params));
+            }
+        });
+        advertConfig.setDeepLinkHost("https://ads-uat.growingio.cn"); // uat-uba
+        advertConfig.setReadClipBoardEnable(true);
+
+        ApmConfig apmConfig = new ApmConfig();
+        apmConfig.setActivityLifecycleTracing(true)
+                .setFragmentXLifecycleTracing(false)
+                .setFragmentSupportLifecycleTracing(true)
+                .setFragmentSystemLifecycleTracing(false)
+                .setUncaughtException(true)
+                .setPrintUncaughtException(true);
         if (sConfiguration == null) {
-            sConfiguration = new CdpAutotrackConfiguration("bc675c65b3b0290e", "growing.47d2b990025d67f5")
-                    .setDataSourceId("939c0b26233d3ed1")
-                    .setDataCollectionServerHost("http://uat-api.growingio.com")
+            sConfiguration = new CdpAutotrackConfiguration("bc675c65b3b0290e", "growing.ff8a70351000af43") //uat-uba
+                    .setDataSourceId("8b17366d9e90b05b")
+                    .setDataCollectionServerHost("http://117.50.84.75:8080")
                     .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setDataCollectionEnabled(true)
                     .setIdMappingEnabled(true)
-                    //.setRequireAppProcessesEnabled(true)
+                    .setRequireAppProcessesEnabled(true)
                     .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.REENGAGE))
                     .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
                     //.addConfiguration(oaidConfig)
-                    .addPreloadComponent(new AdvertLibraryGioModule())
-                    .addPreloadComponent(new ApmLibraryGioModule())
+                    .addPreloadComponent(new AdvertLibraryGioModule(), advertConfig)
+                    .addPreloadComponent(new ApmLibraryGioModule(), apmConfig)
+//                    .addPreloadComponent(new ProtobufLibraryModule())
+//                    .addPreloadComponent(new EncoderLibraryGioModule())
                     .addPreloadComponent(new OaidLibraryGioModule());
         }
 
