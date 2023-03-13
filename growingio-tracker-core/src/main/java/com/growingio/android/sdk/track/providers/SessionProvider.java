@@ -112,23 +112,27 @@ public class SessionProvider implements IActivityLifecycle {
         return mLongitude;
     }
 
+    public boolean checkSessionIntervalAndSendVisit() {
+        if (PersistentDataProvider.get().getActivityCount() == 0) {
+            long latestPauseTime = PersistentDataProvider.get().getLatestPauseTime();
+            if (latestPauseTime != 0 && (System.currentTimeMillis() - latestPauseTime >= mSessionInterval)) {
+                TrackMainThread.trackMain().postActionToTrackMain(() -> {
+                    refreshSessionId();
+                    generateVisit();
+                });
+                PersistentDataProvider.get().setLatestPauseTime(System.currentTimeMillis());
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void onActivityLifecycle(final ActivityLifecycleEvent event) {
         Activity activity = event.getActivity();
         if (activity == null) return;
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) {
-            if (PersistentDataProvider.get().getActivityCount() == 0) {
-                long latestPauseTime = PersistentDataProvider.get().getLatestPauseTime();
-                if (latestPauseTime != 0 && (System.currentTimeMillis() - latestPauseTime >= mSessionInterval)) {
-                    TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshSessionId();
-                            generateVisit();
-                        }
-                    });
-                }
-            }
+            checkSessionIntervalAndSendVisit();
             mActivityList.add(activity.toString());
             PersistentDataProvider.get().addActivityCount();
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
