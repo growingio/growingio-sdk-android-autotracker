@@ -124,7 +124,7 @@ public class PageEvent extends BaseAttributesEvent {
 
         @Override
         public void readPropertyInTrackThread() {
-            if (mOrientation == null || !mOrientation.equals(ORIENTATION_PORTRAIT) || !mOrientation.equals(ORIENTATION_LANDSCAPE)) {
+            if (mOrientation == null) {
                 mOrientation = TrackerContext.get().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
             }
             super.readPropertyInTrackThread();
