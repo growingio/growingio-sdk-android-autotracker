@@ -303,7 +303,7 @@ public abstract class BaseEvent extends GEvent {
         protected String mEventType;
         protected long mTimestamp;
         protected String mDomain;
-        private final String mUrlScheme;
+        private String mUrlScheme;
         private String mAppState;
         private long mGlobalSequenceId;
         private long mEventSequenceId;
@@ -327,18 +327,12 @@ public abstract class BaseEvent extends GEvent {
             mEventType = eventType;
             mPlatform = ConstantPool.ANDROID;
             mPlatformVersion = DeviceInfoProvider.get().getOperatingSystemVersion();
-            mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
-            mDomain = AppInfoProvider.get().getPackageName();
-            mUrlScheme = ConfigurationProvider.core().getUrlScheme();
         }
 
         @Deprecated
         protected BaseBuilder() {
             mPlatform = ConstantPool.ANDROID;
             mPlatformVersion = DeviceInfoProvider.get().getOperatingSystemVersion();
-            mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
-            mDomain = AppInfoProvider.get().getPackageName();
-            mUrlScheme = ConfigurationProvider.core().getUrlScheme();
         }
 
         protected Map<String, Boolean> mFilterField = new HashMap<>();
@@ -352,10 +346,6 @@ public abstract class BaseEvent extends GEvent {
         }
 
         public Map<String, Boolean> getFilterMap() {
-            //mFilterField.put(BaseField.PLATFORM, true);
-            //mFilterField.put(BaseField.PLATFORM_VERSION, true);
-            //mFilterField.put(BaseField.DOMAIN, true);
-            //mFilterField.put(BaseField.URL_SCHEME, true);
             mFilterField.put(BaseField.APP_STATE, true);
             mFilterField.put(BaseField.NETWORK_STATE, true);
             mFilterField.put(BaseField.SCREEN_HEIGHT, true);
@@ -377,6 +367,11 @@ public abstract class BaseEvent extends GEvent {
         @CallSuper
         public void readPropertyInTrackThread() {
             if (mEventType == null) mEventType = getEventType();
+
+            mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
+            mDomain = AppInfoProvider.get().getPackageName();
+            mUrlScheme = ConfigurationProvider.core().getUrlScheme();
+
             mTimestamp = (mTimestamp != 0) ? mTimestamp : System.currentTimeMillis();
             mDeviceId = DeviceInfoProvider.get().getDeviceId();
             mSessionId = PersistentDataProvider.get().getSessionId();

@@ -37,6 +37,7 @@ import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.CacheEventProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeepLinkProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
@@ -63,10 +64,11 @@ public class Tracker {
         }
         // 配置
         setup(application);
+
+        TrackerContext.initSuccess();
         // 业务逻辑
         start();
 
-        TrackerContext.initSuccess();
         isInited = true;
     }
 
@@ -88,6 +90,8 @@ public class Tracker {
 
     private void start() {
         PersistentDataProvider.get().start();
+
+        CacheEventProvider.get().releaseCaches();
     }
 
 

@@ -45,8 +45,6 @@ public class DeviceInfoProvider {
 
     private static final String MAGIC_ANDROID_ID = "9774d56d682e549c"; // Error AndroidID
 
-    private final Context mContext;
-
     private String mOperatingSystemVersion;
     private String mDeviceBrand;
     private String mDeviceModel;
@@ -66,7 +64,10 @@ public class DeviceInfoProvider {
     }
 
     private DeviceInfoProvider() {
-        mContext = TrackerContext.get().getApplicationContext();
+    }
+
+    private Context getContext() {
+        return TrackerContext.get().getApplicationContext();
     }
 
     public static DeviceInfoProvider get() {
@@ -96,14 +97,14 @@ public class DeviceInfoProvider {
 
     public String getDeviceType() {
         if (TextUtils.isEmpty(mDeviceType)) {
-            mDeviceType = DeviceUtil.isPhone(mContext) ? DEVICE_TYPE_PHONE : DEVICE_TYPE_PAD;
+            mDeviceType = DeviceUtil.isPhone(getContext()) ? DEVICE_TYPE_PHONE : DEVICE_TYPE_PAD;
         }
         return mDeviceType;
     }
 
     public int getScreenHeight() {
         if (mScreenHeight <= 0) {
-            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(mContext);
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(getContext());
             mScreenHeight = metrics.heightPixels;
         }
         return mScreenHeight;
@@ -111,7 +112,7 @@ public class DeviceInfoProvider {
 
     public int getScreenWidth() {
         if (mScreenWidth <= 0) {
-            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(mContext);
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(getContext());
             mScreenWidth = metrics.widthPixels;
         }
         return mScreenWidth;
@@ -122,7 +123,7 @@ public class DeviceInfoProvider {
         if (TextUtils.isEmpty(mImei)) {
             if (PermissionUtil.checkReadPhoneStatePermission()) {
                 try {
-                    TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                    TelephonyManager tm = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         mImei = tm.getImei();
                     } else {
@@ -140,7 +141,7 @@ public class DeviceInfoProvider {
         // ensure androidid call once in a process
         if (TextUtils.isEmpty(mAndroidId)) {
             try {
-                mAndroidId = Settings.System.getString(mContext.getContentResolver(), Settings.System.ANDROID_ID);
+                mAndroidId = Settings.System.getString(getContext().getContentResolver(), Settings.System.ANDROID_ID);
                 if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
                     Logger.e(TAG, "get AndroidId error");
                     mAndroidId = MAGIC_ANDROID_ID;
@@ -206,11 +207,11 @@ public class DeviceInfoProvider {
         if (TextUtils.isEmpty(mUserAgent)
                 && PermissionUtil.hasInternetPermission()) {
             try {
-                mUserAgent = new WebView(mContext).getSettings().getUserAgentString();
+                mUserAgent = new WebView(getContext()).getSettings().getUserAgentString();
             } catch (Exception e) {
                 Logger.e(TAG, e.getMessage());
                 try {
-                    mUserAgent = WebSettings.getDefaultUserAgent(mContext);
+                    mUserAgent = WebSettings.getDefaultUserAgent(getContext());
                 } catch (Exception badException) {
                     Logger.e(TAG, badException.getMessage());
                 }

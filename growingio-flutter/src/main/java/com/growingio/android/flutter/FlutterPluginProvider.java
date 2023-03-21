@@ -16,16 +16,15 @@
 
 package com.growingio.android.flutter;
 
-import android.content.res.Configuration;
 import android.util.Base64;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.AttributesBuilder;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
+import com.growingio.android.sdk.track.providers.CacheEventProvider;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
 import com.growingio.android.sdk.track.webservices.WebService;
@@ -86,8 +85,6 @@ public class FlutterPluginProvider {
     }
 
     public void trackFlutterPage(Map args) {
-        if (!TrackerContext.initializedSuccessfully()) return;
-
         try {
             String title = (String) args.get("title");
             String path = (String) args.get("path");
@@ -108,15 +105,13 @@ public class FlutterPluginProvider {
                 }
             }
             long timeStamp = (Long) args.get("timestamp");
-            String orientation = TrackerContext.get().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
-                    ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
 
-            TrackMainThread.trackMain().postEventToTrackMain(
+
+            CacheEventProvider.get().cacheEvent(
                     new PageEvent.Builder()
                             .setPath(path)
                             .setTitle(title)
                             .setTimestamp(timeStamp)
-                            .setOrientation(orientation)
                             .setAttributes(builder.build())
             );
         } catch (Exception e) {
@@ -126,8 +121,6 @@ public class FlutterPluginProvider {
     }
 
     public void trackClickEvent(Map args) {
-        if (!TrackerContext.initializedSuccessfully()) return;
-
         try {
             String eventType = (String) args.get("eventType");
             String path = (String) args.get("path");
@@ -136,7 +129,7 @@ public class FlutterPluginProvider {
             String title = (String) args.get("textValue");
             int index = (int) args.get("index");
 
-            TrackMainThread.trackMain().postEventToTrackMain(
+            CacheEventProvider.get().cacheEvent(
                     new ViewElementEvent.Builder(eventType)
                             .setPath(path)
                             .setPageShowTimestamp(timeStamp)
