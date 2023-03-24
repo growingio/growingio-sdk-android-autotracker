@@ -90,22 +90,8 @@ public class FlutterPluginProvider {
             String path = (String) args.get("path");
             Map<String, Object> attributes = (Map<String, Object>) args.get("attributes");
             AttributesBuilder builder = new AttributesBuilder();
-            if (attributes != null && attributes.keySet() != null) {
-                for (String key : attributes.keySet()) {
-                    Object value = attributes.get(key);
-                    if (value instanceof List) {
-                        builder.addAttribute(key, (List) value);
-                    } else if (value instanceof String[]) {
-                        builder.addAttribute(key, (String[]) value);
-                    } else if (value instanceof Set) {
-                        builder.addAttribute(key, (Set) value);
-                    } else {
-                        builder.addAttribute(key, String.valueOf(value));
-                    }
-                }
-            }
+            builder.addAttribute(attributes);
             long timeStamp = (Long) args.get("timestamp");
-
 
             CacheEventProvider.get().cacheEvent(
                     new PageEvent.Builder()

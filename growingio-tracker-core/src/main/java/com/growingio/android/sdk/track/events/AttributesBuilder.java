@@ -43,11 +43,35 @@ public class AttributesBuilder {
         this.attributes = new HashMap<>();
     }
 
+    public AttributesBuilder addAttribute(Map<String, Object> map) {
+        if (map != null && map.keySet() != null) {
+            for (String key : map.keySet()) {
+                Object value = map.get(key);
+                if (value instanceof List<?>) {
+                    List<?> tempValue = (List<?>) value;
+                    addAttribute(key, tempValue);
+                } else if (value instanceof SparseArray) {
+                    SparseArray<?> tempValue = (SparseArray<?>) value;
+                    addAttribute(key, tempValue);
+                } else if (value instanceof String[]) {
+                    addAttribute(key, (String[]) value);
+                } else if (value instanceof Set) {
+                    Set<?> tempValue = (Set<?>) value;
+                    addAttribute(key, tempValue);
+                } else if (value instanceof JSONArray) {
+                    addAttribute(key, (JSONArray) value);
+                } else {
+                    addAttribute(key, String.valueOf(value));
+                }
+            }
+        }
+        return this;
+    }
+
     public AttributesBuilder addAttribute(String key, String value) {
         if (key != null && value != null) {
             attributes.put(key, value);
         }
-
         return this;
     }
 

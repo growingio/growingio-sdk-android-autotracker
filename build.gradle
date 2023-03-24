@@ -92,7 +92,7 @@ buildscript {
 
                 'squareup' : [
                         'javapoet': 'com.squareup:javapoet:1.13.0',
-                        'okhttp3' : 'com.squareup.okhttp3:okhttp:3.12.1',
+                        'okhttp3' : 'com.squareup.okhttp3:okhttp:3.12.13',
                 ],
 
                 'others'   : [
