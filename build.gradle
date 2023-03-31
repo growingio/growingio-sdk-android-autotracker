@@ -11,10 +11,10 @@ buildscript {
         ]
 
         releaseConfiguration = [
-                releaseVersion    : "3.4.6",
-                releaseVersionCode: 30406,
+                releaseVersion    : "3.4.7-SNAPSHOT",
+                releaseVersionCode: 30407,
 
-                pluginVersion     : "3.4.5",
+                pluginVersion     : "3.4.6",
         ]
 
         versions = [
@@ -72,6 +72,7 @@ buildscript {
                         'encoder'         : "com.growingio.android:encoder:$releaseConfiguration.releaseVersion",
                         'oaid'            : "com.growingio.android:oaid:$releaseConfiguration.releaseVersion",
                         'advert'          : "com.growingio.android:advert:$releaseConfiguration.releaseVersion",
+                        'flutter'         : "com.growingio.android:flutter:$releaseConfiguration.releaseVersion",
 
                         'apm'             : "com.growingio.android:apm:$releaseConfiguration.releaseVersion",
                         'snappy'          : "com.growingio.android:snappy:1.1.0",
@@ -90,8 +91,9 @@ buildscript {
                 ],
 
                 'squareup' : [
-                        'javapoet': 'com.squareup:javapoet:1.13.0',
-                        'okhttp3' : 'com.squareup.okhttp3:okhttp:3.12.1',
+                        'javapoet'       : 'com.squareup:javapoet:1.13.0',
+                        'okhttp3'        : 'com.squareup.okhttp3:okhttp:3.12.13',
+                        'okhttp3_logging': 'com.squareup.okhttp3:logging-interceptor:3.12.13',
                 ],
 
                 'others'   : [
@@ -135,7 +137,7 @@ buildscript {
                         'asm_tree'   : 'org.ow2.asm:asm-tree:9.1',
                 ],
         ]
-        kotlin_version = '1.7.10'
+        kotlin_version = '1.7.20'
     }
 
     repositories {

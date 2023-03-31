@@ -75,6 +75,11 @@ class WebSocketHandler extends WebSocketListener {
             return;
         }
         Logger.d(TAG, "Received message is " + text);
+
+        if (text.contains("had disconnected")) {
+            ThreadUtils.runOnUiThread(() -> webSocketListener.onQuited());
+            return;
+        }
         try {
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");

@@ -16,8 +16,11 @@
 
 package com.growingio.android.sdk.track.events;
 
+import android.content.res.Configuration;
+
 import androidx.annotation.StringDef;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
 import org.json.JSONException;
@@ -82,7 +85,7 @@ public class PageEvent extends BaseAttributesEvent {
 
     public static class Builder extends BaseAttributesEvent.Builder<PageEvent> {
         private String mPath;
-        private String mOrientation = ORIENTATION_PORTRAIT;
+        private String mOrientation;
         private String mTitle;
         private String mReferralPage = "";
 
@@ -121,6 +124,9 @@ public class PageEvent extends BaseAttributesEvent {
 
         @Override
         public void readPropertyInTrackThread() {
+            if (mOrientation == null) {
+                mOrientation = TrackerContext.get().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
+            }
             super.readPropertyInTrackThread();
         }
 

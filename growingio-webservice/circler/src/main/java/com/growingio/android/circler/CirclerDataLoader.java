@@ -44,7 +44,7 @@ public class CirclerDataLoader implements ModelLoader<Circler, WebService> {
 
     @Override
     public LoadData<WebService> buildLoadData(Circler circler) {
-        circlerService.init(circler.getParams());
+        circlerService.sendCircleData(circler);
         return new LoadData<>(circlerService);
     }
 

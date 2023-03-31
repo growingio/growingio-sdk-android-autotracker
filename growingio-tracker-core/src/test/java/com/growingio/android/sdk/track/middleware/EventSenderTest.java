@@ -30,8 +30,8 @@ import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.database.DatabaseDataLoader;
 import com.growingio.android.database.EventDataContentProvider;
-import com.growingio.protobuf.EventV3Protocol;
-import com.growingio.protobuf.ProtobufDataLoader;
+import com.growingio.android.protobuf.EventV3Protocol;
+import com.growingio.android.protobuf.ProtobufDataLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;

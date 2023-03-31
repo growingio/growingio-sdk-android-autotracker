@@ -15,6 +15,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'consumer-rules.pro'
         }
     }
 
@@ -26,9 +27,11 @@ android {
     testOptions {
         unitTests.all {
             jacoco {
+                jvmArgs '-noverify'
                 includeNoLocationClasses = true
                 excludes = ['jdk.internal.*']
             }
+
         }
         unitTests {
             returnDefaultValues = true
@@ -38,21 +41,17 @@ android {
 }
 
 dependencies {
+
     testImplementation libraries.test.junit
-    testImplementation libraries.test.androidx_core
     testImplementation libraries.test.truth
-    testImplementation libraries.test.okhttp3_mockwebserver
-    testImplementation libraries.test.mockito_core
-    testImplementation libraries.test.powermock_core
-    testImplementation libraries.test.powermock_api_mockito2
-    testImplementation libraries.test.powermock_module_junit4
+    testImplementation libraries.test.androidx_core
+    testImplementation libraries.test.robolectric
+    testImplementation libraries.androidx.appcompat
 
-    implementation project(':growingio-tracker-core')
-    implementation libraries.squareup.okhttp3
-    //debugImplementation libraries.squareup.okhttp3_logging
-
+    compileOnly project(':growingio-tracker-core')
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }
+
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
 apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"

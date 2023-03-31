@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.growingio.protobuf;
+package com.growingio.android.protobuf;
 
 import com.growingio.android.sdk.track.events.ActivateEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;

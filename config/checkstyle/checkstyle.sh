@@ -14,6 +14,7 @@
 && ./gradlew :growingio-webservice:debugger:checkstyle \
 && ./gradlew :growingio-webservice:circler:checkstyle \
 && ./gradlew :growingio-apm:checkstyle \
+&& ./gradlew :growingio-flutter:checkstyle \
 && ./gradlew :growingio-advert:checkstyle \
 && ./gradlew :growingio-tools:oaid:checkstyle \
 && ./gradlew :growingio-tools:snappy:checkstyle \

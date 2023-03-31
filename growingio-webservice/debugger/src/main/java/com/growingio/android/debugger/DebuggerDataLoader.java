@@ -40,7 +40,7 @@ public class DebuggerDataLoader implements ModelLoader<Debugger, WebService> {
 
     @Override
     public LoadData<WebService> buildLoadData(Debugger debugger) {
-        debuggerService.init(debugger.getParams());
+        debuggerService.sendDebuggerData(debugger);
         return new LoadData<>(debuggerService);
     }
 

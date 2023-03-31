@@ -18,6 +18,7 @@ package com.growingio.android.circler.screenshot;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -33,10 +34,13 @@ import com.growingio.android.sdk.track.view.DecorView;
 import com.growingio.android.sdk.track.view.ScreenshotUtil;
 import com.growingio.android.sdk.track.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.track.view.WindowHelper;
+import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnScreenshotRefreshedListener, CircleScreenshot> {
     private static final String TAG = "ScreenshotProvider";
@@ -85,6 +89,17 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
         return modelLoader;
     }
 
+    View.OnAttachStateChangeListener attachStateChangeListener = new View.OnAttachStateChangeListener() {
+        @Override
+        public void onViewAttachedToWindow(View v) {
+        }
+
+        @Override
+        public void onViewDetachedFromWindow(View v) {
+            refreshScreenshot();
+        }
+    };
+
     private void dispatchScreenshot() {
         if (getListenerCount() == 0) return;
         List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
@@ -98,16 +113,8 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
             }
         }
         View topView = decorViews.get(decorViews.size() - 1).getView();
-        topView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                refreshScreenshot();
-            }
-        });
+        topView.removeOnAttachStateChangeListener(attachStateChangeListener);
+        topView.addOnAttachStateChangeListener(attachStateChangeListener);
 
         topView.post(() -> {
             try {
@@ -148,7 +155,7 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
     private long mSnapshotKey = 0;
 
-    public void sendScreenshotRefreshed(String screenshotBase64, float scale) {
+    private void sendScreenshotRefreshed(String screenshotBase64, float scale) {
         lastSendTime = System.currentTimeMillis();
         CircleScreenshot.Builder builder = new CircleScreenshot.Builder()
                 .setScale(scale)
@@ -171,6 +178,68 @@ public class ScreenshotProvider extends ListenerContainer<ScreenshotProvider.OnS
 
     public void sendScreenshot(CircleScreenshot result) {
         if (result != null) dispatchActions(result);
+    }
+
+    public void generateCircleData(Circler.CirclerData data) {
+        if (getListenerCount() == 0) return;
+        mHandler.removeMessages(0);
+        Message message = Message.obtain(mHandler, new CircleDataThread(data));
+        message.what = 0;
+        mHandler.sendMessageDelayed(message, 100L);
+    }
+
+    private class CircleDataThread implements Runnable {
+        final Circler.CirclerData circlerData;
+
+        CircleDataThread(Circler.CirclerData circlerData) {
+            this.circlerData = circlerData;
+        }
+
+        @Override
+        public void run() {
+            lastSendTime = System.currentTimeMillis();
+
+            List<ViewElement> viewElements = new ArrayList<>();
+            for (int i = 0; i < circlerData.getElements().size(); i++) {
+                Map<String, Object> data = circlerData.getElements().get(i);
+                ViewElement viewElement = new ViewElement.Builder().buildWithMap(data);
+                if (viewElement != null) viewElements.add(viewElement);
+            }
+
+            List<PageElement> pageElements = new ArrayList<>();
+            for (int i = 0; i < circlerData.getPages().size(); i++) {
+                Map<String, Object> data = circlerData.getPages().get(i);
+                PageElement pageElement = new PageElement.Builder().buildWithMap(data);
+                if (pageElement != null) pageElements.add(pageElement);
+            }
+
+            try {
+                String screenshotBase64 = circlerData.getScreenshot() == null ? ScreenshotUtil.getScreenshotBase64(mScale) : circlerData.getScreenshot();
+                CircleScreenshot.Builder builder = new CircleScreenshot.Builder()
+                        .setScale((float) circlerData.getScale())
+                        .setScreenWidth((int) circlerData.getWidth())
+                        .setScreenHeight((int) circlerData.getHeight())
+                        .setScreenshot(screenshotBase64)
+                        .setSnapshotKey(mSnapshotKey++)
+                        .addPages(pageElements)
+                        .addElements(viewElements);
+
+                builder.build(new Callback<CircleScreenshot>() {
+                    @Override
+                    public void onSuccess(CircleScreenshot result) {
+                        Logger.d(TAG, "Create circle screenshot successfully");
+                        sendScreenshot(result);
+                    }
+
+                    @Override
+                    public void onFailed() {
+                        Logger.e(TAG, "Create circle screenshot failed");
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

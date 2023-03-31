@@ -200,7 +200,7 @@ public class EventsTest {
     }
 
     public void inRobolectric(JSONObject jsonObject) {
-        Truth.assertThat(jsonObject.opt("domain")).isEqualTo("com.growingio.android.sdk.track.test");
+        Truth.assertThat(jsonObject.opt("platform")).isEqualTo("Android");
     }
 
 

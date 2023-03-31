@@ -17,7 +17,6 @@
 package com.growingio.android.circler;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
@@ -48,7 +47,6 @@ class WebSocketHandler extends WebSocketListener {
     }
 
     public void sendMessage(String msg) {
-        Log.d("WebSocket", msg);
         if (webSocket != null) {
             webSocket.send(msg);
         }
@@ -75,7 +73,14 @@ class WebSocketHandler extends WebSocketListener {
         if (TextUtils.isEmpty(text) || TextUtils.isEmpty(text.trim())) {
             return;
         }
+
         Logger.d(TAG, "Received message is " + text);
+
+        if (text.contains("had disconnected")) {
+            ThreadUtils.runOnUiThread(() -> webSocketListener.onQuited());
+            return;
+        }
+
         try {
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");

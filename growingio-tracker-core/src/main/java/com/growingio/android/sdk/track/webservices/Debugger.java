@@ -16,6 +16,7 @@
 
 package com.growingio.android.sdk.track.webservices;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,13 +27,32 @@ import java.util.Map;
  */
 public class Debugger {
 
+    public final static int DEBUGGER_INIT = 0;
+    public final static int DEBUGGER_SCREENSHOT = 1;
+
+    public final int debuggerDataType;
+
     private final Map<String, String> params;
 
     public Debugger(Map<String, String> params) {
         this.params = params;
+        screenshot = null;
+        debuggerDataType = DEBUGGER_INIT;
+    }
+
+    private final byte[] screenshot;
+
+    public Debugger(byte[] screenshot) {
+        params = new HashMap<>();
+        this.screenshot = screenshot;
+        debuggerDataType = DEBUGGER_SCREENSHOT;
     }
 
     public Map<String, String> getParams() {
         return params;
+    }
+
+    public byte[] getScreenshot() {
+        return screenshot;
     }
 }

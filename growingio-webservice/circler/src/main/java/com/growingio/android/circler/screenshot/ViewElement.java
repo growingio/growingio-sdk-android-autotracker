@@ -16,8 +16,12 @@
 
 package com.growingio.android.circler.screenshot;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Map;
 
 class ViewElement {
     private static final String NODE_TYPE_BUTTON = "button";
@@ -149,6 +153,30 @@ class ViewElement {
 
         public ViewElement build() {
             return new ViewElement(this);
+        }
+
+        public ViewElement buildWithMap(Map<String, Object> data) {
+            try {
+                mXpath = (String) data.get("xpath");
+                mLeft = ((Double) data.get("left")).intValue();
+                mTop = ((Double) data.get("top")).intValue();
+                mWidth = ((Double) data.get("width")).intValue();
+                mHeight = ((Double) data.get("height")).intValue();
+                mIndex = (int) data.get("index");
+
+                mZLevel = (int) data.get("zLevel");
+                mContent = (String) data.get("content");
+                mNodeType = (String) data.get("nodeType");
+                mPage = (String) data.get("page");
+                mParentXPath = (String) data.get("parentXPath");
+                //extra param;
+                //bool isContainer = (boolean) data.get("isContainer");
+                //bool isIgnored = (boolean) data.get("isIgnored");
+                return new ViewElement(this);
+            } catch (Exception e) {
+                Logger.e("Circler Data ViewElement parser fail", e);
+            }
+            return null;
         }
     }
 }

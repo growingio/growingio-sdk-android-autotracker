@@ -16,8 +16,12 @@
 
 package com.growingio.android.circler.screenshot;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Map;
 
 class PageElement {
     private final String mPath;
@@ -99,6 +103,23 @@ class PageElement {
 
         public PageElement build() {
             return new PageElement(this);
+        }
+
+        public PageElement buildWithMap(Map<String, Object> data) {
+            try {
+                mPath = (String) data.get("path");
+                mIsIgnored = (boolean) data.get("isIgnored");
+                mLeft = ((Double) data.get("left")).intValue();
+                mTop = ((Double) data.get("top")).intValue();
+                mWidth = ((Double) data.get("width")).intValue();
+                mHeight = ((Double) data.get("height")).intValue();
+                mTitle = (String) data.get("title");
+
+                return new PageElement(this);
+            } catch (Exception e) {
+                Logger.e("Circler Data PageElement parser fail", e);
+            }
+            return null;
         }
     }
 }

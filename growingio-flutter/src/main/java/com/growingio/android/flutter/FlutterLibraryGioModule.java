@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.protobuf;
+
+package com.growingio.android.flutter;
 
 import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.middleware.format.EventByteArray;
-import com.growingio.android.sdk.track.middleware.format.EventFormatData;
+import com.growingio.android.sdk.track.middleware.EventFlutter;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
  * <p>
  *
- * @author cpacm 5/19/21
+ * @author cpacm
  */
 @GIOLibraryModule
-public class ProtobufLibraryModule extends LibraryGioModule {
+public class FlutterLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
+        registry.register(EventFlutter.class, Void.class, new FlutterDataLoader.Factory(context));
     }
+
 }

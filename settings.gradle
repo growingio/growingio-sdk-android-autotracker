@@ -35,3 +35,4 @@ include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:autotracker-cdp'
 
 include ':growingio-sdk-bom'
+include ':growingio-flutter'
