@@ -369,7 +369,6 @@ public abstract class BaseEvent extends GEvent {
             if (mEventType == null) mEventType = getEventType();
 
             mAppState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
-            mDomain = AppInfoProvider.get().getPackageName();
             mUrlScheme = ConfigurationProvider.core().getUrlScheme();
 
             mTimestamp = (mTimestamp != 0) ? mTimestamp : System.currentTimeMillis();
@@ -409,6 +408,10 @@ public abstract class BaseEvent extends GEvent {
             mAppChannel = getFieldDefault(BaseField.APP_CHANNEL) ? appInfo.getAppChannel() : null;
             mAppName = getFieldDefault(BaseField.APP_NAME) ? appInfo.getAppName() : null;
             mAppVersion = getFieldDefault(BaseField.APP_VERSION) ? appInfo.getAppVersion() : null;
+            if (mDomain == null || mDomain.isEmpty()) {
+                // default is packageName
+                mDomain = appInfo.getPackageName();
+            }
 
             SessionProvider session = SessionProvider.get();
             mLatitude = getFieldDefault(BaseField.LATITUDE) ? session.getLatitude() : 0;
