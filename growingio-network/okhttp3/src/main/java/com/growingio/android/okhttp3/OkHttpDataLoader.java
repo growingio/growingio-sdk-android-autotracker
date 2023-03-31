@@ -59,6 +59,7 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
                                 .connectTimeout(DEFAULT_CONNECT_TIMEOUT, TimeUnit.SECONDS)
                                 .readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.SECONDS)
                                 .addInterceptor(new SecurityExceptionInterceptor())
+                                //.addInterceptor(new HttpLoggingInterceptor(message -> Logger.d("OKHTTP Logging", message)).setLevel(HttpLoggingInterceptor.Level.HEADERS))
                                 .build();
                     }
                 }

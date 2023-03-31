@@ -49,6 +49,7 @@ dependencies {
 
     implementation project(':growingio-tracker-core')
     implementation libraries.squareup.okhttp3
+    //debugImplementation libraries.squareup.okhttp3_logging
 
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
