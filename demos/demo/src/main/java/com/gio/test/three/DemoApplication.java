@@ -33,7 +33,6 @@ import com.growingio.android.advert.AdvertLibraryGioModule;
 import com.growingio.android.apm.ApmConfig;
 import com.growingio.android.apm.ApmLibraryGioModule;
 import com.growingio.android.oaid.OaidLibraryGioModule;
-import com.growingio.android.protobuf.ProtobufLibraryModule;
 import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
@@ -119,7 +118,7 @@ public class DemoApplication extends Application {
                     //.addConfiguration(oaidConfig)
                     .addPreloadComponent(new AdvertLibraryGioModule(), advertConfig)
                     .addPreloadComponent(new ApmLibraryGioModule(), apmConfig)
-                    .addPreloadComponent(new ProtobufLibraryModule())
+//                    .addPreloadComponent(new ProtobufLibraryModule())
 //                    .addPreloadComponent(new EncoderLibraryGioModule())
                     .addPreloadComponent(new OaidLibraryGioModule());
         }
