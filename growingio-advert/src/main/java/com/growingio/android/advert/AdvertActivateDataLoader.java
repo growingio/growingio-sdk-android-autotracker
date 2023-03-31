@@ -210,7 +210,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             String dataSourceId = ConfigurationProvider.core().getDataSourceId();
             String deepType = isInApp ? "inapp" : "defer";
             String url = AdvertUtils.getRequestDeepLinkUrl(deepLinkHost.toString(), deepType, projectId, dataSourceId, trackId);
-            EventUrl eventUrl = new EventUrl(url, System.currentTimeMillis()).addHeader("ua", DeviceInfoProvider.get().getUserAgent());
+            EventUrl eventUrl = new EventUrl(url, System.currentTimeMillis()).addHeader("User-Agent", DeviceInfoProvider.get().getUserAgent());
             //.addHeader("ip", AdvertUtils.getIP());
             TrackerContext.get().loadData(eventUrl, EventUrl.class, EventResponse.class, new LoadDataFetcher.DataCallback<EventResponse>() {
                 @Override

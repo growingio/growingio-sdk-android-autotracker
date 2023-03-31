@@ -105,6 +105,8 @@ dependencies {
     releaseImplementation libraries.growingio.apm
     debugImplementation project(':growingio-advert')
     releaseImplementation libraries.growingio.advert
+    debugImplementation project(':growingio-data:protobuf')
+    releaseImplementation libraries.growingio.protobuf
     //implementation libraries.growingio.oaid
 
     compileOnly libraries.androidx.appcompat

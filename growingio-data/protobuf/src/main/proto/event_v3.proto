@@ -1,8 +1,7 @@
 syntax = "proto3";
 
-
-package com.growingio.database;
-option java_package = "com.growingio.protobuf";
+package com.growingio.android.protobuf;
+option java_package = "com.growingio.android.protobuf";
 option java_outer_classname = "EventV3Protocol";
 
 message EventV3Dto {

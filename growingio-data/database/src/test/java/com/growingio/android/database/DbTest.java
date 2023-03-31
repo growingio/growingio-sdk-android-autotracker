@@ -33,7 +33,7 @@ import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.protobuf.ProtobufDataLoader;
+import com.growingio.android.protobuf.ProtobufDataLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
