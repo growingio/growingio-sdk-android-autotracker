@@ -58,6 +58,7 @@ class AdvertUtils {
     static final String DEEP_CLICK_TIME = "deep_click_time"; //timestamp
     static final String DEEP_PARAMS = "deep_params"; //{}
 
+    static final String DEEPLINK_AD_HOST = "https://n.datayi.cn/";
 
     static final String DEEPLINK_PARAMS_REQUEST_URL = "%1$s/deep/v1/%2$s/android/%3$s/%4$s/%5$s";
 

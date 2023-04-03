@@ -16,6 +16,8 @@
 
 package com.growingio.android.advert;
 
+import static com.growingio.android.advert.AdvertUtils.DEEPLINK_AD_HOST;
+
 import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 
@@ -27,7 +29,7 @@ import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 public class AdvertConfig implements Configurable {
 
     private boolean readClipBoardEnable = true;
-    private String deepLinkHost;
+    private String deepLinkHost = DEEPLINK_AD_HOST;
     private DeepLinkCallback deepLinkCallback;
 
     public AdvertConfig setReadClipBoardEnable(boolean readClipBoardEnable) {
