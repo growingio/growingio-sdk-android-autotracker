@@ -39,7 +39,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mDataCollectionEnabled = true;
     private boolean mUploadExceptionEnabled = true;
     private boolean mRequireAppProcessesEnabled = true;
-    private String mDataCollectionServerHost = "http://api.growingio.com";
+    private String mDataCollectionServerHost = "http://napi.growingio.com";
 
     private EventFilterInterceptor mEventFilterInterceptor;
     @FieldToString(clazz = EventExcludeFilter.class, method = "getEventFilterLog", parameterTypes = {int.class})

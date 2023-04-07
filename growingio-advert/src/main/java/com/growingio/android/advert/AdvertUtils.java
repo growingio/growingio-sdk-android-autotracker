@@ -58,11 +58,15 @@ class AdvertUtils {
     static final String DEEP_CLICK_TIME = "deep_click_time"; //timestamp
     static final String DEEP_PARAMS = "deep_params"; //{}
 
+    static final String DEEPLINK_AD_HOST = "https://n.datayi.cn";
 
     static final String DEEPLINK_PARAMS_REQUEST_URL = "%1$s/deep/v1/%2$s/android/%3$s/%4$s/%5$s";
 
     static String getRequestDeepLinkUrl(String url, String deepType, String projectId, String datasourceId, String trackId) {
-        return String.format(DEEPLINK_PARAMS_REQUEST_URL, url, deepType, projectId, datasourceId, trackId);
+        if (url != null && url.endsWith("/")) url = url.substring(0, url.length() - 1);
+        String deeplinkUrl = String.format(DEEPLINK_PARAMS_REQUEST_URL, url, deepType, projectId, datasourceId, trackId);
+        Logger.d(TAG, "Call DeepLink Url:" + deeplinkUrl);
+        return deeplinkUrl;
     }
 
     static AdvertData parseDeeplinkResponse(String body) {
