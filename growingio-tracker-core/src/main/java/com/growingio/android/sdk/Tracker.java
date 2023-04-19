@@ -28,8 +28,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
@@ -144,27 +142,6 @@ public class Tracker {
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
-    /**
-     * @see #trackCustomEvent(String, Map)
-     * <code>
-     * trackCustomEvent(eventName,new AttributesBuilder().build())
-     * </code>
-     */
-    @Deprecated
-    public void trackCustomEventWithAttrBuilder(String eventName, CustomEvent.AttributesBuilder attributesBuilder) {
-        if (!isInited) return;
-        if (TextUtils.isEmpty(eventName)) {
-            Logger.e(TAG, "trackCustomEventWithAttrBuilder: eventName is NULL");
-            return;
-        }
-
-        if (attributesBuilder == null) {
-            TrackEventGenerator.generateCustomEvent(eventName, null);
-        } else {
-            TrackEventGenerator.generateCustomEvent(eventName, attributesBuilder.getAttributes());
-        }
-    }
-
     public void setConversionVariables(Map<String, String> variables) {
         if (!isInited) return;
         if (variables == null || variables.isEmpty()) {
@@ -181,24 +158,6 @@ public class Tracker {
             return;
         }
         TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
-    }
-
-    /**
-     * @see #setLoginUserAttributes(Map)
-     * <code>
-     * setLoginUserAttributes(new AttributesBuilder().build())
-     * </code>
-     */
-    @Deprecated
-    public void setLoginUserAttributesWithAttrBuilder(LoginUserAttributesEvent.AttributesBuilder attributesBuilder) {
-        if (!isInited) return;
-        Map<String, String> attributes = attributesBuilder == null ? null : attributesBuilder.getAttributes();
-        if (attributes == null || attributes.isEmpty()) {
-            Logger.e(TAG, "setLoginUserAttributesWithAttrBuilder: attributes is NULL");
-            return;
-        }
-
-        TrackEventGenerator.generateLoginUserAttributesEvent(attributes);
     }
 
     public void setVisitorAttributes(Map<String, String> attributes) {

@@ -81,7 +81,8 @@ public class EventsTest {
         List<String> list = new ArrayList<>();
         list.add("1111");
         list.add("2222");
-        Map<String, String> map = CustomEvent.AttributesBuilder.getAttributesBuilder()
+        AttributesBuilder builder = new AttributesBuilder();
+        Map<String, String> map = builder
                 .addAttribute("key1", "value1")
                 .addAttribute("key2", Arrays.asList(1, 2, 3, 4))
                 .addAttribute(null, "value3")
@@ -93,7 +94,7 @@ public class EventsTest {
                 .addAttribute("key9", list)
                 .addAttribute("", Arrays.asList("", "", ""))
                 .addAttribute("key10", Arrays.asList(null, "1"))
-                .getAttributes();
+                .build();
         Truth.assertThat(map.size()).isEqualTo(6);
         Truth.assertThat(map.containsKey("key5")).isFalse();
         Truth.assertThat("1||2||3||4").isEqualTo(map.get("key2"));
@@ -118,7 +119,8 @@ public class EventsTest {
         List<String> list = new ArrayList<>();
         list.add("1111");
         list.add("2222");
-        Map<String, String> map = LoginUserAttributesEvent.AttributesBuilder.getAttributesBuilder()
+        AttributesBuilder builder = new AttributesBuilder();
+        Map<String, String> map = builder
                 .addAttribute("key1", "value1")
                 .addAttribute("key2", Arrays.asList(1, 2, 3, 4))
                 .addAttribute(null, "value3")
@@ -130,7 +132,7 @@ public class EventsTest {
                 .addAttribute("key9", list)
                 .addAttribute("", Arrays.asList("", "", ""))
                 .addAttribute("key10", Arrays.asList(null, "1"))
-                .getAttributes();
+                .build();
         Truth.assertThat(map.size()).isEqualTo(6);
         Truth.assertThat(map.containsKey("key5")).isFalse();
         Truth.assertThat("1||2||3||4").isEqualTo(map.get("key2"));

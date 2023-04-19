@@ -92,11 +92,7 @@ public class EventSender {
         return loadData.fetcher.executeData();
     }
 
-    /**
-     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
-     * if you want modify it,please check adsdk first
-     */
-    public void setEventNetSender(IEventNetSender mEventNetSender) {
+    void setEventNetSender(IEventNetSender mEventNetSender) {
         this.mEventNetSender = mEventNetSender;
     }
 
@@ -240,12 +236,7 @@ public class EventSender {
     }
 
 
-    /**
-     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
-     * if you want modify it,please check adsdk first
-     */
-    @Deprecated
-    public EventDbResult getGEventsFromPolicy(int policy) {
+    EventDbResult getGEventsFromPolicy(int policy) {
         return databaseOperation(EventDatabase.queryAndDelete(policy, numOfMaxEventsPerRequest()));
     }
 

@@ -16,9 +16,9 @@
 
 package com.growingio.android.sdk.track.events.helper;
 
+import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
-import com.growingio.android.sdk.track.events.base.BaseField;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.events.TrackEventType;
 
 import java.util.Map;
 
@@ -29,10 +29,10 @@ import java.util.Map;
  * @author cpacm 2022/8/5
  */
 public class DefaultEventFilterInterceptor implements EventFilterInterceptor {
+
     @Override
     public boolean filterEventType(String eventType) {
-        // 判断当前事件类型是否被过滤
-        return !EventExcludeFilter.isEventFilter(eventType, getExcludeEvent());
+        return true;
     }
 
     @Override
@@ -45,22 +45,15 @@ public class DefaultEventFilterInterceptor implements EventFilterInterceptor {
         return true;
     }
 
+    /**
+     * filter event's field eg:
+     * fieldArea.put(BaseField.NETWORK_STATE, false);
+     *
+     * @param type      event's type
+     * @param fieldArea event's field map
+     */
     @Override
     public Map<String, Boolean> filterEventField(String type, Map<String, Boolean> fieldArea) {
-        fieldArea.put(BaseField.NETWORK_STATE, !FieldIgnoreFilter.isFieldFilter(BaseField.NETWORK_STATE, getIgnoreField()));
-        fieldArea.put(BaseField.SCREEN_HEIGHT, !FieldIgnoreFilter.isFieldFilter(BaseField.SCREEN_HEIGHT, getIgnoreField()));
-        fieldArea.put(BaseField.SCREEN_WIDTH, !FieldIgnoreFilter.isFieldFilter(BaseField.SCREEN_WIDTH, getIgnoreField()));
-        fieldArea.put(BaseField.DEVICE_BRAND, !FieldIgnoreFilter.isFieldFilter(BaseField.DEVICE_BRAND, getIgnoreField()));
-        fieldArea.put(BaseField.DEVICE_MODEL, !FieldIgnoreFilter.isFieldFilter(BaseField.DEVICE_MODEL, getIgnoreField()));
-        fieldArea.put(BaseField.DEVICE_TYPE, !FieldIgnoreFilter.isFieldFilter(BaseField.DEVICE_TYPE, getIgnoreField()));
-
-        fieldArea.put(BaseField.APP_CHANNEL, !FieldIgnoreFilter.isFieldFilter(BaseField.APP_CHANNEL, getIgnoreField()));
-        fieldArea.put(BaseField.APP_NAME, !FieldIgnoreFilter.isFieldFilter(BaseField.APP_NAME, getIgnoreField()));
-        fieldArea.put(BaseField.APP_VERSION, !FieldIgnoreFilter.isFieldFilter(BaseField.APP_VERSION, getIgnoreField()));
-        fieldArea.put(BaseField.LANGUAGE, !FieldIgnoreFilter.isFieldFilter(BaseField.LANGUAGE, getIgnoreField()));
-        fieldArea.put(BaseField.LATITUDE, !FieldIgnoreFilter.isFieldFilter(BaseField.LATITUDE, getIgnoreField()));
-        fieldArea.put(BaseField.LONGITUDE, !FieldIgnoreFilter.isFieldFilter(BaseField.LONGITUDE, getIgnoreField()));
-        fieldArea.put(BaseField.SDK_VERSION, !FieldIgnoreFilter.isFieldFilter(BaseField.SDK_VERSION, getIgnoreField()));
         return fieldArea;
     }
 
@@ -69,13 +62,19 @@ public class DefaultEventFilterInterceptor implements EventFilterInterceptor {
         return true;
     }
 
-    @Deprecated
-    protected int getIgnoreField() {
-        return ConfigurationProvider.core().getIgnoreField();
-    }
-
-    @Deprecated
-    protected int getExcludeEvent() {
-        return ConfigurationProvider.core().getExcludeEvent();
+    public static class FilterEventType {
+        public static final String VISIT = TrackEventType.VISIT;
+        public static final String CUSTOM = TrackEventType.CUSTOM;
+        public static final String VISITOR_ATTRIBUTES = TrackEventType.VISITOR_ATTRIBUTES;
+        public static final String LOGIN_USER_ATTRIBUTES = TrackEventType.LOGIN_USER_ATTRIBUTES;
+        public static final String CONVERSION_VARIABLES = TrackEventType.CONVERSION_VARIABLES;
+        public static final String APP_CLOSED = TrackEventType.APP_CLOSED;
+        public static final String PAGE = AutotrackEventType.PAGE;
+        public static final String PAGE_ATTRIBUTES = AutotrackEventType.PAGE_ATTRIBUTES;
+        public static final String VIEW_CLICK = AutotrackEventType.VIEW_CLICK;
+        public static final String VIEW_CHANGE = AutotrackEventType.VIEW_CHANGE;
+        public static final String FORM_SUBMIT = TrackEventType.FORM_SUBMIT;
+        public static final String REENGAGE = TrackEventType.REENGAGE;
+        public static final String ACTIVATE = TrackEventType.ACTIVATE;
     }
 }

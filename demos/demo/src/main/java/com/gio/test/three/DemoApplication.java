@@ -35,8 +35,6 @@ import com.growingio.android.apm.ApmLibraryGioModule;
 import com.growingio.android.oaid.OaidLibraryGioModule;
 import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
-import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.tencent.smtt.sdk.QbSdk;
@@ -108,13 +106,10 @@ public class DemoApplication extends Application {
             sConfiguration = new CdpAutotrackConfiguration("bc675c65b3b0290e", "growing.ff8a70351000af43") //uat-uba
                     .setDataSourceId("8b17366d9e90b05b")
                     .setDataCollectionServerHost("http://117.50.84.75:8080")
-                    .setUploadExceptionEnabled(false)
                     .setDebugEnabled(true)
                     .setDataCollectionEnabled(true)
                     .setIdMappingEnabled(true)
                     .setRequireAppProcessesEnabled(true)
-                    .setExcludeEvent(EventExcludeFilter.of(EventExcludeFilter.REENGAGE))
-                    .setIgnoreField(FieldIgnoreFilter.of(FieldIgnoreFilter.FIELD_IGNORE_ALL))
                     //.addConfiguration(oaidConfig)
                     .addPreloadComponent(new AdvertLibraryGioModule(), advertConfig)
                     .addPreloadComponent(new ApmLibraryGioModule(), apmConfig)

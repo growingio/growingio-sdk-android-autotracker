@@ -50,8 +50,7 @@ public final class TestTrackConfiguration {
         return MODULE_CONFIGURATIONS;
     }
 
-    @Deprecated
-    public TestTrackConfiguration addConfiguration(Configurable config) {
+    private TestTrackConfiguration addConfiguration(Configurable config) {
         if (config != null) {
             MODULE_CONFIGURATIONS.put(config.getClass(), config);
         }
@@ -99,17 +98,6 @@ public final class TestTrackConfiguration {
 
     public final TestTrackConfiguration setChannel(String channel) {
         core().setChannel(channel);
-        return this;
-    }
-
-    @Deprecated
-    public final boolean isUploadExceptionEnabled() {
-        return core().isUploadExceptionEnabled();
-    }
-
-    @Deprecated
-    public final TestTrackConfiguration setUploadExceptionEnabled(boolean uploadExceptionEnabled) {
-        core().setUploadExceptionEnabled(uploadExceptionEnabled);
         return this;
     }
 
@@ -166,30 +154,6 @@ public final class TestTrackConfiguration {
             EventFilterInterceptor eventFilterInterceptor) {
         core().setEventFilterInterceptor(eventFilterInterceptor);
         return this;
-    }
-
-    @Deprecated
-    public final TestTrackConfiguration setExcludeEvent(
-            @EventExcludeFilter.EventFilterLimit int filterEventFlag) {
-        core().setExcludeEvent(filterEventFlag);
-        return this;
-    }
-
-    @Deprecated
-    public final int getExcludeEvent() {
-        return core().getExcludeEvent();
-    }
-
-    @Deprecated
-    public final TestTrackConfiguration setIgnoreField(
-            @FieldIgnoreFilter.FieldFilterType int ignoreFieldFlag) {
-        core().setIgnoreField(ignoreFieldFlag);
-        return this;
-    }
-
-    @Deprecated
-    public final int getIgnoreField() {
-        return core().getIgnoreField();
     }
 
     public final TestTrackConfiguration addPreloadComponent(LibraryGioModule component) {
