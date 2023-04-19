@@ -16,7 +16,8 @@
 
 package com.growingio.android.sdk.test;
 
-import android.app.Application;
+import android.content.Context;
+
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.log.Logger;
@@ -47,7 +48,7 @@ public final class GrowingTracker {
         }
     }
 
-    public static void start(Application application) {
+    public static void start(Context context) {
         if (_gioTracker != null) {
             Logger.e(TAG, "Tracker is running");
             return;
@@ -55,7 +56,7 @@ public final class GrowingTracker {
         throw new IllegalStateException("If you want use start() method, you must define ProjectId and UrlScheme in @GIOTracker annotation");
     }
 
-    public static void startWithConfiguration(Application application,
+    public static void startWithConfiguration(Context context,
                                               TestTrackConfiguration trackConfiguration) {
         if (_gioTracker != null) {
             Logger.e(TAG, "Tracker is running");
@@ -64,7 +65,7 @@ public final class GrowingTracker {
         EmptyAppGioModule appModule = new EmptyAppGioModule();
         appModule.config(trackConfiguration);
         ConfigurationProvider.initWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
-        _gioTracker = new Tracker(application);
+        _gioTracker = new Tracker(context);
         initSuccess();
     }
 

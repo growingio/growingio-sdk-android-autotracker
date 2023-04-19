@@ -17,8 +17,8 @@
 package com.growingio.android.sdk.autotrack;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.Fragment;
+import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 import android.view.View;
@@ -38,14 +38,14 @@ import java.util.Map;
 public class Autotracker extends Tracker {
     private static final String TAG = "Autotracker";
 
-    public Autotracker(Application application) {
-        super(application);
+    public Autotracker(Context context) {
+        super(context);
     }
 
     @Override
     @CallSuper
-    protected void setup(Application application) {
-        super.setup(application);
+    protected void setup(Context context) {
+        super.setup(context);
         PageProvider.get().setup();
         ViewChangeProvider mViewChangeProvider;
         mViewChangeProvider = new ViewChangeProvider();

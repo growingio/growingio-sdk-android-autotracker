@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk;
 
-import android.app.Application;
+import android.content.Context;
 import android.content.ContextWrapper;
 
 import com.growingio.android.sdk.track.log.Logger;
@@ -39,15 +39,15 @@ public class TrackerContext extends ContextWrapper {
         sInitializedSuccessfully = true;
     }
 
-    private TrackerContext(Application application) {
-        super(application);
+    private TrackerContext(Context context) {
+        super(context);
         registry = new TrackerRegistry();
     }
 
-    public static void init(Application application) {
+    public static void init(Context context) {
         synchronized (TrackerContext.class) {
             if (null == INSTANCE) {
-                INSTANCE = new TrackerContext(application);
+                INSTANCE = new TrackerContext(context);
             }
         }
     }

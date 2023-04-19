@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.autotrack;
 
-import android.app.Application;
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -30,8 +30,8 @@ import java.util.Map;
 public class CdpAutotracker extends Autotracker {
     private static final String TAG = "GrowingAutotracker";
 
-    public CdpAutotracker(Application application) {
-        super(application);
+    public CdpAutotracker(Context context) {
+        super(context);
     }
 
     /**

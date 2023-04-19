@@ -17,26 +17,15 @@
 package com.growingio.android.sdk.track.utils;
 
 import android.content.Context;
-import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.WindowManager;
 
 public class DeviceUtil {
     private DeviceUtil() {
     }
 
     public static DisplayMetrics getDisplayMetrics(Context context) {
-        DisplayMetrics metrics = new DisplayMetrics();
-        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        if (display == null) return metrics;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            display.getRealMetrics(metrics);
-        } else {
-            display.getMetrics(metrics);
-        }
-        return metrics;
+        return context.getResources().getDisplayMetrics();
     }
 
     public static boolean isPhone(Context context) {

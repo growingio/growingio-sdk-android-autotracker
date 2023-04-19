@@ -24,8 +24,39 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+
+import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+
 public final class ActivityUtil {
     private ActivityUtil() {
+    }
+
+    public static ActivityLifecycleEvent.EVENT_TYPE judgeContextState(Activity activity) {
+        if (ClassExistHelper.hasClass("androidx.lifecycle.LifecycleOwner")) {
+            return judgeAndroidXActivityState(activity);
+        } else {
+            return null;
+        }
+    }
+
+    private static ActivityLifecycleEvent.EVENT_TYPE judgeAndroidXActivityState(Activity activity) {
+        if (activity instanceof LifecycleOwner) {
+            LifecycleOwner owner = (LifecycleOwner) activity;
+            Lifecycle.State state = owner.getLifecycle().getCurrentState();
+            switch (state) {
+                case CREATED:
+                    return ActivityLifecycleEvent.EVENT_TYPE.ON_CREATED;
+                case STARTED:
+                    return ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED;
+                case RESUMED:
+                    return ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED;
+                default:
+                    return null;
+            }
+        }
+        return null;
     }
 
     @Nullable

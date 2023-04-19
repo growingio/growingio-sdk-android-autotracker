@@ -32,6 +32,7 @@ import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
+import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
@@ -44,6 +45,7 @@ import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.timer.TimerCenter;
+import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -56,42 +58,71 @@ public class Tracker {
 
     protected volatile boolean isInited;
 
-    public Tracker(Application application) {
-        if (application == null) {
+    public Tracker(Context context) {
+        if (context == null) {
             isInited = false;
             Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized before use API");
             return;
         }
         // 配置
-        setup(application);
+        setup(context);
 
         TrackerContext.initSuccess();
         // 业务逻辑
-        start();
+        start(context);
 
         isInited = true;
     }
 
     @CallSuper
-    protected void setup(Application application) {
-        TrackerContext.init(application);
+    protected void setup(Context context) {
+        if (context instanceof Application) {
+            Application application = (Application) context;
+            application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
+        } else if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            activity.getApplication().registerActivityLifecycleCallbacks(ActivityStateProvider.get());
+        } else {
+            Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized SDK with Application or Activity");
+            return;
+        }
+        TrackerContext.init(context);
         // init core service
-        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         DeepLinkProvider.get().init();
         SessionProvider.get().init();
         PersistentDataProvider.get().setup();
 
-        loadAnnotationGeneratedModules(application);
+        loadAnnotationGeneratedModules(context);
         // 支持配置中注册模块, 如加密模块等事件模块需要先于所有事件发送注册
         for (LibraryGioModule component : ConfigurationProvider.core().getPreloadComponents()) {
-            component.registerComponents(application, TrackerContext.get().getRegistry());
+            component.registerComponents(context, TrackerContext.get().getRegistry());
         }
     }
 
-    private void start() {
+    private void start(Context context) {
         PersistentDataProvider.get().start();
 
         CacheEventProvider.get().releaseCaches();
+
+        makeupActivityLifecycle(context);
+    }
+
+    private void makeupActivityLifecycle(Context context) {
+        if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            ActivityLifecycleEvent.EVENT_TYPE state = ActivityUtil.judgeContextState(activity);
+            if (state != null) {
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_CREATED) >= 0) {
+                    ActivityStateProvider.get().onActivityCreated(activity, null);
+                }
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) >= 0) {
+                    ActivityStateProvider.get().onActivityStarted(activity);
+                }
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) >= 0) {
+                    ActivityStateProvider.get().onActivityResumed(activity);
+                }
+            }
+        }
     }
 
 
@@ -191,7 +222,7 @@ public class Tracker {
             @Override
             public void run() {
                 if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
-                    Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
+                    Logger.d(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
                 } else {
                     ConfigurationProvider.core().setDataCollectionEnabled(enabled);
                     if (enabled) {
