@@ -84,7 +84,7 @@ public class Tracker {
             Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized SDK with Application or Activity");
             return;
         }
-        TrackerContext.init(context);
+        TrackerContext.init(context.getApplicationContext());
         // init core service
         DeepLinkProvider.get().init();
         SessionProvider.get().init();
