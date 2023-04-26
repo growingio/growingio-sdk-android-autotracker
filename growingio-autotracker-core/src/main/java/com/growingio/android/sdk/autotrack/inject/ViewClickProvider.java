@@ -22,6 +22,7 @@ import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
@@ -41,6 +42,10 @@ class ViewClickProvider {
     public static void viewOnClick(View view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        if (ViewAttributeUtil.isIgnoreViewClick(view)) {
             return;
         }
 

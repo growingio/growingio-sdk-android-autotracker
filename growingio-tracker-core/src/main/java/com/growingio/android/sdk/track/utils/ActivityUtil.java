@@ -19,9 +19,6 @@ package com.growingio.android.sdk.track.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 
 import androidx.lifecycle.Lifecycle;
@@ -59,16 +56,14 @@ public final class ActivityUtil {
         return null;
     }
 
-    @Nullable
-    public static Activity findActivity(@Nullable View view) {
+    public static Activity findActivity(View view) {
         if (view == null) {
             return null;
         }
         return findActivity(view.getContext());
     }
 
-    @Nullable
-    public static Activity findActivity(@NonNull Context context) {
+    public static Activity findActivity(Context context) {
         if (!(context instanceof ContextWrapper)) {
             return null;
         }
@@ -92,9 +87,7 @@ public final class ActivityUtil {
     public static boolean isDestroy(Context context) {
         Activity activity = findActivity(context);
         if (activity != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                return activity.isDestroyed();
-            }
+            return activity.isDestroyed();
         }
         return false;
     }

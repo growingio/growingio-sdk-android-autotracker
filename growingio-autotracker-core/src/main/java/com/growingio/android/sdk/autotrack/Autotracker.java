@@ -284,4 +284,13 @@ public class Autotracker extends Tracker {
         }
         ThreadUtils.runOnUiThread(() -> ViewAttributeUtil.setIgnorePolicy(view, policy));
     }
+
+    public void ignoreViewClick(final View view, boolean isIgnore) {
+        if (!isInited) return;
+        if (view == null) {
+            Logger.e(TAG, "ignoreViewClick failed: view is NULL");
+            return;
+        }
+        ThreadUtils.runOnUiThread(() -> ViewAttributeUtil.setIgnoreViewClick(view, isIgnore));
+    }
 }
