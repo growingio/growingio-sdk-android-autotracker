@@ -145,7 +145,7 @@ public class DeviceInfoProvider {
                 if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
                     mAndroidId = MAGIC_ANDROID_ID;
                 } else {
-                    Logger.i(TAG, "get AndroidId success, and androidId is" + mAndroidId);
+                    Logger.i(TAG, "get AndroidId success, and androidId is " + mAndroidId);
                 }
             } catch (Throwable e) {
                 mAndroidId = MAGIC_ANDROID_ID;

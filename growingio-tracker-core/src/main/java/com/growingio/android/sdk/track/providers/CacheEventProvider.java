@@ -52,7 +52,7 @@ public class CacheEventProvider {
             }
             Logger.d(TAG, "release cache events after sdk init: count-" + caches.size());
             caches.clear();
-        } else {
+        } else if (caches.size() > 0) {
             Logger.w(TAG, "drop events when data collect disabled");
             caches.clear();
         }

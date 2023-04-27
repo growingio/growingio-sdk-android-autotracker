@@ -63,7 +63,6 @@ public class SessionProvider implements IActivityLifecycle {
      */
     @TrackThread
     public void refreshSessionId() {
-        Logger.d(TAG, "refresh sessionId");
         PersistentDataProvider.get().setSessionId(UUID.randomUUID().toString());
         PersistentDataProvider.get().setSendVisitAfterRefreshSessionId(false);
     }

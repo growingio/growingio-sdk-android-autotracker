@@ -52,7 +52,7 @@ import java.util.Map;
 
 public class Tracker {
 
-    private static final String TAG = "GrowingIO Track SDK";
+    private static final String TAG = "Tracker";
 
     protected volatile boolean isInited;
 

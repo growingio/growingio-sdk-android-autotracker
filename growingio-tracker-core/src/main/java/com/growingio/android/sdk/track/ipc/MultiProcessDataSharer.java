@@ -344,11 +344,11 @@ public class MultiProcessDataSharer implements IDataSharer {
                         entry.putLong(mMappedByteBuffer, result[0]);
                     }
                 }, entry.getPosition(), SharedEntry.MAX_SIZE);
-                Logger.d(TAG, "getAndAddLong:  update key=" + key + " result = " + result[0]);
+                Logger.v(TAG, "getAndAddLong:  update key=" + key + " result = " + result[0]);
                 return result[0];
             } else {
                 putValue(key, SharedEntry.VALUE_TYPE_LONG, startValue);
-                Logger.d(TAG, "getAndAddLong: insert key=" + key + " with " + startValue);
+                Logger.v(TAG, "getAndAddLong: insert key=" + key + " with " + startValue);
                 return startValue;
             }
         }
@@ -374,11 +374,11 @@ public class MultiProcessDataSharer implements IDataSharer {
                         entry.putInt(mMappedByteBuffer, result[0]);
                     }
                 }, entry.getPosition(), SharedEntry.MAX_SIZE);
-                Logger.d(TAG, "getAndAddInt: update key=" + key + " result = " + result[0]);
+                Logger.v(TAG, "getAndAddInt: update key=" + key + " result = " + result[0]);
                 return result[0];
             } else {
                 putValue(key, SharedEntry.VALUE_TYPE_INT, startValue);
-                Logger.d(TAG, "getAndAddInt: insert key=" + key + " with " + startValue);
+                Logger.v(TAG, "getAndAddInt: insert key=" + key + " with " + startValue);
                 return startValue;
             }
         }
@@ -404,11 +404,11 @@ public class MultiProcessDataSharer implements IDataSharer {
                         entry.putInt(mMappedByteBuffer, result[0]);
                     }
                 }, entry.getPosition(), SharedEntry.MAX_SIZE);
-                Logger.d(TAG, "getAndSubInt: update key=" + key + " result = " + result[0]);
+                Logger.v(TAG, "getAndSubInt: update key=" + key + " result = " + result[0]);
                 return result[0];
             } else {
                 putValue(key, SharedEntry.VALUE_TYPE_INT, startValue);
-                Logger.d(TAG, "getAndSubInt: insert key=" + key + " with " + startValue);
+                Logger.v(TAG, "getAndSubInt: insert key=" + key + " with " + startValue);
                 return startValue;
             }
         }
