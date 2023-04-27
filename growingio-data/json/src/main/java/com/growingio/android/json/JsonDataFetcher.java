@@ -86,7 +86,6 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
         }
         StringBuilder sb = new StringBuilder("[");
         int length = events.size();
-        Logger.d(TAG, "----- merge json data size:" + length + " ----");
         for (byte[] data : events) {
             length -= 1;
             if (data.length > 0) {

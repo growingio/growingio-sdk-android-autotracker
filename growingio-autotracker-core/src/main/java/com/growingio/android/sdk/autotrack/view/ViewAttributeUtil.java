@@ -82,7 +82,7 @@ public class ViewAttributeUtil {
         return null;
     }
 
-    public static void setIgnoreViewClick(View view,boolean isIgnore) {
+    public static void setIgnoreViewClick(View view, boolean isIgnore) {
         view.setTag(R.id.growing_tracker_ignore_view_click, isIgnore);
     }
 

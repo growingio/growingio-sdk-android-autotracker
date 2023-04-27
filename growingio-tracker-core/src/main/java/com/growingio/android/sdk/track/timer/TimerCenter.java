@@ -23,6 +23,7 @@ import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
@@ -31,6 +32,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class TimerCenter implements IActivityLifecycle {
+
+
+    private static final String TAG = "TimerCenter";
     public static final String ATTR_EVENT_DURATION = "event_duration";
     private final Map<String, Timer> mTimers = new HashMap<>();
     private boolean mEnterBackground = false;
@@ -59,6 +63,7 @@ public class TimerCenter implements IActivityLifecycle {
                 return null;
             }
             mTimers.put(timerId, timer);
+            Logger.d(TAG, "start a timer with %s", timerId);
         }
 
         return timerId;
@@ -70,6 +75,7 @@ public class TimerCenter implements IActivityLifecycle {
             Timer timer = mTimers.get(timerId);
             if (timer != null) {
                 timer.updateState(currentTime, isResume);
+                Logger.d(TAG, "update a timer with %s", timerId);
             }
         }
     }
@@ -91,6 +97,7 @@ public class TimerCenter implements IActivityLifecycle {
                                 .setAttributes(attributes)
                 );
                 mTimers.remove(timerId);
+                Logger.d(TAG, "remove a timer with %s", timerId);
             }
         }
     }

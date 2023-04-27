@@ -127,7 +127,7 @@ public class PageProvider implements IActivityLifecycle {
             useCachePageAttributesIfNeeded(page);
             generatePageEvent(context, page);
         } else {
-            Logger.e(TAG, "sendPage: path = " + page.path() + " is ignored");
+            Logger.w(TAG, "ignoredPage: path = " + page.path());
         }
     }
 
@@ -239,7 +239,7 @@ public class PageProvider implements IActivityLifecycle {
         if (!hidden) {
             Page<?> page = findPage(fragment);
             if (page == null) {
-                Logger.e(TAG, "fragmentOnHiddenChanged: fragment is NULL");
+                Logger.w(TAG, "fragmentOnHiddenChanged: fragment is NULL");
             } else {
                 refreshPages(fragment.getActivity(), page);
             }
@@ -264,12 +264,12 @@ public class PageProvider implements IActivityLifecycle {
         }
 
         if (isHidden(fragment)) {
-            Logger.e(TAG, "createOrResumePage: this fragment is hidden");
+            Logger.w(TAG, "createOrResumePage: this fragment is hidden");
             return;
         }
 
         if (!fragment.getUserVisibleHint()) {
-            Logger.e(TAG, "createOrResumePage: this fragment's UI is currently invisible to the user");
+            Logger.w(TAG, "createOrResumePage: this fragment's UI is currently invisible to the user");
             return;
         }
 
@@ -279,7 +279,7 @@ public class PageProvider implements IActivityLifecycle {
         }
 
         if (!fragment.isResumed()) {
-            Logger.e(TAG, "createOrResumePage: this fragment not is resumed");
+            Logger.w(TAG, "createOrResumePage: this fragment not is resumed");
             return;
         }
 
@@ -309,7 +309,7 @@ public class PageProvider implements IActivityLifecycle {
         }
 
         if (fragment == null) {
-            Logger.e(TAG, "removePage: this fragment can not make superFragment");
+            Logger.w(TAG, "removePage: this fragment can not make superFragment");
             return;
         }
 
@@ -318,7 +318,7 @@ public class PageProvider implements IActivityLifecycle {
             return;
         }
 
-        Logger.e(TAG, "removePage: fragment is " + fragment.getRealFragment());
+        Logger.d(TAG, "removePage: fragment is " + fragment.getRealFragment().getClass().getSimpleName());
         PAGE_ATTRIBUTES_CACHE.remove(fragment.getRealFragment());
 
         Page<?> page = ALL_PAGE_TREE.get(fragment.getActivity());
@@ -402,7 +402,7 @@ public class PageProvider implements IActivityLifecycle {
         if (page != null) {
             setPageAttributes(page, attributes, true);
         } else {
-            Logger.e(TAG, "setPageAttributes: can't find Activity " + activity);
+            Logger.d(TAG, "setPageAttributes: can't find Activity " + activity);
             PAGE_ATTRIBUTES_CACHE.put(activity, attributes);
         }
     }
@@ -412,14 +412,14 @@ public class PageProvider implements IActivityLifecycle {
         if (page != null) {
             setPageAttributes(page, attributes, true);
         } else {
-            Logger.e(TAG, "setPageAttributes: can't find Fragment " + fragment.getRealFragment());
+            Logger.d(TAG, "setPageAttributes: can't find Fragment " + fragment.getRealFragment());
             PAGE_ATTRIBUTES_CACHE.put(fragment.getRealFragment(), attributes);
         }
     }
 
     private void setPageAttributes(Page<?> page, Map<String, String> attributes, boolean checkEquals) {
         if (checkEquals && attributes.equals(page.getAttributes())) {
-            Logger.e(TAG, "setPageAttributes is equals page.getAttributes");
+            Logger.w(TAG, "setPageAttributes is equals page.getAttributes");
             return;
         }
 

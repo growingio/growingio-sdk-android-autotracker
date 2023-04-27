@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.track.modelloader;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 /**
  * <p>
  * Manages component registration to extend or replace Tracker's default feature
@@ -39,6 +41,7 @@ public class TrackerRegistry {
     }
 
     public <Model, Data> TrackerRegistry register(Class<Model> modelClass, Class<Data> dataClass, ModelLoaderFactory<Model, Data> factory) {
+        Logger.d("TrackerRegistry", "register module: " + modelClass + "[" + dataClass + "]");
         modelLoaderRegistry.put(modelClass, dataClass, factory);
         return this;
     }

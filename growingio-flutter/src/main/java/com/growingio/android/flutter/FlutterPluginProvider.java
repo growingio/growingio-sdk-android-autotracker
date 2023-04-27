@@ -168,7 +168,7 @@ public class FlutterPluginProvider {
         TrackerContext.get().loadData(new Debugger(screenshot), Debugger.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
             @Override
             public void onDataReady(WebService data) {
-                Logger.d(TAG, "send circle data success");
+                Logger.d(TAG, "send debugger data success");
             }
 
             @Override

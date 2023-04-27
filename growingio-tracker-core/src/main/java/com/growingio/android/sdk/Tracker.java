@@ -110,6 +110,7 @@ public class Tracker {
             Activity activity = (Activity) context;
             ActivityLifecycleEvent.EVENT_TYPE state = ActivityUtil.judgeContextState(activity);
             if (state != null) {
+                Logger.i(TAG, "initSdk with Activity, makeup ActivityLifecycle before current state:" + state.name());
                 if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_CREATED) >= 0) {
                     ActivityStateProvider.get().onActivityCreated(activity, null);
                 }
@@ -145,7 +146,7 @@ public class Tracker {
     public void setConversionVariables(Map<String, String> variables) {
         if (!isInited) return;
         if (variables == null || variables.isEmpty()) {
-            Logger.e(TAG, "setConversionVariables: variables is NULL");
+            Logger.e(TAG, "setConversionVariables: variables is NULL, and skip it.");
             return;
         }
         TrackEventGenerator.generateConversionVariablesEvent(new HashMap<>(variables));
@@ -154,7 +155,7 @@ public class Tracker {
     public void setLoginUserAttributes(Map<String, String> attributes) {
         if (!isInited) return;
         if (attributes == null || attributes.isEmpty()) {
-            Logger.e(TAG, "setLoginUserAttributes: attributes is NULL");
+            Logger.e(TAG, "setLoginUserAttributes: attributes is NULL, and skip it.");
             return;
         }
         TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
@@ -163,7 +164,7 @@ public class Tracker {
     public void setVisitorAttributes(Map<String, String> attributes) {
         if (!isInited) return;
         if (attributes == null || attributes.isEmpty()) {
-            Logger.e(TAG, "setVisitorAttributes: attributes is NULL");
+            Logger.e(TAG, "setVisitorAttributes: attributes is NULL, and skip it");
             return;
         }
         TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>(attributes));
@@ -180,9 +181,8 @@ public class Tracker {
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
             public void run() {
-                if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
-                    Logger.d(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
-                } else {
+                if (enabled != ConfigurationProvider.core().isDataCollectionEnabled()) {
+                    Logger.d(TAG, "isDataCollectionEnabled = " + enabled);
                     ConfigurationProvider.core().setDataCollectionEnabled(enabled);
                     if (enabled) {
                         SessionProvider.get().generateVisit();

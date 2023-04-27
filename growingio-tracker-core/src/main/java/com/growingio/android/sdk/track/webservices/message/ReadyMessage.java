@@ -21,7 +21,6 @@ import android.util.DisplayMetrics;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.SDKConfig;
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
@@ -82,7 +81,6 @@ public class ReadyMessage {
             json.put("screenWidth", mScreenWidth);
             json.put("screenHeight", mScreenHeight);
             json.put("urlScheme", mUrlScheme);
-            Logger.d("READY MESSAGE", json.toString());
         } catch (JSONException ignored) {
         }
         return json;

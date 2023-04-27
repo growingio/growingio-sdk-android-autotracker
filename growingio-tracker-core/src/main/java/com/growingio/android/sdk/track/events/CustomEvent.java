@@ -21,7 +21,6 @@ import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
 public class CustomEvent extends BaseAttributesEvent {

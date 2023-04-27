@@ -83,7 +83,6 @@ public class ConfigurationProvider extends ListenerDispatcher<OnConfigurationCha
     }
 
     public static void initWithConfig(CoreConfiguration coreConfiguration, Map<Class<? extends Configurable>, Configurable> moduleConfigs) {
-        Logger.w(TAG, "Warning!! GrowingSDK already has the config, please don't initialized again!");
         INSTANCE = new ConfigurationProvider(coreConfiguration, moduleConfigs);
     }
 

@@ -117,9 +117,7 @@ public class EventDataManager {
 
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();
-            int deleteNum = contentResolver.delete(uri, EventDataTable.COLUMN_CREATE_TIME + "<=" + sevenDayAgo, null);
-            Logger.d(TAG, "removeOverdueEvents: num: %d", deleteNum);
-            return deleteNum;
+            return contentResolver.delete(uri, EventDataTable.COLUMN_CREATE_TIME + "<=" + sevenDayAgo, null);
         } catch (SQLiteFullException e) {
             onDiskFull(e);
             return -1;
@@ -244,7 +242,6 @@ public class EventDataManager {
         } else {
             client.delete(uri, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
         }
-        Logger.d(TAG, "removeEventById: id:" + id);
     }
 
 
@@ -256,11 +253,9 @@ public class EventDataManager {
         try {
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();
-            int sum = contentResolver.delete(uri,
+            return contentResolver.delete(uri,
                     COLUMN_ID + "<=? AND " + COLUMN_EVENT_TYPE + "=? AND " + COLUMN_POLICY + "=?",
                     new String[]{String.valueOf(lastId), eventType, String.valueOf(policy)});
-            Logger.d(TAG, "removeEvents: num: %d", sum);
-            return sum;
         } catch (SQLiteFullException e) {
             onDiskFull(e);
             return -1;
@@ -280,7 +275,7 @@ public class EventDataManager {
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();
             contentResolver.delete(uri, null, null);
-            Logger.d(TAG, "removeAllEvents success");
+            Logger.w(TAG, "removeAllEvents success");
         } catch (SQLiteFullException e) {
             onDiskFull(e);
         } catch (Exception e) {
@@ -289,7 +284,7 @@ public class EventDataManager {
     }
 
     private void onDiskFull(SQLiteFullException e) {
-        Logger.e(TAG, e, "Disk full, all operations will be ignored");
+        Logger.w(TAG, e, "Disk full, all operations will be ignored");
         ignoreOperations = true;
     }
 }

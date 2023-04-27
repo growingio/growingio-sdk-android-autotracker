@@ -51,7 +51,7 @@ class ViewClickProvider {
 
         // 为了防止click事件重复发送
         if (ClassUtil.isDuplicateClick(view)) {
-            Logger.e(TAG, "Duplicate Click");
+            Logger.w(TAG, "Duplicate Click");
             return;
         }
 
@@ -95,7 +95,7 @@ class ViewClickProvider {
 
     private static void sendClickEvent(Page<?> page, ViewNode viewNode) {
         if (page == null) {
-            Logger.e(TAG, "sendClickEvent page Activity is NULL");
+            Logger.w(TAG, "sendClickEvent page Activity is NULL");
             return;
         }
         TrackMainThread.trackMain().postEventToTrackMain(

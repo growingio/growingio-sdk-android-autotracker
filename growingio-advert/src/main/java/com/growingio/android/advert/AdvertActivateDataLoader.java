@@ -228,7 +228,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                         }
                         sendDeepLinkCallback(advertData.errorCode, advertData.params, wakeTime);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Logger.e(TAG, e);
                     }
                 }
 

@@ -20,8 +20,6 @@ import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 class NativeBridge {
-    private static final String TAG = "NativeBridge";
-
     private final HybridTransformer mHybridTransformer;
 
     NativeBridge() {

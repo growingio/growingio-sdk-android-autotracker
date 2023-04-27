@@ -21,6 +21,7 @@ import android.content.Context;
 import com.growingio.android.gmonitor.GMonitor;
 import com.growingio.android.gmonitor.GMonitorOption;
 import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.apm.EventApm;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
@@ -66,6 +67,7 @@ public class ApmDataLoader implements ModelLoader<EventApm, Void> {
                 ApmTracker apmTracker = new ApmTracker();
                 ConfigurationProvider.get().addConfigurationListener(apmTracker);
 
+                Logger.d("Apm", "init gmonitor success");
                 GMonitor.init(context, new ApmLogger(), option, apmTracker);
             }
         }

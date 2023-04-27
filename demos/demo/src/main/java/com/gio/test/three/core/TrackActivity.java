@@ -132,8 +132,6 @@ public class TrackActivity extends Activity {
                     public void onReceive(Map<String, String> params, int error, long appAwakePassedTime) {
                         Log.e(TAG, String.valueOf(params));
                     }
-
-                    ;
                 });
                 break;
             case TRACK_TIMER_START:

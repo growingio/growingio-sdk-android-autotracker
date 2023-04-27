@@ -81,15 +81,6 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         mMainHandler.sendEmptyMessage(MSG_INIT_SDK);
     }
 
-
-    /**
-     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
-     * if you want modify it,please check adsdk first
-     */
-    public EventSender getEventSender() {
-        return mEventSender;
-    }
-
     @Override
     protected void singleAction(OnTrackMainInitSDKCallback listener, Void action) {
         listener.onTrackMainInitSDK();
@@ -137,22 +128,6 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         };
     }
 
-    /**
-     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
-     * if you want modify it,please check adsdk first
-     */
-    public void postGEventToTrackMain(GEvent gEvent) {
-        postActionToTrackMain(new Runnable() {
-            @Override
-            public void run() {
-                if (gEvent == null) return;
-                if (coreConfiguration.isDataCollectionEnabled()) {
-                    cacheEvent(gEvent);
-                }
-            }
-        });
-    }
-
     public void postActionToTrackMain(Runnable runnable) {
         if (mMainHandler.getLooper() == Looper.myLooper()) {
             runnable.run();
@@ -197,15 +172,20 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
             return false;
         }*/
 
-        if (!eventFilterInterceptor.filterEventType(eventBuilder.getEventType())) return false;
+        if (!eventFilterInterceptor.filterEventType(eventBuilder.getEventType())) {
+            Logger.d(TAG, "filter event type: " + eventBuilder.getEventType());
+            return false;
+        }
 
         String eventPath = getEventPath(eventBuilder);
         if (!TextUtils.isEmpty(eventPath) && !eventFilterInterceptor.filterEventPath(eventPath)) {
+            Logger.d(TAG, "filter event path: " + eventPath);
             return false;
         }
 
         String eventName = getEventName(eventBuilder);
         if (!TextUtils.isEmpty(eventName) && !eventFilterInterceptor.filterEventName(eventName)) {
+            Logger.d(TAG, "filter custom event name: " + eventName);
             return false;
         }
 
@@ -308,16 +288,6 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
             SessionProvider.get().generateVisit();
         }
         mEventSender.sendEvent(event);
-    }
-
-    @TrackThread
-    private void cacheEvent(GEvent event) {
-        if (event instanceof BaseEvent) {
-            Logger.printJson(TAG, "cache: event, type is " + event.getEventType(), ((BaseEvent) event).toJSONObject().toString());
-        } else {
-            Logger.d(TAG, "cache: event, type is " + event.getEventType() + event.toString());
-        }
-        mEventSender.cacheEvent(event);
     }
 
     private class H extends Handler {

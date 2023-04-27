@@ -98,7 +98,7 @@ class DialogClickProvider {
         }
 
         if (dialog == null) {
-            Logger.d(TAG, "alertDialogShow: dialog is NULL");
+            Logger.w(TAG, "alertDialogShow: dialog is NULL");
             return;
         }
 

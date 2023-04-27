@@ -16,24 +16,16 @@
 
 package com.growingio.android.sdk.track.middleware;
 
-import android.os.Build;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.middleware.http.EventEncoder;
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class EventHttpSender implements IEventNetSender {
     private static final String TAG = "EventHttpSender";
@@ -85,30 +77,7 @@ public class EventHttpSender implements IEventNetSender {
         EventResponse response = loadData.fetcher.executeData();
 
         boolean successful = response != null && response.isSucceeded();
-        if (successful) {
-            Logger.d(TAG, "Send events successfully");
-        } else {
-            Logger.d(TAG, "Send events failed, response = " + response);
-        }
         long totalUsed = data == null ? 0L : data.length;
         return new SendResponse(successful, totalUsed);
-    }
-
-    public byte[] defaultDataTransfer(List<GEvent> events) {
-        if (events == null || events.isEmpty()) {
-            return null;
-        }
-        JSONArray jsonArray = new JSONArray();
-        for (GEvent event : events) {
-            if (event instanceof BaseEvent) {
-                JSONObject eventJson = ((BaseEvent) event).toJSONObject();
-                jsonArray.put(eventJson);
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return jsonArray.toString().getBytes(StandardCharsets.UTF_8);
-        } else {
-            return jsonArray.toString().getBytes();
-        }
     }
 }

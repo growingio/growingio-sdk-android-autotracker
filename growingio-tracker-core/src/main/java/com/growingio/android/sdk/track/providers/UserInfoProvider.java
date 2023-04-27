@@ -21,12 +21,10 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.track.ErrorLog;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.TrackThread;
-import com.growingio.android.sdk.track.listener.ListenerContainer;
-import com.growingio.android.sdk.track.listener.OnUserIdChangedListener;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 
-public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener, String> {
+public class UserInfoProvider {
     private static final String TAG = "UserInfoPolicy";
 
     private static class SingleInstance {
@@ -55,7 +53,10 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
 
     public void setLoginUserId(String userId, String userKey) {
         if (!ConfigurationProvider.core().isIdMappingEnabled()) {
-            userKey = null;
+            if (userKey != null) {
+                Logger.w(TAG, "setUserId with UserKey should enable idMapping in sdk Configuration.");
+                userKey = null;
+            }
         }
 
         // 考虑DataSharer存储限制
@@ -72,45 +73,30 @@ public class UserInfoProvider extends ListenerContainer<OnUserIdChangedListener,
             // to null, never send visit, just return
             PersistentDataProvider.get().setLoginUserIdAndUserKey(null, null);
             Logger.d(TAG, "clean the userId (and will also clean the userKey");
-            dispatchActions(null);
             return;
         }
 
         String lastUserId = getLoginUserId();
         if (ObjectUtils.equals(userId, lastUserId)) {
             if (!ObjectUtils.equals(getLoginUserKey(), userKey)) {
-                Logger.d(TAG, "setUserId, the userId is same as the old userId, but userKey different.");
+                Logger.d(TAG, "setUserId, the userId=" + userId + " is same as the old userId, but the userKey=" + userKey + " is different.");
                 PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, userKey);
             } else {
-                Logger.d(TAG, "setUserId, the userId is same as the old userId,just return");
+                Logger.d(TAG, "setUserId, the userId is same as the old userId, just return");
             }
             return;
         }
 
         Logger.d(TAG, "userIdChange: newUserId = " + userId + ", latestUserId = " + lastUserId);
-        dispatchActions(userId);
         PersistentDataProvider.get().setGioId(userId);
         PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, (TextUtils.isEmpty(userKey) ? null : userKey));
         needSendVisit(userId);
     }
 
-    public void registerUserIdChangedListener(OnUserIdChangedListener l) {
-        register(l);
-    }
-
-    public void unregisterUserIdChangedListener(OnUserIdChangedListener l) {
-        unregister(l);
-    }
-
-    @Override
-    protected void singleAction(OnUserIdChangedListener listener, String action) {
-        listener.onUserIdChanged(action);
-    }
-
     @TrackThread
     private void needSendVisit(String newUserId) {
         String mLatestNonNullUserId = PersistentDataProvider.get().getLatestNonNullUserId();
-        Logger.d(TAG, "onUserIdChanged: newUserId = " + newUserId + ", mLatestNonNullUserId = " + mLatestNonNullUserId);
+        Logger.d(TAG, "resend visit after UserIdChanged");
         if (newUserId != null && newUserId.length() != 0) {
             if (TextUtils.isEmpty(mLatestNonNullUserId)) {
                 SessionProvider.get().generateVisit();

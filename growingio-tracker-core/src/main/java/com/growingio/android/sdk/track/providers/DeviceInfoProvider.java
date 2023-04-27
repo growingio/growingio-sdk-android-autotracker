@@ -130,7 +130,7 @@ public class DeviceInfoProvider {
                         mImei = tm.getDeviceId();
                     }
                 } catch (Throwable e) {
-                    Logger.d(TAG, "don't have permission android.permission.READ_PHONE_STATE,initIMEI failed ");
+                    Logger.w(TAG, "sdk doesn't have permission - android.permission.READ_PHONE_STATE, initIMEI failed and skip");
                 }
             }
         }
@@ -143,11 +143,11 @@ public class DeviceInfoProvider {
             try {
                 mAndroidId = Settings.System.getString(getContext().getContentResolver(), Settings.System.ANDROID_ID);
                 if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
-                    Logger.e(TAG, "get AndroidId error");
                     mAndroidId = MAGIC_ANDROID_ID;
+                } else {
+                    Logger.i(TAG, "get AndroidId success, and androidId is" + mAndroidId);
                 }
             } catch (Throwable e) {
-                Logger.e(TAG, "get AndroidId error");
                 mAndroidId = MAGIC_ANDROID_ID;
             }
         }
@@ -175,12 +175,7 @@ public class DeviceInfoProvider {
         return mDeviceId;
     }
 
-//    public void setDeviceId(String deviceId) {
-//        this.mDeviceId = deviceId;
-//    }
-
     private String calculateDeviceId() {
-        Logger.d(TAG, "first time calculate deviceId");
         String adId = getAndroidId();
         String result = null;
         if (!TextUtils.isEmpty(adId)) {
@@ -193,6 +188,7 @@ public class DeviceInfoProvider {
         }
 
         if (TextUtils.isEmpty(result)) {
+            Logger.w(TAG, "try get AndroidId and fail, sdk generate random uuid as AndroidId");
             result = UUID.randomUUID().toString();
         }
         if (result != null && result.length() != 0) {

@@ -22,16 +22,13 @@ import android.app.Application;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.cdp.ResourceItem;
 import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
-import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
-import com.growingio.android.sdk.track.middleware.EventSender;
 import com.growingio.android.sdk.track.middleware.GEvent;
 
 import org.json.JSONException;
@@ -39,13 +36,11 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -114,11 +109,4 @@ public class CdpTest {
         trackMainThread.removeEventBuildInterceptor(testInterceptor);
     }
 
-    @Test
-    public void adSdkTest() {
-        Truth.assertThat(trackMainThread.getEventSender()).isInstanceOf(EventSender.class);
-        trackMainThread.postGEventToTrackMain(new CustomEvent.Builder().build());
-        Robolectric.flushForegroundThreadScheduler();
-        Uninterruptibles.sleepUninterruptibly(1000, TimeUnit.MILLISECONDS);
-    }
 }
