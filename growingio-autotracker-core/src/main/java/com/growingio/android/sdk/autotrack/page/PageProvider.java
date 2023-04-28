@@ -288,7 +288,7 @@ public class PageProvider implements IActivityLifecycle {
             page = new FragmentPage(fragment);
             Page<?> pageParent = findPageParent(fragment);
             if (pageParent == null) {
-                Logger.e(TAG, "pageParent is NULL");
+                Logger.e(TAG, fragment.getClass().getSimpleName() + "'s pageParent is NULL");
                 return;
             }
             page.assignParent(pageParent);

@@ -173,19 +173,19 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         }*/
 
         if (!eventFilterInterceptor.filterEventType(eventBuilder.getEventType())) {
-            Logger.d(TAG, "filter event type: " + eventBuilder.getEventType());
+            Logger.w(TAG, "filter [" + eventBuilder.getEventType() + "] event by type");
             return false;
         }
 
         String eventPath = getEventPath(eventBuilder);
         if (!TextUtils.isEmpty(eventPath) && !eventFilterInterceptor.filterEventPath(eventPath)) {
-            Logger.d(TAG, "filter event path: " + eventPath);
+            Logger.w(TAG, "filter [" + eventBuilder.getEventType() + "] event by path=" + eventPath);
             return false;
         }
 
         String eventName = getEventName(eventBuilder);
         if (!TextUtils.isEmpty(eventName) && !eventFilterInterceptor.filterEventName(eventName)) {
-            Logger.d(TAG, "filter custom event name: " + eventName);
+            Logger.w(TAG, "filter [CUSTOM] event by name=" + eventName);
             return false;
         }
 

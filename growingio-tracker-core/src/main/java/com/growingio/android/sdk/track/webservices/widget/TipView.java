@@ -34,6 +34,7 @@ import android.widget.TextView;
 import androidx.annotation.StringRes;
 
 import com.growingio.android.sdk.track.R;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 
 public class TipView extends FrameLayout {
@@ -186,9 +187,14 @@ public class TipView extends FrameLayout {
 
     public void remove() {
         if (mIsShowing) {
-            WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-            windowManager.removeView(this);
-            mIsShowing = false;
+            try {
+                WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+                windowManager.removeView(this);
+            } catch (Exception e) {
+                Logger.e("TipView", e);
+            } finally {
+                mIsShowing = false;
+            }
         }
     }
 
