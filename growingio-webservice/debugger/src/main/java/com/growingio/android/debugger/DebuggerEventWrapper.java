@@ -73,7 +73,7 @@ public class DebuggerEventWrapper implements EventBuildInterceptor, ScreenshotPr
 
     public void end() {
         mIsConnected = false;
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
+        ScreenshotProvider.get().unregisterScreenshotRefreshedListener();
         TrackMainThread.trackMain().removeEventBuildInterceptor(this);
         closeLogger();
         mOnDebuggerEventListener = null;

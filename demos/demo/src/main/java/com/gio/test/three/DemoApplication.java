@@ -103,9 +103,9 @@ public class DemoApplication extends Application {
                 .setUncaughtException(true)
                 .setPrintUncaughtException(true);
         if (sConfiguration == null) {
-            sConfiguration = new CdpAutotrackConfiguration("bc675c65b3b0290e", "growing.ff8a70351000af43") //uat-uba
-                    .setDataSourceId("8b17366d9e90b05b")
-                    .setDataCollectionServerHost("http://117.50.84.75:8080")
+            sConfiguration = new CdpAutotrackConfiguration("0a1b4118dd954ec3bcc69da5138bdb96", "growing.bd71d91eb56f5f53") //uat-uba
+                    .setDataSourceId("baffd6fb52b78ca7")
+                    .setDataCollectionServerHost("https://napi.growingio.com")
                     .setDebugEnabled(true)
                     .setDataCollectionEnabled(true)
                     .setIdMappingEnabled(true)

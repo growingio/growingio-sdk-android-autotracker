@@ -99,6 +99,7 @@ public class SessionProvider implements IActivityLifecycle {
 
     @TrackThread
     public void cleanLocation() {
+        Logger.d(TAG, "clean location by User, Doesn't send visit event.");
         mLatitude = 0;
         mLongitude = 0;
     }

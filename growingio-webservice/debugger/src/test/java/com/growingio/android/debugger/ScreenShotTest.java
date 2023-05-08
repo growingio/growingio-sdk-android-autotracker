@@ -60,7 +60,7 @@ public class ScreenShotTest {
         ScreenshotProvider.get().registerScreenshotRefreshedListener(dispatchListener);
         ScreenshotProvider.get().refreshScreenshot();
 
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(dispatchListener);
+        ScreenshotProvider.get().unregisterScreenshotRefreshedListener();
     }
 
     @Test

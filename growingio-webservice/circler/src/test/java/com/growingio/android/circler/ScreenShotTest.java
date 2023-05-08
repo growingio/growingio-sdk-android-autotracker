@@ -70,7 +70,7 @@ public class ScreenShotTest {
         ScreenshotProvider.get().registerScreenshotRefreshedListener(dispatchListener);
         ScreenshotProvider.get().refreshScreenshot();
 
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(dispatchListener);
+        ScreenshotProvider.get().unregisterScreenshotRefreshedListener();
     }
 
     @Test
@@ -101,7 +101,7 @@ public class ScreenShotTest {
 
                     }
                 });
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(baseListener);
+        ScreenshotProvider.get().unregisterScreenshotRefreshedListener();
     }
 
     public List<DecorView> getAllWindowDecorViews() {

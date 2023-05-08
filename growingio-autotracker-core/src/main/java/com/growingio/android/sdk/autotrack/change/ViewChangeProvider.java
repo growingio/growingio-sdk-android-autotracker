@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
@@ -29,7 +30,7 @@ import com.growingio.android.sdk.track.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
-import com.growingio.android.sdk.track.view.ViewTreeStatusProvider;
+import com.growingio.android.sdk.track.view.ViewTreeStatusObserver;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
@@ -39,22 +40,27 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChangedListener {
     private static final String TAG = "ViewChangeProvider";
 
-
     public ViewChangeProvider() {
     }
 
+    private ViewTreeStatusObserver mViewTreeStatusObserver;
+
     public void setup() {
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        ViewTreeStatusProvider.get().register(this);
+        mViewTreeStatusObserver = new ViewTreeStatusObserver(false, false, true, this,
+                R.id.growing_tracker_monitoring_focus_change);
     }
 
     @Override
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
-        if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
-            Activity activity = event.getActivity();
-            if (activity == null) {
-                return;
-            }
+        Activity activity = event.getActivity();
+        if (activity == null) {
+            return;
+        }
+        if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
+            mViewTreeStatusObserver.onActivityResumed(activity);
+        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
+            mViewTreeStatusObserver.onActivityPaused(activity);
             View focusView = activity.getWindow().getDecorView().findFocus();
             if (focusView instanceof EditText) {
                 Logger.d(TAG, "onActivityPaused, and focus view is EditText");

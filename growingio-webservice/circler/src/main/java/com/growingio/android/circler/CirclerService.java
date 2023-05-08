@@ -137,7 +137,7 @@ public class CirclerService implements LoadDataFetcher<WebService>, IActivityLif
         if (webSocketHandler.getWebSocket() != null) {
             webSocketHandler.getWebSocket().close(1000, "exit");
         }
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener(this);
+        ScreenshotProvider.get().unregisterScreenshotRefreshedListener();
         safeTipView.dismiss();
         ActivityStateProvider.get().unregisterActivityLifecycleListener(this);
     }

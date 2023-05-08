@@ -42,7 +42,7 @@ public class TrackHelper {
     }
 
     public static void waitTrackMainThreadForIdleSync() {
-        Looper mainLooper = TrackMainThread.trackMain().getMainLooper();
+        Looper mainLooper = TrackMainThread.trackMain().getMainHandler().getLooper();
         if (Looper.myLooper() == mainLooper) {
             throw new RuntimeException(
                     "This method can not be called from the TrackMainThread");

@@ -29,22 +29,24 @@ import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
+import com.growingio.android.sdk.track.listener.IActivityLifecycle;
+import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
-import com.growingio.android.sdk.track.view.ViewTreeStatusProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
+import com.growingio.android.sdk.track.view.ViewTreeStatusObserver;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class ImpressionProvider implements OnViewStateChangedListener {
+public class ImpressionProvider implements IActivityLifecycle, OnViewStateChangedListener {
     private static final String TAG = "ImpressionProvider";
 
     private static final int CHECK_IMPRESSION_ANTI_SHAKE_TIME = 500;
@@ -52,13 +54,14 @@ public class ImpressionProvider implements OnViewStateChangedListener {
     private static final Map<Activity, List<ViewImpression>> ACTIVITY_SCOPE = new WeakHashMap<>();
     private final float mImpressionScale;
     private final Handler mUiHandler;
-    private volatile boolean mStarted = false;
     private final Runnable mCheckImpressionRunnable = new Runnable() {
         @Override
         public void run() {
             checkImpression();
         }
     };
+
+    private final ViewTreeStatusObserver mViewTreeStatusObserver;
 
     private static class SingleInstance {
         private static final ImpressionProvider INSTANCE = new ImpressionProvider();
@@ -68,11 +71,26 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         AutotrackConfig configuration = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         mImpressionScale = configuration.getImpressionScale();
 
+        ActivityStateProvider.get().registerActivityLifecycleListener(this);
+        mViewTreeStatusObserver = new ViewTreeStatusObserver(this);
         mUiHandler = new Handler(Looper.getMainLooper());
     }
 
     public static ImpressionProvider get() {
         return SingleInstance.INSTANCE;
+    }
+
+    @Override
+    public void onActivityLifecycle(ActivityLifecycleEvent event) {
+        Activity activity = event.getActivity();
+        if (!ACTIVITY_SCOPE.containsKey(activity)) return;
+        if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
+            mViewTreeStatusObserver.onActivityResumed(activity);
+        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
+            mViewTreeStatusObserver.onActivityPaused(activity);
+        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_DESTROYED) {
+            ACTIVITY_SCOPE.remove(activity);
+        }
     }
 
     @Override
@@ -126,7 +144,7 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         if (trackedView == null) {
             return;
         }
-
+        Logger.d(TAG, "find View from invisible to visible, send impression event");
         Page<?> page = PageProvider.get().findPage(trackedView);
         if (page == null) {
             Logger.w(TAG, "sendViewImpressionEvent trackedView Activity is NULL");
@@ -141,26 +159,13 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         );
     }
 
-    private void start() {
-        if (mStarted) {
-            Logger.w(TAG, "ImpressionProvider is running");
-            return;
-        }
-        mStarted = true;
-        ViewTreeStatusProvider.get().register(this);
-        Logger.d(TAG, "ImpressionProvider started");
-    }
-
     public void trackViewImpression(View view, String impressionEventName, Map<String, String> attributes) {
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
             return;
         }
         if (ViewHelper.isIgnoredView(view)) {
-            Logger.d(TAG, "Current view is set to ignore");
+            Logger.w(TAG, "Current view is set to ignore");
             return;
-        }
-        if (!mStarted) {
-            start();
         }
         Activity activity = findViewActivity(view);
         if (activity == null) {
@@ -180,7 +185,9 @@ public class ImpressionProvider implements OnViewStateChangedListener {
             }
         }
 
+        Logger.d(TAG, "add view to impression list");
         viewImpressions.add(new ViewImpression(view, impressionEventName, attributes));
+        mViewTreeStatusObserver.onActivityResumed(activity);
         delayCheckImpression();
     }
 
@@ -220,10 +227,14 @@ public class ImpressionProvider implements OnViewStateChangedListener {
         for (int i = 0; i < viewImpressions.size(); i++) {
             if (viewImpressions.get(i).getTrackedView() == trackedView) {
                 viewImpressions.remove(i);
+                Logger.d(TAG, "remove view from impression list");
                 break;
             }
         }
-
+        if (viewImpressions.isEmpty()) {
+            mViewTreeStatusObserver.onActivityPaused(activity);
+            ACTIVITY_SCOPE.remove(activity);
+        }
     }
 
     @Nullable

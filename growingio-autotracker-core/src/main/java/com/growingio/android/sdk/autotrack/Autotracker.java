@@ -47,9 +47,8 @@ public class Autotracker extends Tracker {
     protected void setup(Context context) {
         super.setup(context);
         PageProvider.get().setup();
-        ViewChangeProvider mViewChangeProvider;
-        mViewChangeProvider = new ViewChangeProvider();
-        mViewChangeProvider.setup();
+        ViewChangeProvider viewChangeProvider = new ViewChangeProvider();
+        viewChangeProvider.setup();
     }
 
     public void setUniqueTag(final View view, final String tag) {

@@ -94,8 +94,8 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         return SingleInstance.INSTANCE;
     }
 
-    public Looper getMainLooper() {
-        return mMainLooper;
+    public Handler getMainHandler() {
+        return mMainHandler;
     }
 
     @TrackThread
