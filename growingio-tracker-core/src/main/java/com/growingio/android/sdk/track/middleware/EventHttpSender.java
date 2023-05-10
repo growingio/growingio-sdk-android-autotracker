@@ -85,7 +85,7 @@ public class EventHttpSender implements IEventNetSender {
 
     private void printEventUrlLog(EventUrl eventUrl) {
         if (ConfigurationProvider.core().isDebugEnabled()) {
-            Logger.d(TAG, "send event url: " + eventUrl.toString());
+            Logger.d(TAG, "send event to url: " + eventUrl.toString());
             byte[] data = eventUrl.getRequestBody();
             Logger.v(TAG, "send event data:\n " + new String(data));
         }

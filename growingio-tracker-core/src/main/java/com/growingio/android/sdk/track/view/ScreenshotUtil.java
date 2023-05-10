@@ -42,6 +42,7 @@ import java.util.List;
 public class ScreenshotUtil {
     private ScreenshotUtil() {
     }
+
     public static Bitmap getScreenshotBitmap() {
         List<DecorView> decorViews = WindowHelper.get().getTopActivityViews();
         for (int i = decorViews.size() - 1; i >= 0; i--) {
@@ -95,7 +96,10 @@ public class ScreenshotUtil {
         // https://muyangmin.github.io/glide-docs-cn/doc/hardwarebitmaps.html
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Activity activity = ActivityStateProvider.get().getForegroundActivity();
-            if (activity == null) getScreenShotBitmapDefault(scale, callback);
+            if (activity == null) {
+                getScreenShotBitmapDefault(scale, callback);
+                return;
+            }
             Window window = activity.getWindow();
             DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(activity);
             int widthPixels = metrics.widthPixels;
