@@ -27,7 +27,7 @@ public class DebugLogger extends BaseLogger {
 
     @Override
     protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
-        if (priority > Log.ASSERT) {
+        if (priority > Log.ASSERT || priority < Log.DEBUG) {
             return;
         }
         tag = TAG_PREFIX + tag;

@@ -68,6 +68,8 @@ public class EventHttpSender implements IEventNetSender {
         }
 
         byte[] data = eventUrl.getRequestBody();
+        printEventUrlLog(eventUrl);
+
 
         ModelLoader.LoadData<EventResponse> loadData = getNetworkModelLoader().buildLoadData(eventUrl);
         if (!loadData.fetcher.getDataClass().isAssignableFrom(EventResponse.class)) {
@@ -79,5 +81,13 @@ public class EventHttpSender implements IEventNetSender {
         boolean successful = response != null && response.isSucceeded();
         long totalUsed = data == null ? 0L : data.length;
         return new SendResponse(successful, totalUsed);
+    }
+
+    private void printEventUrlLog(EventUrl eventUrl) {
+        if (ConfigurationProvider.core().isDebugEnabled()) {
+            Logger.d(TAG, "send event url: " + eventUrl.toString());
+            byte[] data = eventUrl.getRequestBody();
+            Logger.v(TAG, "send event data:\n " + new String(data));
+        }
     }
 }

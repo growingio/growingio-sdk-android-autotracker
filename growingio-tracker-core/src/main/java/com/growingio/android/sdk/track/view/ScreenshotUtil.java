@@ -97,7 +97,7 @@ public class ScreenshotUtil {
             Activity activity = ActivityStateProvider.get().getForegroundActivity();
             if (activity == null) getScreenShotBitmapDefault(scale, callback);
             Window window = activity.getWindow();
-            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(activity);
             int widthPixels = metrics.widthPixels;
             int heightPixels = metrics.heightPixels;
             int[] location = new int[2];
