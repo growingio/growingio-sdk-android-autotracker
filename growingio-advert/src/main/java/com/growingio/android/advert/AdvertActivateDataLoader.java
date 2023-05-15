@@ -249,6 +249,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             if (AdvertUtils.isDeviceActivated()) {
                 return;
             }
+            Logger.d(TAG, "send activate event");
             // just send activate event
             final ActivateEvent.Builder builder = new ActivateEvent.Builder().
                     activate();

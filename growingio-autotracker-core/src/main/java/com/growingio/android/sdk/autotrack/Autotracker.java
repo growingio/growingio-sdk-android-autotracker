@@ -57,7 +57,7 @@ public class Autotracker extends Tracker {
             Logger.e(TAG, "setUniqueTag: view or tag is NULL");
             return;
         }
-
+        Logger.d(TAG, "setUniqueTag: " + tag + " for " + view.getClass().getSimpleName());
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
