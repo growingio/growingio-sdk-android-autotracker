@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
@@ -32,9 +33,9 @@ import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -42,9 +43,8 @@ import java.util.WeakHashMap;
 public class PageProvider implements IActivityLifecycle {
     private static final String TAG = "PageProvider";
 
-    private static final Map<Activity, ActivityPage> ALL_PAGE_TREE = new WeakHashMap<>();
+    private static final Map<Activity, ActivityPage> ALL_PAGE_TREE = new WeakHashMap<>(); // page roots
     private static final Map<Object, String> ALL_PAGE_ALIAS = new WeakHashMap<>();
-    private static final Map<Class<?>, IgnorePolicy> IGNORE_PAGE_CLASSES = new HashMap<>();
     private static final Map<Object, IgnorePolicy> IGNORE_PAGES = new WeakHashMap<>();
     private static final Map<Object, Map<String, String>> PAGE_ATTRIBUTES_CACHE = new WeakHashMap<>();
 
@@ -84,10 +84,6 @@ public class PageProvider implements IActivityLifecycle {
         }
     }
 
-    public void addIgnorePageClass(Class<?> pageClazz, IgnorePolicy policy) {
-        IGNORE_PAGE_CLASSES.put(pageClazz, policy);
-    }
-
     @UiThread
     private void createOrResumePage(Activity activity) {
         ActivityPage page = ALL_PAGE_TREE.get(activity);
@@ -117,12 +113,22 @@ public class PageProvider implements IActivityLifecycle {
     }
 
     private void sendPage(Context context, Page<?> page) {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        boolean sendPage = true;
         if (page.getCarrier() instanceof Activity) {
             page.setIgnored(isIgnoreActivity((Activity) page.getCarrier()));
+            if (config != null && !config.getAutotrackOptions().isActivityPageEnabled()) {
+                sendPage = false;
+                Logger.w(TAG, "AutotrackOptions: activity page enable is false");
+            }
         } else if (page.getCarrier() instanceof SuperFragment) {
             page.setIgnored(isIgnoreFragment((SuperFragment<?>) page.getCarrier()));
+            if (config != null && !config.getAutotrackOptions().isFragmentPageEnabled()) {
+                Logger.w(TAG, "AutotrackOptions: fragment page enable is false");
+                sendPage = false;
+            }
         }
-        if (!page.isIgnored()) {
+        if (!page.isIgnored() && sendPage) {
             Logger.d(TAG, "sendPage: path = " + page.path());
             useCachePageAttributesIfNeeded(page);
             generatePageEvent(context, page);
@@ -286,7 +292,7 @@ public class PageProvider implements IActivityLifecycle {
         Page<?> page = findPage(fragment);
         if (page == null) {
             page = new FragmentPage(fragment);
-            Page<?> pageParent = findPageParent(fragment);
+            Page<?> pageParent = searchPageParent(fragment);
             if (pageParent == null) {
                 Logger.e(TAG, fragment.getClass().getSimpleName() + "'s pageParent is NULL");
                 return;
@@ -341,14 +347,33 @@ public class PageProvider implements IActivityLifecycle {
         }
     }
 
-    private Page<?> findPageParent(SuperFragment<?> fragment) {
+    protected Page<?> findPage(SuperFragment<?> carrier) {
+        Activity activity = carrier.getActivity();
+        Page<?> page = ALL_PAGE_TREE.get(activity);
+        if (page == null) {
+            return null;
+        }
+        return searchPage(carrier, page);
+    }
+
+    private Page<?> searchPageParent(SuperFragment<?> fragment) {
         Page<?> pageParent = null;
         SuperFragment<?> parentFragment = fragment.getParentFragment();
         ActivityPage activityPage = ALL_PAGE_TREE.get(fragment.getActivity());
         if (parentFragment == null) {
             pageParent = activityPage;
         } else if (activityPage != null) {
-            pageParent = findPage(parentFragment, activityPage);
+            while (parentFragment != null) {
+                pageParent = searchPage(parentFragment, activityPage);
+                if (pageParent != null) {
+                    break;
+                }
+                // fragment not hook in gradle plugin, find next parent fragment.
+                parentFragment = parentFragment.getParentFragment();
+            }
+            if (pageParent == null) {
+                pageParent = activityPage;
+            }
         }
         // TODO: 2021/04/26 如果为null可能存在以下情况
         // 1. 父fragment getUserVisibleHint为false， 导致子fragment无法找到page
@@ -357,16 +382,7 @@ public class PageProvider implements IActivityLifecycle {
         return pageParent;
     }
 
-    protected Page<?> findPage(SuperFragment<?> carrier) {
-        Activity activity = carrier.getActivity();
-        Page<?> page = ALL_PAGE_TREE.get(activity);
-        if (page == null) {
-            return null;
-        }
-        return findPage(carrier, page);
-    }
-
-    private Page<?> findPage(SuperFragment<?> carrier, Page<?> page) {
+    private Page<?> searchPage(SuperFragment<?> carrier, Page<?> page) {
         if (carrier.equals(page.getCarrier())) {
             return page;
         }
@@ -374,7 +390,7 @@ public class PageProvider implements IActivityLifecycle {
         List<Page<?>> pages = page.getAllChildren();
         for (Page<?> onePage : pages) {
             if (onePage != null) {
-                Page<?> p = findPage(carrier, onePage);
+                Page<?> p = searchPage(carrier, onePage);
                 if (p != null) {
                     return p;
                 }

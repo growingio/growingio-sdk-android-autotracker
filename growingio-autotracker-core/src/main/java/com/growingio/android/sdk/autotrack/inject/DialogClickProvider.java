@@ -19,14 +19,17 @@ package com.growingio.android.sdk.autotrack.inject;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.shadow.AlertControllerShadow;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 class DialogClickProvider {
@@ -45,12 +48,12 @@ class DialogClickProvider {
         if (which < 0) {
             Button button = dialog.getButton(which);
             if (button != null) {
-                ViewClickProvider.viewOnClick(button);
+                viewOnClick(button);
             }
         } else {
             ListView listView = dialog.getListView();
             if (listView != null) {
-                ViewClickProvider.viewOnClick(listView.getChildAt(which - listView.getFirstVisiblePosition()));
+                viewOnClick(listView.getChildAt(which - listView.getFirstVisiblePosition()));
             }
         }
     }
@@ -60,12 +63,12 @@ class DialogClickProvider {
         if (which < 0) {
             Button button = dialog.getButton(which);
             if (button != null) {
-                ViewClickProvider.viewOnClick(button);
+                viewOnClick(button);
             }
         } else {
             ListView listView = dialog.getListView();
             if (listView != null) {
-                ViewClickProvider.viewOnClick(listView.getChildAt(which - listView.getFirstVisiblePosition()));
+                viewOnClick(listView.getChildAt(which - listView.getFirstVisiblePosition()));
             }
         }
     }
@@ -75,14 +78,23 @@ class DialogClickProvider {
         if (which < 0) {
             Button button = dialog.getButton(which);
             if (button != null) {
-                ViewClickProvider.viewOnClick(button);
+                viewOnClick(button);
             }
         } else {
             ListView listView = dialog.getListView();
             if (listView != null) {
-                ViewClickProvider.viewOnClick(listView.getChildAt(which - listView.getFirstVisiblePosition()));
+                viewOnClick(listView.getChildAt(which - listView.getFirstVisiblePosition()));
             }
         }
+    }
+
+    private static void viewOnClick(View view) {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config != null && !config.getAutotrackOptions().isDialogClickEnabled()) {
+            Logger.i(TAG, "AutotrackOptions: dialog click enable is false");
+            return;
+        }
+        ViewClickProvider.viewOnClick(view);
     }
 
     /**

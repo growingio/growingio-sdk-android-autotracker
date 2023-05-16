@@ -21,11 +21,13 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.autotrack.view.ViewNode;
@@ -99,6 +101,12 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             Logger.w(TAG, "sendChangeEvent page Activity is NULL");
             return;
         }
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config != null && !config.getAutotrackOptions().isEditTextChangeEnabled()) {
+            Logger.i(TAG, "AutotrackOptions: edittext change enable is false");
+            return;
+        }
+
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ViewElementEvent.Builder(AutotrackEventType.VIEW_CHANGE)
                         .setPath(page.path())

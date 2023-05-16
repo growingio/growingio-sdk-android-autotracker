@@ -33,44 +33,44 @@ public class ViewClickInjector {
     }
 
     public static void viewOnClick(View.OnClickListener listener, View view) {
-        ViewClickProvider.viewOnClick(view);
+        ViewClickProvider.viewOnClickListener(view);
     }
 
     public static void seekBarOnSeekBarChange(SeekBar.OnSeekBarChangeListener listener, SeekBar seekBar) {
-        ViewClickProvider.viewOnClick(seekBar);
+        ViewClickProvider.seekBarOnClick(seekBar);
     }
 
     public static void adapterViewOnItemClick(AdapterView.OnItemClickListener listener, AdapterView adapterView, View view, int position, long id) {
-        ViewClickProvider.viewOnClick(view);
+        ViewClickProvider.adapterViewItemClick(view);
     }
 
     public static void adapterViewOnItemSelected(AdapterView.OnItemSelectedListener listener, AdapterView adapterView, View view, int position, long id) {
         if (adapterView instanceof Spinner) {
             // 目前只需要将Spinner的onItemSelected回调触发点击事件,因为Spinner的元素点击只会触发onItemSelected回调
-            ViewClickProvider.viewOnClick(view);
+            ViewClickProvider.spinnerViewOnClick(view);
         }
     }
 
     public static void expandableListViewOnGroupClick(ExpandableListView.OnGroupClickListener listener, ExpandableListView parent, View v, int groupPosition, long id) {
-        ViewClickProvider.viewOnClick(v);
+        ViewClickProvider.expandableListViewOnGroupClick(v);
     }
 
     public static void expandableListViewOnChildClick(ExpandableListView.OnChildClickListener listener, ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-        ViewClickProvider.viewOnClick(v);
+        ViewClickProvider.expandableListViewOnChildClick(v);
     }
 
 
     public static void compoundButtonOnChecked(CompoundButton.OnCheckedChangeListener listener, CompoundButton button, boolean checked) {
-        ViewClickProvider.viewOnClick(button);
+        ViewClickProvider.compoundButtonOnCheck(button);
     }
 
     public static void radioGroupOnChecked(RadioGroup.OnCheckedChangeListener listener, RadioGroup radioGroup, int i) {
-        ViewClickProvider.viewOnClick(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId()));
+        ViewClickProvider.radioGroupOnCheck(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId()));
     }
 
     public static void ratingBarOnRatingBarChange(RatingBar.OnRatingBarChangeListener listener, RatingBar ratingBar, float rating, boolean fromUser) {
         if (fromUser) {
-            ViewClickProvider.viewOnClick(ratingBar);
+            ViewClickProvider.ratingBarOnRatingBarChange(ratingBar);
         }
     }
 }

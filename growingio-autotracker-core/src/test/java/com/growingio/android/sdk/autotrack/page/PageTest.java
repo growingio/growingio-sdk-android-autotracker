@@ -83,7 +83,6 @@ public class PageTest {
         Fragment testFragment = new Fragment();
         SuperFragment<Fragment> fragmentX = SuperFragment.makeX(testFragment);
         PageProvider.get().addIgnoreFragment(fragmentX, IgnorePolicy.IGNORE_SELF);
-        PageProvider.get().addIgnorePageClass(fragmentX.getClass(), IgnorePolicy.IGNORE_SELF);
         PageProvider.get().addIgnoreActivity(activity, IgnorePolicy.IGNORE_ALL);
         activityController.resume();
         Truth.assertThat(PageProvider.get().findPage(activity).isIgnored()).isTrue();
