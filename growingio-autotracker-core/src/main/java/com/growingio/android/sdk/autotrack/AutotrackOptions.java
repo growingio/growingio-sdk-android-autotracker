@@ -41,6 +41,8 @@ public class AutotrackOptions {
     private boolean expandableListChildClickEnabled = true;
     private boolean compoundButtonCheckEnabled = true;
     private boolean radioGroupCheckEnabled = true;
+
+    private boolean materialToggleGroupButtonCheckEnabled = true;
     private boolean ratingBarChangeEnabled = true;
     private boolean viewClickEnabled = true;
 
@@ -178,5 +180,13 @@ public class AutotrackOptions {
 
     public void setSpinnerItemClickSelectEnabled(boolean spinnerItemClickSelectEnabled) {
         this.spinnerItemClickSelectEnabled = spinnerItemClickSelectEnabled;
+    }
+
+    public boolean isMaterialToggleGroupButtonCheckEnabled() {
+        return materialToggleGroupButtonCheckEnabled;
+    }
+
+    public void setMaterialToggleGroupButtonCheckEnabled(boolean materialToggleGroupButtonCheckEnabled) {
+        this.materialToggleGroupButtonCheckEnabled = materialToggleGroupButtonCheckEnabled;
     }
 }

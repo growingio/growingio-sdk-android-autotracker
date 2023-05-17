@@ -104,6 +104,15 @@ class ViewClickProvider {
         viewOnClick(view);
     }
 
+    public static void materialButtonToggleGroupOnButtonCheck(View view) {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config != null && !config.getAutotrackOptions().isMaterialToggleGroupButtonCheckEnabled()) {
+            Logger.i(TAG, "AutotrackOptions: material toggle group check enable is false");
+            return;
+        }
+        viewOnClick(view);
+    }
+
     public static void ratingBarOnRatingBarChange(View view) {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         if (config != null && !config.getAutotrackOptions().isRatingBarChangeEnabled()) {

@@ -25,6 +25,8 @@ import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 
+import com.google.android.material.button.MaterialButtonToggleGroup;
+
 
 public class ViewClickInjector {
     private static final String TAG = "ViewClickInjector";
@@ -66,6 +68,12 @@ public class ViewClickInjector {
 
     public static void radioGroupOnChecked(RadioGroup.OnCheckedChangeListener listener, RadioGroup radioGroup, int i) {
         ViewClickProvider.radioGroupOnCheck(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId()));
+    }
+
+    public static void materialButtonToggleGroupOnButtonChecked(MaterialButtonToggleGroup.OnButtonCheckedListener listener, MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+        if (isChecked) {
+            ViewClickProvider.materialButtonToggleGroupOnButtonCheck(group.findViewById(checkedId));
+        }
     }
 
     public static void ratingBarOnRatingBarChange(RatingBar.OnRatingBarChangeListener listener, RatingBar ratingBar, float rating, boolean fromUser) {
