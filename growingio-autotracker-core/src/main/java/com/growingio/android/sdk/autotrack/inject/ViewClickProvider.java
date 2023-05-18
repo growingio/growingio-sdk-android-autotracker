@@ -163,12 +163,6 @@ class ViewClickProvider {
             return;
         }
 
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isActivityMenuItemClickEnabled()) {
-            Logger.i(TAG, "AutotrackOptions: activityMenuItemClickEnabled is false");
-            return;
-        }
-
         if (activity == null || menuItem == null) {
             Logger.e(TAG, "menuItemOnClick: activity or menuItem is NULL");
             return;
@@ -182,6 +176,16 @@ class ViewClickProvider {
             Logger.e(TAG, "MenuItem ViewNode is NULL");
         }
     }
+
+    public static void activityOptionsItemOnClick(Activity activity, MenuItem menuItem) {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config != null && !config.getAutotrackOptions().isActivityMenuItemClickEnabled()) {
+            Logger.i(TAG, "AutotrackOptions: activityMenuItemClickEnabled is false");
+            return;
+        }
+        menuItemOnClick(activity, menuItem);
+    }
+
 
     public static void toolbarMenuItemOnClick(MenuItem menuItem) {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
@@ -205,6 +209,15 @@ class ViewClickProvider {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         if (config != null && !config.getAutotrackOptions().isPopupMenuItemClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: popupMenuItemClickEnabled is false");
+            return;
+        }
+        menuItemOnClick(menuItem);
+    }
+
+    public static void contextMenuItemOnClick(MenuItem menuItem) {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config != null && !config.getAutotrackOptions().isContextMenuItemClickEnabled()) {
+            Logger.i(TAG, "AutotrackOptions: contextMenuItemClickEnabled is false");
             return;
         }
         menuItemOnClick(menuItem);

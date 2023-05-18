@@ -27,12 +27,13 @@ public class MenuItemInjector {
     private MenuItemInjector() {
     }
 
+
     public static void toolbarOnMenuItemClick(Toolbar.OnMenuItemClickListener listener, MenuItem item) {
         ViewClickProvider.toolbarMenuItemOnClick(item);
     }
 /*
     public static void toolbarXOnMenuItemClick(androidx.appcompat.widget.Toolbar.OnMenuItemClickListener listener, MenuItem item) {
-        ViewClickProvider.menuItemOnClick(item);
+        ViewClickProvider.toolbarMenuItemOnClick(item);
     }
 
     public static void toolbarSupportOnMenuItemClick(android.support.v7.widget.Toolbar.OnMenuItemClickListener listener, MenuItem item) {
@@ -46,6 +47,10 @@ public class MenuItemInjector {
 
     public static void popupMenuOnMenuItemClick(PopupMenu.OnMenuItemClickListener listener, MenuItem item) {
         ViewClickProvider.popupMenuItemOnClick(item);
+    }
+
+    public static void contextMenuOnMenuItemClick(MenuItem.OnMenuItemClickListener listener,MenuItem item){
+        ViewClickProvider.contextMenuItemOnClick(item);
     }
 
 /*

@@ -27,6 +27,7 @@ public class AutotrackOptions {
     private boolean toolbarMenuItemClickEnabled = true;
     private boolean actionMenuItemClickEnabled = true;
     private boolean popupMenuItemClickEnabled = true;
+    private boolean contextMenuItemClickEnabled = true;
 
     private boolean fragmentPageEnabled = true;
     private boolean activityPageEnabled = true;
@@ -188,5 +189,13 @@ public class AutotrackOptions {
 
     public void setMaterialToggleGroupButtonCheckEnabled(boolean materialToggleGroupButtonCheckEnabled) {
         this.materialToggleGroupButtonCheckEnabled = materialToggleGroupButtonCheckEnabled;
+    }
+
+    public boolean isContextMenuItemClickEnabled() {
+        return contextMenuItemClickEnabled;
+    }
+
+    public void setContextMenuItemClickEnabled(boolean contextMenuItemClickEnabled) {
+        this.contextMenuItemClickEnabled = contextMenuItemClickEnabled;
     }
 }
