@@ -38,14 +38,15 @@ public class AutotrackOptions {
     private boolean spinnerItemClickSelectEnabled = true;
     private boolean expandableListGroupClickEnabled = true;
     private boolean expandableListChildClickEnabled = true;
-    private boolean compoundButtonCheckEnabled = true;
     private boolean materialToggleGroupButtonCheckEnabled = true;
+    private boolean tabLayoutTabSelectedEnabled = true;
+    private boolean radioGroupCheckEnabled = true;
     private boolean viewClickEnabled = true;
 
     private boolean editTextChangeEnabled = true;
+    private boolean compoundButtonCheckEnabled = true;
     private boolean seekbarChangeEnabled = true;
     private boolean ratingBarChangeEnabled = true;
-    private boolean radioGroupCheckEnabled = true;
     private boolean sliderChangeEnabled = true;
 
     public boolean isActivityMenuItemClickEnabled() {
@@ -190,6 +191,14 @@ public class AutotrackOptions {
 
     public void setMaterialToggleGroupButtonCheckEnabled(boolean materialToggleGroupButtonCheckEnabled) {
         this.materialToggleGroupButtonCheckEnabled = materialToggleGroupButtonCheckEnabled;
+    }
+
+    public boolean isTabLayoutTabSelectedEnabled() {
+        return tabLayoutTabSelectedEnabled;
+    }
+
+    public void setTabLayoutTabSelectedEnabled(boolean tabLayoutTabSelectedEnabled) {
+        this.tabLayoutTabSelectedEnabled = tabLayoutTabSelectedEnabled;
     }
 
     public boolean isContextMenuItemClickEnabled() {

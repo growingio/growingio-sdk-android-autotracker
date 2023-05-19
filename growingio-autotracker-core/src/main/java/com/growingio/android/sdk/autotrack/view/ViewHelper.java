@@ -378,7 +378,6 @@ public class ViewHelper {
         return value;
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static boolean isPasswordInputType(int inputType) {
         final int variation = inputType & (EditorInfo.TYPE_MASK_CLASS | EditorInfo.TYPE_MASK_VARIATION);
         return variation == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD)

@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.material.tabs.TabLayout;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
@@ -95,6 +96,15 @@ class ViewClickProvider {
         viewOnClick(view);
     }
 
+    public static void tabLayoutOnTabSelected(TabLayout.Tab tab) {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config != null && !config.getAutotrackOptions().isTabLayoutTabSelectedEnabled()) {
+            Logger.i(TAG, "AutotrackOptions: tablayout tab select enable is false");
+            return;
+        }
+        viewOnClick(tab.view, tab.getText() == null ? null : tab.getText().toString());
+    }
+
     public static void viewOnClickListener(View view) {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         if (config != null && !config.getAutotrackOptions().isViewClickEnabled()) {
@@ -104,51 +114,6 @@ class ViewClickProvider {
         viewOnClick(view);
     }
 
-
-    public static void viewOnClick(View view) {
-        if (!TrackerContext.initializedSuccessfully()) {
-            Logger.e(TAG, "Autotracker do not initialized successfully");
-            return;
-        }
-
-        if (ViewAttributeUtil.isIgnoreViewClick(view)) {
-            return;
-        }
-
-        // 为了防止click事件重复发送
-        if (ClassUtil.isDuplicateClick(view)) {
-            Logger.w(TAG, "Duplicate Click");
-            return;
-        }
-
-        ViewNode viewNode = ViewHelper.getClickViewNode(view);
-        if (viewNode != null) {
-            Page<?> page = PageProvider.get().findPage(view);
-            sendClickEvent(page, viewNode);
-        } else {
-            Logger.e(TAG, "ViewNode is NULL");
-        }
-    }
-
-    public static void menuItemOnClick(Activity activity, MenuItem menuItem) {
-        if (!TrackerContext.initializedSuccessfully()) {
-            Logger.e(TAG, "Autotracker do not initialized successfully");
-            return;
-        }
-
-        if (activity == null || menuItem == null) {
-            Logger.e(TAG, "menuItemOnClick: activity or menuItem is NULL");
-            return;
-        }
-
-        Page<?> page = PageProvider.get().findPage(activity);
-        ViewNode viewNode = ViewHelper.getMenuItemViewNode(page, menuItem);
-        if (viewNode != null) {
-            sendClickEvent(page, viewNode);
-        } else {
-            Logger.e(TAG, "MenuItem ViewNode is NULL");
-        }
-    }
 
     public static void activityOptionsItemOnClick(Activity activity, MenuItem menuItem) {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
@@ -206,7 +171,56 @@ class ViewClickProvider {
         menuItemOnClick(activity, menuItem);
     }
 
-    private static void sendClickEvent(Page<?> page, ViewNode viewNode) {
+    public static void viewOnClick(View view) {
+        viewOnClick(view, null);
+    }
+
+    private static void viewOnClick(View view, String content) {
+        if (!TrackerContext.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        if (ViewAttributeUtil.isIgnoreViewClick(view)) {
+            return;
+        }
+
+        // 为了防止click事件重复发送
+        if (ClassUtil.isDuplicateClick(view)) {
+            Logger.w(TAG, "Duplicate Click");
+            return;
+        }
+
+        ViewNode viewNode = ViewHelper.getClickViewNode(view);
+        if (viewNode != null) {
+            Page<?> page = PageProvider.get().findPage(view);
+            sendClickEvent(page, viewNode, content);
+        } else {
+            Logger.e(TAG, "ViewNode is NULL");
+        }
+    }
+
+    public static void menuItemOnClick(Activity activity, MenuItem menuItem) {
+        if (!TrackerContext.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        if (activity == null || menuItem == null) {
+            Logger.e(TAG, "menuItemOnClick: activity or menuItem is NULL");
+            return;
+        }
+
+        Page<?> page = PageProvider.get().findPage(activity);
+        ViewNode viewNode = ViewHelper.getMenuItemViewNode(page, menuItem);
+        if (viewNode != null) {
+            sendClickEvent(page, viewNode, null);
+        } else {
+            Logger.e(TAG, "MenuItem ViewNode is NULL");
+        }
+    }
+
+    private static void sendClickEvent(Page<?> page, ViewNode viewNode, String content) {
         if (page == null) {
             Logger.w(TAG, "sendClickEvent page Activity is NULL");
             return;
@@ -217,7 +231,7 @@ class ViewClickProvider {
                         .setPageShowTimestamp(page.getShowTimestamp())
                         .setXpath(viewNode.getXPath())
                         .setIndex(viewNode.getIndex())
-                        .setTextValue(viewNode.getViewContent())
+                        .setTextValue(content == null ? viewNode.getViewContent() : content)
         );
     }
 }

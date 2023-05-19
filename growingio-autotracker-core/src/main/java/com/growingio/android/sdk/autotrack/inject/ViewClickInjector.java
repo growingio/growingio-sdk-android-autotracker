@@ -23,6 +23,7 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.tabs.TabLayout;
 
 
 public class ViewClickInjector {
@@ -62,5 +63,9 @@ public class ViewClickInjector {
         if (isChecked) {
             ViewClickProvider.materialButtonToggleGroupOnButtonCheck(group.findViewById(checkedId));
         }
+    }
+
+    public static void tabLayoutOnTabSelected(TabLayout.OnTabSelectedListener listener, TabLayout.Tab tab) {
+        ViewClickProvider.tabLayoutOnTabSelected(tab);
     }
 }
