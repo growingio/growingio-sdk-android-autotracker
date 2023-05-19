@@ -32,7 +32,6 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
-import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -273,7 +272,7 @@ public class ViewHelper {
         return -1;
     }
 
-    private static boolean shouldChangeOn(View view) {
+    private static boolean hasEditTextChanged(View view) {
         if (view instanceof EditText) {
             String tag = ViewAttributeUtil.getMonitoringFocusContent(view);
             String lastText = tag == null ? "" : tag;
@@ -284,7 +283,7 @@ public class ViewHelper {
             ViewAttributeUtil.setMonitoringFocusContent(view, nowText);
             return true;
         }
-        return false;
+        return true;
     }
 
     @Nullable
@@ -293,7 +292,7 @@ public class ViewHelper {
             return null;
         }
         Activity activity = ActivityUtil.findActivity(view.getContext());
-        if (activity == null || ViewHelper.isIgnoredView(view) || !shouldChangeOn(view)) {
+        if (activity == null || ViewHelper.isIgnoredView(view) || !hasEditTextChanged(view)) {
             return null;
         }
 
@@ -346,8 +345,6 @@ public class ViewHelper {
                         value = ((TextView) selected).getText().toString();
                     }
                 }
-            } else if (view instanceof SeekBar) {
-                value = String.valueOf(((SeekBar) view).getProgress());
             } else if (view instanceof RadioGroup) {
                 RadioGroup group = (RadioGroup) view;
                 View selected = group.findViewById(group.getCheckedRadioButtonId());

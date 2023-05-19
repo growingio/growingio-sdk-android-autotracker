@@ -49,7 +49,7 @@ public class MenuItemInjector {
         ViewClickProvider.popupMenuItemOnClick(item);
     }
 
-    public static void contextMenuOnMenuItemClick(MenuItem.OnMenuItemClickListener listener,MenuItem item){
+    public static void contextMenuOnMenuItemClick(MenuItem.OnMenuItemClickListener listener, MenuItem item) {
         ViewClickProvider.contextMenuItemOnClick(item);
     }
 

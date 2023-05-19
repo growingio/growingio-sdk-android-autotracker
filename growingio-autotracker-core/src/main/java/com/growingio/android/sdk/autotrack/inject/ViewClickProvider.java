@@ -41,15 +41,6 @@ class ViewClickProvider {
     private ViewClickProvider() {
     }
 
-    public static void seekBarOnClick(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isSeekbarChangeEnabled()) {
-            Logger.i(TAG, "AutotrackOptions: seekbar change enable is false");
-            return;
-        }
-        viewOnClick(view);
-    }
-
     public static void adapterViewItemClick(View view) {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         if (config != null && !config.getAutotrackOptions().isAdapterViewItemClickEnabled()) {
@@ -86,15 +77,6 @@ class ViewClickProvider {
         viewOnClick(view);
     }
 
-    public static void compoundButtonOnCheck(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isCompoundButtonCheckEnabled()) {
-            Logger.i(TAG, "AutotrackOptions: compound button check enable is false");
-            return;
-        }
-        viewOnClick(view);
-    }
-
     public static void radioGroupOnCheck(View view) {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         if (config != null && !config.getAutotrackOptions().isRadioGroupCheckEnabled()) {
@@ -108,15 +90,6 @@ class ViewClickProvider {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         if (config != null && !config.getAutotrackOptions().isMaterialToggleGroupButtonCheckEnabled()) {
             Logger.i(TAG, "AutotrackOptions: material toggle group check enable is false");
-            return;
-        }
-        viewOnClick(view);
-    }
-
-    public static void ratingBarOnRatingBarChange(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isRatingBarChangeEnabled()) {
-            Logger.i(TAG, "AutotrackOptions: ratingbar change enable is false");
             return;
         }
         viewOnClick(view);

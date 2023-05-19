@@ -34,18 +34,19 @@ public class AutotrackOptions {
 
     private boolean dialogClickEnabled = true;
 
-    private boolean editTextChangeEnabled = true;
-    private boolean seekbarChangeEnabled = true;
     private boolean adapterViewItemClickEnabled = true;
     private boolean spinnerItemClickSelectEnabled = true;
     private boolean expandableListGroupClickEnabled = true;
     private boolean expandableListChildClickEnabled = true;
     private boolean compoundButtonCheckEnabled = true;
-    private boolean radioGroupCheckEnabled = true;
-
     private boolean materialToggleGroupButtonCheckEnabled = true;
-    private boolean ratingBarChangeEnabled = true;
     private boolean viewClickEnabled = true;
+
+    private boolean editTextChangeEnabled = true;
+    private boolean seekbarChangeEnabled = true;
+    private boolean ratingBarChangeEnabled = true;
+    private boolean radioGroupCheckEnabled = true;
+    private boolean sliderChangeEnabled = true;
 
     public boolean isActivityMenuItemClickEnabled() {
         return activityMenuItemClickEnabled;
@@ -197,5 +198,13 @@ public class AutotrackOptions {
 
     public void setContextMenuItemClickEnabled(boolean contextMenuItemClickEnabled) {
         this.contextMenuItemClickEnabled = contextMenuItemClickEnabled;
+    }
+
+    public boolean isSliderChangeEnabled() {
+        return sliderChangeEnabled;
+    }
+
+    public void setSliderChangeEnabled(boolean sliderChangeEnabled) {
+        this.sliderChangeEnabled = sliderChangeEnabled;
     }
 }

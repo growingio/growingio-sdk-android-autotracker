@@ -23,7 +23,7 @@ import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.growingio.android.sdk.autotrack.change.ViewChangeProvider;
+import com.growingio.android.sdk.autotrack.inject.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
