@@ -41,7 +41,9 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
     private static final String TAG = "ScreenshotProvider";
 
     private static final float SCREENSHOT_STANDARD_WIDTH = 720F;
-    private static final long MIN_REFRESH_INTERVAL = 300L;
+    private static final long MIN_REFRESH_INTERVAL = 500L;
+    private static final long EVENT_REFRESH_INTERVAL = 1000L;
+    private static final long MAX_REFRESH_INTERVAL = 3000L;
     private long lastSendTime = 0L; // 记录上次发送的事件，用来避免当界面刷新频率过快时一直无法发送圈选事件。
 
     private final float mScale;
@@ -68,11 +70,15 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
 
     @Override
     public void onViewStateChanged(ViewStateChangedEvent changedEvent) {
-        if (System.currentTimeMillis() - lastSendTime >= MIN_REFRESH_INTERVAL * 2) {
+        if (System.currentTimeMillis() - lastSendTime >= MAX_REFRESH_INTERVAL) {
             lastSendTime = System.currentTimeMillis();
             mHandler.post(this::dispatchScreenshot);
         } else {
-            refreshScreenshot();
+            if (changedEvent.getStateType() == ViewStateChangedEvent.StateType.MANUAL_CHANGED) {
+                refreshScreenshot(EVENT_REFRESH_INTERVAL);
+            } else {
+                refreshScreenshot();
+            }
         }
     }
 
@@ -89,8 +95,6 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         if (activity == null) return;
 
         View topView = activity.getWindow().getDecorView();
-        topView.removeOnAttachStateChangeListener(attachStateChangeListener);
-        topView.addOnAttachStateChangeListener(attachStateChangeListener);
 
         try {
             ScreenshotUtil.getScreenshotBitmap(mScale, bitmap -> topView.post(() -> {
@@ -106,20 +110,13 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         }
     }
 
-    View.OnAttachStateChangeListener attachStateChangeListener = new View.OnAttachStateChangeListener() {
-        @Override
-        public void onViewAttachedToWindow(View v) {
-        }
-
-        @Override
-        public void onViewDetachedFromWindow(View v) {
-            refreshScreenshot();
-        }
-    };
-
-    public void refreshScreenshot() {
+    private void refreshScreenshot(long duration) {
         mHandler.removeCallbacks(mRefreshScreenshotRunnable);
-        mHandler.postDelayed(mRefreshScreenshotRunnable, MIN_REFRESH_INTERVAL);
+        mHandler.postDelayed(mRefreshScreenshotRunnable, duration);
+    }
+
+    private void refreshScreenshot() {
+        refreshScreenshot(MIN_REFRESH_INTERVAL);
     }
 
     public void generateDebuggerData(String screenshotBase64) {

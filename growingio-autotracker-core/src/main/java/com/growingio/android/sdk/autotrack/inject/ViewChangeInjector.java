@@ -34,9 +34,9 @@ public class ViewChangeInjector {
         ViewChangeProvider.seekBarOnProgressChange(seekBar);
     }
 
-    public static void ratingBarOnRatingBarChange(RatingBar.OnRatingBarChangeListener listener, RatingBar ratingBar, float rating, boolean fromUser) {
+    public static void ratingBarOnRatingChange(RatingBar.OnRatingBarChangeListener listener, RatingBar ratingBar, float rating, boolean fromUser) {
         if (fromUser) {
-            ViewChangeProvider.ratingBarOnRatingBarChange(ratingBar, rating);
+            ViewChangeProvider.ratingBarOnRatingChange(ratingBar, rating);
         }
     }
 

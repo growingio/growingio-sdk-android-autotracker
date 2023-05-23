@@ -19,8 +19,12 @@ package com.growingio.android.sdk.track.view;
 import android.app.Activity;
 
 import com.growingio.android.sdk.track.R;
+import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.events.EventBuildInterceptor;
+import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
 /**
@@ -28,7 +32,7 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
  *
  * @author cpacm 2023/5/5
  */
-public abstract class ViewTreeStatusListener implements IActivityLifecycle, OnViewStateChangedListener {
+public abstract class ViewTreeStatusListener implements IActivityLifecycle, OnViewStateChangedListener, EventBuildInterceptor {
 
     private final ViewTreeStatusObserver mViewTreeStatusObserver;
 
@@ -49,6 +53,7 @@ public abstract class ViewTreeStatusListener implements IActivityLifecycle, OnVi
     public void register() {
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
         registerResumedActivity();
+        TrackMainThread.trackMain().addEventBuildInterceptor(this);
     }
 
     public void unRegister() {
@@ -57,6 +62,7 @@ public abstract class ViewTreeStatusListener implements IActivityLifecycle, OnVi
         if (activity != null) {
             mViewTreeStatusObserver.onActivityPaused(activity);
         }
+        TrackMainThread.trackMain().removeEventBuildInterceptor(this);
     }
 
     private void registerResumedActivity() {
@@ -64,5 +70,14 @@ public abstract class ViewTreeStatusListener implements IActivityLifecycle, OnVi
         if (activity != null && !activity.isDestroyed()) {
             mViewTreeStatusObserver.onActivityResumed(activity);
         }
+    }
+
+    @Override
+    public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
+    }
+
+    @Override
+    public void eventDidBuild(GEvent event) {
+        mViewTreeStatusObserver.sendManualStateChangedEvent();
     }
 }

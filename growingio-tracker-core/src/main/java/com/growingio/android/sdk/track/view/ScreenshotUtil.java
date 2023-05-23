@@ -111,7 +111,8 @@ public class ScreenshotUtil {
             PixelCopy.request(window, new Rect(location[0], location[1], widthPixels, heightPixels),
                     bitmap, copyResult -> {
                         if (copyResult == PixelCopy.SUCCESS) {
-                            callback.onScreenshot(scaleBitmap(bitmap, scale));
+                            Bitmap screenshot = WindowHelper.get().tryRenderDialog(activity, bitmap);
+                            callback.onScreenshot(scaleBitmap(screenshot, scale));
                         }
                     }, TrackMainThread.trackMain().getMainHandler());
         } else {

@@ -32,18 +32,19 @@ public class ViewTreeStatusObserver {
     private final boolean observeLayout;
     private final boolean observeScroll;
     private final boolean observeFocus;
+    private final boolean observeAttach;
 
     private final int defaultTagId;
 
     public ViewTreeStatusObserver(OnViewStateChangedListener viewStateChangedListener) {
-        this(true, true, false, viewStateChangedListener, R.id.growing_tracker_monitoring_view_tree_enabled);
+        this(true, true, false, true, viewStateChangedListener, R.id.growing_tracker_monitoring_view_tree_enabled);
     }
 
     public ViewTreeStatusObserver(OnViewStateChangedListener viewStateChangedListener, int defaultTagId) {
-        this(true, true, false, viewStateChangedListener, defaultTagId);
+        this(true, true, false, true, viewStateChangedListener, defaultTagId);
     }
 
-    public ViewTreeStatusObserver(boolean observeLayout, boolean observeScroll, boolean observeFocus, OnViewStateChangedListener viewStateChangedListener, int defaultTagId) {
+    public ViewTreeStatusObserver(boolean observeLayout, boolean observeScroll, boolean observeFocus, boolean observeAttach, OnViewStateChangedListener viewStateChangedListener, int defaultTagId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             viewStateObserver = new ViewStateObserver(viewStateChangedListener);
         } else {
@@ -52,6 +53,7 @@ public class ViewTreeStatusObserver {
         this.observeLayout = observeLayout;
         this.observeScroll = observeScroll;
         this.observeFocus = observeFocus;
+        this.observeAttach = observeAttach;
         this.defaultTagId = defaultTagId;
     }
 
@@ -61,6 +63,10 @@ public class ViewTreeStatusObserver {
 
     public void onActivityPaused(Activity activity) {
         unRegisterViewTreeChange(activity.getWindow().getDecorView());
+    }
+
+    public void sendManualStateChangedEvent() {
+        viewStateObserver.sendViewStateChangedEvent();
     }
 
     private void unRegisterViewTreeChange(View root) {
@@ -85,6 +91,9 @@ public class ViewTreeStatusObserver {
             }
             if (observeFocus) {
                 root.getViewTreeObserver().addOnGlobalFocusChangeListener(viewStateObserver);
+            }
+            if (observeAttach && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                root.getViewTreeObserver().addOnWindowAttachListener((ViewTreeObserver.OnWindowAttachListener) viewStateObserver);
             }
             if (observeLayout && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 root.getViewTreeObserver().addOnWindowFocusChangeListener((ViewTreeObserver.OnWindowFocusChangeListener) viewStateObserver);
@@ -116,6 +125,10 @@ public class ViewTreeStatusObserver {
             this.viewStateChangedListener = viewStateChangedListener;
         }
 
+        public void sendViewStateChangedEvent() {
+            viewStateChangedListener.onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.MANUAL_CHANGED));
+        }
+
         @Override
         public void onGlobalFocusChanged(View oldFocus, View newFocus) {
             viewStateChangedListener.onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.FOCUS_CHANGED, oldFocus, newFocus));
@@ -133,7 +146,8 @@ public class ViewTreeStatusObserver {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private static class ViewStateObserver extends DeprecatedViewStateObserver implements ViewTreeObserver.OnWindowFocusChangeListener {
+    private static class ViewStateObserver extends DeprecatedViewStateObserver implements ViewTreeObserver.OnWindowFocusChangeListener,
+            ViewTreeObserver.OnWindowAttachListener {
 
         ViewStateObserver(OnViewStateChangedListener viewStateChangedListener) {
             super(viewStateChangedListener);
@@ -142,6 +156,16 @@ public class ViewTreeStatusObserver {
         @Override
         public void onWindowFocusChanged(boolean hasFocus) {
             viewStateChangedListener.onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.WINDOW_FOCUS_CHANGED));
+        }
+
+        @Override
+        public void onWindowAttached() {
+            viewStateChangedListener.onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.WINDOW_ATTACH));
+        }
+
+        @Override
+        public void onWindowDetached() {
+            viewStateChangedListener.onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.WINDOW_DETACH));
         }
     }
 }

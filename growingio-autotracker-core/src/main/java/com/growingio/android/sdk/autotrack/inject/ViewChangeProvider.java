@@ -53,7 +53,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
 
     public void setup() {
         ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        mViewTreeStatusObserver = new ViewTreeStatusObserver(false, false, true, this,
+        mViewTreeStatusObserver = new ViewTreeStatusObserver(false, false, true, false, this,
                 R.id.growing_tracker_monitoring_focus_change);
     }
 
@@ -104,7 +104,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
         sendChangeEvent(seekBar, String.valueOf(seekBar.getProgress()));
     }
 
-    public static void ratingBarOnRatingBarChange(View view, float rating) {
+    public static void ratingBarOnRatingChange(View view, float rating) {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
         if (config != null && !config.getAutotrackOptions().isRatingBarChangeEnabled()) {
             Logger.i(TAG, "AutotrackOptions: ratingbar change enable is false");
