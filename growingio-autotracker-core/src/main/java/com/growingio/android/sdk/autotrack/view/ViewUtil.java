@@ -22,6 +22,10 @@ import android.widget.AbsSeekBar;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.slider.Slider;
+import com.google.android.material.tabs.TabLayout;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
@@ -37,6 +41,40 @@ public class ViewUtil {
                 || view instanceof EditText
                 || (view.isClickable() && view.hasOnClickListeners())
                 || ClassExistHelper.isListView(view.getParent())
-                || ListMenuItemViewShadow.isListMenuItemView(view);
+                || ListMenuItemViewShadow.isListMenuItemView(view)
+                || isMaterialCircleView(view);
+    }
+
+    public static boolean isMaterialCircleView(View view) {
+        // MaterialButtonGroup
+        if (ClassExistHelper.hasClass("com.google.android.material.button.MaterialButton")) {
+            if (view instanceof MaterialButton) {
+                MaterialButton button = (MaterialButton) view;
+                return button.isCheckable();
+            }
+        }
+
+        // TabLayout
+        if (ClassExistHelper.hasClass("com.google.android.material.tabs.TabLayout")) {
+            if (view instanceof TabLayout.TabView) {
+                TabLayout.TabView tabView = (TabLayout.TabView) view;
+                return tabView.isEnabled() && tabView.isClickable();
+            }
+        }
+
+        // Slider
+        if (ClassExistHelper.hasClass("com.google.android.material.slider.Slider")) {
+            if (view instanceof Slider) {
+                Slider slider = (Slider) view;
+                return slider.isEnabled();
+            }
+            if (view instanceof RangeSlider) {
+                RangeSlider slider = (RangeSlider) view;
+                return slider.isEnabled();
+            }
+        }
+
+
+        return false;
     }
 }

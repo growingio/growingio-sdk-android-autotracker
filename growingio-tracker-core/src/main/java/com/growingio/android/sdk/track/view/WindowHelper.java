@@ -151,7 +151,7 @@ public class WindowHelper {
         if (mWindowManager != null) {
             try {
                 return mWindowManager.getAllWindowViews();
-            } catch (IllegalAccessException e) {
+            } catch (Exception e) {
                 Logger.e(TAG, e);
             }
         }

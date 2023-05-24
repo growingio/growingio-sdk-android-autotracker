@@ -53,27 +53,28 @@ class WindowManagerShadow {
     private static final String TAG = "WindowManagerShadow";
 
     private Object realWindowManager;
-    private final Field mViews;
-    private final boolean mIsArrayList;
-
     private final Map<CacheFieldKey, Field> fieldsMap = new HashMap<>();
     private final int[] outLocation = new int[2];
+    private final String wmClassName;
 
     @SuppressLint("PrivateApi")
-    public WindowManagerShadow(String wmClassName) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Class<?> windowManager = Class.forName(wmClassName);
-        Method method = windowManager.getMethod("getInstance");
-        method.setAccessible(true);
-        realWindowManager = method.invoke(null);
-
-        mViews = windowManager.getDeclaredField("mViews");
-        mViews.setAccessible(true);
-        mIsArrayList = mViews.getType() == ArrayList.class;
+    public WindowManagerShadow(String wmClassName) {
+        this.wmClassName = wmClassName;
     }
 
-
-    public View[] getAllWindowViews() throws IllegalAccessException {
+    public View[] getAllWindowViews() throws IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
+        Object wm = realWindowManager;
+        if (wm == null) {
+            Class<?> windowManager = Class.forName(wmClassName);
+            Method method = windowManager.getMethod("getInstance");
+            method.setAccessible(true);
+            wm = method.invoke(null);
+            realWindowManager = wm;
+        }
         View[] views;
+        Field mViews = getNotNullField("mViews", realWindowManager);
+        mViews.setAccessible(true);
+        boolean mIsArrayList = mViews.getType() == ArrayList.class;
         if (mIsArrayList) {
             views = ((ArrayList<View>) mViews.get(realWindowManager)).toArray(new View[0]);
         } else {
@@ -162,11 +163,15 @@ class WindowManagerShadow {
         }
         return wm;
     }
-
     private Object getNotNullFieldValue(String fieldName, Object target) throws NoSuchFieldException, IllegalAccessException {
+        Field field = getNotNullField(fieldName,target);
+        return field.get(target);
+    }
+
+    private Field getNotNullField(String fieldName, Object target) throws NoSuchFieldException{
         CacheFieldKey key = new CacheFieldKey(target.getClass(), fieldName);
         if (fieldsMap.containsKey(key)) {
-            return fieldsMap.get(key).get(target);
+            return fieldsMap.get(key);
         } else {
             Class<?> clazz = target.getClass();
             while (clazz != null) {
@@ -174,7 +179,7 @@ class WindowManagerShadow {
                     if (field.getName().equals(fieldName)) {
                         field.setAccessible(true);
                         fieldsMap.put(key, field);
-                        return field.get(target);
+                        return field;
                     }
                 }
                 clazz = clazz.getSuperclass();
