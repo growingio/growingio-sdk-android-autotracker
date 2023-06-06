@@ -233,11 +233,11 @@ class ViewClickProvider {
         }
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ViewElementEvent.Builder(AutotrackEventType.VIEW_CLICK)
-                        .setPath(page.path())
-                        .setPageShowTimestamp(page.getShowTimestamp())
+                        .setPath(page.activePath())
                         .setXpath(viewNode.getXPath())
                         .setIndex(viewNode.getIndex())
                         .setTextValue(viewNode.getViewContent())
+                        .setAttributes(page.activeAttributes())
         );
     }
 }

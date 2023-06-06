@@ -271,7 +271,7 @@ public class ViewNode {
             } else if (page != null) {
                 // 圈选为bfs，需要考虑page是否被忽略
                 // 点击为dfs，计算时所有page均为忽略
-                if (mNeedCalculatePage && !page.isIgnored()) {
+                if (mNeedCalculatePage) {
                     mOriginalXPath = "/Page";
                 } else {
                     mOriginalXPath = mPrefixPage + "/" + page.getName();

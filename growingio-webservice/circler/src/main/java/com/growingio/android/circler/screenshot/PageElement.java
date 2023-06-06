@@ -64,7 +64,7 @@ class PageElement {
         private int mTop;
         private int mWidth;
         private int mHeight;
-        private boolean mIsIgnored;
+        private boolean mIsIgnored = false;
 
         public Builder setPath(String path) {
             mPath = path;

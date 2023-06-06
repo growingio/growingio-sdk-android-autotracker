@@ -29,8 +29,8 @@ public class AutotrackOptions {
     private boolean popupMenuItemClickEnabled = true;
     private boolean contextMenuItemClickEnabled = true;
 
-    private boolean fragmentPageEnabled = true;
-    private boolean activityPageEnabled = true;
+    private boolean fragmentPageEnabled = false;
+    private boolean activityPageEnabled = false;
 
     private boolean dialogClickEnabled = true;
 

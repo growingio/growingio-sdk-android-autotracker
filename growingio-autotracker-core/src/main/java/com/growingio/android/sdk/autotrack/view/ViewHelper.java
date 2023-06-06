@@ -110,11 +110,7 @@ public class ViewHelper {
 
     public static ViewNode getMenuItemViewNode(Page<?> page, MenuItem menuItem) {
         StringBuilder xpath = new StringBuilder();
-        if (page.isIgnored()) {
-            xpath.append(PageHelper.IGNORE_PAGE_PREFIX);
-        } else {
-            xpath.append(PageHelper.PAGE_PREFIX);
-        }
+        xpath.append(PageHelper.PAGE_PREFIX);
         Context context = TrackerContext.get().getApplicationContext();
         xpath.append("/MenuView/MenuItem#").append(getPackageId(context, menuItem.getItemId()));
 
@@ -191,21 +187,9 @@ public class ViewHelper {
             } else {
                 Page<?> page = ViewAttributeUtil.getViewPage(parent);
                 // 找到page直接迭代page
+                viewTreeList.add(parent);
                 if (page != null) {
-                    View pageView = parent;
-                    do {
-                        viewTreeList.add(pageView);
-                        if (!page.isIgnored()) {
-                            break;
-                        }
-                        page = page.getParent();
-                        if (page != null) {
-                            pageView = page.getView();
-                        }
-                    } while (page != null && pageView != null);
                     break;
-                } else {
-                    viewTreeList.add(parent);
                 }
 
                 if (parent.getParent() instanceof View) {

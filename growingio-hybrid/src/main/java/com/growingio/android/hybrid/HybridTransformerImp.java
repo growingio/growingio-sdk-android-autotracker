@@ -134,7 +134,6 @@ public class HybridTransformerImp implements HybridTransformer {
                 .setIndex(eventJson.optInt(KEY_INDEX, -1))
                 .setTextValue(eventJson.optString(KEY_TEXT_VALUE))
                 .setXpath(eventJson.getString(KEY_XPATH))
-                .setPath(eventJson.getString(KEY_PATH))
-                .setPageShowTimestamp(eventJson.getLong(KEY_PAGE_SHOW_TIMESTAMP));
+                .setPath(eventJson.getString(KEY_PATH));
     }
 }
