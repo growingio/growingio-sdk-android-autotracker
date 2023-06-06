@@ -87,12 +87,6 @@ public final class HybridViewElementEvent extends ViewElementEvent {
         }
 
         @Override
-        public Builder setPageShowTimestamp(long pageShowTimestamp) {
-            super.setPageShowTimestamp(pageShowTimestamp);
-            return this;
-        }
-
-        @Override
         public Builder setTextValue(String textValue) {
             super.setTextValue(textValue);
             return this;

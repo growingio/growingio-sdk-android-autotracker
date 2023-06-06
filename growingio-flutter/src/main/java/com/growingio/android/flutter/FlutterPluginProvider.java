@@ -110,14 +110,12 @@ public class FlutterPluginProvider {
             String eventType = (String) args.get("eventType");
             String path = (String) args.get("path");
             String xpath = (String) args.get("xpath");
-            long timeStamp = (Long) args.get("pageShowTimestamp");
             String title = (String) args.get("textValue");
             int index = (int) args.get("index");
 
             CacheEventProvider.get().cacheEvent(
                     new ViewElementEvent.Builder(eventType)
                             .setPath(path)
-                            .setPageShowTimestamp(timeStamp)
                             .setXpath(xpath)
                             .setIndex(index)
                             .setTextValue(title)

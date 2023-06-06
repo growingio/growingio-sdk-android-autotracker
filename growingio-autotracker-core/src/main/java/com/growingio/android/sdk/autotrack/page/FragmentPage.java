@@ -20,6 +20,9 @@ import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+
 public class FragmentPage extends Page<SuperFragment<?>> {
     public FragmentPage(SuperFragment<?> carrier) {
         super(carrier);
@@ -81,5 +84,14 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         }
 
         return tag;
+    }
+
+    @Override
+    public boolean isAutotrack() {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config.getAutotrackOptions().isFragmentPageEnabled()) {
+            return true;
+        }
+        return super.isAutotrack();
     }
 }

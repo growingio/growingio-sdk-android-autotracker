@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.text.TextUtils;
@@ -51,6 +50,46 @@ public class Autotracker extends Tracker {
         viewChangeProvider.setup();
     }
 
+    public void autotrackPage(Activity activity) {
+        autotrackPage(activity, null);
+    }
+
+    public void autotrackPage(Activity activity, final Map<String, String> attributes) {
+        if (!isInited) return;
+        Logger.d(TAG, "make activity page: " + activity.getClass() + " active.");
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackActivity(activity, attributes));
+    }
+
+    public void autotrackPage(androidx.fragment.app.Fragment fragment) {
+        autotrackPage(fragment, null);
+    }
+
+    public void autotrackPage(androidx.fragment.app.Fragment fragment, final Map<String, String> attributes) {
+        if (!isInited) return;
+        Logger.d(TAG, "make fragment page: " + fragment.getClass() + " active.");
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.makeX(fragment), attributes));
+    }
+
+    public void autotrackSystemPage(android.app.Fragment fragment) {
+        autotrackSystemPage(fragment, null);
+    }
+
+    public void autotrackSystemPage(android.app.Fragment fragment, final Map<String, String> attributes) {
+        if (!isInited) return;
+        Logger.d(TAG, "make fragment page: " + fragment.getClass() + " active.");
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.make(fragment), attributes));
+    }
+
+    public void autotrackSupportPage(android.support.v4.app.Fragment fragment) {
+        autotrackSupportPage(fragment, null);
+    }
+
+    public void autotrackSupportPage(android.support.v4.app.Fragment fragment, final Map<String, String> attributes) {
+        if (!isInited) return;
+        Logger.d(TAG, "make fragment page: " + fragment.getClass() + " active.");
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.makeSupport(fragment), attributes));
+    }
+
     public void setUniqueTag(final View view, final String tag) {
         if (!isInited) return;
         if (view == null || TextUtils.isEmpty(tag)) {
@@ -64,39 +103,6 @@ public class Autotracker extends Tracker {
                 ViewAttributeUtil.setCustomId(view, tag);
             }
         });
-    }
-
-    // TODO: 用户cstm事件不关联page，可扩展通过特定API发送的cstm事件支持p字段(通过private隐藏相关方法)
-    private void trackCustomEvent(String eventName, Activity page) {
-
-    }
-
-    private void trackCustomEvent(String eventName, Fragment page) {
-
-    }
-
-    private void trackCustomEventSupport(String eventName, android.support.v4.app.Fragment page) {
-
-    }
-
-    private void trackCustomEventX(String eventName, androidx.fragment.app.Fragment page) {
-
-    }
-
-    private void trackCustomEvent(String eventName, Map<String, String> attributes, Activity page) {
-
-    }
-
-    private void trackCustomEvent(String eventName, Map<String, String> attributes, Fragment page) {
-
-    }
-
-    private void trackCustomEventSupport(String eventName, Map<String, String> attributes, android.support.v4.app.Fragment page) {
-
-    }
-
-    private void trackCustomEventX(String eventName, Map<String, String> attributes, androidx.fragment.app.Fragment page) {
-
     }
 
     public void setPageAttributes(final Activity page, final Map<String, String> attributes) {
@@ -219,60 +225,24 @@ public class Autotracker extends Tracker {
         });
     }
 
+    @Deprecated
     public void ignorePage(final Activity page, final IgnorePolicy policy) {
-        if (!isInited) return;
-        if (page == null || policy == null) {
-            Logger.e(TAG, "activity or policy is NULL");
-            return;
-        }
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().addIgnoreActivity(page, policy);
-            }
-        });
+        Logger.w(TAG, "Ignore page is no longer supported");
     }
 
+    @Deprecated
     public void ignorePage(final android.app.Fragment page, final IgnorePolicy policy) {
-        if (!isInited) return;
-        if (page == null || policy == null) {
-            Logger.e(TAG, "fragment or policy is NULL");
-            return;
-        }
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().addIgnoreFragment(SuperFragment.make(page), policy);
-            }
-        });
+        Logger.w(TAG, "Ignore page is no longer supported");
     }
 
+    @Deprecated
     public void ignorePageSupport(final android.support.v4.app.Fragment page, final IgnorePolicy policy) {
-        if (!isInited) return;
-        if (page == null || policy == null) {
-            Logger.e(TAG, "fragment or policy is NULL");
-            return;
-        }
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().addIgnoreFragment(SuperFragment.makeSupport(page), policy);
-            }
-        });
+        Logger.w(TAG, "Ignore page is no longer supported");
     }
 
+    @Deprecated
     public void ignorePageX(final androidx.fragment.app.Fragment page, final IgnorePolicy policy) {
-        if (!isInited) return;
-        if (page == null || policy == null) {
-            Logger.e(TAG, "fragment or policy is NULL");
-            return;
-        }
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().addIgnoreFragment(SuperFragment.makeX(page), policy);
-            }
-        });
+        Logger.w(TAG, "Ignore page is no longer supported");
     }
 
     public void ignoreView(final View view, final IgnorePolicy policy) {

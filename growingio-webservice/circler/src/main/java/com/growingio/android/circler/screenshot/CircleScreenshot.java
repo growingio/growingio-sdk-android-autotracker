@@ -270,7 +270,6 @@ public class CircleScreenshot {
                 mPages.add(new PageElement.Builder()
                         .setTitle(viewPage.getTitle())
                         .setPath(viewPage.path())
-                        .setIgnored(viewPage.isIgnored())
                         .setHeight(view.getHeight())
                         .setWidth(view.getWidth())
                         .setLeft(location[0])

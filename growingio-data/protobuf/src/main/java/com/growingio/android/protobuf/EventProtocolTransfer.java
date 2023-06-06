@@ -142,7 +142,6 @@ class EventProtocolTransfer {
         if (gEvent instanceof ViewElementEvent) {
             ViewElementEvent vEvent = (ViewElementEvent) gEvent;
             eventBuilder.setPath(vEvent.getPath()); //10
-            eventBuilder.setPageShowTimestamp(vEvent.getPageShowTimestamp()); //23
             eventBuilder.setTextValue(vEvent.getTextValue()); //27
             eventBuilder.setXpath(vEvent.getXpath()); //28
             eventBuilder.setIndex(vEvent.getIndex()); //29

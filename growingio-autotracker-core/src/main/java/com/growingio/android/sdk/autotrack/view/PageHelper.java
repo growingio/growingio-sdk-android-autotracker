@@ -31,8 +31,6 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 class PageHelper {
 
     public static final String PAGE_PREFIX = "/Page";
-    public static final String IGNORE_PAGE_PREFIX = "/IgnorePage";
-
     public static final String MAIN_WINDOW_PREFIX = "/MainWindow";
     public static final String DIALOG_WINDOW_PREFIX = "/DialogWindow";
     public static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
@@ -49,11 +47,7 @@ class PageHelper {
         String windowPrefix;
         Page<?> page = ViewAttributeUtil.getViewPage(root);
         if (page != null) {
-            if (page.isIgnored()) {
-                windowPrefix = IGNORE_PAGE_PREFIX;
-            } else {
-                windowPrefix = PAGE_PREFIX;
-            }
+            windowPrefix = PAGE_PREFIX;
         } else if (root.hashCode() == ActivityStateProvider.get().getCurrentRootWindowsHashCode()) {
             windowPrefix = getMainWindowPrefix();
         } else {

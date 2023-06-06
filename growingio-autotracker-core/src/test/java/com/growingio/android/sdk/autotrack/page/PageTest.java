@@ -78,17 +78,6 @@ public class PageTest {
     }
 
     @Test
-    public void pageIgnoreTest() {
-        RobolectricActivity activity = activityController.create().get();
-        Fragment testFragment = new Fragment();
-        SuperFragment<Fragment> fragmentX = SuperFragment.makeX(testFragment);
-        PageProvider.get().addIgnoreFragment(fragmentX, IgnorePolicy.IGNORE_SELF);
-        PageProvider.get().addIgnoreActivity(activity, IgnorePolicy.IGNORE_ALL);
-        activityController.resume();
-        Truth.assertThat(PageProvider.get().findPage(activity).isIgnored()).isTrue();
-    }
-
-    @Test
     public void pageViewTest() {
         RobolectricActivity activity = activityController.get();
         PageProvider.get().setActivityAlias(activity, "test");
@@ -110,7 +99,7 @@ public class PageTest {
         activity.attachFragment(appFragment);
         fc.create().resume();
         FragmentInjector.systemFragmentOnResume(appFragment);
-        Page page = PageProvider.get().findPage(SuperFragment.make(appFragment));
+        Page page = PageProvider.get().findFragmentPage(SuperFragment.make(appFragment));
         String name = page.getName();
         Truth.assertThat(name).isEqualTo("TestFragment[app]");
 
@@ -119,7 +108,7 @@ public class PageTest {
         FragmentInjector.systemFragmentOnHiddenChanged(appFragment, false);
         FragmentInjector.systemFragmentOnDestroyView(appFragment);
 
-        Page findPage = PageProvider.get().findPage(SuperFragment.make(appFragment));
+        Page findPage = PageProvider.get().findFragmentPage(SuperFragment.make(appFragment));
         Truth.assertThat(findPage).isNull();
 
     }
@@ -129,14 +118,14 @@ public class PageTest {
         FragmentScenario<TestXFragment> fs = FragmentScenario.launch(TestXFragment.class);
         fs.onFragment(testXFragment -> {
             FragmentInjector.androidxFragmentOnResume(testXFragment);
-            String name = PageProvider.get().findPage(SuperFragment.makeX(testXFragment)).getName();
+            String name = PageProvider.get().findFragmentPage(SuperFragment.makeX(testXFragment)).getName();
             Truth.assertThat(name).isEqualTo("TestXFragment[FragmentScenario_Fragment_Tag]");
 
             FragmentInjector.androidxFragmentSetUserVisibleHint(testXFragment, false);
             FragmentInjector.androidxFragmentOnHiddenChanged(testXFragment, false);
             FragmentInjector.androidxFragmentOnDestroyView(testXFragment);
 
-            Page findPage = PageProvider.get().findPage(SuperFragment.makeX(testXFragment));
+            Page findPage = PageProvider.get().findFragmentPage(SuperFragment.makeX(testXFragment));
             Truth.assertThat(findPage).isNull();
         });
     }

@@ -18,16 +18,15 @@ package com.growingio.android.sdk.track.events;
 
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ViewElementEvent extends BaseEvent {
+public class ViewElementEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
     private final String mPath;
-    private final long mPageShowTimestamp;
     private final String mTextValue;
     private final String mXpath;
     private final int mIndex;
@@ -35,7 +34,6 @@ public class ViewElementEvent extends BaseEvent {
     protected ViewElementEvent(Builder eventBuilder) {
         super(eventBuilder);
         mPath = eventBuilder.mPath;
-        mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
         mTextValue = eventBuilder.mTextValue;
         mXpath = eventBuilder.mXpath;
         mIndex = eventBuilder.mIndex;
@@ -43,10 +41,6 @@ public class ViewElementEvent extends BaseEvent {
 
     public String getPath() {
         return checkValueSafe(mPath);
-    }
-
-    public long getPageShowTimestamp() {
-        return mPageShowTimestamp;
     }
 
     public String getTextValue() {
@@ -66,7 +60,6 @@ public class ViewElementEvent extends BaseEvent {
         JSONObject json = super.toJSONObject();
         try {
             json.put("path", getPath());
-            json.put("pageShowTimestamp", getPageShowTimestamp());
             if (!TextUtils.isEmpty(getTextValue())) {
                 json.put("textValue", getTextValue());
             }
@@ -77,9 +70,8 @@ public class ViewElementEvent extends BaseEvent {
         return json;
     }
 
-    public static class Builder extends BaseBuilder<ViewElementEvent> {
+    public static class Builder extends BaseAttributesEvent.Builder<ViewElementEvent> {
         private String mPath;
-        private long mPageShowTimestamp;
         private String mTextValue;
         private String mXpath;
         private int mIndex = -1;
@@ -100,11 +92,6 @@ public class ViewElementEvent extends BaseEvent {
 
         public Builder setPath(String path) {
             mPath = path;
-            return this;
-        }
-
-        public Builder setPageShowTimestamp(long pageShowTimestamp) {
-            mPageShowTimestamp = pageShowTimestamp;
             return this;
         }
 

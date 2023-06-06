@@ -20,6 +20,9 @@ import android.app.Activity;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+
 public class ActivityPage extends Page<Activity> {
     public ActivityPage(Activity carrier) {
         super(carrier);
@@ -32,6 +35,15 @@ public class ActivityPage extends Page<Activity> {
         }
 
         return getCarrier().getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean isAutotrack() {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config.getAutotrackOptions().isActivityPageEnabled()) {
+            return true;
+        }
+        return super.isAutotrack();
     }
 
     @Override

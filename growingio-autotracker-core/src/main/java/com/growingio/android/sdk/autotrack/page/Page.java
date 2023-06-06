@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public abstract class Page<T> {
     private final T mCarrier;
     private Page<?> mParent;
     private long mShowTimestamp;
-    private boolean mIsIgnored = false;
+    private boolean mIsAutotrack = false;//是否标记为可发送
     private String mAlias;
     private String mTitle;
     private String mPath;
@@ -49,12 +50,12 @@ public abstract class Page<T> {
         mShowTimestamp = System.currentTimeMillis();
     }
 
-    public boolean isIgnored() {
-        return mIsIgnored;
+    public boolean isAutotrack() {
+        return mIsAutotrack;
     }
 
-    public void setIgnored(boolean ignored) {
-        mIsIgnored = ignored;
+    public void setIsAutotrack(boolean mIsAutotrack) {
+        this.mIsAutotrack = mIsAutotrack;
     }
 
     public long getShowTimestamp() {
@@ -109,6 +110,29 @@ public abstract class Page<T> {
 
     void removeChildren(Page<?> child) {
         mChildren.remove(child);
+    }
+
+    private Page<?> lastActivePage() {
+        Page<?> activePage = this;
+        while (activePage != null) {
+            if (activePage.isAutotrack()) {
+                return activePage;
+            }
+            activePage = activePage.mParent;
+        }
+        return null;
+    }
+
+    public String activePath() {
+        Page<?> activePage = lastActivePage();
+        if (activePage != null) return activePage.path();
+        return "";
+    }
+
+    public Map<String, String> activeAttributes() {
+        Page<?> activePage = lastActivePage();
+        if (activePage != null) return activePage.getAttributes();
+        return Collections.emptyMap();
     }
 
     public String path() {
