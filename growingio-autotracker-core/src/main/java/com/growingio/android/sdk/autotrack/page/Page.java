@@ -123,12 +123,6 @@ public abstract class Page<T> {
         return null;
     }
 
-    public String activePath() {
-        Page<?> activePage = lastActivePage();
-        if (activePage != null) return activePage.path();
-        return "";
-    }
-
     public Map<String, String> activeAttributes() {
         Page<?> activePage = lastActivePage();
         if (activePage != null) return activePage.getAttributes();
