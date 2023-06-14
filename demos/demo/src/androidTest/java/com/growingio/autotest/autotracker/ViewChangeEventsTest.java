@@ -17,11 +17,16 @@
 package com.growingio.autotest.autotracker;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.action.GeneralClickAction;
+import androidx.test.espresso.action.GeneralLocation;
+import androidx.test.espresso.action.Press;
+import androidx.test.espresso.action.Tap;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
 import com.gio.test.R;
 import com.gio.test.three.DemoApplication;
+import com.gio.test.three.autotrack.activity.ClickTestActivity;
 import com.gio.test.three.autotrack.activity.ui.login.LoginActivity;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.autotest.EventsTest;
@@ -85,6 +90,98 @@ public class ViewChangeEventsTest extends EventsTest {
         onView(withId(R.id.login)).perform(click());
         TrackHelper.waitForIdleSync();
         Awaiter.untilTrue(receivedEvent);
+    }
+
+    @Test
+    public void ratingBarClickEventTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewChangeEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RatingBar[0]#rating_bar")
+                        .setTextValue("3.0")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
+        onView(withId(R.id.rating_bar)).perform(click());
+        Awaiter.untilTrue(receivedEvent);
+        scenario.close();
+    }
+
+    @Test
+    public void switchClickEventTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewChangeEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Switch[0]#switch1")
+                        .setTextValue("Switch")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Switch[0]#switch1")
+                        .setTextValue("Switch")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
+        onView(withId(R.id.switch1)).perform(click());
+        onView(withId(R.id.switch1)).perform(click());
+        Awaiter.untilTrue(receivedEvent);
+
+        scenario.close();
+    }
+
+    @Test
+    public void seekBarClickEventTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewChangeEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/SeekBar[0]#seek_bar")
+                        .setTextValue("100")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
+        onView(withId(R.id.seek_bar)).perform(new GeneralClickAction(Tap.SINGLE, GeneralLocation.BOTTOM_RIGHT, Press.FINGER));
+        Awaiter.untilTrue(receivedEvent);
+        scenario.close();
+    }
+
+    @Test
+    public void checkBoxClickEventTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewChangeEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/CheckBox[0]#check_box_android")
+                        .setTextValue("Android")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/CheckBox[1]#check_box_ios")
+                        .setTextValue("iOS")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
+        onView(withId(R.id.check_box_android)).perform(click());
+        onView(withId(R.id.check_box_ios)).perform(click());
+        Awaiter.untilTrue(receivedEvent);
+
+        scenario.close();
     }
 
     private static final class OnReceivedViewChangeEventsListener extends MockEventsApiServer.OnReceivedEventListener {

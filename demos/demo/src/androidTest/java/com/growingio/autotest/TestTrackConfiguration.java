@@ -30,8 +30,7 @@ public class TestTrackConfiguration {
 
     public static CdpAutotrackConfiguration getTestConfig() {
         CdpAutotrackConfiguration configuration = new CdpAutotrackConfiguration(TEST_PROJECT_ID, TEST_URL_SCHEME);
-        configuration.setUploadExceptionEnabled(false)
-                .setDataCollectionServerHost(MOCK_SERVER_HOST)
+        configuration.setDataCollectionServerHost(MOCK_SERVER_HOST)
                 .setDataSourceId(TEST_DATA_SOURCE_ID)
                 .setDebugEnabled(true);
         return configuration;
@@ -39,8 +38,7 @@ public class TestTrackConfiguration {
 
     public static CdpAutotrackConfiguration getTestConfig(String urlScheme) {
         CdpAutotrackConfiguration configuration = new CdpAutotrackConfiguration(TEST_PROJECT_ID, urlScheme);
-        configuration.setUploadExceptionEnabled(false)
-                .setDataCollectionServerHost(MOCK_SERVER_HOST)
+        configuration.setDataCollectionServerHost(MOCK_SERVER_HOST)
                 .setDataSourceId(TEST_DATA_SOURCE_ID)
                 .setDebugEnabled(true);
         return configuration;

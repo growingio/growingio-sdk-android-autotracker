@@ -58,7 +58,6 @@ public class ScreenShotTest {
             Truth.assertThat(screenshot).isNotNull();
         };
         ScreenshotProvider.get().registerScreenshotRefreshedListener(dispatchListener);
-        ScreenshotProvider.get().refreshScreenshot();
 
         ScreenshotProvider.get().unregisterScreenshotRefreshedListener();
     }

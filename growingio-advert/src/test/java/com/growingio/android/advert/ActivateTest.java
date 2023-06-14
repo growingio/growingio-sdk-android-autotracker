@@ -55,6 +55,9 @@ import org.robolectric.annotation.LooperMode;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * need java 9+
+ */
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class ActivateTest {

@@ -47,7 +47,7 @@ public class TrackerRegistry {
      * Unregister a {@link ModelLoaderFactory} that is capable of handling a specific model and data class.
      * Don't use in production environment,it's a test api.
      */
-    public <Model,Data> void unregister(Class<Model> modelClass, Class<Data> dataClass){
+    public <Model, Data> void unregister(Class<Model> modelClass, Class<Data> dataClass) {
         modelLoaderRegistry.remove(modelClass, dataClass);
     }
 }

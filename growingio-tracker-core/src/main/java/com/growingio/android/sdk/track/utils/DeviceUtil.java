@@ -19,13 +19,19 @@ package com.growingio.android.sdk.track.utils;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
 public class DeviceUtil {
     private DeviceUtil() {
     }
 
     public static DisplayMetrics getDisplayMetrics(Context context) {
-        return context.getResources().getDisplayMetrics();
+        DisplayMetrics metrics = new DisplayMetrics();
+        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        if (display == null) return context.getResources().getDisplayMetrics();
+        display.getRealMetrics(metrics);
+        return metrics;
     }
 
     public static boolean isPhone(Context context) {

@@ -20,7 +20,7 @@ import com.growingio.android.sdk.Configurable;
 
 public class AutotrackConfig implements Configurable {
     private float mImpressionScale = 0;
-    private AutotrackOptions mAutotrackOptions = new AutotrackOptions();
+    private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
     public AutotrackConfig setImpressionScale(float scale) {
         if (scale < 0) {
@@ -36,11 +36,11 @@ public class AutotrackConfig implements Configurable {
         return mImpressionScale;
     }
 
-    public AutotrackConfig setAutotrackOptions(AutotrackOptions options) {
-        this.mAutotrackOptions = options;
-        return this;
-    }
-
+//    public AutotrackConfig setAutotrackOptions(AutotrackOptions options) {
+//        this.mAutotrackOptions = options;
+//        return this;
+//    }
+//
     public AutotrackOptions getAutotrackOptions() {
         return mAutotrackOptions;
     }

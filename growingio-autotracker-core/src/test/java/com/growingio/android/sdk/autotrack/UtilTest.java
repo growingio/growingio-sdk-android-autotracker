@@ -80,7 +80,7 @@ public class UtilTest {
 
     @Test
     public void activityInjectTest() {
-        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).get();
+        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().get();
         ActivityInjector.onActivityNewIntent(activity, new Intent());
         ViewChangeProvider.editTextOnFocusChange(activity.getTextView());
     }

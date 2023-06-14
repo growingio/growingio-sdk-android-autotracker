@@ -20,10 +20,7 @@ import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
-import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
-import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.sdk.annotation.compiler.sample.EmptyConfig;
-
 import java.util.HashMap;
 
 /**
@@ -38,7 +35,7 @@ public final class TestTrackConfiguration {
     private final HashMap<Class<? extends Configurable>, Configurable> MODULE_CONFIGURATIONS = new HashMap<Class<? extends Configurable>, Configurable>();
 
     public TestTrackConfiguration(String projectId, String urlScheme) {
-        this.coreConfiguration = new CoreConfiguration(projectId, urlScheme);
+        this.coreConfiguration = new CoreConfiguration(projectId,urlScheme);
         addConfiguration(new EmptyConfig());
     }
 
@@ -98,6 +95,15 @@ public final class TestTrackConfiguration {
 
     public final TestTrackConfiguration setChannel(String channel) {
         core().setChannel(channel);
+        return this;
+    }
+
+    public final String getDataSourceId() {
+        return core().getDataSourceId();
+    }
+
+    public final TestTrackConfiguration setDataSourceId(String dataSourceId) {
+        core().setDataSourceId(dataSourceId);
         return this;
     }
 

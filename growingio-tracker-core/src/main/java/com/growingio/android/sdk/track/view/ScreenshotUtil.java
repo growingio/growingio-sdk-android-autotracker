@@ -100,21 +100,25 @@ public class ScreenshotUtil {
                 getScreenShotBitmapDefault(scale, callback);
                 return;
             }
-            Window window = activity.getWindow();
-            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(activity);
-            int widthPixels = metrics.widthPixels;
-            int heightPixels = metrics.heightPixels;
-            int[] location = new int[2];
-            Logger.d("ScreenshotUtil", "getScreenshotBitmap: " + widthPixels + " " + heightPixels);
-            window.getDecorView().getLocationOnScreen(location);
-            Bitmap bitmap = Bitmap.createBitmap(widthPixels, heightPixels, Bitmap.Config.ARGB_8888);
-            PixelCopy.request(window, new Rect(location[0], location[1], widthPixels, heightPixels),
-                    bitmap, copyResult -> {
-                        if (copyResult == PixelCopy.SUCCESS) {
-                            Bitmap screenshot = WindowHelper.get().tryRenderDialog(activity, bitmap);
-                            callback.onScreenshot(scaleBitmap(screenshot, scale));
-                        }
-                    }, TrackMainThread.trackMain().getMainHandler());
+            try {
+                Window window = activity.getWindow();
+                DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(activity);
+                int widthPixels = metrics.widthPixels;
+                int heightPixels = metrics.heightPixels;
+                int[] location = new int[2];
+                Logger.d("ScreenshotUtil", "getScreenshotBitmap: " + widthPixels + " " + heightPixels);
+                window.getDecorView().getLocationOnScreen(location);
+                Bitmap bitmap = Bitmap.createBitmap(widthPixels, heightPixels, Bitmap.Config.ARGB_8888);
+                PixelCopy.request(window, new Rect(location[0], location[1], widthPixels, heightPixels),
+                        bitmap, copyResult -> {
+                            if (copyResult == PixelCopy.SUCCESS) {
+                                Bitmap screenshot = WindowHelper.get().tryRenderDialog(activity, bitmap);
+                                callback.onScreenshot(scaleBitmap(screenshot, scale));
+                            }
+                        }, TrackMainThread.trackMain().getMainHandler());
+            } catch (IllegalArgumentException e) {
+                getScreenShotBitmapDefault(scale, callback);
+            }
         } else {
             getScreenShotBitmapDefault(scale, callback);
         }

@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.view;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -29,6 +28,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
@@ -335,6 +335,8 @@ public class ViewHelper {
                 }
             } else if (view instanceof RatingBar) {
                 value = String.valueOf(((RatingBar) view).getRating());
+            } else if (view instanceof ProgressBar) {
+                value = String.valueOf(((ProgressBar) view).getProgress());
             } else if (view instanceof Spinner) {
                 Object item = ((Spinner) view).getSelectedItem();
                 if (item instanceof String) {

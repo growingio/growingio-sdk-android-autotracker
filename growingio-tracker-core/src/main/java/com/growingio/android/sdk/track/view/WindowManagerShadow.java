@@ -57,8 +57,7 @@ class WindowManagerShadow {
     private final int[] outLocation = new int[2];
     private final String wmClassName;
 
-    @SuppressLint("PrivateApi")
-    public WindowManagerShadow(String wmClassName) {
+    WindowManagerShadow(String wmClassName) {
         this.wmClassName = wmClassName;
     }
 
@@ -163,12 +162,13 @@ class WindowManagerShadow {
         }
         return wm;
     }
+
     private Object getNotNullFieldValue(String fieldName, Object target) throws NoSuchFieldException, IllegalAccessException {
-        Field field = getNotNullField(fieldName,target);
+        Field field = getNotNullField(fieldName, target);
         return field.get(target);
     }
 
-    private Field getNotNullField(String fieldName, Object target) throws NoSuchFieldException{
+    private Field getNotNullField(String fieldName, Object target) throws NoSuchFieldException {
         CacheFieldKey key = new CacheFieldKey(target.getClass(), fieldName);
         if (fieldsMap.containsKey(key)) {
             return fieldsMap.get(key);
@@ -210,7 +210,7 @@ class WindowManagerShadow {
         public Class<?> clazz;
         public String fieldName;
 
-        public CacheFieldKey(Class<?> clazz, String fieldName) {
+        private CacheFieldKey(Class<?> clazz, String fieldName) {
             this.clazz = clazz;
             this.fieldName = fieldName;
         }
