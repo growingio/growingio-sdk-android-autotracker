@@ -36,16 +36,40 @@ public class ViewUtil {
 
     public static boolean canCircle(View view) {
         return view instanceof WebView
-                || view instanceof CompoundButton
-                || view instanceof AbsSeekBar
-                || view instanceof EditText
-                || (view.isClickable() && view.hasOnClickListeners())
+                || isChangeTypeView(view)
+                || isClickTypeView(view)
                 || ClassExistHelper.isListView(view.getParent())
-                || ListMenuItemViewShadow.isListMenuItemView(view)
-                || isMaterialCircleView(view);
+                || ListMenuItemViewShadow.isListMenuItemView(view);
     }
 
-    public static boolean isMaterialCircleView(View view) {
+    public static boolean isChangeTypeView(View view) {
+        return view instanceof EditText
+                || view instanceof CompoundButton
+                || view instanceof AbsSeekBar
+                || isSliderView(view);
+    }
+
+    public static boolean isClickTypeView(View view) {
+        return (view.isClickable() && view.hasOnClickListeners())
+                || isMaterialClickView(view);
+    }
+
+    private static boolean isSliderView(View view) {
+        // Slider
+        if (ClassExistHelper.hasClass("com.google.android.material.slider.Slider")) {
+            if (view instanceof Slider) {
+                Slider slider = (Slider) view;
+                return slider.isEnabled();
+            }
+            if (view instanceof RangeSlider) {
+                RangeSlider slider = (RangeSlider) view;
+                return slider.isEnabled();
+            }
+        }
+        return false;
+    }
+
+    public static boolean isMaterialClickView(View view) {
         // MaterialButtonGroup
         if (ClassExistHelper.hasClass("com.google.android.material.button.MaterialButton")) {
             if (view instanceof MaterialButton) {
@@ -61,19 +85,6 @@ public class ViewUtil {
                 return tabView.isEnabled() && tabView.isClickable();
             }
         }
-
-        // Slider
-        if (ClassExistHelper.hasClass("com.google.android.material.slider.Slider")) {
-            if (view instanceof Slider) {
-                Slider slider = (Slider) view;
-                return slider.isEnabled();
-            }
-            if (view instanceof RangeSlider) {
-                RangeSlider slider = (RangeSlider) view;
-                return slider.isEnabled();
-            }
-        }
-
 
         return false;
     }

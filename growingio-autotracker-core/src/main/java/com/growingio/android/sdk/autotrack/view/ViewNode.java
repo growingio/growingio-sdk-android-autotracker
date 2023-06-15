@@ -96,7 +96,7 @@ public class ViewNode {
     }
 
     public String getNodeType() {
-        if (mView instanceof EditText) {
+        if (ViewUtil.isChangeTypeView(mView)) {
             return INPUT;
         }
 
