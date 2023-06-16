@@ -103,7 +103,7 @@ class ViewClickProvider {
             Logger.i(TAG, "AutotrackOptions: tablayout tab select enable is false");
             return;
         }
-        viewOnClick(tab.view, tab.getText() == null ? null : tab.getText().toString());
+        viewOnClick(tab.view);
     }
 
     public static void compoundButtonOnCheck(CompoundButton button) {
@@ -112,9 +112,7 @@ class ViewClickProvider {
             Logger.i(TAG, "AutotrackOptions: compound button check enable is false");
             return;
         }
-        String content = button.getText().toString();
-        if (content == null || content.isEmpty()) content = String.valueOf(button.isChecked());
-        viewOnClick(button, content);
+        viewOnClick(button);
     }
 
     public static void viewOnClickListener(View view) {
@@ -183,11 +181,7 @@ class ViewClickProvider {
         menuItemOnClick(activity, menuItem);
     }
 
-    public static void viewOnClick(View view) {
-        viewOnClick(view, null);
-    }
-
-    private static void viewOnClick(View view, String content) {
+    private static void viewOnClick(View view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
@@ -206,7 +200,7 @@ class ViewClickProvider {
         ViewNode viewNode = ViewHelper.getClickViewNode(view);
         if (viewNode != null) {
             Page<?> page = PageProvider.get().findPage(view);
-            sendClickEvent(page, viewNode, content);
+            sendClickEvent(page, viewNode);
         } else {
             Logger.e(TAG, "ViewNode is NULL");
         }
@@ -226,13 +220,13 @@ class ViewClickProvider {
         Page<?> page = PageProvider.get().findPage(activity);
         ViewNode viewNode = ViewHelper.getMenuItemViewNode(page, menuItem);
         if (viewNode != null) {
-            sendClickEvent(page, viewNode, null);
+            sendClickEvent(page, viewNode);
         } else {
             Logger.e(TAG, "MenuItem ViewNode is NULL");
         }
     }
 
-    private static void sendClickEvent(Page<?> page, ViewNode viewNode, String content) {
+    private static void sendClickEvent(Page<?> page, ViewNode viewNode) {
         if (page == null) {
             Logger.w(TAG, "sendClickEvent page Activity is NULL");
             return;
@@ -243,7 +237,7 @@ class ViewClickProvider {
                         .setPageShowTimestamp(page.getShowTimestamp())
                         .setXpath(viewNode.getXPath())
                         .setIndex(viewNode.getIndex())
-                        .setTextValue(content == null ? viewNode.getViewContent() : content)
+                        .setTextValue(viewNode.getViewContent())
         );
     }
 }

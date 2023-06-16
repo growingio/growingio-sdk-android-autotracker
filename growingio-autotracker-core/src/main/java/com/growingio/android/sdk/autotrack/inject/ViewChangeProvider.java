@@ -91,7 +91,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             Logger.i(TAG, "AutotrackOptions: edittext change enable is false");
             return;
         }
-        sendChangeEvent(view, null);
+        sendChangeEvent(view);
     }
 
     public static void seekBarOnProgressChange(SeekBar seekBar) {
@@ -100,7 +100,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             Logger.i(TAG, "AutotrackOptions: seekbar change enable is false");
             return;
         }
-        sendChangeEvent(seekBar, String.valueOf(seekBar.getProgress()));
+        sendChangeEvent(seekBar);
     }
 
     public static void ratingBarOnRatingChange(View view, float rating) {
@@ -109,7 +109,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             Logger.i(TAG, "AutotrackOptions: ratingbar change enable is false");
             return;
         }
-        sendChangeEvent(view, String.valueOf(rating));
+        sendChangeEvent(view);
     }
 
     public static void sliderOnStopTrackingTouch(Slider slider) {
@@ -118,7 +118,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             Logger.i(TAG, "AutotrackOptions: slider value change enable is false");
             return;
         }
-        sendChangeEvent(slider, String.valueOf(slider.getValue()));
+        sendChangeEvent(slider);
     }
 
     public static void rangeSliderOnStopTrackingTouch(RangeSlider slider) {
@@ -127,12 +127,10 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             Logger.i(TAG, "AutotrackOptions: rangeSlider value change enable is false");
             return;
         }
-        if (slider.getValues().size() == 2) {
-            sendChangeEvent(slider, slider.getValues().get(0) + "-" + slider.getValues().get(1));
-        }
+        sendChangeEvent(slider);
     }
 
-    private static void sendChangeEvent(View view, String viewContent) {
+    private static void sendChangeEvent(View view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
         }
@@ -155,7 +153,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
                         .setPageShowTimestamp(page.getShowTimestamp())
                         .setXpath(viewNode.getXPath())
                         .setIndex(viewNode.getIndex())
-                        .setTextValue(viewContent == null ? viewNode.getViewContent() : viewContent)
+                        .setTextValue(viewNode.getViewContent())
         );
     }
 }

@@ -26,14 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.RatingBar;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -325,40 +318,7 @@ public class ViewHelper {
         if (contentTag != null) {
             value = contentTag;
         } else {
-            if (view instanceof EditText) {
-                EditText editText = (EditText) view;
-                if (ViewAttributeUtil.getTrackText(editText) != null) {
-                    if (!isPasswordInputType(editText.getInputType())) {
-                        CharSequence sequence = editText.getText();
-                        value = sequence == null ? "" : sequence.toString();
-                    }
-                }
-            } else if (view instanceof RatingBar) {
-                value = String.valueOf(((RatingBar) view).getRating());
-            } else if (view instanceof ProgressBar) {
-                value = String.valueOf(((ProgressBar) view).getProgress());
-            } else if (view instanceof Spinner) {
-                Object item = ((Spinner) view).getSelectedItem();
-                if (item instanceof String) {
-                    value = (String) item;
-                } else {
-                    View selected = ((Spinner) view).getSelectedView();
-                    if (selected instanceof TextView && ((TextView) selected).getText() != null) {
-                        value = ((TextView) selected).getText().toString();
-                    }
-                }
-            } else if (view instanceof RadioGroup) {
-                RadioGroup group = (RadioGroup) view;
-                View selected = group.findViewById(group.getCheckedRadioButtonId());
-                if (selected instanceof RadioButton && ((RadioButton) selected).getText() != null) {
-                    value = ((RadioButton) selected).getText().toString();
-                }
-            } else if (view instanceof TextView) {
-                if (((TextView) view).getText() != null) {
-                    value = ((TextView) view).getText().toString();
-                }
-            }
-
+            value = ViewUtil.getWidgetContent(view);
             if (TextUtils.isEmpty(value)) {
                 if (view.getContentDescription() != null) {
                     value = view.getContentDescription().toString();
@@ -378,13 +338,5 @@ public class ViewHelper {
             }
         }
         return value;
-    }
-
-    private static boolean isPasswordInputType(int inputType) {
-        final int variation = inputType & (EditorInfo.TYPE_MASK_CLASS | EditorInfo.TYPE_MASK_VARIATION);
-        return variation == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD)
-                || variation == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_WEB_PASSWORD)
-                || variation == (EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD)
-                || variation == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
     }
 }
