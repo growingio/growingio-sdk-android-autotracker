@@ -181,7 +181,7 @@ class ViewClickProvider {
         menuItemOnClick(activity, menuItem);
     }
 
-    private static void viewOnClick(View view) {
+    public static void viewOnClick(View view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
