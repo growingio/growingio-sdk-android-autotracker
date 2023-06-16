@@ -18,6 +18,7 @@ package com.growingio.android.sdk.autotrack.inject;
 
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -67,5 +68,9 @@ public class ViewClickInjector {
 
     public static void tabLayoutOnTabSelected(TabLayout.OnTabSelectedListener listener, TabLayout.Tab tab) {
         ViewClickProvider.tabLayoutOnTabSelected(tab);
+    }
+
+    public static void compoundButtonOnChecked(CompoundButton.OnCheckedChangeListener listener, CompoundButton button, boolean checked) {
+        ViewClickProvider.compoundButtonOnCheck(button);
     }
 }

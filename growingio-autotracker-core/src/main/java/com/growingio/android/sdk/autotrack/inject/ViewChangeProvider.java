@@ -18,7 +18,6 @@ package com.growingio.android.sdk.autotrack.inject;
 
 import android.app.Activity;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.SeekBar;
 
@@ -111,17 +110,6 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             return;
         }
         sendChangeEvent(view, String.valueOf(rating));
-    }
-
-    public static void compoundButtonOnCheck(CompoundButton button) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isCompoundButtonCheckEnabled()) {
-            Logger.i(TAG, "AutotrackOptions: compound button check enable is false");
-            return;
-        }
-        String content = button.getText().toString();
-        if (content == null || content.isEmpty()) content = String.valueOf(button.isChecked());
-        sendChangeEvent(button, content);
     }
 
     public static void sliderOnStopTrackingTouch(Slider slider) {

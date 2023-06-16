@@ -19,6 +19,7 @@ package com.growingio.android.sdk.autotrack.inject;
 import android.app.Activity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 
 import com.google.android.material.tabs.TabLayout;
 import com.growingio.android.sdk.TrackerContext;
@@ -103,6 +104,17 @@ class ViewClickProvider {
             return;
         }
         viewOnClick(tab.view, tab.getText() == null ? null : tab.getText().toString());
+    }
+
+    public static void compoundButtonOnCheck(CompoundButton button) {
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (config != null && !config.getAutotrackOptions().isCompoundButtonCheckEnabled()) {
+            Logger.i(TAG, "AutotrackOptions: compound button check enable is false");
+            return;
+        }
+        String content = button.getText().toString();
+        if (content == null || content.isEmpty()) content = String.valueOf(button.isChecked());
+        viewOnClick(button, content);
     }
 
     public static void viewOnClickListener(View view) {

@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.inject;
 
 
-import android.widget.CompoundButton;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 
@@ -46,9 +45,5 @@ public class ViewChangeInjector {
 
     public static void rangeSliderOnStopTrackingTouch(RangeSlider.OnSliderTouchListener listener, RangeSlider slider) {
         ViewChangeProvider.rangeSliderOnStopTrackingTouch(slider);
-    }
-
-    public static void compoundButtonOnChecked(CompoundButton.OnCheckedChangeListener listener, CompoundButton button, boolean checked) {
-        ViewChangeProvider.compoundButtonOnCheck(button);
     }
 }

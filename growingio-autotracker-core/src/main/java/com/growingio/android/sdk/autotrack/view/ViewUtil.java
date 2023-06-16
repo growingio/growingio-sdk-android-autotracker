@@ -44,13 +44,13 @@ public class ViewUtil {
 
     public static boolean isChangeTypeView(View view) {
         return view instanceof EditText
-                || view instanceof CompoundButton
                 || view instanceof AbsSeekBar
                 || isSliderView(view);
     }
 
     public static boolean isClickTypeView(View view) {
         return (view.isClickable() && view.hasOnClickListeners())
+                || view instanceof CompoundButton
                 || isMaterialClickView(view);
     }
 
