@@ -27,21 +27,21 @@ public class CoreConfiguration implements Configurable {
     private String mProjectId;
     private String mUrlScheme;
     private String mDataSourceId;
-
     private String mChannel;
     private boolean mDebugEnabled = false;
     private int mCellularDataLimit = 10;
     private int mDataUploadInterval = 15;
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
+
     private boolean mUploadExceptionEnabled = true;
     private boolean mRequireAppProcessesEnabled = true;
     private String mDataCollectionServerHost = "http://napi.growingio.com";
-
     private EventFilterInterceptor mEventFilterInterceptor;
-
     private final List<LibraryGioModule> mComponents = new ArrayList<>();
     private boolean mIdMappingEnabled = false;
+
+    private boolean mImeiEnabled = false;
 
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
@@ -79,6 +79,7 @@ public class CoreConfiguration implements Configurable {
         this.mChannel = channel;
         return this;
     }
+
     public String getDataSourceId() {
         return mDataSourceId;
     }
@@ -180,4 +181,12 @@ public class CoreConfiguration implements Configurable {
         return this;
     }
 
+    public boolean isImeiEnabled() {
+        return mImeiEnabled;
+    }
+
+    public CoreConfiguration setImeiEnabled(boolean mImeiEnabled) {
+        this.mImeiEnabled = mImeiEnabled;
+        return this;
+    }
 }

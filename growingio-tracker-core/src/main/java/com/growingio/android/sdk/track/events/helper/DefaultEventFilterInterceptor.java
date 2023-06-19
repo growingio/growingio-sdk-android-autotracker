@@ -57,11 +57,6 @@ public class DefaultEventFilterInterceptor implements EventFilterInterceptor {
         return fieldArea;
     }
 
-    @Override
-    public boolean filterEventGroup(String group) {
-        return true;
-    }
-
     public static class FilterEventType {
         public static final String VISIT = TrackEventType.VISIT;
         public static final String CUSTOM = TrackEventType.CUSTOM;

@@ -167,10 +167,6 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     boolean filterEvent(BaseEvent.BaseBuilder<?> eventBuilder) {
         EventFilterInterceptor eventFilterInterceptor = getEventFilterInterceptor();
         if (eventFilterInterceptor == null) return true;
-        /*String eventGroup = "undefine";
-        if (!eventFilterInterceptor.filterEventGroup(eventGroup)) {
-            return false;
-        }*/
 
         if (!eventFilterInterceptor.filterEventType(eventBuilder.getEventType())) {
             Logger.w(TAG, "filter [" + eventBuilder.getEventType() + "] event by type");

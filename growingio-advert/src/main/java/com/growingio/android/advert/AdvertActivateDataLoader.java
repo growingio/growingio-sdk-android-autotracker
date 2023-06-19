@@ -138,7 +138,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         private int checkDeepLinkType() {
             Uri data = uri;
             if (data != null) {
-                if (data.getScheme().startsWith("growing.")) {
+                if (data.getScheme() != null && data.getScheme().startsWith("growing.")) {
                     return DEEPLINK_TYPE_URI;
                 }
                 if (data.getHost() == null) {

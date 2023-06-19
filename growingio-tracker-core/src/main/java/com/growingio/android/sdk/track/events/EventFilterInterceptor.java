@@ -52,15 +52,4 @@ public interface EventFilterInterceptor {
      * @return map. if the value is true,the field will pass,and if the value is false, sdk will make the field blank.
      */
     Map<String, Boolean> filterEventField(String type, Map<String, Boolean> fieldArea);
-
-    /**
-     * <p>
-     * future's feature. it's useless now.
-     * </p>
-     * filter events based on group
-     *
-     * @param group event's group
-     * @return true:pass false:block
-     */
-    boolean filterEventGroup(String group);
 }

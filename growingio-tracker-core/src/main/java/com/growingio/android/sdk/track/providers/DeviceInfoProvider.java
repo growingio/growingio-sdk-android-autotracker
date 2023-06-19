@@ -120,7 +120,7 @@ public class DeviceInfoProvider {
 
     @SuppressLint({"MissingPermission", "HardwareIds", "WrongConstant"})
     public String getImei() {
-        if (TextUtils.isEmpty(mImei)) {
+        if (TextUtils.isEmpty(mImei) && ConfigurationProvider.core().isImeiEnabled()) {
             if (PermissionUtil.checkReadPhoneStatePermission()) {
                 try {
                     TelephonyManager tm = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
