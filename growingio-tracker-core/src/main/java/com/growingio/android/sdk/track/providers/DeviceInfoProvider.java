@@ -134,7 +134,7 @@ public class DeviceInfoProvider {
                 }
             }
         }
-        return null;
+        return mImei;
     }
 
     public String getAndroidId() {

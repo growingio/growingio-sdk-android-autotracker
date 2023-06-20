@@ -164,6 +164,60 @@ public class ViewClickEventsTest extends EventsTest {
     }
 
     @Test
+    public void switchClickEventTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Switch[0]#switch1")
+                        .setTextValue("Switch")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Switch[0]#switch1")
+                        .setTextValue("Switch")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
+        onView(withId(R.id.switch1)).perform(click());
+        onView(withId(R.id.switch1)).perform(click());
+        Awaiter.untilTrue(receivedEvent);
+
+        scenario.close();
+    }
+
+    @Test
+    public void checkBoxClickEventTest() {
+        final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(
+                receivedEvent,
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/CheckBox[0]#check_box_android")
+                        .setTextValue("Android")
+                        .setIndex(-1)
+                        .build(),
+                new ViewElementEvent.Builder()
+                        .setPath("/ClickTestActivity")
+                        .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/CheckBox[1]#check_box_ios")
+                        .setTextValue("iOS")
+                        .setIndex(-1)
+                        .build()
+
+        ));
+        ActivityScenario<ClickTestActivity> scenario = ActivityScenario.launch(ClickTestActivity.class);
+        onView(withId(R.id.check_box_android)).perform(click());
+        onView(withId(R.id.check_box_ios)).perform(click());
+        Awaiter.untilTrue(receivedEvent);
+
+        scenario.close();
+    }
+
+    @Test
     public void layoutClickEventTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewClickEventsListener(

@@ -119,12 +119,6 @@ public class ViewUtil {
             }
         }
 
-        if (widget instanceof TextView) {
-            if (((TextView) widget).getText() != null) {
-                return ((TextView) widget).getText().toString();
-            }
-        }
-
         return null;
     }
 
@@ -175,6 +169,10 @@ public class ViewUtil {
             View selected = group.findViewById(group.getCheckedRadioButtonId());
             if (selected instanceof RadioButton && ((RadioButton) selected).getText() != null) {
                 value = ((RadioButton) selected).getText().toString();
+            }
+        } else if (view instanceof TextView) {
+            if (((TextView) view).getText() != null) {
+                return ((TextView) view).getText().toString();
             }
         }
         return value;
