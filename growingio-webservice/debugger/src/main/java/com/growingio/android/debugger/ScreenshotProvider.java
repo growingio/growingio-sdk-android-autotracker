@@ -164,7 +164,6 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         builder.build(new Callback<DebuggerScreenshot>() {
             @Override
             public void onSuccess(DebuggerScreenshot result) {
-                Logger.d(TAG, "Create circle screenshot successfully");
                 if (result != null && mListener != null) mListener.onScreenshotRefreshed(result);
             }
 

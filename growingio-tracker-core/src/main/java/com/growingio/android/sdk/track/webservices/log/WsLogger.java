@@ -54,8 +54,8 @@ public class WsLogger {
             logHt.start();
             sLogHandler = new Handler(logHt.getLooper());
         }
-        //send log 2 times per 1 second
-        sLogHandler.postDelayed(mLogRunnable, 500);
+        //send log 1 times per 1 second
+        sLogHandler.postDelayed(mLogRunnable, 1000);
     }
 
     public void closeLog() {
@@ -81,7 +81,7 @@ public class WsLogger {
             }
         }
         sLogHandler.removeCallbacks(mLogRunnable);
-        sLogHandler.postDelayed(mLogRunnable, 500);
+        sLogHandler.postDelayed(mLogRunnable, 1000);
     }
 
     public interface Callback {
