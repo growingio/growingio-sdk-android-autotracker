@@ -144,13 +144,13 @@ public class ViewClickEventsTest extends EventsTest {
                 new ViewElementEvent.Builder()
                         .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[1]#rb_female")
-                        .setTextValue("female")
+                        .setTextValue("female[true]")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
                         .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/RadioGroup[0]#radio_group_gender/RadioButton[0]#rb_male")
-                        .setTextValue("male")
+                        .setTextValue("male[true]")
                         .setIndex(-1)
                         .build()
 
@@ -171,13 +171,13 @@ public class ViewClickEventsTest extends EventsTest {
                 new ViewElementEvent.Builder()
                         .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Switch[0]#switch1")
-                        .setTextValue("Switch")
+                        .setTextValue("Switch[true]")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
                         .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/Switch[0]#switch1")
-                        .setTextValue("Switch")
+                        .setTextValue("Switch[false]")
                         .setIndex(-1)
                         .build()
 
@@ -198,13 +198,13 @@ public class ViewClickEventsTest extends EventsTest {
                 new ViewElementEvent.Builder()
                         .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/CheckBox[0]#check_box_android")
-                        .setTextValue("Android")
+                        .setTextValue("Android[false]")
                         .setIndex(-1)
                         .build(),
                 new ViewElementEvent.Builder()
                         .setPath("/ClickTestActivity")
                         .setXpath("/Page/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]#content_parent/CheckBox[1]#check_box_ios")
-                        .setTextValue("iOS")
+                        .setTextValue("iOS[true]")
                         .setIndex(-1)
                         .build()
 
