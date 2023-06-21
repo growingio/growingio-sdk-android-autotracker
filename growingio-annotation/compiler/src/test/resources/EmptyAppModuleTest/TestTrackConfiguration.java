@@ -20,10 +20,7 @@ import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
-import com.growingio.android.sdk.track.events.helper.EventExcludeFilter;
-import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter;
 import com.growingio.sdk.annotation.compiler.sample.EmptyConfig;
-
 import java.util.HashMap;
 
 /**
@@ -38,7 +35,7 @@ public final class TestTrackConfiguration {
     private final HashMap<Class<? extends Configurable>, Configurable> MODULE_CONFIGURATIONS = new HashMap<Class<? extends Configurable>, Configurable>();
 
     public TestTrackConfiguration(String projectId, String urlScheme) {
-        this.coreConfiguration = new CoreConfiguration(projectId, urlScheme);
+        this.coreConfiguration = new CoreConfiguration(projectId,urlScheme);
         addConfiguration(new EmptyConfig());
     }
 
@@ -50,8 +47,7 @@ public final class TestTrackConfiguration {
         return MODULE_CONFIGURATIONS;
     }
 
-    @Deprecated
-    public TestTrackConfiguration addConfiguration(Configurable config) {
+    private TestTrackConfiguration addConfiguration(Configurable config) {
         if (config != null) {
             MODULE_CONFIGURATIONS.put(config.getClass(), config);
         }
@@ -102,14 +98,12 @@ public final class TestTrackConfiguration {
         return this;
     }
 
-    @Deprecated
-    public final boolean isUploadExceptionEnabled() {
-        return core().isUploadExceptionEnabled();
+    public final String getDataSourceId() {
+        return core().getDataSourceId();
     }
 
-    @Deprecated
-    public final TestTrackConfiguration setUploadExceptionEnabled(boolean uploadExceptionEnabled) {
-        core().setUploadExceptionEnabled(uploadExceptionEnabled);
+    public final TestTrackConfiguration setDataSourceId(String dataSourceId) {
+        core().setDataSourceId(dataSourceId);
         return this;
     }
 
@@ -166,30 +160,6 @@ public final class TestTrackConfiguration {
             EventFilterInterceptor eventFilterInterceptor) {
         core().setEventFilterInterceptor(eventFilterInterceptor);
         return this;
-    }
-
-    @Deprecated
-    public final TestTrackConfiguration setExcludeEvent(
-            @EventExcludeFilter.EventFilterLimit int filterEventFlag) {
-        core().setExcludeEvent(filterEventFlag);
-        return this;
-    }
-
-    @Deprecated
-    public final int getExcludeEvent() {
-        return core().getExcludeEvent();
-    }
-
-    @Deprecated
-    public final TestTrackConfiguration setIgnoreField(
-            @FieldIgnoreFilter.FieldFilterType int ignoreFieldFlag) {
-        core().setIgnoreField(ignoreFieldFlag);
-        return this;
-    }
-
-    @Deprecated
-    public final int getIgnoreField() {
-        return core().getIgnoreField();
     }
 
     public final TestTrackConfiguration addPreloadComponent(LibraryGioModule component) {

@@ -18,7 +18,6 @@ package com.growingio.android.debugger;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ThreadUtils;
 import com.growingio.android.sdk.track.webservices.message.QuitMessage;
 import com.growingio.android.sdk.track.webservices.message.ReadyMessage;
@@ -55,11 +54,10 @@ class WebSocketHandler extends WebSocketListener {
 
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
-        Logger.d(TAG, "Created webSocket successfully");
         if (webSocket.send(ReadyMessage.createMessage().toJSONObject().toString())) {
             this.webSocket = webSocket;
         } else {
-            Logger.e(TAG, "send ready message failed");
+            Log.e(TAG, "send ready message failed");
             ThreadUtils.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -74,7 +72,7 @@ class WebSocketHandler extends WebSocketListener {
         if (TextUtils.isEmpty(text) || TextUtils.isEmpty(text.trim())) {
             return;
         }
-        Logger.d(TAG, "Received message is " + text);
+        Log.d(TAG, "Received message is " + text);
 
         if (text.contains("had disconnected")) {
             ThreadUtils.runOnUiThread(() -> webSocketListener.onQuited());
@@ -84,7 +82,7 @@ class WebSocketHandler extends WebSocketListener {
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");
             if (ReadyMessage.MSG_TYPE.equals(msgType)) {
-                Logger.d(TAG, "Web is ready");
+                Log.d(TAG, "Web is ready");
                 ThreadUtils.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -93,7 +91,7 @@ class WebSocketHandler extends WebSocketListener {
                 });
                 return;
             } else if (QuitMessage.MSG_TYPE.equals(msgType)) {
-                Logger.d(TAG, "Web is quited");
+                Log.d(TAG, "Web is quited");
                 ThreadUtils.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -103,7 +101,7 @@ class WebSocketHandler extends WebSocketListener {
                 return;
             }
         } catch (JSONException e) {
-            Logger.e(TAG, e);
+            Log.e(TAG, e.getMessage());
         }
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
@@ -115,7 +113,7 @@ class WebSocketHandler extends WebSocketListener {
 
     @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
-        Logger.e(TAG, "webSocket on onClosed, reason: $reason");
+        Log.e(TAG, "webSocket on onClosed, reason: " + reason);
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -126,7 +124,7 @@ class WebSocketHandler extends WebSocketListener {
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        Logger.e(TAG, t, "webSocket on onFailure, reason: ");
+        Log.e(TAG, "webSocket on onFailure, reason: " + t.getMessage());
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {

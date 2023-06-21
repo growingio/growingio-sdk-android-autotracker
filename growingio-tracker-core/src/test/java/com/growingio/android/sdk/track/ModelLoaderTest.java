@@ -45,6 +45,9 @@ public class ModelLoaderTest {
         TestModelLoaderFactory factory2 = new TestModelLoaderFactory(modelLoader2);
         registry.register(String.class, Integer.class, factory2);
         Truth.assertThat(modelLoader2).isEqualTo(registry.getModelLoader(String.class, Integer.class));
+
+        registry.unregister(String.class, Integer.class);
+        Truth.assertThat(registry.getModelLoader(String.class, Integer.class)).isNull();
     }
 
     static class TestModelLoaderFactory implements ModelLoaderFactory<String, Integer> {

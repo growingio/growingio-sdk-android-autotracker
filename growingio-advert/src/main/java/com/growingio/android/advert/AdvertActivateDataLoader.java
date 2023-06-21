@@ -138,7 +138,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         private int checkDeepLinkType() {
             Uri data = uri;
             if (data != null) {
-                if (data.getScheme().startsWith("growing.")) {
+                if (data.getScheme() != null && data.getScheme().startsWith("growing.")) {
                     return DEEPLINK_TYPE_URI;
                 }
                 if (data.getHost() == null) {
@@ -228,7 +228,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                         }
                         sendDeepLinkCallback(advertData.errorCode, advertData.params, wakeTime);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Logger.e(TAG, e);
                     }
                 }
 
@@ -249,6 +249,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             if (AdvertUtils.isDeviceActivated()) {
                 return;
             }
+            Logger.d(TAG, "send activate event");
             // just send activate event
             final ActivateEvent.Builder builder = new ActivateEvent.Builder().
                     activate();

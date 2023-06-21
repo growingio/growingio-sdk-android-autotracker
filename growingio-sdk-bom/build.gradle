@@ -35,6 +35,7 @@ dependencies {
                             it.name != "growingio-network" &&
                             it.name != "growingio-webservice" &&
                             it.name != "growingio-data" &&
+                            it.name != "growingio-adapter" &&
                             it.name != "snappy"
                 }
                 .map {
@@ -47,14 +48,15 @@ dependencies {
 
         api "com.growingio.android:analytics-fa:3.4.1"
         api "com.growingio.android:analytics-ga:3.4.1"
-        api "com.growingio.android:analytics-sa:3.4.1"
+        api "com.growingio.android:analytics-sa:3.4.7"
+        api "com.growingio.android:dummy-sa:3.4.7"
 
         // 2升3模块
         api 'com.growingio.android.sdk.upgrade:autotracker-upgrade-2to3-cdp:1.2.0'
 
         // giokit
-        api 'com.growingio.giokit:giokit:1.2.0'
-        api 'com.growingio.giokit:giokit-no-op:1.2.0'
+        api 'com.growingio.giokit:giokit:1.4.0'
+        api 'com.growingio.giokit:giokit-no-op:1.4.0'
 
         // saas sdk
         //api 'com.growingio.android:vds-android-agent:autotrack-2.9.13'

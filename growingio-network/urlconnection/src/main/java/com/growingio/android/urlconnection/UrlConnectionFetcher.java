@@ -67,7 +67,7 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             EventResponse result = loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, headers, eventUrl.getRequestBody());
             callback.onDataReady(result);
         } catch (IOException e) {
-            Logger.d(TAG, "Failed to load data for url", e);
+            Logger.e(TAG, "Failed to load data for url", e);
             callback.onLoadFailed(e);
         } finally {
             cleanup();

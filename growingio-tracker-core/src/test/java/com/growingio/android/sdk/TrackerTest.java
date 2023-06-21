@@ -23,8 +23,6 @@ import android.webkit.WebView;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
 import org.junit.Test;
@@ -78,9 +76,6 @@ public class TrackerTest {
         tracker.setLoginUserId("cpacm", "username");
         tracker.cleanLoginUserId();
 
-        tracker.setLoginUserAttributesWithAttrBuilder(LoginUserAttributesEvent.AttributesBuilder.getAttributesBuilder().addAttribute("age", "18"));
-        tracker.trackCustomEventWithAttrBuilder("custom", CustomEvent.AttributesBuilder.getAttributesBuilder().addAttribute("name", "custom"));
-
         TestLibraryGioModule testLibraryGioModule = new TestLibraryGioModule();
         testLibraryGioModule.registerComponents(application, TrackerContext.get().getRegistry());
         testLibraryGioModule.getConfiguration(TestLibraryGioModule.class);
@@ -94,7 +89,6 @@ public class TrackerTest {
         coreConfiguration.setDataCollectionServerHost("https://www.growingio.com/");
         coreConfiguration.setDataCollectionEnabled(true);
         coreConfiguration.setChannel("origin");
-        coreConfiguration.setUploadExceptionEnabled(false);
         coreConfiguration.setDebugEnabled(true);
         coreConfiguration.setCellularDataLimit(100);
         coreConfiguration.setDataUploadInterval(100);

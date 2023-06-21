@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.track.utils;
 
 import android.content.Context;
-import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -30,12 +29,8 @@ public class DeviceUtil {
     public static DisplayMetrics getDisplayMetrics(Context context) {
         DisplayMetrics metrics = new DisplayMetrics();
         Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        if (display == null) return metrics;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            display.getRealMetrics(metrics);
-        } else {
-            display.getMetrics(metrics);
-        }
+        if (display == null) return context.getResources().getDisplayMetrics();
+        display.getRealMetrics(metrics);
         return metrics;
     }
 

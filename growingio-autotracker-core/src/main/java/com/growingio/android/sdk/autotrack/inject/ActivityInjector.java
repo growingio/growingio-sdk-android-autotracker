@@ -36,7 +36,7 @@ public class ActivityInjector {
     }
 
     public static void menuItemOnOptionsItemSelected(Activity activity, MenuItem item) {
-        ViewClickProvider.menuItemOnClick(activity, item);
+        ViewClickProvider.activityOptionsItemOnClick(activity, item);
     }
 
     public static void expandableListActivityOnChildClick(ExpandableListActivity activity, ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {

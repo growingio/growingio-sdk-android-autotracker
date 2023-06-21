@@ -54,9 +54,11 @@ class WebSocketHandler extends WebSocketListener {
 
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
-        Logger.d(TAG, "Created webSocket successfully");
+        String readyMessage = ReadyMessage.createMessage().toJSONObject().toString();
+        Logger.d(TAG, "Prepare send open message: " + readyMessage);
         if (webSocket.send(ReadyMessage.createMessage().toJSONObject().toString())) {
             this.webSocket = webSocket;
+            Logger.d(TAG, "send ready message success");
         } else {
             Logger.e(TAG, "send ready message failed");
             ThreadUtils.runOnUiThread(new Runnable() {

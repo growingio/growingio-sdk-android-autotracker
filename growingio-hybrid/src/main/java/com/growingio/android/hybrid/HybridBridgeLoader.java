@@ -45,7 +45,6 @@ public class HybridBridgeLoader implements ModelLoader<HybridBridge, Boolean> {
 
 
     public static class HybridDataFetcher implements DataFetcher<Boolean> {
-        private static final String TAG = "HybridDataFetcher";
 
         private final HybridBridge bridge;
 

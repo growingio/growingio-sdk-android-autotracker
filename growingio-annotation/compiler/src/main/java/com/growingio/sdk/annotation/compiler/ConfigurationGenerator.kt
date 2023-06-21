@@ -225,11 +225,8 @@ internal class ConfigurationGenerator(
     private fun generateAddConfiguration(generateClass: ClassName, config: ClassName): MethodSpec {
         val addMethod = MethodSpec.methodBuilder("addConfiguration")
             .addParameter(config, "config")
-            .addModifiers(Modifier.PUBLIC)
-            .addAnnotation(
-                AnnotationSpec.builder(java.lang.Deprecated::class.java)
-                    .build()
-            )
+            .addModifiers(Modifier.PRIVATE)
+            //.addAnnotation(AnnotationSpec.builder(java.lang.Deprecated::class.java).build())
             .beginControlFlow("if (config != null)")
             .addStatement("MODULE_CONFIGURATIONS.put(config.getClass(), config)")
             .endControlFlow()

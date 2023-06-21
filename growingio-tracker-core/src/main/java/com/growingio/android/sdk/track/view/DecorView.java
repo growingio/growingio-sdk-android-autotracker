@@ -42,4 +42,8 @@ public class DecorView {
     public WindowManager.LayoutParams getLayoutParams() {
         return mLayoutParams;
     }
+
+    public boolean isDialog() {
+        return mLayoutParams.type == WindowManager.LayoutParams.TYPE_APPLICATION;
+    }
 }

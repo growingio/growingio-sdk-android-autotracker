@@ -94,6 +94,7 @@ public class DeprecatedEventSQLite {
         if (this.dbHelper == null) {
             this.dbHelper = new EventDataSQLiteOpenHelper(context, DATABASE_NAME);
         }
+        Logger.d(TAG, "migrate deprecated database to new database");
         String querySql = "SELECT * FROM " + TABLE_EVENTS + " ORDER BY " + COLUMN_ID + " DESC LIMIT " + 100 + ";";
         try {
             synchronized (lock) {
@@ -110,7 +111,7 @@ public class DeprecatedEventSQLite {
                         if (event != null) {
                             events.add(event);
                             if (event instanceof BaseEvent) {
-                                Logger.printJson(TAG, "------migrate data------", ((BaseEvent) event).toJSONObject().toString());
+                                Logger.printJson(TAG, "migrate data:", ((BaseEvent) event).toJSONObject().toString());
                             }
                         }
                     }

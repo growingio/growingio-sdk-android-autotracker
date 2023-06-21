@@ -17,6 +17,9 @@
 package com.growingio.android.sdk.track.view;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,6 +54,41 @@ public class WindowHelper {
 
     public static WindowHelper get() {
         return SingleInstance.INSTANCE;
+    }
+
+    Bitmap tryRenderDialog(Activity activity, Bitmap original) {
+        List<DecorView> views = mWindowManager.getFloatingWindow(activity);
+        if (views.isEmpty()) return original;
+        try {
+            Canvas canvas = new Canvas(original);
+            for (DecorView view : views) {
+                if (!view.isDialog()) {
+                    drawPanel(canvas, view);
+                }
+            }
+
+            for (DecorView dialog : views) {
+                if (dialog.isDialog()) {
+                    int dimColorAlpha = (int) (dialog.getLayoutParams().dimAmount * 255);
+                    canvas.drawColor(Color.argb(dimColorAlpha, 0, 0, 0));
+                    drawPanel(canvas, dialog);
+                }
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+        return original;
+    }
+
+    private void drawPanel(Canvas canvas, DecorView info) {
+        View panelView = info.getView();
+        if (panelView.getWidth() == 0 || panelView.getHeight() == 0) {
+            return;
+        }
+        canvas.save();
+        canvas.translate(info.getRect().left * 1.0f, info.getRect().top * 1.0f);
+        panelView.draw(canvas);
+        canvas.restore();
     }
 
     public boolean isDecorView(View rootView) {
@@ -113,7 +151,7 @@ public class WindowHelper {
         if (mWindowManager != null) {
             try {
                 return mWindowManager.getAllWindowViews();
-            } catch (IllegalAccessException e) {
+            } catch (Exception e) {
                 Logger.e(TAG, e);
             }
         }

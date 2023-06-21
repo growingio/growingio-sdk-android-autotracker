@@ -80,7 +80,7 @@ public class SessionProvider implements IActivityLifecycle {
     public void setLocation(double latitude, double longitude) {
         double eps = 1e-5;
         if (Math.abs(latitude) < eps && Math.abs(longitude) < eps) {
-            Logger.d(TAG, "found invalid latitude and longitude, and return: ", latitude, ", ", longitude);
+            Logger.w(TAG, "invalid latitude and longitude, and return");
             return;
         }
 
@@ -89,6 +89,7 @@ public class SessionProvider implements IActivityLifecycle {
                 (mLongitude == 0 && Math.abs(longitude) > eps)) {
             mLatitude = latitude;
             mLongitude = longitude;
+            Logger.d(TAG, "send visit event after set location at first time.");
             generateVisit();
         } else {
             mLatitude = latitude;
@@ -98,6 +99,7 @@ public class SessionProvider implements IActivityLifecycle {
 
     @TrackThread
     public void cleanLocation() {
+        Logger.d(TAG, "clean location by User, Doesn't send visit event.");
         mLatitude = 0;
         mLongitude = 0;
     }

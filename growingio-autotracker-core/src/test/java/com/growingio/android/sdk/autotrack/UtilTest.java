@@ -25,7 +25,7 @@ import androidx.appcompat.view.menu.ListMenuItemView;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.autotrack.change.ViewChangeProvider;
+import com.growingio.android.sdk.autotrack.inject.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.inject.ActivityInjector;
 import com.growingio.android.sdk.autotrack.shadow.AlertControllerShadow;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
@@ -80,9 +80,9 @@ public class UtilTest {
 
     @Test
     public void activityInjectTest() {
-        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).get();
+        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().get();
         ActivityInjector.onActivityNewIntent(activity, new Intent());
-        ViewChangeProvider.viewOnChange(activity.getTextView());
+        ViewChangeProvider.editTextOnFocusChange(activity.getTextView());
     }
 
 }

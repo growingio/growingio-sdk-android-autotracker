@@ -87,7 +87,7 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
                 long contentLength = responseBody.contentLength();
                 return new EventResponse(successed, responseBody.byteStream(), contentLength);
             } else {
-                Logger.e(TAG, "EventHttpSender failed with code:" + response.code());
+                Logger.e(TAG, "OkHttpSender failed with code:" + response.code());
                 return new EventResponse(false);
             }
         } catch (IOException e) {

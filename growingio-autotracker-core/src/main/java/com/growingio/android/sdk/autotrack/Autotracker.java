@@ -17,13 +17,13 @@
 package com.growingio.android.sdk.autotrack;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.Fragment;
+import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.growingio.android.sdk.autotrack.change.ViewChangeProvider;
+import com.growingio.android.sdk.autotrack.inject.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
@@ -38,18 +38,17 @@ import java.util.Map;
 public class Autotracker extends Tracker {
     private static final String TAG = "Autotracker";
 
-    public Autotracker(Application application) {
-        super(application);
+    public Autotracker(Context context) {
+        super(context);
     }
 
     @Override
     @CallSuper
-    protected void setup(Application application) {
-        super.setup(application);
+    protected void setup(Context context) {
+        super.setup(context);
         PageProvider.get().setup();
-        ViewChangeProvider mViewChangeProvider;
-        mViewChangeProvider = new ViewChangeProvider();
-        mViewChangeProvider.setup();
+        ViewChangeProvider viewChangeProvider = new ViewChangeProvider();
+        viewChangeProvider.setup();
     }
 
     public void setUniqueTag(final View view, final String tag) {
@@ -58,7 +57,7 @@ public class Autotracker extends Tracker {
             Logger.e(TAG, "setUniqueTag: view or tag is NULL");
             return;
         }
-
+        Logger.d(TAG, "setUniqueTag: " + tag + " for " + view.getClass().getSimpleName());
         ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -283,5 +282,14 @@ public class Autotracker extends Tracker {
             return;
         }
         ThreadUtils.runOnUiThread(() -> ViewAttributeUtil.setIgnorePolicy(view, policy));
+    }
+
+    public void ignoreViewClick(final View view, boolean isIgnore) {
+        if (!isInited) return;
+        if (view == null) {
+            Logger.e(TAG, "ignoreViewClick failed: view is NULL");
+            return;
+        }
+        ThreadUtils.runOnUiThread(() -> ViewAttributeUtil.setIgnoreViewClick(view, isIgnore));
     }
 }

@@ -83,8 +83,6 @@ public class ProtobufDataFetcher implements FormatDataFetcher<EventByteArray> {
                 Logger.e(TAG, "Events in the database are not in the protobuf format");
             }
         }
-        Logger.d(TAG, "----- merge pb data size:" + listBuilder.getValuesCount() + " ----");
-
         return listBuilder.build().toByteArray();
     }
 

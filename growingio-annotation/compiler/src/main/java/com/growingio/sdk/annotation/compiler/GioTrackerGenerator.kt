@@ -49,7 +49,7 @@ import javax.lang.model.element.TypeElement
  *        }
  *    }
  *
- *    public static void start(Application application) {
+ *    public static void start(Context context) {
  *        if (_gioTracker != null) {
  *            Logger.e(TAG, "Tracker is running");
  *            return;
@@ -57,14 +57,14 @@ import javax.lang.model.element.TypeElement
  *        throw new IllegalStateException("If you want use start() method, you must use @GIOTracker in GIOAppModule and rebuild project.");
  *    }
  *
- *    public static void startWithConfiguration(Application application,
+ *    public static void startWithConfiguration(Context context,
  *    TrackConfiguration trackConfiguration) {
  *        if (_gioTracker != null) {
  *            Logger.e(TAG, "Tracker is running");
  *            return;
  *        }
  *        ConfigurationProvider.initWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
- *        _gioTracker = new Tracker(application);
+ *        _gioTracker = new Tracker(context);
  *        initSuccess();
  *    }
  *
@@ -176,11 +176,11 @@ class GioTrackerGenerator(
     ): MethodSpec {
         val logger =
             processEnv.elementUtils.getTypeElement(GIO_DEFAULT_LOGGER)
-        val application = processEnv.elementUtils.getTypeElement("android.app.Application")
+        val context = processEnv.elementUtils.getTypeElement("android.content.Context")
         val getMethod = MethodSpec.methodBuilder("startWithConfiguration")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             //.addAnnotation(java.lang.Deprecated::class.java)
-            .addParameter(ClassName.get(application), "application")
+            .addParameter(ClassName.get(context), "context")
             .addParameter(configClass, "trackConfiguration")
             .beginControlFlow("if (_gioTracker != null)")
             .addStatement(
@@ -204,7 +204,7 @@ class GioTrackerGenerator(
         )
 
         getMethod.addStatement(
-            "_gioTracker = new \$T(application)",
+            "_gioTracker = new \$T(context)",
             trackerClass
         )
         getMethod.addStatement("initSuccess()")
@@ -218,10 +218,10 @@ class GioTrackerGenerator(
     ): MethodSpec {
         val logger =
             processEnv.elementUtils.getTypeElement(GIO_DEFAULT_LOGGER)
-        val application = processEnv.elementUtils.getTypeElement("android.app.Application")
+        val context = processEnv.elementUtils.getTypeElement("android.content.Context")
         val getMethod = MethodSpec.methodBuilder("start")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addParameter(ClassName.get(application), "application")
+            .addParameter(ClassName.get(context), "context")
             .beginControlFlow("if (_gioTracker != null)")
             .addStatement(
                 "\$T.e(TAG, \$S)",
@@ -262,7 +262,7 @@ class GioTrackerGenerator(
         )
 
         getMethod.addStatement(
-            "_gioTracker = new \$T(application)",
+            "_gioTracker = new \$T(context)",
             trackerClass
         )
         getMethod.addStatement("initSuccess()")

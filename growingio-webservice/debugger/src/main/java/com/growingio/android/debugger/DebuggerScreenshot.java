@@ -19,8 +19,6 @@ import android.util.DisplayMetrics;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.async.Disposable;
-import com.growingio.android.sdk.track.async.UnsubscribedDisposable;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 
 import org.json.JSONException;
@@ -69,7 +67,6 @@ public class DebuggerScreenshot {
         private String mScreenshot;
         private long mSnapshotKey;
         private Callback<DebuggerScreenshot> mScreenshotResultCallback;
-        private Disposable mBuildDisposable;
 
         public Builder setScale(float scale) {
             mScale = scale;
@@ -86,36 +83,27 @@ public class DebuggerScreenshot {
             return this;
         }
 
-        public Disposable build(Callback<DebuggerScreenshot> callback) {
+        public void build(Callback<DebuggerScreenshot> callback) {
             if (callback == null) {
-                return Disposable.EMPTY_DISPOSABLE;
+                return;
             }
-            mBuildDisposable = new UnsubscribedDisposable();
             mScreenshotResultCallback = callback;
-
             DisplayMetrics displayMetrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
             mScreenWidth = displayMetrics.widthPixels;
             mScreenHeight = displayMetrics.heightPixels;
 
             callResultOnSuccess();
-            return mBuildDisposable;
         }
 
         private void callResultOnSuccess() {
-            if (!mBuildDisposable.isDisposed()) {
-                mBuildDisposable.dispose();
-                if (mScreenshotResultCallback != null) {
-                    mScreenshotResultCallback.onSuccess(new DebuggerScreenshot(this));
-                }
+            if (mScreenshotResultCallback != null) {
+                mScreenshotResultCallback.onSuccess(new DebuggerScreenshot(this));
             }
         }
 
         private void callResultOnFailed() {
-            if (!mBuildDisposable.isDisposed()) {
-                mBuildDisposable.dispose();
-                if (mScreenshotResultCallback != null) {
-                    mScreenshotResultCallback.onFailed();
-                }
+            if (mScreenshotResultCallback != null) {
+                mScreenshotResultCallback.onFailed();
             }
         }
 

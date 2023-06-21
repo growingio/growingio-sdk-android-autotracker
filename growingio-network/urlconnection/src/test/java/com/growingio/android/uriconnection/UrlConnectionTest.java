@@ -182,8 +182,6 @@ public class UrlConnectionTest {
 
     @Test
     public void httpException() throws IOException {
-        HttpException httpException = new HttpException("error");
-        Truth.assertThat(httpException.getStatusCode()).isEqualTo(-1);
         HttpException httpException2 = new HttpException(404);
         Truth.assertThat(httpException2.getStatusCode()).isEqualTo(404);
     }

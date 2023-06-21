@@ -83,11 +83,7 @@ public class SessionEventsTest extends EventsTest {
 
             DisplayMetrics metrics = new DisplayMetrics();
             Display display = ((WindowManager) ApplicationProvider.getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                display.getRealMetrics(metrics);
-            } else {
-                display.getMetrics(metrics);
-            }
+            display.getRealMetrics(metrics);
             Truth.assertThat(jsonObject.getInt("screenHeight")).isEqualTo(metrics.heightPixels);
             Truth.assertThat(jsonObject.getInt("screenWidth")).isEqualTo(metrics.widthPixels);
 

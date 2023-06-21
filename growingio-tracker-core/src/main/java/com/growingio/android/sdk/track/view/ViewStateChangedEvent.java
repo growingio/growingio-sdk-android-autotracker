@@ -55,6 +55,12 @@ public class ViewStateChangedEvent {
         LAYOUT_CHANGED,
         SCROLL_CHANGED,
         DRAW,
-        WINDOW_FOCUS_CHANGED
+        WINDOW_FOCUS_CHANGED,
+
+        WINDOW_ATTACH,
+        WINDOW_DETACH,
+
+        MANUAL_CHANGED,
+
     }
 }

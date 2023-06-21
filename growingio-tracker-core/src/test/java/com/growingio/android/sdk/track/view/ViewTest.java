@@ -24,7 +24,6 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.R;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
 
@@ -32,9 +31,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -74,28 +73,16 @@ public class ViewTest {
         TrackerContext.init(application);
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
         ActivityStateProvider.get().onActivityResumed(activity);
-        String base64 = ScreenshotUtil.getScreenshotBase64(1);
-        Truth.assertThat(base64).startsWith("data:image/jpeg;base64,");
-    }
 
-    @Test
-    public void viewTreeStatusTest() {
-        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
-        TrackerContext.init(application);
-        OnViewStateChangedListener testViewStateChangeListener = new OnViewStateChangedListener() {
-            @Override
-            public void onViewStateChanged(ViewStateChangedEvent changedEvent) {
-                ViewStateChangedEvent.StateType stateType = changedEvent.getStateType();
-                Truth.assertThat(stateType).isInstanceOf(ViewStateChangedEvent.StateType.class);
+        ScreenshotUtil.getScreenshotBitmap(1, bitmap -> {
+            Truth.assertThat(bitmap).isNotNull();
+            try {
+                String base64 = ScreenshotUtil.getScreenshotBase64(bitmap);
+                Truth.assertThat(base64).startsWith("data:image/jpeg;base64,");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        };
-        ViewTreeStatusProvider.get().register(testViewStateChangeListener);
-        ActivityController<RobolectricActivity> controller = Robolectric.buildActivity(RobolectricActivity.class);
-        RobolectricActivity activity = controller.create().resume().get();
-        Truth.assertThat(activity.getWindow().getDecorView().getTag(R.id.growing_tracker_monitoring_view_tree_enabled)).isNotNull();
-        activity.refresh();
-        controller.pause();
-        ViewTreeStatusProvider.get().unregister(testViewStateChangeListener);
+        });
     }
 
 }

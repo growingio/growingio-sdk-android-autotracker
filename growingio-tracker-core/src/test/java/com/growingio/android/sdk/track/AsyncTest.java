@@ -20,7 +20,6 @@ import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.track.async.Disposable;
 import com.growingio.android.sdk.track.async.HandlerDisposable;
-import com.growingio.android.sdk.track.async.UnsubscribedDisposable;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,13 +46,5 @@ public class AsyncTest {
         Disposable empty = hd.schedule(() -> {
         }, 1000);
         Truth.assertThat(empty.isDisposed()).isTrue();
-    }
-
-    @Test
-    public void unsubscribedTest() {
-        UnsubscribedDisposable ud = new UnsubscribedDisposable();
-        Truth.assertThat(ud.isDisposed()).isFalse();
-        ud.dispose();
-        Truth.assertThat(ud.isDisposed()).isTrue();
     }
 }

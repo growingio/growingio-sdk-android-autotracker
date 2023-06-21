@@ -21,7 +21,6 @@ import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
 public class CustomEvent extends BaseAttributesEvent {
@@ -73,32 +72,6 @@ public class CustomEvent extends BaseAttributesEvent {
         @Override
         public CustomEvent build() {
             return new CustomEvent(this);
-        }
-    }
-
-    public static class AttributesBuilder {
-        private final com.growingio.android.sdk.track.events.AttributesBuilder builder;
-
-        private AttributesBuilder() {
-            builder = new com.growingio.android.sdk.track.events.AttributesBuilder();
-        }
-
-        public static AttributesBuilder getAttributesBuilder() {
-            return new AttributesBuilder();
-        }
-
-        public AttributesBuilder addAttribute(String key, String value) {
-            builder.addAttribute(key, value);
-            return this;
-        }
-
-        public <T> AttributesBuilder addAttribute(String key, List<T> value) {
-            builder.addAttribute(key, value);
-            return this;
-        }
-
-        public Map<String, String> getAttributes() {
-            return builder.build();
         }
     }
 }

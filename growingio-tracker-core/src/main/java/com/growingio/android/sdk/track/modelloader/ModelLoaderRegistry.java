@@ -33,6 +33,16 @@ class ModelLoaderRegistry {
     private final Map<Class<?>, ModelLoader<?, ?>> cachedModelLoaders = new HashMap<>();
     private final List<Entry<?, ?>> entries = new ArrayList<>();
 
+    public synchronized <Model, Data> void remove(Class<Model> modelClass, Class<Data> dataClass) {
+        for (Iterator<Entry<?, ?>> iterator = entries.iterator(); iterator.hasNext();) {
+            Entry<?, ?> entry = iterator.next();
+            if (entry.handles(modelClass, dataClass)) {
+                iterator.remove();
+            }
+        }
+        cachedModelLoaders.remove(modelClass);
+    }
+
     public synchronized <Model, Data> void put(Class<Model> modelClass, Class<Data> dataClass, ModelLoaderFactory<? extends Model, ? extends Data> factory) {
         add(modelClass, dataClass, factory);
         cachedModelLoaders.clear();

@@ -27,8 +27,9 @@ import android.widget.ListView;
 import com.gio.test.R;
 import com.gio.test.three.ModuleEntry;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.events.AttributesBuilder;
 import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -130,7 +131,7 @@ public class TrackActivity extends Activity {
                     @Override
                     public void onReceive(Map<String, String> params, int error, long appAwakePassedTime) {
                         Log.e(TAG, String.valueOf(params));
-                    };
+                    }
                 });
                 break;
             case TRACK_TIMER_START:
@@ -156,7 +157,8 @@ public class TrackActivity extends Activity {
                 List<String> list1 = new ArrayList<>();
                 list1.add("aaaa");
                 list1.add("bbbb");
-                Map<String, String> map3 = CustomEvent.AttributesBuilder.getAttributesBuilder()
+                AttributesBuilder builder = new AttributesBuilder();
+                Map<String, String> map3 = builder
                         .addAttribute("key1", "value1")
                         .addAttribute("key2", Arrays.asList(1, 2, 3, 4))
                         .addAttribute(null, "value3")
@@ -168,7 +170,7 @@ public class TrackActivity extends Activity {
                         .addAttribute("key9", list1)
                         .addAttribute("", Arrays.asList("", ""))
                         .addAttribute("key10", Arrays.asList(null, "1"))
-                        .getAttributes();
+                        .build();
 
                 GrowingAutotracker.get().trackTimerEnd(timerId2, map3);
 

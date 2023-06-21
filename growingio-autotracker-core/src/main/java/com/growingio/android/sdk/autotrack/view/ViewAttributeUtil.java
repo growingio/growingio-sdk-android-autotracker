@@ -82,7 +82,18 @@ public class ViewAttributeUtil {
         return null;
     }
 
+    public static void setIgnoreViewClick(View view, boolean isIgnore) {
+        view.setTag(R.id.growing_tracker_ignore_view_click, isIgnore);
+    }
 
+    public static boolean isIgnoreViewClick(View view) {
+        Object ignoreViewClick = view.getTag(R.id.growing_tracker_ignore_view_click);
+        if (ignoreViewClick == null) return false;
+        if (ignoreViewClick instanceof Boolean) {
+            return (Boolean) ignoreViewClick;
+        }
+        return false;
+    }
 
     public static void setMonitoringFocusContent(View view, String text) {
         view.setTag(R.id.growing_tracker_monitoring_focus_content, text);

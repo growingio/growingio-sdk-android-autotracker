@@ -135,6 +135,10 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
         }
         Uri uri = Uri.parse(url);
         AdvertResult result = TrackerContext.get().executeData(Activate.handleDeeplink(uri, callback), Activate.class, AdvertResult.class);
+        if (result == null) {
+            Logger.e(TAG, "AdvertModule is null, please register advert component first.");
+            return false;
+        }
         return result.hasDealWithDeepLink();
     }
 

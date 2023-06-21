@@ -28,7 +28,7 @@ dependencies {
         // confusing.
         exclude group: "com.google.auto.value", module: "auto-value"
     }
-    testImplementation files('libs/tracker-core-test-3.4.4.jar')
+    testImplementation files('libs/tracker-core-test-3.5.0.jar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.track;
 
-import android.app.Application;
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.Tracker;
@@ -30,8 +30,8 @@ import java.util.Map;
 public class CdpTracker extends Tracker {
     private static final String TAG = "CdpTracker";
 
-    public CdpTracker(Application application) {
-        super(application);
+    public CdpTracker(Context context) {
+        super(context);
     }
 
     @Deprecated

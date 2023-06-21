@@ -71,9 +71,7 @@ public class MultiProcessDataSharer implements IDataSharer {
     private synchronized void awaitLoadedLocked() {
         while (!mLoaded) {
             try {
-                Logger.d(TAG, "awaitLoadedLocked");
                 wait();
-                Logger.d(TAG, "awaitLoadedLocked end");
             } catch (InterruptedException e) {
                 Logger.e(TAG, e, "awaitLoadedLocked interrupted");
                 Thread.currentThread().interrupt();
@@ -83,7 +81,6 @@ public class MultiProcessDataSharer implements IDataSharer {
 
     private void loadFromDisk() {
         synchronized (this) {
-            Logger.d(TAG, "loadFromDisk mLoaded is " + mLoaded);
             if (mLoaded) {
                 return;
             }
@@ -96,7 +93,6 @@ public class MultiProcessDataSharer implements IDataSharer {
             } catch (IOException e) {
                 Logger.e(TAG, e);
             }
-            Logger.d(TAG, "loadFromDisk successfully ");
             mLoaded = true;
             notifyAll();
         }
@@ -336,7 +332,6 @@ public class MultiProcessDataSharer implements IDataSharer {
     @Override
     public long getAndAddLong(String key, long delta, long startValue) {
         synchronized (this) {
-            Logger.d(TAG, "getAndAddLong: key = " + key + ", delta = " + delta + ", startValue = " + startValue);
             awaitLoadedLocked();
             final long[] result = new long[1];
             SharedEntry entry = mSharedEntries.get(key);
@@ -349,11 +344,11 @@ public class MultiProcessDataSharer implements IDataSharer {
                         entry.putLong(mMappedByteBuffer, result[0]);
                     }
                 }, entry.getPosition(), SharedEntry.MAX_SIZE);
-                Logger.d(TAG, "getAndAddLong: result = " + result[0]);
+                Logger.v(TAG, "getAndAddLong:  update key=" + key + " result = " + result[0]);
                 return result[0];
             } else {
                 putValue(key, SharedEntry.VALUE_TYPE_LONG, startValue);
-                Logger.d(TAG, "getAndAddLong: return startValue");
+                Logger.v(TAG, "getAndAddLong: insert key=" + key + " with " + startValue);
                 return startValue;
             }
         }
@@ -367,7 +362,6 @@ public class MultiProcessDataSharer implements IDataSharer {
     @Override
     public int getAndAddInt(String key, int delta, int startValue) {
         synchronized (this) {
-            Logger.d(TAG, "getAndAddInt: key = " + key + ", delta = " + delta + ", startValue = " + startValue);
             awaitLoadedLocked();
             final int[] result = new int[1];
             SharedEntry entry = mSharedEntries.get(key);
@@ -380,11 +374,11 @@ public class MultiProcessDataSharer implements IDataSharer {
                         entry.putInt(mMappedByteBuffer, result[0]);
                     }
                 }, entry.getPosition(), SharedEntry.MAX_SIZE);
-                Logger.d(TAG, "getAndAddInt: result = " + result[0]);
+                Logger.v(TAG, "getAndAddInt: update key=" + key + " result = " + result[0]);
                 return result[0];
             } else {
                 putValue(key, SharedEntry.VALUE_TYPE_INT, startValue);
-                Logger.d(TAG, "getAndAddInt: return startValue");
+                Logger.v(TAG, "getAndAddInt: insert key=" + key + " with " + startValue);
                 return startValue;
             }
         }
@@ -398,7 +392,6 @@ public class MultiProcessDataSharer implements IDataSharer {
     @Override
     public int getAndDelInt(String key, int delta, int startValue) {
         synchronized (this) {
-            Logger.d(TAG, "getAndDelInt: key = " + key + ", delta = " + delta + ", startValue = " + startValue);
             awaitLoadedLocked();
             final int[] result = new int[1];
             SharedEntry entry = mSharedEntries.get(key);
@@ -411,11 +404,11 @@ public class MultiProcessDataSharer implements IDataSharer {
                         entry.putInt(mMappedByteBuffer, result[0]);
                     }
                 }, entry.getPosition(), SharedEntry.MAX_SIZE);
-                Logger.d(TAG, "getAndDelInt: result = " + result[0]);
+                Logger.v(TAG, "getAndSubInt: update key=" + key + " result = " + result[0]);
                 return result[0];
             } else {
                 putValue(key, SharedEntry.VALUE_TYPE_INT, startValue);
-                Logger.d(TAG, "getAndDelInt: return startValue");
+                Logger.v(TAG, "getAndSubInt: insert key=" + key + " with " + startValue);
                 return startValue;
             }
         }

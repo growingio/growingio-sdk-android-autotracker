@@ -68,7 +68,7 @@ public class PermissionUtil {
             hasPermission = PackageManager.PERMISSION_GRANTED == sPackageManager.checkPermission(permissionName, sPackageName);
         } catch (Throwable e) {
             hasPermission = false;
-            Logger.d(TAG, e, "checkPermission failed");
+            Logger.w(TAG, e, "checkPermission with " + permissionName + " failed.");
         }
         if (hasPermission) {
             sPermissionFlags |= flag;

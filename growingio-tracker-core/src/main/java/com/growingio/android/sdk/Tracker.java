@@ -28,10 +28,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
+import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
@@ -44,6 +43,7 @@ import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.timer.TimerCenter;
+import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -52,46 +52,76 @@ import java.util.Map;
 
 public class Tracker {
 
-    private static final String TAG = "GrowingIO Track SDK";
+    private static final String TAG = "Tracker";
 
     protected volatile boolean isInited;
 
-    public Tracker(Application application) {
-        if (application == null) {
+    public Tracker(Context context) {
+        if (context == null) {
             isInited = false;
             Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized before use API");
             return;
         }
         // 配置
-        setup(application);
+        setup(context);
 
         TrackerContext.initSuccess();
         // 业务逻辑
-        start();
+        start(context);
 
         isInited = true;
     }
 
     @CallSuper
-    protected void setup(Application application) {
-        TrackerContext.init(application);
+    protected void setup(Context context) {
+        if (context instanceof Application) {
+            Application application = (Application) context;
+            application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
+        } else if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            activity.getApplication().registerActivityLifecycleCallbacks(ActivityStateProvider.get());
+        } else {
+            Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized SDK with Application or Activity");
+            return;
+        }
+        TrackerContext.init(context.getApplicationContext());
         // init core service
-        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
         DeepLinkProvider.get().init();
         SessionProvider.get().init();
         PersistentDataProvider.get().setup();
 
-        loadAnnotationGeneratedModules(application);
+        loadAnnotationGeneratedModules(context);
         // 支持配置中注册模块, 如加密模块等事件模块需要先于所有事件发送注册
         for (LibraryGioModule component : ConfigurationProvider.core().getPreloadComponents()) {
-            component.registerComponents(application, TrackerContext.get().getRegistry());
+            component.registerComponents(context, TrackerContext.get().getRegistry());
         }
     }
 
-    private void start() {
+    private void start(Context context) {
         PersistentDataProvider.get().start();
 
         CacheEventProvider.get().releaseCaches();
+
+        makeupActivityLifecycle(context);
+    }
+
+    private void makeupActivityLifecycle(Context context) {
+        if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            ActivityLifecycleEvent.EVENT_TYPE state = ActivityUtil.judgeContextState(activity);
+            if (state != null) {
+                Logger.i(TAG, "initSdk with Activity, makeup ActivityLifecycle before current state:" + state.name());
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_CREATED) >= 0) {
+                    ActivityStateProvider.get().onActivityCreated(activity, null);
+                }
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) >= 0) {
+                    ActivityStateProvider.get().onActivityStarted(activity);
+                }
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) >= 0) {
+                    ActivityStateProvider.get().onActivityResumed(activity);
+                }
+            }
+        }
     }
 
 
@@ -113,31 +143,10 @@ public class Tracker {
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
-    /**
-     * @see #trackCustomEvent(String, Map)
-     * <code>
-     * trackCustomEvent(eventName,new AttributesBuilder().build())
-     * </code>
-     */
-    @Deprecated
-    public void trackCustomEventWithAttrBuilder(String eventName, CustomEvent.AttributesBuilder attributesBuilder) {
-        if (!isInited) return;
-        if (TextUtils.isEmpty(eventName)) {
-            Logger.e(TAG, "trackCustomEventWithAttrBuilder: eventName is NULL");
-            return;
-        }
-
-        if (attributesBuilder == null) {
-            TrackEventGenerator.generateCustomEvent(eventName, null);
-        } else {
-            TrackEventGenerator.generateCustomEvent(eventName, attributesBuilder.getAttributes());
-        }
-    }
-
     public void setConversionVariables(Map<String, String> variables) {
         if (!isInited) return;
         if (variables == null || variables.isEmpty()) {
-            Logger.e(TAG, "setConversionVariables: variables is NULL");
+            Logger.e(TAG, "setConversionVariables: variables is NULL, and skip it.");
             return;
         }
         TrackEventGenerator.generateConversionVariablesEvent(new HashMap<>(variables));
@@ -146,34 +155,16 @@ public class Tracker {
     public void setLoginUserAttributes(Map<String, String> attributes) {
         if (!isInited) return;
         if (attributes == null || attributes.isEmpty()) {
-            Logger.e(TAG, "setLoginUserAttributes: attributes is NULL");
+            Logger.e(TAG, "setLoginUserAttributes: attributes is NULL, and skip it.");
             return;
         }
         TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
     }
 
-    /**
-     * @see #setLoginUserAttributes(Map)
-     * <code>
-     * setLoginUserAttributes(new AttributesBuilder().build())
-     * </code>
-     */
-    @Deprecated
-    public void setLoginUserAttributesWithAttrBuilder(LoginUserAttributesEvent.AttributesBuilder attributesBuilder) {
-        if (!isInited) return;
-        Map<String, String> attributes = attributesBuilder == null ? null : attributesBuilder.getAttributes();
-        if (attributes == null || attributes.isEmpty()) {
-            Logger.e(TAG, "setLoginUserAttributesWithAttrBuilder: attributes is NULL");
-            return;
-        }
-
-        TrackEventGenerator.generateLoginUserAttributesEvent(attributes);
-    }
-
     public void setVisitorAttributes(Map<String, String> attributes) {
         if (!isInited) return;
         if (attributes == null || attributes.isEmpty()) {
-            Logger.e(TAG, "setVisitorAttributes: attributes is NULL");
+            Logger.e(TAG, "setVisitorAttributes: attributes is NULL, and skip it");
             return;
         }
         TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>(attributes));
@@ -190,9 +181,8 @@ public class Tracker {
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
             public void run() {
-                if (enabled == ConfigurationProvider.core().isDataCollectionEnabled()) {
-                    Logger.e(TAG, "当前数据采集开关 = " + enabled + ", 请勿重复操作");
-                } else {
+                if (enabled != ConfigurationProvider.core().isDataCollectionEnabled()) {
+                    Logger.d(TAG, "isDataCollectionEnabled = " + enabled);
                     ConfigurationProvider.core().setDataCollectionEnabled(enabled);
                     if (enabled) {
                         SessionProvider.get().generateVisit();

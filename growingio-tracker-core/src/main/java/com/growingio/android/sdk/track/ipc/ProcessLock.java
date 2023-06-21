@@ -25,8 +25,6 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 
 public class ProcessLock {
-    private static final String TAG = "ProcessLock";
-
     private final Context mContext;
     private final String mName;
     private FileOutputStream mOutputStream;

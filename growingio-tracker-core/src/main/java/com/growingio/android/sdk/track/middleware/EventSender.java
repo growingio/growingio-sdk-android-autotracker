@@ -66,6 +66,7 @@ public class EventSender {
      * @param dataUploadInterval 发送事件的时间周期，单位 s
      * @param cellularDataLimit  事件发送的移动网络的流量限制，单位 MB
      */
+    @SuppressLint("WrongConstant")
     public EventSender(IEventNetSender sender, long dataUploadInterval, long cellularDataLimit) {
         mContext = TrackerContext.get().getApplicationContext();
         mCellularDataLimit = cellularDataLimit * 1024L * 1024L;
@@ -92,11 +93,7 @@ public class EventSender {
         return loadData.fetcher.executeData();
     }
 
-    /**
-     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
-     * if you want modify it,please check adsdk first
-     */
-    public void setEventNetSender(IEventNetSender mEventNetSender) {
+    void setEventNetSender(IEventNetSender mEventNetSender) {
         this.mEventNetSender = mEventNetSender;
     }
 
@@ -116,7 +113,7 @@ public class EventSender {
             if (mDataUploadInterval > 0) {
                 mCacheEventNum++;
                 if (mCacheEventNum >= EVENTS_BULK_SIZE) {
-                    Logger.d(TAG, "cacheEventNum >= EVENTS_BULK_SIZE, toggle one send action");
+                    Logger.w(TAG, "cacheEventNum >= EVENTS_BULK_SIZE, toggle one send action");
                     mSendHandler.uploadUninstantEvents();
                     mCacheEventNum = 0;
                 }
@@ -127,7 +124,7 @@ public class EventSender {
     }
 
     void removeAllEvents() {
-        Logger.d(TAG, "action: removeAllEvents");
+        Logger.w(TAG, "action: removeAllEvents");
         databaseOperation(EventDatabase.clear());
     }
 
@@ -167,7 +164,7 @@ public class EventSender {
         try {
             databaseOperation(EventDatabase.outDated());
         } catch (Exception e) {
-            Logger.d(TAG, "action: removeOverdueEvents,failed");
+            Logger.w(TAG, "action: removeOverdueEvents,failed");
         }
     }
 
@@ -218,7 +215,7 @@ public class EventSender {
                 if (policy != SEND_POLICY_INSTANT
                         && networkState.isMobileData()
                         && mCellularDataLimit < todayBytes(0)) {
-                    Logger.e(TAG, "Today's mobile data is exhausted");
+                    Logger.w(TAG, "Today's mobile data is exhausted");
                     break;
                 }
                 EventDbResult dbResult = databaseOperation(EventDatabase.query(policy, numOfMaxEventsPerRequest()));
@@ -240,12 +237,7 @@ public class EventSender {
     }
 
 
-    /**
-     * this api adapt for adSdk(https://github.com/growingio/growingio-sdk-android-advert)
-     * if you want modify it,please check adsdk first
-     */
-    @Deprecated
-    public EventDbResult getGEventsFromPolicy(int policy) {
+    EventDbResult getGEventsFromPolicy(int policy) {
         return databaseOperation(EventDatabase.queryAndDelete(policy, numOfMaxEventsPerRequest()));
     }
 

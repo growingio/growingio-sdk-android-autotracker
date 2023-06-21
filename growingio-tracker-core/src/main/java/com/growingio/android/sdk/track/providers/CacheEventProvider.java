@@ -20,6 +20,7 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.CircularFifoQueue;
+import com.growingio.android.sdk.track.log.Logger;
 
 /**
  * <p>
@@ -28,6 +29,9 @@ import com.growingio.android.sdk.track.log.CircularFifoQueue;
  * @author cpacm 2023/3/21
  */
 public class CacheEventProvider {
+
+    private static final String TAG = "CacheEventProvider";
+
     private static class SingleInstance {
         private static final CacheEventProvider INSTANCE = new CacheEventProvider();
     }
@@ -35,7 +39,7 @@ public class CacheEventProvider {
     private CacheEventProvider() {
     }
 
-    private final CircularFifoQueue<BaseEvent.BaseBuilder<?>> caches = new CircularFifoQueue<>(100);
+    private final CircularFifoQueue<BaseEvent.BaseBuilder<?>> caches = new CircularFifoQueue<>(200);
 
     public static CacheEventProvider get() {
         return CacheEventProvider.SingleInstance.INSTANCE;
@@ -46,15 +50,17 @@ public class CacheEventProvider {
             for (BaseEvent.BaseBuilder<?> eventBuilder : caches) {
                 TrackMainThread.trackMain().postEventToTrackMain(eventBuilder);
             }
+            Logger.d(TAG, "release cache events after sdk init: count-" + caches.size());
             caches.clear();
-        } else {
-            // drop events if data collect disabled
+        } else if (caches.size() > 0) {
+            Logger.w(TAG, "drop events when data collect disabled");
             caches.clear();
         }
     }
 
     public void cacheEvent(BaseEvent.BaseBuilder<?> eventBuilder) {
         if (!TrackerContext.initializedSuccessfully()) {
+            Logger.w(TAG, "cache event before sdk init: " + eventBuilder.getEventType());
             caches.add(eventBuilder);
         } else {
             TrackMainThread.trackMain().postEventToTrackMain(eventBuilder);

@@ -16,14 +16,22 @@
 
 package com.growingio.android.sdk.track.view;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.os.Build;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.view.PixelCopy;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.webservices.widget.TipView;
 
@@ -33,29 +41,6 @@ import java.util.List;
 
 public class ScreenshotUtil {
     private ScreenshotUtil() {
-    }
-
-    public static String getScreenshotBase64(float scale) throws IOException {
-        Bitmap screenshotBitmap = getScreenshotBitmap(scale);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        screenshotBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        stream.flush();
-        stream.close();
-        screenshotBitmap.recycle();
-        byte[] bitmapBytes = stream.toByteArray();
-        return "data:image/jpeg;base64," + Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
-    }
-
-    public static Bitmap getScreenshotBitmap(float scale) {
-        Bitmap originBitmap = getScreenshotBitmap();
-        Matrix matrix = new Matrix();
-        matrix.postScale(scale, scale);
-        Bitmap newBitmap = Bitmap.createBitmap(originBitmap, 0, 0, originBitmap.getWidth(), originBitmap.getHeight(), matrix, false);
-        if (newBitmap.equals(originBitmap)) {
-            return originBitmap;
-        }
-        originBitmap.recycle();
-        return newBitmap;
     }
 
     public static Bitmap getScreenshotBitmap() {
@@ -90,5 +75,67 @@ public class ScreenshotUtil {
         final Canvas canvas = new Canvas(bitmap);
         canvas.translate(decorView.getRect().left, decorView.getRect().top);
         decorView.getView().draw(canvas);
+    }
+
+    public interface ScreenshotCallback {
+        void onScreenshot(Bitmap bitmap);
+    }
+
+    public static String getScreenshotBase64(Bitmap screenshotBitmap) throws IOException {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        screenshotBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        stream.flush();
+        stream.close();
+        screenshotBitmap.recycle();
+        byte[] bitmapBytes = stream.toByteArray();
+        return "data:image/jpeg;base64," + Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
+    }
+
+    public static void getScreenshotBitmap(float scale, ScreenshotCallback callback) throws IllegalArgumentException {
+        // PixelCopy
+        // https://muyangmin.github.io/glide-docs-cn/doc/hardwarebitmaps.html
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Activity activity = ActivityStateProvider.get().getForegroundActivity();
+            if (activity == null) {
+                getScreenShotBitmapDefault(scale, callback);
+                return;
+            }
+            try {
+                Window window = activity.getWindow();
+                DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(activity);
+                int widthPixels = metrics.widthPixels;
+                int heightPixels = metrics.heightPixels;
+                int[] location = new int[2];
+                Logger.d("ScreenshotUtil", "getScreenshotBitmap: " + widthPixels + " " + heightPixels);
+                window.getDecorView().getLocationOnScreen(location);
+                Bitmap bitmap = Bitmap.createBitmap(widthPixels, heightPixels, Bitmap.Config.ARGB_8888);
+                PixelCopy.request(window, new Rect(location[0], location[1], widthPixels, heightPixels),
+                        bitmap, copyResult -> {
+                            if (copyResult == PixelCopy.SUCCESS) {
+                                Bitmap screenshot = WindowHelper.get().tryRenderDialog(activity, bitmap);
+                                callback.onScreenshot(scaleBitmap(screenshot, scale));
+                            }
+                        }, TrackMainThread.trackMain().getMainHandler());
+            } catch (IllegalArgumentException e) {
+                getScreenShotBitmapDefault(scale, callback);
+            }
+        } else {
+            getScreenShotBitmapDefault(scale, callback);
+        }
+
+    }
+
+    private static void getScreenShotBitmapDefault(float scale, ScreenshotCallback callback) {
+        Bitmap originBitmap = getScreenshotBitmap();
+        callback.onScreenshot(scaleBitmap(originBitmap, scale));
+    }
+
+    private static Bitmap scaleBitmap(Bitmap bitmap, float scale) {
+        if (scale == 1f) return bitmap;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scale, scale);
+        Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+        bitmap.recycle();
+        return newBitmap;
     }
 }
