@@ -185,6 +185,7 @@ public class Tracker {
                     Logger.d(TAG, "isDataCollectionEnabled = " + enabled);
                     ConfigurationProvider.core().setDataCollectionEnabled(enabled);
                     if (enabled) {
+                        SessionProvider.get().refreshSessionId();
                         SessionProvider.get().generateVisit();
                     } else {
                         TimerCenter.get().clearTimer();

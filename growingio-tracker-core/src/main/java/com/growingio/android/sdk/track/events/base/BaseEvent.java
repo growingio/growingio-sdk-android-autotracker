@@ -22,7 +22,7 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.ipc.EventSequenceId;
+import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
 import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
@@ -60,7 +60,6 @@ public abstract class BaseEvent extends GEvent {
     private final String mDomain;
     private final String mUrlScheme;
     private final String mAppState;
-    private final long mGlobalSequenceId;
     private final long mEventSequenceId;
     private final Map<String, String> mExtraParams;
 
@@ -90,7 +89,6 @@ public abstract class BaseEvent extends GEvent {
         mDomain = eventBuilder.mDomain;
         mUrlScheme = eventBuilder.mUrlScheme;
         mAppState = eventBuilder.mAppState;
-        mGlobalSequenceId = eventBuilder.mGlobalSequenceId;
         mEventSequenceId = eventBuilder.mEventSequenceId;
         mExtraParams = eventBuilder.mExtraParams;
 
@@ -139,10 +137,6 @@ public abstract class BaseEvent extends GEvent {
 
     public String getAppState() {
         return checkValueSafe(mAppState);
-    }
-
-    public long getGlobalSequenceId() {
-        return mGlobalSequenceId;
     }
 
     public long getEventSequenceId() {
@@ -242,7 +236,6 @@ public abstract class BaseEvent extends GEvent {
             json.put(BaseField.SESSION_ID, getSessionId());
             json.put(BaseField.EVENT_TYPE, getEventType());
             json.put(BaseField.TIMESTAMP, getTimestamp());
-            json.put(BaseField.GSID, getGlobalSequenceId());
             json.put(BaseField.ESID, getEventSequenceId());
 
             json.put(BaseField.DOMAIN, getDomain());
@@ -305,7 +298,6 @@ public abstract class BaseEvent extends GEvent {
         protected String mDomain;
         private String mUrlScheme;
         private String mAppState;
-        private long mGlobalSequenceId;
         private long mEventSequenceId;
         private final Map<String, String> mExtraParams = new HashMap<>();
 
@@ -363,6 +355,15 @@ public abstract class BaseEvent extends GEvent {
             return mFilterField;
         }
 
+        private  boolean isEventSequenceIdType(String type) {
+            if (DefaultEventFilterInterceptor.FilterEventType.VISIT.equals(type)) return true;
+            if (DefaultEventFilterInterceptor.FilterEventType.CUSTOM.equals(type)) return true;
+            if (DefaultEventFilterInterceptor.FilterEventType.PAGE.equals(type)) return true;
+            if (DefaultEventFilterInterceptor.FilterEventType.VIEW_CLICK.equals(type)) return true;
+            if (DefaultEventFilterInterceptor.FilterEventType.VIEW_CHANGE.equals(type)) return true;
+            return false;
+        }
+
         @TrackThread
         @CallSuper
         public void readPropertyInTrackThread() {
@@ -376,17 +377,15 @@ public abstract class BaseEvent extends GEvent {
             mSessionId = PersistentDataProvider.get().getSessionId();
             mUserKey = UserInfoProvider.get().getLoginUserKey();
             mUserId = UserInfoProvider.get().getLoginUserId();
-            EventSequenceId sequenceId = PersistentDataProvider.get().getAndIncrement(mEventType);
-            mGlobalSequenceId = sequenceId.getGlobalId();
-            mEventSequenceId = sequenceId.getEventTypeId();
+            if (isEventSequenceIdType(mEventType)) {
+                mEventSequenceId = PersistentDataProvider.get().getGlobalEventSequenceIdAndIncrement();
+            } else {
+                mEventSequenceId = 0L;
+            }
 
             String mDataSourceId = ConfigurationProvider.core().getDataSourceId();
             if (!TextUtils.isEmpty(mDataSourceId)) {
                 addExtraParam(BaseField.DATA_SOURCE_ID, mDataSourceId);
-                String mLatestGioId = PersistentDataProvider.get().getGioId();
-                if (!TextUtils.isEmpty(mLatestGioId)) {
-                    addExtraParam(BaseField.GIO_ID, mLatestGioId);
-                }
             }
 
             // filter field area

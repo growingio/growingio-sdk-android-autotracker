@@ -130,7 +130,6 @@ public class MockEventsApiServer extends MockServer {
             }
             Truth.assertThat(jsonObject.getString("urlScheme")).isEqualTo(ConfigurationProvider.core().getUrlScheme());
             Truth.assertThat(jsonObject.getString("appState")).isIn(Arrays.asList("FOREGROUND", "BACKGROUND"));
-            Truth.assertThat(jsonObject.getLong("globalSequenceId")).isGreaterThan(0);
             Truth.assertThat(jsonObject.getLong("eventSequenceId")).isGreaterThan(0);
         }
     }

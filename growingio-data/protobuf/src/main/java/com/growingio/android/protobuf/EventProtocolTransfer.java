@@ -82,9 +82,9 @@ class EventProtocolTransfer {
             eventBuilder.setDeviceId(baseEvent.getDeviceId()); //1
             eventBuilder.setUserId(baseEvent.getUserId()); //2
             Map<String, String> extraParams = baseEvent.getExtraParams();
-            if (extraParams != null && extraParams.containsKey("gioId")) {
-                eventBuilder.setGioId(extraParams.get("gioId")); //3
-            }
+//            if (extraParams != null && extraParams.containsKey("gioId")) {
+//                eventBuilder.setGioId(extraParams.get("gioId")); //3
+//            }
             eventBuilder.setSessionId(baseEvent.getSessionId()); //4
             if (extraParams != null && extraParams.containsKey("dataSourceId")) {
                 eventBuilder.setDataSourceId(extraParams.get("dataSourceId")); //5
@@ -94,7 +94,7 @@ class EventProtocolTransfer {
             eventBuilder.setTimestamp(baseEvent.getTimestamp()); //8
             eventBuilder.setDomain(baseEvent.getDomain()); //9
 
-            eventBuilder.setGlobalSequenceId(baseEvent.getGlobalSequenceId()); //14
+//            eventBuilder.setGlobalSequenceId(baseEvent.getGlobalSequenceId()); //14
             eventBuilder.setEventSequenceId((int) baseEvent.getEventSequenceId()); //15
             eventBuilder.setScreenHeight(baseEvent.getScreenHeight()); //16
             eventBuilder.setScreenWidth(baseEvent.getScreenWidth()); //17

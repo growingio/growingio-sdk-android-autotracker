@@ -84,17 +84,9 @@ public class SessionProvider implements IActivityLifecycle {
             return;
         }
 
-        // 只有在第一次设置位置信息的时候才会补发Visit，重设位置信息只会更新，不会重发visit
-        if ((mLatitude == 0 && Math.abs(latitude) > eps) ||
-                (mLongitude == 0 && Math.abs(longitude) > eps)) {
-            mLatitude = latitude;
-            mLongitude = longitude;
-            Logger.d(TAG, "send visit event after set location at first time.");
-            generateVisit();
-        } else {
-            mLatitude = latitude;
-            mLongitude = longitude;
-        }
+        mLatitude = latitude;
+        mLongitude = longitude;
+        Logger.d(TAG, "set location with " + mLatitude + "-" + mLongitude);
     }
 
     @TrackThread

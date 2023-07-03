@@ -70,6 +70,12 @@ public final class HybridViewElementEvent extends ViewElementEvent {
             return this;
         }
 
+        @Override
+        public Builder setPageShowTimestamp(long pageShowTimestamp) {
+            super.setPageShowTimestamp(pageShowTimestamp);
+            return this;
+        }
+
         public Builder setHyperlink(String hyperlink) {
             mHyperlink = hyperlink;
             return this;

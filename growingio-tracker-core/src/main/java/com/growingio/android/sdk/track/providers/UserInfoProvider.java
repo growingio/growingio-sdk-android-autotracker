@@ -88,7 +88,6 @@ public class UserInfoProvider {
         }
 
         Logger.d(TAG, "userIdChange: newUserId = " + userId + ", latestUserId = " + lastUserId);
-        PersistentDataProvider.get().setGioId(userId);
         PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, (TextUtils.isEmpty(userKey) ? null : userKey));
         needSendVisit(userId);
     }
@@ -96,15 +95,11 @@ public class UserInfoProvider {
     @TrackThread
     private void needSendVisit(String newUserId) {
         String mLatestNonNullUserId = PersistentDataProvider.get().getLatestNonNullUserId();
-        Logger.d(TAG, "resend visit after UserIdChanged");
         if (newUserId != null && newUserId.length() != 0) {
-            if (TextUtils.isEmpty(mLatestNonNullUserId)) {
+            if (!TextUtils.isEmpty(mLatestNonNullUserId) && !newUserId.equals(mLatestNonNullUserId)) {
+                Logger.d(TAG, "resend visit after UserIdChanged");
+                SessionProvider.get().refreshSessionId();
                 SessionProvider.get().generateVisit();
-            } else {
-                if (!newUserId.equals(mLatestNonNullUserId)) {
-                    SessionProvider.get().refreshSessionId();
-                    SessionProvider.get().generateVisit();
-                }
             }
             PersistentDataProvider.get().setLatestNonNullUserId(newUserId);
         }

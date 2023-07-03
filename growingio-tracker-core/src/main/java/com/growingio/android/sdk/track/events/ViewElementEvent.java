@@ -28,6 +28,8 @@ public class ViewElementEvent extends BaseAttributesEvent {
 
     private final String mPath;
     private final String mTextValue;
+
+    private final long mPageShowTimestamp;
     private final String mXpath;
     private final int mIndex;
 
@@ -35,6 +37,7 @@ public class ViewElementEvent extends BaseAttributesEvent {
         super(eventBuilder);
         mPath = eventBuilder.mPath;
         mTextValue = eventBuilder.mTextValue;
+        mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
         mXpath = eventBuilder.mXpath;
         mIndex = eventBuilder.mIndex;
     }
@@ -45,6 +48,10 @@ public class ViewElementEvent extends BaseAttributesEvent {
 
     public String getTextValue() {
         return checkValueSafe(mTextValue);
+    }
+
+    public long getPageShowTimestamp() {
+        return mPageShowTimestamp;
     }
 
     public String getXpath() {
@@ -63,6 +70,7 @@ public class ViewElementEvent extends BaseAttributesEvent {
             if (!TextUtils.isEmpty(getTextValue())) {
                 json.put("textValue", getTextValue());
             }
+            json.put("pageShowTimestamp", getPageShowTimestamp());
             json.put("xpath", getXpath());
             json.put("index", getIndex());
         } catch (JSONException ignored) {
@@ -76,6 +84,8 @@ public class ViewElementEvent extends BaseAttributesEvent {
         private String mXpath;
         private int mIndex = -1;
 
+        private long mPageShowTimestamp;
+
         public Builder() {
             super(AutotrackEventType.VIEW_CLICK);
         }
@@ -83,6 +93,11 @@ public class ViewElementEvent extends BaseAttributesEvent {
 
         public Builder(String eventType) {
             super(eventType);
+        }
+
+        public Builder setPageShowTimestamp(long pageShowTimestamp) {
+            mPageShowTimestamp = pageShowTimestamp;
+            return this;
         }
 
         public Builder setEventType(String eventType) {
