@@ -25,7 +25,7 @@ dependencies {
 
     debugApi project(':gio-sdk:autotracker')
     releaseApi libs.growingio.autotracker
-    //api "com.growingio.android:autotracker-cdp:3.3.1"
+    //api "com.growingio.android:autotracker:3.3.1"
 
     implementation project(':demo-core')
 

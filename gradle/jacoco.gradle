@@ -26,8 +26,6 @@ def coverageSourceDirs = [
         "$rootDir/growingio-webservice/circler/src/main/java",
         "$rootDir/growingio-webservice/debugger/src/main/java",
         "$rootDir/growingio-annotation/compiler/src/main/java",
-//        "$rootDir/gio-sdk/tracker-cdp/src/main/java",
-//        "$rootDir/gio-sdk/autotracker-cdp/src/main/java",
 ]
 
 def coverageClassDirs = [
@@ -52,9 +50,7 @@ def coverageClassDirs = [
         "$rootDir/growingio-hybrid/build/intermediates/javac/debug/classes",
         "$rootDir/growingio-annotation/compiler/build/classes/java/main",
 //        "$rootDir/gio-sdk/tracker/build/intermediates/javac/debug/classes",
-//        "$rootDir/gio-sdk/tracker-cdp/build/intermediates/javac/debug/classes",
 //        "$rootDir/gio-sdk/autotracker/build/intermediates/javac/debug/classes",
-//        "$rootDir/gio-sdk/autotracker-cdp/build/intermediates/javac/debug/classes",
 ]
 
 def executionDirs = [

@@ -18,8 +18,6 @@
 && ./gradlew :growingio-advert:checkstyle \
 && ./gradlew :growingio-tools:oaid:checkstyle \
 && ./gradlew :growingio-tools:snappy:checkstyle \
-&& ./gradlew :gio-sdk:tracker-cdp:checkstyle \
-&& ./gradlew :gio-sdk:autotracker-cdp:checkstyle \
 && ./gradlew :demo:checkstyle \
 && ./gradlew :demo-core:checkstyle \
 && ./gradlew :demo-autotrack:checkstyle

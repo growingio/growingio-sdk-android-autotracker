@@ -46,9 +46,7 @@ growingio-plugin = { id = "com.growingio.android.autotracker", version.ref = "gr
 growingio-autotracker-bom = { module = "com.growingio.android:autotracker-bom", version.ref = "growingio" }
 # sdk
 growingio-tracker = { module = "com.growingio.android:tracker", version.ref = "growingio" }
-growingio-tracker-cdp = { module = "com.growingio.android:tracker-cdp", version.ref = "growingio" }
 growingio-autotracker = { module = "com.growingio.android:autotracker", version.ref = "growingio" }
-growingio-autotracker-cdp = { module = "com.growingio.android:autotracker-cdp", version.ref = "growingio" }
 growingio-tracker-core = { module = "com.growingio.android:tracker-core", version.ref = "growingio" }
 growingio-autotracker-core = { module = "com.growingio.android:autotracker-core", version.ref = "growingio" }
 # compiler
