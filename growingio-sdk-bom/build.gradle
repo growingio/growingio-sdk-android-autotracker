@@ -42,8 +42,7 @@ dependencies {
                     it.name.replace("growingio-", "")
                 }
                 .forEach {
-                    //System.out.println("com.growingio.android:" + it + ":" + releaseConfiguration.releaseVersion)
-                    api "com.growingio.android:" + it + ":" + releaseConfiguration.releaseVersion
+                    api "com.growingio.android:" + it + ":" + libs.versions.growingio.get()
                 }
 
         api "com.growingio.android:analytics-fa:3.4.1"

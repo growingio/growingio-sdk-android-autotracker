@@ -32,7 +32,7 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.R;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.autotrack.AutotrackEntryActivity;
-import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class HybridSpecialScenarioTest extends EventsTest {
-    private static CdpAutotrackConfiguration sTestTrackConfiguration;
+    private static AutotrackConfiguration sTestTrackConfiguration;
 
     @BeforeAppOnCreate
     public static void beforeAppOnCreate() {

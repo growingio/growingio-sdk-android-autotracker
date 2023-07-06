@@ -24,13 +24,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.testing.FragmentScenario;
+import androidx.lifecycle.Lifecycle;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
 import com.growingio.android.sdk.autotrack.inject.FragmentInjector;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
@@ -99,16 +99,16 @@ public class PageTest {
         activity.attachFragment(appFragment);
         fc.create().resume();
         FragmentInjector.systemFragmentOnResume(appFragment);
-        Page page = PageProvider.get().findFragmentPage(SuperFragment.make(appFragment));
+        Page page = PageProvider.get().findOrCreateFragmentPage(SuperFragment.make(appFragment));
         String name = page.getName();
         Truth.assertThat(name).isEqualTo("TestFragment[app]");
-
 
         FragmentInjector.systemFragmentSetUserVisibleHint(appFragment, false);
         FragmentInjector.systemFragmentOnHiddenChanged(appFragment, false);
         FragmentInjector.systemFragmentOnDestroyView(appFragment);
 
-        Page findPage = PageProvider.get().findFragmentPage(SuperFragment.make(appFragment));
+        Page activityPage = PageProvider.get().findOrCreateActivityPage(activity);
+        Page findPage = PageProvider.get().searchFragmentPage(SuperFragment.make(appFragment), activityPage);
         Truth.assertThat(findPage).isNull();
 
     }
@@ -118,16 +118,33 @@ public class PageTest {
         FragmentScenario<TestXFragment> fs = FragmentScenario.launch(TestXFragment.class);
         fs.onFragment(testXFragment -> {
             FragmentInjector.androidxFragmentOnResume(testXFragment);
-            String name = PageProvider.get().findFragmentPage(SuperFragment.makeX(testXFragment)).getName();
+            String name = PageProvider.get().findOrCreateFragmentPage(SuperFragment.makeX(testXFragment)).getName();
             Truth.assertThat(name).isEqualTo("TestXFragment[FragmentScenario_Fragment_Tag]");
 
             FragmentInjector.androidxFragmentSetUserVisibleHint(testXFragment, false);
             FragmentInjector.androidxFragmentOnHiddenChanged(testXFragment, false);
             FragmentInjector.androidxFragmentOnDestroyView(testXFragment);
 
-            Page findPage = PageProvider.get().findFragmentPage(SuperFragment.makeX(testXFragment));
+            Page activityPage = PageProvider.get().findOrCreateActivityPage(testXFragment.getActivity());
+            Page findPage = PageProvider.get().searchFragmentPage(SuperFragment.makeX(testXFragment), activityPage);
             Truth.assertThat(findPage).isNull();
         });
+        fs.close();
+    }
+
+    @Test
+    public void activityTest() {
+        ActivityScenario<RobolectricActivity> as = ActivityScenario.launch(RobolectricActivity.class);
+        as.moveToState(Lifecycle.State.RESUMED);
+        as.onActivity(activity -> {
+            Page activityPage = PageProvider.get().searchActivityPage(activity);
+            String name = activityPage.getName();
+            Truth.assertThat(name).isEqualTo("RobolectricActivity");
+            as.moveToState(Lifecycle.State.DESTROYED);
+            activityPage = PageProvider.get().searchActivityPage(activity);
+            Truth.assertThat(activityPage).isNull();
+        });
+        as.close();
     }
 
     public static class TestFragment extends android.app.Fragment {
@@ -156,12 +173,12 @@ public class PageTest {
 
         @Nullable
         @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        public View onCreateView(@Nullable LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
             return new TextView(getActivity());
         }
 
         @Override
-        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        public void onViewCreated(@Nullable View view, @Nullable Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
         }
     }

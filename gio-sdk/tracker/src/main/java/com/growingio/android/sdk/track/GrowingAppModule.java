@@ -26,6 +26,7 @@ import com.growingio.sdk.annotation.GIOTracker;
  *
  * @author cpacm 4/28/21
  */
+@Deprecated()
 @GIOAppModule()
 public final class GrowingAppModule extends AppGioModule {
 

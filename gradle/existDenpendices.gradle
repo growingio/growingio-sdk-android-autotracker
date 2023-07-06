@@ -22,32 +22,19 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.squareup.okhttp3:okhttp:4.9.3"
+        classpath "com.squareup.okhttp3:okhttp:4.10.0"
     }
-}
-
-def getModuleVersion(moduleId) {
-    def version = 'SNAPSHOT'
-    libraries.growingio.each { key, value ->
-        def library = value.split(":")
-        def libraryId = library[1]
-        if (moduleId.equals(libraryId)) {
-            version = library[2]
-            return true
-        }
-    }
-    return version
 }
 
 //tasks.withType(PublishToMavenLocal) {
 tasks.withType(PublishToMavenRepository) {
     onlyIf {
         def moduleId = POM_ARTIFACT_ID
-        def version = getModuleVersion(moduleId)
+        def version = libs.versions.growingio.get()
         if (project.hasProperty('CI_SELECT_MODULE') && project.hasProperty("CI_SELECT_VERSION")) {
             def cmdModuleId = CI_SELECT_MODULE
             if (cmdModuleId != moduleId) {
-                println("can't match module:" + moduleId + " with ==> "+ cmdModuleId)
+                println("can't match module:" + moduleId + " with ==> " + cmdModuleId)
                 return false
             }
             if (CI_SELECT_VERSION != "DEFAULT") version = CI_SELECT_VERSION

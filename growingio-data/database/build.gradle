@@ -3,12 +3,13 @@ plugins {
 }
 
 android {
+    namespace 'com.growingio.android.database'
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         minSdkVersion buildConfiguration.minSdkVersion
         targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
+        versionName libs.versions.growingio.get()
+        versionCode libs.versions.growingioCode.get().toInteger()
     }
 
     buildTypes {
@@ -39,15 +40,13 @@ android {
 
 
 dependencies {
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.robolectric
+    testImplementation libs.bundles.test
+    testImplementation libs.androidx.test.core
     testImplementation project(path: ':growingio-data:protobuf')
     testImplementation project(path: ':growingio-data:json')
 
     implementation project(':growingio-tracker-core')
-    compileOnly libraries.growingio.gmonitor
+    compileOnly libs.growingio.gmonitor
 
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")

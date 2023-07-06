@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export IS_EXCLUDE_DEMOS=true
 ./gradlew clean \
 && ./gradlew :growingio-annotation:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-annotation:compiler:publishMavenAgentPublicationToMavenLocal \
@@ -20,10 +19,7 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :growingio-apm:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-flutter:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tools:oaid:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :gio-sdk:tracker-cdp:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :gio-sdk:autotracker-cdp:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-sdk-bom:publishBomPublicationToMavenLocal \
 && ./gradlew clean
-export IS_EXCLUDE_DEMOS=false

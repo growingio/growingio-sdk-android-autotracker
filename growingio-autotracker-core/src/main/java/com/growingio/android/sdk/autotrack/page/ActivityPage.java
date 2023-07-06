@@ -40,7 +40,7 @@ public class ActivityPage extends Page<Activity> {
     @Override
     public boolean isAutotrack() {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config.getAutotrackOptions().isActivityPageEnabled()) {
+        if (config != null && config.getAutotrackOptions().isActivityPageEnabled()) {
             return true;
         }
         return super.isAutotrack();

@@ -1,25 +1,14 @@
-apply plugin: 'com.android.application'
-apply plugin: 'jacoco'
-
-apply plugin: 'com.growingio.android.autotracker'
-
-buildscript {
-    repositories {
-        google()
-        mavenLocal()
-        mavenCentral()
-        maven {url "https://s01.oss.sonatype.org/content/repositories/snapshots/"}
-    }
-    dependencies {
-        classpath "com.growingio.android:autotracker-gradle-plugin:${releaseConfiguration.pluginVersion}"
-    }
+plugins {
+    id 'com.android.application'
+    id 'jacoco'
+    id 'com.growingio.android.autotracker'
 }
 
 android {
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         applicationId "com.gio.test.three"
-        minSdkVersion 26
+        minSdkVersion 21
         targetSdkVersion buildConfiguration.targetSdkVersion
 
         testInstrumentationRunner "com.growingio.autotest.TrackAndroidJUnitRunner"
@@ -30,12 +19,6 @@ android {
             abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86"
         }
         multiDexEnabled true
-    }
-
-    repositories {
-        flatDir {
-            dirs '../../thirdLibs'
-        }
     }
 
     lintOptions {
@@ -76,43 +59,41 @@ growingAutotracker {
 }
 
 dependencies {
-    androidTestUtil libraries.test.orchestrator
-    androidTestImplementation libraries.test.androidx_junit
-    androidTestImplementation libraries.test.androidx_runner
-    androidTestImplementation libraries.test.androidx_rules
-    androidTestImplementation libraries.test.espresso_core
-    androidTestImplementation libraries.test.espresso_web
-    androidTestImplementation libraries.test.mockito_core
-    androidTestImplementation libraries.test.truth
-    androidTestImplementation libraries.test.okhttp3_mockwebserver
-    androidTestImplementation libraries.test.powermock_reflect
-    androidTestImplementation libraries.androidx.appcompat
-    androidTestImplementation libraries.android.appcompat
+    androidTestUtil libs.orchestrator
+    androidTestImplementation libs.bundles.androidx.test
+    androidTestImplementation libs.bundles.espresso
+    androidTestImplementation libs.mockito.core
+    //androidTestImplementation libs.truth
+    androidTestImplementation libs.okhttp3.mockwebserver
+    androidTestImplementation libs.powermock.reflect
+    androidTestImplementation libs.androidx.appcompat
+    androidTestImplementation libs.support.appcompat
     androidTestImplementation(name: 'tbs_sdk_44051', ext: 'jar')
 
-    implementation libraries.android.appcompat
-    implementation libraries.android.constraint
-    implementation libraries.android.multidex
+    implementation libs.support.appcompat
+    implementation libs.support.constraint
+    implementation libs.support.multidex
     implementation(name: 'tbs_sdk_44051', ext: 'jar')
     implementation(name: 'oaid_sdk_1.0.25', ext: 'aar')
     implementation project(':demo-core')
     implementation project(":demo-autotrack")
 
     debugImplementation project(":growingio-tools:oaid")
-    releaseImplementation libraries.growingio.oaid
+    releaseImplementation libs.growingio.oaid
 
     debugImplementation project(':growingio-apm')
-    releaseImplementation libraries.growingio.apm
-    debugImplementation project(':growingio-advert')
-    releaseImplementation libraries.growingio.advert
-    debugImplementation project(':growingio-data:protobuf')
-    releaseImplementation libraries.growingio.protobuf
-    //implementation libraries.growingio.oaid
+    releaseImplementation libs.growingio.apm
 
-    compileOnly libraries.androidx.appcompat
+    debugImplementation project(':growingio-advert')
+    releaseImplementation libs.growingio.advert
+
+    //debugImplementation project(':growingio-data:json')
+    //releaseImplementation libs.growingio.json
+
+    compileOnly libs.androidx.appcompat
 
     // leakcanary 避免发版前未使用Profiler进行内存泄漏检测
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
+    debugImplementation libs.square.leakCanary
 }
 
 apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"

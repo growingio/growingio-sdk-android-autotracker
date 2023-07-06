@@ -1,5 +1,4 @@
 apply plugin: "org.sonarqube"
-apply from: 'gradle/publicFun.gradle'
 
 sonarqube {
     properties {
@@ -12,22 +11,20 @@ sonarqube {
     }
 }
 
-if (!isExcludeDemos()) {
-    project(":demo") {
-        sonarqube {
-            skipProject = true
-        }
+project(":demo") {
+    sonarqube {
+        skipProject = true
     }
+}
 
-    project(":demo-autotrack") {
-        sonarqube {
-            skipProject = true
-        }
+project(":demo-autotrack") {
+    sonarqube {
+        skipProject = true
     }
+}
 
-    project(":demo-core") {
-        sonarqube {
-            skipProject = true
-        }
+project(":demo-core") {
+    sonarqube {
+        skipProject = true
     }
 }

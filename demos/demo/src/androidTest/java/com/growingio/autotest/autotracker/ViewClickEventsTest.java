@@ -39,7 +39,6 @@ import com.gio.test.three.autotrack.activity.NestedFragmentActivity;
 import com.gio.test.three.autotrack.activity.ToolBarActivity;
 import com.gio.test.three.autotrack.fragments.FragmentLifecycleCallback;
 import com.gio.test.three.autotrack.fragments.FragmentLifecycleMonitor;
-import com.gio.test.three.autotrack.fragments.GreenFragment;
 import com.gio.test.three.autotrack.fragments.RedFragment;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;

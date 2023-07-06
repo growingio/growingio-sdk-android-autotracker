@@ -21,10 +21,18 @@ import com.growingio.sdk.annotation.GIOTracker
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_CONFIGURATION_PROVIDER
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_LOGGER
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_TRACKER
-import com.squareup.javapoet.*
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.FieldSpec
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.TypeSpec
+import java.lang.Deprecated
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+import kotlin.IllegalStateException
+import kotlin.String
+import kotlin.apply
+import kotlin.check
 
 /**
  * <p>
@@ -98,9 +106,18 @@ class GioTrackerGenerator(
         val trackerClass = ClassName.get(tracker)
         val annotation = appModule.getAnnotation(GIOAppModule::class.java)
         val growingName = annotation.name
+        val isDeprecated = appModule.getAnnotation(Deprecated::class.java) != null
         val configPath = processUtils.getConfigName(appModule)
         val configClass = ClassName.get(generatedCodePackageName, configPath)
         val trackerBuilder = TypeSpec.classBuilder(growingName)
+            .apply {
+                if (isDeprecated) addJavadoc(
+                    """<p>In version 4.0, we use GrowingAutotracker to fully replace GrowingTracker. 
+                        |<p>For details, please visit our version migration document: @see <a href="https://growingio.github.io/growingio-sdk-docs/docs/android/version#release-400">https://growingio.github.io/growingio-sdk-docs/docs/android/version#release-400</a>
+                        |
+                        |""".trimMargin()
+                )
+            }
             .addJavadoc(
                 """
                             The entry point for interacting with GrowingIO Tracker for Applications
@@ -130,6 +147,7 @@ class GioTrackerGenerator(
                 Modifier.PRIVATE,
                 Modifier.VOLATILE
             )
+            .apply { if (isDeprecated) this.addAnnotation(Deprecated::class.java) }
             .addMethod(generateGetMethod(trackerClass, growingName))
             .addMethod(generateStartMethod(appModule, trackerClass, configClass))
             .addMethod(generateStartConfigurationMethod(appModule, trackerClass, configClass))
@@ -296,9 +314,9 @@ class GioTrackerGenerator(
                 ClassName.get(sdk)
             )
             .addStatement(
-                    "\$T.d(TAG, \$T.get().getAllConfigurationInfo())",
-                    ClassName.get(logger),
-                    ClassName.get(configProvider)
+                "\$T.d(TAG, \$T.get().getAllConfigurationInfo())",
+                ClassName.get(logger),
+                ClassName.get(configProvider)
             )
         return successMethod.build()
     }

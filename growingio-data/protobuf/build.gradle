@@ -4,12 +4,13 @@ plugins {
 }
 
 android {
+    namespace 'com.growingio.android.protobuf'
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         minSdkVersion buildConfiguration.minSdkVersion
         targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
+        versionName libs.versions.growingio.get()
+        versionCode libs.versions.growingioCode.get().toInteger()
     }
 
     buildTypes {
@@ -53,7 +54,7 @@ android {
 
 protobuf {
     protoc {
-        artifact = libraries.google.protobufc
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
     }
     generateProtoTasks {
         all().each { task ->
@@ -65,12 +66,10 @@ protobuf {
 }
 
 dependencies {
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.robolectric
+    testImplementation libs.bundles.test
+    testImplementation libs.androidx.test.core
 
-    implementation libraries.google.protobuf_javalite
+    implementation libs.protobuf.javalite
 
     implementation project(':growingio-tracker-core')
 

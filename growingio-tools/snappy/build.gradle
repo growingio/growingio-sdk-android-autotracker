@@ -3,12 +3,13 @@ plugins {
 }
 
 android {
+    namespace 'com.growingio.android.snappy'
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         minSdkVersion buildConfiguration.minSdkVersion
         targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
+        versionName libs.versions.growingio.get()
+        versionCode libs.versions.growingioCode.get().toInteger()
     }
 
     buildTypes {
@@ -38,9 +39,7 @@ android {
 }
 
 dependencies {
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.truth
+    testImplementation libs.bundles.test
 }
 
 // snappy为工具库，固定版本为1.1.0，不再随着sdk版本迭代

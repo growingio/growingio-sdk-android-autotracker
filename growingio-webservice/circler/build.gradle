@@ -3,12 +3,13 @@ plugins {
 }
 
 android {
+    namespace 'com.growingio.android.circler'
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         minSdkVersion buildConfiguration.minSdkVersion
         targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
+        versionName libs.versions.growingio.get()
+        versionCode libs.versions.growingioCode.get().toInteger()
     }
 
     buildTypes {
@@ -38,22 +39,17 @@ android {
 }
 
 dependencies {
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.okhttp3_mockwebserver
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.robolectric
+    testImplementation libs.bundles.test
+    testImplementation libs.okhttp3.mockwebserver
+    testImplementation libs.androidx.test.core
     testImplementation project(':growingio-hybrid')
 
-    compileOnly fileTree(include: ['*.jar'], dir: '../../thirdLibs')
+    //compileOnly fileTree(include: ['*.jar'], dir: '../../thirdLibs')
 
     implementation project(':growingio-autotracker-core')
     implementation project(':growingio-tracker-core')
-    //compileOnly(name: 'tbs_sdk_44051', ext: 'jar')
-    //compileOnly libraries.others.x5_webview
-    //compileOnly files(name: 'uc_webview_sdk-2.14.0.31-Build181010110034.jar')
 
-    implementation libraries.squareup.okhttp3
+    implementation libs.okhttp3
 
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")

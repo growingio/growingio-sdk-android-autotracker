@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.autotrack.view;
 
 import android.app.Activity;
-import android.support.annotation.StringDef;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +36,8 @@ import com.growingio.android.sdk.track.view.WindowHelper;
 import java.lang.annotation.Retention;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
+
+import androidx.annotation.StringDef;
 
 public class ViewNode {
     private View mView;
@@ -373,6 +374,9 @@ public class ViewNode {
         }
 
         private void calculateViewContent() {
+            //字体大小 SIZE：f(x) = 2^(-2*abs(x-12))  其中12sp为常用标题文字大小，越靠近12结果越接近1
+            //文字长度 LEN: f(x) = 2^(-1*abs(x-10)) 其中标题10个文字一般取10个文字大小，过滤掉小于2或者大于50的文字大小。
+            //控件大小 AREA: (x2-x1)*(y2-y1) 简单的面积计算。
             mViewContent = ViewHelper.getViewContent(mView);
         }
     }

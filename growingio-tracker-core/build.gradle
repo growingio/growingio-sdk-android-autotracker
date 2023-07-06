@@ -1,20 +1,24 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    //id 'org.jetbrains.kotlin.android'
+}
 
 def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim() as String
 def buildTime = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+8"))
 
 android {
+    namespace 'com.growingio.android.sdk.track'
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         minSdkVersion buildConfiguration.minSdkVersion
         targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
+        versionName libs.versions.growingio.get()
+        versionCode libs.versions.growingioCode.get().toInteger()
 
         buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
         buildConfigField("int", "VERSION_CODE", "${defaultConfig.versionCode}")
-        buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
     }
 
     buildTypes {
@@ -28,7 +32,7 @@ android {
             consumerProguardFiles 'consumer-proguard-rules.pro'
         }
     }
-    
+
     compileOptions {
         sourceCompatibility buildConfiguration.sourceCompatibility
         targetCompatibility buildConfiguration.targetCompatibility
@@ -55,31 +59,21 @@ android {
 }
 
 dependencies {
+    //implementation libs.kotlin.stdlib
 
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
+    compileOnly libs.bundles.androidx
+    compileOnly libs.bundles.android.support
 
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.robolectric
-    testImplementation libraries.androidx.appcompat
-    testImplementation libraries.androidx.recyclerview
-    testImplementation libraries.androidx.swiperefreshlayout
+    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
+    testImplementation libs.bundles.test
+    testImplementation libs.androidx.test.core
+    testImplementation libs.bundles.androidx
+    testImplementation libs.protobuf.javalite
 
     testImplementation project(path: ':growingio-data:database')
     testImplementation project(path: ':growingio-data:protobuf')
     testImplementation project(path: ':growingio-data:json')
-    testImplementation libraries.google.protobuf_javalite
-
-    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
-
-    compileOnly libraries.androidx.appcompat
-    compileOnly libraries.androidx.recyclerview
-    compileOnly libraries.androidx.swiperefreshlayout
-    compileOnly libraries.android.appcompat
-    compileOnly libraries.android.recyclerview
-    //compileOnly libraries.others.x5_webview
-
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

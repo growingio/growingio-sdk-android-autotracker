@@ -18,7 +18,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 def getSelectVersion(){
-    def version = releaseConfiguration.releaseVersion
+    def version = libs.versions.growingio.get()
     if (project.hasProperty('CI_SELECT_MODULE') && project.hasProperty("CI_SELECT_VERSION")) {
         def cmdModuleId = CI_SELECT_MODULE
         def moduleId = POM_ARTIFACT_ID

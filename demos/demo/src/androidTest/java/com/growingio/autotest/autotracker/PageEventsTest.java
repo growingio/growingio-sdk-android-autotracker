@@ -38,7 +38,6 @@ import com.gio.test.three.autotrack.fragments.FragmentLifecycleMonitor;
 import com.gio.test.three.autotrack.fragments.GreenFragment;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
-import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.track.utils.JsonUtil;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;

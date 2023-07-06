@@ -3,12 +3,13 @@ plugins {
 }
 
 android {
+    namespace 'com.growingio.android.okhttp3'
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         minSdkVersion buildConfiguration.minSdkVersion
         targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
+        versionName libs.versions.growingio.get()
+        versionCode libs.versions.growingioCode.get().toInteger()
     }
 
     buildTypes {
@@ -38,18 +39,14 @@ android {
 }
 
 dependencies {
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.okhttp3_mockwebserver
-    testImplementation libraries.test.mockito_core
-    testImplementation libraries.test.powermock_core
-    testImplementation libraries.test.powermock_api_mockito2
-    testImplementation libraries.test.powermock_module_junit4
+    testImplementation libs.bundles.test
+    testImplementation libs.androidx.test.core
+    testImplementation libs.bundles.powermock
+    testImplementation libs.okhttp3.mockwebserver
 
     implementation project(':growingio-tracker-core')
-    implementation libraries.squareup.okhttp3
-    //debugImplementation libraries.squareup.okhttp3_logging
+    implementation libs.okhttp3
+    //debugImplementation libs.okhttp3.logging
 
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")

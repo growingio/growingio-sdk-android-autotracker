@@ -18,7 +18,7 @@ nexusStaging {
 
 
 task tryCloseAndReleaseRepository() {
-    if (releaseConfiguration.releaseVersion.contains("SNAPSHOT")) {
+    if (libs.versions.growingio.get().contains("SNAPSHOT")) {
         //println "not release, closeAndReleaseRepository pass"
     } else {
         //dependsOn closeAndReleaseRepository

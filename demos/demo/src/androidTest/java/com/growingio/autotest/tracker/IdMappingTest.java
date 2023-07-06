@@ -23,7 +23,7 @@ import androidx.test.filters.LargeTest;
 import com.gio.test.three.DemoApplication;
 import com.gio.test.three.core.TrackActivity;
 import com.growingio.android.sdk.CoreConfiguration;
-import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @LargeTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IdMappingTest extends EventsTest {
-    private static CdpAutotrackConfiguration sTestTrackConfiguration;
+    private static AutotrackConfiguration sTestTrackConfiguration;
     private final String userKey = "outlook 邮箱";
 
     @BeforeAppOnCreate

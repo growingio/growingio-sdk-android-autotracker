@@ -1,12 +1,16 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    // id 'org.jetbrains.kotlin.android'
+}
 
 android {
+    namespace 'com.growingio.android.sdk.autotrack'
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         minSdkVersion buildConfiguration.minSdkVersion
         targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
+        versionName libs.versions.growingio.get()
+        versionCode libs.versions.growingioCode.get().toInteger()
     }
 
     buildTypes {
@@ -46,30 +50,25 @@ android {
 }
 
 dependencies {
-
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.androidx_fragment
-    testImplementation libraries.test.robolectric
-    testImplementation libraries.androidx.appcompat
-    testImplementation libraries.androidx.recyclerview
-    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    //noinspection GradleCompatible
-    testCompileOnly 'com.android.support:support-fragment:28.0.0'
+//    implementation libs.kotlin.stdlib
 
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
+    compileOnly libs.bundles.androidx
+    compileOnly libs.google.material
+    compileOnly libs.bundles.android.support
+
+    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
+    testImplementation libs.bundles.test
+    testImplementation libs.bundles.androidx
+    testImplementation libs.androidx.test.core
+    testImplementation libs.androidx.fragment.test
+    testImplementation libs.protobuf.javalite
+
+    testCompileOnly libs.support.fragment
 
     debugApi project(':growingio-tracker-core')
-    releaseApi libraries.growingio.tracker_core
-
-    compileOnly libraries.androidx.appcompat
-    compileOnly libraries.androidx.material
-    compileOnly libraries.androidx.recyclerview
-    compileOnly libraries.android.appcompat
-    compileOnly libraries.android.recyclerview
-    //compileOnly libraries.others.x5_webview
-
+    releaseApi libs.growingio.tracker.core
+    
     implementation project(":growingio-annotation")
     annotationProcessor project(":growingio-annotation:compiler")
 }

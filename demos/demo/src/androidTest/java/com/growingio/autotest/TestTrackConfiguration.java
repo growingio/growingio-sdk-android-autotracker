@@ -16,7 +16,7 @@
 
 package com.growingio.autotest;
 
-import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 
 import static com.growingio.autotest.help.MockServer.MOCK_SERVER_HOST;
 
@@ -28,16 +28,16 @@ public class TestTrackConfiguration {
     private TestTrackConfiguration() {
     }
 
-    public static CdpAutotrackConfiguration getTestConfig() {
-        CdpAutotrackConfiguration configuration = new CdpAutotrackConfiguration(TEST_PROJECT_ID, TEST_URL_SCHEME);
+    public static AutotrackConfiguration getTestConfig() {
+        AutotrackConfiguration configuration = new AutotrackConfiguration(TEST_PROJECT_ID, TEST_URL_SCHEME);
         configuration.setDataCollectionServerHost(MOCK_SERVER_HOST)
                 .setDataSourceId(TEST_DATA_SOURCE_ID)
                 .setDebugEnabled(true);
         return configuration;
     }
 
-    public static CdpAutotrackConfiguration getTestConfig(String urlScheme) {
-        CdpAutotrackConfiguration configuration = new CdpAutotrackConfiguration(TEST_PROJECT_ID, urlScheme);
+    public static AutotrackConfiguration getTestConfig(String urlScheme) {
+        AutotrackConfiguration configuration = new AutotrackConfiguration(TEST_PROJECT_ID, urlScheme);
         configuration.setDataCollectionServerHost(MOCK_SERVER_HOST)
                 .setDataSourceId(TEST_DATA_SOURCE_ID)
                 .setDebugEnabled(true);

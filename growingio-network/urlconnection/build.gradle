@@ -3,12 +3,13 @@ plugins {
 }
 
 android {
+    namespace 'com.growingio.android.urlconnection'
     compileSdkVersion buildConfiguration.compileVersion
     defaultConfig {
         minSdkVersion buildConfiguration.minSdkVersion
         targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
+        versionName libs.versions.growingio.get()
+        versionCode libs.versions.growingioCode.get().toInteger()
     }
 
     buildTypes {
@@ -38,12 +39,9 @@ android {
 }
 
 dependencies {
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.okhttp3_mockwebserver
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.robolectric
+    testImplementation libs.bundles.test
+    testImplementation libs.androidx.test.core
+    testImplementation libs.okhttp3.mockwebserver
 
     implementation project(':growingio-tracker-core')
 

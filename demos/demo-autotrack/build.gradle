@@ -15,29 +15,19 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    repositories {
-        flatDir {
-            dirs '../../thirdLibs'
-        }
-    }
 }
 
 dependencies {
-    implementation libraries.android.appcompat
-    implementation libraries.android.constraint
-    implementation libraries.android.navigation_fragment
-    implementation libraries.android.navigation_ui
-    implementation libraries.android.livedata
-    implementation libraries.android.viewmodel
+
+    implementation libs.bundles.android.support
 
     implementation(name: 'tbs_sdk_44051', ext: 'jar')
 
-    debugApi project(':gio-sdk:autotracker-cdp')
-    releaseApi libraries.growingio.autotracker_cdp
+    debugApi project(':gio-sdk:autotracker')
+    releaseApi libs.growingio.autotracker
     //api "com.growingio.android:autotracker-cdp:3.3.1"
 
     implementation project(':demo-core')
 
-    compileOnly libraries.androidx.appcompat
+    compileOnly libs.androidx.appcompat
 }

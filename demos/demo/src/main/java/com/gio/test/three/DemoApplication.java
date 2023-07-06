@@ -33,7 +33,7 @@ import com.growingio.android.advert.AdvertLibraryGioModule;
 import com.growingio.android.apm.ApmConfig;
 import com.growingio.android.apm.ApmLibraryGioModule;
 import com.growingio.android.oaid.OaidLibraryGioModule;
-import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration;
+import com.growingio.android.sdk.autotrack.AutotrackConfiguration;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
@@ -46,9 +46,9 @@ public class DemoApplication extends Application {
     private static final String TAG = "DemoApplication";
 
     private static boolean sIsAutotracker = true;
-    private static CdpAutotrackConfiguration sConfiguration;
+    private static AutotrackConfiguration sConfiguration;
 
-    public static void setConfiguration(CdpAutotrackConfiguration configuration) {
+    public static void setConfiguration(AutotrackConfiguration configuration) {
         sConfiguration = configuration;
     }
 
@@ -103,7 +103,7 @@ public class DemoApplication extends Application {
                 .setUncaughtException(true)
                 .setPrintUncaughtException(true);
         if (sConfiguration == null) {
-            sConfiguration = new CdpAutotrackConfiguration("0a1b4118dd954ec3bcc69da5138bdb96", "growing.bd71d91eb56f5f53") //uat-uba
+            sConfiguration = new AutotrackConfiguration("0a1b4118dd954ec3bcc69da5138bdb96", "growing.bd71d91eb56f5f53") //uat-uba
                     .setDataSourceId("baffd6fb52b78ca7")
                     .setDataCollectionServerHost("https://napi.growingio.com")
                     .setDebugEnabled(true)

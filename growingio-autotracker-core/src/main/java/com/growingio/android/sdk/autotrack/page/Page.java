@@ -30,7 +30,7 @@ public abstract class Page<T> {
     private final T mCarrier;
     private Page<?> mParent;
     private long mShowTimestamp;
-    private boolean mIsAutotrack = false;//是否标记为可发送
+    private boolean mIsAutotrack = false; //是否标记为可发送
     private String mAlias;
     private String mTitle;
     private String mPath;
@@ -68,6 +68,10 @@ public abstract class Page<T> {
 
     public void setAttributes(Map<String, String> attributes) {
         mAttributes = attributes;
+    }
+
+    public void addAttributes(Map<String, String> attributes) {
+        mAttributes.putAll(attributes);
     }
 
     public abstract String getName();

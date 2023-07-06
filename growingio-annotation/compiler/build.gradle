@@ -22,19 +22,19 @@ jacocoTestReport{
 dependencies {
 
     // About test: we couldn't use compile-testing in android project unless import jre's rt.jar.
-    testImplementation libraries.test.junit
-    testImplementation("com.google.testing.compile:compile-testing:0.19") {
+    testImplementation libs.junit
+    testImplementation("com.google.testing.compile:compile-testing:0.21.0") {
         // We don't use this and including it requires us to list it separatel which would be
         // confusing.
         exclude group: "com.google.auto.value", module: "auto-value"
     }
     testImplementation files('libs/tracker-core-test-3.5.0.jar')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation libs.kotlin.stdlib
 
-    annotationProcessor libraries.google.auto_service
-    compileOnly libraries.google.auto_service_annotations
-    implementation libraries.squareup.javapoet
+    annotationProcessor libs.google.auto.service
+    compileOnly libs.google.auto.service.annotations
+    implementation libs.square.javapoet
 
     implementation project(":growingio-annotation")
 }

@@ -89,7 +89,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
     @Override
     public boolean isAutotrack() {
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config.getAutotrackOptions().isFragmentPageEnabled()) {
+        if (config != null && config.getAutotrackOptions().isFragmentPageEnabled()) {
             return true;
         }
         return super.isAutotrack();

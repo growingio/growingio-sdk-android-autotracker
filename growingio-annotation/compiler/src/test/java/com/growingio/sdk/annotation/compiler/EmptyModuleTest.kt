@@ -25,6 +25,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.nio.charset.Charset
 import javax.tools.JavaFileObject
 
 @RunWith(JUnit4::class)
@@ -46,7 +47,7 @@ class EmptyModuleTest : CompilationProvider {
         val expectedClassName =
             "GioIndexer_GIOLibraryModule_com_growingio_android_sdk_EmptyLibraryGioModule"
         assertThat(compilation!!).generatedSourceFile(TestUtil.annotation(expectedClassName))
-            .toString().contains(expectedClassName)
+            .contentsAsString(Charset.defaultCharset()).contains(expectedClassName)
 
         assertThat(compilation!!).generatedSourceFile(TestUtil.annotation(expectedClassName))
             .hasSourceEquivalentTo(forResource(expectedClassName + ".java"))
