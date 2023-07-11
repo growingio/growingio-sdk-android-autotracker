@@ -17,38 +17,22 @@
 package com.growingio.android.circler.screenshot;
 
 import android.util.DisplayMetrics;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.page.Page;
-import com.growingio.android.sdk.autotrack.page.PageProvider;
-import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
-import com.growingio.android.sdk.autotrack.view.ViewHelper;
-import com.growingio.android.sdk.autotrack.view.ViewNode;
-import com.growingio.android.sdk.autotrack.view.ViewUtil;
+import com.growingio.android.sdk.autotrack.view.ViewNodeProvider;
 import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
-import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
-import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
-import com.growingio.android.sdk.track.utils.ClassExistHelper;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.view.DecorView;
 import com.growingio.android.sdk.track.view.WindowHelper;
-import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * create screenshot server date from app's screenshot  for circle and debugger
+ * create screenshot server date from app's screenshot for circle and debugger
  */
 public class CircleScreenshot {
     private static final String MSG_TYPE = "refreshScreenshot";
@@ -59,8 +43,8 @@ public class CircleScreenshot {
     private final String mScreenshot;
     private final String mMsgType;
     private final long mSnapshotKey;
-    private final List<ViewElement> mElements;
-    private final List<PageElement> mPages;
+    private final JSONArray mElements;
+    private final JSONArray mPages;
 
     public CircleScreenshot(Builder builder) {
         mMsgType = MSG_TYPE;
@@ -69,8 +53,8 @@ public class CircleScreenshot {
         mScale = builder.mScale;
         mScreenshot = builder.mScreenshot;
         mSnapshotKey = builder.mSnapshotKey;
-        mElements = Collections.unmodifiableList(builder.mViewElements);
-        mPages = Collections.unmodifiableList(builder.mPages);
+        mElements = builder.mViewElements;
+        mPages = builder.mPages;
     }
 
     public JSONObject toJSONObject() {
@@ -83,18 +67,8 @@ public class CircleScreenshot {
             json.put("screenshot", mScreenshot);
             json.put("msgType", mMsgType);
             json.put("snapshotKey", mSnapshotKey);
-
-            JSONArray elementArray = new JSONArray();
-            for (ViewElement element : mElements) {
-                elementArray.put(element.toJSONObject());
-            }
-            json.put("elements", elementArray);
-
-            JSONArray pageArray = new JSONArray();
-            for (PageElement page : mPages) {
-                pageArray.put(page.toJSONObject());
-            }
-            json.put("pages", pageArray);
+            json.put("elements", mElements);
+            json.put("pages", mPages);
         } catch (JSONException ignored) {
         }
         return json;
@@ -106,10 +80,8 @@ public class CircleScreenshot {
         private float mScale;
         private String mScreenshot;
         private long mSnapshotKey;
-        private final List<ViewElement> mViewElements = new ArrayList<>();
-        private final List<PageElement> mPages = new ArrayList<>();
-        private final AtomicInteger mScreenLock = new AtomicInteger(0);
-        private int mViewCount = 0;
+        private final JSONArray mViewElements = new JSONArray();
+        private final JSONArray mPages = new JSONArray();
         private Callback<CircleScreenshot> mScreenshotResultCallback;
 
         public Builder() {
@@ -143,13 +115,13 @@ public class CircleScreenshot {
             return this;
         }
 
-        public Builder addElements(List<ViewElement> elements) {
-            mViewElements.addAll(elements);
+        public Builder addElement(JSONObject element) {
+            mViewElements.put(element);
             return this;
         }
 
-        public Builder addPages(List<PageElement> pages) {
-            mPages.addAll(pages);
+        public Builder addPage(JSONObject page) {
+            mPages.put(page);
             return this;
         }
 
@@ -170,88 +142,24 @@ public class CircleScreenshot {
 
             mScreenshotResultCallback = callback;
 
-            mScreenLock.incrementAndGet();
-            for (DecorView decorView : decorViews) {
-                if (decorView.getView() instanceof TipView) {
-                    continue;
+            try {
+                JSONArray p = ViewNodeProvider.get().buildScreenPages(decorViews);
+                for (int i = 0; i < p.length(); i++) {
+                    mPages.put(p.getJSONObject(i));
                 }
-                if (isViewInvisible(decorView.getView())) {
-                    continue;
+                JSONArray v = ViewNodeProvider.get().buildScreenViews(decorViews);
+                for (int i = 0; i < v.length(); i++) {
+                    mViewElements.put(v.getJSONObject(i));
                 }
-                checkView2PageElement(decorView.getView());
-                checkView2ViewElement(decorView.getView());
+            } catch (JSONException ignored) {
+
             }
             callResultOnSuccess();
         }
 
-        private ViewElement.Builder createViewElementBuilder(ViewNode viewNode) {
-            ViewElement.Builder builder = new ViewElement.Builder();
-            int[] location = new int[2];
-            viewNode.getView().getLocationOnScreen(location);
-
-            return builder.setLeft(location[0])
-                    .setTop(location[1])
-                    .setHeight(viewNode.getView().getHeight())
-                    .setWidth(viewNode.getView().getWidth())
-                    .setContent(viewNode.getViewContent())
-                    .setNodeType(viewNode.getNodeType())
-                    .setPage(PageProvider.get().findPage(viewNode.getView()).path())
-                    .setParentXPath(viewNode.getClickableParentXPath())
-                    .setXpath(viewNode.getXPath())
-                    .setIndex(viewNode.getIndex())
-                    .setZLevel(mViewCount++);
-        }
-
-        private void checkView2ViewElement(View view) {
-            ViewNode topViewNode = ViewHelper.getTopViewNode(view, null);
-            traverseViewNode(topViewNode);
-        }
-
-        private void traverseViewNode(ViewNode viewNode) {
-            if (isViewInvisible(viewNode.getView())) return;
-            if (!disposeWebView(viewNode) && ViewUtil.canCircle(viewNode.getView())) {
-                mViewElements.add(createViewElementBuilder(viewNode).build());
-            }
-            if (viewNode.getView() instanceof ViewGroup) {
-                ViewGroup viewGroup = (ViewGroup) viewNode.getView();
-                if (viewGroup.getChildCount() > 0) {
-                    for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                        ViewNode childViewNode = viewNode.appendNode(viewGroup.getChildAt(index), index, true);
-                        traverseViewNode(childViewNode);
-                    }
-                }
-            }
-        }
-
-        private boolean disposeWebView(ViewNode viewNode) {
-            if (ClassExistHelper.isWebView(viewNode.getView())) {
-                ModelLoader<HybridDom, HybridJson> modelLoader = ScreenshotProvider.get().getHybridModelLoader();
-                if (modelLoader == null) return false;
-                mScreenLock.incrementAndGet();
-                LoadDataFetcher<HybridJson> loadDataFetcher = (LoadDataFetcher<HybridJson>) modelLoader.buildLoadData(new HybridDom(viewNode.getView())).fetcher;
-                loadDataFetcher.loadData(new LoadDataFetcher.DataCallback<HybridJson>() {
-                    @Override
-                    public void onDataReady(HybridJson data) {
-                        ViewElement.Builder elementBuilder = createViewElementBuilder(viewNode);
-                        mViewElements.add(elementBuilder.setWebView(data.getJsonObject()).build());
-                        callResultOnSuccess();
-                    }
-
-                    @Override
-                    public void onLoadFailed(Exception e) {
-                        callResultOnSuccess();
-                    }
-                });
-                return true;
-            }
-            return false;
-        }
-
         private void callResultOnSuccess() {
-            if (mScreenLock.decrementAndGet() <= 0) {
-                if (mScreenshotResultCallback != null) {
-                    mScreenshotResultCallback.onSuccess(new CircleScreenshot(this));
-                }
+            if (mScreenshotResultCallback != null) {
+                mScreenshotResultCallback.onSuccess(new CircleScreenshot(this));
             }
         }
 
@@ -259,36 +167,6 @@ public class CircleScreenshot {
             if (mScreenshotResultCallback != null) {
                 mScreenshotResultCallback.onFailed();
             }
-        }
-
-        private void checkView2PageElement(View view) {
-            Page<?> viewPage = ViewAttributeUtil.getViewPage(view);
-            if (viewPage != null) {
-                int[] location = new int[2];
-                view.getLocationOnScreen(location);
-
-                mPages.add(new PageElement.Builder()
-                        .setTitle(viewPage.getTitle())
-                        .setPath(viewPage.path())
-                        .setHeight(view.getHeight())
-                        .setWidth(view.getWidth())
-                        .setLeft(location[0])
-                        .setTop(location[1])
-                        .build());
-            }
-
-            if (view instanceof ViewGroup) {
-                ViewGroup viewGroup = (ViewGroup) view;
-                if (viewGroup.getChildCount() > 0) {
-                    for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                        checkView2PageElement(viewGroup.getChildAt(i));
-                    }
-                }
-            }
-        }
-
-        private boolean isViewInvisible(View view) {
-            return view.getVisibility() == View.GONE || view.getWidth() <= 0 || view.getHeight() <= 0;
         }
     }
 }

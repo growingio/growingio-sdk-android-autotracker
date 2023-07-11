@@ -16,9 +16,6 @@
 
 package com.growingio.android.sdk.track.log;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +26,7 @@ public class CacheLogger extends BaseLogger {
     private final CircularFifoQueue<LogItem> mCacheLogs = new CircularFifoQueue<>(100);
 
     @Override
-    protected synchronized void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
+    protected synchronized void print(int priority, String tag, String message, Throwable t) {
         mCacheLogs.add(new LogItem.Builder()
                 .setPriority(priority)
                 .setTag(tag)

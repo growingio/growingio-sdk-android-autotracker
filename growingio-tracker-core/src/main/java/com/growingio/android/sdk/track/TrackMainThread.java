@@ -20,7 +20,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import androidx.annotation.VisibleForTesting;
@@ -292,7 +291,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
+        public void handleMessage(Message msg) {
             if (msg.what == MSG_INIT_SDK) {
                 initSDK();
                 return;

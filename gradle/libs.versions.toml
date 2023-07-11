@@ -161,7 +161,7 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.
 espresso-web = { module = "androidx.test.espresso:espresso-web", version = "3.5.1" }
 
 mockK = "io.mockk:mockk:1.12.1"
-mockito-core = { module = "org.mockito:mockito-core", version = "2.24.0" }
+mockito-core = { module = "org.mockito:mockito-core", version = "4.9.0" }
 powermock-core = { module = "org.powermock:powermock-core", version.ref = "powermock" }
 powermock-api-mockito2 = { module = "org.powermock:powermock-api-mockito2", version.ref = "powermock" }
 powermock-module-junit4 = { module = "org.powermock:powermock-module-junit4", version.ref = "powermock" }

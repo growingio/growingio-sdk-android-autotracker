@@ -26,13 +26,7 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
-import com.growingio.android.sdk.track.events.AutotrackEventType;
-import com.growingio.android.sdk.track.events.ViewElementEvent;
-import com.growingio.android.sdk.autotrack.page.Page;
-import com.growingio.android.sdk.autotrack.page.PageProvider;
-import com.growingio.android.sdk.autotrack.view.ViewHelper;
-import com.growingio.android.sdk.autotrack.view.ViewNode;
-import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.autotrack.view.ViewNodeProvider;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
@@ -197,13 +191,7 @@ class ViewClickProvider {
             return;
         }
 
-        ViewNode viewNode = ViewHelper.getClickViewNode(view);
-        if (viewNode != null) {
-            Page<?> page = PageProvider.get().findPage(view);
-            sendClickEvent(page, viewNode);
-        } else {
-            Logger.e(TAG, "ViewNode is NULL");
-        }
+        ViewNodeProvider.get().generateViewClickEvent(view);
     }
 
     public static void menuItemOnClick(Activity activity, MenuItem menuItem) {
@@ -217,27 +205,6 @@ class ViewClickProvider {
             return;
         }
 
-        Page<?> page = PageProvider.get().findPage(activity);
-        ViewNode viewNode = ViewHelper.getMenuItemViewNode(page, menuItem);
-        if (viewNode != null) {
-            sendClickEvent(page, viewNode);
-        } else {
-            Logger.e(TAG, "MenuItem ViewNode is NULL");
-        }
-    }
-
-    private static void sendClickEvent(Page<?> page, ViewNode viewNode) {
-        if (page == null) {
-            Logger.w(TAG, "sendClickEvent page Activity is NULL");
-            return;
-        }
-        TrackMainThread.trackMain().postEventToTrackMain(
-                new ViewElementEvent.Builder(AutotrackEventType.VIEW_CLICK)
-                        .setPath(page.activePath())
-                        .setXpath(viewNode.getXPath())
-                        .setIndex(viewNode.getIndex())
-                        .setTextValue(viewNode.getViewContent())
-                        .setAttributes(page.activeAttributes())
-        );
+        ViewNodeProvider.get().generateMenuItemEvent(activity, menuItem);
     }
 }

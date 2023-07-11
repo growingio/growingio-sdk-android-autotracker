@@ -21,9 +21,9 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.view.ScreenElementHelper;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
@@ -36,9 +36,9 @@ import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.track.view.ViewTreeStatusListener;
 import com.growingio.android.sdk.track.webservices.Circler;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class ScreenshotProvider extends ViewTreeStatusListener {
@@ -102,17 +102,15 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null) return;
 
-        View topView = activity.getWindow().getDecorView();
-
         try {
-            ScreenshotUtil.getScreenshotBitmap(mScale, bitmap -> topView.post(() -> {
+            ScreenshotUtil.getScreenshotBitmap(mScale, bitmap -> {
                 try {
                     String screenshotBase64 = ScreenshotUtil.getScreenshotBase64(bitmap);
                     sendScreenshotRefreshed(screenshotBase64, mScale);
                 } catch (IOException e) {
                     Logger.e(TAG, "base64 screenshot failed:" + e.getMessage());
                 }
-            }));
+            });
         } catch (IllegalArgumentException e) {
             Logger.e(TAG, "dispatch screenshot failed:" + e.getMessage());
         }
@@ -194,27 +192,29 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         public void run() {
             lastSendTime = System.currentTimeMillis();
 
-            List<ViewElement> viewElements = new ArrayList<>();
-            for (int i = 0; i < circlerData.getElements().size(); i++) {
-                Map<String, Object> data = circlerData.getElements().get(i);
-                ViewElement viewElement = new ViewElement.Builder().buildWithMap(data);
-                if (viewElement != null) viewElements.add(viewElement);
-            }
-
-            List<PageElement> pageElements = new ArrayList<>();
-            for (int i = 0; i < circlerData.getPages().size(); i++) {
-                Map<String, Object> data = circlerData.getPages().get(i);
-                PageElement pageElement = new PageElement.Builder().buildWithMap(data);
-                if (pageElement != null) pageElements.add(pageElement);
-            }
 
             CircleScreenshot.Builder builder = new CircleScreenshot.Builder()
                     .setScale((float) circlerData.getScale())
                     .setScreenWidth((int) circlerData.getWidth())
                     .setScreenHeight((int) circlerData.getHeight())
-                    .setSnapshotKey(mSnapshotKey++)
-                    .addPages(pageElements)
-                    .addElements(viewElements);
+                    .setSnapshotKey(mSnapshotKey++);
+
+            for (int i = 0; i < circlerData.getElements().size(); i++) {
+                Map<String, Object> data = circlerData.getElements().get(i);
+                JSONObject viewJson = ScreenElementHelper.createViewElementWithMap(data);
+                if (viewJson != null) {
+                    builder.addElement(viewJson);
+                }
+            }
+
+            for (int i = 0; i < circlerData.getPages().size(); i++) {
+                Map<String, Object> data = circlerData.getPages().get(i);
+                JSONObject pageJson = ScreenElementHelper.createPageElementWithMap(data);
+                if (pageJson != null) {
+                    builder.addPage(pageJson);
+                }
+            }
+
 
             if (circlerData.getScreenshot() == null) {
                 try {

@@ -20,6 +20,7 @@ import com.growingio.android.sdk.Configurable;
 
 public class AutotrackConfig implements Configurable {
     private float mImpressionScale = 0;
+    private boolean mDowngrade = false;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
     public AutotrackConfig setImpressionScale(float scale) {
@@ -40,8 +41,22 @@ public class AutotrackConfig implements Configurable {
 //        this.mAutotrackOptions = options;
 //        return this;
 //    }
-//
+
     public AutotrackOptions getAutotrackOptions() {
         return mAutotrackOptions;
+    }
+
+    /**
+     * You must understand what you are doing before using
+     */
+    public AutotrackConfig downgrade() {
+        this.mDowngrade = true;
+        mAutotrackOptions.setFragmentPageEnabled(true);
+        mAutotrackOptions.setActivityPageEnabled(true);
+        return this;
+    }
+
+    public boolean isDowngrade() {
+        return this.mDowngrade;
     }
 }

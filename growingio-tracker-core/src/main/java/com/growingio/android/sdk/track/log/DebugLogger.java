@@ -16,8 +16,6 @@
 
 package com.growingio.android.sdk.track.log;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 public class DebugLogger extends BaseLogger {
@@ -26,7 +24,7 @@ public class DebugLogger extends BaseLogger {
     private static final int MAX_LOG_LENGTH = 4000;
 
     @Override
-    protected void print(int priority, @NonNull String tag, @NonNull String message, @Nullable Throwable t) {
+    protected void print(int priority, String tag, String message, Throwable t) {
         if (priority > Log.ASSERT || priority < Log.DEBUG) {
             return;
         }

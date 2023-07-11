@@ -26,17 +26,11 @@ import com.google.android.material.slider.Slider;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.R;
-import com.growingio.android.sdk.track.events.AutotrackEventType;
-import com.growingio.android.sdk.track.events.ViewElementEvent;
-import com.growingio.android.sdk.autotrack.page.Page;
-import com.growingio.android.sdk.autotrack.page.PageProvider;
+import com.growingio.android.sdk.autotrack.view.ViewNodeProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.view.OnViewStateChangedListener;
-import com.growingio.android.sdk.autotrack.view.ViewHelper;
-import com.growingio.android.sdk.autotrack.view.ViewNode;
 import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.track.view.ViewTreeStatusObserver;
-import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
@@ -135,25 +129,6 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             Logger.e(TAG, "Autotracker do not initialized successfully");
         }
 
-        ViewNode viewNode = ViewHelper.getChangeViewNode(view);
-        if (viewNode == null) {
-            Logger.e(TAG, "ViewNode is NULL with the View: " + view.getClass().getSimpleName());
-            return;
-        }
-
-        Page<?> page = PageProvider.get().findPage(viewNode.getView());
-        if (page == null) {
-            Logger.w(TAG, "sendChangeEvent page Activity is NULL");
-            return;
-        }
-
-        TrackMainThread.trackMain().postEventToTrackMain(
-                new ViewElementEvent.Builder(AutotrackEventType.VIEW_CHANGE)
-                        .setPath(page.activePath())
-                        .setXpath(viewNode.getXPath())
-                        .setIndex(viewNode.getIndex())
-                        .setTextValue(viewNode.getViewContent())
-                        .setAttributes(page.activeAttributes())
-        );
+        ViewNodeProvider.get().generateViewChangeEvent(view);
     }
 }

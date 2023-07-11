@@ -33,6 +33,7 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -105,14 +106,6 @@ public class PageProvider implements IActivityLifecycle {
         return page;
     }
 
-    public void setActivityAlias(Activity activity, String alias) {
-        if (TextUtils.isEmpty(alias)) {
-            return;
-        }
-        ActivityPage page = findOrCreateActivityPage(activity);
-        page.setAlias(alias);
-    }
-
     protected ActivityPage findOrCreateActivityPage(Activity activity) {
         ActivityPage page = ALL_PAGE_TREE.get(activity);
         if (page != null) {
@@ -129,12 +122,11 @@ public class PageProvider implements IActivityLifecycle {
         return page;
     }
 
-    public void autotrackActivity(Activity activity, Map<String, String> attributes) {
+    public void autotrackActivity(Activity activity, String alias, Map<String, String> attributes) {
         ActivityPage page = ALL_PAGE_TREE.get(activity);
         if (page != null) {
-            if (attributes != null) {
-                page.setAttributes(attributes);
-            }
+            if (alias != null) page.setAlias(alias);
+            page.setAttributes(attributes);
             if (!page.isAutotrack()) {
                 page.setIsAutotrack(true);
                 sendPage(activity, page);
@@ -148,12 +140,11 @@ public class PageProvider implements IActivityLifecycle {
             CACHE_PAGES.put(activity, page);
         }
         page.setIsAutotrack(true);
-        if (attributes != null) {
-            page.setAttributes(attributes);
-        }
+        if (alias != null) page.setAlias(alias);
+        page.setAttributes(attributes);
     }
 
-    protected Page<Activity> searchActivityPage(Activity activity) {
+    public Page<Activity> searchActivityPage(Activity activity) {
         ActivityPage page = ALL_PAGE_TREE.get(activity);
         if (page != null) {
             return page;
@@ -181,7 +172,7 @@ public class PageProvider implements IActivityLifecycle {
             Logger.d(TAG, "sendPage: path = " + page.path());
             generatePageEvent(context, page);
         } else {
-            Logger.w(TAG, "AutotrackOptions: page enable is false");
+            Logger.d(TAG, "AutotrackOptions: page enable is false");
         }
     }
 
@@ -196,14 +187,6 @@ public class PageProvider implements IActivityLifecycle {
                         .setOrientation(orientation)
                         .setAttributes(page.getAttributes())
         );
-    }
-
-    public void setFragmentAlias(SuperFragment<?> fragment, String alias) {
-        if (TextUtils.isEmpty(alias)) {
-            return;
-        }
-        FragmentPage page = findOrCreateFragmentPage(fragment);
-        page.setAlias(alias);
     }
 
     protected FragmentPage findOrCreateFragmentPage(SuperFragment<?> fragment) {
@@ -336,7 +319,7 @@ public class PageProvider implements IActivityLifecycle {
         return new FragmentPage(fragment);
     }
 
-    public void autotrackFragment(SuperFragment<?> fragment, Map<String, String> attributes) {
+    public void autotrackFragment(SuperFragment<?> fragment, String alias, Map<String, String> attributes) {
         // find activity page
         Activity activity = fragment.getActivity();
         ActivityPage page = findOrCreateActivityPage(activity);
@@ -344,9 +327,8 @@ public class PageProvider implements IActivityLifecycle {
         // find fragment page
         Page<?> fragmentPage = searchFragmentPage(fragment, page);
         if (fragmentPage != null) {
-            if (attributes != null) {
-                fragmentPage.setAttributes(attributes);
-            }
+            if (alias != null) fragmentPage.setAlias(alias);
+            fragmentPage.setAttributes(attributes);
             if (!fragmentPage.isAutotrack()) {
                 fragmentPage.setIsAutotrack(true);
                 sendPage(activity, fragmentPage);
@@ -360,9 +342,8 @@ public class PageProvider implements IActivityLifecycle {
             CACHE_PAGES.put(fragment, fragmentPage);
         }
         fragmentPage.setIsAutotrack(true);
-        if (attributes != null) {
-            fragmentPage.setAttributes(attributes);
-        }
+        if (alias != null) fragmentPage.setAlias(alias);
+        fragmentPage.setAttributes(attributes);
     }
 
     @UiThread
@@ -445,34 +426,27 @@ public class PageProvider implements IActivityLifecycle {
     }
 
     public void setPageAttributes(Activity activity, Map<String, String> attributes) {
-        ActivityPage page = findOrCreateActivityPage(activity);
-        setPageAttributes(page, attributes, true);
+        Page page = findOrCreateActivityPage(activity);
+        setPageAttributes(page, attributes);
     }
 
     public void setPageAttributes(SuperFragment<?> fragment, Map<String, String> attributes) {
         Page<?> page = findOrCreateFragmentPage(fragment);
-        setPageAttributes(page, attributes, true);
+        setPageAttributes(page, attributes);
     }
 
-    private void setPageAttributes(Page<?> page, Map<String, String> attributes, boolean checkEquals) {
-        if (checkEquals && attributes.equals(page.getAttributes())) {
+    private void setPageAttributes(Page<?> page, Map<String, String> attributes) {
+        if (attributes == null) attributes = new HashMap<>();
+        if (attributes.equals(page.getAttributes())) {
             Logger.w(TAG, "setPageAttributes is equals page.getAttributes");
             return;
         }
         page.setAttributes(attributes);
     }
 
-
-    /**
-     * find activity page from tree
-     */
-    public Page<?> findPage(Activity activity) {
-        return ALL_PAGE_TREE.get(activity);
-    }
-
     public Page<?> findPage(View view) {
         Page<?> page = ViewAttributeUtil.getViewPage(view);
-        if (page != null || page instanceof ActivityPage) {
+        if (page != null) {
             return page;
         }
 

@@ -68,7 +68,7 @@ public class PageTest {
     @Test
     public void pageSample() {
         RobolectricActivity activity = activityController.create().resume().get();
-        ActivityPage activityPage = (ActivityPage) PageProvider.get().findPage(activity);
+        ActivityPage activityPage = (ActivityPage) PageProvider.get().searchActivityPage(activity);
         String name = activityPage.getName();
         View view = activityPage.getView();
         String tag = activityPage.getTag();
@@ -80,7 +80,7 @@ public class PageTest {
     @Test
     public void pageViewTest() {
         RobolectricActivity activity = activityController.get();
-        PageProvider.get().setActivityAlias(activity, "test");
+        PageProvider.get().autotrackActivity(activity, "test", null);
         activityController.create().resume();
         Map<String, String> attrMap = new HashMap<>();
         attrMap.put("username", "cpacm");

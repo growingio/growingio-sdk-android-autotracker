@@ -20,8 +20,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
@@ -106,49 +104,49 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
     }
 
     @Override
-    public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         SysTrace.beginSection("gio.ActivityOnCreate");
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnCreatedEvent(activity, savedInstanceState));
         SysTrace.endSection();
     }
 
     @Override
-    public void onActivityStarted(@NonNull Activity activity) {
+    public void onActivityStarted(Activity activity) {
         SysTrace.beginSection("gio.onActivityStart");
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnStartedEvent(activity));
         SysTrace.endSection();
     }
 
     @Override
-    public void onActivityResumed(@NonNull Activity activity) {
+    public void onActivityResumed(Activity activity) {
         SysTrace.beginSection("gio.onActivityResumed");
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnResumedEvent(activity));
         SysTrace.endSection();
     }
 
     @Override
-    public void onActivityPaused(@NonNull Activity activity) {
+    public void onActivityPaused(Activity activity) {
         SysTrace.beginSection("gio.onActivityPaused");
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnPausedEvent(activity));
         SysTrace.endSection();
     }
 
     @Override
-    public void onActivityStopped(@NonNull Activity activity) {
+    public void onActivityStopped(Activity activity) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnStoppedEvent(activity));
     }
 
     @Override
-    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnSaveInstanceStateEvent(activity, outState));
     }
 
     @Override
-    public void onActivityDestroyed(@NonNull Activity activity) {
+    public void onActivityDestroyed(Activity activity) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnDestroyedEvent(activity));
     }
 
-    public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
+    public void onActivityNewIntent(Activity activity, Intent intent) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnNewIntentEvent(activity, intent));
     }
 

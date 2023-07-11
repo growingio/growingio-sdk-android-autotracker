@@ -16,8 +16,6 @@
 
 package com.growingio.android.sdk.track.listener;
 
-import android.support.annotation.Nullable;
-
 public interface OnUserIdChangedListener {
-    void onUserIdChanged(@Nullable String newUserId);
+    void onUserIdChanged(String newUserId);
 }

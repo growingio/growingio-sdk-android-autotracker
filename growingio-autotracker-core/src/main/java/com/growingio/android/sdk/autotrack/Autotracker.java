@@ -18,9 +18,9 @@ package com.growingio.android.sdk.autotrack;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 
 import com.growingio.android.sdk.autotrack.inject.ViewChangeProvider;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
@@ -34,6 +34,7 @@ import com.growingio.android.sdk.track.utils.ThreadUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("DeprecatedIsStillUsed")
 public class Autotracker extends Tracker {
     private static final String TAG = "Autotracker";
 
@@ -42,7 +43,6 @@ public class Autotracker extends Tracker {
     }
 
     @Override
-    @CallSuper
     protected void setup(Context context) {
         super.setup(context);
         PageProvider.get().setup();
@@ -50,46 +50,138 @@ public class Autotracker extends Tracker {
         viewChangeProvider.setup();
     }
 
-    public void autotrackPage(Activity activity) {
-        autotrackPage(activity, null);
+    /**
+     * Generate an event for the current page
+     */
+    private void autotrackPage(Activity activity) {
+        Logger.w(TAG, "please set a specific alias for the page:" + activity.getClass().getSimpleName());
+        autotrackPage(activity, activity.getClass().getSimpleName());
     }
 
-    public void autotrackPage(Activity activity, final Map<String, String> attributes) {
+    /**
+     * Generate a page event for the current activity
+     *
+     * @param activity page
+     * @param alias    page's name
+     */
+    public void autotrackPage(Activity activity, String alias) {
+        autotrackPage(activity, alias, null);
+    }
+
+    /**
+     * Generate a page event for the current activity
+     *
+     * @param activity   page
+     * @param alias      page's name
+     * @param attributes page's attributes. Will be carried to the autotracker event.
+     */
+    public void autotrackPage(Activity activity, String alias, final Map<String, String> attributes) {
         if (!isInited) return;
+        if (activity == null || TextUtils.isEmpty(alias)) {
+            Logger.e(TAG, "fragment or alias is NULL");
+            return;
+        }
         Logger.d(TAG, "make activity page: " + activity.getClass() + " active.");
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackActivity(activity, attributes));
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackActivity(activity, alias, attributes));
     }
 
-    public void autotrackPage(androidx.fragment.app.Fragment fragment) {
-        autotrackPage(fragment, null);
+    private void autotrackPage(androidx.fragment.app.Fragment fragment) {
+        autotrackPage(fragment, fragment.getClass().getSimpleName());
     }
 
-    public void autotrackPage(androidx.fragment.app.Fragment fragment, final Map<String, String> attributes) {
+    /**
+     * Generate a page event for the current Fragment
+     *
+     * @param fragment page
+     * @param alias    page's name
+     */
+    public void autotrackPage(androidx.fragment.app.Fragment fragment, String alias) {
+        autotrackPage(fragment, alias, null);
+    }
+
+    /**
+     * Generate a page event for the current Fragment
+     *
+     * @param fragment   page
+     * @param alias      page's name
+     * @param attributes page's attributes. Will be carried to the autotracker event.
+     */
+    public void autotrackPage(androidx.fragment.app.Fragment fragment, String alias, final Map<String, String> attributes) {
         if (!isInited) return;
+        if (fragment == null || TextUtils.isEmpty(alias)) {
+            Logger.e(TAG, "fragment or alias is NULL");
+            return;
+        }
         Logger.d(TAG, "make fragment page: " + fragment.getClass() + " active.");
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.makeX(fragment), attributes));
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.makeX(fragment), alias, attributes));
     }
 
-    public void autotrackSystemPage(android.app.Fragment fragment) {
-        autotrackSystemPage(fragment, null);
+    private void autotrackSystemPage(android.app.Fragment fragment) {
+        autotrackSystemPage(fragment, fragment.getClass().getSimpleName());
     }
 
-    public void autotrackSystemPage(android.app.Fragment fragment, final Map<String, String> attributes) {
+    /**
+     * Generate a page event for the current Fragment
+     *
+     * @param fragment page
+     * @param alias    page's name
+     */
+    public void autotrackSystemPage(android.app.Fragment fragment, String alias) {
+        autotrackSystemPage(fragment, alias, null);
+    }
+
+    /**
+     * Generate a page event for the current Fragment
+     *
+     * @param fragment   page
+     * @param alias      page's name
+     * @param attributes page's attributes. Will be carried to the autotracker event.
+     */
+    public void autotrackSystemPage(android.app.Fragment fragment, String alias, final Map<String, String> attributes) {
         if (!isInited) return;
+        if (fragment == null || TextUtils.isEmpty(alias)) {
+            Logger.e(TAG, "fragment or alias is NULL");
+            return;
+        }
         Logger.d(TAG, "make fragment page: " + fragment.getClass() + " active.");
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.make(fragment), attributes));
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.make(fragment), alias, attributes));
     }
 
-    public void autotrackSupportPage(android.support.v4.app.Fragment fragment) {
-        autotrackSupportPage(fragment, null);
+    private void autotrackSupportPage(android.support.v4.app.Fragment fragment) {
+        autotrackSupportPage(fragment, fragment.getClass().getSimpleName());
     }
 
-    public void autotrackSupportPage(android.support.v4.app.Fragment fragment, final Map<String, String> attributes) {
+    /**
+     * Generate a page event for the current Fragment
+     *
+     * @param fragment page
+     * @param alias    page's name
+     */
+    public void autotrackSupportPage(android.support.v4.app.Fragment fragment, String alias) {
+        autotrackSupportPage(fragment, alias, null);
+    }
+
+    /**
+     * Generate a page event for the current Fragment
+     *
+     * @param fragment   page
+     * @param alias      page's name
+     * @param attributes page's attributes. Will be carried to the autotracker event.
+     */
+    public void autotrackSupportPage(android.support.v4.app.Fragment fragment, String alias, final Map<String, String> attributes) {
         if (!isInited) return;
+        if (fragment == null || TextUtils.isEmpty(alias)) {
+            Logger.e(TAG, "fragment or alias is NULL");
+            return;
+        }
         Logger.d(TAG, "make fragment page: " + fragment.getClass() + " active.");
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.makeSupport(fragment), attributes));
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().autotrackFragment(SuperFragment.makeSupport(fragment), alias, attributes));
     }
 
+    /**
+     * Generate a unique identifier for the current View.
+     * eg: setUniqueTag(button,"note"), when the button is clicked,the resulting path is "/note".
+     */
     public void setUniqueTag(final View view, final String tag) {
         if (!isInited) return;
         if (view == null || TextUtils.isEmpty(tag)) {
@@ -105,42 +197,57 @@ public class Autotracker extends Tracker {
         });
     }
 
-    public void setPageAttributes(final Activity page, final Map<String, String> attributes) {
+    /**
+     * will be carried to the autotracker event's attribute.
+     * note: please use autotrackPage generate page first. @see {@link #autotrackPage(Activity, String, Map)}
+     */
+    public void setPageAttributes(final Activity activity, final Map<String, String> attributes) {
         if (!isInited) return;
-        if (page == null) {
+        if (activity == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(page, attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
+        ThreadUtils.runOnUiThread(() -> {
+            PageProvider.get().setPageAttributes(activity, attributes);
+        });
     }
 
-    public void setPageAttributes(final android.app.Fragment page, final Map<String, String> attributes) {
+    /**
+     * will be carried to the autotracker event's attribute.
+     * note: please use autotrackSystemPage generate page first. @see {@link #autotrackSystemPage(android.app.Fragment, String, Map)}
+     */
+    public void setPageAttributes(final android.app.Fragment fragment, final Map<String, String> attributes) {
         if (!isInited) return;
-        if (page == null) {
+        if (fragment == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
-
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.make(page), attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
+        ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.make(fragment), attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
     }
 
+    /**
+     * will be carried to the autotracker event's attribute.
+     * note: please use autotrackSupportPage generate page first. @see {@link #autotrackSupportPage(android.support.v4.app.Fragment, String, Map)}
+     */
     public void setPageAttributesSupport(final android.support.v4.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
         if (page == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
-
         ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.makeSupport(page), attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
     }
 
+    /**
+     * will be carried to the autotracker event's attribute.
+     * note: please use autotrackPage generate page first. @see {@link #autotrackPage(androidx.fragment.app.Fragment, String, Map)}
+     */
     public void setPageAttributesX(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
         if (page == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
-
         ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.makeX(page), attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
     }
 
@@ -174,55 +281,36 @@ public class Autotracker extends Tracker {
         ThreadUtils.runOnUiThread(() -> ImpressionProvider.get().stopTrackViewImpression(trackedView));
     }
 
+    /**
+     * please use autotrackPage replace. @see {@link #autotrackPage(Activity, String)}
+     */
+    @Deprecated
     public void setPageAlias(final Activity page, final String alias) {
-        if (!isInited) return;
-        if (page == null || TextUtils.isEmpty(alias)) {
-            Logger.e(TAG, "activity or alias is NULL");
-            return;
-        }
-        ThreadUtils.runOnUiThread(() -> PageProvider.get().setActivityAlias(page, alias));
+        autotrackPage(page, alias);
     }
 
+    /**
+     * please use autotrackSystemPage replace. @see {@link #autotrackSystemPage(android.app.Fragment, String)}
+     */
+    @Deprecated
     public void setPageAlias(final android.app.Fragment page, final String alias) {
-        if (!isInited) return;
-        if (page == null || TextUtils.isEmpty(alias)) {
-            Logger.e(TAG, "fragment or alias is NULL");
-            return;
-        }
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().setFragmentAlias(SuperFragment.make(page), alias);
-            }
-        });
+        autotrackSystemPage(page, alias);
     }
 
+    /**
+     * please use autotrackSupportPage replace. @see {@link #autotrackSupportPage(android.support.v4.app.Fragment, String)}
+     */
+    @Deprecated
     public void setPageAliasSupport(final android.support.v4.app.Fragment page, final String alias) {
-        if (!isInited) return;
-        if (page == null || TextUtils.isEmpty(alias)) {
-            Logger.e(TAG, "fragment or alias is NULL");
-            return;
-        }
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().setFragmentAlias(SuperFragment.makeSupport(page), alias);
-            }
-        });
+        autotrackSupportPage(page, alias);
     }
 
+    /**
+     * please use autotrackPage replace. @see {{@link #autotrackPage(androidx.fragment.app.Fragment, String)}}
+     */
+    @Deprecated
     public void setPageAliasX(final androidx.fragment.app.Fragment page, final String alias) {
-        if (!isInited) return;
-        if (page == null || TextUtils.isEmpty(alias)) {
-            Logger.e(TAG, "fragment or alias is NULL");
-            return;
-        }
-        ThreadUtils.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PageProvider.get().setFragmentAlias(SuperFragment.makeX(page), alias);
-            }
-        });
+        autotrackPage(page, alias);
     }
 
     @Deprecated
@@ -261,5 +349,12 @@ public class Autotracker extends Tracker {
             return;
         }
         ThreadUtils.runOnUiThread(() -> ViewAttributeUtil.setIgnoreViewClick(view, isIgnore));
+    }
+
+    /**
+     * collect the content on EditText
+     */
+    public void trackEditText(EditText editText, boolean track) {
+        ViewAttributeUtil.setTrackText(editText, track);
     }
 }

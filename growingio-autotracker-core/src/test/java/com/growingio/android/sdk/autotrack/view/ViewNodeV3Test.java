@@ -47,7 +47,7 @@ import java.util.Objects;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
-public class ViewNodeTest {
+public class ViewNodeV3Test {
 
     Application application = ApplicationProvider.getApplicationContext();
 
@@ -68,35 +68,37 @@ public class ViewNodeTest {
     @Test
     public void viewNodeTest() {
         RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().start().resume().get();
+        ViewNodeV3Renderer renderer = new ViewNodeV3Renderer();
 
-        ViewNode viewNode = ViewHelper.getClickViewNode(activity.getTextView());
+        ViewNodeV3 viewNode = renderer.renderViewNode(activity.getTextView());
         Truth.assertThat(viewNode.getXPath()).endsWith("/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]");
         Truth.assertThat(viewNode.getViewContent()).isEqualTo("this is cpacm");
         Truth.assertThat(viewNode.getNodeType()).isEqualTo("TEXT");
         Truth.assertThat(viewNode.getClickableParentXPath()).isNull();
         Truth.assertThat(viewNode.getIndex()).isEqualTo(-1);
-        ViewNode newNode = viewNode.appendNode(activity.getImageView(), 0, true);
+        ViewNodeV3 newNode = viewNode.append(activity.getImageView(), 0, true);
         Truth.assertThat(newNode.getXPath()).endsWith("/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]/ImageView[0]");
 
         RecyclerView recyclerView = activity.getRecyclerView();
         View itemView = Objects.requireNonNull(recyclerView.findViewHolderForAdapterPosition(2)).itemView;
-        ViewNode listItemNode = ViewHelper.getClickViewNode(itemView);
+        ViewNodeV3 listItemNode = renderer.renderViewNode(itemView);
         Truth.assertThat(listItemNode.getXPath()).endsWith("/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/RecyclerView[0]/TextView[-]");
     }
 
     @Test
-    public void viewHelperTest() {
+    public void viewRenderTest() {
         TrackerContext.init(application);
         RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().start().resume().get();
         ActivityStateProvider.get().onActivityResumed(activity);
+        ViewNodeV3Renderer renderer = new ViewNodeV3Renderer();
 
         RecyclerView recyclerView = activity.getRecyclerView();
         recyclerView.getWindowVisibility();
-        Truth.assertThat(ViewHelper.isViewSelfVisible(activity.getWindow().getDecorView())).isFalse();
-        Truth.assertThat(ViewHelper.viewVisibilityInParents(recyclerView)).isFalse();
+        Truth.assertThat(ViewAttributeUtil.isViewSelfVisible(activity.getWindow().getDecorView())).isFalse();
+        Truth.assertThat(ViewAttributeUtil.viewVisibilityInParents(recyclerView)).isFalse();
 
         View itemView = Objects.requireNonNull(recyclerView.findViewHolderForAdapterPosition(0)).itemView;
-        String content = ViewHelper.getViewContent(itemView);
+        String content = ViewAttributeUtil.getViewContent(itemView);
         Truth.assertThat(content).isEqualTo("position:0");
 
         EditText testEt = new EditText(activity);
@@ -104,20 +106,20 @@ public class ViewNodeTest {
         MenuItem testItem = new RoboMenuItem().setTitle("test menu item")
                 .setActionView(testEt);
         activity.onContextItemSelected(testItem);
-        ViewNode pageNode = ViewHelper.getMenuItemViewNode(new ActivityPage(activity), testItem);
+        ViewNodeV3 pageNode = ViewNodeV3.generateMenuItemViewNode(activity, testItem);
         Truth.assertThat(pageNode.getXPath()).isEqualTo("/Page/MenuView/MenuItem#null");
 
-        ViewNode menuNode = ViewHelper.getChangeViewNode(testItem.getActionView());
+        ViewNodeV3 menuNode = renderer.renderViewNode(testItem.getActionView());
         Truth.assertThat(menuNode.getXPath()).isEqualTo("/CustomWindow/EditText");
 
         RatingBar ratingBar = new RatingBar(activity);
         ratingBar.setRating(10f);
         ratingBar.setProgress(1);
-        Truth.assertThat(ViewHelper.getViewContent(ratingBar)).isEqualTo("0.5");
+        Truth.assertThat(ViewAttributeUtil.getViewContent(ratingBar)).isEqualTo("0.5");
 
         SeekBar seekBar = new SeekBar(activity);
         seekBar.setProgress(100);
-        Truth.assertThat(ViewHelper.getViewContent(seekBar)).isEqualTo("100");
+        Truth.assertThat(ViewAttributeUtil.getViewContent(seekBar)).isEqualTo("100");
 
         RadioGroup radioGroup = new RadioGroup(activity);
         RadioButton radio1 = new RadioButton(activity);
@@ -131,7 +133,7 @@ public class ViewNodeTest {
         radioGroup.addView(radio1);
         radioGroup.addView(radio2);
         radioGroup.setSelected(true);
-        Truth.assertThat(ViewHelper.getViewContent(radioGroup)).isEqualTo("radio2");
+        Truth.assertThat(ViewAttributeUtil.getViewContent(radioGroup)).isEqualTo("radio2");
     }
 
     @Test

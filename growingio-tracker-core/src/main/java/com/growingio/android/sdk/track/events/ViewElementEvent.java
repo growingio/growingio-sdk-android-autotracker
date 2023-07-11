@@ -29,6 +29,10 @@ public class ViewElementEvent extends BaseAttributesEvent {
     private final String mPath;
     private final String mTextValue;
 
+    /**
+     * keep for v3.0 sdk
+     */
+    @Deprecated
     private final long mPageShowTimestamp;
     private final String mXpath;
     private final int mIndex;
@@ -84,6 +88,10 @@ public class ViewElementEvent extends BaseAttributesEvent {
         private String mXpath;
         private int mIndex = -1;
 
+        /**
+         * keep for v3.0 sdk
+         */
+        @Deprecated
         private long mPageShowTimestamp;
 
         public Builder() {

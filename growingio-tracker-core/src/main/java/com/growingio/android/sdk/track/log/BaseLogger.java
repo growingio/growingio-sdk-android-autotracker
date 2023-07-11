@@ -16,8 +16,6 @@
 
 package com.growingio.android.sdk.track.log;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.PrintWriter;
@@ -139,7 +137,7 @@ public abstract class BaseLogger implements ILogger {
         print(priority, tag, message, t);
     }
 
-    private String formatMessage(@NonNull String message, @NonNull Object[] args) {
+    private String formatMessage(String message, Object[] args) {
         try {
             return String.format(message, args);
         } catch (Exception ignored) {
@@ -156,6 +154,5 @@ public abstract class BaseLogger implements ILogger {
         return sw.toString();
     }
 
-    protected abstract void print(int priority, @NonNull String tag, @NonNull String message,
-                                  @Nullable Throwable t);
+    protected abstract void print(int priority, String tag, String message, Throwable t);
 }

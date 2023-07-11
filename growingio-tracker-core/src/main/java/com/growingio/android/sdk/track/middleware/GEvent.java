@@ -16,7 +16,7 @@
 
 package com.growingio.android.sdk.track.middleware;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;

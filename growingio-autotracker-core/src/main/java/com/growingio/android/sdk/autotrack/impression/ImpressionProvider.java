@@ -26,13 +26,13 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.view.OnViewStateChangedListener;
-import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
@@ -127,7 +127,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
     }
 
     private boolean isVisibility(View view) {
-        if (ViewHelper.viewVisibilityInParents(view)) {
+        if (ViewAttributeUtil.viewVisibilityInParents(view)) {
             if (mImpressionScale <= 0) {
                 return true;
             }
@@ -163,7 +163,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
             return;
         }
-        if (ViewHelper.isIgnoredView(view)) {
+        if (ViewAttributeUtil.isIgnoredView(view)) {
             Logger.w(TAG, "Current view is set to ignore");
             return;
         }

@@ -16,8 +16,6 @@
 
 package com.growingio.android.sdk.track.log;
 
-import android.support.annotation.Nullable;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,7 +46,6 @@ public class Logger {
         LOGGERS.remove(logger.getType());
     }
 
-    @Nullable
     public static ILogger getLogger(String loggerType) {
         return LOGGERS.get(loggerType);
     }

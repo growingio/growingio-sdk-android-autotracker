@@ -70,10 +70,6 @@ public abstract class Page<T> {
         mAttributes = attributes;
     }
 
-    public void addAttributes(Map<String, String> attributes) {
-        mAttributes.putAll(attributes);
-    }
-
     public abstract String getName();
 
     public abstract View getView();

@@ -20,9 +20,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -72,7 +69,6 @@ public class Tracker {
         isInited = true;
     }
 
-    @CallSuper
     protected void setup(Context context) {
         if (context instanceof Application) {
             Application application = (Application) context;
@@ -170,7 +166,6 @@ public class Tracker {
         TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>(attributes));
     }
 
-    @Nullable
     public String getDeviceId() {
         if (!isInited) return "UNKNOWN";
         return DeviceInfoProvider.get().getDeviceId();
@@ -222,7 +217,7 @@ public class Tracker {
         TrackMainThread.trackMain().postActionToTrackMain(() -> SessionProvider.get().cleanLocation());
     }
 
-    public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
+    public void onActivityNewIntent(Activity activity, Intent intent) {
         if (!isInited) return;
         ActivityStateProvider.get().onActivityNewIntent(activity, intent);
     }

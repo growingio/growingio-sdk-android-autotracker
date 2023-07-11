@@ -21,8 +21,6 @@ import static android.content.Context.ACTIVITY_SERVICE;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Process;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
@@ -102,7 +100,7 @@ public class PersistentDataProvider {
         return mDataSharer.getString(KEY_DEVICE_ID, "");
     }
 
-    public void setDeviceId(@NonNull String deviceId) {
+    public void setDeviceId(String deviceId) {
         if (TextUtils.isEmpty(deviceId)) {
             return;
         }
@@ -117,7 +115,7 @@ public class PersistentDataProvider {
         return mDataSharer.getString(KEY_LOGIN_USER_ID, "");
     }
 
-    public void setLoginUserIdAndUserKey(@Nullable String userId, @Nullable String userKey) {
+    public void setLoginUserIdAndUserKey(String userId, String userKey) {
         HashMap<String, String> map = new HashMap<>();
         map.put(KEY_LOGIN_USER_ID, userId);
         map.put(KEY_LOGIN_USER_KEY, userKey);
@@ -128,7 +126,7 @@ public class PersistentDataProvider {
         return mDataSharer.getString(KEY_LATEST_NON_NULL_USER_ID, "");
     }
 
-    public void setLatestNonNullUserId(@Nullable String latestNonNullUserId) {
+    public void setLatestNonNullUserId(String latestNonNullUserId) {
         mDataSharer.putString(KEY_LATEST_NON_NULL_USER_ID, latestNonNullUserId);
     }
 
@@ -164,11 +162,11 @@ public class PersistentDataProvider {
         mDataSharer.putBoolean(KEY_SEND_VISIT_AFTER_REFRESH_SESSION_ID, sendVisitAfterRefreshSessionId);
     }
 
-    public void putString(String key, @Nullable String value) {
+    public void putString(String key, String value) {
         mDataSharer.putString(key, value);
     }
 
-    @Nullable
+
     public String getString(String key, String defValue) {
         return mDataSharer.getString(key, defValue);
     }

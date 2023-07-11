@@ -63,7 +63,6 @@ dependencies {
 
     compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
     compileOnly libs.bundles.androidx
-    compileOnly libs.bundles.android.support
 
     testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
     testImplementation libs.bundles.test

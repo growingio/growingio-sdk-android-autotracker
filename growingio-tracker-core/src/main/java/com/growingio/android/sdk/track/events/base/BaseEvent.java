@@ -17,7 +17,6 @@
 package com.growingio.android.sdk.track.events.base;
 
 import android.content.Context;
-import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.SDKConfig;
@@ -365,7 +364,6 @@ public abstract class BaseEvent extends GEvent {
         }
 
         @TrackThread
-        @CallSuper
         public void readPropertyInTrackThread() {
             if (mEventType == null) mEventType = getEventType();
 
