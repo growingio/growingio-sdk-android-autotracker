@@ -33,7 +33,7 @@ import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.CacheEventProvider;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeepLinkProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
@@ -96,7 +96,7 @@ public class Tracker {
     private void start(Context context) {
         PersistentDataProvider.get().start();
 
-        CacheEventProvider.get().releaseCaches();
+        EventStateProvider.get().releaseCaches();
 
         makeupActivityLifecycle(context);
     }

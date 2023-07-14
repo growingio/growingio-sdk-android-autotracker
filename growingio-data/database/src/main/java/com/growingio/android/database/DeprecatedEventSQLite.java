@@ -28,6 +28,7 @@ import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.Serializer;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -111,7 +112,7 @@ public class DeprecatedEventSQLite {
                         if (event != null) {
                             events.add(event);
                             if (event instanceof BaseEvent) {
-                                Logger.printJson(TAG, "migrate data:", ((BaseEvent) event).toJSONObject().toString());
+                                Logger.printJson(TAG, "migrate data:", EventStateProvider.get().toJson((BaseEvent) event).toString());
                             }
                         }
                     }

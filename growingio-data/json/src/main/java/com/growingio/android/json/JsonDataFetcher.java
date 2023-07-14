@@ -24,6 +24,7 @@ import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.format.FormatDataFetcher;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 
 import org.json.JSONObject;
 
@@ -64,7 +65,7 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
     @Override
     public EventByteArray format(GEvent gEvent) {
         if (gEvent instanceof BaseEvent) {
-            JSONObject eventJson = ((BaseEvent) gEvent).toJSONObject();
+            JSONObject eventJson = EventStateProvider.get().toJson((BaseEvent) gEvent);
             return new EventByteArray(eventJson.toString().getBytes(), "application/json");
         }
         return new EventByteArray(null);

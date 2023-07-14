@@ -100,8 +100,10 @@ public class ApmEventBuilder {
         hashMap.put(EVENT_ERROR_TITLE, title);
         hashMap.put(EVENT_ERROR_CONTENT, errorContent);
 
-        return new CustomEvent.Builder().setEventName(EVENT_ERROR_NAME)
+        CustomEvent.Builder builder = new CustomEvent.Builder();
+        builder.setEventName(EVENT_ERROR_NAME)
                 .setAttributes(hashMap);
+        return builder;
     }
 
     private static CustomEvent.Builder appStartBuilder(boolean isCold, long duration) {
@@ -114,16 +116,20 @@ public class ApmEventBuilder {
             hashMap.put(EVENT_REBOOT_TIME, String.valueOf(duration));
         }
 
-        return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
+        CustomEvent.Builder builder = new CustomEvent.Builder();
+        builder.setEventName(EVENT_APP_LAUNCHTIME_NAME)
                 .setAttributes(hashMap);
+        return builder;
     }
 
     private static CustomEvent.Builder pageStartBuilder(String pageName, long pageDuration) {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(EVENT_PAGE_NAME, pageName);
         hashMap.put(EVENT_PAGE_DURATION, String.valueOf(pageDuration));
-        return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
+        CustomEvent.Builder builder = new CustomEvent.Builder();
+        builder.setEventName(EVENT_APP_LAUNCHTIME_NAME)
                 .setAttributes(hashMap);
+        return builder;
     }
 
     private static CustomEvent.Builder pageStartBuilderWithHot(String pageName, long pageDuration, boolean isCold, long appDuration) {
@@ -137,8 +143,10 @@ public class ApmEventBuilder {
             hashMap.put(EVENT_REBOOT_MODE, "warm");
             hashMap.put(EVENT_REBOOT_TIME, String.valueOf(appDuration == 0L ? pageDuration : appDuration));
         }
-        return new CustomEvent.Builder().setEventName(EVENT_APP_LAUNCHTIME_NAME)
+        CustomEvent.Builder builder = new CustomEvent.Builder();
+        builder.setEventName(EVENT_APP_LAUNCHTIME_NAME)
                 .setAttributes(hashMap);
+        return builder;
     }
 
     private static boolean equals(Object a, Object b) {

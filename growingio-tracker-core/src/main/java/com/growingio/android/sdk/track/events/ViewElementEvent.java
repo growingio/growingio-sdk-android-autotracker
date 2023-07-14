@@ -16,77 +16,88 @@
 
 package com.growingio.android.sdk.track.events;
 
-import android.text.TextUtils;
+import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
+import com.growingio.sdk.annotation.json.JsonAlias;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+@JsonSerializer
 public class ViewElementEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mPath;
-    private final String mTextValue;
+    private final String path;
+    @Nullable
+    private final String textValue;
 
     /**
      * keep for v3.0 sdk
      */
     @Deprecated
-    private final long mPageShowTimestamp;
-    private final String mXpath;
-    private final int mIndex;
+    private final long pageShowTimestamp;
+    private final String xpath;
+    private final int index;
+
+    /**
+     * new for v4.0 sdk
+     */
+    @Nullable
+    @JsonAlias(name = "xindex")
+    private final String xIndex;
+    @Nullable
+    @JsonAlias(name = "xcontent")
+    private final String xContent;
 
     protected ViewElementEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mPath = eventBuilder.mPath;
-        mTextValue = eventBuilder.mTextValue;
-        mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
-        mXpath = eventBuilder.mXpath;
-        mIndex = eventBuilder.mIndex;
+        path = eventBuilder.path;
+        textValue = eventBuilder.textValue;
+        pageShowTimestamp = eventBuilder.mPageShowTimestamp;
+        xpath = eventBuilder.xpath;
+        index = eventBuilder.index;
+        xIndex = eventBuilder.xIndex;
+        xContent = eventBuilder.xContent;
     }
 
     public String getPath() {
-        return checkValueSafe(mPath);
+        return checkValueSafe(path);
     }
 
     public String getTextValue() {
-        return checkValueSafe(mTextValue);
+        return checkValueSafe(textValue);
     }
 
     public long getPageShowTimestamp() {
-        return mPageShowTimestamp;
+        return pageShowTimestamp;
     }
 
     public String getXpath() {
-        return checkValueSafe(mXpath);
+        return checkValueSafe(xpath);
     }
 
     public int getIndex() {
-        return mIndex;
+        return index;
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("path", getPath());
-            if (!TextUtils.isEmpty(getTextValue())) {
-                json.put("textValue", getTextValue());
-            }
-            json.put("pageShowTimestamp", getPageShowTimestamp());
-            json.put("xpath", getXpath());
-            json.put("index", getIndex());
-        } catch (JSONException ignored) {
-        }
-        return json;
+    public String getXIndex() {
+        return xIndex;
+    }
+
+    public String getXContent() {
+        return xContent;
     }
 
     public static class Builder extends BaseAttributesEvent.Builder<ViewElementEvent> {
-        private String mPath;
-        private String mTextValue;
-        private String mXpath;
-        private int mIndex = -1;
+        private String path;
+        private String textValue;
+        private String xpath;
+        private int index = -1;
+
+        /**
+         * new for v4.0 sdk
+         */
+        private String xIndex;
+        private String xContent;
 
         /**
          * keep for v3.0 sdk
@@ -109,32 +120,42 @@ public class ViewElementEvent extends BaseAttributesEvent {
         }
 
         public Builder setEventType(String eventType) {
-            mEventType = eventType;
+            this.eventType = eventType;
             return this;
         }
 
         public Builder setPath(String path) {
-            mPath = path;
+            this.path = path;
             return this;
         }
 
         public Builder setTextValue(String textValue) {
-            mTextValue = textValue;
+            this.textValue = textValue;
             return this;
         }
 
         public Builder setXpath(String xpath) {
-            mXpath = xpath;
+            this.xpath = xpath;
             return this;
         }
 
         public Builder setIndex(int index) {
-            mIndex = index;
+            this.index = index;
+            return this;
+        }
+
+        public Builder setXIndex(String xIndex) {
+            this.xIndex = xIndex;
+            return this;
+        }
+
+        public Builder setXContent(String xContent) {
+            this.xContent = xContent;
             return this;
         }
 
         public String getPath() {
-            return mPath;
+            return path;
         }
 
         @Override

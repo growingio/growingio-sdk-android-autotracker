@@ -152,10 +152,11 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         }
         TrackMainThread.trackMain().postEventToTrackMain(
                 new PageLevelCustomEvent.Builder()
-                        .setEventName(impression.getImpressionEventName())
-                        .setAttributes(impression.getEventAttributes())
                         .setPath(page.path())
                         .setPageShowTimestamp(page.getShowTimestamp())
+                        .setEventName(impression.getImpressionEventName())
+                        .setAttributes(impression.getEventAttributes())
+
         );
     }
 

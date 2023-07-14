@@ -16,32 +16,36 @@
 
 package com.growingio.android.sdk.track.events;
 
-import android.text.TextUtils;
+import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
 import java.util.Map;
 
+@JsonSerializer
 public final class VisitEvent extends BaseEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mImei;
-    private final String mAndroidId;
-    private final String mOaid;
-    private final String mGoogleAdvertisingId;
-    private final Map<String, String> mExtraSdk;
+    @Nullable
+    private final String imei;
+    @Nullable
+    private final String androidId;
+    @Nullable
+    private final String oaid;
+    @Nullable
+    private final String googleAdvertisingId;
+    @Nullable
+    private final Map<String, String> extraSdk;
 
-    protected VisitEvent(Builder eventBuilder) {
+    VisitEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mImei = eventBuilder.mImei;
-        mAndroidId = eventBuilder.mAndroidId;
-        mOaid = eventBuilder.mOaid;
-        mGoogleAdvertisingId = eventBuilder.mGoogleAdvertisingId;
-        mExtraSdk = eventBuilder.mExtraSdk;
+        imei = eventBuilder.imei;
+        androidId = eventBuilder.androidId;
+        oaid = eventBuilder.oaid;
+        googleAdvertisingId = eventBuilder.googleAdvertisingId;
+        extraSdk = eventBuilder.extraSdk;
     }
 
     @Override
@@ -49,61 +53,37 @@ public final class VisitEvent extends BaseEvent {
         return SEND_POLICY_INSTANT;
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            if (!TextUtils.isEmpty(getImei())) {
-                json.put("imei", getImei());
-            }
-            if (!TextUtils.isEmpty(getAndroidId())) {
-                json.put("androidId", getAndroidId());
-            }
-            if (!TextUtils.isEmpty(getOaid())) {
-                json.put("oaid", getOaid());
-            }
-            if (!TextUtils.isEmpty(getGoogleAdvertisingId())) {
-                json.put("googleAdvertisingId", getGoogleAdvertisingId());
-            }
-
-            if (getExtraSdk() != null && !getExtraSdk().isEmpty()) {
-                json.put("extraSdk", getExtraSdk());
-            }
-        } catch (JSONException ignored) {
-        }
-        return json;
-    }
-
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
 
     public String getImei() {
-        return checkValueSafe(mImei);
+        return checkValueSafe(imei);
     }
 
     public String getAndroidId() {
-        return checkValueSafe(mAndroidId);
+        return checkValueSafe(androidId);
     }
 
     public String getOaid() {
-        return checkValueSafe(mOaid);
+        return checkValueSafe(oaid);
     }
 
     public String getGoogleAdvertisingId() {
-        return checkValueSafe(mGoogleAdvertisingId);
+        return checkValueSafe(googleAdvertisingId);
     }
 
+    @Nullable
     public Map<String, String> getExtraSdk() {
-        return mExtraSdk;
+        return extraSdk;
     }
 
     public static final class Builder extends BaseBuilder<VisitEvent> {
-        private String mImei;
-        private String mAndroidId;
-        private String mOaid;
-        private String mGoogleAdvertisingId;
-        private Map<String, String> mExtraSdk;
+        String imei;
+        String androidId;
+        String oaid;
+        String googleAdvertisingId;
+        private Map<String, String> extraSdk;
 
         public Builder() {
             super(TrackEventType.VISIT);
@@ -114,24 +94,14 @@ public final class VisitEvent extends BaseEvent {
             super.readPropertyInTrackThread();
 
             DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
-            mImei = deviceInfo.getImei();
-            mAndroidId = deviceInfo.getAndroidId();
-            mOaid = deviceInfo.getOaid();
-            mGoogleAdvertisingId = "";
+            imei = deviceInfo.getImei();
+            androidId = deviceInfo.getAndroidId();
+            oaid = deviceInfo.getOaid();
+            googleAdvertisingId = "";
         }
 
         public Builder setExtraSdk(Map<String, String> extraSdk) {
-            this.mExtraSdk = extraSdk;
-            return this;
-        }
-
-        public Builder setTimestamp(long timestamp) {
-            mTimestamp = timestamp;
-            return this;
-        }
-
-        public Builder setSessionId(String sessionId) {
-            mSessionId = sessionId;
+            this.extraSdk = extraSdk;
             return this;
         }
 

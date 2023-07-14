@@ -26,19 +26,8 @@ public final class BaseField {
     private BaseField() {
     }
 
-    final static String PLATFORM = "platform";
-    final static String PLATFORM_VERSION = "platformVersion";
-    final static String USER_KEY = "userKey";
-    final static String USER_ID = "userId";
-    final static String SESSION_ID = "sessionId";
-    final static String EVENT_TYPE = "eventType";
-    final static String TIMESTAMP = "timestamp";
-    final static String DOMAIN = "domain";
-    final static String URL_SCHEME = "urlScheme";
     final static String APP_STATE = "appState";
-    final static String ESID = "eventSequenceId";
-    final static String DEVICE_ID = "deviceId";
-    final static String DATA_SOURCE_ID = "dataSourceId";
+
     public final static String NETWORK_STATE = "networkState";
     public final static String APP_CHANNEL = "appChannel";
     public final static String SCREEN_HEIGHT = "screenHeight";

@@ -41,6 +41,7 @@ import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 import org.json.JSONObject;
@@ -75,7 +76,7 @@ public class HybridTest {
         String customJson = "{\"eventType\":\"CUSTOM\",\"query\":\"something\",\"domain\":\"growingio.com\",\"path\":\"/webview/button/\",\"eventName\":\"test event\",\"pageShowTimestamp\":12345678,\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
         HybridCustomEvent customEvent = (HybridCustomEvent) hybridTransformerImp.transform(customJson).build();
         Truth.assertThat(customEvent.getQuery()).isEqualTo("something");
-        Truth.assertThat(customEvent.toJSONObject().toString()).contains("test event");
+        Truth.assertThat(EventStateProvider.get().toJson(customEvent).toString()).contains("test event");
         Truth.assertThat(customEvent.getAttributes().size()).isEqualTo(2);
 
         String userAttrJson = "{\"eventType\":\"LOGIN_USER_ATTRIBUTES\",\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";

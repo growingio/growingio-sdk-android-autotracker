@@ -17,9 +17,9 @@
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import java.util.Map;
-
+@JsonSerializer
 public final class VisitorAttributesEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
@@ -35,12 +35,6 @@ public final class VisitorAttributesEvent extends BaseAttributesEvent {
         @Override
         public VisitorAttributesEvent build() {
             return new VisitorAttributesEvent(this);
-        }
-
-        @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
-            return this;
         }
     }
 }

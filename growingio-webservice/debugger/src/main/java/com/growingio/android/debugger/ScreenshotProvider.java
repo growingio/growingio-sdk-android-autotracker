@@ -21,7 +21,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.async.Callback;
@@ -94,17 +93,15 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         Activity activity = ActivityStateProvider.get().getForegroundActivity();
         if (activity == null) return;
 
-        View topView = activity.getWindow().getDecorView();
-
         try {
-            ScreenshotUtil.getScreenshotBitmap(mScale, bitmap -> topView.post(() -> {
+            ScreenshotUtil.getScreenshotBitmap(mScale, bitmap -> {
                 try {
                     String screenshotBase64 = ScreenshotUtil.getScreenshotBase64(bitmap);
                     sendScreenshotRefreshed(screenshotBase64, mScale);
                 } catch (IOException e) {
                     Logger.e(TAG, "base64 screenshot failed:" + e.getMessage());
                 }
-            }));
+            });
         } catch (IllegalArgumentException e) {
             Logger.e(TAG, "dispatch screenshot failed:" + e.getMessage());
         }

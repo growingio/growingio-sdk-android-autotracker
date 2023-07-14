@@ -23,6 +23,7 @@ import com.growingio.android.sdk.track.log.CircularFifoQueue;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 import com.growingio.android.sdk.track.webservices.log.WsLogger;
 
 import org.json.JSONException;
@@ -101,7 +102,7 @@ public class DebuggerEventWrapper implements EventBuildInterceptor, ScreenshotPr
         if (event instanceof BaseEvent) {
             BaseEvent baseEvent = (BaseEvent) event;
             try {
-                JSONObject eventJson = baseEvent.toJSONObject();
+                JSONObject eventJson = EventStateProvider.get().toJson(baseEvent);
                 //添加额外的url,以便debugger显示请求地址
                 eventJson.put("url", getUrl());
                 JSONObject json = new JSONObject();

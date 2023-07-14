@@ -17,56 +17,37 @@
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Map;
-
+@JsonSerializer
 public class CustomEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mEventName;
+    private final String eventName;
 
     protected CustomEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mEventName = eventBuilder.mEventName;
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("eventName", getEventName());
-        } catch (JSONException ignored) {
-        }
-        return json;
+        eventName = eventBuilder.eventName;
     }
 
     public String getEventName() {
-        return checkValueSafe(mEventName);
+        return checkValueSafe(eventName);
     }
 
     public static class Builder extends BaseAttributesEvent.Builder<CustomEvent> {
-        private String mEventName;
+        private String eventName;
 
         public Builder() {
             super(TrackEventType.CUSTOM);
         }
 
         public Builder setEventName(String eventName) {
-            mEventName = eventName;
+            this.eventName = eventName;
             return this;
         }
 
         public String getEventName() {
-            return mEventName;
-        }
-
-        @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
-            return this;
+            return eventName;
         }
 
         @Override

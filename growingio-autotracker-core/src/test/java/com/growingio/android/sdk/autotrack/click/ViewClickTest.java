@@ -67,7 +67,6 @@ public class ViewClickTest {
         }, activity.getTextView());
 
         TrackMainThreadShadow.callback = (event) -> {
-            System.out.println(event.toJSONObject());
             if (event.getEventType().equals("VIEW_CLICK")) {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
                 Truth.assertThat(clickEvent.getTextValue()).isEqualTo("test");

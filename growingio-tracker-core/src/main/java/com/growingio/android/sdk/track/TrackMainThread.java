@@ -41,6 +41,7 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.EventSender;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.middleware.EventHttpSender;
 
@@ -276,7 +277,7 @@ public final class TrackMainThread extends ListenerContainer<OnTrackMainInitSDKC
     @TrackThread
     private void saveEvent(GEvent event) {
         if (event instanceof BaseEvent) {
-            Logger.printJson(TAG, "save: event, type is " + event.getEventType(), ((BaseEvent) event).toJSONObject().toString());
+            Logger.printJson(TAG, "save: event, type is " + event.getEventType(), EventStateProvider.get().toJson((BaseEvent) event).toString());
         }
         if (!PersistentDataProvider.get().isSendVisitAfterRefreshSessionId()) {
             // we should resend visitEvent when sessionId refreshed

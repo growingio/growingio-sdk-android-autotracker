@@ -26,6 +26,7 @@ import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,8 +90,9 @@ public class JsonDataTest {
         CustomEvent customEvent2 = new CustomEvent.Builder()
                 .setEventName("cpacm")
                 .build();
-        arrayList.add(customEvent.toJSONObject().toString().getBytes());
-        arrayList.add(customEvent2.toJSONObject().toString().getBytes());
+
+        arrayList.add(EventStateProvider.get().toJson(customEvent).toString().getBytes());
+        arrayList.add(EventStateProvider.get().toJson(customEvent2).toString().getBytes());
 
         EventFormatData eventData = EventFormatData.merge(arrayList);
         DataFetcher<EventByteArray> dataFetcher = trackerRegistry.getModelLoader(EventFormatData.class, EventByteArray.class)

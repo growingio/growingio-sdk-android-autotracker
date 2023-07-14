@@ -25,8 +25,6 @@ import java.io.File;
 
 public class EventDataTable {
 
-    private static final int DATABASE_VERSION = 1;
-
     public static final String TABLE_EVENTS = "events";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_CREATE_TIME = "_created";

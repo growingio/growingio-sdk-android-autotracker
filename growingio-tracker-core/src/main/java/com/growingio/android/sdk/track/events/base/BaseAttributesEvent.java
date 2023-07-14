@@ -16,45 +16,41 @@
 
 package com.growingio.android.sdk.track.events.base;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import androidx.annotation.Nullable;
+
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
 import java.util.Map;
 
+@JsonSerializer
 public abstract class BaseAttributesEvent extends BaseEvent {
-    private final Map<String, String> mAttributes;
+    @Nullable
+    private final Map<String, String> attributes;
 
     protected BaseAttributesEvent(Builder<?> eventBuilder) {
         super(eventBuilder);
-        mAttributes = eventBuilder.mAttributes;
+        attributes = eventBuilder.attributes;
     }
 
+    @Nullable
     public Map<String, String> getAttributes() {
-        return mAttributes;
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            if (getAttributes() != null && !getAttributes().isEmpty()) {
-                json.put("attributes", new JSONObject(getAttributes()));
-            }
-        } catch (JSONException ignored) {
-        }
-        return json;
+        return attributes;
     }
 
     public abstract static class Builder<T extends BaseAttributesEvent> extends BaseBuilder<T> {
-        private Map<String, String> mAttributes;
+        private Map<String, String> attributes;
 
         protected Builder(String eventType) {
             super(eventType);
         }
 
         public Builder<T> setAttributes(Map<String, String> attributes) {
-            mAttributes = attributes;
+            this.attributes = attributes;
             return this;
+        }
+
+        protected Map<String, String> getAttributes() {
+            return attributes;
         }
     }
 }

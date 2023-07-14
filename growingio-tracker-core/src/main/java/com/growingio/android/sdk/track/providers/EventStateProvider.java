@@ -19,30 +19,49 @@ package com.growingio.android.sdk.track.providers;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.events.helper.JsonSerializableFactory;
 import com.growingio.android.sdk.track.log.CircularFifoQueue;
 import com.growingio.android.sdk.track.log.Logger;
 
+import org.json.JSONObject;
+
 /**
  * <p>
- * cache events before sdk init
  *
  * @author cpacm 2023/3/21
  */
-public class CacheEventProvider {
+public class EventStateProvider {
 
-    private static final String TAG = "CacheEventProvider";
+    private static final String TAG = "EventStateProvider";
 
     private static class SingleInstance {
-        private static final CacheEventProvider INSTANCE = new CacheEventProvider();
+        private static final EventStateProvider INSTANCE = new EventStateProvider();
     }
 
-    private CacheEventProvider() {
+    private EventStateProvider() {
+        serializableFactory = new JsonSerializableFactory();
     }
 
     private final CircularFifoQueue<BaseEvent.BaseBuilder<?>> caches = new CircularFifoQueue<>(200);
 
-    public static CacheEventProvider get() {
-        return CacheEventProvider.SingleInstance.INSTANCE;
+    private final JsonSerializableFactory serializableFactory;
+
+    public static EventStateProvider get() {
+        return EventStateProvider.SingleInstance.INSTANCE;
+    }
+
+    public JSONObject toJson(BaseEvent event) {
+        JSONObject jsonObject = new JSONObject();
+        serializableFactory.toJson(jsonObject, event);
+        return jsonObject;
+    }
+
+    public void toJson(JSONObject jsonObject, BaseEvent event) {
+        serializableFactory.toJson(jsonObject, event);
+    }
+
+    public void parseFrom(BaseEvent.BaseBuilder builder, JSONObject jsonObject) {
+        serializableFactory.parseFrom(builder, jsonObject);
     }
 
     public void releaseCaches() {

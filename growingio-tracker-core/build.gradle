@@ -73,6 +73,9 @@ dependencies {
     testImplementation project(path: ':growingio-data:database')
     testImplementation project(path: ':growingio-data:protobuf')
     testImplementation project(path: ':growingio-data:json')
+
+    implementation project(":growingio-annotation")
+    annotationProcessor project(":growingio-annotation:json-serializer")
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

@@ -17,13 +17,13 @@
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import java.util.Map;
-
+@JsonSerializer
 public final class LoginUserAttributesEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
-    protected LoginUserAttributesEvent(Builder eventBuilder) {
+    private LoginUserAttributesEvent(Builder eventBuilder) {
         super(eventBuilder);
     }
 
@@ -35,12 +35,6 @@ public final class LoginUserAttributesEvent extends BaseAttributesEvent {
         @Override
         public LoginUserAttributesEvent build() {
             return new LoginUserAttributesEvent(this);
-        }
-
-        @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
-            return this;
         }
     }
 }

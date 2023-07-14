@@ -18,11 +18,12 @@ package com.growingio.android.sdk.track.events;
 
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.growingio.sdk.annotation.json.JsonAlias;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ import java.util.Map;
  *
  * @author cpacm 2022/8/3
  */
+@JsonSerializer
 public class ActivateEvent extends BaseAttributesEvent {
 
     private static final String EVENT_REENGAGE = "$app_reengage";
@@ -40,66 +42,23 @@ public class ActivateEvent extends BaseAttributesEvent {
 
     private final String eventName;
 
+    @Nullable
     private final String oaid;
+    @Nullable
+    @JsonAlias(name = "googleAdvertisingId")
     private final String googleId;
-    private final String ua;
+    @Nullable
     private final String androidId;
+    @Nullable
     private final String imei;
-
-    private final String linkId;
-    private final String clickId;
-    private final String clickTm;
-    private final String params;
-    private final String classification; // cl 类别
 
     protected ActivateEvent(Builder eventBuilder) {
         super(eventBuilder);
         eventName = eventBuilder.eventName;
         oaid = eventBuilder.oaid;
         googleId = eventBuilder.googleId;
-        ua = eventBuilder.ua;
         androidId = eventBuilder.androidId;
         imei = eventBuilder.imei;
-
-        linkId = eventBuilder.linkId;
-        clickId = eventBuilder.clickId;
-        clickTm = eventBuilder.clickTm;
-        params = eventBuilder.params;
-        classification = eventBuilder.classification;
-    }
-
-    @Override
-    public Map<String, String> getAttributes() {
-        HashMap<String, String> map = new HashMap<>();
-        if (!TextUtils.isEmpty(ua)) map.put("userAgent", ua);
-        if (!TextUtils.isEmpty(classification)) map.put("deep_type", classification);
-        if (!TextUtils.isEmpty(linkId)) map.put("deep_link_id", linkId);
-        if (!TextUtils.isEmpty(clickId)) map.put("deep_click_id", clickId);
-        if (!TextUtils.isEmpty(clickTm)) map.put("deep_click_time", clickTm);
-        if (params != null) map.put("deep_params", params);
-        return map;
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("eventName", eventName);
-            if (!TextUtils.isEmpty(googleId)) {
-                json.put("googleAdvertisingId", googleId);
-            }
-            if (!TextUtils.isEmpty(oaid)) {
-                json.put("oaid", oaid);
-            }
-            if (!TextUtils.isEmpty(imei)) {
-                json.put("imei", imei);
-            }
-            if (!TextUtils.isEmpty(androidId)) {
-                json.put("androidId", androidId);
-            }
-        } catch (JSONException ignored) {
-        }
-        return json;
     }
 
     public String getOaid() {
@@ -124,13 +83,12 @@ public class ActivateEvent extends BaseAttributesEvent {
 
     public static final class Builder extends BaseAttributesEvent.Builder<ActivateEvent> {
 
-        private String eventName;
-
-        private String oaid;
-        private String googleId;
-        private String ua;
-        private String androidId;
-        private String imei;
+        String eventName;
+        String oaid;
+        String googleId;
+        String ua;
+        String androidId;
+        String imei;
 
         private String linkId;
         private String clickId;
@@ -181,6 +139,15 @@ public class ActivateEvent extends BaseAttributesEvent {
 
         @Override
         public ActivateEvent build() {
+            Map<String, String> map = getAttributes();
+            if (map == null) map = new HashMap<>();
+            if (!TextUtils.isEmpty(ua)) map.put("userAgent", ua);
+            if (!TextUtils.isEmpty(classification)) map.put("deep_type", classification);
+            if (!TextUtils.isEmpty(linkId)) map.put("deep_link_id", linkId);
+            if (!TextUtils.isEmpty(clickId)) map.put("deep_click_id", clickId);
+            if (!TextUtils.isEmpty(clickTm)) map.put("deep_click_time", clickTm);
+            if (params != null) map.put("deep_params", params);
+            setAttributes(map);
             return new ActivateEvent(this);
         }
     }

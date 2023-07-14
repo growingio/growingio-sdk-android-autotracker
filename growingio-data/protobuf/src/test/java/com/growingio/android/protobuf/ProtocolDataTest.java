@@ -86,8 +86,8 @@ public class ProtocolDataTest {
         CustomEvent customEvent2 = new CustomEvent.Builder()
                 .setEventName("cpacm")
                 .build();
-        arrayList.add(EventProtocolTransfer.protocol(customEvent));
-        arrayList.add(EventProtocolTransfer.protocol(customEvent2));
+        arrayList.add(EventProtocolTransfer.protocolByte(customEvent));
+        arrayList.add(EventProtocolTransfer.protocolByte(customEvent2));
 
         EventFormatData eventData = EventFormatData.merge(arrayList);
         DataFetcher<EventByteArray> dataFetcher = trackerRegistry.getModelLoader(EventFormatData.class, EventByteArray.class)

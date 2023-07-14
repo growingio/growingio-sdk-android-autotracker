@@ -17,9 +17,9 @@
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import java.util.Map;
-
+@JsonSerializer
 public final class ConversionVariablesEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
@@ -30,12 +30,6 @@ public final class ConversionVariablesEvent extends BaseAttributesEvent {
     public static final class Builder extends BaseAttributesEvent.Builder<ConversionVariablesEvent> {
         public Builder() {
             super(TrackEventType.CONVERSION_VARIABLES);
-        }
-
-        @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
-            return this;
         }
 
         @Override

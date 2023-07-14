@@ -16,73 +16,48 @@
 
 package com.growingio.android.sdk.track.events;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import java.util.Map;
-
+@JsonSerializer
 public class PageLevelCustomEvent extends CustomEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mPath;
-    private final long mPageShowTimestamp;
+    private final String path;
+    private final long pageShowTimestamp;
 
     protected PageLevelCustomEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mPath = eventBuilder.mPath;
-        mPageShowTimestamp = eventBuilder.mPageShowTimestamp;
+        path = eventBuilder.path;
+        pageShowTimestamp = eventBuilder.pageShowTimestamp;
     }
 
     public String getPath() {
-        return checkValueSafe(mPath);
+        return checkValueSafe(path);
     }
 
     public long getPageShowTimestamp() {
-        return mPageShowTimestamp;
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("path", getPath());
-            json.put("pageShowTimestamp", getPageShowTimestamp());
-        } catch (JSONException ignored) {
-        }
-        return json;
+        return pageShowTimestamp;
     }
 
     public static class Builder extends CustomEvent.Builder {
-        private String mPath;
-        private long mPageShowTimestamp;
+        private String path;
+        private long pageShowTimestamp;
 
         public Builder() {
         }
 
         public Builder setPath(String path) {
-            mPath = path;
+            this.path = path;
             return this;
         }
 
         public Builder setPageShowTimestamp(long pageShowTimestamp) {
-            mPageShowTimestamp = pageShowTimestamp;
-            return this;
-        }
-
-        @Override
-        public Builder setEventName(String eventName) {
-            super.setEventName(eventName);
-            return this;
-        }
-
-        @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
+            this.pageShowTimestamp = pageShowTimestamp;
             return this;
         }
 
         public String getPath() {
-            return mPath;
+            return path;
         }
 
         @Override

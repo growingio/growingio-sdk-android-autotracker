@@ -30,6 +30,7 @@ apply from: 'demos/settings-parent.gradle'
 // tools
 include ':growingio-annotation'
 include ':growingio-annotation:compiler'
+include ':growingio-annotation:json-serializer'
 
 include ':growingio-tracker-core'
 include ':growingio-autotracker-core'

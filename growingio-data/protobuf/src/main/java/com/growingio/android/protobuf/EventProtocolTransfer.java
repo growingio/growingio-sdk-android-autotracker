@@ -16,6 +16,9 @@
 
 package com.growingio.android.protobuf;
 
+import android.text.TextUtils;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.growingio.android.sdk.track.events.ActivateEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.CustomEvent;
@@ -26,14 +29,15 @@ import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.events.VisitEvent;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
-import com.growingio.android.sdk.track.events.cdp.ResourceItem;
-import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 
-import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * <p>
@@ -44,6 +48,29 @@ import java.util.Map;
 class EventProtocolTransfer {
 
     private EventProtocolTransfer() {
+    }
+
+    public static EventV3Protocol.EventV3Dto covertToProtobuf(byte[] byteArray) {
+        try {
+            return EventV3Protocol.EventV3Dto.parseFrom(byteArray);
+        } catch (InvalidProtocolBufferException e) {
+            Logger.w("EventProtocolTransfer", "Events in the database are not in the protobuf format");
+        }
+        try {
+            String data = new String(byteArray);
+            if (data.startsWith("{") && data.endsWith("}")) { //ensure json format
+                JSONObject json = new JSONObject(data);
+                BaseEvent.BaseBuilder builder = generateEventBuilder(json);
+                EventStateProvider.get().parseFrom(builder, json);
+                if (builder != null) {
+                    return protocol(builder.build());
+                }
+                return null;
+            }
+        } catch (JSONException e) {
+            Logger.w("EventProtocolTransfer", "Events in the database are not in the json format");
+        }
+        return null;
     }
 
     private static EventV3Protocol.EventType protocolType(String eventType) {
@@ -70,25 +97,55 @@ class EventProtocolTransfer {
         } else if (TrackEventType.FORM_SUBMIT.equals(eventType)) {
             return EventV3Protocol.EventType.FORM_SUBMIT; //10
         } else if (TrackEventType.ACTIVATE.equals(eventType)) {
-            return EventV3Protocol.EventType.ACTIVATE;
+            return EventV3Protocol.EventType.ACTIVATE; //11
         }
         return EventV3Protocol.EventType.CUSTOM; //1
     }
 
-    public static byte[] protocol(GEvent gEvent) {
+    private static BaseEvent.BaseBuilder generateEventBuilder(JSONObject event) {
+        try {
+            String eventType = event.getString(BaseEvent.EVENT_TYPE);
+            if (TrackEventType.VISIT.equals(eventType)) {
+                return new VisitEvent.Builder();
+            } else if (AutotrackEventType.VIEW_CLICK.equals(eventType)
+                    || AutotrackEventType.VIEW_CHANGE.equals(eventType)) {
+                return new HybridViewElementEvent.Builder(eventType);
+            } else if (AutotrackEventType.PAGE.equals(eventType)) {
+                return new HybridPageEvent.Builder();
+            } else if (TrackEventType.CUSTOM.equals(eventType)) {
+                if (!TextUtils.isEmpty(event.optString("path"))) {
+                    return new PageLevelCustomEvent.Builder();
+                }
+                if (!TextUtils.isEmpty(event.optString("query"))) {
+                    return new HybridCustomEvent.Builder();
+                }
+                return new CustomEvent.Builder(); //custom
+            } else if (TrackEventType.ACTIVATE.equals(eventType)) {
+                return new ActivateEvent.Builder();
+            }
+        } catch (JSONException ignored) {
+        }
+        return null;
+    }
+
+
+    public static byte[] protocolByte(GEvent gEvent) {
+        EventV3Protocol.EventV3Dto eventBuilder = protocol(gEvent);
+        return eventBuilder.toByteArray();
+
+    }
+
+    private static EventV3Protocol.EventV3Dto protocol(GEvent gEvent) {
         EventV3Protocol.EventV3Dto.Builder eventBuilder = EventV3Protocol.EventV3Dto.newBuilder();
         if (gEvent instanceof BaseEvent) {
             BaseEvent baseEvent = (BaseEvent) gEvent;
             eventBuilder.setDeviceId(baseEvent.getDeviceId()); //1
             eventBuilder.setUserId(baseEvent.getUserId()); //2
-            Map<String, String> extraParams = baseEvent.getExtraParams();
 //            if (extraParams != null && extraParams.containsKey("gioId")) {
 //                eventBuilder.setGioId(extraParams.get("gioId")); //3
 //            }
             eventBuilder.setSessionId(baseEvent.getSessionId()); //4
-            if (extraParams != null && extraParams.containsKey("dataSourceId")) {
-                eventBuilder.setDataSourceId(extraParams.get("dataSourceId")); //5
-            }
+            eventBuilder.setDataSourceId(baseEvent.getDataSourceId()); //5
             eventBuilder.setEventType(protocolType(baseEvent.getEventType())); //6
             eventBuilder.setPlatform(baseEvent.getPlatform()); //7
             eventBuilder.setTimestamp(baseEvent.getTimestamp()); //8
@@ -117,18 +174,32 @@ class EventProtocolTransfer {
 
             eventBuilder.setUserKey(baseEvent.getUserKey()); //55
         }
+
+        if (gEvent instanceof BaseAttributesEvent) {
+            BaseAttributesEvent attrEvent = (BaseAttributesEvent) gEvent;
+            if (attrEvent.getAttributes() != null) {
+                eventBuilder.putAllAttributes(attrEvent.getAttributes()); //24
+            }
+        }
+        if (gEvent instanceof ViewElementEvent) {
+            ViewElementEvent vEvent = (ViewElementEvent) gEvent;
+            eventBuilder.setPath(vEvent.getPath()); //10
+            eventBuilder.setTextValue(vEvent.getTextValue()); //27
+            eventBuilder.setXpath(vEvent.getXpath()); //28
+            eventBuilder.setIndex(vEvent.getIndex()); //29
+            if (vEvent.getXIndex() != null) {
+                eventBuilder.setXindex(vEvent.getXIndex()); //56
+            }
+            if (vEvent.getXContent() != null) {
+                eventBuilder.setXcontent(vEvent.getXContent()); //57
+            }
+        }
         if (gEvent instanceof PageEvent) {
             PageEvent pageEvent = (PageEvent) gEvent;
             eventBuilder.setPath(pageEvent.getPath()); //10
             eventBuilder.setTitle(pageEvent.getTitle()); //12
             eventBuilder.setReferralPage(pageEvent.getReferralPage()); //13
             eventBuilder.setOrientation(pageEvent.getOrientation()); //52
-        }
-        if (gEvent instanceof BaseAttributesEvent) {
-            BaseAttributesEvent attrEvent = (BaseAttributesEvent) gEvent;
-            if (attrEvent.getAttributes() != null) {
-                eventBuilder.putAllAttributes(attrEvent.getAttributes()); //24
-            }
         }
         if (gEvent instanceof CustomEvent) {
             CustomEvent customEvent = (CustomEvent) gEvent;
@@ -138,13 +209,6 @@ class EventProtocolTransfer {
             PageLevelCustomEvent plEvent = (PageLevelCustomEvent) gEvent;
             eventBuilder.setPath(plEvent.getPath()); //10
             eventBuilder.setPageShowTimestamp(plEvent.getPageShowTimestamp()); //23
-        }
-        if (gEvent instanceof ViewElementEvent) {
-            ViewElementEvent vEvent = (ViewElementEvent) gEvent;
-            eventBuilder.setPath(vEvent.getPath()); //10
-            eventBuilder.setTextValue(vEvent.getTextValue()); //27
-            eventBuilder.setXpath(vEvent.getXpath()); //28
-            eventBuilder.setIndex(vEvent.getIndex()); //29
         }
         if (gEvent instanceof VisitEvent) {
             VisitEvent visitEvent = (VisitEvent) gEvent;
@@ -173,16 +237,6 @@ class EventProtocolTransfer {
             eventBuilder.setQuery(hvEvent.getQuery()); //11
         }
 
-        // deal with cdp event
-        if (gEvent instanceof ResourceItemCustomEvent) {
-            ResourceItemCustomEvent ricEvent = (ResourceItemCustomEvent) gEvent;
-            ResourceItem resourceItem = ricEvent.getResourceItem();
-            if (resourceItem != null) {
-                eventBuilder.setResourceItem(EventV3Protocol.ResourceItem.newBuilder()
-                        .setId(resourceItem.getId()).setKey(resourceItem.getKey())); //25
-            }
-        }
-
         // deal with advert events
         if (gEvent instanceof ActivateEvent) {
             ActivateEvent activateEvent = (ActivateEvent) gEvent;
@@ -193,7 +247,7 @@ class EventProtocolTransfer {
             eventBuilder.setOaid(activateEvent.getOaid()); //48
         }
 
-        return eventBuilder.build().toByteArray();
+        return eventBuilder.build();
     }
 }
 

@@ -24,7 +24,7 @@ import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
-import com.growingio.android.sdk.track.providers.CacheEventProvider;
+import com.growingio.android.sdk.track.providers.EventStateProvider;
 import com.growingio.android.sdk.track.webservices.Circler;
 import com.growingio.android.sdk.track.webservices.Debugger;
 import com.growingio.android.sdk.track.webservices.WebService;
@@ -92,7 +92,7 @@ public class FlutterPluginProvider {
             builder.addAttribute(attributes);
             long timeStamp = (Long) args.get("timestamp");
 
-            CacheEventProvider.get().cacheEvent(
+            EventStateProvider.get().cacheEvent(
                     new PageEvent.Builder()
                             .setPath(path)
                             .setTitle(title)
@@ -113,7 +113,7 @@ public class FlutterPluginProvider {
             String title = (String) args.get("textValue");
             int index = (int) args.get("index");
 
-            CacheEventProvider.get().cacheEvent(
+            EventStateProvider.get().cacheEvent(
                     new ViewElementEvent.Builder(eventType)
                             .setPath(path)
                             .setXpath(xpath)
