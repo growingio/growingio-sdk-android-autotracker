@@ -39,6 +39,8 @@ import com.growingio.android.sdk.track.providers.EventStateProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Map;
+
 /**
  * <p>
  * transfer GEvent to protocol
@@ -122,6 +124,18 @@ class EventProtocolTransfer {
                 return new CustomEvent.Builder(); //custom
             } else if (TrackEventType.ACTIVATE.equals(eventType)) {
                 return new ActivateEvent.Builder();
+            } else{
+                return new BaseAttributesEvent.Builder(eventType) {
+                    @Override
+                    public BaseEvent build() {
+                        return new BaseAttributesEvent(this) {
+                            @Override
+                            public Map<String, String> getAttributes() {
+                                return super.getAttributes();
+                            }
+                        };
+                    }
+                };
             }
         } catch (JSONException ignored) {
         }

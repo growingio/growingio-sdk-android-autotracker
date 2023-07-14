@@ -76,13 +76,11 @@ public class TrackConfigurationImpressionScaleTest extends EventsTest {
         TrackHelper.waitForIdleSync();
         Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
         Awaiter.untilFalse(receivedEvent);
-
+        PageLevelCustomEvent.Builder pEvent = new PageLevelCustomEvent.Builder();
+        pEvent.setPath("/ViewImpressionActivity").setEventName("blankViewImpressionEvent");
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("blankViewImpressionEvent")
-                        .build()
+                pEvent.build()
         ));
         scenario.moveToState(Lifecycle.State.CREATED).moveToState(Lifecycle.State.RESUMED);
         onView(withId(R.id.tv_impression)).perform(scrollTo());

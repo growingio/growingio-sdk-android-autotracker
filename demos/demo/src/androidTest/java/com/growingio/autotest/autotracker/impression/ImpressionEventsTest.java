@@ -74,12 +74,11 @@ public class ImpressionEventsTest extends EventsTest {
     @Test
     public void impressionEventTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        PageLevelCustomEvent.Builder pEvent = new PageLevelCustomEvent.Builder();
+        pEvent.setPath("/ViewImpressionActivity").setEventName("buttonImpressionEvent");
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("buttonImpressionEvent")
-                        .build()
+                pEvent.build()
         ));
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback((activity, stage) -> {
             if (activity.getClass() == ViewImpressionActivity.class && stage == Stage.CREATED) {
@@ -95,13 +94,11 @@ public class ImpressionEventsTest extends EventsTest {
     @Test
     public void stopImpressionEventTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        PageLevelCustomEvent.Builder pEvent = new PageLevelCustomEvent.Builder();
+        pEvent.setPath("/ViewImpressionActivity").setEventName("buttonImpressionEvent").setAttributes(TEST_ATTRIBUTES);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("buttonImpressionEvent")
-                        .setAttributes(TEST_ATTRIBUTES)
-                        .build()
+                pEvent.build()
         ));
         AtomicReference<View> button = new AtomicReference<>();
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback((activity, stage) -> {
@@ -127,13 +124,11 @@ public class ImpressionEventsTest extends EventsTest {
     @Test
     public void impressionAttributesEventTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        PageLevelCustomEvent.Builder pEvent = new PageLevelCustomEvent.Builder();
+        pEvent.setPath("/ViewImpressionActivity").setEventName("buttonImpressionEvent").setAttributes(TEST_ATTRIBUTES);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("buttonImpressionEvent")
-                        .setAttributes(TEST_ATTRIBUTES)
-                        .build()
+                pEvent.build()
         ));
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback((activity, stage) -> {
             if (activity.getClass() == ViewImpressionActivity.class && stage == Stage.CREATED) {
@@ -149,21 +144,19 @@ public class ImpressionEventsTest extends EventsTest {
     @Test
     public void impressionEventsTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        PageLevelCustomEvent.Builder pEvent = new PageLevelCustomEvent.Builder();
+        pEvent.setPath("/ViewImpressionActivity").setEventName("buttonImpressionEvent").setAttributes(TEST_ATTRIBUTES);
+
+        PageLevelCustomEvent.Builder pEvent2 = new PageLevelCustomEvent.Builder();
+        pEvent2.setPath("/ViewImpressionActivity").setEventName("imageViewImpressionEvent").setAttributes(TEST_ATTRIBUTES);
+
+        PageLevelCustomEvent.Builder pEvent3 = new PageLevelCustomEvent.Builder();
+        pEvent3.setPath("/ViewImpressionActivity").setEventName("blankViewImpressionEvent").setAttributes(TEST_ATTRIBUTES);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("buttonImpressionEvent")
-                        .setAttributes(TEST_ATTRIBUTES)
-                        .build(),
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("imageViewImpressionEvent")
-                        .build(),
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("blankViewImpressionEvent")
-                        .build()
+                pEvent.build(),
+                pEvent2.build(),
+                pEvent3.build()
         ));
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback((activity, stage) -> {
             if (activity.getClass() == ViewImpressionActivity.class && stage == Stage.CREATED) {
@@ -185,13 +178,11 @@ public class ImpressionEventsTest extends EventsTest {
     @Test
     public void impressionEventFromGoneTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        PageLevelCustomEvent.Builder pEvent = new PageLevelCustomEvent.Builder();
+        pEvent.setPath("/ViewImpressionActivity").setEventName("buttonImpressionEvent").setAttributes(TEST_ATTRIBUTES);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("buttonImpressionEvent")
-                        .setAttributes(TEST_ATTRIBUTES)
-                        .build()
+                pEvent.build()
         ));
         AtomicReference<View> button = new AtomicReference<>();
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback((activity, stage) -> {
@@ -209,16 +200,14 @@ public class ImpressionEventsTest extends EventsTest {
         scenario.close();
     }
 
-//    @Test
+    //    @Test
     public void impressionEventFromInvisibleTest() {
         final AtomicBoolean receivedEvent = new AtomicBoolean(false);
+        PageLevelCustomEvent.Builder pEvent = new PageLevelCustomEvent.Builder();
+        pEvent.setPath("/ViewImpressionActivity").setEventName("buttonImpressionEvent").setAttributes(TEST_ATTRIBUTES);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("buttonImpressionEvent")
-                        .setAttributes(TEST_ATTRIBUTES)
-                        .build()
+                pEvent.build()
         ));
         AtomicReference<View> button = new AtomicReference<>();
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback((activity, stage) -> {
@@ -253,14 +242,11 @@ public class ImpressionEventsTest extends EventsTest {
         TrackHelper.waitForIdleSync();
         Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
         Awaiter.untilFalse(receivedEvent);
-
+        PageLevelCustomEvent.Builder pEvent = new PageLevelCustomEvent.Builder();
+        pEvent.setPath("/ViewImpressionActivity").setEventName("textViewImpressionEvent").setAttributes(TEST_ATTRIBUTES);
         getEventsApiServer().setOnReceivedEventListener(new OnReceivedViewImpressionEventsListener(
                 receivedEvent,
-                new PageLevelCustomEvent.Builder()
-                        .setPath("/ViewImpressionActivity")
-                        .setEventName("textViewImpressionEvent")
-                        .setAttributes(TEST_ATTRIBUTES)
-                        .build()
+                pEvent.build()
         ));
         scenario.moveToState(Lifecycle.State.CREATED).moveToState(Lifecycle.State.RESUMED);
         onView(withId(R.id.tv_impression)).perform(scrollTo());
