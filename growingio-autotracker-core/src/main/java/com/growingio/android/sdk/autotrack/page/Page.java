@@ -34,6 +34,10 @@ public abstract class Page<T> {
     private String mAlias;
     private String mTitle;
     private String mPath;
+
+    private String mOriginPath;
+    private String xIndex;
+
     private Map<String, String> mAttributes;
     private final List<Page<?>> mChildren = new ArrayList<>();
 
@@ -98,7 +102,7 @@ public abstract class Page<T> {
         return mParent;
     }
 
-    abstract String getTag();
+    public abstract String getTag();
 
     public void addChildren(Page<?> page) {
         mChildren.add(page);
@@ -135,6 +139,62 @@ public abstract class Page<T> {
         return Collections.emptyMap();
     }
 
+    public String getXIndex() {
+        originPath(false);
+        return this.xIndex;
+    }
+
+    /**
+     * @param omitted true:v3 false:v4
+     * @return path
+     */
+    public String originPath(boolean omitted) {
+        if (!TextUtils.isEmpty(mOriginPath)) {
+            return mOriginPath;
+        }
+        List<Page<?>> pageTree = new ArrayList<>();
+        pageTree.add(this);
+        int pageLevel = 1;
+        boolean hasMoreParent = false;
+        Page<?> parent = getParent();
+        while (parent != null) {
+            pageTree.add(parent);
+            pageLevel++;
+            if (pageLevel >= MAX_PAGE_LEVEL && omitted) {
+                hasMoreParent = parent.getParent() != null;
+                break;
+            }
+            if (!TextUtils.isEmpty(parent.getAlias()) && omitted) {
+                break;
+            }
+            parent = parent.getParent();
+        }
+        StringBuilder path = new StringBuilder();
+        StringBuilder xIndex = new StringBuilder();
+        for (int i = pageTree.size() - 1; i >= 0; i--) {
+            Page<?> page = pageTree.get(i);
+            if (hasMoreParent && i == pageTree.size() - 1) {
+                path.append("*/");
+                xIndex.append("*/");
+            } else {
+                path.append("/");
+                xIndex.append("/");
+            }
+            path.append(page.getName());
+            String tag = page.getTag();
+            if (tag != null) {
+                if (omitted) path.append("[").append(tag.isEmpty() ? "-" : tag).append("]");
+                xIndex.append(tag.isEmpty() ? "-" : tag);
+            } else {
+                xIndex.append(0);// 默认page的index都为0,不做index的计算。
+            }
+
+        }
+        this.xIndex = xIndex.toString();
+        mOriginPath = path.toString();
+        return mOriginPath;
+    }
+
     public String path() {
         if (!TextUtils.isEmpty(mPath)) {
             return mPath;
@@ -145,34 +205,7 @@ public abstract class Page<T> {
             return mPath;
         }
 
-        List<Page<?>> pageTree = new ArrayList<>();
-        pageTree.add(this);
-        int pageLevel = 1;
-        boolean hasMoreParent = false;
-        Page<?> parent = getParent();
-        while (parent != null) {
-            pageTree.add(parent);
-            pageLevel++;
-            if (pageLevel >= MAX_PAGE_LEVEL) {
-                hasMoreParent = parent.getParent() != null;
-                break;
-            }
-            if (!TextUtils.isEmpty(parent.getAlias())) {
-                break;
-            }
-            parent = parent.getParent();
-        }
-        StringBuilder path = new StringBuilder();
-        for (int i = pageTree.size() - 1; i >= 0; i--) {
-            Page<?> page = pageTree.get(i);
-            if (hasMoreParent && i == pageTree.size() - 1) {
-                path.append("*/");
-            } else {
-                path.append("/");
-            }
-            path.append(page.getName());
-        }
-        mPath = path.toString();
-        return mPath;
+        this.mPath = originPath(true);
+        return this.mPath;
     }
 }

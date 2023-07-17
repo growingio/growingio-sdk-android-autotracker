@@ -43,12 +43,10 @@ class ViewNodeV4 {
 
     private String xIndex;
     private String indeedXIndex;
-
-    private String originalXPath;
     private String clickableParentXPath;
+    private String clickablePatentXIndex;
     private String viewContent;
     private boolean hasListParent;
-    private String prefixPage;
     private int index;
 
     private String page;
@@ -75,14 +73,6 @@ class ViewNodeV4 {
         return xPath;
     }
 
-    ViewNodeV4 setOriginalXPath(String originalXPath) {
-        return this;
-    }
-
-    String getOriginalXPath() {
-        return "originalXPath";
-    }
-
     ViewNodeV4 setClickableParentXPath(String clickableParentXPath) {
         this.clickableParentXPath = clickableParentXPath;
         return this;
@@ -90,6 +80,15 @@ class ViewNodeV4 {
 
     String getClickableParentXPath() {
         return clickableParentXPath;
+    }
+
+    public String getClickablePatentXIndex() {
+        return clickablePatentXIndex;
+    }
+
+    public ViewNodeV4 setClickablePatentXIndex(String clickablePatentXIndex) {
+        this.clickablePatentXIndex = clickablePatentXIndex;
+        return this;
     }
 
     ViewNodeV4 setViewContent(String viewContent) {
@@ -108,15 +107,6 @@ class ViewNodeV4 {
 
     boolean isHasListParent() {
         return hasListParent;
-    }
-
-    ViewNodeV4 setPrefixPage(String prefixPage) {
-        this.prefixPage = prefixPage;
-        return this;
-    }
-
-    String getPrefixPage() {
-        return prefixPage;
     }
 
     ViewNodeV4 setIndex(int index) {
@@ -150,9 +140,27 @@ class ViewNodeV4 {
         this.page = page;
     }
 
-    public void calculate(boolean ignorePage) {
+    public ViewNodeV4 setXIndex(String xIndex) {
+        this.xIndex = xIndex;
+        return this;
+    }
+
+    public String getXIndex() {
+        return xIndex;
+    }
+
+    public String getIndeedXIndex() {
+        return indeedXIndex;
+    }
+
+    public ViewNodeV4 setIndeedXIndex(String indeedXIndex) {
+        this.indeedXIndex = indeedXIndex;
+        return this;
+    }
+
+    public void calculate() {
         calculateViewPosition();
-        calculateViewXPath(ignorePage);
+        calculateViewXPath();
         calculateViewContent();
     }
 
@@ -175,33 +183,15 @@ class ViewNodeV4 {
         }
     }
 
-    private void calculateViewXPath(boolean ignorePage) {
+    private void calculateViewXPath() {
         Object parentObject = this.view.getParent();
         if (parentObject == null || (WindowHelper.get().isDecorView(this.view) && !(parentObject instanceof View))) {
             return;
         }
 
-        String customId = ViewAttributeUtil.getCustomId(this.view);
-        Page<?> page = ViewAttributeUtil.getViewPage(this.view);
-        if (customId != null) {
-            this.originalXPath = "/" + customId;
-            this.xPath = originalXPath;
-            return;
-        } else if (page != null) {
-            // 圈选为bfs，需要考虑page是否被忽略
-            // 点击为dfs，计算时所有page均为忽略
-            if (ignorePage) {
-                this.originalXPath = "/Page";
-            } else {
-                this.originalXPath = this.prefixPage + "/" + page.getName();
-            }
-            this.xPath = this.originalXPath;
-            this.prefixPage = this.originalXPath;
-            return;
-        }
-
-        StringBuilder originalXPath = new StringBuilder(this.originalXPath);
+        StringBuilder indeedXIndex = new StringBuilder(this.indeedXIndex);
         StringBuilder xPath = new StringBuilder(this.xPath);
+        StringBuilder xIndex = new StringBuilder(this.xIndex);
         String viewName = ClassUtil.getSimpleClassName(this.view.getClass());
 
         //针对菜单栏处理
@@ -211,9 +201,9 @@ class ViewNodeV4 {
                 ViewNodeV4 itemViewNode = generateMenuItemViewNode(this.view.getContext(), menuItem);
                 this.xPath = itemViewNode.getXPath();
                 this.index = itemViewNode.getIndex();
+                this.xIndex = itemViewNode.getXIndex();
                 this.viewContent = itemViewNode.getViewContent();
-                this.originalXPath = itemViewNode.getOriginalXPath();
-                this.prefixPage = itemViewNode.getOriginalXPath();
+                this.indeedXIndex = itemViewNode.getIndeedXIndex();
                 return;
             }
         }
@@ -222,29 +212,41 @@ class ViewNodeV4 {
             ViewGroup parent = (ViewGroup) parentObject;
             if (parent instanceof ExpandableListView) {
                 ExpandableListView listParent = (ExpandableListView) parent;
-                calculateExpandableListView(listParent, viewName, originalXPath, xPath);
+                calculateExpandableListView(listParent, viewName, xPath, indeedXIndex, xIndex);
             } else if (ClassExistHelper.isListView(parent) || ClassExistHelper.instanceOfRecyclerView(parent)) {
-                calculateListView(viewName, originalXPath, xPath);
+                calculateListView(viewName, xPath, indeedXIndex, xIndex);
             } else if (ClassExistHelper.instanceofAndroidXSwipeRefreshLayout(parentObject)
                     || ClassExistHelper.instanceOfSupportSwipeRefreshLayout(parentObject)) {
-                originalXPath.append("/").append(viewName).append("[0]");
-                xPath.append("/").append(viewName).append("[0]");
+                xPath.append("/").append(viewName);
+                xIndex.append("/0");
+                indeedXIndex.append("/0");
             } else {
-                calculateDefaultViewGroup(parent, viewName, originalXPath, xPath);
+                calculateDefaultViewGroup(parent, viewName, xPath, indeedXIndex, xIndex);
             }
         } else {
-            originalXPath.append("/").append(viewName).append("[").append(this.viewPosition).append("]");
-            xPath.append("/").append(viewName).append("[").append(this.viewPosition).append("]");
+            xPath.append("/").append(viewName);
+            xIndex.append("/").append(this.viewPosition);
+            indeedXIndex.append("/").append(this.viewPosition);
         }
 
+        String customId = ViewAttributeUtil.getCustomId(this.view);
         String id = ViewAttributeUtil.getViewPackageId(this.view);
-        if (id != null) {
-            originalXPath.append("#").append(id);
-            xPath.append("#").append(id);
+        String replaceId = customId == null ? id : customId;
+
+        if (replaceId != null) {
+            int lastPath = xIndex.lastIndexOf("/");
+            if (lastPath != -1) {
+                xIndex.replace(lastPath + 1, xIndex.length(), replaceId);
+            }
+            lastPath = indeedXIndex.lastIndexOf("/");
+            if (lastPath != -1) {
+                indeedXIndex.replace(lastPath + 1, indeedXIndex.length(), replaceId);
+            }
         }
 
         this.xPath = xPath.toString();
-        this.originalXPath = originalXPath.toString();
+        this.xIndex = xIndex.toString();
+        this.indeedXIndex = indeedXIndex.toString();
     }
 
     private void calculateViewContent() {
@@ -267,62 +269,71 @@ class ViewNodeV4 {
         viewNode.withView(view)
                 .setIndex(hasListParent ? this.index : -1)
                 .setXPath(this.xPath)
-                .setOriginalXPath(this.originalXPath)
+                .setIndeedXIndex(this.indeedXIndex)
+                .setXIndex(this.xIndex)
                 .setClickableParentXPath(ViewUtil.canCircle(this.view) ? this.xPath : this.clickableParentXPath)
+                .setClickablePatentXIndex(ViewUtil.canCircle(this.view) ? this.xIndex : this.clickablePatentXIndex)
                 .setHasListParent(hasListParent)
-                .setPrefixPage(this.prefixPage)
                 .setViewPosition(index)
                 .setParent(this)
-                .calculate(ignorePage);
+                .calculate();
         return viewNode;
     }
 
+
     public static ViewNodeV4 generateMenuItemViewNode(Context context, MenuItem menuItem) {
         StringBuilder xpath = new StringBuilder();
-        xpath.append(PageHelper.PAGE_PREFIX);
-        xpath.append("/MenuView/MenuItem#").append(ViewAttributeUtil.getPackageId(context, menuItem.getItemId()));
+        StringBuilder xIndex = new StringBuilder();
+        String packageId = ViewAttributeUtil.getPackageId(context, menuItem.getItemId());
+        xpath.append("/MenuView/MenuItem");
+        xIndex.append("/0/").append(packageId == null ? "0" : packageId);
 
         return new ViewNodeV4()
                 .setIndex(-1)
                 .setViewContent(menuItem.getTitle() != null ? menuItem.getTitle().toString() : null)
                 .setXPath(xpath.toString())
-                .setOriginalXPath(xpath.toString())
-                .setPrefixPage(xpath.toString());
+                .setXIndex(xIndex.toString())
+                .setIndeedXIndex(xpath.toString());
     }
 
-    private void calculateExpandableListView(ExpandableListView listParent, String viewName, StringBuilder originalXPath, StringBuilder xPath) {
+    private void calculateExpandableListView(ExpandableListView listParent, String viewName, StringBuilder xPath, StringBuilder indeedXIndex, StringBuilder xIndex) {
         long elp = listParent.getExpandableListPosition(this.viewPosition);
         if (ExpandableListView.getPackedPositionType(elp) == ExpandableListView.PACKED_POSITION_TYPE_NULL) {
             if (this.viewPosition < listParent.getHeaderViewsCount()) {
-                originalXPath.append("/ELH[").append(this.viewPosition).append("]/").append(viewName).append("[0]");
-                xPath.append("/ELH[").append(this.viewPosition).append("]/").append(viewName).append("[0]");
+                xPath.append("/ELH/").append(viewName);
+                xIndex.append("/").append(this.viewPosition).append("/0");
+                indeedXIndex.append("/").append(this.viewPosition).append("/0");
             } else {
                 int footerIndex = this.viewPosition - (listParent.getCount() - listParent.getFooterViewsCount());
-                originalXPath.append("/ELF[").append(footerIndex).append("]/").append(viewName).append("[0]");
-                xPath.append("/ELF[").append(footerIndex).append("]/").append(viewName).append("[0]");
+                xPath.append("/ELF/").append(viewName);
+                xIndex.append("/").append(footerIndex).append("/0");
+                indeedXIndex.append("/").append(footerIndex).append("/0");
             }
         } else {
             int groupIdx = ExpandableListView.getPackedPositionGroup(elp);
             int childIdx = ExpandableListView.getPackedPositionChild(elp);
             if (childIdx != -1) {
                 this.index = childIdx;
-                xPath.delete(0, xPath.length()).append(originalXPath).append("/ELVG[").append(groupIdx).append("]/ELVC[-]/").append(viewName).append("[0]");
-                originalXPath.append("/ELVG[").append(groupIdx).append("]/ELVC[").append(childIdx).append("]/").append(viewName).append("[0]");
+                xPath.append("/ELVG/ELVC/").append(viewName);
+                xIndex.delete(0, xIndex.length()).append(indeedXIndex).append("/").append(groupIdx).append("/-").append("/0");
+                indeedXIndex.append("/").append(groupIdx).append("/").append(childIdx).append("/0");
             } else {
                 this.index = groupIdx;
-                xPath.delete(0, xPath.length()).append(originalXPath).append("/ELVG[-]/").append(viewName).append("[0]");
-                originalXPath.append("/ELVG[").append(groupIdx).append("]/").append(viewName).append("[0]");
+                xPath.append("/ELVG[").append(groupIdx).append("]/").append(viewName).append("[0]");
+                xIndex.delete(0, xIndex.length()).append(indeedXIndex).append("/-").append("/0");
+                indeedXIndex.append("/").append(groupIdx).append("/0");
             }
         }
     }
 
-    private void calculateListView(String viewName, StringBuilder originalXPath, StringBuilder xPath) {
+    private void calculateListView(String viewName, StringBuilder xPath, StringBuilder indeedXIndex, StringBuilder xIndex) {
         this.index = this.viewPosition;
-        xPath.delete(0, xPath.length()).append(originalXPath).append("/").append(viewName).append("[-]");
-        originalXPath.append("/").append(viewName).append("[").append(this.viewPosition).append("]");
+        xPath.append("/").append(viewName);
+        xIndex.delete(0, xIndex.length()).append(indeedXIndex).append("/-");
+        indeedXIndex.append("/-");
     }
 
-    private void calculateDefaultViewGroup(ViewGroup parent, String viewName, StringBuilder originalXPath, StringBuilder xPath) {
+    private void calculateDefaultViewGroup(ViewGroup parent, String viewName, StringBuilder xPath, StringBuilder indeedXIndex, StringBuilder xIndex) {
         int matchTypePosition = 0;
         boolean findChildView = false;
         for (int siblingIndex = 0; siblingIndex < parent.getChildCount(); siblingIndex++) {
@@ -335,11 +346,13 @@ class ViewNodeV4 {
             }
         }
         if (findChildView) {
-            originalXPath.append("/").append(viewName).append("[").append(matchTypePosition).append("]");
-            xPath.append("/").append(viewName).append("[").append(matchTypePosition).append("]");
+            xPath.append("/").append(viewName);
+            xIndex.append("/").append(matchTypePosition);
+            indeedXIndex.append("/").append(matchTypePosition);
         } else {
-            originalXPath.append("/").append(viewName).append("[").append(this.viewPosition).append("]");
-            xPath.append("/").append(viewName).append("[").append(this.viewPosition).append("]");
+            xPath.append("/").append(viewName);
+            xIndex.append("/").append(this.viewPosition);
+            indeedXIndex.append("/").append(this.viewPosition);
         }
     }
 

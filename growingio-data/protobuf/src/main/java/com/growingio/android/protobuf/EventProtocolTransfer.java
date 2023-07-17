@@ -124,7 +124,7 @@ class EventProtocolTransfer {
                 return new CustomEvent.Builder(); //custom
             } else if (TrackEventType.ACTIVATE.equals(eventType)) {
                 return new ActivateEvent.Builder();
-            } else{
+            } else {
                 return new BaseAttributesEvent.Builder(eventType) {
                     @Override
                     public BaseEvent build() {

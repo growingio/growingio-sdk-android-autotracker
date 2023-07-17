@@ -33,13 +33,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         if (!TextUtils.isEmpty(getAlias())) {
             return getAlias();
         }
-
-        String tag = getTag();
-        if (TextUtils.isEmpty(tag)) {
-            tag = "-";
-        }
-        return "" + getCarrier().getRealFragment().getClass().getSimpleName() +
-                "[" + tag + "]";
+        return getCarrier().getRealFragment().getClass().getSimpleName();
     }
 
     @Override
@@ -48,7 +42,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
     }
 
     @Override
-    String getTag() {
+    public String getTag() {
         String tag = getCarrier().getTag();
         if (!TextUtils.isEmpty(tag)) {
             return transformSwitcherTag(tag);

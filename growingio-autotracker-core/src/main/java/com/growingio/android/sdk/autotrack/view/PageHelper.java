@@ -36,6 +36,8 @@ class PageHelper {
     public static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
     public static final String CUSTOM_WINDOW_PREFIX = "/CustomWindow";
 
+    public static final String POPUP_DECOR_VIEW_CLASS_NAME = "PopupDecorView";
+
     private PageHelper() {
     }
 

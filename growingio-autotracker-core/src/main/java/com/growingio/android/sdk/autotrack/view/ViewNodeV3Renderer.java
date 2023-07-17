@@ -16,6 +16,8 @@
 
 package com.growingio.android.sdk.autotrack.view;
 
+import static com.growingio.android.sdk.autotrack.view.PageHelper.POPUP_DECOR_VIEW_CLASS_NAME;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
@@ -309,6 +311,4 @@ class ViewNodeV3Renderer implements ViewNodeRenderer {
             });
         });
     }
-
-    private static final String POPUP_DECOR_VIEW_CLASS_NAME = "PopupDecorView";
 }

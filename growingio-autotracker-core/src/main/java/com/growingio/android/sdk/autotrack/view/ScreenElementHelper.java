@@ -39,6 +39,8 @@ public class ScreenElementHelper {
 
     private static final String VIEW_XPATH = "xpath";
     private static final String VIEW_PARENT_XPATH = "parentXPath";
+    private static final String VIEW_PARENT_XINDEX = "parentXIndex";//new for v4
+    private static final String VIEW_XINDEX = "xindex";//new for v4
     private static final String VIEW_LEFT = "left";
     private static final String VIEW_TOP = "top";
     private static final String VIEW_WIDTH = "width";
@@ -56,17 +58,23 @@ public class ScreenElementHelper {
     public static JSONObject createViewElementWithMap(Map<String, Object> data) {
         try {
             JSONObject json = new JSONObject();
-            json.put(VIEW_XPATH, (String) data.get("xpath"));
-            json.put(VIEW_PARENT_XPATH, (String) data.get("parentXPath"));
-            json.put(VIEW_LEFT, ((Double) data.get("left")).intValue());
-            json.put(VIEW_TOP, ((Double) data.get("top")).intValue());
-            json.put(VIEW_WIDTH, ((Double) data.get("width")).intValue());
-            json.put(VIEW_HEIGHT, ((Double) data.get("height")).intValue());
-            json.put(VIEW_NODE_TYPE, (String) data.get("nodeType"));
-            json.put(VIEW_CONTENT, (String) data.get("content"));
-            json.put(VIEW_PAGE, (String) data.get("page"));
-            json.put(VIEW_ZINDEX, (int) data.get("zLevel"));
-            int index = (int) data.get("index");
+            json.put(VIEW_XPATH, (String) data.get(VIEW_XPATH));
+            if (data.containsKey(VIEW_XINDEX)) {
+                json.put(VIEW_XINDEX, (String) data.get(VIEW_XINDEX));
+            }
+            json.put(VIEW_PARENT_XPATH, (String) data.get(VIEW_PARENT_XPATH));
+            if (data.containsKey(VIEW_PARENT_XINDEX)) {
+                json.put(VIEW_PARENT_XINDEX, (String) data.get(VIEW_PARENT_XINDEX));
+            }
+            json.put(VIEW_LEFT, ((Double) data.get(VIEW_LEFT)).intValue());
+            json.put(VIEW_TOP, ((Double) data.get(VIEW_TOP)).intValue());
+            json.put(VIEW_WIDTH, ((Double) data.get(VIEW_WIDTH)).intValue());
+            json.put(VIEW_HEIGHT, ((Double) data.get(VIEW_HEIGHT)).intValue());
+            json.put(VIEW_NODE_TYPE, (String) data.get(VIEW_NODE_TYPE));
+            json.put(VIEW_CONTENT, (String) data.get(VIEW_CONTENT));
+            json.put(VIEW_PAGE, (String) data.get(VIEW_PAGE));
+            json.put(VIEW_ZINDEX, (int) data.get(VIEW_ZINDEX));
+            int index = (int) data.get(VIEW_INDEX);
             if (index > -1) {
                 json.put(VIEW_INDEX, index);
             }
@@ -92,6 +100,35 @@ public class ScreenElementHelper {
             json.put(VIEW_CONTENT, viewNode.getViewContent());
             json.put(VIEW_PAGE, viewNode.findPagePath());
             json.put(VIEW_ZINDEX, zLevel);
+            if (viewNode.getIndex() > -1) {
+                json.put(VIEW_INDEX, viewNode.getIndex());
+            }
+            if (webViewData != null && webViewData.getJsonObject() != null) {
+                json.put(VIEW_WEBVIEW, webViewData.getJsonObject());
+            }
+
+        } catch (JSONException ignored) {
+        }
+        return json;
+    }
+
+    static JSONObject createViewElementData(ViewNodeV4 viewNode, int zLevel, HybridJson webViewData) {
+        int[] location = new int[2];
+        viewNode.getView().getLocationOnScreen(location);
+        JSONObject json = new JSONObject();
+        try {
+            json.put(VIEW_XPATH, viewNode.getXPath());
+            json.put(VIEW_PARENT_XPATH, viewNode.getClickableParentXPath());
+            json.put(VIEW_LEFT, location[0]);
+            json.put(VIEW_TOP, location[1]);
+            json.put(VIEW_WIDTH, viewNode.getView().getWidth());
+            json.put(VIEW_HEIGHT, viewNode.getView().getHeight());
+            json.put(VIEW_NODE_TYPE, viewNode.getNodeType());
+            json.put(VIEW_CONTENT, viewNode.getViewContent());
+            json.put(VIEW_PAGE, viewNode.findPagePath());
+            json.put(VIEW_ZINDEX, zLevel);
+            json.put(VIEW_PARENT_XINDEX, viewNode.getClickablePatentXIndex());
+            json.put(VIEW_XINDEX, viewNode.getXIndex());
             if (viewNode.getIndex() > -1) {
                 json.put(VIEW_INDEX, viewNode.getIndex());
             }

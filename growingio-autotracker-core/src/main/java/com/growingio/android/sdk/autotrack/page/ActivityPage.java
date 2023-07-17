@@ -52,7 +52,7 @@ public class ActivityPage extends Page<Activity> {
     }
 
     @Override
-    String getTag() {
+    public String getTag() {
         return null;
     }
 }

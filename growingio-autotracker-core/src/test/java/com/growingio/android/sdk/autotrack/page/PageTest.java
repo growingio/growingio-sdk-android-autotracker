@@ -102,6 +102,7 @@ public class PageTest {
         Page page = PageProvider.get().findOrCreateFragmentPage(SuperFragment.make(appFragment));
         String name = page.getName();
         Truth.assertThat(name).isEqualTo("TestFragment[app]");
+        Truth.assertThat(page.getTag()).isEqualTo("app");
 
         FragmentInjector.systemFragmentSetUserVisibleHint(appFragment, false);
         FragmentInjector.systemFragmentOnHiddenChanged(appFragment, false);
@@ -118,8 +119,9 @@ public class PageTest {
         FragmentScenario<TestXFragment> fs = FragmentScenario.launch(TestXFragment.class);
         fs.onFragment(testXFragment -> {
             FragmentInjector.androidxFragmentOnResume(testXFragment);
-            String name = PageProvider.get().findOrCreateFragmentPage(SuperFragment.makeX(testXFragment)).getName();
-            Truth.assertThat(name).isEqualTo("TestXFragment[FragmentScenario_Fragment_Tag]");
+            Page findTestPage = PageProvider.get().findOrCreateFragmentPage(SuperFragment.makeX(testXFragment));
+            Truth.assertThat(findTestPage.getName()).isEqualTo("TestXFragment");
+            Truth.assertThat(findTestPage.getTag()).isEqualTo("FragmentScenario_Fragment_Tag");
 
             FragmentInjector.androidxFragmentSetUserVisibleHint(testXFragment, false);
             FragmentInjector.androidxFragmentOnHiddenChanged(testXFragment, false);

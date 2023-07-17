@@ -191,14 +191,19 @@ class ViewNodeV3 {
                 this.originalXPath = "/Page";
             } else {
                 this.originalXPath = this.prefixPage + "/" + page.getName();
+                String tag = page.getTag();
+                if (tag != null) {
+                    tag = tag.isEmpty() ? "-" : tag;
+                    this.originalXPath += "[" + tag + "]";
+                }
             }
             this.xPath = this.originalXPath;
             this.prefixPage = this.originalXPath;
             return;
         }
 
-        StringBuilder originalXPath = new StringBuilder(this.originalXPath);
-        StringBuilder xPath = new StringBuilder(this.xPath);
+        StringBuilder originalXPath = new StringBuilder().append(this.originalXPath != null ? this.originalXPath : "");
+        StringBuilder xPath = new StringBuilder().append(this.xPath != null ? this.xPath : "");
         String viewName = ClassUtil.getSimpleClassName(this.view.getClass());
 
         //针对菜单栏处理
