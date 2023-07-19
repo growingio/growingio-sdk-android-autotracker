@@ -465,7 +465,7 @@ public class PageProvider implements IActivityLifecycle {
             if (!TextUtils.isEmpty(activity.getTitle())) {
                 activityPage.setTitle(activity.getTitle().toString());
             } else {
-                //一般不会进入，如果出现则新生成page返回
+                //一般不会进入
                 //如穿山甲广告：会自己生成一个ActivityWrapper做代理并自己控制生命周期导致sdk的page无法命中，具体类为：PluginFragmentActivityWrapper
                 activityPage.setTitle("WrapperActivity");
             }

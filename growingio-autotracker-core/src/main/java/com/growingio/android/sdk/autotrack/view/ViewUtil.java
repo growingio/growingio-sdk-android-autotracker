@@ -17,6 +17,7 @@
 package com.growingio.android.sdk.autotrack.view;
 
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.WebView;
 import android.widget.AbsSeekBar;
@@ -119,6 +120,7 @@ public class ViewUtil {
             }
         }
 
+        // must put at last
         if (widget instanceof TextView) {
             if (((TextView) widget).getText() != null) {
                 return ((TextView) widget).getText().toString();
@@ -143,6 +145,28 @@ public class ViewUtil {
         } else {
             return content + "[" + status + "]";
         }
+    }
+
+    private static String defaultViewGroupContentValue(ViewGroup viewGroup) {
+        String value = null;
+        if (viewGroup instanceof Spinner) {
+            Object item = ((Spinner) viewGroup).getSelectedItem();
+            if (item instanceof String) {
+                value = (String) item;
+            } else {
+                View selected = ((Spinner) viewGroup).getSelectedView();
+                if (selected instanceof TextView && ((TextView) selected).getText() != null) {
+                    value = ((TextView) selected).getText().toString();
+                }
+            }
+        } else if (viewGroup instanceof RadioGroup) {
+            RadioGroup group = (RadioGroup) viewGroup;
+            View selected = group.findViewById(group.getCheckedRadioButtonId());
+            if (selected instanceof RadioButton && ((RadioButton) selected).getText() != null) {
+                value = ((RadioButton) selected).getText().toString();
+            }
+        }
+        return value;
     }
 
     private static String defaultWidgetContentValue(View view) {

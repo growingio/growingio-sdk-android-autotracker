@@ -158,8 +158,8 @@ public class ViewNodeV3Test {
         ViewAttributeUtil.setViewPage(activity.getTextView(), new ActivityPage(activity));
         Truth.assertThat(ViewAttributeUtil.getViewPage(activity.getTextView()).path()).isEqualTo("/RobolectricActivity");
 
-        Truth.assertThat(PageHelper.getWindowPrefix(activity.getTextView())).isEqualTo("/Page");
-        Truth.assertThat(PageHelper.getMainWindowPrefix()).isEqualTo("/MainWindow");
+        Truth.assertThat(PageHelper.getWindowPrefix(activity.getTextView())).isEqualTo("Page");
+        Truth.assertThat(PageHelper.getMainWindowPrefix()).isEqualTo("MainWindow");
     }
 
 }

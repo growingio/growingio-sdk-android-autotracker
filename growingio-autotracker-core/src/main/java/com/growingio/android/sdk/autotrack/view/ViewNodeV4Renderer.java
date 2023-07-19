@@ -16,7 +16,6 @@
 
 package com.growingio.android.sdk.autotrack.view;
 
-import static com.growingio.android.sdk.autotrack.view.PageHelper.PAGE_PREFIX;
 import static com.growingio.android.sdk.autotrack.view.PageHelper.POPUP_DECOR_VIEW_CLASS_NAME;
 
 import android.app.Activity;
@@ -28,6 +27,7 @@ import android.view.ViewGroup;
 
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
+import com.growingio.android.sdk.autotrack.page.WindowPage;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -112,6 +112,11 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             xpath.append(pagePath).append(viewNode.getXPath());
             xIndex.append(page.getXIndex()).append(viewNode.getXIndex());
 
+            if (viewNode.getViewContent() == null || viewNode.getViewContent().isEmpty()) {
+                String content = ViewAttributeUtil.findViewContent(viewNode.getView());
+                viewNode.setViewContent(content);
+            }
+
             TrackMainThread.trackMain().postEventToTrackMain(
                     new ViewElementEvent.Builder(AutotrackEventType.VIEW_CLICK)
                             .setPath(page.activePath())
@@ -154,6 +159,11 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             String pagePath = page.originPath(false);
             xpath.append(pagePath).append(viewNode.getXPath());
             xIndex.append(page.getXIndex()).append(viewNode.getXIndex());
+
+            if (viewNode.getViewContent() == null || viewNode.getViewContent().isEmpty()) {
+                String content = ViewAttributeUtil.findViewContent(viewNode.getView());
+                viewNode.setViewContent(content);
+            }
 
             TrackMainThread.trackMain().postEventToTrackMain(
                     new ViewElementEvent.Builder(AutotrackEventType.VIEW_CHANGE)
@@ -201,11 +211,12 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
 
     private ViewNodeV4 findRootViewNode(View childView, LinkedList<View> linkedViews) {
         View rootView = childView;
+        Page<?> findPage;
         do {
-            Page<?> page = ViewAttributeUtil.getViewPage(rootView);
+            findPage = ViewAttributeUtil.getViewPage(rootView);
             linkedViews.addFirst(rootView);
             // 找到page直接迭代page
-            if (page != null) {
+            if (findPage != null) {
                 break;
             }
             if (rootView.getParent() instanceof View) {
@@ -217,11 +228,9 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
         } while (rootView instanceof ViewGroup);
 
         StringBuilder xpath = new StringBuilder();
-        String prefixPage = null;
         StringBuilder xIndex = new StringBuilder();
 
-        String prefix = PageHelper.getWindowPrefix(rootView);
-        if (prefix.equals(PAGE_PREFIX)) {
+        if (findPage != null) {
             xpath.append("/").append(ClassUtil.getSimpleClassName(rootView.getClass()));
             if (ViewAttributeUtil.getCustomId(rootView) != null) {
                 xIndex.append("/").append(ViewAttributeUtil.getCustomId(rootView));
@@ -229,19 +238,21 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
                 xIndex.append("/0");
             }
         } else {
+            String prefix = PageHelper.getWindowPrefix(rootView);
+            findPage = new WindowPage(prefix);
+            Page parentPage = PageProvider.get().findPage(rootView);
+            findPage.assignParent(parentPage);
             // PopupDecorView 这个class是在Android 6.0的时候才引入的，为了兼容6.0以下的版本，需要手动添加这个class层级
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && prefix.equals(PageHelper.POPUP_WINDOW_PREFIX) && !POPUP_DECOR_VIEW_CLASS_NAME.equals(ClassUtil.getSimpleClassName(rootView.getClass()))) {
-                xpath.append(prefix).append("/").append(POPUP_DECOR_VIEW_CLASS_NAME).append("/").append(ClassUtil.getSimpleClassName(rootView.getClass()));
-                xIndex.append("/0/0/0");
-            } else {
-                xpath.append(prefix);
-                xIndex.append("/0");
+                xpath.append("/").append(POPUP_DECOR_VIEW_CLASS_NAME).append("/").append(ClassUtil.getSimpleClassName(rootView.getClass()));
+                xIndex.append("/0/0");
             }
         }
         // construct root viewNode
         rootView = linkedViews.pollFirst();
         return new ViewNodeV4().withView(rootView)
                 .setIndex(-1)
+                .setPage(findPage)
                 .setViewContent(ViewAttributeUtil.getViewContent(rootView))
                 .setXPath(xpath.toString())
                 .setXIndex(xIndex.toString())
@@ -266,10 +277,19 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
     private void checkView2PageElement(View view, JSONArray container) {
         Page<?> viewPage = ViewAttributeUtil.getViewPage(view);
         if (viewPage != null) {
-            if (!viewPage.isAutotrack()) return;
-            JSONObject pageJson = ScreenElementHelper.createPageElementData(view, viewPage);
-            if (pageJson != null) {
-                container.put(pageJson);
+            if (viewPage.isAutotrack()) {
+                JSONObject pageJson = ScreenElementHelper.createPageElementData(view, viewPage);
+                if (pageJson != null) {
+                    container.put(pageJson);
+                }
+            }
+            for (Page page : viewPage.getAllChildren()) {
+                if (page.isAutotrack()) {
+                    JSONObject childPageJson = ScreenElementHelper.createPageElementData(view, page);
+                    if (childPageJson != null) {
+                        container.put(childPageJson);
+                    }
+                }
             }
             return;
         }
@@ -317,6 +337,10 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             } catch (InterruptedException ignored) {
             }
         } else if (ViewUtil.canCircle(viewNode.getView())) {
+            if (viewNode.getViewContent() == null || viewNode.getViewContent().isEmpty()) {
+                String content = ViewAttributeUtil.findViewContent(viewNode.getView());
+                viewNode.setViewContent(content);
+            }
             container.put(ScreenElementHelper.createViewElementData(viewNode, container.length(), null));
         }
 
@@ -324,7 +348,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             ViewGroup viewGroup = (ViewGroup) viewNode.getView();
             if (viewGroup.getChildCount() > 0) {
                 for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                    ViewNodeV4 childViewNode = viewNode.append(viewGroup.getChildAt(index), index, true);
+                    ViewNodeV4 childViewNode = viewNode.append(viewGroup.getChildAt(index), index);
                     traverseViewNode(childViewNode, container);
                 }
             }
@@ -342,6 +366,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             loadDataFetcher.loadData(new LoadDataFetcher.DataCallback<HybridJson>() {
                 @Override
                 public void onDataReady(HybridJson data) {
+                    viewNode.setViewContent("WebView");
                     JSONObject webViewJson = ScreenElementHelper.createViewElementData(viewNode, container.length(), data);
                     container.put(webViewJson);
                     latch.countDown();

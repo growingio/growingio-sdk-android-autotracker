@@ -26,7 +26,6 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.growingio.android.sdk.autotrack.page.Page;
-import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
@@ -49,7 +48,7 @@ class ViewNodeV4 {
     private boolean hasListParent;
     private int index;
 
-    private String page;
+    private Page page;
 
     private int viewPosition; //for xpath calculate
 
@@ -132,12 +131,13 @@ class ViewNodeV4 {
         return this;
     }
 
-    public String getPage() {
+    public Page getPage() {
         return page;
     }
 
-    public void setPage(String page) {
+    public ViewNodeV4 setPage(Page page) {
         this.page = page;
+        return this;
     }
 
     public ViewNodeV4 setXIndex(String xIndex) {
@@ -258,12 +258,12 @@ class ViewNodeV4 {
      */
     public ViewNodeV4 append(View view) {
         if (this.view instanceof ViewGroup) {
-            return append(view, ((ViewGroup) (this.view)).indexOfChild(view), false);
+            return append(view, ((ViewGroup) (this.view)).indexOfChild(view));
         }
         return this;
     }
 
-    public ViewNodeV4 append(View view, int index, boolean ignorePage) {
+    public ViewNodeV4 append(View view, int index) {
         boolean hasListParent = isHasListParent() || ClassExistHelper.isListView(view);
         ViewNodeV4 viewNode = new ViewNodeV4();
         viewNode.withView(view)
@@ -271,6 +271,7 @@ class ViewNodeV4 {
                 .setXPath(this.xPath)
                 .setIndeedXIndex(this.indeedXIndex)
                 .setXIndex(this.xIndex)
+                .setPage(this.page)
                 .setClickableParentXPath(ViewUtil.canCircle(this.view) ? this.xPath : this.clickableParentXPath)
                 .setClickablePatentXIndex(ViewUtil.canCircle(this.view) ? this.xIndex : this.clickablePatentXIndex)
                 .setHasListParent(hasListParent)
@@ -392,22 +393,5 @@ class ViewNodeV4 {
             return WEB_VIEW;
         }
         return BUTTON;
-    }
-
-
-    String findPagePath() {
-        if (page != null) return page;
-        String pagePath = null;
-        Page<?> page = ViewAttributeUtil.getViewPage(this.view);
-        if (page != null) {
-            pagePath = page.path();
-        } else {
-            pagePath = this.parent.getPage();
-        }
-        if (pagePath == null) {
-            pagePath = PageProvider.get().findPage(this.view).path();
-        }
-        setPage(pagePath);
-        return pagePath;
     }
 }

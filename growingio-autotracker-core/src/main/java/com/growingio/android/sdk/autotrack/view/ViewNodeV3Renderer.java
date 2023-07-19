@@ -159,7 +159,15 @@ class ViewNodeV3Renderer implements ViewNodeRenderer {
             if (pageJson != null) {
                 container.put(pageJson);
             }
-            return;
+            if (viewPage.hasChildren()) {
+                for (Page page : viewPage.getAllChildren()) {
+                    JSONObject childPageJson = ScreenElementHelper.createPageElementData(view, page);
+                    if (childPageJson != null) {
+                        container.put(childPageJson);
+                    }
+
+                }
+            }
         }
 
         if (view instanceof ViewGroup) {
@@ -276,16 +284,22 @@ class ViewNodeV3Renderer implements ViewNodeRenderer {
             String prefix = PageHelper.getWindowPrefix(rootView);
             // PopupDecorView 这个class是在Android 6.0的时候才引入的，为了兼容6.0以下的版本，需要手动添加这个class层级
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && prefix.equals(PageHelper.POPUP_WINDOW_PREFIX) && !POPUP_DECOR_VIEW_CLASS_NAME.equals(ClassUtil.getSimpleClassName(rootView.getClass()))) {
-                xpath = prefix + "/" + POPUP_DECOR_VIEW_CLASS_NAME + "/" + ClassUtil.getSimpleClassName(rootView.getClass()) + "[0]";
+                xpath = "/" + prefix + "/" + POPUP_DECOR_VIEW_CLASS_NAME + "/" + ClassUtil.getSimpleClassName(rootView.getClass()) + "[0]";
             } else {
-                xpath = prefix + "/" + ClassUtil.getSimpleClassName(rootView.getClass());
+                xpath = "/" + prefix + "/" + ClassUtil.getSimpleClassName(rootView.getClass());
             }
             originalXpath = xpath;
         }
 
         // construct root viewNode
         rootView = linkedViews.pollFirst();
-        return new ViewNodeV3().withView(rootView).setIndex(-1).setViewContent(ViewAttributeUtil.getViewContent(rootView)).setXPath(xpath).setOriginalXPath(originalXpath).setPrefixPage(prefixPage);
+        return new ViewNodeV3()
+                .withView(rootView)
+                .setIndex(-1)
+                .setViewContent(ViewAttributeUtil.getViewContent(rootView))
+                .setXPath(xpath)
+                .setOriginalXPath(originalXpath)
+                .setPrefixPage(prefixPage);
     }
 
     private void disposeWebView(ViewNodeV3 viewNode, JSONArray container, final CountDownLatch latch) {

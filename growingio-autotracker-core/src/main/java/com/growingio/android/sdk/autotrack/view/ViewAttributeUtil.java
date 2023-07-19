@@ -21,8 +21,10 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -31,6 +33,9 @@ import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.view.WindowHelper;
+
+import java.util.Arrays;
+import java.util.LinkedList;
 
 public class ViewAttributeUtil {
 
@@ -175,9 +180,57 @@ public class ViewAttributeUtil {
 
     private static final int MAX_CONTENT_LENGTH = 100;
 
+    /**
+     * it's a loop content finder.
+     */
+    static String findViewContent(View view) {
+        LinkedList<View> queue = new LinkedList<>();
+        queue.add(view);
+        while (!queue.isEmpty()) {
+            View childView = queue.poll();
+            String content = findViewContentBfs(childView, queue);
+            if (!TextUtils.isEmpty(content)) return content;
+        }
+        return null;
+    }
+
+    private static String findViewContentBfs(View view, LinkedList<View> queue) {
+        String findContent = getViewContent(view);
+        if (TextUtils.isEmpty(findContent) && view instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) view;
+            View[] children = new View[vg.getChildCount()];
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                children[i] = vg.getChildAt(i);
+            }
+            Arrays.sort(children, (o1, o2) -> {
+                int scoreA = 0;
+                scoreA += isViewInvisible(o1) ? 0 : 100;
+                scoreA += o1 instanceof TextView ? 10 : 0;
+
+                int scoreB = 0;
+                scoreB += isViewInvisible(o2) ? 0 : 100;
+                scoreB += o2 instanceof TextView ? 10 : 0;
+
+                if (scoreA == scoreB) {
+                    return o2.getHeight() * o2.getWidth() - o1.getHeight() * o1.getWidth();
+                }
+                return scoreB - scoreA;
+            });
+
+            for (View child : children) {
+                findContent = getViewContent(child);
+                if (!TextUtils.isEmpty(findContent)) {
+                    return findContent;
+                }
+                queue.add(child);
+            }
+        }
+        return findContent;
+    }
+
     static String getViewContent(View view) {
         String value = "";
-        String contentTag = ViewAttributeUtil.getContent(view);
+        String contentTag = getContent(view);
         if (contentTag != null) {
             value = contentTag;
         } else {

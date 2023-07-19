@@ -35,7 +35,7 @@ public abstract class Page<T> {
     private String mTitle;
     private String mPath;
 
-    private String mOriginPath;
+    protected String mOriginPath;
     private String xIndex;
 
     private Map<String, String> mAttributes;
@@ -112,11 +112,11 @@ public abstract class Page<T> {
         return mChildren;
     }
 
-    void removeChildren(Page<?> child) {
-        mChildren.remove(child);
+    public boolean hasChildren() {
+        return !mChildren.isEmpty();
     }
 
-    private Page<?> lastActivePage() {
+    public Page<?> lastActivePage() {
         Page<?> activePage = this;
         while (activePage != null) {
             if (activePage.isAutotrack()) {
@@ -186,7 +186,7 @@ public abstract class Page<T> {
                 if (omitted) path.append("[").append(tag.isEmpty() ? "-" : tag).append("]");
                 xIndex.append(tag.isEmpty() ? "-" : tag);
             } else {
-                xIndex.append(0);// 默认page的index都为0,不做index的计算。
+                xIndex.append(0); // 默认page的index都为0,不做index的计算。
             }
 
         }

@@ -30,11 +30,11 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
  */
 class PageHelper {
 
-    public static final String PAGE_PREFIX = "/Page";
-    public static final String MAIN_WINDOW_PREFIX = "/MainWindow";
-    public static final String DIALOG_WINDOW_PREFIX = "/DialogWindow";
-    public static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
-    public static final String CUSTOM_WINDOW_PREFIX = "/CustomWindow";
+    public static final String PAGE_PREFIX = "Page";
+    public static final String MAIN_WINDOW_PREFIX = "MainWindow";
+    public static final String DIALOG_WINDOW_PREFIX = "DialogWindow";
+    public static final String POPUP_WINDOW_PREFIX = "PopupWindow";
+    public static final String CUSTOM_WINDOW_PREFIX = "CustomWindow";
 
     public static final String POPUP_DECOR_VIEW_CLASS_NAME = "PopupDecorView";
 

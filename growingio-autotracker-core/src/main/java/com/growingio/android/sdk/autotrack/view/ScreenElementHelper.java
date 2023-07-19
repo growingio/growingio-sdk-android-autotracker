@@ -39,16 +39,17 @@ public class ScreenElementHelper {
 
     private static final String VIEW_XPATH = "xpath";
     private static final String VIEW_PARENT_XPATH = "parentXPath";
-    private static final String VIEW_PARENT_XINDEX = "parentXIndex";//new for v4
-    private static final String VIEW_XINDEX = "xindex";//new for v4
+    private static final String VIEW_PARENT_XINDEX = "parentXIndex"; //new for v4
+    private static final String VIEW_XINDEX = "xindex"; //new for v4
     private static final String VIEW_LEFT = "left";
     private static final String VIEW_TOP = "top";
     private static final String VIEW_WIDTH = "width";
     private static final String VIEW_HEIGHT = "height";
     private static final String VIEW_NODE_TYPE = "nodeType";
     private static final String VIEW_CONTENT = "content";
-    private static final String VIEW_PAGE = "page";
-    private static final String VIEW_ZINDEX = "zLevel";
+    private static final String VIEW_PAGE = "page"; // for 3.0
+    private static final String VIEW_PATH = "path"; //new for v4.0, replace with page
+    private static final String VIEW_Z_LEVEL = "zLevel";
     private static final String VIEW_INDEX = "index";
     private static final String VIEW_WEBVIEW = "webView";
 
@@ -73,7 +74,7 @@ public class ScreenElementHelper {
             json.put(VIEW_NODE_TYPE, (String) data.get(VIEW_NODE_TYPE));
             json.put(VIEW_CONTENT, (String) data.get(VIEW_CONTENT));
             json.put(VIEW_PAGE, (String) data.get(VIEW_PAGE));
-            json.put(VIEW_ZINDEX, (int) data.get(VIEW_ZINDEX));
+            json.put(VIEW_Z_LEVEL, (int) data.get(VIEW_Z_LEVEL));
             int index = (int) data.get(VIEW_INDEX);
             if (index > -1) {
                 json.put(VIEW_INDEX, index);
@@ -99,7 +100,7 @@ public class ScreenElementHelper {
             json.put(VIEW_NODE_TYPE, viewNode.getNodeType());
             json.put(VIEW_CONTENT, viewNode.getViewContent());
             json.put(VIEW_PAGE, viewNode.findPagePath());
-            json.put(VIEW_ZINDEX, zLevel);
+            json.put(VIEW_Z_LEVEL, zLevel);
             if (viewNode.getIndex() > -1) {
                 json.put(VIEW_INDEX, viewNode.getIndex());
             }
@@ -116,19 +117,23 @@ public class ScreenElementHelper {
         int[] location = new int[2];
         viewNode.getView().getLocationOnScreen(location);
         JSONObject json = new JSONObject();
+
+        Page page = viewNode.getPage();
+        if (page == null) return null;
         try {
-            json.put(VIEW_XPATH, viewNode.getXPath());
-            json.put(VIEW_PARENT_XPATH, viewNode.getClickableParentXPath());
+            String pagePath = page.originPath(false);
+            json.put(VIEW_PATH, page.activePath());
+            json.put(VIEW_XPATH, pagePath + viewNode.getXPath());
+            json.put(VIEW_PARENT_XPATH, viewNode.getClickableParentXPath() == null ? null : pagePath + viewNode.getClickableParentXPath());
+            json.put(VIEW_PARENT_XINDEX, viewNode.getClickablePatentXIndex() == null ? null : page.getXIndex() + viewNode.getClickablePatentXIndex());
+            json.put(VIEW_XINDEX, page.getXIndex() + viewNode.getXIndex());
             json.put(VIEW_LEFT, location[0]);
             json.put(VIEW_TOP, location[1]);
             json.put(VIEW_WIDTH, viewNode.getView().getWidth());
             json.put(VIEW_HEIGHT, viewNode.getView().getHeight());
             json.put(VIEW_NODE_TYPE, viewNode.getNodeType());
             json.put(VIEW_CONTENT, viewNode.getViewContent());
-            json.put(VIEW_PAGE, viewNode.findPagePath());
-            json.put(VIEW_ZINDEX, zLevel);
-            json.put(VIEW_PARENT_XINDEX, viewNode.getClickablePatentXIndex());
-            json.put(VIEW_XINDEX, viewNode.getXIndex());
+            json.put(VIEW_Z_LEVEL, zLevel);
             if (viewNode.getIndex() > -1) {
                 json.put(VIEW_INDEX, viewNode.getIndex());
             }
