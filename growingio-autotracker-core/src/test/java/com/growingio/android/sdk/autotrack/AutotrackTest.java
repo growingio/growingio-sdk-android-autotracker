@@ -64,8 +64,8 @@ public class AutotrackTest {
         testMap.put("data", "test");
         testMap.put("name", "cpacm");
         autotracker.setPageAttributes(activity, testMap);
-        autotracker.setPageAttributes(new Fragment(), testMap);
-        autotracker.setPageAttributesX(new androidx.fragment.app.Fragment(), testMap);
+        autotracker.setPageAttributesSystem(new Fragment(), testMap);
+        autotracker.setPageAttributes(new androidx.fragment.app.Fragment(), testMap);
 
         autotracker.trackViewImpression(activity.getImageView(), "testImp");
         Truth.assertThat(ImpressionProvider.get().hasTrackViewImpression(activity.getImageView())).isTrue();

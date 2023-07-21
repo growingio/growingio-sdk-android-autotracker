@@ -19,9 +19,10 @@ package com.growingio.android.sdk.autotrack.page;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.view.View;
+
+import androidx.annotation.UiThread;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.PageEvent;

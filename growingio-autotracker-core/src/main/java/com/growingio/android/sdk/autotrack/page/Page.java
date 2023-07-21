@@ -196,12 +196,12 @@ public abstract class Page<T> {
     }
 
     public String path() {
-        if (!TextUtils.isEmpty(mPath)) {
+        if (!TextUtils.isEmpty(mAlias)) {
+            mPath = "/" + mAlias;
             return mPath;
         }
 
-        if (!TextUtils.isEmpty(mAlias)) {
-            mPath = "/" + mAlias;
+        if (!TextUtils.isEmpty(mPath)) {
             return mPath;
         }
 

@@ -216,7 +216,7 @@ public class Autotracker extends Tracker {
      * will be carried to the autotracker event's attribute.
      * note: please use autotrackSystemPage generate page first. @see {@link #autotrackSystemPage(android.app.Fragment, String, Map)}
      */
-    public void setPageAttributes(final android.app.Fragment fragment, final Map<String, String> attributes) {
+    public void setPageAttributesSystem(final android.app.Fragment fragment, final Map<String, String> attributes) {
         if (!isInited) return;
         if (fragment == null) {
             Logger.e(TAG, "page or attributes is NULL");
@@ -242,13 +242,18 @@ public class Autotracker extends Tracker {
      * will be carried to the autotracker event's attribute.
      * note: please use autotrackPage generate page first. @see {@link #autotrackPage(androidx.fragment.app.Fragment, String, Map)}
      */
-    public void setPageAttributesX(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
+    public void setPageAttributes(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
         if (!isInited) return;
         if (page == null) {
             Logger.e(TAG, "page or attributes is NULL");
             return;
         }
         ThreadUtils.runOnUiThread(() -> PageProvider.get().setPageAttributes(SuperFragment.makeX(page), attributes == null ? new HashMap<>() : new HashMap<>(attributes)));
+    }
+
+    @Deprecated
+    public void setPageAttributesX(final androidx.fragment.app.Fragment page, final Map<String, String> attributes) {
+        setPageAttributes(page, attributes);
     }
 
     public void trackViewImpression(View view, String impressionEventName) {
