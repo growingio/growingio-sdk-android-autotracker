@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.volley;
 
-import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
@@ -32,7 +30,7 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 @GIOLibraryModule
 public class VolleyLibraryGioModule extends LibraryGioModule {
     @Override
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(EventUrl.class, EventResponse.class, new VolleyDataLoader.Factory(context));
+    public void registerComponents(TrackerContext context) {
+        context.getRegistry().register(EventUrl.class, EventResponse.class, new VolleyDataLoader.Factory(context.getBaseContext()));
     }
 }

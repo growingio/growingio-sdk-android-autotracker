@@ -1,58 +1,58 @@
 plugins {
-    id 'com.android.library'
+	id 'com.android.library'
 }
 
 android {
-    namespace 'com.growingio.android.circler'
-    compileSdkVersion buildConfiguration.compileVersion
-    defaultConfig {
-        minSdkVersion buildConfiguration.minSdkVersion
-        targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName libs.versions.growingio.get()
-        versionCode libs.versions.growingioCode.get().toInteger()
-    }
+	namespace 'com.growingio.android.circler'
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+		versionName libs.versions.growingio.get()
+		versionCode libs.versions.growingioCode.get().toInteger()
+	}
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		}
+	}
 
-    compileOptions {
-        sourceCompatibility buildConfiguration.sourceCompatibility
-        targetCompatibility buildConfiguration.targetCompatibility
-    }
+	compileOptions {
+		sourceCompatibility buildConfiguration.sourceCompatibility
+		targetCompatibility buildConfiguration.targetCompatibility
+	}
 
-    testOptions {
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-        }
-        unitTests {
-            returnDefaultValues = true
-            includeAndroidResources = true
-        }
-    }
+	testOptions {
+		unitTests.all {
+			jacoco {
+				includeNoLocationClasses = true
+				excludes = ['jdk.internal.*']
+			}
+		}
+		unitTests {
+			returnDefaultValues = true
+			includeAndroidResources = true
+		}
+	}
 }
 
 dependencies {
-    testImplementation libs.bundles.test
-    testImplementation libs.okhttp3.mockwebserver
-    testImplementation libs.androidx.test.core
-    testImplementation project(':growingio-hybrid')
+	testImplementation libs.bundles.test
+	testImplementation libs.okhttp3.mockwebserver
+	testImplementation libs.androidx.test.core
+	testImplementation project(':growingio-hybrid')
 
-    //compileOnly fileTree(include: ['*.jar'], dir: '../../thirdLibs')
+	//compileOnly fileTree(include: ['*.jar'], dir: '../../thirdLibs')
 
-    implementation project(':growingio-autotracker-core')
-    implementation project(':growingio-tracker-core')
+	implementation project(':growingio-autotracker-core')
+	implementation project(':growingio-tracker-core')
 
-    implementation libs.okhttp3
+	implementation libs.okhttp3
 
-    implementation project(":growingio-annotation")
-    annotationProcessor project(":growingio-annotation:compiler")
+	implementation project(":growingio-annotation")
+	annotationProcessor project(":growingio-annotation:compiler")
 }
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
 apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"

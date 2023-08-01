@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,35 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.hybrid;
 
 
 import android.app.Application;
 import android.webkit.WebView;
-import android.widget.TextView;
 
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
-import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.events.ConversionVariablesEvent;
 import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
-import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
-import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
-import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
-import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
+import com.growingio.android.sdk.track.listener.Callback;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
-import com.growingio.android.sdk.track.providers.EventStateProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 import org.json.JSONObject;
@@ -60,12 +54,14 @@ import java.util.concurrent.TimeUnit;
 public class HybridTest {
 
     Application application = ApplicationProvider.getApplicationContext();
+    private TrackerContext context;
 
     @Before
     public void setup() {
-        TrackerContext.init(application);
-        TrackerContext.initSuccess();
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("HybridTest", "growingio://Hybrid"), new HashMap<>());
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("HybridTest", "growingio://Hybrid"), new HashMap<>());
+        Tracker tracker = new Tracker(application);
+        tracker.registerComponent(new HybridLibraryGioModule());
+        context = tracker.getContext();
     }
 
 
@@ -76,7 +72,7 @@ public class HybridTest {
         String customJson = "{\"eventType\":\"CUSTOM\",\"query\":\"something\",\"domain\":\"growingio.com\",\"path\":\"/webview/button/\",\"eventName\":\"test event\",\"pageShowTimestamp\":12345678,\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
         HybridCustomEvent customEvent = (HybridCustomEvent) hybridTransformerImp.transform(customJson).build();
         Truth.assertThat(customEvent.getQuery()).isEqualTo("something");
-        Truth.assertThat(EventStateProvider.get().toJson(customEvent).toString()).contains("test event");
+        Truth.assertThat(EventBuilderProvider.toJson(customEvent).toString()).contains("test event");
         Truth.assertThat(customEvent.getAttributes().size()).isEqualTo(2);
 
         String userAttrJson = "{\"eventType\":\"LOGIN_USER_ATTRIBUTES\",\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
@@ -119,10 +115,12 @@ public class HybridTest {
         SuperWebView<WebView> superWebView = SuperWebView.make(webView);
         OnDomChangedListener testListener = () -> {
         };
-        HybridBridgeProvider.get().registerDomChangedListener(testListener);
-        HybridBridgeProvider.get().unregisterDomChangedListener(testListener);
-        HybridBridgeProvider.get().bridgeForWebView(superWebView);
-        HybridBridgeProvider.get().getWebViewDomTree(superWebView, new Callback<JSONObject>() {
+        HybridBridgeProvider hybridBridgeProvider = context.getProvider(HybridBridgeProvider.class);
+
+        hybridBridgeProvider.registerDomChangedListener(testListener);
+        hybridBridgeProvider.unregisterDomChangedListener(testListener);
+        hybridBridgeProvider.bridgeForWebView(superWebView);
+        hybridBridgeProvider.getWebViewDomTree(superWebView, new Callback<JSONObject>() {
             @Override
             public void onSuccess(JSONObject result) {
                 System.out.println(result);
@@ -138,26 +136,30 @@ public class HybridTest {
 
     @Test
     public void bridgeInterfaceTest() {
+        HybridBridgeProvider hybridBridgeProvider = context.getProvider(HybridBridgeProvider.class);
+        UserInfoProvider userInfoProvider = context.getUserInfoProvider();
+        ConfigurationProvider configurationProvider = context.getConfigurationProvider();
+
         WebViewJavascriptBridgeConfiguration configuration = new WebViewJavascriptBridgeConfiguration("test", "test", "test", "test", 23);
-        WebViewBridgeJavascriptInterface webInterface = new WebViewBridgeJavascriptInterface(configuration);
+        WebViewBridgeJavascriptInterface webInterface = new WebViewBridgeJavascriptInterface(configuration, hybridBridgeProvider, userInfoProvider);
         webInterface.setNativeUserId("cpacm");
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("cpacm");
+        Truth.assertThat(userInfoProvider.getLoginUserId()).isEqualTo("cpacm");
         webInterface.clearNativeUserId();
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
+        Truth.assertThat(userInfoProvider.getLoginUserId()).isEqualTo("");
 
-        ConfigurationProvider.core().setIdMappingEnabled(true);
+        configurationProvider.core().setIdMappingEnabled(true);
         webInterface.setNativeUserIdAndUserKey("cpacm", "email");
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("cpacm");
-        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("email");
+        Truth.assertThat(userInfoProvider.getLoginUserId()).isEqualTo("cpacm");
+        Truth.assertThat(userInfoProvider.getLoginUserKey()).isEqualTo("email");
 
         webInterface.clearNativeUserIdAndUserKey();
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-        Truth.assertThat(UserInfoProvider.get().getLoginUserId()).isEqualTo("");
-        Truth.assertThat(UserInfoProvider.get().getLoginUserKey()).isEqualTo("");
-        ConfigurationProvider.core().setIdMappingEnabled(false);
+        Truth.assertThat(userInfoProvider.getLoginUserId()).isEqualTo("");
+        Truth.assertThat(userInfoProvider.getLoginUserKey()).isEqualTo("");
+        configurationProvider.core().setIdMappingEnabled(false);
 
         String testJson = "{\"eventType\":\"LOGIN_USER_ATTRIBUTES\",\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
         webInterface.dispatchEvent(testJson);
@@ -166,53 +168,6 @@ public class HybridTest {
 
         Robolectric.flushForegroundThreadScheduler();
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-    }
-
-    @Test
-    public void moduleBridgeTest() {
-        HybridLibraryGioModule hybridLibraryGioModule = new HybridLibraryGioModule();
-        hybridLibraryGioModule.registerComponents(application, TrackerContext.get().getRegistry());
-        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().get();
-        WebView webView = new WebView(activity);
-        com.tencent.smtt.sdk.WebView x5Wv = new com.tencent.smtt.sdk.WebView(activity);
-        com.uc.webview.export.WebView ucWv = new com.uc.webview.export.WebView(activity);
-
-        ModelLoader<HybridBridge, Boolean> modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridBridge.class, Boolean.class);
-        DataFetcher<Boolean> dataFetcher = modelLoader.buildLoadData(new HybridBridge(webView)).fetcher;
-        boolean result = dataFetcher.executeData();
-        Truth.assertThat(result).isTrue();
-        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(Boolean.class);
-        Truth.assertThat(modelLoader.buildLoadData(new HybridBridge(x5Wv)).fetcher.executeData()).isTrue();
-        Truth.assertThat(modelLoader.buildLoadData(new HybridBridge(ucWv)).fetcher.executeData()).isTrue();
-
-        TextView textView = new TextView(activity);
-        Truth.assertThat(modelLoader.buildLoadData(new HybridBridge(textView)).fetcher.executeData()).isFalse();
-    }
-
-    @Test
-    public void moduleDomTest() {
-        HybridLibraryGioModule hybridLibraryGioModule = new HybridLibraryGioModule();
-        hybridLibraryGioModule.registerComponents(application, TrackerContext.get().getRegistry());
-        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().get();
-        WebView webView = new WebView(activity);
-
-        ModelLoader<HybridDom, HybridJson> modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridDom.class, HybridJson.class);
-        modelLoader.buildLoadData(new HybridDom(() -> {
-        })).fetcher.executeData();
-
-        LoadDataFetcher<HybridJson> dataFetcher = (LoadDataFetcher<HybridJson>) modelLoader.buildLoadData(new HybridDom(webView)).fetcher;
-        dataFetcher.loadData(new LoadDataFetcher.DataCallback<HybridJson>() {
-            @Override
-            public void onDataReady(HybridJson data) {
-                System.out.println(data.getJsonObject());
-            }
-
-            @Override
-            public void onLoadFailed(Exception e) {
-
-            }
-        });
-        Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(HybridJson.class);
     }
 
 }

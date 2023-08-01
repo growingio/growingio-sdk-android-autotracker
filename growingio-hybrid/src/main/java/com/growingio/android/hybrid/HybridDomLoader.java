@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.hybrid;
 
 import android.view.View;
 import android.webkit.WebView;
 
-import com.growingio.android.sdk.track.async.Callback;
+import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.listener.Callback;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
@@ -38,19 +38,32 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
 
     private HybridDom.OnDomChangedListener onDomChangedListener;
 
+    private final HybridBridgeProvider hybridBridgeProvider;
+
+    public HybridDomLoader(TrackerContext context) {
+        hybridBridgeProvider = context.getProvider(HybridBridgeProvider.class);
+    }
+
     @Override
     public LoadData<HybridJson> buildLoadData(HybridDom eventData) {
         if (eventData.getOnDomChangedListener() != null) {
             this.onDomChangedListener = eventData.getOnDomChangedListener();
-            HybridBridgeProvider.get().registerDomChangedListener(() -> onDomChangedListener.onDomChanged());
+            hybridBridgeProvider.registerDomChangedListener(() -> onDomChangedListener.onDomChanged());
         }
-        return new LoadData<>(new HybridDataFetcher(eventData));
+        return new LoadData<>(new HybridDataFetcher(eventData, hybridBridgeProvider));
     }
 
     public static class Factory implements ModelLoaderFactory<HybridDom, HybridJson> {
+
+        private final TrackerContext context;
+
+        public Factory(TrackerContext context) {
+            this.context = context;
+        }
+
         @Override
         public ModelLoader<HybridDom, HybridJson> build() {
-            return new HybridDomLoader();
+            return new HybridDomLoader(context);
         }
     }
 
@@ -59,9 +72,11 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
         private static final String TAG = "HybridDataFetcher";
 
         private final HybridDom dom;
+        private final HybridBridgeProvider hybridBridgeProvider;
 
-        public HybridDataFetcher(HybridDom eventData) {
+        public HybridDataFetcher(HybridDom eventData, HybridBridgeProvider hybridBridgeProvider) {
             this.dom = eventData;
+            this.hybridBridgeProvider = hybridBridgeProvider;
         }
 
         @Override
@@ -75,7 +90,7 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
                 callback.onLoadFailed(new IllegalArgumentException(dom.getView().getClass().getName() + "is not webView"));
                 return;
             }
-            HybridBridgeProvider.get().getWebViewDomTree(superWebView, new Callback<JSONObject>() {
+            hybridBridgeProvider.getWebViewDomTree(superWebView, new Callback<JSONObject>() {
                 @Override
                 public void onSuccess(JSONObject result) {
                     callback.onDataReady(new HybridJson(result));

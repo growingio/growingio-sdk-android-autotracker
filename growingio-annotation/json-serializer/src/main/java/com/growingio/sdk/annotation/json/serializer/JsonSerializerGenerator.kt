@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,18 @@ import com.growingio.sdk.annotation.json.serializer.ProcessUtils.Companion.JSON_
 import com.growingio.sdk.annotation.json.serializer.ProcessUtils.Companion.JSON_SERIALIZABLE_PACKAGE
 import com.growingio.sdk.annotation.json.serializer.ProcessUtils.Companion.TEXT_UTILS_CLASS
 import com.growingio.sdk.annotation.json.serializer.ProcessUtils.Companion.TEXT_UTILS_PACKAGE
-import com.squareup.javapoet.*
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.FieldSpec
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterizedTypeName
+import com.squareup.javapoet.TypeName
+import com.squareup.javapoet.TypeSpec
 import java.lang.Exception
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.*
+import javax.lang.model.element.Element
+import javax.lang.model.element.Modifier
+import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeKind
 
 /**
@@ -43,11 +51,12 @@ import javax.lang.model.type.TypeKind
  * @author cpacm 7/13/23
  */
 internal class JsonSerializerGenerator(
-    private val processEnv: ProcessingEnvironment, private val processUtils: ProcessUtils
+    private val processEnv: ProcessingEnvironment,
+    private val processUtils: ProcessUtils,
 ) {
     fun generate(jsonSerializer: TypeElement, containSuperElement: Boolean) {
         val annotation: JsonSerializer = jsonSerializer.getAnnotation(
-            JsonSerializer::class.java
+            JsonSerializer::class.java,
         )
 
         val builderName: String = annotation.builder
@@ -75,16 +84,16 @@ internal class JsonSerializerGenerator(
         val builderType = ClassName.get(eventBuilderType)
 
         val superinterface = ParameterizedTypeName.get(
-            ClassName.get(JSON_SERIALIZABLE_PACKAGE, JSON_SERIALIZABLE_CLASS),//rawType
-            ClassName.get(eventType),//the value for T
-            builderType, //the value for R
+            ClassName.get(JSON_SERIALIZABLE_PACKAGE, JSON_SERIALIZABLE_CLASS), // rawType
+            ClassName.get(eventType), // the value for T
+            builderType, // the value for R
         )
 
         val jonSerialBuilder = TypeSpec.classBuilder(generateClass).addJavadoc(
             """
                             <p>This class is generated and should not be modified
                             
-                            """.trimIndent()
+            """.trimIndent(),
         ).addModifiers(Modifier.PUBLIC, Modifier.FINAL).addSuperinterface(superinterface)
             .addField(generateInstanceField(generateClass))
             .addMethod(generateStaticCreateMethod(generateClass, generatedName))
@@ -93,8 +102,8 @@ internal class JsonSerializerGenerator(
                     ClassName.get(eventType),
                     fields,
                     jsonSerializer,
-                    containSuperElement
-                )
+                    containSuperElement,
+                ),
             )
             .addMethod(
                 generateParseFromMethod(
@@ -102,8 +111,8 @@ internal class JsonSerializerGenerator(
                     builderName,
                     fields,
                     jsonSerializer,
-                    containSuperElement
-                )
+                    containSuperElement,
+                ),
             )
 
         processUtils.writeClass(generatedCodePackageName, jonSerialBuilder.build())
@@ -141,7 +150,7 @@ internal class JsonSerializerGenerator(
         eventType: TypeName,
         fields: MutableList<VariableElement>,
         clazz: TypeElement,
-        containSuperElement: Boolean
+        containSuperElement: Boolean,
     ): MethodSpec {
         val toJsonMethod = MethodSpec.methodBuilder("toJson")
             .addParameter(ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS), "jsonObject")
@@ -175,12 +184,12 @@ internal class JsonSerializerGenerator(
                     val annotation = field.getAnnotation(IntRange::class.java)
                     if (annotation != null) {
                         val state = if (annotation.from == annotation.to) {
-                            "if (event.${fieldMethod} != ${annotation.from})"
+                            "if (event.$fieldMethod != ${annotation.from})"
                         } else {
                             val hasFrom =
-                                if (annotation.from != Long.MIN_VALUE) "event.${fieldMethod} > ${annotation.from}" else ""
+                                if (annotation.from != Long.MIN_VALUE) "event.$fieldMethod > ${annotation.from}" else ""
                             val hasTo =
-                                if (annotation.to != Long.MAX_VALUE) "event.${fieldMethod} < ${annotation.to}" else ""
+                                if (annotation.to != Long.MAX_VALUE) "event.$fieldMethod < ${annotation.to}" else ""
                             if (hasFrom.isNotEmpty() && hasTo.isNotEmpty()) {
                                 "if ($hasFrom && $hasTo)"
                             } else if (hasFrom.isEmpty() && hasTo.isEmpty()) {
@@ -191,26 +200,26 @@ internal class JsonSerializerGenerator(
                         }
                         if (state != null) {
                             toJsonMethod.beginControlFlow(state)
-                                .addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                                .addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                                 .endControlFlow()
                         } else {
-                            toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                            toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                         }
                     } else {
-                        toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                        toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                     }
                 } else if (field.asType().kind == TypeKind.DOUBLE || field.asType().kind == TypeKind.FLOAT) {
                     val annotation = field.getAnnotation(FloatRange::class.java)
                     if (annotation != null) {
                         val state = if (annotation.from == annotation.to) {
-                            "if (event.${fieldMethod} != ${annotation.from})"
+                            "if (event.$fieldMethod != ${annotation.from})"
                         } else {
                             val fromEqual = if (annotation.fromInclusive) ">=" else ">"
                             val toEqual = if (annotation.toInclusive) "<=" else "<"
                             val hasFrom =
-                                if (annotation.from != Double.NEGATIVE_INFINITY) "event.${fieldMethod} $fromEqual ${annotation.from}" else ""
+                                if (annotation.from != Double.NEGATIVE_INFINITY) "event.$fieldMethod $fromEqual ${annotation.from}" else ""
                             val hasTo =
-                                if (annotation.to != Double.POSITIVE_INFINITY) "event.${fieldMethod} $toEqual ${annotation.to}" else ""
+                                if (annotation.to != Double.POSITIVE_INFINITY) "event.$fieldMethod $toEqual ${annotation.to}" else ""
                             if (hasFrom.isNotEmpty() && hasTo.isNotEmpty()) {
                                 "if ($hasFrom && $hasTo)"
                             } else if (hasFrom.isEmpty() && hasTo.isEmpty()) {
@@ -221,25 +230,25 @@ internal class JsonSerializerGenerator(
                         }
                         if (state != null) {
                             toJsonMethod.beginControlFlow(state)
-                                .addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                                .addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                                 .endControlFlow()
                         } else {
-                            toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                            toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                         }
                     } else {
-                        toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                        toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                     }
                 } else if ("java.lang.String" == field.asType().toString()) {
                     val annotation = field.getAnnotation(Nullable::class.java)
                     if (annotation != null) {
                         toJsonMethod.beginControlFlow(
-                            "if(!\$T.isEmpty(event.${fieldMethod}))",
-                            ClassName.get(TEXT_UTILS_PACKAGE, TEXT_UTILS_CLASS)
+                            "if(!\$T.isEmpty(event.$fieldMethod))",
+                            ClassName.get(TEXT_UTILS_PACKAGE, TEXT_UTILS_CLASS),
                         )
-                            .addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                            .addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                             .endControlFlow()
                     } else {
-                        toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                        toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                     }
                 } else if ("java.util.Map<java.lang.String,java.lang.String>" == field.asType()
                         .toString()
@@ -247,25 +256,25 @@ internal class JsonSerializerGenerator(
                     val annotation = field.getAnnotation(Nullable::class.java)
                     if (annotation != null) {
                         toJsonMethod.beginControlFlow(
-                            "if(event.${fieldMethod} != null && !event.${fieldMethod}.isEmpty())"
+                            "if(event.$fieldMethod != null && !event.$fieldMethod.isEmpty())",
                         ).addStatement(
-                            "jsonObject.put(\"${fieldName}\", new \$T(event.${fieldMethod}))",
-                            ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS)
+                            "jsonObject.put(\"${fieldName}\", new \$T(event.$fieldMethod))",
+                            ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
                         ).endControlFlow()
                     } else {
                         toJsonMethod.addStatement(
-                            "jsonObject.put(\"${fieldName}\", new \$T(event.${fieldMethod}))",
-                            ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS)
+                            "jsonObject.put(\"${fieldName}\", new \$T(event.$fieldMethod))",
+                            ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
                         )
                     }
                 } else {
-                    toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.${fieldMethod})")
+                    toJsonMethod.addStatement("jsonObject.put(\"${fieldName}\", event.$fieldMethod)")
                 }
             }
 
             toJsonMethod.nextControlFlow(
                 "catch (\$T ignored)",
-                ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_EXCEPTION)
+                ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_EXCEPTION),
             ).endControlFlow()
         }
 
@@ -281,7 +290,7 @@ internal class JsonSerializerGenerator(
         builderName: String,
         fields: MutableList<VariableElement>,
         clazz: TypeElement,
-        containSuperElement: Boolean
+        containSuperElement: Boolean,
     ): MethodSpec {
         val parseFromMethod =
             MethodSpec.methodBuilder("parseFrom").addParameter(parameterizedBuilderType, "builder")
@@ -289,7 +298,7 @@ internal class JsonSerializerGenerator(
                 .addModifiers(Modifier.PUBLIC).addAnnotation(Override::class.java)
 
         if (containSuperElement) {
-            //BaseEventJsonSerializableFactory.create().parseFrom(builder, jsonObject);
+            // BaseEventJsonSerializableFactory.create().parseFrom(builder, jsonObject);
             val superElement = clazz.superclass
             val superClassName = superElement.toString().substringAfterLast(".")
             val superPackageName = superElement.toString().substringBeforeLast(".")
@@ -317,82 +326,82 @@ internal class JsonSerializerGenerator(
                 }
                 if (field.asType().kind == TypeKind.INT) {
                     parseFromMethod.addStatement(
-                        "builder.${fieldMethod}".replace(
+                        "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optInt(\"$fieldName\")"
-                        )
+                            "jsonObject.optInt(\"$fieldName\")",
+                        ),
                     )
                 } else if (field.asType().kind == TypeKind.LONG) {
                     parseFromMethod.addStatement(
-                        "builder.${fieldMethod}".replace(
+                        "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optLong(\"$fieldName\")"
-                        )
+                            "jsonObject.optLong(\"$fieldName\")",
+                        ),
                     )
                 } else if (field.asType().kind == TypeKind.FLOAT) {
                     parseFromMethod.addStatement(
-                        "builder.${fieldMethod}".replace(
+                        "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optFloat(\"$fieldName\")"
-                        )
+                            "jsonObject.optFloat(\"$fieldName\")",
+                        ),
                     )
                 } else if (field.asType().kind == TypeKind.DOUBLE) {
                     parseFromMethod.addStatement(
-                        "builder.${fieldMethod}".replace(
+                        "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optDouble(\"$fieldName\")"
-                        )
+                            "jsonObject.optDouble(\"$fieldName\")",
+                        ),
                     )
                 } else if (field.asType().kind == TypeKind.BOOLEAN) {
                     parseFromMethod.addStatement(
-                        "builder.${fieldMethod}".replace(
+                        "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optBoolean(\"$fieldName\")"
-                        )
+                            "jsonObject.optBoolean(\"$fieldName\")",
+                        ),
                     )
                 } else if ("java.lang.String" == field.asType().toString()) {
                     parseFromMethod.addStatement(
-                        "builder.${fieldMethod}".replace(
+                        "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optString(\"$fieldName\")"
-                        )
+                            "jsonObject.optString(\"$fieldName\")",
+                        ),
                     )
                 } else if ("java.util.Map<java.lang.String,java.lang.String>" == field.asType()
                         .toString()
                 ) {
                     parseFromMethod.addStatement(
                         "\$T json = jsonObject.optJSONObject(\"$fieldName\")",
-                        ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS)
+                        ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
                     )
                     parseFromMethod.addStatement(
                         "\$T map = new \$T()",
                         ParameterizedTypeName.get(
                             ClassName.get(Map::class.java),
                             ClassName.get(String::class.java),
-                            ClassName.get(String::class.java)
+                            ClassName.get(String::class.java),
                         ),
                         ParameterizedTypeName.get(
                             ClassName.get(HashMap::class.java),
                             ClassName.get(String::class.java),
-                            ClassName.get(String::class.java)
-                        )
+                            ClassName.get(String::class.java),
+                        ),
                     )
                     parseFromMethod.addStatement(
                         "\$T keys = json.keys()",
                         ParameterizedTypeName.get(
                             ClassName.get(Iterator::class.java),
-                            ClassName.get(String::class.java)
-                        )
+                            ClassName.get(String::class.java),
+                        ),
                     )
                     parseFromMethod.beginControlFlow("while (keys.hasNext())")
                     parseFromMethod.addStatement("\$T key = keys.next()", String::class.java)
                     parseFromMethod.addStatement("map.put(key, json.getString(key))")
                     parseFromMethod.endControlFlow()
                     parseFromMethod.addStatement(
-                        "builder.${fieldMethod}".replace(
+                        "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "map"
-                        )
+                            "map",
+                        ),
                     )
                 } else {
                     processUtils.debugLog("unsupported data type.")
@@ -401,12 +410,10 @@ internal class JsonSerializerGenerator(
 
             parseFromMethod.nextControlFlow(
                 "catch (\$T ignored)",
-                Exception::class.java
+                Exception::class.java,
             ).endControlFlow()
         }
 
         return parseFromMethod.build()
     }
-
-
 }

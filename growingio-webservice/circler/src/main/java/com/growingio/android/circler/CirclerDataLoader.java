@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.circler;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
-import com.growingio.android.sdk.track.webservices.Circler;
-import com.growingio.android.sdk.track.webservices.WebService;
+import com.growingio.android.sdk.track.middleware.webservice.Circler;
+import com.growingio.android.sdk.track.middleware.webservice.WebService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,12 +34,8 @@ public class CirclerDataLoader implements ModelLoader<Circler, WebService> {
 
     private final CirclerService circlerService;
 
-    public CirclerDataLoader(OkHttpClient client) {
-        circlerService = new CirclerService(client);
-    }
-
-    public CirclerService getCirclerService() {
-        return circlerService;
+    public CirclerDataLoader(OkHttpClient client, TrackerContext context) {
+        circlerService = new CirclerService(client, context);
     }
 
     @Override
@@ -68,12 +64,15 @@ public class CirclerDataLoader implements ModelLoader<Circler, WebService> {
             return sInternalClient;
         }
 
-        public Factory() {
+        private final TrackerContext context;
+
+        public Factory(TrackerContext context) {
+            this.context = context;
         }
 
         @Override
         public ModelLoader<Circler, WebService> build() {
-            return new CirclerDataLoader(getsInternalClient());
+            return new CirclerDataLoader(getsInternalClient(), context);
         }
     }
 }

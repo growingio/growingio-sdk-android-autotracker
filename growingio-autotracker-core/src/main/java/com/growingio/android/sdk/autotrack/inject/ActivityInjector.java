@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.inject;
 
 import android.app.Activity;
@@ -25,25 +24,23 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-
 public class ActivityInjector {
     private ActivityInjector() {
     }
 
     public static void onActivityNewIntent(Activity activity, Intent intent) {
-        ActivityStateProvider.get().onActivityNewIntent(activity, intent);
+        InjectorProvider.get().onActivityNewIntent(activity, intent);
     }
 
     public static void menuItemOnOptionsItemSelected(Activity activity, MenuItem item) {
-        ViewClickProvider.activityOptionsItemOnClick(activity, item);
+        InjectorProvider.get().activityOptionsItemOnClick(activity, item);
     }
 
     public static void expandableListActivityOnChildClick(ExpandableListActivity activity, ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-        ViewClickProvider.viewOnClick(v);
+        InjectorProvider.get().viewOnClick(v);
     }
 
     public static void listActivityOnListItemClick(ListActivity activity, ListView listView, View view, int position, long id) {
-        ViewClickProvider.viewOnClick(view);
+        InjectorProvider.get().viewOnClick(view);
     }
 }

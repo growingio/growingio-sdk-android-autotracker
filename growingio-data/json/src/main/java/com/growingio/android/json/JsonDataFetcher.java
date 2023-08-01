@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.json;
 
 import android.os.Build;
@@ -24,7 +23,7 @@ import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.format.FormatDataFetcher;
-import com.growingio.android.sdk.track.providers.EventStateProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 
 import org.json.JSONObject;
 
@@ -65,7 +64,7 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
     @Override
     public EventByteArray format(GEvent gEvent) {
         if (gEvent instanceof BaseEvent) {
-            JSONObject eventJson = EventStateProvider.get().toJson((BaseEvent) gEvent);
+            JSONObject eventJson = EventBuilderProvider.toJson((BaseEvent) gEvent);
             return new EventByteArray(eventJson.toString().getBytes(), "application/json");
         }
         return new EventByteArray(null);

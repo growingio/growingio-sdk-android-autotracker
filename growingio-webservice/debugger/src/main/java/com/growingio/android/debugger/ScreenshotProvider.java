@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.debugger;
 
 import android.app.Activity;
@@ -22,17 +21,27 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.util.DisplayMetrics;
 
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.async.Callback;
+import com.growingio.android.sdk.track.SDKConfig;
+import com.growingio.android.sdk.track.listener.Callback;
+import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.EventFlutter;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.providers.AppInfoProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.view.ScreenshotUtil;
 import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.track.view.ViewTreeStatusListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -45,33 +54,49 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
     private static final long MAX_REFRESH_INTERVAL = 3000L;
     private long lastSendTime = 0L; // 记录上次发送的事件，用来避免当界面刷新频率过快时一直无法发送圈选事件。
 
-    private final float mScale;
-    private final Handler mHandler;
-    private final Runnable mRefreshScreenshotRunnable = this::dispatchScreenshot;
+    private float scale;
+    private final Handler screenshotHandler;
+    private final Runnable refreshScreenshotRunnable = this::dispatchScreenshot;
 
-    private OnScreenshotRefreshedListener mListener;
+    private OnScreenshotRefreshedListener refreshListener;
 
+    private ThreadSafeTipView safeTipView;
 
-    private static class SingleInstance {
-        private static final ScreenshotProvider INSTANCE = new ScreenshotProvider();
-    }
+    private ConfigurationProvider configurationProvider;
+    private AppInfoProvider appInfoProvider;
+    private DeviceInfoProvider deviceInfoProvider;
+    private TrackerRegistry registry;
 
-    private ScreenshotProvider() {
-        DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
-        mScale = SCREENSHOT_STANDARD_WIDTH / Math.min(metrics.widthPixels, metrics.heightPixels);
-
+    ScreenshotProvider() {
         HandlerThread mHandlerThread = new HandlerThread("ScreenshotProvider");
         mHandlerThread.start();
-        mHandler = new Handler(mHandlerThread.getLooper());
+        screenshotHandler = new Handler(mHandlerThread.getLooper());
+    }
 
-        getHybridModelLoader();
+    @Override
+    public void setup(TrackerContext context) {
+        super.setup(context);
+        configurationProvider = context.getConfigurationProvider();
+        appInfoProvider = context.getProvider(AppInfoProvider.class);
+        deviceInfoProvider = context.getDeviceInfoProvider();
+        registry = context.getRegistry();
+
+        DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context.getBaseContext());
+        scale = SCREENSHOT_STANDARD_WIDTH / Math.min(metrics.widthPixels, metrics.heightPixels);
+
+        safeTipView = new ThreadSafeTipView(context.getBaseContext(), activityStateProvider, appInfoProvider.getAppVersion());
+
+        ModelLoader<HybridDom, HybridJson> modelLoader = context.getRegistry().getModelLoader(HybridDom.class, HybridJson.class);
+        if (modelLoader != null) {
+            modelLoader.buildLoadData(new HybridDom(this::refreshScreenshot)).fetcher.executeData();
+        }
     }
 
     @Override
     public void onViewStateChanged(ViewStateChangedEvent changedEvent) {
         if (System.currentTimeMillis() - lastSendTime >= MAX_REFRESH_INTERVAL) {
             lastSendTime = System.currentTimeMillis();
-            mHandler.post(this::dispatchScreenshot);
+            screenshotHandler.post(this::dispatchScreenshot);
         } else {
             if (changedEvent.getStateType() == ViewStateChangedEvent.StateType.MANUAL_CHANGED) {
                 refreshScreenshot(EVENT_REFRESH_INTERVAL);
@@ -81,23 +106,16 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         }
     }
 
-    private void getHybridModelLoader() {
-        ModelLoader<HybridDom, HybridJson> modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridDom.class, HybridJson.class);
-        if (modelLoader != null) {
-            modelLoader.buildLoadData(new HybridDom(this::refreshScreenshot)).fetcher.executeData();
-        }
-    }
-
     private void dispatchScreenshot() {
-        if (mListener == null) return;
-        Activity activity = ActivityStateProvider.get().getForegroundActivity();
+        if (refreshListener == null) return;
+        Activity activity = activityStateProvider.getForegroundActivity();
         if (activity == null) return;
 
         try {
-            ScreenshotUtil.getScreenshotBitmap(mScale, bitmap -> {
+            ScreenshotUtil.getScreenshotBitmap(scale, bitmap -> {
                 try {
                     String screenshotBase64 = ScreenshotUtil.getScreenshotBase64(bitmap);
-                    sendScreenshotRefreshed(screenshotBase64, mScale);
+                    sendScreenshotRefreshed(screenshotBase64, scale);
                 } catch (IOException e) {
                     Logger.e(TAG, "base64 screenshot failed:" + e.getMessage());
                 }
@@ -108,8 +126,8 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
     }
 
     private void refreshScreenshot(long duration) {
-        mHandler.removeCallbacks(mRefreshScreenshotRunnable);
-        mHandler.postDelayed(mRefreshScreenshotRunnable, duration);
+        screenshotHandler.removeCallbacks(refreshScreenshotRunnable);
+        screenshotHandler.postDelayed(refreshScreenshotRunnable, duration);
     }
 
     private void refreshScreenshot() {
@@ -117,31 +135,31 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
     }
 
     public void generateDebuggerData(String screenshotBase64) {
-        if (mListener == null) return;
-        mHandler.removeMessages(0);
-        Message message = Message.obtain(mHandler, new Runnable() {
+        if (refreshListener == null) return;
+        screenshotHandler.removeMessages(0);
+        Message message = Message.obtain(screenshotHandler, new Runnable() {
             @Override
             public void run() {
-                sendScreenshotRefreshed(screenshotBase64, mScale);
+                sendScreenshotRefreshed(screenshotBase64, scale);
             }
         });
         message.what = 0;
-        mHandler.sendMessageDelayed(message, MIN_REFRESH_INTERVAL);
-    }
-
-    public static ScreenshotProvider get() {
-        return SingleInstance.INSTANCE;
+        screenshotHandler.sendMessageDelayed(message, MIN_REFRESH_INTERVAL);
     }
 
     public void registerScreenshotRefreshedListener(OnScreenshotRefreshedListener listener) {
         register();
-        mListener = listener;
+        refreshListener = listener;
         refreshScreenshot();
+
+        registry.executeData(EventFlutter.flutterCircle(true), EventFlutter.class, Void.class);
     }
 
     public void unregisterScreenshotRefreshedListener() {
-        mListener = null;
+        refreshListener = null;
         unRegister();
+
+        registry.executeData(EventFlutter.flutterCircle(false), EventFlutter.class, Void.class);
     }
 
     public interface OnScreenshotRefreshedListener {
@@ -154,14 +172,16 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
 
         lastSendTime = System.currentTimeMillis();
 
-        DebuggerScreenshot.Builder builder = new DebuggerScreenshot.Builder()
+        DebuggerScreenshot.Builder builder = new DebuggerScreenshot
+                .Builder(deviceInfoProvider.getScreenWidth(), deviceInfoProvider.getScreenHeight())
                 .setScale(scale)
                 .setScreenshot(screenshotBase64)
                 .setSnapshotKey(mSnapshotKey++);
         builder.build(new Callback<DebuggerScreenshot>() {
             @Override
             public void onSuccess(DebuggerScreenshot result) {
-                if (result != null && mListener != null) mListener.onScreenshotRefreshed(result);
+                if (result != null && refreshListener != null)
+                    refreshListener.onScreenshotRefreshed(result);
             }
 
             @Override
@@ -169,5 +189,91 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
                 Logger.e(TAG, "Create circle screenshot failed");
             }
         });
+    }
+
+    @Override
+    public void onActivityLifecycle(ActivityLifecycleEvent event) {
+        if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
+            safeTipView.show(event.getActivity());
+        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
+            safeTipView.removeOnly();
+        }
+    }
+
+    void enableTipViewShow() {
+        safeTipView.enableShow();
+    }
+
+    void disableTipView() {
+        safeTipView.dismiss();
+    }
+
+    void readyTipView(ThreadSafeTipView.OnExitListener listener) {
+        safeTipView.onReady(listener);
+    }
+
+    void setTipViewMessage(int message) {
+        safeTipView.setErrorMessage(message);
+    }
+
+    void showQuitDialog(ThreadSafeTipView.OnExitListener listener) {
+        safeTipView.showQuitedDialog(listener);
+    }
+
+    static final String MSG_READY_TYPE = "ready";
+    static final String MSG_QUIT_TYPE = "quit";
+    private static final String MSG_OS = "Android";
+    static final String MSG_CLIENT_TYPE = "client_info";
+
+    String buildReadyMessage() {
+        CoreConfiguration core = configurationProvider.core();
+        JSONObject json = new JSONObject();
+        try {
+            json.put("projectId", core.getProjectId());
+            json.put("msgType", MSG_READY_TYPE);
+            json.put("timestamp", System.currentTimeMillis());
+            json.put("domain", appInfoProvider.getPackageName());
+            json.put("sdkVersion", SDKConfig.SDK_VERSION);
+            json.put("sdkVersionCode", SDKConfig.SDK_VERSION_CODE);
+            json.put("os", MSG_OS);
+            json.put("screenWidth", deviceInfoProvider.getScreenWidth());
+            json.put("screenHeight", deviceInfoProvider.getScreenHeight());
+            json.put("urlScheme", core.getUrlScheme());
+        } catch (JSONException ignored) {
+        }
+        return json.toString();
+    }
+
+    String buildQuitMessage() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("msgType", MSG_QUIT_TYPE);
+        } catch (JSONException ignored) {
+        }
+        return json.toString();
+    }
+
+    String buildClientInfoMessage() {
+        CoreConfiguration core = configurationProvider.core();
+        JSONObject json = new JSONObject();
+        try {
+            json.put("msgType", MSG_CLIENT_TYPE);
+            json.put("sdkVersion", SDKConfig.SDK_VERSION);
+
+            JSONObject info = new JSONObject();
+            info.put("os", MSG_OS);
+            info.put("appVersion", appInfoProvider.getAppVersion());
+            info.put("appChannel", core.getChannel());
+            info.put("osVersion", deviceInfoProvider.getOperatingSystemVersion());
+            info.put("deviceType", deviceInfoProvider.getDeviceType());
+            info.put("deviceBrand", deviceInfoProvider.getDeviceBrand());
+            info.put("deviceModel", deviceInfoProvider.getDeviceModel());
+
+            json.put("data", info);
+
+        } catch (JSONException ignored) {
+        }
+
+        return json.toString();
     }
 }

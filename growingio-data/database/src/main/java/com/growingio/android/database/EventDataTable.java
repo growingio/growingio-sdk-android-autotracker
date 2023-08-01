@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.database;
 
 import android.content.ContentValues;
-import android.net.Uri;
 
-import com.growingio.android.sdk.TrackerContext;
 
-import java.io.File;
 
 public class EventDataTable {
 
@@ -48,10 +44,6 @@ public class EventDataTable {
                     + ");";
 
     public static final String DROP_TABLE_EVENTS = "DROP TABLE IF EXISTS " + TABLE_EVENTS + ";";
-
-    public static Uri getContentUri() {
-        return Uri.parse("content://" + TrackerContext.get().getPackageName() + "." + EventDataContentProvider.CONTENT_PROVIDER_NAME + File.separator + TABLE_EVENTS);
-    }
 
     public static ContentValues putValues(byte[] data, String eventType, Integer policy) {
         long current = System.currentTimeMillis();

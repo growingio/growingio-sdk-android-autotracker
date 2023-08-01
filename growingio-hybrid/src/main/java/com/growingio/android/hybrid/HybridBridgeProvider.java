@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.hybrid;
 
 import android.annotation.SuppressLint;
@@ -21,40 +20,48 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.webkit.ValueCallback;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.SDKConfig;
-import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.async.Disposable;
-import com.growingio.android.sdk.track.async.HandlerDisposable;
+import com.growingio.android.sdk.track.listener.Callback;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
+import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.growingio.android.hybrid.WebViewBridgeJavascriptInterface.JAVASCRIPT_GET_DOM_TREE_METHOD;
 
-public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener, Void> {
+public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener, Void> implements TrackerLifecycleProvider {
     private static final String TAG = "HybridBridgePolicy";
 
-    private static final int EVALUATE_JAVASCRIPT_TIMEOUT = 5000;
-
-    private static class SingleInstance {
-        private static final HybridBridgeProvider INSTANCE = new HybridBridgeProvider();
+    HybridBridgeProvider() {
     }
 
-    private HybridBridgeProvider() {
+
+    private ConfigurationProvider configurationProvider;
+    private AppInfoProvider appInfoProvider;
+    private UserInfoProvider userInfoProvider;
+
+    @Override
+    public void setup(TrackerContext context) {
+        configurationProvider = context.getConfigurationProvider();
+        appInfoProvider = context.getProvider(AppInfoProvider.class);
+        userInfoProvider = context.getUserInfoProvider();
     }
 
-    public static HybridBridgeProvider get() {
-        return SingleInstance.INSTANCE;
+    @Override
+    public void shutdown() {
+
     }
 
     private WebViewJavascriptBridgeConfiguration getJavascriptBridgeConfiguration() {
-        String projectId = ConfigurationProvider.core().getProjectId();
-        String appId = ConfigurationProvider.core().getUrlScheme();
-        String appPackage = AppInfoProvider.get().getPackageName();
+        String projectId = configurationProvider.core().getProjectId();
+        String appId = configurationProvider.core().getUrlScheme();
+        String appPackage = appInfoProvider.getPackageName();
         String nativeSdkVersion = SDKConfig.SDK_VERSION;
         int nativeSdkVersionCode = SDKConfig.SDK_VERSION_CODE;
         return new WebViewJavascriptBridgeConfiguration(projectId, appId, appPackage, nativeSdkVersion, nativeSdkVersionCode);
@@ -79,20 +86,17 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
             Logger.d(TAG, "JavascriptInterface has already been added to the WebView");
             return;
         }
-        webView.addJavascriptInterface(new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration()), WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
+        webView.addJavascriptInterface(
+                new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration(), this, userInfoProvider),
+                WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
         webView.setAddJavaScript();
     }
 
-    public Disposable getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
+    public void getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
         Logger.d(TAG, "getWebViewDomTree");
         if (callback == null) {
-            return Disposable.EMPTY_DISPOSABLE;
+            return;
         }
-        final Disposable disposable = new HandlerDisposable().schedule(() -> {
-            Logger.e(TAG, "getWebViewDomTree timeout");
-            callback.onFailed();
-        }, EVALUATE_JAVASCRIPT_TIMEOUT);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             int[] location = new int[2];
             webView.getLocationOnScreen(location);
@@ -101,10 +105,6 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
                     new ValueCallback<String>() {
                         @Override
                         public void onReceiveValue(String value) {
-                            if (disposable.isDisposed()) {
-                                return;
-                            }
-                            disposable.dispose();
                             if (TextUtils.isEmpty(value) || "null".equals(value)) {
                                 Logger.e(TAG, "getWebViewDomTree ValueCallback is NULL");
                                 callback.onFailed();
@@ -121,12 +121,8 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
                     });
         } else {
             Logger.e(TAG, "You need use after Android 4.4 to getWebViewDomTree");
-            if (!disposable.isDisposed()) {
-                disposable.dispose();
-            }
             callback.onFailed();
         }
-        return disposable;
     }
 
     @Override

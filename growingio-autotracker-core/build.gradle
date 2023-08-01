@@ -1,76 +1,76 @@
 plugins {
-    id 'com.android.library'
-    // id 'org.jetbrains.kotlin.android'
+	id 'com.android.library'
+	// id 'org.jetbrains.kotlin.android'
 }
 
 android {
-    namespace 'com.growingio.android.sdk.autotrack'
-    compileSdkVersion buildConfiguration.compileVersion
-    defaultConfig {
-        minSdkVersion buildConfiguration.minSdkVersion
-        targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName libs.versions.growingio.get()
-        versionCode libs.versions.growingioCode.get().toInteger()
-    }
+	namespace 'com.growingio.android.sdk.autotrack'
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+		versionName libs.versions.growingio.get()
+		versionCode libs.versions.growingioCode.get().toInteger()
+	}
 
-    buildTypes {
-//        debug {
-//            testCoverageEnabled = true
-//        }
+	buildTypes {
+		//        debug {
+		//            testCoverageEnabled = true
+		//        }
 
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            consumerProguardFiles 'consumer-proguard-rules.pro'
-        }
-    }
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			consumerProguardFiles 'consumer-proguard-rules.pro'
+		}
+	}
 
-    compileOptions {
-        sourceCompatibility buildConfiguration.sourceCompatibility
-        targetCompatibility buildConfiguration.targetCompatibility
-    }
+	compileOptions {
+		sourceCompatibility buildConfiguration.sourceCompatibility
+		targetCompatibility buildConfiguration.targetCompatibility
+	}
 
-    testOptions {
-        unitTests.all {
-            jacoco {
-                jvmArgs '-noverify'
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-        }
-        unitTests {
-            returnDefaultValues = true
-            includeAndroidResources = true
-        }
-    }
+	testOptions {
+		unitTests.all {
+			jacoco {
+				jvmArgs '-noverify'
+				includeNoLocationClasses = true
+				excludes = ['jdk.internal.*']
+			}
+		}
+		unitTests {
+			returnDefaultValues = true
+			includeAndroidResources = true
+		}
+	}
 
-    lintOptions {
-        abortOnError false
-    }
+	lintOptions {
+		abortOnError false
+	}
 }
 
 dependencies {
-//    implementation libs.kotlin.stdlib
+	//    implementation libs.kotlin.stdlib
 
-    compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    compileOnly libs.bundles.androidx
-    compileOnly libs.google.material
-    compileOnly libs.bundles.android.support
+	compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
+	compileOnly libs.bundles.androidx
+	compileOnly libs.google.material
+	compileOnly libs.bundles.android.support
 
-    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    testImplementation libs.bundles.test
-    testImplementation libs.bundles.androidx
-    testImplementation libs.androidx.test.core
-    testImplementation libs.androidx.fragment.test
-    testImplementation libs.protobuf.javalite
+	testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
+	testImplementation libs.bundles.test
+	testImplementation libs.bundles.androidx
+	testImplementation libs.androidx.test.core
+	testImplementation libs.androidx.fragment.test
+	testImplementation libs.protobuf.javalite
 
-    testCompileOnly libs.support.fragment
+	testCompileOnly libs.support.fragment
 
-    debugApi project(':growingio-tracker-core')
-    releaseApi libs.growingio.tracker.core
-    
-    implementation project(":growingio-annotation")
-    annotationProcessor project(":growingio-annotation:compiler")
+	debugApi project(':growingio-tracker-core')
+	releaseApi libs.growingio.tracker.core
+
+	implementation project(":growingio-annotation")
+	annotationProcessor project(":growingio-annotation:compiler")
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

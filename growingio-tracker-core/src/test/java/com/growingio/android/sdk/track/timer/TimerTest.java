@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.timer;
 
 import android.os.SystemClock;
 
 import com.google.common.truth.Truth;
+import com.growingio.android.sdk.track.utils.TimerEvent;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,7 +35,7 @@ public class TimerTest {
         Robolectric.getForegroundThreadScheduler().advanceTo(1);
         long startTime = SystemClock.elapsedRealtime();
         String eventName = "Test1";
-        Timer timer = new Timer(startTime, eventName);
+        TimerEvent timer = new TimerEvent(startTime, eventName);
         Robolectric.getForegroundThreadScheduler().advanceTo(1001);
         long endTime = SystemClock.elapsedRealtime();
         float elapsedTime = (endTime - startTime) / 1000F;
@@ -50,7 +50,7 @@ public class TimerTest {
         Robolectric.getForegroundThreadScheduler().advanceTo(1);
         long startTime = SystemClock.elapsedRealtime();
         String eventName = "Test2";
-        Timer timer = new Timer(startTime, eventName);
+        TimerEvent timer = new TimerEvent(startTime, eventName);
         Robolectric.getForegroundThreadScheduler().advanceTo(1001);
         long pauseTime = SystemClock.elapsedRealtime();
         timer.updateState(pauseTime, false);
@@ -73,7 +73,7 @@ public class TimerTest {
         Robolectric.getForegroundThreadScheduler().advanceTo(1);
         long startTime = SystemClock.elapsedRealtime();
         String eventName = "Test3";
-        Timer timer = new Timer(startTime, eventName);
+        TimerEvent timer = new TimerEvent(startTime, eventName);
         Robolectric.getForegroundThreadScheduler().advanceTo(1001);
         long backgroundTime = SystemClock.elapsedRealtime();
         timer.computeElapsedTimeBeforeEnterBackground(backgroundTime);

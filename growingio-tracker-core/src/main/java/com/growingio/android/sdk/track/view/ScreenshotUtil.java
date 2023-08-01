@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -28,12 +28,9 @@ import android.view.PixelCopy;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
-import com.growingio.android.sdk.track.webservices.widget.TipView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,8 +48,8 @@ public class ScreenshotUtil {
                 break;
             }
         }
-
-        DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
+        Context context = TrackMainThread.trackMain().getContext();
+        DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
         Bitmap bitmap = Bitmap.createBitmap(metrics.widthPixels, metrics.heightPixels, Bitmap.Config.ARGB_8888);
         drawDecorViewsToBitmap(decorViews, bitmap);
         return bitmap;
@@ -95,7 +92,7 @@ public class ScreenshotUtil {
         // PixelCopy
         // https://muyangmin.github.io/glide-docs-cn/doc/hardwarebitmaps.html
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Activity activity = ActivityStateProvider.get().getForegroundActivity();
+            Activity activity = TrackMainThread.trackMain().getForegroundActivity();
             if (activity == null) {
                 getScreenShotBitmapDefault(scale, callback);
                 return;

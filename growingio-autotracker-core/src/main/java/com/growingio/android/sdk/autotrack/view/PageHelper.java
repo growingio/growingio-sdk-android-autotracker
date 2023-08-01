@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.view;
 
 import android.view.View;
@@ -21,7 +20,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.growingio.android.sdk.autotrack.page.Page;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
 /**
  * <p>
@@ -50,7 +48,7 @@ class PageHelper {
         Page<?> page = ViewAttributeUtil.getViewPage(root);
         if (page != null) {
             windowPrefix = PAGE_PREFIX;
-        } else if (root.hashCode() == ActivityStateProvider.get().getCurrentRootWindowsHashCode()) {
+        } else if (root.hashCode() == ViewUtil.getCurrentRootWindowsHashCode()) {
             windowPrefix = getMainWindowPrefix();
         } else {
             windowPrefix = getSubWindowPrefix(root);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.page;
 
 import android.app.Activity;
@@ -25,6 +24,7 @@ import android.view.View;
 import androidx.annotation.UiThread;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -32,6 +32,7 @@ import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
 import java.util.HashMap;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class PageProvider implements IActivityLifecycle {
+public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvider {
     private static final String TAG = "PageProvider";
 
     //CHECKSTYLE:OFF
@@ -51,25 +52,38 @@ public class PageProvider implements IActivityLifecycle {
      * Cache Pages that not in the Lifecycle but has set properties.
      */
     private final Map<Object, Page<?>> CACHE_PAGES = new WeakHashMap<>();
+
     //CHECKSTYLE:ON
 
     private static class SingleInstance {
         private static final PageProvider INSTANCE = new PageProvider();
     }
 
+    private ActivityStateProvider activityStateProvider;
+    private AutotrackConfig autotrackConfig;
+
     private PageProvider() {
+        ALL_PAGE_TREE.clear();
+        CACHE_PAGES.clear();
+    }
+
+    @Override
+    public void setup(TrackerContext context) {
+        activityStateProvider = context.getActivityStateProvider();
+        autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
+        activityStateProvider.registerActivityLifecycleListener(this);
+    }
+
+    @Override
+    public void shutdown() {
+        activityStateProvider.unregisterActivityLifecycleListener(this);
     }
 
     public static PageProvider get() {
         return SingleInstance.INSTANCE;
     }
 
-    public void setup() {
-        ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        ALL_PAGE_TREE.clear();
-        CACHE_PAGES.clear();
-    }
-
+    @Override
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
         Activity activity = event.getActivity();
         if (activity == null) {
@@ -101,7 +115,7 @@ public class PageProvider implements IActivityLifecycle {
             CACHE_PAGES.remove(activity);
         }
         if (page == null) {
-            page = new ActivityPage(activity);
+            page = new ActivityPage(activity, autotrackConfig);
         }
         ALL_PAGE_TREE.put(activity, page);
         return page;
@@ -117,7 +131,7 @@ public class PageProvider implements IActivityLifecycle {
             return page;
         }
         if (page == null) {
-            page = new ActivityPage(activity);
+            page = new ActivityPage(activity, autotrackConfig);
             CACHE_PAGES.put(activity, page);
         }
         return page;
@@ -137,7 +151,7 @@ public class PageProvider implements IActivityLifecycle {
         if (CACHE_PAGES.containsKey(activity)) {
             page = (ActivityPage) CACHE_PAGES.get(activity);
         } else {
-            page = new ActivityPage(activity);
+            page = new ActivityPage(activity, autotrackConfig);
             CACHE_PAGES.put(activity, page);
         }
         page.setIsAutotrack(true);
@@ -203,7 +217,7 @@ public class PageProvider implements IActivityLifecycle {
         if (CACHE_PAGES.containsKey(fragment)) {
             return (FragmentPage) CACHE_PAGES.get(fragment);
         }
-        FragmentPage fragmentPage = new FragmentPage(fragment);
+        FragmentPage fragmentPage = new FragmentPage(fragment, autotrackConfig);
         CACHE_PAGES.put(fragment, fragmentPage);
         return fragmentPage;
     }
@@ -317,7 +331,7 @@ public class PageProvider implements IActivityLifecycle {
             CACHE_PAGES.remove(fragment);
             return fragmentPage;
         }
-        return new FragmentPage(fragment);
+        return new FragmentPage(fragment, autotrackConfig);
     }
 
     public void autotrackFragment(SuperFragment<?> fragment, String alias, Map<String, String> attributes) {
@@ -339,7 +353,7 @@ public class PageProvider implements IActivityLifecycle {
         if (CACHE_PAGES.containsKey(fragment)) {
             fragmentPage = (FragmentPage) CACHE_PAGES.get(fragment);
         } else {
-            fragmentPage = new FragmentPage(fragment);
+            fragmentPage = new FragmentPage(fragment, autotrackConfig);
             CACHE_PAGES.put(fragment, fragmentPage);
         }
         fragmentPage.setIsAutotrack(true);
@@ -458,8 +472,8 @@ public class PageProvider implements IActivityLifecycle {
         //需要考虑其他Window的上面的View
         Context viewContext = view.getContext();
         Activity activity = ActivityUtil.findActivity(viewContext);
-        if (activity == null) {
-            activity = ActivityStateProvider.get().getForegroundActivity();
+        if (activity == null && activityStateProvider != null) {
+            activity = activityStateProvider.getForegroundActivity();
         }
         if (activity != null) {
             ActivityPage activityPage = findOrCreateActivityPage(activity);

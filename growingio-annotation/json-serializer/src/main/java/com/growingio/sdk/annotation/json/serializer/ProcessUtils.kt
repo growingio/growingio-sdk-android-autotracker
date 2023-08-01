@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.sdk.annotation.json.serializer
 
 import com.squareup.javapoet.JavaFile
@@ -54,7 +53,7 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
         if (findFieldResult != null) {
             return "$findFieldResult = $FIELD_REPLACE_REG"
         }
-        return null;
+        return null
     }
 
     fun findGetFieldMethod(field: VariableElement, clazz: TypeElement): String? {
@@ -76,15 +75,15 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
 
     private fun findField(
         field: VariableElement,
-        clazz: TypeElement
+        clazz: TypeElement,
     ): String? {
         val findFieldResult = clazz.enclosedElements.filterIsInstance<VariableElement>().find {
             it.simpleName.toString() == field.simpleName.toString() && field.asType().kind == it.asType().kind
         }
-        if (findFieldResult != null
-            && !findFieldResult.modifiers.contains(Modifier.PRIVATE)
-            && !findFieldResult.modifiers.contains(Modifier.FINAL)
-            && !findFieldResult.modifiers.contains(Modifier.STATIC)
+        if (findFieldResult != null &&
+            !findFieldResult.modifiers.contains(Modifier.PRIVATE) &&
+            !findFieldResult.modifiers.contains(Modifier.FINAL) &&
+            !findFieldResult.modifiers.contains(Modifier.STATIC)
         ) {
             return findFieldResult.simpleName.toString()
         }
@@ -105,18 +104,15 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
         return null
     }
 
-
     fun writeClass(packageName: String?, clazz: TypeSpec) {
         try {
             debugLog("Writing class:\n$clazz")
             JavaFile.builder(packageName, clazz).skipJavaLangImports(true).build()
                 .writeTo(processEnv.getFiler())
-
         } catch (e: Throwable) {
             throw RuntimeException(e)
         }
     }
-
 
     companion object {
         const val DEBUG = false
@@ -135,6 +131,5 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
         const val TEXT_UTILS_CLASS = "TextUtils"
 
         const val FIELD_REPLACE_REG = "#_FIELD_#"
-
     }
 }

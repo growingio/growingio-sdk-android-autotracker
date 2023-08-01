@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.encoder;
 
-import android.content.Context;
 
-import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.middleware.http.EventEncoder;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.snappy.Snappy;
 import com.growingio.android.snappy.XORUtils;
 
@@ -36,13 +32,8 @@ import org.robolectric.annotation.Config;
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class EncoderTest {
-    private Context context = ApplicationProvider.getApplicationContext();
-
     @Test
     public void encoder() {
-        EncoderLibraryGioModule module = new EncoderLibraryGioModule();
-        TrackerRegistry trackerRegistry = new TrackerRegistry();
-        module.registerComponents(context, trackerRegistry);
 
         EventUrl eventUrl = new EventUrl("https://localhost", 10000L)
                 .addPath("v3")
@@ -53,9 +44,7 @@ public class EncoderTest {
                 .addParam("stm", String.valueOf(10000L));
 
         EventEncoder encoder = new EventEncoder(eventUrl);
-        DataFetcher<EventEncoder> dataFetcher = trackerRegistry.getModelLoader(EventEncoder.class, EventEncoder.class)
-                .buildLoadData(encoder)
-                .fetcher;
+        DataFetcher<EventEncoder> dataFetcher = new EncoderDataFetcher(encoder);
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventEncoder.class);
         EventEncoder data = dataFetcher.executeData();
         EventUrl eurl = data.getEventUrl();

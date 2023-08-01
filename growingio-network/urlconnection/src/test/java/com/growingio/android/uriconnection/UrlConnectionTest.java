@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.uriconnection;
 
 
@@ -30,7 +29,7 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.urlconnection.HttpException;
 import com.growingio.android.urlconnection.LogTime;
-import com.growingio.android.urlconnection.UrlConnectionGioModule;
+import com.growingio.android.urlconnection.UrlConnectionDataLoader;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -98,9 +97,8 @@ public class UrlConnectionTest {
     @Test
     public void sendTest() throws IOException {
         mockWebServer.start(8910);
-        UrlConnectionGioModule module = new UrlConnectionGioModule();
         TrackerRegistry trackerRegistry = new TrackerRegistry();
-        module.registerComponents(application, trackerRegistry);
+        trackerRegistry.register(EventUrl.class, EventResponse.class, new UrlConnectionDataLoader.Factory());
 
         ModelLoader<EventUrl, EventResponse> modelLoader = trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
         EventUrl eventUrl = initEventUrl("http://localhost:8910/");

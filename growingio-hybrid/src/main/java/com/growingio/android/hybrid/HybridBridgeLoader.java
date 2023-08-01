@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.hybrid;
 
 import android.webkit.WebView;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
@@ -31,15 +31,28 @@ import com.growingio.android.sdk.track.utils.ClassExistHelper;
  */
 public class HybridBridgeLoader implements ModelLoader<HybridBridge, Boolean> {
 
+    private final HybridBridgeProvider hybridBridgeProvider;
+
+    public HybridBridgeLoader(TrackerContext context) {
+        hybridBridgeProvider = context.getProvider(HybridBridgeProvider.class);
+    }
+
     @Override
     public LoadData<Boolean> buildLoadData(HybridBridge eventData) {
-        return new LoadData<>(new HybridDataFetcher(eventData));
+        return new LoadData<>(new HybridDataFetcher(eventData, hybridBridgeProvider));
     }
 
     public static class Factory implements ModelLoaderFactory<HybridBridge, Boolean> {
+
+        private final TrackerContext context;
+
+        public Factory(TrackerContext context) {
+            this.context = context;
+        }
+
         @Override
         public ModelLoader<HybridBridge, Boolean> build() {
-            return new HybridBridgeLoader();
+            return new HybridBridgeLoader(context);
         }
     }
 
@@ -47,20 +60,22 @@ public class HybridBridgeLoader implements ModelLoader<HybridBridge, Boolean> {
     public static class HybridDataFetcher implements DataFetcher<Boolean> {
 
         private final HybridBridge bridge;
+        private final HybridBridgeProvider hybridBridgeProvider;
 
-        public HybridDataFetcher(HybridBridge eventData) {
+        public HybridDataFetcher(HybridBridge eventData, HybridBridgeProvider hybridBridgeProvider) {
             this.bridge = eventData;
+            this.hybridBridgeProvider = hybridBridgeProvider;
         }
 
 
         @Override
         public Boolean executeData() {
             if (bridge.getView() instanceof WebView) {
-                HybridBridgeProvider.get().bridgeForWebView(SuperWebView.make((WebView) bridge.getView()));
+                hybridBridgeProvider.bridgeForWebView(SuperWebView.make((WebView) bridge.getView()));
             } else if (ClassExistHelper.instanceOfX5WebView(bridge.getView())) {
-                HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeX5((com.tencent.smtt.sdk.WebView) bridge.getView()));
+                hybridBridgeProvider.bridgeForWebView(SuperWebView.makeX5((com.tencent.smtt.sdk.WebView) bridge.getView()));
             } else if (ClassExistHelper.instanceOfUcWebView(bridge.getView())) {
-                HybridBridgeProvider.get().bridgeForWebView(SuperWebView.makeUC((com.uc.webview.export.WebView) bridge.getView()));
+                hybridBridgeProvider.bridgeForWebView(SuperWebView.makeUC((com.uc.webview.export.WebView) bridge.getView()));
             } else {
                 return false;
             }

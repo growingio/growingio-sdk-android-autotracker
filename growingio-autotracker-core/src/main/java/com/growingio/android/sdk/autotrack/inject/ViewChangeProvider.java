@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.inject;
 
 import android.app.Activity;
@@ -27,7 +26,7 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.R;
 import com.growingio.android.sdk.autotrack.view.ViewNodeProvider;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.view.OnViewStateChangedListener;
 import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
 import com.growingio.android.sdk.track.view.ViewTreeStatusObserver;
@@ -36,18 +35,33 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
-public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChangedListener {
+public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChangedListener, TrackerLifecycleProvider {
     private static final String TAG = "ViewChangeProvider";
 
-    public ViewChangeProvider() {
+    ViewChangeProvider() {
     }
 
-    private ViewTreeStatusObserver mViewTreeStatusObserver;
+    private ViewTreeStatusObserver viewTreeStatusObserver;
+    private ActivityStateProvider activityStateProvider;
+    private ViewNodeProvider viewNodeProvider;
 
-    public void setup() {
-        ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        mViewTreeStatusObserver = new ViewTreeStatusObserver(false, false, true, false, this,
+    private AutotrackConfig autotrackConfig;
+
+
+    @Override
+    public void setup(TrackerContext context) {
+        activityStateProvider = context.getActivityStateProvider();
+        autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
+        activityStateProvider.registerActivityLifecycleListener(this);
+        viewNodeProvider = context.getProvider(ViewNodeProvider.class);
+
+        viewTreeStatusObserver = new ViewTreeStatusObserver(false, false, true, false, this,
                 R.id.growing_tracker_monitoring_focus_change);
+    }
+
+    @Override
+    public void shutdown() {
+        activityStateProvider.unregisterActivityLifecycleListener(this);
     }
 
     @Override
@@ -57,9 +71,9 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             return;
         }
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
-            mViewTreeStatusObserver.onActivityResumed(activity);
+            viewTreeStatusObserver.onActivityResumed(activity);
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
-            mViewTreeStatusObserver.onActivityPaused(activity);
+            viewTreeStatusObserver.onActivityPaused(activity);
             View focusView = activity.getWindow().getDecorView().findFocus();
             if (focusView instanceof EditText) {
                 Logger.d(TAG, "onActivityPaused, and focus view is EditText");
@@ -79,56 +93,51 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
         }
     }
 
-    public static void editTextOnFocusChange(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isEditTextChangeEnabled()) {
+    void editTextOnFocusChange(View view) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isEditTextChangeEnabled()) {
             Logger.i(TAG, "AutotrackOptions: edittext change enable is false");
             return;
         }
         sendChangeEvent(view);
     }
 
-    public static void seekBarOnProgressChange(SeekBar seekBar) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isSeekbarChangeEnabled()) {
+    public void seekBarOnProgressChange(SeekBar seekBar) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isSeekbarChangeEnabled()) {
             Logger.i(TAG, "AutotrackOptions: seekbar change enable is false");
             return;
         }
         sendChangeEvent(seekBar);
     }
 
-    public static void ratingBarOnRatingChange(View view, float rating) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isRatingBarChangeEnabled()) {
+    public void ratingBarOnRatingChange(View view, float rating) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isRatingBarChangeEnabled()) {
             Logger.i(TAG, "AutotrackOptions: ratingbar change enable is false");
             return;
         }
         sendChangeEvent(view);
     }
 
-    public static void sliderOnStopTrackingTouch(Slider slider) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isSliderChangeEnabled()) {
+    public void sliderOnStopTrackingTouch(Slider slider) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isSliderChangeEnabled()) {
             Logger.i(TAG, "AutotrackOptions: slider value change enable is false");
             return;
         }
         sendChangeEvent(slider);
     }
 
-    public static void rangeSliderOnStopTrackingTouch(RangeSlider slider) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isSliderChangeEnabled()) {
+    public void rangeSliderOnStopTrackingTouch(RangeSlider slider) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isSliderChangeEnabled()) {
             Logger.i(TAG, "AutotrackOptions: rangeSlider value change enable is false");
             return;
         }
         sendChangeEvent(slider);
     }
 
-    private static void sendChangeEvent(View view) {
+    private void sendChangeEvent(View view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
         }
 
-        ViewNodeProvider.get().generateViewChangeEvent(view);
+        viewNodeProvider.generateViewChangeEvent(view);
     }
 }

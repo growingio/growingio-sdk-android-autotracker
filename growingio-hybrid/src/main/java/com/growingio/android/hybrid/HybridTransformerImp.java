@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.hybrid;
 
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
@@ -26,7 +25,7 @@ import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.EventStateProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +40,7 @@ public class HybridTransformerImp implements HybridTransformer {
             String type = eventJson.getString(BaseEvent.EVENT_TYPE);
             if (AutotrackEventType.PAGE.equals(type)) {
                 HybridPageEvent.Builder builder = new HybridPageEvent.Builder();
-                EventStateProvider.get().parseFrom(builder, eventJson);
+                EventBuilderProvider.parseFrom(builder, eventJson);
                 return builder;
             } else if (AutotrackEventType.VIEW_CLICK.equals(type) ||
                     AutotrackEventType.VIEW_CHANGE.equals(type) ||
@@ -50,21 +49,21 @@ public class HybridTransformerImp implements HybridTransformer {
                 return transformViewElementEventBuilder(type, eventJson);
             } else if (TrackEventType.CUSTOM.equals(type)) {
                 HybridCustomEvent.Builder builder = new HybridCustomEvent.Builder();
-                EventStateProvider.get().parseFrom(builder, eventJson);
+                EventBuilderProvider.parseFrom(builder, eventJson);
                 return builder;
             } else if (TrackEventType.LOGIN_USER_ATTRIBUTES.equals(type)) {
                 LoginUserAttributesEvent.Builder builder = new LoginUserAttributesEvent.Builder();
-                EventStateProvider.get().parseFrom(builder, eventJson);
+                EventBuilderProvider.parseFrom(builder, eventJson);
                 return builder;
 
             } else if (TrackEventType.VISITOR_ATTRIBUTES.equals(type)) {
                 VisitorAttributesEvent.Builder builder = new VisitorAttributesEvent.Builder();
-                EventStateProvider.get().parseFrom(builder, eventJson);
+                EventBuilderProvider.parseFrom(builder, eventJson);
                 return builder;
 
             } else if (TrackEventType.CONVERSION_VARIABLES.equals(type)) {
                 ConversionVariablesEvent.Builder builder = new ConversionVariablesEvent.Builder();
-                EventStateProvider.get().parseFrom(builder, eventJson);
+                EventBuilderProvider.parseFrom(builder, eventJson);
                 return builder;
             }
         } catch (JSONException e) {
@@ -75,7 +74,7 @@ public class HybridTransformerImp implements HybridTransformer {
 
     private HybridViewElementEvent.Builder transformViewElementEventBuilder(String eventType, JSONObject eventJson) throws JSONException {
         HybridViewElementEvent.Builder builder = new HybridViewElementEvent.Builder(eventType);
-        EventStateProvider.get().parseFrom(builder, eventJson);
+        EventBuilderProvider.parseFrom(builder, eventJson);
         return builder;
     }
 }

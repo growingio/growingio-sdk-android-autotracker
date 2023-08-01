@@ -1,17 +1,17 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.growingio.android.sdk.track.middleware;
 
@@ -24,8 +24,10 @@ import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.growingio.android.json.JsonDataLoader;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.database.DatabaseDataLoader;
@@ -55,13 +57,15 @@ public class EventSenderTest {
     private final Application application = ApplicationProvider.getApplicationContext();
     private EventSender eventSender;
 
+    private TrackerContext context;
+
     @Before
     public void setup() {
-        TrackerContext.init(application);
+        context = new Tracker(application).getContext();
         ProviderInfo providerInfo = new ProviderInfo();
         providerInfo.authority = application.getPackageName() + "." + EventDataContentProvider.class.getSimpleName();
 
-        eventSender = new EventSender(null, 0, 10);
+        eventSender = new EventSender(application, context.getRegistry(), null, 0, 10);
         controller.create(providerInfo).get();
     }
 
@@ -87,9 +91,9 @@ public class EventSenderTest {
 
     @Test
     public void eventCacheTestPb() throws InvalidProtocolBufferException {
-        TrackerContext.get().getRegistry().register(EventDatabase.class, EventDbResult.class, new DatabaseDataLoader.Factory(application));
-        TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
-
+        context.getRegistry().register(EventDatabase.class, EventDbResult.class, new DatabaseDataLoader.Factory(context));
+        context.getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
+        eventSender.removeAllEvents();
         CustomEvent ce = new CustomEvent.Builder()
                 .setEventName("cpacm").build();
         eventSender.cacheEvent(ce);
@@ -102,8 +106,11 @@ public class EventSenderTest {
         eventSender.setEventNetSender((events, mediaType) -> {
             try {
                 EventV3Protocol.EventV3List list1 = EventV3Protocol.EventV3List.parseFrom(events);
-                Truth.assertThat(list1.getValuesCount()).isEqualTo(2);
-                Truth.assertThat(list1.getValues(0).getEventName()).isEqualTo("cpacm");
+                for (EventV3Protocol.EventV3Dto dto : list1.getValuesList()) {
+                    if (dto.getEventType().toString().equals(TrackEventType.CUSTOM)) {
+                        Truth.assertThat(dto.getEventName()).isEqualTo("cpacm");
+                    }
+                }
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
             }
@@ -112,13 +119,13 @@ public class EventSenderTest {
         eventSender.cacheEvent(ce);
         eventSender.cacheEvent(ce);
         eventSender.sendEvents(false);
-        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
     }
 
     @Test
     public void eventCacheTestJson() throws JSONException {
-        TrackerContext.get().getRegistry().register(EventDatabase.class, EventDbResult.class, new DatabaseDataLoader.Factory(application));
-        TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
+        context.getRegistry().register(EventDatabase.class, EventDbResult.class, new DatabaseDataLoader.Factory(context));
+        context.getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
 
         CustomEvent ce = new CustomEvent.Builder()
                 .setEventName("cpacm").build();
@@ -133,10 +140,13 @@ public class EventSenderTest {
         eventSender.setEventNetSender((events, mediaType) -> {
             try {
                 JSONArray array = new JSONArray(new String(events));
-                Truth.assertThat(array.length()).isEqualTo(2);
-
-                JSONObject obj1 = array.getJSONObject(0);
-                Truth.assertThat(obj1.opt("eventName")).isEqualTo("cpacm");
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject obj = array.getJSONObject(i);
+                    String eventType = obj.getString("eventType");
+                    if (eventType.equals(TrackEventType.CUSTOM)) {
+                        Truth.assertThat(obj.opt("eventName")).isEqualTo("cpacm");
+                    }
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

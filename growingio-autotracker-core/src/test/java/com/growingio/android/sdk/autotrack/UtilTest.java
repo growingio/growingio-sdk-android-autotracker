@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack;
 
 
 import android.app.AlertDialog;
 import android.app.Application;
-import android.content.Intent;
 
 import androidx.appcompat.view.menu.ListMenuItemView;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.autotrack.inject.ViewChangeProvider;
-import com.growingio.android.sdk.autotrack.inject.ActivityInjector;
 import com.growingio.android.sdk.autotrack.shadow.AlertControllerShadow;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.autotrack.util.HurtLocker;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import java.lang.reflect.Field;
@@ -76,13 +71,6 @@ public class UtilTest {
         ListMenuItemView lmiv = new ListMenuItemView(application, null);
         ListMenuItemViewShadow lmivShadow = new ListMenuItemViewShadow(lmiv);
         Truth.assertThat(lmivShadow.getMenuItem()).isNull();
-    }
-
-    @Test
-    public void activityInjectTest() {
-        RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().get();
-        ActivityInjector.onActivityNewIntent(activity, new Intent());
-        ViewChangeProvider.editTextOnFocusChange(activity.getTextView());
     }
 
 }

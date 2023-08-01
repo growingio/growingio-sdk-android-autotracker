@@ -1,81 +1,81 @@
 plugins {
-    id 'com.android.library'
-    //id 'org.jetbrains.kotlin.android'
+	id 'com.android.library'
+	//id 'org.jetbrains.kotlin.android'
 }
 
 def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim() as String
 def buildTime = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+8"))
 
 android {
-    namespace 'com.growingio.android.sdk.track'
-    compileSdkVersion buildConfiguration.compileVersion
-    defaultConfig {
-        minSdkVersion buildConfiguration.minSdkVersion
-        targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName libs.versions.growingio.get()
-        versionCode libs.versions.growingioCode.get().toInteger()
+	namespace 'com.growingio.android.sdk.track'
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+		versionName libs.versions.growingio.get()
+		versionCode libs.versions.growingioCode.get().toInteger()
 
-        buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
-        buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
-        buildConfigField("int", "VERSION_CODE", "${defaultConfig.versionCode}")
-        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
-    }
+		buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
+		buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
+		buildConfigField("int", "VERSION_CODE", "${defaultConfig.versionCode}")
+		buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+	}
 
-    buildTypes {
-//        debug {
-//            testCoverageEnabled = true
-//        }
+	buildTypes {
+		//        debug {
+		//            testCoverageEnabled = true
+		//        }
 
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            consumerProguardFiles 'consumer-proguard-rules.pro'
-        }
-    }
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			consumerProguardFiles 'consumer-proguard-rules.pro'
+		}
+	}
 
-    compileOptions {
-        sourceCompatibility buildConfiguration.sourceCompatibility
-        targetCompatibility buildConfiguration.targetCompatibility
-    }
+	compileOptions {
+		sourceCompatibility buildConfiguration.sourceCompatibility
+		targetCompatibility buildConfiguration.targetCompatibility
+	}
 
-    testOptions {
-        unitTests.all {
-            jacoco {
-                jvmArgs '-noverify'
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-        }
-        unitTests {
-            returnDefaultValues = true
-            includeAndroidResources = true
-        }
-    }
+	testOptions {
+		unitTests.all {
+			jacoco {
+				jvmArgs '-noverify'
+				includeNoLocationClasses = true
+				excludes = ['jdk.internal.*']
+			}
+		}
+		unitTests {
+			returnDefaultValues = true
+			includeAndroidResources = true
+		}
+	}
 
-    lintOptions {
-        abortOnError false
-    }
-
+	lintOptions {
+		abortOnError false
+	}
 }
 
 dependencies {
-    //implementation libs.kotlin.stdlib
+	//implementation libs.kotlin.stdlib
 
-    compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    compileOnly libs.bundles.androidx
+	compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
+	compileOnly libs.bundles.androidx
 
-    testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
-    testImplementation libs.bundles.test
-    testImplementation libs.androidx.test.core
-    testImplementation libs.bundles.androidx
-    testImplementation libs.protobuf.javalite
+	testImplementation fileTree(dir: '../thirdLibs', include: ['*.jar'])
+	testImplementation libs.bundles.test
+	testImplementation libs.androidx.test.core
+	testImplementation libs.bundles.androidx
+	testImplementation libs.protobuf.javalite
 
-    testImplementation project(path: ':growingio-data:database')
-    testImplementation project(path: ':growingio-data:protobuf')
-    testImplementation project(path: ':growingio-data:json')
+	testImplementation project(path: ':growingio-data:database')
+	testImplementation project(path: ':growingio-data:protobuf')
+	testImplementation project(path: ':growingio-data:json')
 
-    implementation project(":growingio-annotation")
-    annotationProcessor project(":growingio-annotation:json-serializer")
+	implementation project(":growingio-annotation")
+	annotationProcessor project(":growingio-annotation:json-serializer")
+	annotationProcessor project(":growingio-annotation:compiler")
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

@@ -1,14 +1,14 @@
 //import org.gradle.internal.jvm.Jvm
 
 plugins {
-    id 'java-library'
-    id 'kotlin'
-    id 'jacoco'
+	id 'java-library'
+	id 'kotlin'
+	id 'jacoco'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 //test {
@@ -16,27 +16,27 @@ java {
 //}
 
 jacocoTestReport{
-    dependsOn test // report is always generated after tests run
+	dependsOn test // report is always generated after tests run
 }
 
 dependencies {
 
-    // About test: we couldn't use compile-testing in android project unless import jre's rt.jar.
-    testImplementation libs.junit
-    testImplementation("com.google.testing.compile:compile-testing:0.21.0") {
-        // We don't use this and including it requires us to list it separatel which would be
-        // confusing.
-        exclude group: "com.google.auto.value", module: "auto-value"
-    }
-    testImplementation files('libs/tracker-core-test-3.5.0.jar')
+	// About test: we couldn't use compile-testing in android project unless import jre's rt.jar.
+	testImplementation libs.junit
+	testImplementation("com.google.testing.compile:compile-testing:0.21.0") {
+		// We don't use this and including it requires us to list it separatel which would be
+		// confusing.
+		exclude group: "com.google.auto.value", module: "auto-value"
+	}
+	testImplementation files('libs/tracker-core-test-4.0.0.jar')
 
-    implementation libs.kotlin.stdlib
+	implementation libs.kotlin.stdlib
 
-    annotationProcessor libs.google.auto.service
-    compileOnly libs.google.auto.service.annotations
-    implementation libs.square.javapoet
+	annotationProcessor libs.google.auto.service
+	compileOnly libs.google.auto.service.annotations
+	implementation libs.square.javapoet
 
-    implementation project(":growingio-annotation")
+	implementation project(":growingio-annotation")
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

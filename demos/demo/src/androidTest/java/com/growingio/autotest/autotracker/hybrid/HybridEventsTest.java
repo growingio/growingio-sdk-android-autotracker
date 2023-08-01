@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.autotest.autotracker.hybrid;
 
 import android.text.TextUtils;
@@ -31,15 +30,16 @@ import com.google.common.truth.Truth;
 import com.growingio.android.hybrid.HybridBridgeProvider;
 import com.growingio.android.hybrid.OnDomChangedListener;
 import com.growingio.android.hybrid.SuperWebView;
+import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.SDKConfig;
-import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
-import com.growingio.android.sdk.track.utils.JsonUtil;
+import com.growingio.android.sdk.track.listener.Callback;
+import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;
 import com.growingio.autotest.help.BeforeAppOnCreate;
 import com.growingio.autotest.help.DataHelper;
+import com.growingio.autotest.help.JsonUtil;
 import com.growingio.autotest.help.MockEventsApiServer;
 import com.growingio.autotest.help.TrackHelper;
 
@@ -78,7 +78,7 @@ public class HybridEventsTest extends EventsTest {
     public static void beforeAppOnCreate() {
         DataHelper.deleteEventsDatabase();
         DemoApplication.setConfiguration(TestTrackConfiguration.getTestConfig()
-        .setIdMappingEnabled(true));
+                .setIdMappingEnabled(true));
     }
 
     @Override
@@ -431,42 +431,44 @@ public class HybridEventsTest extends EventsTest {
 
     @Test
     public void hybridUserIdChangeTest() {
+        PersistentDataProvider persistentDataProvider = GrowingAutotracker.get().getContext().getProvider(PersistentDataProvider.class);
         getEventsApiServer().setCheckUserId(false);
         getEventsApiServer().setCheckSessionId(false);
         WebView webView = launchMockWebView();
-        String loginUserId = PersistentDataProvider.get().getLoginUserId();
+        String loginUserId = persistentDataProvider.getLoginUserId();
         String newUserId = loginUserId + "hybrid";
         TrackHelper.postToUiThread(() ->
                 webView.evaluateJavascript("javascript:setUserId(\"" + newUserId + "\")", null));
-        Awaiter.untilTrue(() -> newUserId.equals(PersistentDataProvider.get().getLoginUserId()));
+        Awaiter.untilTrue(() -> newUserId.equals(persistentDataProvider.getLoginUserId()));
 
         TrackHelper.postToUiThread(() ->
                 webView.evaluateJavascript("javascript:clearUserId()", null));
-        Awaiter.untilTrue(() -> TextUtils.isEmpty(PersistentDataProvider.get().getLoginUserId()));
+        Awaiter.untilTrue(() -> TextUtils.isEmpty(persistentDataProvider.getLoginUserId()));
 
-        String loginUserKey = PersistentDataProvider.get().getLoginUserKey();
+        String loginUserKey = persistentDataProvider.getLoginUserKey();
         String newUserKey = loginUserKey + "hybridUserKey";
         TrackHelper.postToUiThread(() ->
-                webView.evaluateJavascript("javascript:setUserIdAndUserKey(\"" + newUserId + "\" , \"" + newUserKey  + "\")", null));
-        Awaiter.untilTrue(() -> newUserId.equals(PersistentDataProvider.get().getLoginUserId()) &&
-                newUserKey.equals(PersistentDataProvider.get().getLoginUserKey()));
+                webView.evaluateJavascript("javascript:setUserIdAndUserKey(\"" + newUserId + "\" , \"" + newUserKey + "\")", null));
+        Awaiter.untilTrue(() -> newUserId.equals(persistentDataProvider.getLoginUserId()) &&
+                newUserKey.equals(persistentDataProvider.getLoginUserKey()));
 
         TrackHelper.postToUiThread(() ->
                 webView.evaluateJavascript("javascript:clearUserIdAndUserKey()", null));
-        Awaiter.untilTrue(() -> TextUtils.isEmpty(PersistentDataProvider.get().getLoginUserId()) &&
-                TextUtils.isEmpty(PersistentDataProvider.get().getLoginUserKey()));
+        Awaiter.untilTrue(() -> TextUtils.isEmpty(persistentDataProvider.getLoginUserId()) &&
+                TextUtils.isEmpty(persistentDataProvider.getLoginUserKey()));
     }
 
     @Test
     public void hybridDomChangedTest() throws Exception {
+        HybridBridgeProvider hybridBridgeProvider = GrowingAutotracker.get().getContext().getProvider(HybridBridgeProvider.class);
         AtomicBoolean receivedEvent = new AtomicBoolean(false);
         WebView webView = launchMockWebView();
         SuperWebView<WebView> superWebView = (SuperWebView<WebView>) Whitebox.invokeConstructor(Class.forName("com.growingio.android.hybrid.SuperWebView$SystemWebView"), webView);
-        HybridBridgeProvider.get().registerDomChangedListener(new OnDomChangedListener() {
+        hybridBridgeProvider.registerDomChangedListener(new OnDomChangedListener() {
             @Override
             public void onDomChanged() {
                 TrackHelper.postToUiThread(() ->
-                        HybridBridgeProvider.get().getWebViewDomTree(superWebView, new Callback<JSONObject>() {
+                        hybridBridgeProvider.getWebViewDomTree(superWebView, new Callback<JSONObject>() {
                             @Override
                             public void onSuccess(JSONObject result) {
                                 receivedEvent.set(result != null);

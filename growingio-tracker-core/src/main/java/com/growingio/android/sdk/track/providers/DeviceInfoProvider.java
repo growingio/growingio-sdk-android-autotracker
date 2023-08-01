@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.providers;
 
 import android.annotation.SuppressLint;
@@ -27,8 +26,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 import com.growingio.android.sdk.track.middleware.OaidHelper;
@@ -37,7 +37,7 @@ import com.growingio.android.sdk.track.utils.PermissionUtil;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-public class DeviceInfoProvider {
+public class DeviceInfoProvider implements TrackerLifecycleProvider {
     private static final String TAG = "DeviceInfoProvider";
 
     private static final String DEVICE_TYPE_PHONE = "PHONE";
@@ -59,19 +59,30 @@ public class DeviceInfoProvider {
     private String mGoogleAdId;
     private String mDeviceId;
 
-    private static class SingleInstance {
-        private static final DeviceInfoProvider INSTANCE = new DeviceInfoProvider();
+    private double mLatitude = 0;
+
+    private double mLongitude = 0;
+
+    private Context context;
+    private TrackerRegistry registry;
+    private ConfigurationProvider configurationProvider;
+    private PersistentDataProvider persistentDataProvider;
+
+    DeviceInfoProvider() {
     }
 
-    private DeviceInfoProvider() {
+    @Override
+    public void setup(TrackerContext context) {
+        this.context = context.getBaseContext();
+        this.registry = context.getRegistry();
+        this.configurationProvider = context.getConfigurationProvider();
+        this.persistentDataProvider = context.getProvider(PersistentDataProvider.class);
+
     }
 
-    private Context getContext() {
-        return TrackerContext.get().getApplicationContext();
-    }
+    @Override
+    public void shutdown() {
 
-    public static DeviceInfoProvider get() {
-        return SingleInstance.INSTANCE;
     }
 
     public String getOperatingSystemVersion() {
@@ -97,14 +108,14 @@ public class DeviceInfoProvider {
 
     public String getDeviceType() {
         if (TextUtils.isEmpty(mDeviceType)) {
-            mDeviceType = DeviceUtil.isPhone(getContext()) ? DEVICE_TYPE_PHONE : DEVICE_TYPE_PAD;
+            mDeviceType = DeviceUtil.isPhone(context) ? DEVICE_TYPE_PHONE : DEVICE_TYPE_PAD;
         }
         return mDeviceType;
     }
 
     public int getScreenHeight() {
         if (mScreenHeight <= 0) {
-            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(getContext());
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
             mScreenHeight = metrics.heightPixels;
         }
         return mScreenHeight;
@@ -112,7 +123,7 @@ public class DeviceInfoProvider {
 
     public int getScreenWidth() {
         if (mScreenWidth <= 0) {
-            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(getContext());
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
             mScreenWidth = metrics.widthPixels;
         }
         return mScreenWidth;
@@ -120,10 +131,10 @@ public class DeviceInfoProvider {
 
     @SuppressLint({"MissingPermission", "HardwareIds", "WrongConstant"})
     public String getImei() {
-        if (TextUtils.isEmpty(mImei) && ConfigurationProvider.core().isImeiEnabled()) {
+        if (TextUtils.isEmpty(mImei) && configurationProvider.core().isImeiEnabled()) {
             if (PermissionUtil.checkReadPhoneStatePermission()) {
                 try {
-                    TelephonyManager tm = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+                    TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         mImei = tm.getImei();
                     } else {
@@ -141,7 +152,7 @@ public class DeviceInfoProvider {
         // ensure androidid call once in a process
         if (TextUtils.isEmpty(mAndroidId)) {
             try {
-                mAndroidId = Settings.System.getString(getContext().getContentResolver(), Settings.System.ANDROID_ID);
+                mAndroidId = Settings.System.getString(context.getContentResolver(), Settings.System.ANDROID_ID);
                 if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
                     mAndroidId = MAGIC_ANDROID_ID;
                 } else {
@@ -156,7 +167,7 @@ public class DeviceInfoProvider {
 
     public String getOaid() {
         if (TextUtils.isEmpty(mOaid)) {
-            mOaid = TrackerContext.get().executeData(null, OaidHelper.class, String.class);
+            mOaid = registry.executeData(null, OaidHelper.class, String.class);
         }
         return mOaid;
     }
@@ -167,7 +178,7 @@ public class DeviceInfoProvider {
 
     public String getDeviceId() {
         if (TextUtils.isEmpty(mDeviceId)) {
-            mDeviceId = PersistentDataProvider.get().getDeviceId();
+            mDeviceId = persistentDataProvider.getDeviceId();
             if (TextUtils.isEmpty(mDeviceId)) {
                 mDeviceId = calculateDeviceId();
             }
@@ -192,7 +203,7 @@ public class DeviceInfoProvider {
             result = UUID.randomUUID().toString();
         }
         if (result != null && result.length() != 0) {
-            PersistentDataProvider.get().setDeviceId(result);
+            persistentDataProvider.setDeviceId(result);
         }
         return result;
     }
@@ -203,16 +214,46 @@ public class DeviceInfoProvider {
         if (TextUtils.isEmpty(mUserAgent)
                 && PermissionUtil.hasInternetPermission()) {
             try {
-                mUserAgent = new WebView(getContext()).getSettings().getUserAgentString();
+                mUserAgent = new WebView(context).getSettings().getUserAgentString();
             } catch (Exception e) {
                 Logger.e(TAG, e.getMessage());
                 try {
-                    mUserAgent = WebSettings.getDefaultUserAgent(getContext());
+                    mUserAgent = WebSettings.getDefaultUserAgent(context);
                 } catch (Exception badException) {
                     Logger.e(TAG, badException.getMessage());
                 }
             }
         }
         return mUserAgent;
+    }
+
+    @TrackThread
+    public void setLocation(double latitude, double longitude) {
+        double eps = 1e-5;
+        if (Math.abs(latitude) < eps && Math.abs(longitude) < eps) {
+            Logger.w(TAG, "invalid latitude and longitude, and return");
+            return;
+        }
+
+        mLatitude = latitude;
+        mLongitude = longitude;
+        Logger.d(TAG, "set location with " + mLatitude + "-" + mLongitude);
+    }
+
+    @TrackThread
+    public void cleanLocation() {
+        Logger.d(TAG, "clean location by User, Doesn't send visit event.");
+        mLatitude = 0;
+        mLongitude = 0;
+    }
+
+    @TrackThread
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    @TrackThread
+    public double getLongitude() {
+        return mLongitude;
     }
 }

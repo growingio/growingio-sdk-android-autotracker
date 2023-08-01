@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.page;
 
 import android.app.Application;
@@ -30,11 +29,13 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
 import com.growingio.android.sdk.autotrack.inject.FragmentInjector;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.SessionProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,11 +58,11 @@ public class PageTest {
 
     @Before
     public void setup() {
-        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
-        TrackerContext.init(application);
-        TrackerContext.initSuccess();
-        PageProvider.get().setup();
-        SessionProvider.get();
+        Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
+        map.put(AutotrackConfig.class, new AutotrackConfig());
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("PageTest", "growingio://impression"), map);
+
+        Autotracker autotracker = new Autotracker(application);
         activityController = Robolectric.buildActivity(RobolectricActivity.class);
     }
 
@@ -101,7 +102,7 @@ public class PageTest {
         FragmentInjector.systemFragmentOnResume(appFragment);
         Page page = PageProvider.get().findOrCreateFragmentPage(SuperFragment.make(appFragment));
         String name = page.getName();
-        Truth.assertThat(name).isEqualTo("TestFragment[app]");
+        Truth.assertThat(name).isEqualTo("TestFragment");
         Truth.assertThat(page.getTag()).isEqualTo("app");
 
         FragmentInjector.systemFragmentSetUserVisibleHint(appFragment, false);

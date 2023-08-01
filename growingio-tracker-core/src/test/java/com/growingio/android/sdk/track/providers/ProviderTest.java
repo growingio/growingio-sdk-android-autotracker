@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 
@@ -49,16 +49,20 @@ public class ProviderTest {
 
     private final Application application = ApplicationProvider.getApplicationContext();
 
+    private TrackerContext context;
+
     @Before
     public void setup() {
-        TrackerContext.init(application);
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("ProviderTest", "growingio://provider"), new HashMap<>());
+        Tracker tracker = new Tracker(application);
+        context = tracker.getContext();
     }
 
     @Test
     public void activityStateProvider() {
+        ActivityStateProvider activityStateProvider = context.getActivityStateProvider();
         ActivityController<RobolectricActivity> activityController = Robolectric.buildActivity(RobolectricActivity.class);
         RobolectricActivity activity = activityController.get();
-        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
 
         Bundle testBundle = new Bundle();
 
@@ -75,34 +79,33 @@ public class ProviderTest {
                 }
             }
         };
-        ActivityStateProvider.get().register(null);
-        ActivityStateProvider.get().register(iActivityLifecycle);
-        ActivityStateProvider.get().register(null);
+        activityStateProvider.register(null);
+        activityStateProvider.register(iActivityLifecycle);
+        activityStateProvider.register(null);
 
         activityController.create(testBundle);
         activityController.resume();
         activityController.pause();
         activityController.stop();
         activityController.destroy();
-        ActivityStateProvider.get().unregisterActivityLifecycleListener(iActivityLifecycle);
+        activityStateProvider.shutdown();
     }
 
     @Test
     public void appInfoProvider() {
-        Truth.assertThat(AppInfoProvider.get().getPackageName()).isEqualTo(application.getPackageName());
-        Truth.assertThat(AppInfoProvider.get().getAppChannel()).isNull();
-        Truth.assertThat(AppInfoProvider.get().getAppName()).isEqualTo(application.getPackageManager().getApplicationLabel(application.getApplicationInfo()).toString());
-        Truth.assertThat(AppInfoProvider.get().getAppVersion()).isNull();
+        AppInfoProvider appInfoProvider = context.getProvider(AppInfoProvider.class);
+        Truth.assertThat(appInfoProvider.getPackageName()).isEqualTo(application.getPackageName());
+        Truth.assertThat(appInfoProvider.getAppName()).isEqualTo(application.getPackageManager().getApplicationLabel(application.getApplicationInfo()).toString());
+        Truth.assertThat(appInfoProvider.getAppVersion()).isNull();
     }
 
     @Test
     public void configProvider() {
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("ProviderTest", "growingio://provider"), new HashMap<>());
-        Truth.assertThat(ConfigurationProvider.core().getUrlScheme()).isEqualTo("growingio://provider");
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("ProviderTest", "growingio://provider"), new HashMap<>());
+        ConfigurationProvider configurationProvider = context.getConfigurationProvider();
+        Truth.assertThat(configurationProvider.core().getUrlScheme()).isEqualTo("growingio://provider");
         TestConfigurable testConfigurable = new TestConfigurable();
-        ConfigurationProvider.get().addConfiguration(testConfigurable);
-        Truth.assertThat((TestConfigurable) ConfigurationProvider.get().getConfiguration(TestConfigurable.class)).isEqualTo(testConfigurable);
+        configurationProvider.addConfiguration(testConfigurable);
+        Truth.assertThat((TestConfigurable) configurationProvider.getConfiguration(TestConfigurable.class)).isEqualTo(testConfigurable);
     }
 
     public static class TestConfigurable implements Configurable {
@@ -110,8 +113,7 @@ public class ProviderTest {
 
     @Test
     public void deeplinkProvider() {
-        application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
-        DeepLinkProvider.get().init();
+        DeepLinkProvider deepLinkProvider = context.getProvider(DeepLinkProvider.class);
 
         //empty
         Robolectric.buildActivity(RobolectricActivity.class).create().get();
@@ -145,19 +147,22 @@ public class ProviderTest {
 
     @Test
     public void deviceInfoProvider() {
-        Truth.assertThat(DeviceInfoProvider.get().getAndroidId()).isNull();
-        Truth.assertThat(DeviceInfoProvider.get().getDeviceBrand()).isEqualTo("robolectric");
-        Truth.assertThat(DeviceInfoProvider.get().getDeviceId()).isNotEmpty();
-        Truth.assertThat(DeviceInfoProvider.get().getDeviceModel()).isEqualTo("robolectric");
-        Truth.assertThat(DeviceInfoProvider.get().getDeviceType()).isEqualTo("PHONE");
-        Truth.assertThat(DeviceInfoProvider.get().getGoogleAdId()).isNull();
-        Truth.assertThat(DeviceInfoProvider.get().getImei()).isNull();
-        Truth.assertThat(DeviceInfoProvider.get().getOaid()).isNull();
-        Truth.assertThat(DeviceInfoProvider.get().getOperatingSystemVersion()).isEqualTo("13");
-        Truth.assertThat(DeviceInfoProvider.get().getScreenHeight()).isEqualTo(470);
-        Truth.assertThat(DeviceInfoProvider.get().getScreenWidth()).isEqualTo(320);
-        PersistentDataProvider.get().setDeviceId("");
-        Truth.assertThat(PersistentDataProvider.get().getDeviceId()).isNotEmpty();
+        DeviceInfoProvider deviceInfoProvider = context.getDeviceInfoProvider();
+        Truth.assertThat(deviceInfoProvider.getAndroidId()).isNull();
+        Truth.assertThat(deviceInfoProvider.getDeviceBrand()).isEqualTo("robolectric");
+        Truth.assertThat(deviceInfoProvider.getDeviceId()).isNotEmpty();
+        Truth.assertThat(deviceInfoProvider.getDeviceModel()).isEqualTo("robolectric");
+        Truth.assertThat(deviceInfoProvider.getDeviceType()).isEqualTo("PHONE");
+        Truth.assertThat(deviceInfoProvider.getGoogleAdId()).isNull();
+        Truth.assertThat(deviceInfoProvider.getImei()).isNull();
+        Truth.assertThat(deviceInfoProvider.getOaid()).isNull();
+        Truth.assertThat(deviceInfoProvider.getOperatingSystemVersion()).isEqualTo("13");
+        Truth.assertThat(deviceInfoProvider.getScreenHeight()).isEqualTo(470);
+        Truth.assertThat(deviceInfoProvider.getScreenWidth()).isEqualTo(320);
+
+        PersistentDataProvider persistentDataProvider = context.getProvider(PersistentDataProvider.class);
+        persistentDataProvider.setDeviceId("");
+        Truth.assertThat(persistentDataProvider.getDeviceId()).isNotEmpty();
     }
 
 }

@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.apm;
 
 import static com.growingio.android.apm.ApmEventBuilder.EVENT_APP_LAUNCHTIME_NAME;
@@ -30,10 +29,11 @@ import com.growingio.android.gmonitor.event.Breadcrumb;
 import com.growingio.android.gmonitor.utils.ExceptionHelper;
 import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
-import com.growingio.android.sdk.track.middleware.apm.EventApm;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,10 +53,11 @@ import java.util.HashMap;
 public class ApmTest {
 
     private final Application application = ApplicationProvider.getApplicationContext();
+    private TrackerContext context;
+
 
     @Before
     public void setup() {
-        TrackerContext.init(application);
         ApmConfig config = new ApmConfig();
         config.setActivityLifecycleTracing(true)
                 .setFragmentXLifecycleTracing(true)
@@ -66,19 +67,22 @@ public class ApmTest {
                 .setPrintUncaughtException(false);
         HashMap<Class<? extends Configurable>, Configurable> configs = new HashMap<>();
         configs.put(config.getClass(), config);
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("ApmTest", "growingio://apm"), configs);
-        TrackerContext.initSuccess();
+
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("ApmTest", "growingio://apm"), configs);
+        Tracker tracker = new Tracker(application);
+        ApmLibraryGioModule module = new ApmLibraryGioModule();
+        tracker.registerComponent(module);
+        context = tracker.getContext();
     }
 
     @Test
     public void apmModuleTest() {
-        ApmLibraryGioModule module = new ApmLibraryGioModule();
-        module.registerComponents(application, TrackerContext.get().getRegistry());
         Truth.assertThat(GMonitor.getInstance()).isNotNull();
+        ConfigurationProvider configurationProvider = context.getConfigurationProvider();
 
-        ApmConfig config = ConfigurationProvider.get().getConfiguration(ApmConfig.class);
+        ApmConfig config = configurationProvider.getConfiguration(ApmConfig.class);
         GMonitorOption options = GMonitor.getInstance().getOption();
-        Truth.assertThat(options.getAvoidRunningAppProcesses()).isEqualTo(!ConfigurationProvider.core().isRequireAppProcessesEnabled());
+        Truth.assertThat(options.getAvoidRunningAppProcesses()).isEqualTo(!configurationProvider.core().isRequireAppProcessesEnabled());
         Truth.assertThat(options.getEnableActivityLifecycleTracing()).isEqualTo(config.isActivityLifecycleTracing());
         Truth.assertThat(options.getEnableFragmentXLifecycleTracing()).isEqualTo(config.isFragmentXLifecycleTracing());
         Truth.assertThat(options.getEnableFragmentSupportLifecycleTracing()).isEqualTo(config.isFragmentSupportLifecycleTracing());
@@ -101,8 +105,8 @@ public class ApmTest {
             }
         }
 
-        ConfigurationProvider.core().setEventFilterInterceptor(new ActivityFilter());
-        TrackerContext.get().getRegistry().register(EventApm.class, Void.class, new ApmDataLoader.Factory(application));
+        ConfigurationProvider configurationProvider = context.getConfigurationProvider();
+        configurationProvider.core().setEventFilterInterceptor(new ActivityFilter());
 
         Breadcrumb breadcrumb = new Breadcrumb(Breadcrumb.TYPE_PERFORMANCE, Breadcrumb.CATEGORY_PERFORMANCE_ACTIVITY, null);
         breadcrumb.putData(Breadcrumb.ATTR_PERFORMANCE_PAGE_NAME, "TestActivity");
@@ -135,26 +139,13 @@ public class ApmTest {
                 return super.filterEventName(eventName);
             }
         }
-
-        ConfigurationProvider.core().setEventFilterInterceptor(new ActivityFilter());
-        TrackerContext.get().getRegistry().register(EventApm.class, Void.class, new ApmDataLoader.Factory(application));
+        ConfigurationProvider configurationProvider = context.getConfigurationProvider();
+        configurationProvider.core().setEventFilterInterceptor(new ActivityFilter());
 
         NullPointerException e = new NullPointerException("NPE FOR TEST");
         Breadcrumb breadcrumb = new Breadcrumb(Breadcrumb.TYPE_ERROR, Breadcrumb.CATEGORY_ERROR_EXCEPTION, e.getMessage());
         breadcrumb.putData(Breadcrumb.ATTR_ERROR_TYPE, ExceptionHelper.INSTANCE.getThrowableType(e));
         breadcrumb.putData(Breadcrumb.ATTR_ERROR_MESSAGE, ExceptionHelper.INSTANCE.getThrowableMessage(e));
         GMonitor.getInstance().trackBreadcrumb(breadcrumb);
-    }
-
-    @Test
-    public void growingioApmTest() {
-        if (GMonitor.getInstance() != null) {
-            GMonitor.getInstance().close();
-        }
-        ApmConfig config = ConfigurationProvider.get().getConfiguration(ApmConfig.class);
-        GrowingApm.startWithConfiguration(application, config);
-        Truth.assertThat(GMonitor.getInstance()).isNotNull();
-
-        Truth.assertThat(GMonitor.getInstance().getOption().getLogger().isEnabled(0)).isTrue();
     }
 }

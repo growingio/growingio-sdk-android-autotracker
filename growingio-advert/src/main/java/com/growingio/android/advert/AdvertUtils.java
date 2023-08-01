@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.advert;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
@@ -26,10 +25,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,15 +103,15 @@ class AdvertUtils {
      * @param data json格式
      * @return 广告参数对象
      */
-    static AdvertData parseClipBoardInfo(String data) {
+    static AdvertData parseClipBoardInfo(String data, String urlScheme) {
         try {
             JSONObject jsonObject = new JSONObject(data);
             if (!"gads".equals(jsonObject.getString("type"))) {
                 Logger.e(TAG, "非剪贴板数据！");
                 return null;
             }
-            if (!ConfigurationProvider.core().getUrlScheme().equals(jsonObject.getString("scheme"))) {
-                Logger.e(TAG, "非此应用的延迟深度链接， urlsheme 不匹配，期望为：" + ConfigurationProvider.core().getUrlScheme() + "， 实际为：" + jsonObject.getString("scheme"));
+            if (!urlScheme.equals(jsonObject.getString("scheme"))) {
+                Logger.e(TAG, "非此应用的延迟深度链接， urlsheme 不匹配，期望为：" + urlScheme + "， 实际为：" + jsonObject.getString("scheme"));
                 return null;
             }
             AdvertData info = new AdvertData();
@@ -144,20 +142,20 @@ class AdvertUtils {
      * @return true 是 Deffer 延迟深度链接，拿到了有效的剪贴板数据
      * false 是普通打开，剪贴板里没有广告组写进去的数据
      */
-    static boolean checkClipBoard(AdvertData info) {
+    static boolean checkClipBoard(Context context, AdvertData info, String urlScheme) {
         try {
-            @SuppressLint("WrongConstant") ClipboardManager cm = (ClipboardManager) TrackerContext.get().getSystemService(CLIPBOARD_SERVICE);
+            @SuppressLint("WrongConstant") ClipboardManager cm = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
             ClipData clipData = cm != null ? cm.getPrimaryClip() : null;
             if (clipData == null) return false;
             if (clipData.getItemCount() == 0) return false;
             ClipData.Item item = clipData.getItemAt(0);
-            CharSequence charSequence = item.coerceToText(TrackerContext.get());
+            CharSequence charSequence = item.coerceToText(context);
 
             if (charSequence == null || charSequence.length() == 0) return false;
             String data = parseZwsData(charSequence);
             if (data == null) return false;
 
-            AdvertData advertData = parseClipBoardInfo(data);
+            AdvertData advertData = parseClipBoardInfo(data, urlScheme);
             if (advertData != null) {
                 info.copy(advertData);
                 //保存剪切板数据
@@ -223,7 +221,7 @@ class AdvertUtils {
 
     @SuppressLint("WrongConstant")
     private static SharedPreferences getSharedPreferences() {
-        return TrackerContext.get().getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+        return TrackMainThread.trackMain().getContext().getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
     }
 
     static void setActivateInfo(String activateInfo) {

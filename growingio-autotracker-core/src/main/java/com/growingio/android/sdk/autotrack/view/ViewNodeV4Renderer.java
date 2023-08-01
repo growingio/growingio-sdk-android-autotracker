@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.view;
 
 import static com.growingio.android.sdk.autotrack.view.PageHelper.POPUP_DECOR_VIEW_CLASS_NAME;
@@ -38,10 +37,9 @@ import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 import com.growingio.android.sdk.track.view.DecorView;
-import com.growingio.android.sdk.track.webservices.widget.TipView;
+import com.growingio.android.sdk.track.view.TipView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -57,6 +55,14 @@ import java.util.concurrent.TimeUnit;
  * @author cpacm 2023/7/10
  */
 class ViewNodeV4Renderer implements ViewNodeRenderer {
+
+    private final ViewNodeProvider viewNodeProvider;
+
+    ViewNodeV4Renderer(ViewNodeProvider viewNodeProvider) {
+        this.viewNodeProvider = viewNodeProvider;
+    }
+
+
     @Override
     public void generateMenuItemEvent(Activity activity, MenuItem menuItem) {
         Page<?> page = PageProvider.get().searchActivityPage(activity);
@@ -92,7 +98,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             Logger.e(TAG, "View is NULL");
             return;
         }
-        Activity activity = ActivityStateProvider.get().getForegroundActivity();
+        Activity activity = TrackMainThread.trackMain().getForegroundActivity();
         if (activity == null || ViewAttributeUtil.isIgnoredView(view)) {
             Logger.e(TAG, "View is ignored");
             return;
@@ -137,7 +143,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             Logger.e(TAG, "View is NULL");
             return;
         }
-        Activity activity = ActivityStateProvider.get().getForegroundActivity();
+        Activity activity = TrackMainThread.trackMain().getForegroundActivity();
         if (activity == null || ViewAttributeUtil.isIgnoredView(view)) {
             Logger.e(TAG, "View is ignored");
             return;
@@ -246,6 +252,9 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && prefix.equals(PageHelper.POPUP_WINDOW_PREFIX) && !POPUP_DECOR_VIEW_CLASS_NAME.equals(ClassUtil.getSimpleClassName(rootView.getClass()))) {
                 xpath.append("/").append(POPUP_DECOR_VIEW_CLASS_NAME).append("/").append(ClassUtil.getSimpleClassName(rootView.getClass()));
                 xIndex.append("/0/0");
+            } else {
+                xpath.append("/").append(ClassUtil.getSimpleClassName(rootView.getClass()));
+                xIndex.append("/0");
             }
         }
         // construct root viewNode
@@ -328,7 +337,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
         if (ViewAttributeUtil.isViewInvisible(viewNode.getView())) return;
 
         // deal with WebView dom.
-        if (ClassExistHelper.isWebView(viewNode.getView()) && ViewNodeProvider.get().getHybridModelLoader() != null) {
+        if (ClassExistHelper.isWebView(viewNode.getView()) && viewNodeProvider.getHybridModelLoader() != null) {
             final CountDownLatch latch = new CountDownLatch(1);
             disposeWebView(viewNode, container, latch);
             try {
@@ -356,7 +365,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
     }
 
     private void disposeWebView(ViewNodeV4 viewNode, JSONArray container, final CountDownLatch latch) {
-        ModelLoader<HybridDom, HybridJson> modelLoader = ViewNodeProvider.get().getHybridModelLoader();
+        ModelLoader<HybridDom, HybridJson> modelLoader = viewNodeProvider.getHybridModelLoader();
         if (modelLoader == null) {
             latch.countDown();
             return;

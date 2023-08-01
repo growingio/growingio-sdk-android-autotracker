@@ -15,56 +15,56 @@
  */
 
 plugins {
-    id 'java-platform'
-    id 'maven-publish'
+	id 'java-platform'
+	id 'maven-publish'
 }
 
 javaPlatform {
-    allowDependencies()
+	allowDependencies()
 }
 
 dependencies {
-    constraints {
+	constraints {
 
-        project.rootProject.subprojects.stream()
-                .filter {
-                    !it.name.startsWith("demo") &&
-                            it.name != project.name &&
-                            it.name != "gio-sdk" &&
-                            it.name != "growingio-tools" &&
-                            it.name != "growingio-network" &&
-                            it.name != "growingio-webservice" &&
-                            it.name != "growingio-data" &&
-                            it.name != "growingio-adapter" &&
-                            it.name != "snappy"
-                }
-                .map {
-                    it.name.replace("growingio-", "")
-                }
-                .forEach {
-                    api "com.growingio.android:" + it + ":" + libs.versions.growingio.get()
-                }
+		project.rootProject.subprojects.stream()
+				.filter {
+					!it.name.startsWith("demo") &&
+							it.name != project.name &&
+							it.name != "gio-sdk" &&
+							it.name != "growingio-tools" &&
+							it.name != "growingio-network" &&
+							it.name != "growingio-webservice" &&
+							it.name != "growingio-data" &&
+							it.name != "growingio-adapter" &&
+							it.name != "snappy"
+				}
+				.map {
+					it.name.replace("growingio-", "")
+				}
+				.forEach {
+					api "com.growingio.android:" + it + ":" + libs.versions.growingio.get()
+				}
 
-        api "com.growingio.android:analytics-fa:3.4.1"
-        api "com.growingio.android:analytics-ga:3.4.1"
-        api "com.growingio.android:analytics-sa:3.4.7"
-        api "com.growingio.android:dummy-sa:3.4.7"
+		api "com.growingio.android:analytics-fa:3.4.1"
+		api "com.growingio.android:analytics-ga:3.4.1"
+		api "com.growingio.android:analytics-sa:3.4.7"
+		api "com.growingio.android:dummy-sa:3.4.7"
 
-        // 2升3模块
-        api 'com.growingio.android.sdk.upgrade:autotracker-upgrade-2to3-cdp:1.2.0'
+		// 2升3模块
+		api 'com.growingio.android.sdk.upgrade:autotracker-upgrade-2to3-cdp:1.2.0'
 
-        // giokit
-        api 'com.growingio.giokit:giokit:1.4.0'
-        api 'com.growingio.giokit:giokit-no-op:1.4.0'
+		// giokit
+		api 'com.growingio.giokit:giokit:1.4.0'
+		api 'com.growingio.giokit:giokit-no-op:1.4.0'
 
-        // saas sdk
-        //api 'com.growingio.android:vds-android-agent:autotrack-2.9.13'
-        //api 'com.growingio.android:vds-android-agent:track-2.9.13'
+		// saas sdk
+		//api 'com.growingio.android:vds-android-agent:autotrack-2.9.13'
+		//api 'com.growingio.android:vds-android-agent:track-2.9.13'
 
-        // tool
-        //runtime "com.growingio.android:snappy:1.1.0"
-        //runtime 'com.growingio.android:gmonitor:1.5.0'
-    }
+		// tool
+		//runtime "com.growingio.android:snappy:1.1.0"
+		//runtime 'com.growingio.android:gmonitor:1.5.0'
+	}
 }
 
 apply from: "publishMaven.gradle"

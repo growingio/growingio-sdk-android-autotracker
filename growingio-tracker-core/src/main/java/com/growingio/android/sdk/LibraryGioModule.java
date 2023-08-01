@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk;
 
-import android.content.Context;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import java.util.Map;
 
 /**
  * Registers a set of components to use when initializing GrowingIO whthin an library when GrowingIO's
@@ -29,10 +27,9 @@ import com.growingio.android.sdk.track.providers.ConfigurationProvider;
  */
 public abstract class LibraryGioModule {
 
-    public void registerComponents(Context context, TrackerRegistry registry) {
+    public void registerComponents(TrackerContext context) {
     }
 
-    protected <T> T getConfiguration(Class<? extends Configurable> clazz) {
-        return ConfigurationProvider.get().getConfiguration(clazz);
+    protected void setupProviders(Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providerStore) {
     }
 }

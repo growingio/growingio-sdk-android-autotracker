@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.debugger;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
-import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.webservices.WebService;
+import com.growingio.android.sdk.track.middleware.webservice.Debugger;
+import com.growingio.android.sdk.track.middleware.webservice.WebService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,8 +34,8 @@ public class DebuggerDataLoader implements ModelLoader<Debugger, WebService> {
 
     private final DebuggerService debuggerService;
 
-    public DebuggerDataLoader(OkHttpClient client) {
-        debuggerService = new DebuggerService(client);
+    public DebuggerDataLoader(OkHttpClient client, TrackerContext context) {
+        debuggerService = new DebuggerService(client, context);
     }
 
     @Override
@@ -64,14 +64,15 @@ public class DebuggerDataLoader implements ModelLoader<Debugger, WebService> {
             return sInternalClient;
         }
 
-        public Factory() {
-            // in order to cache app start event，like:visit,first page event
-            DebuggerEventWrapper.get().observeEventBuild();
+        private final TrackerContext context;
+
+        public Factory(TrackerContext context) {
+            this.context = context;
         }
 
         @Override
         public ModelLoader<Debugger, WebService> build() {
-            return new DebuggerDataLoader(getsInternalClient());
+            return new DebuggerDataLoader(getsInternalClient(), context);
         }
     }
 }

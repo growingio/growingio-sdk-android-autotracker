@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.autotest.tracker;
 
 import android.content.Context;
@@ -34,7 +33,6 @@ import com.gio.test.three.MainActivity;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 import com.growingio.android.sdk.track.BuildConfig;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.autotest.EventsTest;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.help.Awaiter;
@@ -193,8 +191,7 @@ public class SessionEventsTest extends EventsTest {
             }
         });
 
-        long delayTime = ConfigurationProvider.core().getSessionInterval();
-        Uninterruptibles.sleepUninterruptibly(delayTime * 1000 + 1, TimeUnit.MILLISECONDS);
+        Uninterruptibles.sleepUninterruptibly(30 * 1000 + 1, TimeUnit.MILLISECONDS);
 
         //To State RESUMED
         scenario.moveToState(Lifecycle.State.RESUMED);

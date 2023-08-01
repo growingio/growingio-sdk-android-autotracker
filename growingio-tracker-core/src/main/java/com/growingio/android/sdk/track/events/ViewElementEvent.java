@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events;
 
+import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
@@ -34,6 +34,7 @@ public class ViewElementEvent extends BaseAttributesEvent {
      * keep for v3.0 sdk
      */
     @Deprecated
+    @IntRange(from = 0)
     private final long pageShowTimestamp;
     private final String xpath;
     private final int index;

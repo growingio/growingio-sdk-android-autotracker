@@ -25,6 +25,8 @@ plugins {
     alias libs.plugins.protobuf apply false
 
     alias libs.plugins.growingio.plugin apply false
+
+    alias libs.plugins.spotless apply false
 }
 
 apply from: "${rootProject.projectDir}/gradle/sonarcloud.gradle"
@@ -43,22 +45,31 @@ allprojects {
     }
 }
 
-subprojects { project ->
-    apply plugin: 'checkstyle'
+//./gradlew spotlessCheck  ==> check code
+//./gradlew spotlessApply  ==> format code
+subprojects {
+    apply plugin: "com.diffplug.spotless"
+    spotless {
+        java {
+            target '**/*.java'
+            licenseHeaderFile rootProject.file('gradle/java.header')
 
-    task checkstyle(type: Checkstyle, group: 'check') {
-        configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
-        configProperties.checkstyleJavaHeader = file("${rootDir}/config/checkstyle/java.header")
-        source 'src/main/java', 'src/test/java', 'src/androidTest/java'
-        ignoreFailures false
-        showViolations true
-        include '**/*.java'
-        classpath = files()
-    }
+            removeUnusedImports()
+        }
+        kotlin {
+            target '**/*.kt'
+            targetExclude("$buildDir/**/*.kt")
 
-    afterEvaluate {
-        if (project.tasks.findByName('check')) {
-            check.dependsOn('checkstyle')
+            ktlint()
+            licenseHeaderFile rootProject.file('gradle/java.header')
+        }
+        groovyGradle {
+            target '*.gradle'
+            greclipse()
+        }
+
+        format 'xml', {
+            target '**/*.xml'
         }
     }
 }

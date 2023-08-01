@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.hybrid;
 
 
@@ -22,7 +21,7 @@ import android.webkit.WebView;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
 import com.growingio.android.sdk.autotrack.inject.UcWebViewInjector;
 import com.growingio.android.sdk.autotrack.inject.WebViewInjector;
@@ -45,8 +44,7 @@ public class HybridTest {
 
     @Before
     public void setup() {
-        TrackerContext.init(application);
-        TrackerContext.initSuccess();
+        Autotracker tracker = new Autotracker(application);
     }
 
     @Test

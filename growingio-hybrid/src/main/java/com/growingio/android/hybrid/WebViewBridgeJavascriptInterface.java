@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.hybrid;
 
 import android.text.TextUtils;
 import android.webkit.JavascriptInterface;
 
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 class WebViewBridgeJavascriptInterface {
     static final String JAVASCRIPT_INTERFACE_NAME = "GrowingWebViewJavascriptBridge";
     static final String JAVASCRIPT_GET_DOM_TREE_METHOD = "window.GrowingWebViewJavascriptBridge.getDomTree";
     private static final String TAG = "WebViewHybridBridge";
     private final WebViewJavascriptBridgeConfiguration mConfiguration;
-    private final NativeBridge mNativeBridge = new NativeBridge();
+    private final NativeBridge mNativeBridge;
 
-    WebViewBridgeJavascriptInterface(WebViewJavascriptBridgeConfiguration configuration) {
+    private final HybridBridgeProvider mHybridBridgeProvider;
+
+    WebViewBridgeJavascriptInterface(WebViewJavascriptBridgeConfiguration configuration,
+                                     HybridBridgeProvider hybridBridgeProvider,
+                                     UserInfoProvider userInfoProvider) {
         mConfiguration = configuration;
+        this.mHybridBridgeProvider = hybridBridgeProvider;
+        mNativeBridge = new NativeBridge(userInfoProvider);
     }
 
     @JavascriptInterface
@@ -41,7 +47,7 @@ class WebViewBridgeJavascriptInterface {
     @JavascriptInterface
     @com.uc.webview.export.JavascriptInterface
     public void onDomChanged() {
-        HybridBridgeProvider.get().onDomChanged();
+        mHybridBridgeProvider.onDomChanged();
     }
 
     @JavascriptInterface

@@ -39,15 +39,12 @@ jobs:
       - name: Before script
         run: |
           chmod +x gradlew
-          chmod +x config/checkstyle/checkstyle.sh
           chmod +x gradle/publishAllToMavenLocal.sh
 
       - name: Run Gradle command
         run: |
+          bash ./gradlew spotlessCheck
           bash ./gradle/publishAllToMavenLocal.sh
-          bash ./config/checkstyle/checkstyle.sh
-#          ./gradlew lint
-#          ./gradlew assembleDebug
 
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2

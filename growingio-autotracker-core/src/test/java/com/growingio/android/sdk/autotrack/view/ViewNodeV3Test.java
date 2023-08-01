@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.view;
 
 
@@ -30,12 +29,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
+import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
 import com.growingio.android.sdk.autotrack.page.ActivityPage;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -43,6 +47,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.fakes.RoboMenuItem;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Config(manifest = Config.NONE)
@@ -50,6 +56,22 @@ import java.util.Objects;
 public class ViewNodeV3Test {
 
     Application application = ApplicationProvider.getApplicationContext();
+    private TrackerContext context;
+
+    @Before
+    public void setup() {
+        CoreConfiguration coreConfiguration = new CoreConfiguration("ViewNodeV3Test", "growingio://apm");
+        AutotrackConfig autotrackConfig = new AutotrackConfig();
+        autotrackConfig.downgrade();
+        Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
+        map.put(AutotrackConfig.class, autotrackConfig);
+        TrackerLifecycleProviderFactory.create()
+                .createConfigurationProviderWithConfig(
+                        coreConfiguration,
+                        map);
+        Autotracker autotracker = new Autotracker(application);
+        context = autotracker.getContext();
+    }
 
     @Test
     public void utilTest() {
@@ -68,7 +90,9 @@ public class ViewNodeV3Test {
     @Test
     public void viewNodeTest() {
         RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().start().resume().get();
-        ViewNodeV3Renderer renderer = new ViewNodeV3Renderer();
+
+        ViewNodeProvider viewNodeProvider = context.getProvider(ViewNodeProvider.class);
+        ViewNodeV3Renderer renderer = new ViewNodeV3Renderer(viewNodeProvider);
 
         ViewNodeV3 viewNode = renderer.renderViewNode(activity.getTextView());
         Truth.assertThat(viewNode.getXPath()).endsWith("/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]");
@@ -87,10 +111,9 @@ public class ViewNodeV3Test {
 
     @Test
     public void viewRenderTest() {
-        TrackerContext.init(application);
         RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().start().resume().get();
-        ActivityStateProvider.get().onActivityResumed(activity);
-        ViewNodeV3Renderer renderer = new ViewNodeV3Renderer();
+        ViewNodeProvider viewNodeProvider = context.getProvider(ViewNodeProvider.class);
+        ViewNodeV3Renderer renderer = new ViewNodeV3Renderer(viewNodeProvider);
 
         RecyclerView recyclerView = activity.getRecyclerView();
         recyclerView.getWindowVisibility();

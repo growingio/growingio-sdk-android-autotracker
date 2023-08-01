@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import android.app.Application;
-
-import androidx.test.core.app.ApplicationProvider;
-
 import com.google.common.truth.Truth;
-import com.growingio.android.json.JsonLibraryModule;
-import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.json.JsonDataFetcher;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.providers.EventStateProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -42,27 +34,14 @@ import java.util.ArrayList;
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class JsonDataTest {
-    private Application application = ApplicationProvider.getApplicationContext();
-
-    @Before
-    public void setup() {
-        TrackerContext.init(application);
-    }
-
     @Test
     public void dataFormat() {
-        JsonLibraryModule module = new JsonLibraryModule();
-        TrackerRegistry trackerRegistry = new TrackerRegistry();
-        module.registerComponents(application, trackerRegistry);
-
         CustomEvent customEvent = new CustomEvent.Builder()
                 .setEventName("jsonTest")
                 .build();
 
         EventFormatData eventData = EventFormatData.format(customEvent);
-        DataFetcher<EventByteArray> dataFetcher =
-                trackerRegistry.getModelLoader(EventFormatData.class, EventByteArray.class)
-                        .buildLoadData(eventData).fetcher;
+        DataFetcher<EventByteArray> dataFetcher = new JsonDataFetcher(eventData);
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventByteArray.class);
         EventByteArray data = dataFetcher.executeData();
         try {
@@ -79,10 +58,6 @@ public class JsonDataTest {
 
     @Test
     public void dataMerge() {
-        JsonLibraryModule module = new JsonLibraryModule();
-        TrackerRegistry trackerRegistry = new TrackerRegistry();
-        module.registerComponents(application, trackerRegistry);
-
         ArrayList<byte[]> arrayList = new ArrayList<>();
         CustomEvent customEvent = new CustomEvent.Builder()
                 .setEventName("merge")
@@ -91,12 +66,11 @@ public class JsonDataTest {
                 .setEventName("cpacm")
                 .build();
 
-        arrayList.add(EventStateProvider.get().toJson(customEvent).toString().getBytes());
-        arrayList.add(EventStateProvider.get().toJson(customEvent2).toString().getBytes());
+        arrayList.add(EventBuilderProvider.toJson(customEvent).toString().getBytes());
+        arrayList.add(EventBuilderProvider.toJson(customEvent2).toString().getBytes());
 
         EventFormatData eventData = EventFormatData.merge(arrayList);
-        DataFetcher<EventByteArray> dataFetcher = trackerRegistry.getModelLoader(EventFormatData.class, EventByteArray.class)
-                .buildLoadData(eventData).fetcher;
+        DataFetcher<EventByteArray> dataFetcher = new JsonDataFetcher(eventData);
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventByteArray.class);
         EventByteArray data = dataFetcher.executeData();
 

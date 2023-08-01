@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.sdk.annotation.compiler
 
 import com.growingio.sdk.annotation.GIOAppModule
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
-import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
-import javax.lang.model.element.*
+import javax.lang.model.element.Element
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.TypeElement
 import javax.lang.model.util.ElementFilter
 import javax.tools.Diagnostic
-
 
 /**
  * <p>
@@ -78,7 +77,7 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
 
     fun findAnnotatedElementsInClasses(
         inClass: TypeElement,
-        annotationClass: Class<out Annotation>
+        annotationClass: Class<out Annotation>,
     ): List<ExecutableElement> {
         val result: MutableList<ExecutableElement> = ArrayList()
         for (element in inClass.enclosedElements) {
@@ -115,12 +114,10 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
                 .skipJavaLangImports(true)
                 .build()
                 .writeTo(processEnv.getFiler())
-
         } catch (e: Throwable) {
             throw RuntimeException(e)
         }
     }
-
 
     companion object {
         const val GROWINGIO_MODULE_PACKAGE_NAME = "com.growingio.android.sdk"
@@ -144,15 +141,15 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
         const val GENERATED_APP_MODULE_IMPL_SIMPLE_NAME = "GeneratedGioModuleImpl"
         const val GENERATED_ROOT_MODULE_SIMPLE_NAME = "GeneratedGioModule"
 
-        const val GIO_TRACKER_REGISTRY_PACKAGE_NAME = "com.growingio.android.sdk.track.modelloader"
-        const val GIO_TRACKER_REGISTRY_NAME = "TrackerRegistry"
+        const val GIO_TRACKER_CONTEXT_PACKAGE = "com.growingio.android.sdk"
+        const val GIO_TRACKER_CONTEXT_NAME = "TrackerContext"
 
         const val GIO_DEFAULT_TRACKER = "com.growingio.android.sdk.Tracker"
         const val GIO_DEFAULT_CONFIGURATION = "com.growingio.android.sdk.CoreConfiguration"
         const val GIO_DEFAULT_CONFIGURABLE = "com.growingio.android.sdk.Configurable"
         const val GIO_DEFAULT_LIBRARY_MODULE = "com.growingio.android.sdk.LibraryGioModule"
         const val GIO_DEFAULT_LOGGER = "com.growingio.android.sdk.track.log.Logger"
-        const val GIO_CONFIGURATION_PROVIDER="com.growingio.android.sdk.track.providers.ConfigurationProvider"
+        const val GIO_PROVIDER_FACTORY = "com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory"
 
         const val GIO_INDEX_ANNOTATION_MODULES = "modules"
         const val GIO_INDEX_ANNOTATION_CONFIGS = "configs"

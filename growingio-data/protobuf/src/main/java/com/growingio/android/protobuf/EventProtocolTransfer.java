@@ -1,32 +1,35 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.protobuf;
 
 import android.text.TextUtils;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.growingio.android.sdk.track.events.ActivateEvent;
+import com.growingio.android.sdk.track.events.AppClosedEvent;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
+import com.growingio.android.sdk.track.events.ConversionVariablesEvent;
 import com.growingio.android.sdk.track.events.CustomEvent;
+import com.growingio.android.sdk.track.events.LoginUserAttributesEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.events.VisitEvent;
+import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
@@ -34,7 +37,7 @@ import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
-import com.growingio.android.sdk.track.providers.EventStateProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,7 +66,7 @@ class EventProtocolTransfer {
             if (data.startsWith("{") && data.endsWith("}")) { //ensure json format
                 JSONObject json = new JSONObject(data);
                 BaseEvent.BaseBuilder builder = generateEventBuilder(json);
-                EventStateProvider.get().parseFrom(builder, json);
+                EventBuilderProvider.parseFrom(builder, json);
                 if (builder != null) {
                     return protocol(builder.build());
                 }
@@ -110,10 +113,17 @@ class EventProtocolTransfer {
             if (TrackEventType.VISIT.equals(eventType)) {
                 return new VisitEvent.Builder();
             } else if (AutotrackEventType.VIEW_CLICK.equals(eventType)
-                    || AutotrackEventType.VIEW_CHANGE.equals(eventType)) {
-                return new HybridViewElementEvent.Builder(eventType);
+                    || AutotrackEventType.VIEW_CHANGE.equals(eventType)
+                    || TrackEventType.FORM_SUBMIT.equals(eventType)) {
+                if (!TextUtils.isEmpty(event.optString("query"))) {
+                    return new HybridViewElementEvent.Builder(eventType);
+                }
+                return new ViewElementEvent.Builder(eventType);
             } else if (AutotrackEventType.PAGE.equals(eventType)) {
-                return new HybridPageEvent.Builder();
+                if (!TextUtils.isEmpty(event.optString("query"))) {
+                    return new HybridPageEvent.Builder();
+                }
+                return new PageEvent.Builder();
             } else if (TrackEventType.CUSTOM.equals(eventType)) {
                 if (!TextUtils.isEmpty(event.optString("path"))) {
                     return new PageLevelCustomEvent.Builder();
@@ -124,6 +134,14 @@ class EventProtocolTransfer {
                 return new CustomEvent.Builder(); //custom
             } else if (TrackEventType.ACTIVATE.equals(eventType)) {
                 return new ActivateEvent.Builder();
+            } else if (TrackEventType.VISITOR_ATTRIBUTES.equals(eventType)) {
+                return new VisitorAttributesEvent.Builder();
+            } else if (TrackEventType.LOGIN_USER_ATTRIBUTES.equals(eventType)) {
+                return new LoginUserAttributesEvent.Builder();
+            } else if (TrackEventType.CONVERSION_VARIABLES.equals(eventType)) {
+                return new ConversionVariablesEvent.Builder();
+            } else if (TrackEventType.APP_CLOSED.equals(eventType)) {
+                return new AppClosedEvent.Builder();
             } else {
                 return new BaseAttributesEvent.Builder(eventType) {
                     @Override

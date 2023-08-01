@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.advert;
 
 import android.app.Activity;
@@ -42,11 +41,9 @@ import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
-import com.growingio.android.sdk.track.utils.ThreadUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -61,18 +58,25 @@ import java.util.Map;
  */
 public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertResult> {
 
-
     private final static int DEEPLINK_TYPE_NONE = 0; //doesn't contain deeplink.
     private final static int DEEPLINK_TYPE_URI = 1; //web jump,contains ads params.
     private final static int DEEPLINK_TYPE_SHORT = 2; //short scheme,doesn't contain data.
 
+
+    private final TrackerContext context;
+
+    public AdvertActivateDataLoader(TrackerContext context) {
+        this.context = context;
+    }
+
     @Override
     public LoadData<AdvertResult> buildLoadData(Activate activate) {
-        AdvertConfig config = ConfigurationProvider.get().getConfiguration(AdvertConfig.class);
+        ConfigurationProvider configurationProvider = context.getConfigurationProvider();
+        AdvertConfig config = configurationProvider.getConfiguration(AdvertConfig.class);
         if (config == null) config = new AdvertConfig();
         String deepLinkHost = config.getDeepLinkHost();
         if (deepLinkHost == null || deepLinkHost.isEmpty()) {
-            deepLinkHost = ConfigurationProvider.core().getDataCollectionServerHost();
+            deepLinkHost = configurationProvider.core().getDataCollectionServerHost();
         }
         DeepLinkCallback callback = config.getDeepLinkCallback();
         boolean isInApp = false;
@@ -80,14 +84,20 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             isInApp = true;
             callback = activate.getCallback();
         }
-        return new LoadData<>(new ActivateDataFetcher(activate.getUri(), deepLinkHost, callback, isInApp));
+        return new LoadData<>(new ActivateDataFetcher(context, activate.getUri(), deepLinkHost, callback, isInApp));
     }
 
 
     public static class Factory implements ModelLoaderFactory<Activate, AdvertResult> {
+        private final TrackerContext context;
+
+        public Factory(TrackerContext context) {
+            this.context = context;
+        }
+
         @Override
         public ModelLoader<Activate, AdvertResult> build() {
-            return new AdvertActivateDataLoader();
+            return new AdvertActivateDataLoader(this.context);
         }
     }
 
@@ -98,7 +108,10 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         private final Uri deepLinkHost;
         private final boolean isInApp;
 
-        public ActivateDataFetcher(Uri uri, String adHost, DeepLinkCallback callback, boolean isInApp) {
+        private TrackerContext trackerContext;
+
+        public ActivateDataFetcher(TrackerContext trackerContext, Uri uri, String adHost, DeepLinkCallback callback, boolean isInApp) {
+            this.trackerContext = trackerContext;
             this.deepLinkHost = Uri.parse(adHost);
             this.uri = uri;
             this.deepLinkCallback = callback;
@@ -202,17 +215,19 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
 
         private void sendDeepLinkCallback(int finalErrorCode, Map<String, String> params, long wakeTime) {
             if (deepLinkCallback == null) return;
-            ThreadUtils.runOnUiThread(() -> deepLinkCallback.onReceive(params, finalErrorCode, System.currentTimeMillis() - wakeTime));
+            TrackMainThread.trackMain().runOnUiThread(() -> deepLinkCallback.onReceive(params, finalErrorCode, System.currentTimeMillis() - wakeTime));
         }
 
         private void requestDeepLinkParamsByTrackId(String trackId, long wakeTime, boolean isInApp) {
-            String projectId = ConfigurationProvider.core().getProjectId();
-            String dataSourceId = ConfigurationProvider.core().getDataSourceId();
+            ConfigurationProvider configurationProvider = trackerContext.getConfigurationProvider();
+            DeviceInfoProvider deviceInfoProvider = trackerContext.getDeviceInfoProvider();
+            String projectId = configurationProvider.core().getProjectId();
+            String dataSourceId = configurationProvider.core().getDataSourceId();
             String deepType = isInApp ? "inapp" : "defer";
             String url = AdvertUtils.getRequestDeepLinkUrl(deepLinkHost.toString(), deepType, projectId, dataSourceId, trackId);
-            EventUrl eventUrl = new EventUrl(url, System.currentTimeMillis()).addHeader("User-Agent", DeviceInfoProvider.get().getUserAgent());
+            EventUrl eventUrl = new EventUrl(url, System.currentTimeMillis()).addHeader("User-Agent", deviceInfoProvider.getUserAgent());
             //.addHeader("ip", AdvertUtils.getIP());
-            TrackerContext.get().loadData(eventUrl, EventUrl.class, EventResponse.class, new LoadDataFetcher.DataCallback<EventResponse>() {
+            trackerContext.getRegistry().loadData(eventUrl, EventUrl.class, EventResponse.class, new LoadDataFetcher.DataCallback<EventResponse>() {
                 @Override
                 public void onDataReady(EventResponse data) {
                     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -263,13 +278,14 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
          * 2. 打开隐私政策后,发送设备激活事件，同时发送到用户自定义实现的 {@link DeepLinkCallback} 中
          */
         private void activateDeviceWithClipBoard() {
-            AdvertConfig config = ConfigurationProvider.get().getConfiguration(AdvertConfig.class);
+            ConfigurationProvider configurationProvider = trackerContext.getConfigurationProvider();
+            AdvertConfig config = configurationProvider.getConfiguration(AdvertConfig.class);
             if (config != null && !config.isReadClipBoardEnable()) {
                 activateDevice();
                 return;
             }
 
-            Activity activity = ActivityStateProvider.get().getForegroundActivity();
+            Activity activity = trackerContext.getActivityStateProvider().getForegroundActivity();
             //Android 10 限制剪切板获取时机，只有输入法或者焦点APP才有权限获取剪切板
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && activity != null) {
                 activity.getWindow().getDecorView().post(this::checkClipBoardAndSendActivateEvent);
@@ -279,8 +295,10 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         }
 
         private void checkClipBoardAndSendActivateEvent() {
+            ConfigurationProvider configurationProvider = trackerContext.getConfigurationProvider();
+            String urlScheme = configurationProvider.core().getUrlScheme();
             final AdvertData tempData = new AdvertData();
-            final boolean success = AdvertUtils.checkClipBoard(tempData);
+            final boolean success = AdvertUtils.checkClipBoard(trackerContext.getBaseContext(), tempData, urlScheme);
             if (success) {
                 activateDeviceDefer(tempData);
                 final Map<String, String> params = new HashMap<>();
@@ -292,7 +310,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                 // 若无最新的剪贴板信息，则加载上一次未发送的激活信息
                 String data = AdvertUtils.getActivateInfo();
                 if (data != null && !TextUtils.isEmpty(data)) {
-                    AdvertData cacheData = AdvertUtils.parseClipBoardInfo(data);
+                    AdvertData cacheData = AdvertUtils.parseClipBoardInfo(data, urlScheme);
                     if (cacheData != null) tempData.copy(cacheData);
                     activateDeviceDefer(tempData);
                     final Map<String, String> params = new HashMap<>();
@@ -327,7 +345,8 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         private final static String TAG = "AdvertModule";
 
         private void sendEventToMain(ActivateEvent.Builder eventBuilder) {
-            SessionProvider.get().checkSessionIntervalAndSendVisit();
+            SessionProvider sessionProvider = trackerContext.getProvider(SessionProvider.class);
+            sessionProvider.checkSessionIntervalAndSendVisit();
             TrackMainThread.trackMain().postEventToTrackMain(eventBuilder);
         }
 

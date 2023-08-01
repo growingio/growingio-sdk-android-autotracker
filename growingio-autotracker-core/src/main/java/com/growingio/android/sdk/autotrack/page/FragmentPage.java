@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.page;
 
 import android.content.res.Resources;
@@ -21,11 +20,18 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 public class FragmentPage extends Page<SuperFragment<?>> {
+
+    private AutotrackConfig autotrackConfig;
+
     public FragmentPage(SuperFragment<?> carrier) {
         super(carrier);
+    }
+
+    public FragmentPage(SuperFragment<?> carrier, AutotrackConfig autotrackConfig) {
+        super(carrier);
+        this.autotrackConfig = autotrackConfig;
     }
 
     @Override
@@ -82,8 +88,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
 
     @Override
     public boolean isAutotrack() {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && config.getAutotrackOptions().isFragmentPageEnabled()) {
+        if (autotrackConfig != null && autotrackConfig.getAutotrackOptions().isFragmentPageEnabled()) {
             return true;
         }
         return super.isAutotrack();

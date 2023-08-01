@@ -7,6 +7,8 @@ navigation = "2.5.3"
 pluginGradle = "7.4.1" # 4.2.2-7.4.1
 kotlin = "1.8.20"
 
+spotless = "6.20.0"
+
 # https://developer.android.com/jetpack/androidx/releases/compose-compiler
 # composeBom = "2023.04.00"
 
@@ -39,6 +41,7 @@ sonarqube = { id = "org.sonarqube", version = "3.4.0.2513" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 
 growingio-plugin = { id = "com.growingio.android.autotracker", version.ref = "growingioPlugin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 [libraries]
 # [growingio]

@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack;
 
 
@@ -26,7 +25,7 @@ import com.google.common.truth.Truth;
 import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,10 +45,11 @@ public class AutotrackTest {
     @Before
     public void setup() {
         Application application = ApplicationProvider.getApplicationContext();
-        autotracker = new Autotracker(application);
+
         Map<Class<? extends Configurable>, Configurable> modules = new HashMap<>();
         modules.put(AutotrackConfig.class, new AutotrackConfig().setImpressionScale(0.5f));
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("AutotrackTest", "growingio://autotrack"), modules);
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("AutotrackTest", "growingio://autotrack"), modules);
+        autotracker = new Autotracker(application);
     }
 
     @Test
@@ -67,10 +67,11 @@ public class AutotrackTest {
         autotracker.setPageAttributesSystem(new Fragment(), testMap);
         autotracker.setPageAttributes(new androidx.fragment.app.Fragment(), testMap);
 
+        ImpressionProvider impressionProvider = autotracker.getContext().getProvider(ImpressionProvider.class);
         autotracker.trackViewImpression(activity.getImageView(), "testImp");
-        Truth.assertThat(ImpressionProvider.get().hasTrackViewImpression(activity.getImageView())).isTrue();
+        Truth.assertThat(impressionProvider.hasTrackViewImpression(activity.getImageView())).isTrue();
         autotracker.stopTrackViewImpression(activity.getImageView());
-        Truth.assertThat(ImpressionProvider.get().hasTrackViewImpression(activity.getImageView())).isFalse();
+        Truth.assertThat(impressionProvider.hasTrackViewImpression(activity.getImageView())).isFalse();
 
         autotracker.setPageAlias(activity, "TestActivity");
         autotracker.setPageAlias(new Fragment(), "TestFragment");

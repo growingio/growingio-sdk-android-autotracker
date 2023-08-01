@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,11 @@ package com.growingio.android.debugger;
 import android.util.Base64;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.listener.IActivityLifecycle;
-import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.EventFlutter;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.utils.ThreadUtils;
-import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.webservices.WebService;
-import com.growingio.android.sdk.track.webservices.message.ClientInfoMessage;
-import com.growingio.android.sdk.track.webservices.message.QuitMessage;
+import com.growingio.android.sdk.track.middleware.webservice.Debugger;
+import com.growingio.android.sdk.track.middleware.webservice.WebService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,8 +38,8 @@ import okhttp3.Request;
  *
  * @author cpacm 5/19/21
  */
-public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLifecycle,
-        WebSocketHandler.OnWebSocketListener {
+public class DebuggerService implements LoadDataFetcher<WebService>,
+        WebSocketHandler.OnWebSocketListener, ScreenshotProvider.OnScreenshotRefreshedListener {
 
     private static final String TAG = "DebuggerService";
     private static final String WS_URL = "wsUrl";
@@ -54,12 +48,14 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
     private static final int SOCKET_STATE_CLOSED = 2;
 
     private final OkHttpClient client;
-    private final ThreadSafeTipView safeTipView;
     private final WebSocketHandler webSocketHandler;
     private Map<String, String> params;
 
     private int debuggerDataType;
     protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
+
+    private final ScreenshotProvider screenshotProvider;
+    private final DebuggerEventProvider debuggerEventProvider;
 
     void sendDebuggerData(Debugger debugger) {
         debuggerDataType = debugger.debuggerDataType;
@@ -69,22 +65,16 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
             byte[] screenshot = debugger.getScreenshot();
             if (screenshot != null) {
                 String screenshotBase64 = "data:image/jpeg;base64," + Base64.encodeToString(screenshot, Base64.DEFAULT);
-                ScreenshotProvider.get().generateDebuggerData(screenshotBase64);
+                screenshotProvider.generateDebuggerData(screenshotBase64);
             }
         }
     }
 
-    public DebuggerService(OkHttpClient client) {
-        DebuggerEventWrapper.get().registerDebuggerEventListener(new DebuggerEventWrapper.OnDebuggerEventListener() {
-            @Override
-            public void onDebuggerMessage(String message) {
-                sendMessage(message);
-            }
-        });
+    public DebuggerService(OkHttpClient client, TrackerContext context) {
         this.client = client;
-        ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        safeTipView = new ThreadSafeTipView(TrackerContext.get().getApplicationContext());
-        webSocketHandler = new WebSocketHandler(this);
+        screenshotProvider = context.getProvider(ScreenshotProvider.class);
+        debuggerEventProvider = context.getProvider(DebuggerEventProvider.class);
+        webSocketHandler = new WebSocketHandler(this, screenshotProvider);
     }
 
     @Override
@@ -116,17 +106,13 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
         client.newWebSocket(request, webSocketHandler);
         //client.dispatcher().executorService().shutdown()
 
-        ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        safeTipView.enableShow();
+        screenshotProvider.enableTipViewShow();
 
-        ThreadUtils.postOnUiThreadDelayed(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (socketState.get() < SOCKET_STATE_READIED) {
-                            Logger.e(TAG, "start WebSocketService timeout");
-                            onFailed();
-                        }
+        TrackMainThread.trackMain().postOnUiThreadDelayed(
+                () -> {
+                    if (socketState.get() < SOCKET_STATE_READIED) {
+                        Logger.e(TAG, "start WebSocketService timeout");
+                        onFailed();
                     }
                 }, 10000);
     }
@@ -142,6 +128,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
     }
 
     public void cleanup() {
+        sendMessage(screenshotProvider.buildQuitMessage());
         cancel();
     }
 
@@ -151,9 +138,9 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
         if (webSocketHandler.getWebSocket() != null) {
             webSocketHandler.getWebSocket().close(1000, "exit");
         }
-        DebuggerEventWrapper.get().end();
-        safeTipView.dismiss();
-        ActivityStateProvider.get().unregisterActivityLifecycleListener(this);
+        debuggerEventProvider.end();
+        screenshotProvider.disableTipView();
+        screenshotProvider.unregisterScreenshotRefreshedListener();
     }
 
     @Override
@@ -165,13 +152,12 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
     /************************** WebSocket Handler  ************************/
     @Override
     public void onReady() {
-        sendMessage(ClientInfoMessage.createMessage().toJSONObject().toString());
-        DebuggerEventWrapper.get().registerDebuggerEventListener(this::sendMessage);
+        sendMessage(screenshotProvider.buildClientInfoMessage());
+        debuggerEventProvider.registerDebuggerEventListener(this::sendMessage);
         socketState.set(SOCKET_STATE_READIED);
-        DebuggerEventWrapper.get().ready();
-        safeTipView.onReady(this::exitDebugger);
-
-        TrackerContext.get().executeData(EventFlutter.flutterDebugger(true), EventFlutter.class, Void.class);
+        debuggerEventProvider.ready();
+        screenshotProvider.registerScreenshotRefreshedListener(this);
+        screenshotProvider.readyTipView(this::cleanup);
     }
 
     @Override
@@ -179,10 +165,10 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
         try {
             JSONObject message = new JSONObject(msg);
             String msgType = message.optString("msgType");
-            if (DebuggerEventWrapper.SERVICE_LOGGER_OPEN.equals(msgType)) {
-                DebuggerEventWrapper.get().openLogger();
-            } else if (DebuggerEventWrapper.SERVICE_LOGGER_CLOSE.equals(msgType)) {
-                DebuggerEventWrapper.get().closeLogger();
+            if (DebuggerEventProvider.SERVICE_LOGGER_OPEN.equals(msgType)) {
+                debuggerEventProvider.openLogger();
+            } else if (DebuggerEventProvider.SERVICE_LOGGER_CLOSE.equals(msgType)) {
+                debuggerEventProvider.closeLogger();
             }
         } catch (JSONException e) {
             Logger.e(TAG, e);
@@ -190,8 +176,6 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
     }
 
     protected void exitDebugger() {
-        TrackerContext.get().executeData(EventFlutter.flutterDebugger(false), EventFlutter.class, Void.class);
-        sendMessage(new QuitMessage().toJSONObject().toString());
         cleanup();
     }
 
@@ -201,9 +185,10 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
             return;
         }
         socketState.set(SOCKET_STATE_CLOSED);
-        safeTipView.setErrorMessage(R.string.growing_debugger_connected_to_web_failed);
+
         Logger.e(TAG, "Start CirclerService Failed");
-        safeTipView.showQuitedDialog(this::exitDebugger);
+        screenshotProvider.setTipViewMessage(R.string.growing_debugger_connected_to_web_failed);
+        screenshotProvider.showQuitDialog(this::cleanup);
     }
 
     @Override
@@ -213,21 +198,14 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
         }
         cancel();
         socketState.set(SOCKET_STATE_CLOSED);
-        safeTipView.showQuitedDialog(this::exitDebugger);
-    }
-
-    public AtomicInteger getSocketState() {
-        return socketState;
+        screenshotProvider.showQuitDialog(this::cleanup);
     }
 
     /************************** Activity Lifecycle  ************************/
-
     @Override
-    public void onActivityLifecycle(ActivityLifecycleEvent event) {
-        if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
-            safeTipView.show(event.getActivity());
-        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
-            safeTipView.removeOnly();
+    public void onScreenshotRefreshed(DebuggerScreenshot screenshot) {
+        if (screenshot != null) {
+            sendMessage(screenshot.toJSONObject().toString());
         }
     }
 }

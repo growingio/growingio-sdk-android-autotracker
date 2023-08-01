@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.sdk.annotation.compiler
 
 import com.growingio.sdk.annotation.GIOAppModule
 import com.growingio.sdk.annotation.GIOTracker
-import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_CONFIGURATION_PROVIDER
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_LOGGER
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_TRACKER
+import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_PROVIDER_FACTORY
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
@@ -71,18 +70,19 @@ import kotlin.check
  *            Logger.e(TAG, "Tracker is running");
  *            return;
  *        }
- *        ConfigurationProvider.initWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
+ *        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
  *        _gioTracker = new Tracker(context);
- *        initSuccess();
+ *        initSuccess(_gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo());
  *    }
  *
  *    private static Tracker empty() {
  *        return new Tracker(null);
  *    }
  *
- *    private static void initSuccess() {
+ *    private static void initSuccess(String message) {
  *        Logger.i(TAG, "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!");
  *        Logger.i(TAG, "!!! GrowingIO Tracker version: "+SDKConfig.SDK_VERSION+" !!!");
+ *        Logger.d(TAG, message);
  *    }
  *}
  * </code>
@@ -90,7 +90,7 @@ import kotlin.check
  */
 class GioTrackerGenerator(
     private val processEnv: ProcessingEnvironment,
-    private val processUtils: ProcessUtils
+    private val processUtils: ProcessUtils,
 ) {
 
     private lateinit var trackerClassName: String
@@ -111,12 +111,15 @@ class GioTrackerGenerator(
         val configClass = ClassName.get(generatedCodePackageName, configPath)
         val trackerBuilder = TypeSpec.classBuilder(growingName)
             .apply {
-                if (isDeprecated) addJavadoc(
-                    """<p>In version 4.0, we use GrowingAutotracker to fully replace GrowingTracker. 
+                if (isDeprecated) {
+                    addJavadoc(
+                        """<p>In version 4.0, we use GrowingAutotracker to fully replace GrowingTracker. 
                         |<p>For details, please visit our version migration document: @see <a href="https://growingio.github.io/growingio-sdk-docs/docs/android/version#release-400">https://growingio.github.io/growingio-sdk-docs/docs/android/version#release-400</a>
                         |
-                        |""".trimMargin()
-                )
+                        |
+                        """.trimMargin(),
+                    )
+                }
             }
             .addJavadoc(
                 """
@@ -125,7 +128,7 @@ class GioTrackerGenerator(
                             
                             <p>This class is generated and should not be modified
                             
-                            """.trimIndent()
+                """.trimIndent(),
             )
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addField(
@@ -135,17 +138,17 @@ class GioTrackerGenerator(
                         "TAG",
                         Modifier.STATIC,
                         Modifier.FINAL,
-                        Modifier.PRIVATE
+                        Modifier.PRIVATE,
                     )
                     .initializer("\$S", growingName)
-                    .build()
+                    .build(),
             )
             .addField(
                 trackerClass,
                 "_gioTracker",
                 Modifier.STATIC,
                 Modifier.PRIVATE,
-                Modifier.VOLATILE
+                Modifier.VOLATILE,
             )
             .apply { if (isDeprecated) this.addAnnotation(Deprecated::class.java) }
             .addMethod(generateGetMethod(trackerClass, growingName))
@@ -158,7 +161,6 @@ class GioTrackerGenerator(
         writeTracker(generatedCodePackageName, trackerBuilder)
     }
 
-
     private fun generateGetMethod(trackerClass: ClassName, growingName: String): MethodSpec {
         val logger =
             processEnv.elementUtils.getTypeElement("com.growingio.android.sdk.track.log.Logger")
@@ -168,7 +170,7 @@ class GioTrackerGenerator(
             .addStatement(
                 "\$T.e(TAG, \$S)",
                 ClassName.get(logger),
-                "${trackerClass.simpleName()} is UNINITIALIZED, please initialized before use API"
+                "${trackerClass.simpleName()} is UNINITIALIZED, please initialized before use API",
             )
             .addStatement("return empty()")
             .endControlFlow()
@@ -179,7 +181,7 @@ class GioTrackerGenerator(
             .addStatement(
                 "\$T.e(TAG, \$S)",
                 ClassName.get(logger),
-                "${trackerClass.simpleName()} is UNINITIALIZED, please initialized before use API"
+                "${trackerClass.simpleName()} is UNINITIALIZED, please initialized before use API",
             )
             .addStatement("return empty()")
             .endControlFlow()
@@ -190,49 +192,50 @@ class GioTrackerGenerator(
     private fun generateStartConfigurationMethod(
         appModule: TypeElement,
         trackerClass: ClassName,
-        configClass: ClassName
+        configClass: ClassName,
     ): MethodSpec {
         val logger =
             processEnv.elementUtils.getTypeElement(GIO_DEFAULT_LOGGER)
         val context = processEnv.elementUtils.getTypeElement("android.content.Context")
         val getMethod = MethodSpec.methodBuilder("startWithConfiguration")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            //.addAnnotation(java.lang.Deprecated::class.java)
+            // .addAnnotation(java.lang.Deprecated::class.java)
             .addParameter(ClassName.get(context), "context")
             .addParameter(configClass, "trackConfiguration")
             .beginControlFlow("if (_gioTracker != null)")
             .addStatement(
                 "\$T.e(TAG, \$S)",
                 ClassName.get(logger),
-                "${trackerClass.simpleName()} is running"
+                "${trackerClass.simpleName()} is running",
             )
             .addStatement("return")
             .endControlFlow()
         if (trackerMethodName != null) {
-            //GrowingAppModule appModule = new GrowingAppModule();
+            // GrowingAppModule appModule = new GrowingAppModule();
             getMethod.addStatement("\$T appModule = new \$T()", appModule, appModule)
-                //appModule.config(trackConfiguration);
-                .addStatement("appModule.${trackerMethodName}(trackConfiguration)")
+                // appModule.config(trackConfiguration);
+                .addStatement("appModule.$trackerMethodName(trackConfiguration)")
         }
-        val configProvider = processEnv.elementUtils.getTypeElement(GIO_CONFIGURATION_PROVIDER)
-        //ConfigurationProvider.initWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
+        val providerFactory = processEnv.elementUtils.getTypeElement(GIO_PROVIDER_FACTORY)
+        // TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
         getMethod.addStatement(
-            "\$T.initWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules())",
-            ClassName.get(configProvider)
+            "\$T.create().createConfigurationProviderWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules())",
+            ClassName.get(providerFactory),
         )
 
         getMethod.addStatement(
             "_gioTracker = new \$T(context)",
-            trackerClass
+            trackerClass,
         )
-        getMethod.addStatement("initSuccess()")
+        // _gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo()
+        getMethod.addStatement("initSuccess(_gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo())")
         return getMethod.build()
     }
 
     private fun generateStartMethod(
         appModule: TypeElement,
         trackerClass: ClassName,
-        configClass: ClassName
+        configClass: ClassName,
     ): MethodSpec {
         val logger =
             processEnv.elementUtils.getTypeElement(GIO_DEFAULT_LOGGER)
@@ -244,18 +247,18 @@ class GioTrackerGenerator(
             .addStatement(
                 "\$T.e(TAG, \$S)",
                 ClassName.get(logger),
-                "${trackerClass.simpleName()} is running"
+                "${trackerClass.simpleName()} is running",
             )
             .addStatement("return")
             .endControlFlow()
 
         if (trackerMethodName == null) {
-            getMethod.addStatement("throw new IllegalStateException(\"If you want use start() method, you must use @GIOTracker in GIOAppModule and rebuild project.\")");
+            getMethod.addStatement("throw new IllegalStateException(\"If you want use start() method, you must use @GIOTracker in GIOAppModule and rebuild project.\")")
             return getMethod.build()
         }
 
         if (projectId.isNullOrEmpty() || urlScheme.isNullOrEmpty()) {
-            getMethod.addStatement("throw new IllegalStateException(\"If you want use start() method, you must define ProjectId and UrlScheme in @GIOTracker annotation\")");
+            getMethod.addStatement("throw new IllegalStateException(\"If you want use start() method, you must define ProjectId and UrlScheme in @GIOTracker annotation\")")
             return getMethod.build()
         }
 
@@ -264,26 +267,27 @@ class GioTrackerGenerator(
             configClass,
             configClass,
             projectId,
-            urlScheme
+            urlScheme,
         )
 
-        //GrowingAppModule appModule = new GrowingAppModule();
+        // GrowingAppModule appModule = new GrowingAppModule();
         getMethod.addStatement("\$T appModule = new \$T()", appModule, appModule)
-            //appModule.config(trackConfiguration);
-            .addStatement("appModule.${trackerMethodName}(trackConfiguration)")
+            // appModule.config(trackConfiguration);
+            .addStatement("appModule.$trackerMethodName(trackConfiguration)")
 
-        val configProvider = processEnv.elementUtils.getTypeElement(GIO_CONFIGURATION_PROVIDER)
-        //ConfigurationProvider.initWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
+        val providerFactory = processEnv.elementUtils.getTypeElement(GIO_PROVIDER_FACTORY)
+        // TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
         getMethod.addStatement(
-            "\$T.initWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules())",
-            ClassName.get(configProvider)
+            "\$T.create().createConfigurationProviderWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules())",
+            ClassName.get(providerFactory),
         )
 
         getMethod.addStatement(
             "_gioTracker = new \$T(context)",
-            trackerClass
+            trackerClass,
         )
-        getMethod.addStatement("initSuccess()")
+        // _gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo()
+        getMethod.addStatement("initSuccess(_gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo())")
         return getMethod.build()
     }
 
@@ -300,27 +304,22 @@ class GioTrackerGenerator(
             processEnv.elementUtils.getTypeElement(GIO_DEFAULT_LOGGER)
         val sdk =
             processEnv.elementUtils.getTypeElement("com.growingio.android.sdk.track.SDKConfig")
-        val configProvider = processEnv.elementUtils.getTypeElement(GIO_CONFIGURATION_PROVIDER)
         val successMethod = MethodSpec.methodBuilder("initSuccess")
             .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+            .addParameter(String::class.java, "message")
             .addStatement(
                 "\$T.i(TAG, \$S)",
                 ClassName.get(logger),
-                "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!"
+                "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!",
             )
             .addStatement(
                 "\$T.i(TAG, \"!!! GrowingIO Tracker version: \"+\$T.SDK_VERSION+\" !!!\")",
                 ClassName.get(logger),
-                ClassName.get(sdk)
+                ClassName.get(sdk),
             )
-            .addStatement(
-                "\$T.d(TAG, \$T.get().getAllConfigurationInfo())",
-                ClassName.get(logger),
-                ClassName.get(configProvider)
-            )
+            .addStatement("\$T.d(TAG, message)", ClassName.get(logger))
         return successMethod.build()
     }
-
 
     private fun initGIOConfig(appModule: TypeElement) {
         val tracker = processUtils.findAnnotatedElementsInClasses(appModule, GIOTracker::class.java)
@@ -358,5 +357,4 @@ class GioTrackerGenerator(
     private fun writeTracker(packageName: String, gio: TypeSpec) {
         processUtils.writeClass(packageName, gio)
     }
-
 }

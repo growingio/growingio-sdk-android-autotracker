@@ -1,23 +1,23 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion buildConfiguration.compileVersion
-    defaultConfig {
-        minSdkVersion buildConfiguration.minSdkVersion
-        targetSdkVersion buildConfiguration.targetSdkVersion
-    }
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+	}
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
+	}
 
-    sourceSets.main {
-        jniLibs.srcDirs = ['libs']
-        assets.srcDirs = ['assets']
-    }
+	sourceSets.main {
+		jniLibs.srcDirs = ['libs']
+		assets.srcDirs = ['assets']
+	}
 
-    lintOptions {
-        abortOnError false
-    }
+	lintOptions {
+		abortOnError false
+	}
 }

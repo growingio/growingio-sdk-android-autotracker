@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.utils;
 
 import android.app.Activity;
@@ -21,7 +20,6 @@ import android.app.Application;
 import android.app.Dialog;
 import android.content.ContextWrapper;
 import android.net.ConnectivityManager;
-import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.webkit.WebView;
@@ -34,12 +32,11 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -125,11 +122,6 @@ public class UtilsTest {
 
     Application application = ApplicationProvider.getApplicationContext();
 
-    @Before
-    public void setup() {
-        TrackerContext.init(application);
-    }
-
     @Test
     public void networkTest() {
         NetworkUtil.NetworkState state = NetworkUtil.getActiveNetworkState(application);
@@ -154,7 +146,7 @@ public class UtilsTest {
 
     @Test
     public void permissionTest() {
-        TrackerContext.init(application);
+        Tracker tracker = new Tracker(application);
         Truth.assertThat(PermissionUtil.hasAccessNetworkStatePermission()).isTrue();
         Truth.assertThat(PermissionUtil.hasInternetPermission()).isTrue();
         Truth.assertThat(PermissionUtil.hasWriteExternalPermission()).isFalse();
@@ -166,17 +158,8 @@ public class UtilsTest {
         Truth.assertThat(SystemUtil.isMainProcess(application)).isTrue();
         //SystemUtil.killAppProcess(application);
 
-        SysTrace.beginSection("test");
-        SysTrace.endSection();
-    }
-
-    @Test
-    public void threadTest() {
-        ThreadUtils.setUiThread(Looper.myLooper());
-        Truth.assertThat(ThreadUtils.runningOnUiThread()).isTrue();
-        ThreadUtils.setWillOverrideUiThread();
-        ThreadUtils.runOnUiThread(this::objectTest);
-        ThreadUtils.postOnUiThreadDelayed(this::objectTest, 1000L);
+        SysTrace.beginSection("test", true);
+        SysTrace.endSection(true);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events.base;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import androidx.annotation.FloatRange;
@@ -26,14 +24,13 @@ import androidx.annotation.Nullable;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
-import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
+import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
-import com.growingio.android.sdk.track.providers.SessionProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
@@ -269,13 +266,11 @@ public abstract class BaseEvent extends GEvent {
         protected BaseBuilder(String eventType) {
             this.eventType = eventType;
             platform = ConstantPool.ANDROID;
-            platformVersion = DeviceInfoProvider.get().getOperatingSystemVersion();
         }
 
         @Deprecated
         protected BaseBuilder() {
             platform = ConstantPool.ANDROID;
-            platformVersion = DeviceInfoProvider.get().getOperatingSystemVersion();
         }
 
         protected Map<String, Boolean> mFilterField = new HashMap<>();
@@ -316,42 +311,45 @@ public abstract class BaseEvent extends GEvent {
         }
 
         @TrackThread
-        public void readPropertyInTrackThread() {
+        public void readPropertyInTrackThread(TrackerContext context) {
             if (eventType == null) eventType = getEventType();
 
-            appState = ActivityStateProvider.get().getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
-            urlScheme = ConfigurationProvider.core().getUrlScheme();
-
-            timestamp = (timestamp != 0) ? timestamp : System.currentTimeMillis();
-            deviceId = DeviceInfoProvider.get().getDeviceId();
-            sessionId = PersistentDataProvider.get().getSessionId();
-            userKey = UserInfoProvider.get().getLoginUserKey();
-            userId = UserInfoProvider.get().getLoginUserId();
-            if (isEventSequenceIdType(eventType)) {
-                eventSequenceId = PersistentDataProvider.get().getGlobalEventSequenceIdAndIncrement();
-            } else {
-                eventSequenceId = 0L;
-            }
-
-            dataSourceId = ConfigurationProvider.core().getDataSourceId();
-
+            ActivityStateProvider activityStateProvider = context.getActivityStateProvider();
+            appState = activityStateProvider.getForegroundActivity() != null ? APP_STATE_FOREGROUND : APP_STATE_BACKGROUND;
             // filter field area
             if (!getFieldDefault(BaseField.APP_STATE)) {
                 appState = null;
             }
 
-            Context context = TrackerContext.get().getApplicationContext();
-            networkState = getFieldDefault(BaseField.NETWORK_STATE) ? NetworkUtil.getActiveNetworkState(context).getNetworkName() : null;
+            PersistentDataProvider persistentDataProvider = context.getProvider(PersistentDataProvider.class);
+            sessionId = persistentDataProvider.getSessionId();
+            if (isEventSequenceIdType(eventType)) {
+                eventSequenceId = persistentDataProvider.getGlobalEventSequenceIdAndIncrement();
+            } else {
+                eventSequenceId = 0L;
+            }
 
-            DeviceInfoProvider deviceInfo = DeviceInfoProvider.get();
+            UserInfoProvider userInfoProvider = context.getUserInfoProvider();
+            userKey = userInfoProvider.getLoginUserKey();
+            userId = userInfoProvider.getLoginUserId();
+
+            ConfigurationProvider configurationProvider = context.getConfigurationProvider();
+            urlScheme = configurationProvider.core().getUrlScheme();
+            dataSourceId = configurationProvider.core().getDataSourceId();
+            appChannel = getFieldDefault(BaseField.APP_CHANNEL) ? configurationProvider.core().getChannel() : null;
+
+            DeviceInfoProvider deviceInfo = context.getDeviceInfoProvider();
+            platformVersion = deviceInfo.getOperatingSystemVersion();
+            deviceId = deviceInfo.getDeviceId();
             screenHeight = getFieldDefault(BaseField.SCREEN_HEIGHT) ? deviceInfo.getScreenHeight() : 0;
             screenWidth = getFieldDefault(BaseField.SCREEN_WIDTH) ? deviceInfo.getScreenWidth() : 0;
             deviceBrand = getFieldDefault(BaseField.DEVICE_BRAND) ? deviceInfo.getDeviceBrand() : null;
             deviceModel = getFieldDefault(BaseField.DEVICE_MODEL) ? deviceInfo.getDeviceModel() : null;
             deviceType = getFieldDefault(BaseField.DEVICE_TYPE) ? deviceInfo.getDeviceType() : null;
+            latitude = getFieldDefault(BaseField.LATITUDE) ? deviceInfo.getLatitude() : 0;
+            longitude = getFieldDefault(BaseField.LONGITUDE) ? deviceInfo.getLongitude() : 0;
 
-            AppInfoProvider appInfo = AppInfoProvider.get();
-            appChannel = getFieldDefault(BaseField.APP_CHANNEL) ? appInfo.getAppChannel() : null;
+            AppInfoProvider appInfo = context.getProvider(AppInfoProvider.class);
             appName = getFieldDefault(BaseField.APP_NAME) ? appInfo.getAppName() : null;
             appVersion = getFieldDefault(BaseField.APP_VERSION) ? appInfo.getAppVersion() : null;
             if (domain == null || domain.isEmpty()) {
@@ -359,10 +357,8 @@ public abstract class BaseEvent extends GEvent {
                 domain = appInfo.getPackageName();
             }
 
-            SessionProvider session = SessionProvider.get();
-            latitude = getFieldDefault(BaseField.LATITUDE) ? session.getLatitude() : 0;
-            longitude = getFieldDefault(BaseField.LONGITUDE) ? session.getLongitude() : 0;
-
+            timestamp = (timestamp != 0) ? timestamp : System.currentTimeMillis();
+            networkState = getFieldDefault(BaseField.NETWORK_STATE) ? NetworkUtil.getActiveNetworkState(context).getNetworkName() : null;
             sdkVersion = getFieldDefault(BaseField.SDK_VERSION) ? SDKConfig.SDK_VERSION : null;
             language = getFieldDefault(BaseField.LANGUAGE) ? Locale.getDefault().getLanguage() : null;
         }

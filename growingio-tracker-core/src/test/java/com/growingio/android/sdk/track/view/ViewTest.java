@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.view;
 
 import android.app.Activity;
@@ -23,10 +22,12 @@ import android.view.View;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -42,13 +43,23 @@ import java.util.function.Consumer;
 @RunWith(RobolectricTestRunner.class)
 public class ViewTest {
 
+    private TrackerContext context;
+
+    @Before
+    public void setup() {
+        Application application = ApplicationProvider.getApplicationContext();
+        Tracker tracker = new Tracker(application);
+        context = tracker.getContext();
+    }
+
     @Test
     public void windowHelperTest() {
+        ActivityStateProvider activityStateProvider = context.getActivityStateProvider();
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
 
         Truth.assertThat(WindowHelper.get().isDecorView(activity.getWindow().getDecorView())).isTrue();
 
-        ActivityStateProvider.get().onActivityResumed(activity);
+        activityStateProvider.onActivityResumed(activity);
         Truth.assertThat(WindowHelper.get().getTopActivityDecorView()).isEqualTo(activity.getWindow().getDecorView());
         List<DecorView> views = WindowHelper.get().getTopActivityViews();
         views.forEach(new Consumer<DecorView>() {
@@ -70,9 +81,9 @@ public class ViewTest {
 
     @Test
     public void screenshotTest() throws Exception {
-        TrackerContext.init(application);
+        ActivityStateProvider activityStateProvider = context.getActivityStateProvider();
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
-        ActivityStateProvider.get().onActivityResumed(activity);
+        activityStateProvider.onActivityResumed(activity);
 
         ScreenshotUtil.getScreenshotBitmap(1, bitmap -> {
             Truth.assertThat(bitmap).isNotNull();

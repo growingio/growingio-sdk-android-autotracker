@@ -1,51 +1,51 @@
 apply plugin: 'com.android.library'
 
 android {
-    namespace 'com.growingio.android.sdk.tracker'
-    compileSdkVersion buildConfiguration.compileVersion
-    defaultConfig {
-        minSdkVersion buildConfiguration.minSdkVersion
-        targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName libs.versions.growingio.get()
-        versionCode libs.versions.growingioCode.get().toInteger()
-    }
+	namespace 'com.growingio.android.sdk.tracker'
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+		versionName libs.versions.growingio.get()
+		versionCode libs.versions.growingioCode.get().toInteger()
+	}
 
-    buildTypes {
-        debug {
-            testCoverageEnabled = true
-        }
+	buildTypes {
+		debug {
+			testCoverageEnabled = true
+		}
 
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            consumerProguardFiles 'consumer-proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility buildConfiguration.sourceCompatibility
-        targetCompatibility buildConfiguration.targetCompatibility
-    }
-    lintOptions {
-        abortOnError false
-    }
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			consumerProguardFiles 'consumer-proguard-rules.pro'
+		}
+	}
+	compileOptions {
+		sourceCompatibility buildConfiguration.sourceCompatibility
+		targetCompatibility buildConfiguration.targetCompatibility
+	}
+	lintOptions {
+		abortOnError false
+	}
 }
 
 dependencies {
-    compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
+	compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
 
-    debugApi project(':growingio-tracker-core')
-    debugApi project(':growingio-network:okhttp3')
-    debugApi project(':growingio-data:database')
-    debugApi project(':growingio-data:protobuf')
-    debugApi project(':growingio-webservice:debugger')
+	debugApi project(':growingio-tracker-core')
+	debugApi project(':growingio-network:okhttp3')
+	debugApi project(':growingio-data:database')
+	debugApi project(':growingio-data:protobuf')
+	debugApi project(':growingio-webservice:debugger')
 
-    releaseApi libs.bundles.growingio.tracker.sdk
+	releaseApi libs.bundles.growingio.tracker.sdk
 
-    compileOnly libs.support.appcompat
+	compileOnly libs.support.appcompat
 
-    releaseImplementation libs.growingio.annotation
-    debugImplementation project(":growingio-annotation")
-    annotationProcessor project(":growingio-annotation:compiler")
+	releaseImplementation libs.growingio.annotation
+	debugImplementation project(":growingio-annotation")
+	annotationProcessor project(":growingio-annotation:compiler")
 }
 
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

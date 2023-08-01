@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.flutter;
 
-import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.middleware.EventFlutter;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.sdk.annotation.GIOLibraryModule;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -31,8 +32,12 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 @GIOLibraryModule
 public class FlutterLibraryGioModule extends LibraryGioModule {
     @Override
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(EventFlutter.class, Void.class, new FlutterDataLoader.Factory(context));
+    public void registerComponents(TrackerContext context) {
+        context.getRegistry().register(EventFlutter.class, Void.class, new FlutterDataLoader.Factory(context));
     }
 
+    @Override
+    protected void setupProviders(Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providerStore) {
+        providerStore.put(FlutterPluginProvider.class, FlutterPluginProvider.get());
+    }
 }

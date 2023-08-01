@@ -59,8 +59,8 @@ message EventV3Dto {
     int64 send_time = 54;
     string user_key = 55;
 
-    string xindex = 56;//new in sdk 4.0
-    string xcontent = 57;//new in sdk 4.0
+    string xcontent = 56;//new in sdk 4.0
+    string xindex = 57;//new in sdk 4.0
 }
 
 message ResourceItem {

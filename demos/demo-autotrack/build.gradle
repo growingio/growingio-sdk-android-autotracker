@@ -1,33 +1,33 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion buildConfiguration.compileVersion
-    defaultConfig {
-        minSdkVersion buildConfiguration.minSdkVersion
-        targetSdkVersion buildConfiguration.targetSdkVersion
-    }
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+	}
 
-    lintOptions {
-        abortOnError false
-    }
+	lintOptions {
+		abortOnError false
+	}
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
+	}
 }
 
 dependencies {
 
-    implementation libs.bundles.android.support
+	implementation libs.bundles.android.support
 
-    implementation(name: 'tbs_sdk_44051', ext: 'jar')
+	implementation(name: 'tbs_sdk_44051', ext: 'jar')
 
-    debugApi project(':gio-sdk:autotracker')
-    releaseApi libs.growingio.autotracker
-    //api "com.growingio.android:autotracker:3.3.1"
+	debugApi project(':gio-sdk:autotracker')
+	releaseApi libs.growingio.autotracker
+	//api "com.growingio.android:autotracker:3.3.1"
 
-    implementation project(':demo-core')
+	implementation project(':demo-core')
 
-    compileOnly libs.androidx.appcompat
+	compileOnly libs.androidx.appcompat
 }

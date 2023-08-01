@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class EmptyAppModuleTest : CompilationProvider {
     @Before
     fun setUp() {
         compilation = Compiler.javac().withProcessors(GioModuleProcessor()).compile(
-            forResource(MODULE_NAME)
+            forResource(MODULE_NAME),
         )
         assertThat(compilation).succeededWithoutWarnings()
     }
@@ -51,7 +51,6 @@ class EmptyAppModuleTest : CompilationProvider {
 
         assertThat(compilation!!).generatedSourceFile(TestUtil.subpackage("TestTrackConfiguration"))
             .hasSourceEquivalentTo(forResource("TestTrackConfiguration.java"))
-
     }
 
     private fun forResource(name: String): JavaFileObject {

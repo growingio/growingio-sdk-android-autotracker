@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler
 import com.growingio.sdk.annotation.compiler.rule.CompilationProvider
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -35,7 +34,7 @@ class EmptyModuleTest : CompilationProvider {
     @Before
     fun setUp() {
         compilation = Compiler.javac().withProcessors(GioModuleProcessor()).compile(
-            forResource(MODULE_NAME)
+            forResource(MODULE_NAME),
         )
         assertThat(compilation).succeededWithoutWarnings()
     }
@@ -51,7 +50,6 @@ class EmptyModuleTest : CompilationProvider {
 
         assertThat(compilation!!).generatedSourceFile(TestUtil.annotation(expectedClassName))
             .hasSourceEquivalentTo(forResource(expectedClassName + ".java"))
-
     }
 
     private fun forResource(name: String): JavaFileObject {

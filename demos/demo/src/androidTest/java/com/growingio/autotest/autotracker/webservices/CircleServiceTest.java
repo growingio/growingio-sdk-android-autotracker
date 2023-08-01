@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.autotest.autotracker.webservices;
 
 import android.content.Intent;
@@ -32,7 +31,7 @@ import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.view.DecorView;
 import com.growingio.android.sdk.track.view.WindowHelper;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.webservices.widget.TipView;
+import com.growingio.android.sdk.track.view.TipView;
 import com.growingio.autotest.TestTrackConfiguration;
 import com.growingio.autotest.WebServicesTest;
 import com.growingio.autotest.help.Awaiter;

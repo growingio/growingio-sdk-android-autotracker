@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.autotest.help;
 
 import android.net.Uri;
@@ -23,7 +22,6 @@ import android.text.TextUtils;
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.TrackEventType;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -128,7 +126,6 @@ public class MockEventsApiServer extends MockServer {
             if (mIsCheckDomain) {
                 Truth.assertThat(jsonObject.getString("domain")).isEqualTo("com.gio.test.three");
             }
-            Truth.assertThat(jsonObject.getString("urlScheme")).isEqualTo(ConfigurationProvider.core().getUrlScheme());
             Truth.assertThat(jsonObject.getString("appState")).isIn(Arrays.asList("FOREGROUND", "BACKGROUND"));
             Truth.assertThat(jsonObject.getLong("eventSequenceId")).isGreaterThan(0);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.modelloader;
 
 /**
@@ -49,5 +48,25 @@ public class TrackerRegistry {
      */
     public <Model, Data> void unregister(Class<Model> modelClass, Class<Data> dataClass) {
         modelLoaderRegistry.remove(modelClass, dataClass);
+    }
+
+    public <Model, Data> Data executeData(Model model, Class<Model> modelClass, Class<Data> dataClass) {
+        ModelLoader<Model, Data> modelLoader = getModelLoader(modelClass, dataClass);
+        if (modelLoader != null) {
+            return modelLoader.buildLoadData(model).fetcher.executeData();
+        }
+        return null;
+    }
+
+    public <Model, Data> void loadData(Model model, Class<Model> modelClass, Class<Data> dataClass, LoadDataFetcher.DataCallback<Data> callback) {
+        ModelLoader<Model, Data> modelLoader = getModelLoader(modelClass, dataClass);
+        if (modelLoader != null) {
+            DataFetcher<Data> fetcher = modelLoader.buildLoadData(model).fetcher;
+            if (fetcher instanceof LoadDataFetcher) {
+                ((LoadDataFetcher<Data>) fetcher).loadData(callback);
+            }
+        } else {
+            callback.onLoadFailed(new NullPointerException(String.format("please register %s component first", modelClass.getSimpleName())));
+        }
     }
 }

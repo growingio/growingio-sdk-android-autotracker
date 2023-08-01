@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.sdk.annotation.json.serializer
 
 import com.growingio.sdk.annotation.json.JsonSerializer
@@ -26,7 +25,6 @@ import com.squareup.javapoet.TypeSpec
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
 
 /**
  * <p>
@@ -35,7 +33,7 @@ import javax.lang.model.element.VariableElement
  */
 internal class JsonFactoryGenerator(
     private val processEnv: ProcessingEnvironment,
-    private val processUtils: ProcessUtils
+    private val processUtils: ProcessUtils,
 ) {
     fun generate(typeElements: List<TypeElement>) {
         val sortedList = arrayListOf<TypeElement>()
@@ -60,7 +58,7 @@ internal class JsonFactoryGenerator(
 
         val baseEventElement = sortedList.last()
         val annotation: JsonSerializer = baseEventElement.getAnnotation(
-            JsonSerializer::class.java
+            JsonSerializer::class.java,
         )
 
         val builderName: String = annotation.builder
@@ -78,29 +76,29 @@ internal class JsonFactoryGenerator(
         val superinterface = ParameterizedTypeName.get(
             ClassName.get(
                 ProcessUtils.JSON_SERIALIZABLE_PACKAGE,
-                ProcessUtils.JSON_SERIALIZABLE_CLASS
-            ),//rawType
-            ClassName.get(eventType),//the value for T
-            builderType, //the value for R
+                ProcessUtils.JSON_SERIALIZABLE_CLASS,
+            ), // rawType
+            ClassName.get(eventType), // the value for T
+            builderType, // the value for R
         )
 
         val jonSerialBuilder = TypeSpec.classBuilder(generateClass).addJavadoc(
             """
                             <p>This class is generated and should not be modified
                             
-                            """.trimIndent()
+            """.trimIndent(),
         ).addModifiers(Modifier.PUBLIC, Modifier.FINAL).addSuperinterface(superinterface)
             .addMethod(
                 generateToJsonMethod(
                     ClassName.get(eventType),
                     sortedList,
-                )
+                ),
             )
             .addMethod(
                 generateParseFromMethod(
                     builderType,
-                    sortedList
-                )
+                    sortedList,
+                ),
             )
 
         processUtils.writeClass(JSON_SERIALIZABLE_PACKAGE, jonSerialBuilder.build())
@@ -109,9 +107,9 @@ internal class JsonFactoryGenerator(
             processUtils.debugLog(it.simpleName.toString())
             /**
              * if (event instanceof CustomEvent) {
-            CustomEventJsonSerializableFactory.create().toJson(jsonObject, (CustomEvent) event);
-            return;
-            }
+             CustomEventJsonSerializableFactory.create().toJson(jsonObject, (CustomEvent) event);
+             return;
+             }
              */
         }
     }
@@ -124,8 +122,9 @@ internal class JsonFactoryGenerator(
             .addParameter(
                 ClassName.get(
                     ProcessUtils.JSON_OBJECT_PACKAGE,
-                    ProcessUtils.JSON_OBJECT_CLASS
-                ), "jsonObject"
+                    ProcessUtils.JSON_OBJECT_CLASS,
+                ),
+                "jsonObject",
             )
             .addParameter(eventType, "event").addModifiers(Modifier.PUBLIC)
             .addAnnotation(Override::class.java)
@@ -139,7 +138,7 @@ internal class JsonFactoryGenerator(
             toJsonMethod.addStatement(
                 "\$T.create().toJson(jsonObject, (\$T) event)",
                 eventClass,
-                element
+                element,
             )
             toJsonMethod.addStatement("return")
             toJsonMethod.endControlFlow()
@@ -156,8 +155,9 @@ internal class JsonFactoryGenerator(
                 .addParameter(
                     ClassName.get(
                         ProcessUtils.JSON_OBJECT_PACKAGE,
-                        ProcessUtils.JSON_OBJECT_CLASS
-                    ), "jsonObject"
+                        ProcessUtils.JSON_OBJECT_CLASS,
+                    ),
+                    "jsonObject",
                 )
                 .addModifiers(Modifier.PUBLIC).addAnnotation(Override::class.java)
         sortedList.forEach { element ->
@@ -166,7 +166,7 @@ internal class JsonFactoryGenerator(
             val eventClass = ClassName.get(eventPackageName, eventName)
 
             val annotation: JsonSerializer = element.getAnnotation(
-                JsonSerializer::class.java
+                JsonSerializer::class.java,
             )
             val builderName: String = annotation.builder
             val eventBuilderType =
@@ -177,12 +177,11 @@ internal class JsonFactoryGenerator(
             parseFromMethod.addStatement(
                 "\$T.create().parseFrom((\$T) builder, jsonObject)",
                 eventClass,
-                elementBuilderType
+                elementBuilderType,
             )
             parseFromMethod.addStatement("return")
             parseFromMethod.endControlFlow()
         }
-
 
         return parseFromMethod.build()
     }
@@ -190,7 +189,7 @@ internal class JsonFactoryGenerator(
     private fun searchElementInSortedList(
         targetElement: TypeElement,
         sortedList: List<TypeElement>,
-        typeElements: List<TypeElement>
+        typeElements: List<TypeElement>,
     ): Int {
         val index = sortedList.indexOf(targetElement)
         if (index == -1) {

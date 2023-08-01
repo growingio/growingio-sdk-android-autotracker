@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.growingio.android.sdk.test;
 import com.growingio.android.sdk.AppGioModule;
 import com.growingio.android.sdk.Tracker;
-import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.sdk.annotation.GIOAppModule;
 import com.growingio.sdk.annotation.GIOTracker;
 import com.growingio.sdk.annotation.compiler.sample.EmptyConfig;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events;
 
 import android.content.res.Configuration;
@@ -108,11 +107,11 @@ public class PageEvent extends BaseAttributesEvent {
         }
 
         @Override
-        public void readPropertyInTrackThread() {
+        public void readPropertyInTrackThread(TrackerContext context) {
             if (orientation == null) {
-                orientation = TrackerContext.get().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
+                orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
             }
-            super.readPropertyInTrackThread();
+            super.readPropertyInTrackThread(context);
         }
 
         public Builder setTimestamp(long timestamp) {
