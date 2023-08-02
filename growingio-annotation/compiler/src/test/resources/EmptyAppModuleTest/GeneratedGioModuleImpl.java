@@ -15,19 +15,23 @@
  */
 package com.growingio.android.sdk;
 
-import android.content.Context;
 import com.growingio.android.sdk.test.EmptyAppGioModule;
 
 @SuppressWarnings("deprecation")
 final class GeneratedGioModuleImpl extends GeneratedGioModule {
     private final EmptyAppGioModule appModule;
 
-    public GeneratedGioModuleImpl(Context context) {
+    public GeneratedGioModuleImpl() {
         appModule = new EmptyAppGioModule();
     }
 
     @Override
     public void registerComponents(TrackerContext context) {
-        appModule.registerComponents(context);
+        registerModule(appModule, context);
+    }
+
+    private void registerModule(LibraryGioModule module, TrackerContext context) {
+        module.setupProviders(context.getProviderStore());
+        module.registerComponents(context);
     }
 }

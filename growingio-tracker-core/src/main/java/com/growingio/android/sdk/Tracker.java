@@ -51,13 +51,15 @@ public class Tracker {
     public Tracker(Context context) {
         isInited = false;
         if (context == null) {
-            Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized before use API");
-            throw new IllegalArgumentException("GrowingIO Track SDK is UNINITIALIZED, please initialized before use API");
+            Logger.e(TAG, "GrowingAutotracker SDK is UNINITIALIZED, please initialized before use API");
+            trackerContext = null;
+            return;
         }
 
         if ((!(context instanceof Application) && !(context instanceof Activity))) {
-            Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized SDK with Application or Activity");
-            throw new IllegalArgumentException("GrowingIO Track SDK is UNINITIALIZED, please initialized SDK with Application or Activity");
+            Logger.e(TAG, "GrowingAutotracker SDK is UNINITIALIZED, please initialized SDK with Application or Activity");
+            trackerContext = null;
+            return;
         }
         // 初始化
         trackerContext = initTrackerContext(context);
@@ -103,7 +105,7 @@ public class Tracker {
     }
 
     public TrackerContext getContext() {
-        if (null == trackerContext) {
+        if (!isInited || null == trackerContext) {
             Logger.e(TAG, new NullPointerException("You should init growingio sdk first!!"));
         }
         return trackerContext;
@@ -318,7 +320,7 @@ public class Tracker {
             Class<GeneratedGioModule> clazz =
                     (Class<GeneratedGioModule>)
                             Class.forName("com.growingio.android.sdk.GeneratedGioModuleImpl");
-            GeneratedGioModule generatedGioModule = clazz.getDeclaredConstructor(Context.class).newInstance(context.getApplicationContext());
+            GeneratedGioModule generatedGioModule = clazz.getDeclaredConstructor().newInstance();
             generatedGioModule.registerComponents(trackerContext);
         } catch (ClassNotFoundException e) {
             if (Log.isLoggable(TAG, Log.WARN)) {

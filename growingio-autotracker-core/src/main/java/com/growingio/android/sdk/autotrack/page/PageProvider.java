@@ -43,7 +43,6 @@ import java.util.WeakHashMap;
 public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvider {
     private static final String TAG = "PageProvider";
 
-    //CHECKSTYLE:OFF
     /**
      * Page Tree that is already in the Activity or Fragment Lifecycle.
      */
@@ -52,8 +51,6 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
      * Cache Pages that not in the Lifecycle but has set properties.
      */
     private final Map<Object, Page<?>> CACHE_PAGES = new WeakHashMap<>();
-
-    //CHECKSTYLE:ON
 
     private static class SingleInstance {
         private static final PageProvider INSTANCE = new PageProvider();

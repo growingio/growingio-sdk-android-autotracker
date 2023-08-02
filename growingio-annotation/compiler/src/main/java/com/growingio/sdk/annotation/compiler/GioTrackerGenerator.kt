@@ -75,6 +75,13 @@ import kotlin.check
  *        initSuccess(_gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo());
  *    }
  *
+ *    public static void shutdown() {
+ *      if (_gioTracker != null) {
+ *          _gioTracker.shutdown();
+ *      }
+ *      _gioTracker = null;
+ *    }
+ *
  *    private static Tracker empty() {
  *        return new Tracker(null);
  *    }
@@ -155,6 +162,7 @@ class GioTrackerGenerator(
             .addMethod(generateStartMethod(appModule, trackerClass, configClass))
             .addMethod(generateStartConfigurationMethod(appModule, trackerClass, configClass))
             .addMethod(generateEmptyMethod(trackerClass))
+            .addMethod(generateShutdownMethod())
             .addMethod(generateSuccessMethod())
             .build()
 
@@ -289,6 +297,17 @@ class GioTrackerGenerator(
         // _gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo()
         getMethod.addStatement("initSuccess(_gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo())")
         return getMethod.build()
+    }
+
+
+    private fun generateShutdownMethod():MethodSpec{
+        val shutdownMethod = MethodSpec.methodBuilder("shutdown")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .beginControlFlow("if (_gioTracker != null)")
+            .addStatement("_gioTracker.shutdown()")
+            .endControlFlow()
+            .addStatement("_gioTracker = null")
+        return shutdownMethod.build()
     }
 
     private fun generateEmptyMethod(trackerClass: ClassName): MethodSpec {

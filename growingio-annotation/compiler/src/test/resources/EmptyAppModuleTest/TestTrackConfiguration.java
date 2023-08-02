@@ -184,6 +184,15 @@ public final class TestTrackConfiguration {
         return this;
     }
 
+    public final boolean isImeiEnabled() {
+        return core().isImeiEnabled();
+    }
+
+    public final TestTrackConfiguration setImeiEnabled(boolean mImeiEnabled) {
+        core().setImeiEnabled(mImeiEnabled);
+        return this;
+    }
+
     @Deprecated
     public final TestTrackConfiguration setTestValue(String testValue) {
         getConfiguration(EmptyConfig.class).setTestValue(testValue);

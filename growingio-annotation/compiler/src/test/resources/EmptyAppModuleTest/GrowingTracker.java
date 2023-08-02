@@ -63,7 +63,7 @@ public final class GrowingTracker {
         }
         EmptyAppGioModule appModule = new EmptyAppGioModule();
         appModule.config(trackConfiguration);
-        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(trackConfiguration.core(),trackConfiguration.getConfigModules());
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(trackConfiguration.core(), trackConfiguration.getConfigModules());
         _gioTracker = new Tracker(context);
         initSuccess(_gioTracker.getContext().getConfigurationProvider().printAllConfigurationInfo());
     }
@@ -72,9 +72,16 @@ public final class GrowingTracker {
         return new Tracker(null);
     }
 
+    public static void shutdown() {
+        if (_gioTracker != null) {
+            _gioTracker.shutdown();
+        }
+        _gioTracker = null;
+    }
+
     private static void initSuccess(String message) {
         Logger.i(TAG, "!!! Thank you very much for using GrowingIO. We will do our best to provide you with the best service. !!!");
-        Logger.i(TAG, "!!! GrowingIO Tracker version: "+SDKConfig.SDK_VERSION+" !!!");
+        Logger.i(TAG, "!!! GrowingIO Tracker version: " + SDKConfig.SDK_VERSION + " !!!");
         Logger.d(TAG, message);
     }
 }

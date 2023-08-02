@@ -37,10 +37,6 @@ public class TrackerContext extends ContextWrapper {
         return sInitializedSuccessfully;
     }
 
-    public static void initSuccess() {
-        sInitializedSuccessfully = true;
-    }
-
     private final LinkedHashMap<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providerStore;
 
     public TrackerContext(Context context, Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providers) {

@@ -20,7 +20,6 @@ jacocoTestReport{
 }
 
 dependencies {
-
 	// About test: we couldn't use compile-testing in android project unless import jre's rt.jar.
 	testImplementation libs.junit
 	testImplementation("com.google.testing.compile:compile-testing:0.21.0") {
