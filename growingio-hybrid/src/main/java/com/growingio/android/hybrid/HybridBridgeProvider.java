@@ -94,31 +94,37 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
         }, EVALUATE_JAVASCRIPT_TIMEOUT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            int[] location = new int[2];
-            webView.getLocationOnScreen(location);
-            webView.evaluateJavascript("javascript:" + JAVASCRIPT_GET_DOM_TREE_METHOD + "(" +
-                            location[0] + ", " + location[1] + ", " + webView.getWidth() + ", " + webView.getHeight() + ", 100)",
-                    new ValueCallback<String>() {
-                        @Override
-                        public void onReceiveValue(String value) {
-                            if (disposable.isDisposed()) {
-                                return;
-                            }
-                            disposable.dispose();
-                            if (TextUtils.isEmpty(value) || "null".equals(value)) {
-                                Logger.e(TAG, "getWebViewDomTree ValueCallback is NULL");
-                                callback.onFailed();
-                                return;
-                            }
-                            try {
-                                JSONObject domTree = new JSONObject(value);
-                                callback.onSuccess(domTree);
-                            } catch (JSONException e) {
-                                Logger.e(TAG, e);
-                                callback.onFailed();
-                            }
-                        }
-                    });
+            webView.getRealWebView().post(new Runnable() {
+                @Override
+                public void run() {
+                    int[] location = new int[2];
+                    webView.getLocationOnScreen(location);
+                    webView.evaluateJavascript("javascript:" + JAVASCRIPT_GET_DOM_TREE_METHOD + "(" +
+                                    location[0] + ", " + location[1] + ", " + webView.getWidth() + ", " + webView.getHeight() + ", 100)",
+                            new ValueCallback<String>() {
+                                @Override
+                                public void onReceiveValue(String value) {
+                                    if (disposable.isDisposed()) {
+                                        return;
+                                    }
+                                    disposable.dispose();
+                                    if (TextUtils.isEmpty(value) || "null".equals(value)) {
+                                        Logger.e(TAG, "getWebViewDomTree ValueCallback is NULL");
+                                        callback.onFailed();
+                                        return;
+                                    }
+                                    try {
+                                        JSONObject domTree = new JSONObject(value);
+                                        callback.onSuccess(domTree);
+                                    } catch (JSONException e) {
+                                        Logger.e(TAG, e);
+                                        callback.onFailed();
+                                    }
+                                }
+                            });
+                }
+            });
+
         } else {
             Logger.e(TAG, "You need use after Android 4.4 to getWebViewDomTree");
             if (!disposable.isDisposed()) {
