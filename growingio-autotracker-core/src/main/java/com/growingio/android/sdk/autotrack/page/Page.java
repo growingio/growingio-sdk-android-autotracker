@@ -179,7 +179,7 @@ public abstract class Page<T> {
                 path.append("/");
                 xIndex.append("/");
             }
-            path.append(omitted ? page.getName() : getCarrier().getClass().getSimpleName());
+            path.append(omitted ? page.getName() : page.getCarrier().getClass().getSimpleName());
             String tag = page.getTag();
             if (tag != null) {
                 if (omitted) path.append("[").append(tag.isEmpty() ? "-" : tag).append("]");

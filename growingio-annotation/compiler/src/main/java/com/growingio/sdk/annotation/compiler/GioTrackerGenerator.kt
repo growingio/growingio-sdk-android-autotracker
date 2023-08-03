@@ -299,8 +299,7 @@ class GioTrackerGenerator(
         return getMethod.build()
     }
 
-
-    private fun generateShutdownMethod():MethodSpec{
+    private fun generateShutdownMethod(): MethodSpec {
         val shutdownMethod = MethodSpec.methodBuilder("shutdown")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .beginControlFlow("if (_gioTracker != null)")
