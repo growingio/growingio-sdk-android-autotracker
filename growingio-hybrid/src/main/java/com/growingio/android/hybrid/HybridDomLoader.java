@@ -19,6 +19,7 @@ package com.growingio.android.hybrid;
 import android.view.View;
 import android.webkit.WebView;
 
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.async.Callback;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
@@ -78,7 +79,13 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
             HybridBridgeProvider.get().getWebViewDomTree(superWebView, new Callback<JSONObject>() {
                 @Override
                 public void onSuccess(JSONObject result) {
-                    callback.onDataReady(new HybridJson(result));
+                    TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onDataReady(new HybridJson(result));
+                        }
+                    });
+
                 }
 
                 @Override
