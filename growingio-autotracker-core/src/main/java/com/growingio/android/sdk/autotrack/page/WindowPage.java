@@ -47,4 +47,9 @@ public class WindowPage extends Page<Window> {
     public String getTag() {
         return null;
     }
+
+    @Override
+    public String getTitle() {
+        return "";
+    }
 }

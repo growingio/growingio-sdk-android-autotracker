@@ -60,4 +60,12 @@ public class ActivityPage extends Page<Activity> {
     public String getTag() {
         return null;
     }
+
+    @Override
+    public String getTitle() {
+        if (!TextUtils.isEmpty(getCarrier().getTitle())) {
+            return getCarrier().getTitle().toString();
+        }
+        return super.getTitle();
+    }
 }

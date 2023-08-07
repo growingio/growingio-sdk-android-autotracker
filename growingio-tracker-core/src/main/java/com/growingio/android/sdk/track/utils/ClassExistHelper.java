@@ -15,6 +15,7 @@
  */
 package com.growingio.android.sdk.track.utils;
 
+import android.view.View;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 
@@ -39,6 +40,7 @@ public class ClassExistHelper {
     private static final String SUPPORT_FRAGMENT_ACTIVITY_CLASS = "android.support.v4.app.FragmentActivity";
     private static final String SUPPORT_ALERT_DIALOG_CLASS = "android.support.v7.app.AlertDialog";
     private static final String SUPPORT_LIST_MENU_ITEM_CLASS = "android.support.v7.view.menu.ListMenuItemView";
+    private static final String SUPPORT_TOOLBAR_CLASS = "android.support.v7.widget.Toolbar";
 
     static {
         HAS_X5_WEBVIEW = hasClass("com.tencent.smtt.sdk.WebView");
@@ -158,6 +160,14 @@ public class ClassExistHelper {
 
     public static boolean instanceOfSupportListMenuItemView(Object itemView) {
         return isSupportClass(SUPPORT_LIST_MENU_ITEM_CLASS, itemView);
+    }
+
+    public static boolean instanceOfSupportToolBar(Object view) {
+        return isSupportClass(SUPPORT_TOOLBAR_CLASS, view);
+    }
+
+    public static CharSequence getSupportToolBarTitle(View view) {
+        return ((android.support.v7.widget.Toolbar) view).getTitle();
     }
 
 

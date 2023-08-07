@@ -15,8 +15,14 @@
  */
 package com.growingio.android.sdk.autotrack.page;
 
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.appcompat.widget.Toolbar;
+
+import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,10 +84,39 @@ public abstract class Page<T> {
     public abstract View getView();
 
     public String getTitle() {
+        if (mTitle != null) return mTitle;
+        CharSequence title = findToolbarTitle(getView(), 0);
+        if (title != null) {
+            mTitle = title.toString();
+            return mTitle;
+        }
+        mTitle = "";
         return mTitle;
     }
 
-    public void setTitle(String title) {
+    private CharSequence findToolbarTitle(View parent, int level) {
+        if (parent instanceof Toolbar) {
+            return ((Toolbar) parent).getTitle();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && parent instanceof android.widget.Toolbar) {
+            return ((android.widget.Toolbar) parent).getTitle();
+        } else if (ClassExistHelper.instanceOfSupportToolBar(parent)) {
+            return ClassExistHelper.getSupportToolBarTitle(parent);
+        }
+        if (level > 5) return null;
+        if (parent instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) parent;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View view = vg.getChildAt(i);
+                CharSequence title = findToolbarTitle(view, level + 1);
+                if (title != null) {
+                    return title;
+                }
+            }
+        }
+        return null;
+    }
+
+    protected void setTitle(String title) {
         mTitle = title;
     }
 

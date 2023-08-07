@@ -18,7 +18,6 @@ package com.growingio.android.sdk.autotrack.page;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.UiThread;
@@ -97,9 +96,6 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     @UiThread
     private void createOrResumePage(Activity activity) {
         ActivityPage page = generateActivityPageInTree(activity);
-        if (!TextUtils.isEmpty(activity.getTitle())) {
-            page.setTitle(activity.getTitle().toString());
-        }
         ViewAttributeUtil.setViewPage(activity.getWindow().getDecorView(), page);
         page.refreshShowTimestamp();
         sendPage(activity, page);
@@ -473,15 +469,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             activity = activityStateProvider.getForegroundActivity();
         }
         if (activity != null) {
-            ActivityPage activityPage = findOrCreateActivityPage(activity);
-            if (!TextUtils.isEmpty(activity.getTitle())) {
-                activityPage.setTitle(activity.getTitle().toString());
-            } else {
-                //一般不会进入
-                //如穿山甲广告：会自己生成一个ActivityWrapper做代理并自己控制生命周期导致sdk的page无法命中，具体类为：PluginFragmentActivityWrapper
-                activityPage.setTitle("WrapperActivity");
-            }
-            return activityPage;
+            return findOrCreateActivityPage(activity);
         }
         return null;
     }
