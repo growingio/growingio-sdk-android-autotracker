@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public abstract class Page<T> {
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && parent instanceof android.widget.Toolbar) {
             return ((android.widget.Toolbar) parent).getTitle();
         } else if (ClassExistHelper.instanceOfSupportToolBar(parent)) {
-            return ClassExistHelper.getSupportToolBarTitle(parent);
+            return ClassUtil.getSupportToolBarTitle(parent);
         }
         if (level > 5) return null;
         if (parent instanceof ViewGroup) {

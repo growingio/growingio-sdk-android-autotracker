@@ -15,16 +15,12 @@
  */
 package com.growingio.android.sdk.autotrack.util;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.R;
 
-
-@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
 public class ClassUtil {
     private static final String ANONYMOUS_CLASS_NAME = "Anonymous";
 
@@ -55,6 +51,10 @@ public class ClassUtil {
         } catch (Exception ignored) {
         }
         return false;
+    }
+
+    public static CharSequence getSupportToolBarTitle(View view) {
+        return ((android.support.v7.widget.Toolbar) view).getTitle();
     }
 }
 

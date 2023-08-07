@@ -15,7 +15,6 @@
  */
 package com.growingio.android.sdk.track.utils;
 
-import android.view.View;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 
@@ -165,10 +164,4 @@ public class ClassExistHelper {
     public static boolean instanceOfSupportToolBar(Object view) {
         return isSupportClass(SUPPORT_TOOLBAR_CLASS, view);
     }
-
-    public static CharSequence getSupportToolBarTitle(View view) {
-        return ((android.support.v7.widget.Toolbar) view).getTitle();
-    }
-
-
 }
