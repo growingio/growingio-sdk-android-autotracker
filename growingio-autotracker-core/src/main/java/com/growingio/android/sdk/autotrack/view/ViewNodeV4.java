@@ -320,7 +320,7 @@ class ViewNodeV4 {
                 indeedXIndex.append("/").append(groupIdx).append("/").append(childIdx).append("/0");
             } else {
                 this.index = groupIdx;
-                xPath.append("/ELVG[").append(groupIdx).append("]/").append(viewName).append("[0]");
+                xPath.append("/ELVG/").append(viewName);
                 xIndex.delete(0, xIndex.length()).append(indeedXIndex).append("/-").append("/0");
                 indeedXIndex.append("/").append(groupIdx).append("/0");
             }
