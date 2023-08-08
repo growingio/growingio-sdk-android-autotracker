@@ -15,8 +15,6 @@
  */
 package com.growingio.android.sdk.track.events.base;
 
-import android.text.TextUtils;
-
 import androidx.annotation.FloatRange;
 import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
@@ -231,7 +229,7 @@ public abstract class BaseEvent extends GEvent {
     }
 
     protected String checkValueSafe(String value) {
-        return TextUtils.isEmpty(value) ? "" : value;
+        return value == null ? "" : value;
     }
 
     public static abstract class BaseBuilder<T extends BaseEvent> {

@@ -15,8 +15,6 @@
  */
 package com.growingio.android.protobuf;
 
-import android.text.TextUtils;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.growingio.android.sdk.track.events.ActivateEvent;
 import com.growingio.android.sdk.track.events.AppClosedEvent;
@@ -115,21 +113,21 @@ class EventProtocolTransfer {
             } else if (AutotrackEventType.VIEW_CLICK.equals(eventType)
                     || AutotrackEventType.VIEW_CHANGE.equals(eventType)
                     || TrackEventType.FORM_SUBMIT.equals(eventType)) {
-                if (!TextUtils.isEmpty(event.optString("query"))) {
+                if (event.has("query")) {
                     return new HybridViewElementEvent.Builder(eventType);
                 }
                 return new ViewElementEvent.Builder(eventType);
             } else if (AutotrackEventType.PAGE.equals(eventType)) {
-                if (!TextUtils.isEmpty(event.optString("query"))) {
+                if (event.has("query")) {
                     return new HybridPageEvent.Builder();
                 }
                 return new PageEvent.Builder();
             } else if (TrackEventType.CUSTOM.equals(eventType)) {
-                if (!TextUtils.isEmpty(event.optString("path"))) {
-                    return new PageLevelCustomEvent.Builder();
-                }
-                if (!TextUtils.isEmpty(event.optString("query"))) {
+                if (event.has("query")) {
                     return new HybridCustomEvent.Builder();
+                }
+                if (event.has("path")) {
+                    return new PageLevelCustomEvent.Builder();
                 }
                 return new CustomEvent.Builder(); //custom
             } else if (TrackEventType.ACTIVATE.equals(eventType)) {

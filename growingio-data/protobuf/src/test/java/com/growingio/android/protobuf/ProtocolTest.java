@@ -16,7 +16,6 @@
 package com.growingio.android.protobuf;
 
 
-
 import com.google.common.truth.Truth;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.growingio.android.sdk.track.events.AppClosedEvent;
@@ -27,6 +26,7 @@ import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
+import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
@@ -36,7 +36,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -124,4 +126,33 @@ public class ProtocolTest {
         return EventV3Protocol.EventV3Dto.parseFrom(data);
     }
 
+    @Test
+    public void protocolListTest() throws InvalidProtocolBufferException {
+        Map<String, String> defaultMap = new HashMap<>();
+        defaultMap.put("user", "cpacm");
+        defaultMap.put("age", "24");
+        List<BaseEvent> events = new ArrayList<>();
+
+        CustomEvent customEvent = new CustomEvent.Builder()
+                .setEventName("pbTest")
+                .setAttributes(defaultMap)
+                .build();
+        events.add(customEvent);
+
+
+        EventV3Protocol.EventV3List.Builder listBuilder = EventV3Protocol.EventV3List.newBuilder();
+
+        for (BaseEvent event : events) {
+            listBuilder.addValues(protocol(event));
+        }
+
+        byte[] result = listBuilder.build().toByteArray();
+
+        EventV3Protocol.EventV3List parser = EventV3Protocol.EventV3List.parseFrom(result);
+        for (EventV3Protocol.EventV3Dto dto : parser.getValuesList()) {
+            Truth.assertThat(dto.getAttributesCount()).isEqualTo(2);
+            Truth.assertThat(dto.getAttributesMap()).containsEntry("user", "cpacm");
+        }
+
+    }
 }
