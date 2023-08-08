@@ -60,7 +60,6 @@ message EventV3Dto {
     string user_key = 55;
 
     string xcontent = 56;//new in sdk 4.0
-    string xindex = 57;//new in sdk 4.0
 }
 
 message ResourceItem {

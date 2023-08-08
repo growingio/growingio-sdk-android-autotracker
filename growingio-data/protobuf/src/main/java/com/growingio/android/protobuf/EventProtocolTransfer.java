@@ -217,11 +217,11 @@ class EventProtocolTransfer {
             eventBuilder.setTextValue(vEvent.getTextValue()); //27
             eventBuilder.setXpath(vEvent.getXpath()); //28
             eventBuilder.setIndex(vEvent.getIndex()); //29
-            if (vEvent.getXIndex() != null) {
-                eventBuilder.setXindex(vEvent.getXIndex()); //56
+            if (vEvent.getPageShowTimestamp() > 0) {
+                eventBuilder.setPageShowTimestamp(vEvent.getPageShowTimestamp());//23
             }
-            if (vEvent.getXContent() != null) {
-                eventBuilder.setXcontent(vEvent.getXContent()); //57
+            if (vEvent.getXIndex() != null) {
+                eventBuilder.setXcontent(vEvent.getXIndex()); //56 --xIndex isEqualWith xContent
             }
         }
         if (gEvent instanceof PageEvent) {

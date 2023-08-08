@@ -231,8 +231,9 @@ class ViewNodeV4 {
         String customId = ViewAttributeUtil.getCustomId(this.view);
         String id = ViewAttributeUtil.getViewPackageId(this.view);
         String replaceId = customId == null ? id : customId;
+        boolean isList = xIndex.charAt(xIndex.length() - 1) == '-';
 
-        if (replaceId != null) {
+        if (replaceId != null && !isList) {
             int lastPath = xIndex.lastIndexOf("/");
             if (lastPath != -1) {
                 xIndex.replace(lastPath + 1, xIndex.length(), replaceId);

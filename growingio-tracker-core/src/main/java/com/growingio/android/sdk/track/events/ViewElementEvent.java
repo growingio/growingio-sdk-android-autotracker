@@ -43,11 +43,8 @@ public class ViewElementEvent extends BaseAttributesEvent {
      * new for v4.0 sdk
      */
     @Nullable
-    @JsonAlias(name = "xindex")
-    private final String xIndex;
-    @Nullable
     @JsonAlias(name = "xcontent")
-    private final String xContent;
+    private final String xIndex;
 
     protected ViewElementEvent(Builder eventBuilder) {
         super(eventBuilder);
@@ -57,7 +54,6 @@ public class ViewElementEvent extends BaseAttributesEvent {
         xpath = eventBuilder.xpath;
         index = eventBuilder.index;
         xIndex = eventBuilder.xIndex;
-        xContent = eventBuilder.xContent;
     }
 
     public String getPath() {
@@ -84,10 +80,6 @@ public class ViewElementEvent extends BaseAttributesEvent {
         return xIndex;
     }
 
-    public String getXContent() {
-        return xContent;
-    }
-
     public static class Builder extends BaseAttributesEvent.Builder<ViewElementEvent> {
         private String path;
         private String textValue;
@@ -98,7 +90,6 @@ public class ViewElementEvent extends BaseAttributesEvent {
          * new for v4.0 sdk
          */
         private String xIndex;
-        private String xContent;
 
         /**
          * keep for v3.0 sdk
@@ -147,11 +138,6 @@ public class ViewElementEvent extends BaseAttributesEvent {
 
         public Builder setXIndex(String xIndex) {
             this.xIndex = xIndex;
-            return this;
-        }
-
-        public Builder setXContent(String xContent) {
-            this.xContent = xContent;
             return this;
         }
 

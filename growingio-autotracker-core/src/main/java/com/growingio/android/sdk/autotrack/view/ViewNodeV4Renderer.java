@@ -78,7 +78,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
                     postEventToTrackMain(
                             new ViewElementEvent.Builder(AutotrackEventType.VIEW_CLICK)
                                     .setPath(page.activePath())
-                                    .setXIndex(xpath.toString())
+                                    .setXIndex(xIndex.toString())
                                     .setXpath(xpath.toString())
                                     .setIndex(viewNode.getIndex())
                                     .setTextValue(viewNode.getViewContent())
