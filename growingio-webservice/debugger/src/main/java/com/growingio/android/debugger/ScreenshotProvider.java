@@ -198,6 +198,7 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_PAUSED) {
             safeTipView.removeOnly();
         }
+        super.onActivityLifecycle(event);
     }
 
     void enableTipViewShow() {

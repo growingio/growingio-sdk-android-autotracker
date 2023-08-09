@@ -39,6 +39,11 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         if (!TextUtils.isEmpty(getAlias())) {
             return getAlias();
         }
+        return getClassName();
+    }
+
+    @Override
+    public String getClassName() {
         return getCarrier().getRealFragment().getClass().getSimpleName();
     }
 

@@ -82,6 +82,8 @@ public abstract class Page<T> {
 
     public abstract String getName();
 
+    public abstract String getClassName();
+
     public abstract View getView();
 
     public String getTitle() {
@@ -215,7 +217,7 @@ public abstract class Page<T> {
                 path.append("/");
                 xIndex.append("/");
             }
-            path.append(omitted ? page.getName() : page.getCarrier().getClass().getSimpleName());
+            path.append(omitted ? page.getName() : page.getClassName());
             String tag = page.getTag();
             if (tag != null) {
                 if (omitted) path.append("[").append(tag.isEmpty() ? "-" : tag).append("]");

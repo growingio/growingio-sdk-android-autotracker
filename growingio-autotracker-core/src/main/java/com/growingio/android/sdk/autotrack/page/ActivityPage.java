@@ -40,6 +40,11 @@ public class ActivityPage extends Page<Activity> {
             return getAlias();
         }
 
+        return getClassName();
+    }
+
+    @Override
+    public String getClassName() {
         return getCarrier().getClass().getSimpleName();
     }
 

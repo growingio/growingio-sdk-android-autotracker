@@ -56,6 +56,7 @@ public class TipView extends FrameLayout {
         super(context);
         mContext = context;
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        setId(R.id.growing_webservices_tip_view);
         createView();
         setKeepScreenOn(true);
     }
@@ -146,7 +147,7 @@ public class TipView extends FrameLayout {
     }
 
     public void show(Activity activity) {
-        if (isDismissed()) {
+        if (isDismissed() || isShowing()) {
             return;
         }
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
@@ -167,6 +168,10 @@ public class TipView extends FrameLayout {
         } else {
             addView(windowToken);
         }
+    }
+
+    public boolean isShowing() {
+        return mIsShowing;
     }
 
     private void addView(IBinder windowToken) {

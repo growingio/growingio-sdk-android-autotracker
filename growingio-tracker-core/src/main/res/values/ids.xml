@@ -2,4 +2,6 @@
 <resources>
     <item name="growing_tracker_monitoring_view_tree_enabled" type="id" />
     <item name="growing_tracker_monitoring_view_tree_listener" type="id" />
+
+    <item name="growing_webservices_tip_view" type="id" />
 </resources>

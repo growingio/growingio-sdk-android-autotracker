@@ -83,6 +83,8 @@ public class ThreadSafeTipView {
             initView();
             tipView.setContent(R.string.growing_debugger_progress);
             tipView.setOnClickListener(v -> showExitDialog(listener));
+            Activity activity = activityStateProvider.getForegroundActivity();
+            tipView.show(activity);
         });
     }
 

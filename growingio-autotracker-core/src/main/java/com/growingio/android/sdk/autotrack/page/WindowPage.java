@@ -34,6 +34,11 @@ public class WindowPage extends Page<Window> {
     }
 
     @Override
+    public String getClassName() {
+        return this.name;
+    }
+
+    @Override
     public boolean isAutotrack() {
         return false;
     }
