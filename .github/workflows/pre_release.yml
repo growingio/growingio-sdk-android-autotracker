@@ -1,0 +1,79 @@
+name: PRE_RELEASE
+
+on:
+  pull_request:
+    types: [ labeled ]
+
+jobs:
+  build:
+    if: ${{ github.event.label.name == 'pre release' }}
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Before script
+        run: |
+          chmod +x gradlew
+          chmod +x gradle/publishAllToMavenLocal.sh
+          chmod +x gradle/preRelease.sh
+
+      - name: Run Gradle command
+        run: |
+          bash ./gradlew spotlessCheck
+          bash ./gradle/publishAllToMavenLocal.sh
+          bash ./gradle/preRelease.sh
+
+      - name: Run demo ui tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          disable-animations: true
+          api-level: 33
+          profile: Nexus 6
+          target: default
+          arch: x86
+          script: |
+            cd demo
+            ./gradlew :app:connectedAndroidTest
+            cd ..
+
+      - name: Run sdk unit tests
+        run: |
+          bash ./gradlew jacocoTestReport
+          bash ./gradlew :jacocoAllReport
+
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube
+        continue-on-error: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml

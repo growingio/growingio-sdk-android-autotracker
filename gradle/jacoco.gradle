@@ -1,7 +1,7 @@
 apply plugin: 'jacoco'
 
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.10"
 }
 
 def rootDir = project.rootProject.rootDir
@@ -53,14 +53,6 @@ def coverageClassDirs = [
 //        "$rootDir/gio-sdk/autotracker/build/intermediates/javac/debug/classes",
 ]
 
-def executionDirs = [
-        "$rootDir/growingio-tools/crash/build/jacoco/testDebugUnitTest.exec",
-        "$rootDir/growingio-webservice/debugger/build/jacoco/testDebugUnitTest.exec",
-        "$rootDir/growingio-webservice/circler/build/jacoco/testDebugUnitTest.exec",
-        "$rootDir/growingio-tracker-core/build/jacoco/testDebugUnitTest.exec",
-        "$rootDir/growingio-autotracker-core/build/jacoco/testDebugUnitTest.exec",
-]
-
 def fileFilter = [
         '**/R.class',
         '**/R$*.class',
@@ -76,16 +68,6 @@ def fileFilter = [
         'android/**/*.*',
         '**/GioIndexer_GIO*',
 ]
-
-subprojects {
-    apply plugin: "jacoco"
-    test {
-        // Don't instrument and generate code coverage unless "-Pcodecoverage" is set on the command line
-        jacoco {
-            enabled = project.hasProperty("codecoverage")
-        }
-    }
-}
 
 task jacocoAllReport(type: JacocoReport) {
 
@@ -103,23 +85,4 @@ task jacocoAllReport(type: JacocoReport) {
             dir: "$rootDir",
             includes: ["**/*.exec", "**/*.ec"]
     ))
-//    executionData.setFrom(files(executionDirs))
-}
-
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
-
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-
-    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug/classes", excludes: fileFilter)
-    def mainSrc = "${project.projectDir}/src/main/java"
-
-    sourceDirectories.setFrom(files([mainSrc]))
-    classDirectories.setFrom(files([debugTree]))
-    executionData.setFrom(fileTree(dir: "$buildDir", includes: [
-            "jacoco/testDebugUnitTest.exec",
-            "**/*.ec"
-    ]))
 }

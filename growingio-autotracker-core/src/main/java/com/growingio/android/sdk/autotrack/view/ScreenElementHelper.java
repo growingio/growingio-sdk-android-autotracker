@@ -38,7 +38,7 @@ public class ScreenElementHelper {
 
     private static final String VIEW_XPATH = "xpath";
     private static final String VIEW_PARENT_XPATH = "parentXPath";
-    private static final String VIEW_PARENT_XINDEX = "parentXIndex"; //new for v4
+    private static final String VIEW_PARENT_XINDEX = "parentXContent"; //new for v4
     private static final String VIEW_XINDEX = "xcontent"; //new for v4
     private static final String VIEW_LEFT = "left";
     private static final String VIEW_TOP = "top";

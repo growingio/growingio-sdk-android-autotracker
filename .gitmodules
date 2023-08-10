@@ -1,0 +1,4 @@
+[submodule "demo"]
+	path = demo
+	url = git@github.com:growingio/growingio-sdk-android-demo.git
+	branch = master

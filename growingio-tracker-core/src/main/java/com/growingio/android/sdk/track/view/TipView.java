@@ -44,8 +44,9 @@ public class TipView extends FrameLayout {
     private TextView mContent;
     private TextView mDragTip;
 
+
+    private boolean mIsNeedShow = false;
     private boolean mIsShowing = false;
-    private boolean mIsDismissed = false;
 
     private int mMinMoveDistance;
     private int mViewLastY;
@@ -95,10 +96,6 @@ public class TipView extends FrameLayout {
         mContent.setText(content);
     }
 
-    public void setErrorMessage(@StringRes int resid) {
-        setErrorMessage(getContext().getResources().getText(resid));
-    }
-
     public void setErrorMessage(CharSequence message) {
         mDragTip.setVisibility(View.GONE);
         mContent.setGravity(Gravity.CENTER);
@@ -146,32 +143,11 @@ public class TipView extends FrameLayout {
         return result;
     }
 
-    public void show(Activity activity) {
-        if (isDismissed() || isShowing()) {
+    public void ready(Activity activity) {
+        if (!mIsNeedShow) {
             return;
         }
-        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-        layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
-        View decorView = activity.getWindow().getDecorView();
-        IBinder windowToken = decorView.getWindowToken();
-        if (windowToken == null) {
-            decorView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    IBinder token = activity.getWindow().getDecorView().getWindowToken();
-                    if (token != null) {
-                        addView(token);
-                        decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    }
-                }
-            });
-        } else {
-            addView(windowToken);
-        }
-    }
-
-    public boolean isShowing() {
-        return mIsShowing;
+        show(activity);
     }
 
     private void addView(IBinder windowToken) {
@@ -192,6 +168,11 @@ public class TipView extends FrameLayout {
     }
 
     public void remove() {
+        dismiss();
+    }
+
+    public void dismiss() {
+        mIsNeedShow = false;
         if (mIsShowing) {
             try {
                 WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -204,16 +185,26 @@ public class TipView extends FrameLayout {
         }
     }
 
-    public void dismiss() {
-        mIsDismissed = true;
-        remove();
-    }
-
-    public void show() {
-        mIsDismissed = false;
-    }
-
-    public boolean isDismissed() {
-        return mIsDismissed;
+    public void show(Activity activity) {
+        mIsNeedShow = true;
+        if (activity == null) return;
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
+        View decorView = activity.getWindow().getDecorView();
+        IBinder windowToken = decorView.getWindowToken();
+        if (windowToken == null) {
+            decorView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    IBinder token = activity.getWindow().getDecorView().getWindowToken();
+                    if (token != null) {
+                        addView(token);
+                        decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                }
+            });
+        } else {
+            addView(windowToken);
+        }
     }
 }

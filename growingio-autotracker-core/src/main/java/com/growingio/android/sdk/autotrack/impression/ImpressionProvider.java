@@ -69,7 +69,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
     public void setup(TrackerContext context) {
 
         AutotrackConfig configuration = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
-        impressionScale = configuration.getImpressionScale();
+        impressionScale = configuration == null ? 0f : configuration.getImpressionScale();
 
         activityStateProvider = context.getActivityStateProvider();
         activityStateProvider.registerActivityLifecycleListener(this);
