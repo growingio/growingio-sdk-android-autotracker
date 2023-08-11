@@ -64,11 +64,11 @@ jobs:
           disable-animations: false
           working-directory: ./demo
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: ./gradlew :app:connectedAndroidTest
+          script: ./gradlew :app:connectedAndroidTest --stacktrace
 
       - name: Run sdk unit tests
         run: |
-          bash ./gradlew jacocoTestReport
+          bash ./gradlew jacocoTestReport --stacktrace
           bash ./gradlew :jacocoAllReport
 
       - name: Build and analyze
