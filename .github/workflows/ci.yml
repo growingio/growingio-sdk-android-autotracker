@@ -43,6 +43,7 @@ jobs:
       - name: Run Gradle command
         run: |
           bash ./gradlew spotlessCheck
+          bash ./gradle/publishAllToMavenLocal.sh
 
       - name: Run tests
         run: |
