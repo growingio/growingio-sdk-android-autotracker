@@ -57,11 +57,9 @@ jobs:
           arch: x86_64
           force-avd-creation: false
           disable-animations: false
+          working-directory: ./demo
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: |
-            cd demo
-            ./gradlew :app:connectedAndroidTest
-            cd ..
+          script: ./gradlew :app:connectedAndroidTest
 
       - name: Run sdk unit tests
         run: |
