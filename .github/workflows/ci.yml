@@ -46,4 +46,4 @@ jobs:
 
       - name: Run tests
         run: |
-          bash ./gradlew test
+          bash ./gradlew test --stacktrace

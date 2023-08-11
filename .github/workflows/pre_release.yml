@@ -60,10 +60,11 @@ jobs:
           profile: Nexus 6
           target: google_apis
           arch: x86_64
-          force-avd-creation: false
+          disk-size: 2048M
+          ram-size: 2048M
+          heap-size: 512M
           disable-animations: false
           working-directory: ./demo
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: ./gradlew :app:connectedAndroidTest --stacktrace
 
       - name: Run sdk unit tests
