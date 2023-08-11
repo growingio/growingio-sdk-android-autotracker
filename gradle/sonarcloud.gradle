@@ -6,25 +6,7 @@ sonarqube {
         property "sonar.projectKey", "growingio_growingio-sdk-android-autotracker"
         property "sonar.organization", "growingio"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/demos/demo/build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml"
         property 'sonar.exclusions', "**/*.html, **/*.xml, **/R.class, **/BuildConfig.*, **/*AppModule.java"
-    }
-}
-
-project(":demo") {
-    sonarqube {
-        skipProject = true
-    }
-}
-
-project(":demo-autotrack") {
-    sonarqube {
-        skipProject = true
-    }
-}
-
-project(":demo-core") {
-    sonarqube {
-        skipProject = true
     }
 }

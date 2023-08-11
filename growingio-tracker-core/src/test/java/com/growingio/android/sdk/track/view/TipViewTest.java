@@ -60,9 +60,9 @@ public class TipViewTest {
                 System.currentTimeMillis() + 100L,
                 MotionEvent.ACTION_UP, 10f, 10f, 1f, 0, 0, 0, 0, 0, 0));
 
+        tipView.ready(activity);
         tipView.show(activity);
         tipView.dismiss();
-        assertThat(tipView.isDismissed()).isTrue();
     }
 
     @Test

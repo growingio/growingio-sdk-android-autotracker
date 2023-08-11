@@ -37,7 +37,7 @@ import org.robolectric.annotation.Config;
 import java.util.HashMap;
 import java.util.Map;
 
-@Config(manifest = Config.NONE, shadows = {ShadowThreadUtils.class})
+@Config(manifest = Config.NONE, shadows = {TrackMainThreadShadow.class})
 @RunWith(RobolectricTestRunner.class)
 public class AutotrackTest {
     private Autotracker autotracker;

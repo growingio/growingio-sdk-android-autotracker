@@ -11,9 +11,13 @@ java {
 	targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-//test {
-//    finalizedBy jacocoTestReport
-//}
+test {
+	//finalizedBy jacocoTestReport
+	//support java sdk >= 16 (fix IllegalAccessError)
+	jvmArgs "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED"
+	jvmArgs '--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED'
+	jvmArgs '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+}
 
 jacocoTestReport{
 	dependsOn test // report is always generated after tests run

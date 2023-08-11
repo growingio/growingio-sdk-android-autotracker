@@ -17,13 +17,13 @@ package com.growingio.android.sdk.autotrack.click;
 
 import android.app.AlertDialog;
 import android.app.Application;
-import android.view.View;
 
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
+import com.growingio.android.sdk.autotrack.TrackMainThreadShadow;
 import com.growingio.android.sdk.autotrack.inject.DialogInjector;
 import com.growingio.android.sdk.autotrack.inject.ViewClickInjector;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
@@ -44,7 +44,7 @@ public class ViewClickTest {
 
     @Before
     public void setup() {
-        Autotracker tracker = new Autotracker(application);
+        Autotracker autotracker = new Autotracker(application);
         activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
     }
 
@@ -54,18 +54,20 @@ public class ViewClickTest {
             if (event.getEventType().equals("VIEW_CLICK")) {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
                 Truth.assertThat(clickEvent.getTextValue()).isEqualTo("this is cpacm");
-                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/MainWindow/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]");
+                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/ActionBarOverlayLayout/FrameLayout/LinearLayout/TextView");
+                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/0/0");
             }
         };
 
-        ViewClickInjector.viewOnClick((View.OnClickListener) v -> {
+        ViewClickInjector.viewOnClick(v -> {
         }, activity.getTextView());
 
         TrackMainThreadShadow.callback = (event) -> {
             if (event.getEventType().equals("VIEW_CLICK")) {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
                 Truth.assertThat(clickEvent.getTextValue()).isEqualTo("test");
-                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/AlertDialog/BUTTON_POSITIVE");
+                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/FrameLayout/FrameLayout/AlertDialogLayout/ScrollView/ButtonBarLayout/Button");
+                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/0/0/0/AlertDialog/BUTTON_POSITIVE");
             }
         };
 
@@ -77,5 +79,7 @@ public class ViewClickTest {
         DialogInjector.alertDialogShow(testDialog);
         DialogInjector.dialogOnClick((dialog, which) -> {
         }, testDialog, -1);
+
+        TrackMainThreadShadow.callback = null;
     }
 }

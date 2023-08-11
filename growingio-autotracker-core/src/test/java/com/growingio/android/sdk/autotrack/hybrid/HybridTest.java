@@ -44,7 +44,7 @@ public class HybridTest {
 
     @Before
     public void setup() {
-        Autotracker tracker = new Autotracker(application);
+        Autotracker autotracker = new Autotracker(application);
     }
 
     @Test

@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 
 enableFeaturePreview("VERSION_CATALOGS")
 rootProject.name = "GrowingIO SDK"
-apply from: 'demos/settings-parent.gradle'
+
 
 // tools
 include ':growingio-annotation'

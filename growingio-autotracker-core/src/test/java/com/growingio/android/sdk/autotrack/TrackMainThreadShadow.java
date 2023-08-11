@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk.autotrack.click;
+package com.growingio.android.sdk.autotrack;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -31,6 +31,11 @@ public class TrackMainThreadShadow {
         if (callback != null) {
             callback.onEvent(eventBuilder.build());
         }
+    }
+
+    @Implementation
+    public static void runOnUiThread(Runnable r) {
+        r.run();
     }
 
     public interface OnEventCallback {

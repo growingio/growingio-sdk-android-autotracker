@@ -27,8 +27,10 @@ plugins {
     alias libs.plugins.growingio.plugin apply false
 
     alias libs.plugins.spotless apply false
+
 }
 
+apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"
 apply from: "${rootProject.projectDir}/gradle/sonarcloud.gradle"
 apply from: "${rootProject.projectDir}/gradle/stagingMaven.gradle"
 

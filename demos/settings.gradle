@@ -1,5 +1,0 @@
-include ':demo'
-include ':demo-core'
-include ':demo-autotrack'
-
-

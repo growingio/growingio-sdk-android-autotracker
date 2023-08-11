@@ -57,7 +57,7 @@ public class ThreadSafeTipView {
     public void enableShow() {
         runOnUiThread(() -> {
             initView();
-            tipView.show();
+            tipView.show(this.activityStateProvider.getResumedActivity());
         });
     }
 
@@ -83,8 +83,6 @@ public class ThreadSafeTipView {
             initView();
             tipView.setContent(R.string.growing_circler_progress);
             tipView.setOnClickListener(v -> showExitDialog(listener));
-            Activity activity = activityStateProvider.getForegroundActivity();
-            tipView.show(activity);
         });
     }
 
@@ -97,7 +95,7 @@ public class ThreadSafeTipView {
     public void show(Activity activity) {
         runOnUiThread(() -> {
             initView();
-            tipView.show(activity);
+            tipView.ready(activity);
         });
     }
 
