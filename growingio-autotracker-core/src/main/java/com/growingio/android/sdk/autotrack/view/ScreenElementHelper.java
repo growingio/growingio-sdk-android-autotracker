@@ -120,12 +120,17 @@ public class ScreenElementHelper {
         Page page = viewNode.getPage();
         if (page == null) return null;
         try {
-            String pagePath = page.originPath(false);
+            String pageXPath = "";
+            String pageXIndex = "";
+            if (!viewNode.isHasUniqueTag()) {
+                pageXPath = page.originPath(false);
+                pageXIndex = page.getXIndex();
+            }
             json.put(VIEW_PATH, page.activePath());
-            json.put(VIEW_XPATH, pagePath + viewNode.getXPath());
-            json.put(VIEW_PARENT_XPATH, viewNode.getClickableParentXPath() == null ? null : pagePath + viewNode.getClickableParentXPath());
-            json.put(VIEW_PARENT_XINDEX, viewNode.getClickablePatentXIndex() == null ? null : page.getXIndex() + viewNode.getClickablePatentXIndex());
-            json.put(VIEW_XINDEX, page.getXIndex() + viewNode.getXIndex());
+            json.put(VIEW_XPATH, pageXPath + viewNode.getXPath());
+            json.put(VIEW_PARENT_XPATH, viewNode.getClickableParentXPath() == null ? null : pageXPath + viewNode.getClickableParentXPath());
+            json.put(VIEW_PARENT_XINDEX, viewNode.getClickablePatentXIndex() == null ? null : pageXIndex + viewNode.getClickablePatentXIndex());
+            json.put(VIEW_XINDEX, pageXIndex + viewNode.getXIndex());
             json.put(VIEW_LEFT, location[0]);
             json.put(VIEW_TOP, location[1]);
             json.put(VIEW_WIDTH, viewNode.getView().getWidth());
