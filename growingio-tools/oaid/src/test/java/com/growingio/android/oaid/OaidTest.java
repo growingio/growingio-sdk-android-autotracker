@@ -70,20 +70,13 @@ public class OaidTest {
 
     @Test
     public void oaidConfig2() {
-        OaidConfig config = new OaidConfig().setProvideOaidCallback(context -> {
-            try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return "cpacm_job";
-        });
+        OaidConfig config = new OaidConfig().setProvideOaidCallback(context -> "cpacm_job");
         context.getConfigurationProvider().addConfiguration(config);
         ModelLoader<OaidHelper, String> modelLoader = context.getRegistry().getModelLoader(OaidHelper.class, String.class);
         String oaid = modelLoader.buildLoadData(new OaidHelper()).fetcher.executeData();
         assertThat(oaid).isNull();
         try {
-            sleep(3000);
+            sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

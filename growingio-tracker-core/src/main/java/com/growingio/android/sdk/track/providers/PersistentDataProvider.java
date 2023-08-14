@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class PersistentDataProvider implements TrackerLifecycleProvider {
     private static final String TAG = "PersistentDataProvider";
@@ -62,7 +63,8 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
 
     @Override
     public void setup(TrackerContext context) {
-        repairPid(context, context.getConfigurationProvider(), context.getProvider(SessionProvider.class));
+        // need invoke after setup
+        repairPid(context, context.getConfigurationProvider());
     }
 
     @Override
@@ -162,7 +164,7 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
         return dataSharer.getString(key, defValue);
     }
 
-    private void repairPid(Context context, ConfigurationProvider configurationProvider, SessionProvider sessionProvider) {
+    private void repairPid(Context context, ConfigurationProvider configurationProvider) {
         processLock.lockedRun(() -> {
             isFirstProcess = false;
             if (configurationProvider.core().isRequireAppProcessesEnabled() && configurationProvider.core().isDataCollectionEnabled()) {
@@ -188,7 +190,10 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
                 setActivityCount(0);
                 setLatestPauseTime(0L);
                 setLatestNonNullUserId(getLoginUserId());
-                sessionProvider.refreshSessionId();
+
+                // refresh session
+                setSessionId(UUID.randomUUID().toString());
+                setSendVisitAfterRefreshSessionId(false);
             }
         });
     }
