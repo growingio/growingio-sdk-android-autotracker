@@ -109,7 +109,13 @@ public class ViewNodeV4Test {
         ViewNodeV4 listItemNode = renderer.renderViewNode(itemView);
         Truth.assertThat(listItemNode.getXPath()).isEqualTo("/DecorView/ActionBarOverlayLayout/FrameLayout/LinearLayout/RecyclerView/TextView");
         Truth.assertThat(listItemNode.getXIndex()).isEqualTo("/0/0/0/0/0/-");
+
+        ViewNodeV4 uniqueNode = renderer.renderViewNode(activity.getUniqueTagTv());
+        Truth.assertThat(uniqueNode.getXPath()).isEqualTo("/tag");
+        Truth.assertThat(uniqueNode.getXIndex()).isEqualTo("/1");
+        Truth.assertThat(uniqueNode.getViewContent()).isEqualTo("uniqueTextView");
     }
+
 
     @Test
     public void viewRenderTest() {

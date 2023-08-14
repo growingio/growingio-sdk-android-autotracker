@@ -45,6 +45,8 @@ class ViewNodeV4 {
     private String clickablePatentXIndex;
     private String viewContent;
     private boolean hasListParent;
+
+    private boolean hasUniqueTag;
     private int index;
 
     private Page page;
@@ -105,6 +107,15 @@ class ViewNodeV4 {
 
     boolean isHasListParent() {
         return hasListParent;
+    }
+
+    ViewNodeV4 setHasUniqueTag(boolean hasUniqueTag) {
+        this.hasUniqueTag = hasUniqueTag;
+        return this;
+    }
+
+    boolean isHasUniqueTag() {
+        return hasUniqueTag;
     }
 
     ViewNodeV4 setIndex(int index) {
@@ -188,9 +199,11 @@ class ViewNodeV4 {
             return;
         }
 
-        StringBuilder indeedXIndex = new StringBuilder(this.indeedXIndex);
-        StringBuilder xPath = new StringBuilder(this.xPath);
-        StringBuilder xIndex = new StringBuilder(this.xIndex);
+        String customId = ViewAttributeUtil.getCustomId(this.view);
+        if (customId != null) this.hasUniqueTag = true;
+        StringBuilder indeedXIndex = new StringBuilder(customId == null ? this.indeedXIndex : "");
+        StringBuilder xPath = new StringBuilder(customId == null ? this.xPath : "");
+        StringBuilder xIndex = new StringBuilder(customId == null ? this.xIndex : "");
         String viewName = ClassUtil.getSimpleClassName(this.view.getClass());
 
         //针对菜单栏处理
@@ -228,9 +241,7 @@ class ViewNodeV4 {
             indeedXIndex.append("/").append(this.viewPosition);
         }
 
-        String customId = ViewAttributeUtil.getCustomId(this.view);
-        String id = ViewAttributeUtil.getViewPackageId(this.view);
-        String replaceId = customId == null ? id : customId;
+        String replaceId = ViewAttributeUtil.getViewPackageId(this.view);
         boolean isList = xIndex.charAt(xIndex.length() - 1) == '-';
 
         if (replaceId != null && !isList) {
@@ -244,7 +255,7 @@ class ViewNodeV4 {
             }
         }
 
-        this.xPath = xPath.toString();
+        this.xPath = customId == null ? xPath.toString() : ("/" + customId);
         this.xIndex = xIndex.toString();
         this.indeedXIndex = indeedXIndex.toString();
     }
@@ -272,6 +283,7 @@ class ViewNodeV4 {
                 .setIndeedXIndex(this.indeedXIndex)
                 .setXIndex(this.xIndex)
                 .setPage(this.page)
+                .setHasUniqueTag(this.hasUniqueTag)
                 .setClickableParentXPath(ViewUtil.canCircle(this.view) ? this.xPath : this.clickableParentXPath)
                 .setClickablePatentXIndex(ViewUtil.canCircle(this.view) ? this.xIndex : this.clickablePatentXIndex)
                 .setHasListParent(hasListParent)

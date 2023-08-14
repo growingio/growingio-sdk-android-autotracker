@@ -114,9 +114,14 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
 
             StringBuilder xpath = new StringBuilder();
             StringBuilder xIndex = new StringBuilder();
-            String pagePath = page.originPath(false);
-            xpath.append(pagePath).append(viewNode.getXPath());
-            xIndex.append(page.getXIndex()).append(viewNode.getXIndex());
+            if (viewNode.isHasUniqueTag()) {
+                xpath.append(viewNode.getXPath());
+                xIndex.append(viewNode.getXIndex());
+            } else {
+                String pagePath = page.originPath(false);
+                xpath.append(pagePath).append(viewNode.getXPath());
+                xIndex.append(page.getXIndex()).append(viewNode.getXIndex());
+            }
 
             if (viewNode.getViewContent() == null || viewNode.getViewContent().isEmpty()) {
                 String content = ViewAttributeUtil.findViewContent(viewNode.getView());
@@ -162,9 +167,14 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             }
             StringBuilder xpath = new StringBuilder();
             StringBuilder xIndex = new StringBuilder();
-            String pagePath = page.originPath(false);
-            xpath.append(pagePath).append(viewNode.getXPath());
-            xIndex.append(page.getXIndex()).append(viewNode.getXIndex());
+            if (viewNode.isHasUniqueTag()) {
+                xpath.append(viewNode.getXPath());
+                xIndex.append(viewNode.getXIndex());
+            } else {
+                String pagePath = page.originPath(false);
+                xpath.append(pagePath).append(viewNode.getXPath());
+                xIndex.append(page.getXIndex()).append(viewNode.getXIndex());
+            }
 
             if (viewNode.getViewContent() == null || viewNode.getViewContent().isEmpty()) {
                 String content = ViewAttributeUtil.findViewContent(viewNode.getView());
@@ -235,14 +245,16 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
 
         StringBuilder xpath = new StringBuilder();
         StringBuilder xIndex = new StringBuilder();
+        boolean hasUniqueTag = false;
 
         if (findPage != null) {
-            xpath.append("/").append(ClassUtil.getSimpleClassName(rootView.getClass()));
             if (ViewAttributeUtil.getCustomId(rootView) != null) {
-                xIndex.append("/").append(ViewAttributeUtil.getCustomId(rootView));
+                xpath.append("/").append(ViewAttributeUtil.getCustomId(rootView));
+                hasUniqueTag = true;
             } else {
-                xIndex.append("/0");
+                xpath.append("/").append(ClassUtil.getSimpleClassName(rootView.getClass()));
             }
+            xIndex.append("/0");
         } else {
             String prefix = PageHelper.getWindowPrefix(rootView);
             findPage = new WindowPage(prefix);
@@ -262,6 +274,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
         return new ViewNodeV4().withView(rootView)
                 .setIndex(-1)
                 .setPage(findPage)
+                .setHasUniqueTag(hasUniqueTag)
                 .setViewContent(ViewAttributeUtil.getViewContent(rootView))
                 .setXPath(xpath.toString())
                 .setXIndex(xIndex.toString())

@@ -32,6 +32,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 
 import static android.widget.LinearLayout.VERTICAL;
@@ -51,6 +52,7 @@ public class RobolectricActivity extends FragmentActivity {
     private TextView textView;
     private RecyclerView recyclerView;
     private ImageView imageView;
+    private TextView uniqueTagTv;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,6 +60,10 @@ public class RobolectricActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         textView = new TextView(this);
         textView.setText("this is cpacm");
+
+        uniqueTagTv = new TextView(this);
+        uniqueTagTv.setText("uniqueTextView");
+        ViewAttributeUtil.setCustomId(uniqueTagTv, "tag");
 
         recyclerView = new RecyclerView(this);
         recyclerView.setAdapter(new TestAdapter(this));
@@ -69,6 +75,7 @@ public class RobolectricActivity extends FragmentActivity {
         linearLayout.addView(textView);
         linearLayout.addView(imageView);
         linearLayout.addView(recyclerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        linearLayout.addView(uniqueTagTv);
         setContentView(linearLayout);
         WindowManager.LayoutParams wlp = new WindowManager.LayoutParams();
         wlp.packageName = "com.cpacm.test";
@@ -104,6 +111,10 @@ public class RobolectricActivity extends FragmentActivity {
 
     public ImageView getImageView() {
         return imageView;
+    }
+
+    public TextView getUniqueTagTv() {
+        return uniqueTagTv;
     }
 
     @Override
