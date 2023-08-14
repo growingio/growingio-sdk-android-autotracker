@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -128,10 +129,18 @@ class DialogClickProvider implements TrackerLifecycleProvider {
             return;
         }
 
-        Logger.d(TAG, "alertDialogShow: " + dialog);
+        if (autotrackConfig != null && autotrackConfig.isDowngrade()) {
+            alertDialogShowV3(dialog);
+        } else {
+            alertDialogShowV4(dialog);
+        }
+    }
+
+    private void alertDialogShowV3(AlertDialog dialog) {
+        Logger.d(TAG, "alertDialogShowV3: " + dialog);
         for (int i = 0; i < DIALOG_BUTTON_IDS.length; i++) {
             Button button = dialog.getButton(DIALOG_BUTTON_IDS[i]);
-            if (button != null && TextUtils.isEmpty(ViewAttributeUtil.getCustomId(button))) {
+            if (button != null && ViewAttributeUtil.getCustomId(button) == null) {
                 String dialogButtonName = DIALOG_BUTTON_NAMES[i];
                 TrackMainThread.trackMain().runOnUiThread(new Runnable() {
                     @Override
@@ -141,8 +150,39 @@ class DialogClickProvider implements TrackerLifecycleProvider {
                 });
             }
         }
+    }
 
-        // TODO: 2020/10/10 list dialog等也要处理
+    private void alertDialogShowV4(AlertDialog dialog) {
+        Logger.d(TAG, "alertDialogShowV4: " + dialog);
+        for (int dialogButtonId : DIALOG_BUTTON_IDS) {
+            Button button = dialog.getButton(dialogButtonId);
+            if (button != null) {
+                ViewParent viewParent = button.getParent();
+                if (viewParent instanceof View) {
+                    View parent = (View) viewParent;
+                    if (ViewAttributeUtil.getCustomId(parent) == null) {
+                        TrackMainThread.trackMain().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ViewAttributeUtil.setCustomId(parent, getAlertDialogName(dialog) + "ButtonLayout");
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        ListView listView = dialog.getListView();
+        if (listView != null && ViewAttributeUtil.getCustomId(listView) == null) {
+            TrackMainThread.trackMain().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ViewAttributeUtil.setCustomId(listView, getAlertDialogName(dialog) + "ListView");
+                }
+            });
+        }
+
+        // customView
     }
 
     private String getAlertDialogName(AlertDialog dialog) {

@@ -15,8 +15,13 @@
  */
 package com.growingio.android.sdk.autotrack.click;
 
+import static android.widget.LinearLayout.VERTICAL;
+
 import android.app.AlertDialog;
 import android.app.Application;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -65,20 +70,56 @@ public class ViewClickTest {
         TrackMainThreadShadow.callback = (event) -> {
             if (event.getEventType().equals("VIEW_CLICK")) {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
-                Truth.assertThat(clickEvent.getTextValue()).isEqualTo("test");
-                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/FrameLayout/FrameLayout/AlertDialogLayout/ScrollView/ButtonBarLayout/Button");
-                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/0/0/0/AlertDialog/BUTTON_POSITIVE");
+                Truth.assertThat(clickEvent.getTextValue()).isEqualTo("negative");
+                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/AlertDialogButtonLayout/Button");
+                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/1");
             }
         };
 
         AlertDialog testDialog = new AlertDialog.Builder(activity)
                 .setPositiveButton("test", (dialog, which) -> {
                 })
+                .setNegativeButton("negative", (dialog, which) -> {
+                })
                 .create();
         testDialog.show();
         DialogInjector.alertDialogShow(testDialog);
         DialogInjector.dialogOnClick((dialog, which) -> {
-        }, testDialog, -1);
+        }, testDialog, -2);
+
+
+        TrackMainThreadShadow.callback = null;
+    }
+
+    @Test
+    public void alertDialogCustomViewTest() {
+        TrackMainThreadShadow.callback = (event) -> {
+            if (event.getEventType().equals("VIEW_CLICK")) {
+                ViewElementEvent clickEvent = (ViewElementEvent) event;
+                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/FrameLayout/FrameLayout/AlertDialogLayout/FrameLayout/FrameLayout/LinearLayout/Button");
+                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/0/1/0/0/0");
+            }
+        };
+
+        Button button = new Button(activity);
+        button.setText("alertClick");
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        LinearLayout linearLayout = new LinearLayout(activity);
+        linearLayout.setOrientation(VERTICAL);
+        linearLayout.addView(button);
+
+        AlertDialog customViewDialog = new AlertDialog.Builder(activity)
+                .setView(linearLayout)
+                .create();
+        customViewDialog.show();
+        DialogInjector.alertDialogShow(customViewDialog);
+        ViewClickInjector.viewOnClick(v -> {
+        }, button);
 
         TrackMainThreadShadow.callback = null;
     }
