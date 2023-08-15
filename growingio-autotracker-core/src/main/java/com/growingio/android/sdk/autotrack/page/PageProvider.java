@@ -200,8 +200,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
 
     protected FragmentPage findOrCreateFragmentPage(SuperFragment<?> fragment) {
         // find activity page
-
-        if (fragment.getRealFragment() == null) return null;
+        if (fragment.getActivity() == null) return null;
         Activity activity = fragment.getActivity();
         ActivityPage page = findOrCreateActivityPage(activity);
 
@@ -333,7 +332,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     public void autotrackFragment(SuperFragment<?> fragment, String alias, Map<String, String> attributes) {
-        if (fragment.getRealFragment() == null) return;
+        if (fragment.getActivity() == null) return;
         // find activity page
         ActivityPage page = findOrCreateActivityPage(fragment.getActivity());
 

@@ -45,7 +45,7 @@ public class ActivityPage extends Page<SuperActivity> {
 
     @Override
     public String getClassName() {
-        return getCarrier().getClass().getSimpleName();
+        return getCarrier().getSimpleName();
     }
 
     @Override

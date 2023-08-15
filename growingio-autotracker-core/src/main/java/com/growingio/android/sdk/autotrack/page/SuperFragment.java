@@ -66,6 +66,8 @@ public abstract class SuperFragment<T> {
         return simpleName;
     }
 
+    public abstract int getId();
+
     public abstract String getTag();
 
     @Nullable
@@ -105,10 +107,17 @@ public abstract class SuperFragment<T> {
     private static class SystemFragment extends SuperFragment<Fragment> {
 
         private final String tag;
+        private final int id;
 
         protected SystemFragment(Fragment realFragment) {
             super(realFragment);
             tag = realFragment.getTag();
+            id = realFragment.getId();
+        }
+
+        @Override
+        public int getId() {
+            return id;
         }
 
         @Override
@@ -172,10 +181,17 @@ public abstract class SuperFragment<T> {
     private static class V4Fragment extends SuperFragment<android.support.v4.app.Fragment> {
 
         private final String tag;
+        private final int id;
 
         protected V4Fragment(android.support.v4.app.Fragment realFragment) {
             super(realFragment);
             tag = realFragment.getTag();
+            id = realFragment.getId();
+        }
+
+        @Override
+        public int getId() {
+            return id;
         }
 
         @Override
@@ -239,10 +255,17 @@ public abstract class SuperFragment<T> {
     private static class AndroidXFragment extends SuperFragment<androidx.fragment.app.Fragment> {
 
         private final String tag;
+        private final int id;
 
         protected AndroidXFragment(androidx.fragment.app.Fragment realFragment) {
             super(realFragment);
             tag = realFragment.getTag();
+            id = realFragment.getId();
+        }
+
+        @Override
+        public int getId() {
+            return id;
         }
 
         @Override
@@ -259,15 +282,12 @@ public abstract class SuperFragment<T> {
 
         @Override
         public String getResourceEntryName(int id) {
-            if (getRealFragment() == null) return "SystemFragment";
+            if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
-                if (id == -1) {
-                    id = getRealFragment().getId();
-                }
                 return getRealFragment().getResources().getResourceEntryName(id);
             } catch (Resources.NotFoundException ignored) {
             }
-            return "SystemFragment";
+            return null;
         }
 
         @Nullable

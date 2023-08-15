@@ -26,13 +26,19 @@ import java.lang.ref.WeakReference;
  */
 public class SuperActivity {
     private final WeakReference<Activity> realActivity;
+    private final String simpleName;
 
     public SuperActivity(Activity activity) {
         this.realActivity = new WeakReference<>(activity);
+        simpleName = activity.getClass().getSimpleName();
     }
 
     public Activity getRealActivity() {
         return realActivity.get();
+    }
+
+    public String getSimpleName() {
+        return simpleName;
     }
 
     @Override

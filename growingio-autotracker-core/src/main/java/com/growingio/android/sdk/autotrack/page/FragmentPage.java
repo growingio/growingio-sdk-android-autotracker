@@ -57,7 +57,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         if (!TextUtils.isEmpty(tag)) {
             return transformSwitcherTag(tag);
         }
-        return getCarrier().getResourceEntryName(-1);
+        return getCarrier().getResourceEntryName(getCarrier().getId());
     }
 
     /**
