@@ -15,7 +15,6 @@
  */
 package com.growingio.android.sdk.autotrack.page;
 
-import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -44,7 +43,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
 
     @Override
     public String getClassName() {
-        return getCarrier().getRealFragment().getClass().getSimpleName();
+        return getCarrier().getSimpleName();
     }
 
     @Override
@@ -58,15 +57,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         if (!TextUtils.isEmpty(tag)) {
             return transformSwitcherTag(tag);
         }
-        int id = getCarrier().getId();
-        if (id > 0) {
-            try {
-                return getCarrier().getResources().getResourceEntryName(id);
-            } catch (Resources.NotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        return getCarrier().getResourceEntryName(-1);
     }
 
     /**
@@ -78,7 +69,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         String[] e = tag.split(":");
         if (e.length == 4) {
             try {
-                e[2] = getCarrier().getResources().getResourceEntryName(Integer.parseInt(e[2]));
+                e[2] = getCarrier().getResourceEntryName(Integer.parseInt(e[2]));
             } catch (NumberFormatException ignored) {
             }
             StringBuilder stringBuilder = new StringBuilder(e[0]);

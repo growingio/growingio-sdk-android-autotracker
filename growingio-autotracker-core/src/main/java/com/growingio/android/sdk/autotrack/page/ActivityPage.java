@@ -21,16 +21,16 @@ import android.view.View;
 
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
 
-public class ActivityPage extends Page<Activity> {
+public class ActivityPage extends Page<SuperActivity> {
 
     private AutotrackConfig autotrackConfig;
 
     public ActivityPage(Activity carrier) {
-        super(carrier);
+        super(new SuperActivity(carrier));
     }
 
     public ActivityPage(Activity carrier, AutotrackConfig autotrackConfig) {
-        super(carrier);
+        super(new SuperActivity(carrier));
         this.autotrackConfig = autotrackConfig;
     }
 
@@ -58,7 +58,10 @@ public class ActivityPage extends Page<Activity> {
 
     @Override
     public View getView() {
-        return getCarrier().getWindow().getDecorView();
+        if (getCarrier().getRealActivity() != null) {
+            return getCarrier().getRealActivity().getWindow().getDecorView();
+        }
+        return null;
     }
 
     @Override
@@ -68,8 +71,9 @@ public class ActivityPage extends Page<Activity> {
 
     @Override
     public String getTitle() {
-        if (!TextUtils.isEmpty(getCarrier().getTitle())) {
-            return getCarrier().getTitle().toString();
+        Activity activity = getCarrier().getRealActivity();
+        if (activity != null && !TextUtils.isEmpty(activity.getTitle())) {
+            return activity.getTitle().toString();
         }
         return super.getTitle();
     }

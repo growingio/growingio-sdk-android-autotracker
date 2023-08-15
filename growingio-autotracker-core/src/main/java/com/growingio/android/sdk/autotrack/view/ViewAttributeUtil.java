@@ -125,6 +125,7 @@ public class ViewAttributeUtil {
     }
 
     public static void setViewPage(View view, Page<?> page) {
+        if (view == null) return;
         view.setTag(R.id.growing_tracker_view_page, page);
     }
 

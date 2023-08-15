@@ -84,7 +84,7 @@ public class Autotracker extends Tracker {
                               final Map<String, String> attributes) {
         if (!isInited) return;
         if (activity == null || TextUtils.isEmpty(alias)) {
-            Logger.e(TAG, "fragment or alias is NULL");
+            Logger.e(TAG, "activity or alias is NULL");
             return;
         }
         Logger.d(TAG, "make activity page: " + activity.getClass() + " active.");

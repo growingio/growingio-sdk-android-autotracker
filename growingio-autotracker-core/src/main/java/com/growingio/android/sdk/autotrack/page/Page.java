@@ -88,10 +88,12 @@ public abstract class Page<T> {
 
     public String getTitle() {
         if (mTitle != null) return mTitle;
-        CharSequence title = findToolbarTitle(getView(), 0);
-        if (title != null) {
-            mTitle = title.toString();
-            return mTitle;
+        if (getView() != null) {
+            CharSequence title = findToolbarTitle(getView(), 0);
+            if (title != null) {
+                mTitle = title.toString();
+                return mTitle;
+            }
         }
         mTitle = "";
         return mTitle;
