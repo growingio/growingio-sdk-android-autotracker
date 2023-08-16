@@ -18,10 +18,6 @@ package com.growingio.android.sdk.deeplink;
 
 import java.util.Map;
 
-/**
- * Created by denghuaxin on 2018/4/9.
- */
-
 public interface DeeplinkCallback {
     public final static int SUCCESS = 0x0;
     public final static int PRASE_ERROR = 0x1;
