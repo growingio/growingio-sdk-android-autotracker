@@ -22,11 +22,15 @@ import android.webkit.WebView;
 
 import androidx.test.core.app.ApplicationProvider;
 
+import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
 import com.growingio.android.sdk.autotrack.inject.UcWebViewInjector;
 import com.growingio.android.sdk.autotrack.inject.WebViewInjector;
 import com.growingio.android.sdk.autotrack.inject.X5WebViewInjector;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +40,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Config(manifest = Config.NONE, sdk = 23)
 @RunWith(RobolectricTestRunner.class)
@@ -47,6 +52,10 @@ public class HybridTest {
     public void setup() {
         TrackerContext.init(application);
         TrackerContext.initSuccess();
+
+        Map<Class<? extends Configurable>, Configurable> modules = new HashMap<>();
+        modules.put(AutotrackConfig.class, new AutotrackConfig());
+        ConfigurationProvider.initWithConfig(new CoreConfiguration("HybridTest", "growingio.hybridtest"), modules);
     }
 
     @Test

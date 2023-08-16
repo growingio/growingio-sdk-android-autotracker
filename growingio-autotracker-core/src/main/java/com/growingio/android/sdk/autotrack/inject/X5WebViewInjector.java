@@ -18,9 +18,11 @@ package com.growingio.android.sdk.autotrack.inject;
 
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.tencent.smtt.sdk.WebView;
 
 import java.util.Map;
@@ -31,6 +33,12 @@ public class X5WebViewInjector {
     private static void bridgeForWebView(WebView view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        if (!config.isWebViewBridgeEnabled()) {
+            Logger.d(TAG, "Autotracker webViewBridgeEnabled is false");
             return;
         }
 
