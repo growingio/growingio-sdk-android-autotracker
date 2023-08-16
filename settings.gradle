@@ -60,3 +60,4 @@ include ':gio-sdk:autotracker'
 
 include ':growingio-sdk-bom'
 include ':growingio-flutter'
+include ':gio-sdk:autotracker-saas'
