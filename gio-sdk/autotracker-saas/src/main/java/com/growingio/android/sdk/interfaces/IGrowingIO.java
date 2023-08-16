@@ -17,8 +17,6 @@
 package com.growingio.android.sdk.interfaces;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Handler;
@@ -241,7 +239,7 @@ public interface IGrowingIO {
     IGrowingIO ignoreViewImp(final View view);
 
     @Deprecated
-    IGrowingIO manualPageShow(@NonNull Activity activity, @NonNull String pageName);
+    IGrowingIO manualPageShow(Activity activity, String pageName);
 
     @Deprecated
     GrowingIO trackWebView(final View webView);
@@ -289,7 +287,7 @@ public interface IGrowingIO {
     boolean isDeepLinkUrl(@androidx.annotation.Nullable String url);
 
     @Deprecated
-    boolean doDeeplinkByUrl(@Nullable String url, @Nullable DeeplinkCallback callback);
+    boolean doDeeplinkByUrl(String url, DeeplinkCallback callback);
 
     @Deprecated
     void bridgeForWebView(WebView webView);

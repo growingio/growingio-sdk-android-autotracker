@@ -20,8 +20,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.webkit.WebView;
@@ -408,7 +406,7 @@ public class GrowingIO implements IGrowingIO {
     }
 
     @Override
-    public IGrowingIO manualPageShow(@NonNull @androidx.annotation.NonNull Activity activity, @NonNull @androidx.annotation.NonNull String pageName) {
+    public IGrowingIO manualPageShow(Activity activity, String pageName) {
         return this;
     }
 
@@ -483,12 +481,12 @@ public class GrowingIO implements IGrowingIO {
     }
 
     @Override
-    public boolean isDeepLinkUrl(@androidx.annotation.Nullable String url) {
+    public boolean isDeepLinkUrl(String url) {
         return false;
     }
 
     @Override
-    public boolean doDeeplinkByUrl(@Nullable @androidx.annotation.Nullable String url, @Nullable @androidx.annotation.Nullable DeeplinkCallback callback) {
+    public boolean doDeeplinkByUrl(String url, DeeplinkCallback callback) {
         return false;
     }
 
