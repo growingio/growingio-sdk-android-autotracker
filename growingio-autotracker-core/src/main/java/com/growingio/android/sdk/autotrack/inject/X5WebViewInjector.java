@@ -19,6 +19,7 @@ package com.growingio.android.sdk.autotrack.inject;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
@@ -37,8 +38,10 @@ public class X5WebViewInjector {
         }
 
         AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (!config.isWebViewBridgeEnabled()) {
-            Logger.d(TAG, "Autotracker webViewBridgeEnabled is false");
+        boolean webViewBridgeEnabled = config.isWebViewBridgeEnabled();
+        boolean ignoredView = ViewHelper.isIgnoredView(view);
+        if (!webViewBridgeEnabled || ignoredView) {
+            Logger.d(TAG, "Autotracker webViewBridgeEnabled: " + webViewBridgeEnabled + "isIgnoredView: " + ignoredView);
             return;
         }
 
