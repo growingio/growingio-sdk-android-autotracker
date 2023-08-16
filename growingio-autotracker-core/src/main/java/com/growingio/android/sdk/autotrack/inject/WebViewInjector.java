@@ -20,9 +20,12 @@ import android.view.View;
 import android.webkit.WebView;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.view.ViewHelper;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.util.Map;
 
@@ -32,6 +35,14 @@ public class WebViewInjector {
     private static void bridgeForWebView(View view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
+        boolean webViewBridgeEnabled = config.isWebViewBridgeEnabled();
+        boolean ignoredView = ViewHelper.isIgnoredView(view);
+        if (!webViewBridgeEnabled || ignoredView) {
+            Logger.d(TAG, "Autotracker webViewBridgeEnabled: " + webViewBridgeEnabled + ", isIgnoredView: " + ignoredView);
             return;
         }
 
