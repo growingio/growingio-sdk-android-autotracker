@@ -42,7 +42,7 @@ public class WebViewInjector {
         boolean webViewBridgeEnabled = config.isWebViewBridgeEnabled();
         boolean ignoredView = ViewHelper.isIgnoredView(view);
         if (!webViewBridgeEnabled || ignoredView) {
-            Logger.d(TAG, "Autotracker webViewBridgeEnabled: " + webViewBridgeEnabled + "isIgnoredView: " + ignoredView);
+            Logger.d(TAG, "Autotracker webViewBridgeEnabled: " + webViewBridgeEnabled + ", isIgnoredView: " + ignoredView);
             return;
         }
 
