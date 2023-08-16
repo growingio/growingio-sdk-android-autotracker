@@ -36,8 +36,9 @@ public class AutotrackConfig implements Configurable {
         return mImpressionScale;
     }
 
-    public void setWebViewBridgeEnabled(boolean webViewBridgeEnabled) {
+    public AutotrackConfig setWebViewBridgeEnabled(boolean webViewBridgeEnabled) {
         mAutotrackOptions.setWebViewBridgeEnabled(webViewBridgeEnabled);
+        return this;
     }
 
     public boolean isWebViewBridgeEnabled() {
