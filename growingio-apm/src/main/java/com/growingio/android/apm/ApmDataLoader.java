@@ -64,7 +64,7 @@ public class ApmDataLoader implements ModelLoader<EventApm, Void> {
 
                 ApmTracker apmTracker = new ApmTracker();
                 Logger.d("Apm", "init gmonitor success");
-                GMonitor.init(context, new ApmLogger(), option, apmTracker);
+                GMonitor.init(context.getApplicationContext(), new ApmLogger(), option, apmTracker);
             }
         }
 
