@@ -178,15 +178,20 @@ public class ScreenElementHelper {
 
     static JSONObject createPageElementData(View view, Page<?> viewPage) {
         int[] location = new int[2];
-        view.getLocationOnScreen(location);
+        if (view != null) {
+            view.getLocationOnScreen(location);
+        } else {
+            location[0] = 0;
+            location[1] = 0;
+        }
         try {
             JSONObject json = new JSONObject();
             json.put(PAGE_PATH, viewPage.path());
             json.put(PAGE_TITLE, viewPage.getTitle());
             json.put(PAGE_LEFT, location[0]);
             json.put(PAGE_TOP, location[1]);
-            json.put(PAGE_WIDTH, view.getWidth());
-            json.put(PAGE_HEIGHT, view.getHeight());
+            json.put(PAGE_WIDTH, view == null ? 0 : view.getWidth());
+            json.put(PAGE_HEIGHT, view == null ? 0 : view.getHeight());
             json.put(PAGE_IGNORED, false);
             return json;
         } catch (JSONException ignored) {

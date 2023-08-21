@@ -359,6 +359,7 @@ public abstract class BaseEvent extends GEvent {
             networkState = getFieldDefault(BaseField.NETWORK_STATE) ? NetworkUtil.getActiveNetworkState(context).getNetworkName() : null;
             sdkVersion = getFieldDefault(BaseField.SDK_VERSION) ? SDKConfig.SDK_VERSION : null;
             language = getFieldDefault(BaseField.LANGUAGE) ? Locale.getDefault().getLanguage() : null;
+            platform = ConstantPool.ANDROID;
         }
 
         protected Boolean getFieldDefault(String key) {

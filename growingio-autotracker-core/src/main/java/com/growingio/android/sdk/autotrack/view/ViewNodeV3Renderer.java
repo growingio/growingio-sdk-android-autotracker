@@ -164,15 +164,8 @@ class ViewNodeV3Renderer implements ViewNodeRenderer {
             if (pageJson != null) {
                 container.put(pageJson);
             }
-            if (viewPage.hasChildren()) {
-                for (Page page : viewPage.getAllChildren()) {
-                    JSONObject childPageJson = ScreenElementHelper.createPageElementData(view, page);
-                    if (childPageJson != null) {
-                        container.put(childPageJson);
-                    }
-
-                }
-            }
+            getPageFromTree(viewPage, container);
+            return;
         }
 
         if (view instanceof ViewGroup) {
@@ -181,6 +174,18 @@ class ViewNodeV3Renderer implements ViewNodeRenderer {
                 for (int i = 0; i < viewGroup.getChildCount(); i++) {
                     checkView2PageElement(viewGroup.getChildAt(i), container);
                 }
+            }
+        }
+    }
+
+    private void getPageFromTree(Page<?> viewPage, JSONArray container) {
+        if (viewPage.hasChildren()) {
+            for (Page page : viewPage.getAllChildren()) {
+                JSONObject childPageJson = ScreenElementHelper.createPageElementData(page.getView(), page);
+                if (childPageJson != null) {
+                    container.put(childPageJson);
+                }
+                getPageFromTree(page, container);
             }
         }
     }

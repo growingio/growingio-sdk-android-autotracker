@@ -35,8 +35,9 @@ import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvider {
@@ -387,14 +388,15 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     private Page<?> removePageFromTree(SuperFragment<?> carrier, Page<?> page) {
-        List<Page<?>> pages = page.getAllChildren();
-        for (int i = pages.size() - 1; i >= 0; i--) {
-            Page<?> onePage = pages.get(i);
+        Iterator<Page<?>> iterator = page.getAllChildren().iterator();
+        while (iterator.hasNext()) {
+            Page<?> onePage = iterator.next();
             if (carrier.equals(onePage.getCarrier())) {
-                pages.remove(i);
+                iterator.remove();
                 return onePage;
             } else {
-                return removePageFromTree(carrier, onePage);
+                Page<?> childPage = removePageFromTree(carrier, onePage);
+                if (childPage != null) return childPage;
             }
         }
         return null;
@@ -427,7 +429,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             return page;
         }
 
-        List<Page<?>> pages = page.getAllChildren();
+        Set<Page<?>> pages = page.getAllChildren();
         for (Page<?> onePage : pages) {
             if (onePage != null) {
                 Page<?> p = searchFragmentPage(carrier, onePage);

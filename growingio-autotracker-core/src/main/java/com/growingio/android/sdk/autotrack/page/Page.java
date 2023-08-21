@@ -27,8 +27,10 @@ import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class Page<T> {
     private final static int MAX_PAGE_LEVEL = 3;
@@ -45,7 +47,7 @@ public abstract class Page<T> {
     private String xIndex;
 
     private Map<String, String> mAttributes;
-    private final List<Page<?>> mChildren = new ArrayList<>();
+    private final Set<Page<?>> mChildren = new HashSet<>();
 
     Page(T carrier) {
         mCarrier = carrier;
@@ -147,7 +149,7 @@ public abstract class Page<T> {
         mChildren.add(page);
     }
 
-    public List<Page<?>> getAllChildren() {
+    public Set<Page<?>> getAllChildren() {
         return mChildren;
     }
 
