@@ -198,7 +198,6 @@ class ViewNodeV3 {
             }
             this.xPath = this.originalXPath;
             this.prefixPage = this.originalXPath;
-            return;
         }
 
         StringBuilder originalXPath = new StringBuilder().append(this.originalXPath != null ? this.originalXPath : "");
