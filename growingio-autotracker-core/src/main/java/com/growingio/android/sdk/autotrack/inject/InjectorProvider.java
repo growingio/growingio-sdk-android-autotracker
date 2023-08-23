@@ -27,11 +27,14 @@ import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.tabs.TabLayout;
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 
 import java.util.Map;
@@ -61,6 +64,7 @@ public class InjectorProvider implements TrackerLifecycleProvider {
     private ViewClickProvider viewClickProvider;
     private ViewChangeProvider viewChangeProvider;
     private DialogClickProvider dialogClickProvider;
+    private ConfigurationProvider configurationProvider;
 
     private TrackerRegistry registry;
 
@@ -70,6 +74,7 @@ public class InjectorProvider implements TrackerLifecycleProvider {
         viewClickProvider = context.getProvider(ViewClickProvider.class);
         viewChangeProvider = context.getProvider(ViewChangeProvider.class);
         dialogClickProvider = context.getProvider(DialogClickProvider.class);
+        configurationProvider = context.getConfigurationProvider();
 
         registry = context.getRegistry();
     }
@@ -87,6 +92,14 @@ public class InjectorProvider implements TrackerLifecycleProvider {
     }
 
     public void bridgeForWebView(View view) {
+        AutotrackConfig config = configurationProvider.getConfiguration(AutotrackConfig.class);
+        boolean webViewBridgeEnabled = config.isWebViewBridgeEnabled();
+        boolean ignoredView = ViewAttributeUtil.isIgnoredView(view);
+        if (!webViewBridgeEnabled || ignoredView) {
+            Logger.w(TAG, "Autotracker webViewBridgeEnabled: " + webViewBridgeEnabled + ", isIgnoredView: " + ignoredView);
+            return;
+        }
+
         boolean result = false;
         if (registry != null) {
             ModelLoader<HybridBridge, Boolean> modelLoader = registry.getModelLoader(HybridBridge.class, Boolean.class);

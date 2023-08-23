@@ -203,6 +203,7 @@ class EventProtocolTransfer {
             eventBuilder.setLongitude(baseEvent.getLongitude()); //45
 
             eventBuilder.setUserKey(baseEvent.getUserKey()); //55
+            eventBuilder.setTimezoneOffset(baseEvent.getTimezoneOffset()); //57
         }
 
         if (gEvent instanceof BaseAttributesEvent) {

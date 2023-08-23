@@ -40,6 +40,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -66,17 +67,14 @@ public class ProviderTest {
 
         Bundle testBundle = new Bundle();
 
-        IActivityLifecycle iActivityLifecycle = new IActivityLifecycle() {
-            @Override
-            public void onActivityLifecycle(ActivityLifecycleEvent event) {
-                Truth.assertThat(event.getActivity()).isEqualTo(activity);
-                Truth.assertThat(event.eventType).isEqualTo(activity.state);
-                if (event.getBundle() != null) {
-                    Truth.assertThat(event.getBundle()).isEqualTo(testBundle);
-                }
-                if (event.getIntent() != null) {
-                    Truth.assertThat(event.getIntent()).isEqualTo(activity.getIntent());
-                }
+        IActivityLifecycle iActivityLifecycle = event -> {
+            Truth.assertThat(event.getActivity()).isEqualTo(activity);
+            Truth.assertThat(event.eventType).isEqualTo(activity.state);
+            if (event.getBundle() != null) {
+                Truth.assertThat(event.getBundle()).isEqualTo(testBundle);
+            }
+            if (event.getIntent() != null) {
+                Truth.assertThat(event.getIntent()).isEqualTo(activity.getIntent());
             }
         };
         activityStateProvider.register(null);
@@ -113,7 +111,7 @@ public class ProviderTest {
 
     @Test
     public void deeplinkProvider() {
-        DeepLinkProvider deepLinkProvider = context.getProvider(DeepLinkProvider.class);
+        // DeepLinkProvider deepLinkProvider = context.getProvider(DeepLinkProvider.class);
 
         //empty
         Robolectric.buildActivity(RobolectricActivity.class).create().get();
@@ -163,6 +161,8 @@ public class ProviderTest {
         PersistentDataProvider persistentDataProvider = context.getProvider(PersistentDataProvider.class);
         persistentDataProvider.setDeviceId("");
         Truth.assertThat(persistentDataProvider.getDeviceId()).isNotEmpty();
+
+        Truth.assertThat(new Date().getTimezoneOffset()).isEqualTo(deviceInfoProvider.getTimezoneOffset());
     }
 
 }

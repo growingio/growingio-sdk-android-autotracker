@@ -93,6 +93,9 @@ public abstract class BaseEvent extends GEvent {
     @Nullable
     private final String sdkVersion;
 
+    @IntRange(from = Integer.MIN_VALUE)
+    private final int timezoneOffset;
+
     protected BaseEvent(BaseBuilder<?> eventBuilder) {
         platform = eventBuilder.platform;
         platformVersion = eventBuilder.platformVersion;
@@ -121,6 +124,7 @@ public abstract class BaseEvent extends GEvent {
         latitude = eventBuilder.latitude;
         longitude = eventBuilder.longitude;
         sdkVersion = eventBuilder.sdkVersion;
+        timezoneOffset = eventBuilder.timezoneOffset;
     }
 
     public String getDeviceId() {
@@ -228,6 +232,10 @@ public abstract class BaseEvent extends GEvent {
         return checkValueSafe(eventType);
     }
 
+    public int getTimezoneOffset() {
+        return timezoneOffset;
+    }
+
     protected String checkValueSafe(String value) {
         return value == null ? "" : value;
     }
@@ -260,6 +268,7 @@ public abstract class BaseEvent extends GEvent {
         protected double latitude;
         protected double longitude;
         protected String sdkVersion;
+        protected int timezoneOffset;
 
         protected BaseBuilder(String eventType) {
             this.eventType = eventType;
@@ -346,6 +355,7 @@ public abstract class BaseEvent extends GEvent {
             deviceType = getFieldDefault(BaseField.DEVICE_TYPE) ? deviceInfo.getDeviceType() : null;
             latitude = getFieldDefault(BaseField.LATITUDE) ? deviceInfo.getLatitude() : 0;
             longitude = getFieldDefault(BaseField.LONGITUDE) ? deviceInfo.getLongitude() : 0;
+            timezoneOffset = getFieldDefault(BaseField.TIMEZONE_OFFSET) ? deviceInfo.getTimezoneOffset() : Integer.MIN_VALUE;
 
             AppInfoProvider appInfo = context.getProvider(AppInfoProvider.class);
             appName = getFieldDefault(BaseField.APP_NAME) ? appInfo.getAppName() : null;

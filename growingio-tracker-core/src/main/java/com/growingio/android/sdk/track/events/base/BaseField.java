@@ -40,4 +40,5 @@ public final class BaseField {
     public final static String LATITUDE = "latitude";
     public final static String LONGITUDE = "longitude";
     public final static String SDK_VERSION = "sdkVersion";
+    public final static String TIMEZONE_OFFSET = "timezoneOffset";
 }

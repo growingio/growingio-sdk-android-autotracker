@@ -47,6 +47,7 @@ public class AutotrackOptions {
     private boolean seekbarChangeEnabled = true;
     private boolean ratingBarChangeEnabled = true;
     private boolean sliderChangeEnabled = true;
+    private boolean webViewBridgeEnabled = true;
 
     public boolean isActivityMenuItemClickEnabled() {
         return activityMenuItemClickEnabled;
@@ -214,5 +215,13 @@ public class AutotrackOptions {
 
     public void setSliderChangeEnabled(boolean sliderChangeEnabled) {
         this.sliderChangeEnabled = sliderChangeEnabled;
+    }
+
+    public void setWebViewBridgeEnabled(boolean webViewBridgeEnabled) {
+        this.webViewBridgeEnabled = webViewBridgeEnabled;
+    }
+
+    public boolean isWebViewBridgeEnabled() {
+        return webViewBridgeEnabled;
     }
 }

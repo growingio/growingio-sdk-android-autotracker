@@ -35,6 +35,7 @@ import com.growingio.android.sdk.track.middleware.OaidHelper;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
 import java.nio.charset.Charset;
+import java.util.Calendar;
 import java.util.UUID;
 
 public class DeviceInfoProvider implements TrackerLifecycleProvider {
@@ -58,6 +59,7 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
     private String mOaid;
     private String mGoogleAdId;
     private String mDeviceId;
+    private int mTimezoneOffset = Integer.MIN_VALUE;
 
     private double mLatitude = 0;
 
@@ -152,7 +154,7 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         // ensure androidid call once in a process
         if (TextUtils.isEmpty(mAndroidId)) {
             try {
-                mAndroidId = Settings.System.getString(context.getContentResolver(), Settings.System.ANDROID_ID);
+                mAndroidId = Settings.System.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
                 if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
                     mAndroidId = MAGIC_ANDROID_ID;
                 } else {
@@ -255,5 +257,14 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
     @TrackThread
     public double getLongitude() {
         return mLongitude;
+    }
+
+
+    public int getTimezoneOffset() {
+        if (mTimezoneOffset == Integer.MIN_VALUE) {
+            Calendar calendar = Calendar.getInstance();
+            mTimezoneOffset = -(calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET)) / (60 * 1000);
+        }
+        return mTimezoneOffset;
     }
 }
