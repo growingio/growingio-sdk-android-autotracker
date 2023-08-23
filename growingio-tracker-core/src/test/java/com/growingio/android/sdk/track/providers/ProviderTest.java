@@ -30,7 +30,6 @@ import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
-import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 
 import org.junit.Before;
 import org.junit.Test;
