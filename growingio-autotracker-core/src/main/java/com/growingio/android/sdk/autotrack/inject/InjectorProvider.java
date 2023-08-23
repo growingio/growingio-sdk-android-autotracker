@@ -93,7 +93,7 @@ public class InjectorProvider implements TrackerLifecycleProvider {
 
     public void bridgeForWebView(View view) {
         AutotrackConfig config = configurationProvider.getConfiguration(AutotrackConfig.class);
-        boolean webViewBridgeEnabled = config.isWebViewBridgeEnabled();
+        boolean webViewBridgeEnabled = config == null || config.isWebViewBridgeEnabled();
         boolean ignoredView = ViewAttributeUtil.isIgnoredView(view);
         if (!webViewBridgeEnabled || ignoredView) {
             Logger.w(TAG, "Autotracker webViewBridgeEnabled: " + webViewBridgeEnabled + ", isIgnoredView: " + ignoredView);
