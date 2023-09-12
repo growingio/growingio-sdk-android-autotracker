@@ -25,6 +25,7 @@ import okhttp3.Response;
 /**
  * 1.用于OkHttp防止部分机型关闭网络权限导致崩溃（特定Rom对permission的管理问题或Root后关闭权限),转为IO异常回调失败
  * 2.加强保护，将所有异常转为io异常回调失败，避免部分okhttp内部错误导致异常
+ * 3.捕获错误
  */
 public class SecurityExceptionInterceptor implements Interceptor {
     private static final String TAG = "SecurityExceptionInterceptor";
@@ -33,9 +34,9 @@ public class SecurityExceptionInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         try {
             return chain.proceed(chain.request());
-        } catch (Exception e) {
-            Logger.e(TAG, "HTTP FAILED: " + e.getMessage());
-            throw e;
+        } catch (Throwable e) {
+            Logger.e(TAG, "Failed due to an Exception: " + e.getClass().getName() + " with message " + e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 }
