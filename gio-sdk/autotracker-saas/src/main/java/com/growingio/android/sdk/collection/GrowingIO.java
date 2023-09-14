@@ -167,6 +167,21 @@ public class GrowingIO implements IGrowingIO {
         GrowingAutotracker.get().setLoginUserAttributes(new AttributesBuilder().addAttribute(key, String.valueOf(value)).build());
         return this;
     }
+
+    @Override
+    public void bridgeForWebView(WebView webView) {
+       GrowingAutotracker.get().bridgeWebView(webView);
+    }
+
+    @Override
+    public void bridgeForX5WebView(com.tencent.smtt.sdk.WebView x5WebView) {
+        GrowingAutotracker.get().bridgeWebView(x5WebView);
+    }
+
+    @Override
+    public void bridgeForUcWebView(com.uc.webview.export.WebView ucWebView) {
+        GrowingAutotracker.get().bridgeWebView(ucWebView);
+    }
     //endregion
 
     //region SaaS 2.0 Incompatible API
@@ -488,18 +503,6 @@ public class GrowingIO implements IGrowingIO {
     @Override
     public boolean doDeeplinkByUrl(String url, DeeplinkCallback callback) {
         return false;
-    }
-
-    @Override
-    public void bridgeForWebView(WebView webView) {
-    }
-
-    @Override
-    public void bridgeForX5WebView(com.tencent.smtt.sdk.WebView x5WebView) {
-    }
-
-    @Override
-    public void bridgeForUcWebView(com.uc.webview.export.WebView ucWebView) {
     }
     //endregion
 
