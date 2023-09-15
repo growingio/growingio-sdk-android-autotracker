@@ -44,6 +44,7 @@ import com.growingio.android.sdk.track.view.TipView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -61,7 +62,6 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
     ViewNodeV4Renderer(ViewNodeProvider viewNodeProvider) {
         this.viewNodeProvider = viewNodeProvider;
     }
-
 
     @Override
     public void generateMenuItemEvent(Activity activity, MenuItem menuItem) {
@@ -347,6 +347,38 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             checkView2ViewElement(decorView.getView(), container);
         }
         return container;
+    }
+
+    @Override
+    public List<ViewNode> findViewNodesWithinCircle(View rootView) {
+        List<ViewNode> findViewNodes = new ArrayList<>();
+        ViewNodeV4 viewNode = findRootViewNode(rootView, new LinkedList<>());
+        traverseViewNodeWithCircle(viewNode, findViewNodes);
+        return findViewNodes;
+    }
+
+    private void traverseViewNodeWithCircle(ViewNodeV4 viewNode, List<ViewNode> findViewNodes) {
+        if (ViewAttributeUtil.isViewInvisible(viewNode.getView())) return;
+
+        if (ClassExistHelper.isWebView(viewNode.getView())) {
+            findViewNodes.add(viewNode);
+        } else if (ViewUtil.canCircle(viewNode.getView())) {
+            if (viewNode.getViewContent() == null || viewNode.getViewContent().isEmpty()) {
+                String content = ViewAttributeUtil.findViewContent(viewNode.getView());
+                viewNode.setViewContent(content);
+            }
+            findViewNodes.add(viewNode);
+        }
+
+        if (viewNode.getView() instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) viewNode.getView();
+            if (viewGroup.getChildCount() > 0) {
+                for (int index = 0; index < viewGroup.getChildCount(); index++) {
+                    ViewNodeV4 childViewNode = viewNode.append(viewGroup.getChildAt(index), index);
+                    traverseViewNodeWithCircle(childViewNode, findViewNodes);
+                }
+            }
+        }
     }
 
     private void checkView2ViewElement(View view, JSONArray container) {

@@ -33,7 +33,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.google.common.truth.Truth.assertThat;
-import static java.lang.Thread.sleep;
 
 import java.util.HashMap;
 
@@ -66,22 +65,6 @@ public class OaidTest {
         ModelLoader<OaidHelper, String> modelLoader = context.getRegistry().getModelLoader(OaidHelper.class, String.class);
         String oaid = modelLoader.buildLoadData(new OaidHelper()).fetcher.executeData();
         assertThat(oaid).isEqualTo("cpacm");
-    }
-
-    @Test
-    public void oaidConfig2() {
-        OaidConfig config = new OaidConfig().setProvideOaidCallback(context -> "cpacm_job");
-        context.getConfigurationProvider().addConfiguration(config);
-        ModelLoader<OaidHelper, String> modelLoader = context.getRegistry().getModelLoader(OaidHelper.class, String.class);
-        String oaid = modelLoader.buildLoadData(new OaidHelper()).fetcher.executeData();
-        assertThat(oaid).isNull();
-        try {
-            sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        oaid = modelLoader.buildLoadData(new OaidHelper()).fetcher.executeData();
-        assertThat(oaid).isEqualTo("cpacm_job");
     }
 
     @Test

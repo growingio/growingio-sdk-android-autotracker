@@ -42,4 +42,6 @@ interface ViewNodeRenderer {
     JSONArray buildScreenPages(List<DecorView> decorViews);
 
     JSONArray buildScreenViews(List<DecorView> decorViews);
+
+    List<ViewNode> findViewNodesWithinCircle(View rootView);
 }

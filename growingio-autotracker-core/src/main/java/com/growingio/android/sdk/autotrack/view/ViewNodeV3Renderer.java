@@ -43,6 +43,7 @@ import com.growingio.android.sdk.track.view.TipView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -186,6 +187,34 @@ class ViewNodeV3Renderer implements ViewNodeRenderer {
                     container.put(childPageJson);
                 }
                 getPageFromTree(page, container);
+            }
+        }
+    }
+
+    @Override
+    public List<ViewNode> findViewNodesWithinCircle(View rootView) {
+        List<ViewNode> findViewNodes = new ArrayList<>();
+        ViewNodeV3 viewNode = findRootViewNode(rootView, new LinkedList<>());
+        traverseViewNodeWithCircle(viewNode, findViewNodes);
+        return findViewNodes;
+    }
+
+    private void traverseViewNodeWithCircle(ViewNodeV3 viewNode, List<ViewNode> findViewNodes) {
+        if (ViewAttributeUtil.isViewInvisible(viewNode.getView())) return;
+
+        if (ClassExistHelper.isWebView(viewNode.getView())) {
+            findViewNodes.add(viewNode);
+        } else if (ViewUtil.canCircle(viewNode.getView())) {
+            findViewNodes.add(viewNode);
+        }
+
+        if (viewNode.getView() instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) viewNode.getView();
+            if (viewGroup.getChildCount() > 0) {
+                for (int index = 0; index < viewGroup.getChildCount(); index++) {
+                    ViewNodeV3 childViewNode = viewNode.append(viewGroup.getChildAt(index), index,true);
+                    traverseViewNodeWithCircle(childViewNode, findViewNodes);
+                }
             }
         }
     }

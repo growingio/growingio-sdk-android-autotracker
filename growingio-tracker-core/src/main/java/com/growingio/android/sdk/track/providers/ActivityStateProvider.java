@@ -74,6 +74,8 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
                 if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) >= 0) {
                     onActivityResumed(activity);
                 }
+            } else if (!activity.isDestroyed()) {
+                setResumeActivity(activity);
             }
         }
     }

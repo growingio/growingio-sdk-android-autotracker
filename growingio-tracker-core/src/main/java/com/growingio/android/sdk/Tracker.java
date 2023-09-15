@@ -74,7 +74,7 @@ public class Tracker {
 
         TrackMainThread.trackMain().setupWithContext(trackerContext); //need setup
 
-        startAfterSdkSetup(trackerContext);
+        startAfterSdkSetup(trackerContext, context);
     }
 
     private TrackerContext initTrackerContext(Context context) {
@@ -111,23 +111,24 @@ public class Tracker {
         return trackerContext;
     }
 
-    private void startAfterSdkSetup(TrackerContext context) {
+    private void startAfterSdkSetup(TrackerContext trackerContext, Context context) {
 
         //generate first visit
-        SessionProvider sessionProvider = context.getProvider(SessionProvider.class);
+        SessionProvider sessionProvider = trackerContext.getProvider(SessionProvider.class);
         sessionProvider.createVisitAfterAppStart();
 
         // release event caches
         TrackMainThread.trackMain().releaseCaches();
 
         // makeup activity lifecycle
-        context.getActivityStateProvider().makeupActivityLifecycle(context);
+        trackerContext.getActivityStateProvider().makeupActivityLifecycle(context);
 
     }
 
     public void shutdown() {
         isInited = false;
         this.trackerContext.shutdown();
+        TrackMainThread.trackMain().shutdown();
     }
 
     public void trackCustomEvent(String eventName) {

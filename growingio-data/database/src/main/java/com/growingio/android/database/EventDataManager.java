@@ -76,6 +76,7 @@ public class EventDataManager {
         int count = 0;
         for (GEvent event : events) {
             Uri uri = insertEvent(event);
+            //GioDatabase.insertEvent(uri,event);
             if (uri != null) count++;
         }
         return count;
@@ -93,7 +94,6 @@ public class EventDataManager {
             EventByteArray data = formatData(EventFormatData.format(gEvent));
             if (data != null && data.getBodyData() != null) {
                 ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), gEvent.getEventType(), gEvent.getSendPolicy());
-                //GioDatabase.insert(insert, gEvent);
                 return contentResolver.insert(uri, contentValues);
             }
         } catch (SQLiteFullException e) {

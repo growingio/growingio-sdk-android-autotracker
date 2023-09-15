@@ -114,6 +114,7 @@ public class MultiProcessDataSharer implements IDataSharer {
     }
 
     private void lockedRun(Runnable run, long position, long size) {
+        if (mFileChannel == null || !mFileChannel.isOpen()) return;
         FileLock lock = null;
         try {
             lock = mFileChannel.lock(position, size, false);

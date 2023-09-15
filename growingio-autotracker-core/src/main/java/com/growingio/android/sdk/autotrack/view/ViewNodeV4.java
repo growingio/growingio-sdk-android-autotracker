@@ -35,7 +35,7 @@ import com.growingio.android.sdk.track.view.WindowHelper;
  *
  * @author cpacm 2023/7/12
  */
-class ViewNodeV4 {
+class ViewNodeV4 implements ViewNode {
     private View view;
     private String xPath;
 
@@ -60,7 +60,8 @@ class ViewNodeV4 {
         return this;
     }
 
-    View getView() {
+    @Override
+    public View getView() {
         return view;
     }
 
@@ -69,8 +70,17 @@ class ViewNodeV4 {
         return this;
     }
 
-    String getXPath() {
+    @Override
+    public String getXPath() {
         return xPath;
+    }
+
+    @Override
+    public int getViewPosition() {
+        if (hasListParent) {
+            return viewPosition;
+        }
+        return -1;
     }
 
     ViewNodeV4 setClickableParentXPath(String clickableParentXPath) {
@@ -96,7 +106,8 @@ class ViewNodeV4 {
         return this;
     }
 
-    String getViewContent() {
+    @Override
+    public String getViewContent() {
         return viewContent;
     }
 
@@ -155,6 +166,7 @@ class ViewNodeV4 {
         return this;
     }
 
+    @Override
     public String getXIndex() {
         return xIndex;
     }

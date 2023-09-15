@@ -46,8 +46,9 @@ public class ScreenElementHelper {
     private static final String VIEW_HEIGHT = "height";
     private static final String VIEW_NODE_TYPE = "nodeType";
     private static final String VIEW_CONTENT = "content";
-    private static final String VIEW_PAGE = "page"; // for 3.0
-    private static final String VIEW_PATH = "path"; //new for v4.0, replace with page
+    private static final String VIEW_PAGE = "page";
+
+    //private static final String VIEW_PATH = "path"; //new for v4.0, replace with page
     private static final String VIEW_Z_LEVEL = "zLevel";
     private static final String VIEW_INDEX = "index";
     private static final String VIEW_WEBVIEW = "webView";
@@ -126,7 +127,7 @@ public class ScreenElementHelper {
                 pageXPath = page.originPath(false);
                 pageXIndex = page.getXIndex();
             }
-            json.put(VIEW_PATH, page.activePath());
+            json.put(VIEW_PAGE, page.activePath());
             json.put(VIEW_XPATH, pageXPath + viewNode.getXPath());
             json.put(VIEW_PARENT_XPATH, viewNode.getClickableParentXPath() == null ? null : pageXPath + viewNode.getClickableParentXPath());
             json.put(VIEW_PARENT_XINDEX, viewNode.getClickablePatentXIndex() == null ? null : pageXIndex + viewNode.getClickablePatentXIndex());
@@ -162,13 +163,15 @@ public class ScreenElementHelper {
     public static JSONObject createPageElementWithMap(Map<String, Object> data) {
         try {
             JSONObject json = new JSONObject();
-            json.put(PAGE_PATH, (String) data.get("path"));
-            json.put(PAGE_TITLE, (String) data.get("title"));
-            json.put(PAGE_LEFT, ((Double) data.get("left")).intValue());
-            json.put(PAGE_TOP, ((Double) data.get("top")).intValue());
-            json.put(PAGE_WIDTH, ((Double) data.get("width")).intValue());
-            json.put(PAGE_HEIGHT, ((Double) data.get("height")).intValue());
-            json.put(PAGE_IGNORED, (boolean) data.get("isIgnored"));
+            json.put(PAGE_PATH, (String) data.get(PAGE_PATH));
+            json.put(PAGE_TITLE, (String) data.get(PAGE_TITLE));
+            json.put(PAGE_LEFT, ((Double) data.get(PAGE_LEFT)).intValue());
+            json.put(PAGE_TOP, ((Double) data.get(PAGE_TOP)).intValue());
+            json.put(PAGE_WIDTH, ((Double) data.get(PAGE_WIDTH)).intValue());
+            json.put(PAGE_HEIGHT, ((Double) data.get(PAGE_HEIGHT)).intValue());
+            if(data.containsKey(PAGE_IGNORED)) {
+                json.put(PAGE_IGNORED, (boolean) data.get(PAGE_IGNORED));
+            }
             return json;
         } catch (Exception e) {
             Logger.e("Circler Data PageElement parser fail", e);

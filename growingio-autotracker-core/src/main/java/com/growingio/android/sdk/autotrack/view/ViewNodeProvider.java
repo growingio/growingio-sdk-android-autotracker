@@ -91,6 +91,11 @@ public class ViewNodeProvider implements ViewNodeRenderer, TrackerLifecycleProvi
         return renderer.buildScreenViews(decorViews);
     }
 
+    @Override
+    public List<ViewNode> findViewNodesWithinCircle(View rootView) {
+        return renderer.findViewNodesWithinCircle(rootView);
+    }
+
     ModelLoader<HybridDom, HybridJson> getHybridModelLoader() {
         return registry.getModelLoader(HybridDom.class, HybridJson.class);
     }

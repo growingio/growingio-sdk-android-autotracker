@@ -78,6 +78,17 @@ public final class TrackMainThread {
                 coreConfiguration.getCellularDataLimit());
     }
 
+    public void shutdown() {
+        caches.clear();
+        this.context = null;
+        this.coreConfiguration = null;
+        this.eventBuilderProvider = null;
+        this.persistentDataProvider = null;
+        this.sessionProvider = null;
+        this.activityStateProvider = null;
+        this.eventSender = null;
+    }
+
     private static class SingleInstance {
         private static final TrackMainThread INSTANCE = new TrackMainThread();
     }
@@ -108,7 +119,7 @@ public final class TrackMainThread {
                 return;
             }
 
-            if (coreConfiguration.isDataCollectionEnabled()) {
+            if (coreConfiguration != null && coreConfiguration.isDataCollectionEnabled()) {
                 onGenerateGEvent(eventBuilder);
             }
         });
@@ -163,11 +174,11 @@ public final class TrackMainThread {
         if (event instanceof BaseEvent) {
             Logger.printJson(TAG, "save: event, type is " + event.getEventType(), EventBuilderProvider.toJson((BaseEvent) event).toString());
         }
-        if (!persistentDataProvider.isSendVisitAfterRefreshSessionId()) {
+        if (persistentDataProvider != null && !persistentDataProvider.isSendVisitAfterRefreshSessionId()) {
             // we should resend visitEvent when sessionId refreshed
             sessionProvider.generateVisit();
         }
-        eventSender.sendEvent(event);
+        if (eventSender != null) eventSender.sendEvent(event);
     }
 
     public synchronized Activity getForegroundActivity() {
@@ -178,7 +189,6 @@ public final class TrackMainThread {
     public Context getContext() {
         return context;
     }
-
 
     public void runOnUiThread(Runnable r) {
         if (runningOnUiThread()) {
