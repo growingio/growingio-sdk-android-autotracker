@@ -21,5 +21,6 @@
 && ./gradlew :growingio-tools:oaid:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :gio-sdk:autotracker-saas:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-sdk-bom:publishBomPublicationToMavenLocal \
 && ./gradlew clean

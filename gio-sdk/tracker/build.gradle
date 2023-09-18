@@ -31,8 +31,6 @@ android {
 }
 
 dependencies {
-	compileOnly fileTree(dir: '../thirdLibs', include: ['*.jar'])
-
 	debugApi project(':growingio-tracker-core')
 	debugApi project(':growingio-network:okhttp3')
 	debugApi project(':growingio-data:database')
