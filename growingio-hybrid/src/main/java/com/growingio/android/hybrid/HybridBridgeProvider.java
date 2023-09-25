@@ -45,6 +45,7 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
     private ConfigurationProvider configurationProvider;
     private AppInfoProvider appInfoProvider;
     private UserInfoProvider userInfoProvider;
+    private boolean isDownGrade = false;
 
     @Override
     public void setup(TrackerContext context) {
@@ -58,12 +59,16 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
 
     }
 
+    public void setDownGrade(boolean downGrade) {
+        isDownGrade = downGrade;
+    }
+
     private WebViewJavascriptBridgeConfiguration getJavascriptBridgeConfiguration() {
         String projectId = configurationProvider.core().getProjectId();
         String appId = configurationProvider.core().getUrlScheme();
         String appPackage = appInfoProvider.getPackageName();
-        String nativeSdkVersion = SDKConfig.SDK_VERSION;
-        int nativeSdkVersionCode = SDKConfig.SDK_VERSION_CODE;
+        String nativeSdkVersion = isDownGrade ? SDKConfig.SDK_VERSION_DOWNGRADE : SDKConfig.SDK_VERSION;
+        int nativeSdkVersionCode = isDownGrade ? SDKConfig.SDK_VERSION_CODE_DOWNGRADE : SDKConfig.SDK_VERSION_CODE;
         return new WebViewJavascriptBridgeConfiguration(projectId, appId, appPackage, nativeSdkVersion, nativeSdkVersionCode);
     }
 

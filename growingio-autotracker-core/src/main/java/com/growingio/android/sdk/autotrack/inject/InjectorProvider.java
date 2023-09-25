@@ -104,7 +104,7 @@ public class InjectorProvider implements TrackerLifecycleProvider {
         if (registry != null) {
             ModelLoader<HybridBridge, Boolean> modelLoader = registry.getModelLoader(HybridBridge.class, Boolean.class);
             if (modelLoader != null) {
-                result = modelLoader.buildLoadData(new HybridBridge(view)).fetcher.executeData();
+                result = modelLoader.buildLoadData(new HybridBridge(view, config.isDowngrade())).fetcher.executeData();
             }
         }
         Logger.d(TAG, "bridgeForWebView: webView = " + view.getClass().getName() + ", result = " + result);

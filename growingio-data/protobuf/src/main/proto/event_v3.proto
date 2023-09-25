@@ -61,7 +61,7 @@ message EventV3Dto {
 
     //new in sdk 4.0
     string xcontent = 56;
-    int32 timezone_offset = 57;
+    string timezone_offset = 57;
 }
 
 message ResourceItem {

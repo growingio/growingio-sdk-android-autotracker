@@ -94,16 +94,14 @@ public class WindowHelper {
     public List<DecorView> getTopActivityViews() {
         List<DecorView> topViews = new ArrayList<>();
         Activity activity = TrackMainThread.trackMain().getForegroundActivity();
-        if (activity == null) return topViews;
+        if (activity == null) return null;
         List<DecorView> decorViews = getAllWindowDecorViews();
-        boolean findTopActivity = false;
+        View activityView = activity.getWindow().getDecorView();
         for (DecorView decorView : decorViews) {
             View view = decorView.getView();
-            if (view == activity.getWindow().getDecorView()
-                    || view.getContext() == activity) {
+            if (view == activityView || view.getContext() == activity) {
                 topViews.add(decorView);
-                findTopActivity = true;
-            } else if (findTopActivity) {
+            } else if (decorView.getView().getWidth() < activityView.getWidth() && decorView.getView().getHeight() < activityView.getHeight()) {
                 topViews.add(decorView);
             }
         }
