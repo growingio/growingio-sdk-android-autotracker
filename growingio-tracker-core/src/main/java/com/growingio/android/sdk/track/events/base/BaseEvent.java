@@ -233,7 +233,7 @@ public abstract class BaseEvent extends GEvent {
     }
 
     public String getTimezoneOffset() {
-        return timezoneOffset;
+        return checkValueSafe(timezoneOffset);
     }
 
     protected String checkValueSafe(String value) {

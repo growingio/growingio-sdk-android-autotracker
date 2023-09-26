@@ -47,6 +47,7 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
             application.registerActivityLifecycleCallbacks(this);
         } else if (context instanceof Activity) {
             Activity activity = (Activity) context;
+            mForegroundActivity = new WeakReference<>(activity);
             applicationWeakReference = new WeakReference<>(activity.getApplication());
             activity.getApplication().registerActivityLifecycleCallbacks(this);
         }/* else {
@@ -59,9 +60,9 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
         configurationProvider = context.getConfigurationProvider();
     }
 
-    public void makeupActivityLifecycle(Context context) {
-        if (context instanceof Activity) {
-            Activity activity = (Activity) context;
+    public void makeupActivityLifecycle() {
+        Activity activity = mForegroundActivity.get();
+        if (activity != null) {
             ActivityLifecycleEvent.EVENT_TYPE state = ActivityUtil.judgeContextState(activity);
             if (state != null) {
                 Logger.i(TAG, "initSdk with Activity, makeup ActivityLifecycle before current state:" + state.name());

@@ -74,7 +74,7 @@ public class Tracker {
 
         TrackMainThread.trackMain().setupWithContext(trackerContext); //need setup
 
-        startAfterSdkSetup(trackerContext, context);
+        startAfterSdkSetup(trackerContext);
     }
 
     private TrackerContext initTrackerContext(Context context) {
@@ -111,7 +111,7 @@ public class Tracker {
         return trackerContext;
     }
 
-    private void startAfterSdkSetup(TrackerContext trackerContext, Context context) {
+    private void startAfterSdkSetup(TrackerContext trackerContext) {
 
         //generate first visit
         SessionProvider sessionProvider = trackerContext.getProvider(SessionProvider.class);
@@ -121,7 +121,7 @@ public class Tracker {
         TrackMainThread.trackMain().releaseCaches();
 
         // makeup activity lifecycle
-        trackerContext.getActivityStateProvider().makeupActivityLifecycle(context);
+        trackerContext.getActivityStateProvider().makeupActivityLifecycle();
 
     }
 
