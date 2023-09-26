@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack;
 
 import android.content.Context;
