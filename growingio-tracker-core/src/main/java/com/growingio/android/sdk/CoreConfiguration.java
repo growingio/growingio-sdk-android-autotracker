@@ -34,7 +34,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mDataCollectionEnabled = true;
 
     private boolean mUploadExceptionEnabled = true;
-    private boolean mRequireAppProcessesEnabled = true;
+    private boolean mRequireAppProcessesEnabled = false;
     private String mDataCollectionServerHost = "http://napi.growingio.com";
     private EventFilterInterceptor mEventFilterInterceptor;
     private final List<LibraryGioModule> mComponents = new ArrayList<>();
