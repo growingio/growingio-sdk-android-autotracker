@@ -152,7 +152,7 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     public String getAndroidId() {
         // ensure androidid call once in a process
-        if (TextUtils.isEmpty(mAndroidId)) {
+        if (TextUtils.isEmpty(mAndroidId) && configurationProvider.core().isAndroidIdEnabled()) {
             try {
                 mAndroidId = Settings.System.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
                 if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
@@ -164,7 +164,7 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
                 mAndroidId = MAGIC_ANDROID_ID;
             }
         }
-        return mAndroidId.equals(MAGIC_ANDROID_ID) ? null : mAndroidId;
+        return MAGIC_ANDROID_ID.equals(mAndroidId) ? null : mAndroidId;
     }
 
     public String getOaid() {
