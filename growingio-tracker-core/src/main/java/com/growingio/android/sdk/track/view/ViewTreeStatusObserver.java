@@ -75,6 +75,7 @@ public class ViewTreeStatusObserver {
             root.getViewTreeObserver().removeOnScrollChangedListener(viewStateObserver);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 root.getViewTreeObserver().removeOnWindowFocusChangeListener((ViewTreeObserver.OnWindowFocusChangeListener) viewStateObserver);
+                root.getViewTreeObserver().removeOnWindowAttachListener((ViewTreeObserver.OnWindowAttachListener) viewStateObserver);
             }
             setMonitoringViewTreeEnabled(root, false);
         }

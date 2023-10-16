@@ -33,7 +33,6 @@ public class CoreConfiguration implements Configurable {
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
 
-    private boolean mUploadExceptionEnabled = true;
     private boolean mRequireAppProcessesEnabled = false;
     private String mDataCollectionServerHost = "http://napi.growingio.com";
     private EventFilterInterceptor mEventFilterInterceptor;
@@ -43,13 +42,13 @@ public class CoreConfiguration implements Configurable {
     private boolean mImeiEnabled = false;
     private boolean mAndroidIdEnabled = false;
 
-    public CoreConfiguration(String projectId, String urlScheme) {
-        mProjectId = projectId;
+    public CoreConfiguration(String accountId, String urlScheme) {
+        mProjectId = accountId;
         mUrlScheme = urlScheme;
     }
 
-    public CoreConfiguration setProject(String projectId, String urlScheme) {
-        mProjectId = projectId;
+    public CoreConfiguration setProject(String accountId, String urlScheme) {
+        mProjectId = accountId;
         mUrlScheme = urlScheme;
         return this;
     }

@@ -149,7 +149,7 @@ public class Tracker {
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
-    public void setConversionVariables(Map<String, String> variables) {
+    private void setConversionVariables(Map<String, String> variables) {
         if (!isInited) return;
         if (variables == null || variables.isEmpty()) {
             Logger.e(TAG, "setConversionVariables: variables is NULL, and skip it.");
@@ -167,7 +167,7 @@ public class Tracker {
         TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
     }
 
-    public void setVisitorAttributes(Map<String, String> attributes) {
+    private void setVisitorAttributes(Map<String, String> attributes) {
         if (!isInited) return;
         if (attributes == null || attributes.isEmpty()) {
             Logger.e(TAG, "setVisitorAttributes: attributes is NULL, and skip it");

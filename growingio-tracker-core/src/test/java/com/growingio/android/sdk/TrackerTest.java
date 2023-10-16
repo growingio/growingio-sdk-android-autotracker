@@ -53,13 +53,9 @@ public class TrackerTest {
         Map<String, String> valueMap = new HashMap<>();
         valueMap.put("user", "cpacm");
         tracker.trackCustomEvent("test");
-        tracker.setConversionVariables(null);
-        tracker.setConversionVariables(valueMap);
         tracker.setLoginUserId("cpacm");
         tracker.setLoginUserAttributes(null);
         tracker.setLoginUserAttributes(valueMap);
-        tracker.setVisitorAttributes(null);
-        tracker.setVisitorAttributes(valueMap);
         assertThat(tracker.getDeviceId()).isNotEmpty();
 
         tracker.setDataCollectionEnabled(true);
