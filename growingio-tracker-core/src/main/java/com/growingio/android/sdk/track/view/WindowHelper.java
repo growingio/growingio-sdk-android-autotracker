@@ -97,11 +97,13 @@ public class WindowHelper {
         if (activity == null) return null;
         List<DecorView> decorViews = getAllWindowDecorViews();
         View activityView = activity.getWindow().getDecorView();
+        boolean findTopActivity = false;
         for (DecorView decorView : decorViews) {
             View view = decorView.getView();
             if (view == activityView || view.getContext() == activity) {
                 topViews.add(decorView);
-            } else if (decorView.getView().getWidth() < activityView.getWidth() && decorView.getView().getHeight() < activityView.getHeight()) {
+                findTopActivity = true;
+            } else if (findTopActivity) {
                 topViews.add(decorView);
             }
         }
