@@ -107,7 +107,7 @@ class WebSocketHandler extends WebSocketListener {
 
     @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
-        Logger.e(TAG, "webSocket on onClosed, reason: $reason");
+        Logger.e(TAG, "webSocket on onClosed, reason:" + reason);
         TrackMainThread.trackMain().runOnUiThread(webSocketListener::onQuited);
     }
 

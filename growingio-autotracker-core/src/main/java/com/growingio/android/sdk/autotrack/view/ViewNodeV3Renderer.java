@@ -212,7 +212,7 @@ class ViewNodeV3Renderer implements ViewNodeRenderer {
             ViewGroup viewGroup = (ViewGroup) viewNode.getView();
             if (viewGroup.getChildCount() > 0) {
                 for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                    ViewNodeV3 childViewNode = viewNode.append(viewGroup.getChildAt(index), index,true);
+                    ViewNodeV3 childViewNode = viewNode.append(viewGroup.getChildAt(index), index, true);
                     traverseViewNodeWithCircle(childViewNode, findViewNodes);
                 }
             }

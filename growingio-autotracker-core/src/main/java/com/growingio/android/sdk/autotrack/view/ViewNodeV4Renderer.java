@@ -374,7 +374,13 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             ViewGroup viewGroup = (ViewGroup) viewNode.getView();
             if (viewGroup.getChildCount() > 0) {
                 for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                    ViewNodeV4 childViewNode = viewNode.append(viewGroup.getChildAt(index), index);
+                    View childView = viewGroup.getChildAt(index);
+                    ViewNodeV4 childViewNode;
+                    if (viewNode.getPage().hasChildren()) {
+                        childViewNode = replacePageViewNode(childView, viewNode, index);
+                    } else {
+                        childViewNode = viewNode.append(childView, index);
+                    }
                     traverseViewNodeWithCircle(childViewNode, findViewNodes);
                 }
             }
@@ -410,11 +416,25 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             ViewGroup viewGroup = (ViewGroup) viewNode.getView();
             if (viewGroup.getChildCount() > 0) {
                 for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                    ViewNodeV4 childViewNode = viewNode.append(viewGroup.getChildAt(index), index);
+                    View childView = viewGroup.getChildAt(index);
+                    ViewNodeV4 childViewNode;
+                    if (viewNode.getPage().hasChildren()) {
+                        childViewNode = replacePageViewNode(childView, viewNode, index);
+                    } else {
+                        childViewNode = viewNode.append(childView, index);
+                    }
                     traverseViewNode(childViewNode, container);
                 }
             }
         }
+    }
+
+    private ViewNodeV4 replacePageViewNode(View childView, ViewNodeV4 originViewNode, int index) {
+        Page<?> viewPage = ViewAttributeUtil.getViewPage(childView);
+        if (viewPage != null) {
+            return findRootViewNode(childView, new LinkedList<>());
+        }
+        return originViewNode.append(childView, index);
     }
 
     private void disposeWebView(ViewNodeV4 viewNode, JSONArray container, final CountDownLatch latch) {

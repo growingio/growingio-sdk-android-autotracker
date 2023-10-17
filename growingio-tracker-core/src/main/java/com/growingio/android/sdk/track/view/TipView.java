@@ -44,7 +44,6 @@ public class TipView extends FrameLayout {
     private TextView mContent;
     private TextView mDragTip;
 
-
     private boolean mIsNeedShow = false;
     private boolean mIsShowing = false;
 
@@ -168,11 +167,6 @@ public class TipView extends FrameLayout {
     }
 
     public void remove() {
-        dismiss();
-    }
-
-    public void dismiss() {
-        mIsNeedShow = false;
         if (mIsShowing) {
             try {
                 WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -183,6 +177,11 @@ public class TipView extends FrameLayout {
                 mIsShowing = false;
             }
         }
+    }
+
+    public void dismiss() {
+        mIsNeedShow = false;
+        remove();
     }
 
     public void show(Activity activity) {
