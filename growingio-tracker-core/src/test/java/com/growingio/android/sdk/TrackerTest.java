@@ -66,7 +66,7 @@ public class TrackerTest {
         tracker.onActivityNewIntent(null, null);
 
         tracker.setGeneralProps(valueMap);
-        tracker.clearGeneralProps("user");
+        tracker.removeGeneralProps("user");
         tracker.clearGeneralProps();
 
         WebView webView = new WebView(application);

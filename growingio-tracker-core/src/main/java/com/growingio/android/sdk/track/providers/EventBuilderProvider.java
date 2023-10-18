@@ -101,7 +101,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         generalProps.clear();
     }
 
-    public void clearGeneralProps(String... keys) {
+    public void removeGeneralProps(String... keys) {
         for (String key : keys) {
             generalProps.removeAttribute(key);
             Logger.d(TAG, "remove general props of: " + key);

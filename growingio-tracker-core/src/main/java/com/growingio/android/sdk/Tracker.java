@@ -159,9 +159,9 @@ public class Tracker {
         trackerContext.getEventBuilderProvider().clearGeneralProps();
     }
 
-    public void clearGeneralProps(String... keys){
+    public void removeGeneralProps(String... keys){
         if (!isInited) return;
-        trackerContext.getEventBuilderProvider().clearGeneralProps(keys);
+        trackerContext.getEventBuilderProvider().removeGeneralProps(keys);
     }
 
     private void setConversionVariables(Map<String, String> variables) {
