@@ -92,6 +92,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
             for (String key : properties.keySet()) {
                 String value = properties.get(key);
                 generalProps.addAttribute(key, value);
+                Logger.d(TAG, "add general props:[" + key + "-" + value + "]");
             }
         }
     }
@@ -103,6 +104,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     public void clearGeneralProps(String... keys) {
         for (String key : keys) {
             generalProps.removeAttribute(key);
+            Logger.d(TAG, "remove general props of: " + key);
         }
     }
 

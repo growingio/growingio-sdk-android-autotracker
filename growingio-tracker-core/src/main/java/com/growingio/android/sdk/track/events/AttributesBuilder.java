@@ -168,6 +168,10 @@ public class AttributesBuilder {
         attributes.clear();
     }
 
+    public int size() {
+        return attributes.size();
+    }
+
     public AttributesBuilder removeAttribute(String key) {
         attributes.remove(key);
         return this;
