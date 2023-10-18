@@ -65,7 +65,7 @@ public final class TrackMainThread {
     public void setupWithContext(TrackerContext context) {
         this.context = context.getBaseContext();
         this.coreConfiguration = context.getConfigurationProvider().core();
-        this.eventBuilderProvider = context.getProvider(EventBuilderProvider.class);
+        this.eventBuilderProvider = context.getEventBuilderProvider();
         this.persistentDataProvider = context.getProvider(PersistentDataProvider.class);
         this.sessionProvider = context.getProvider(SessionProvider.class);
         this.activityStateProvider = context.getActivityStateProvider();

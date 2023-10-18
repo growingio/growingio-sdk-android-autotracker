@@ -149,6 +149,21 @@ public class Tracker {
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
+    public void setGeneralProps(Map<String, String> variables) {
+        if (!isInited || variables == null || variables.isEmpty()) return;
+        trackerContext.getEventBuilderProvider().setGeneralProps(variables);
+    }
+
+    public void clearGeneralProps(){
+        if (!isInited) return;
+        trackerContext.getEventBuilderProvider().clearGeneralProps();
+    }
+
+    public void clearGeneralProps(String... keys){
+        if (!isInited) return;
+        trackerContext.getEventBuilderProvider().clearGeneralProps(keys);
+    }
+
     private void setConversionVariables(Map<String, String> variables) {
         if (!isInited) return;
         if (variables == null || variables.isEmpty()) {

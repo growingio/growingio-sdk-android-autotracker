@@ -22,6 +22,7 @@ import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 import com.growingio.android.sdk.track.providers.TimingEventProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
@@ -93,6 +94,10 @@ public class TrackerContext extends ContextWrapper {
 
     public TimingEventProvider getTimingEventProvider() {
         return getProvider(TimingEventProvider.class);
+    }
+
+    public EventBuilderProvider getEventBuilderProvider() {
+        return getProvider(EventBuilderProvider.class);
     }
 
     private final TrackerRegistry registry;

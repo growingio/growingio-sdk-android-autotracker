@@ -47,7 +47,7 @@ public abstract class ViewTreeStatusListener implements IActivityLifecycle, OnVi
     @Override
     public void setup(TrackerContext context) {
         activityStateProvider = context.getActivityStateProvider();
-        eventBuilderProvider = context.getProvider(EventBuilderProvider.class);
+        eventBuilderProvider = context.getEventBuilderProvider();
     }
 
     @Override

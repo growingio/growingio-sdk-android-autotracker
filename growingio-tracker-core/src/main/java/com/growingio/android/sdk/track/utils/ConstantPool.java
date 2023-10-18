@@ -21,4 +21,7 @@ public class ConstantPool {
 
     public static final String UNKNOWN = "UNKNOWN";
     public static final String ANDROID = "Android";
+
+    public static final int CUSTOM_TYPE_SYSTEM = 0;
+    public static final int CUSTOM_TYPE_USER = 1;
 }

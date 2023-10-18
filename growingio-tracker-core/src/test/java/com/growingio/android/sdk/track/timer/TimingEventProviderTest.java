@@ -58,8 +58,8 @@ public class TimingEventProviderTest {
 
     @Test
     public void backgroundThenForeground() throws InterruptedException {
-        TimingEventProvider timingEventProvider = context.getProvider(TimingEventProvider.class);
-        EventBuilderProvider eventBuilderProvider = context.getProvider(EventBuilderProvider.class);
+        TimingEventProvider timingEventProvider = context.getTimingEventProvider();
+        EventBuilderProvider eventBuilderProvider = context.getEventBuilderProvider();
         ActivityController<RobolectricActivity> activityController = Robolectric.buildActivity(RobolectricActivity.class);
         activityController.create().start().resume();
 
@@ -110,8 +110,8 @@ public class TimingEventProviderTest {
     @Test
     public void pauseThenResume() throws InterruptedException {
 
-        TimingEventProvider timingEventProvider = context.getProvider(TimingEventProvider.class);
-        EventBuilderProvider eventBuilderProvider = context.getProvider(EventBuilderProvider.class);
+        TimingEventProvider timingEventProvider = context.getTimingEventProvider();
+        EventBuilderProvider eventBuilderProvider = context.getEventBuilderProvider();
         final class TimerResult {
             public String eventName;
             public float elapsedTime;
