@@ -222,7 +222,7 @@ class ViewNodeV4 implements ViewNode {
         if (ListMenuItemViewShadow.isListMenuItemView(this.view)) {
             MenuItem menuItem = new ListMenuItemViewShadow(this.view).getMenuItem();
             if (menuItem != null) {
-                ViewNodeV4 itemViewNode = generateMenuItemViewNode(this.view.getContext(), menuItem);
+                ViewNodeV4 itemViewNode = generateMenuItemViewNode(this.view.getContext(), this.page, menuItem);
                 this.xPath = itemViewNode.getXPath();
                 this.index = itemViewNode.getIndex();
                 this.xIndex = itemViewNode.getXIndex();
@@ -306,7 +306,7 @@ class ViewNodeV4 implements ViewNode {
     }
 
 
-    public static ViewNodeV4 generateMenuItemViewNode(Context context, MenuItem menuItem) {
+    public static ViewNodeV4 generateMenuItemViewNode(Context context, Page page, MenuItem menuItem) {
         StringBuilder xpath = new StringBuilder();
         StringBuilder xIndex = new StringBuilder();
         String packageId = ViewAttributeUtil.getPackageId(context, menuItem.getItemId());
@@ -315,6 +315,7 @@ class ViewNodeV4 implements ViewNode {
 
         return new ViewNodeV4()
                 .setIndex(-1)
+                .setPage(page)
                 .setViewContent(menuItem.getTitle() != null ? menuItem.getTitle().toString() : null)
                 .setXPath(xpath.toString())
                 .setXIndex(xIndex.toString())
