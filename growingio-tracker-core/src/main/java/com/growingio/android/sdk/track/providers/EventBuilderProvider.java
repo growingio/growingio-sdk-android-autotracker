@@ -18,11 +18,13 @@ package com.growingio.android.sdk.track.providers;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.events.AttributesBuilder;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
+import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
@@ -55,6 +57,8 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     private ConfigurationProvider configurationProvider;
     private TrackerContext context;
 
+    private final AttributesBuilder generalProps = new AttributesBuilder();
+
     EventBuilderProvider() {
     }
 
@@ -83,17 +87,49 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         serializableFactory.parseFrom(builder, jsonObject);
     }
 
+    public void setGeneralProps(Map<String, String> properties) {
+        if (properties != null && properties.keySet() != null) {
+            for (String key : properties.keySet()) {
+                String value = properties.get(key);
+                generalProps.addAttribute(key, value);
+                Logger.d(TAG, "add general props:[" + key + "-" + value + "]");
+            }
+        }
+    }
+
+    public void clearGeneralProps() {
+        generalProps.clear();
+    }
+
+    public void removeGeneralProps(String... keys) {
+        for (String key : keys) {
+            generalProps.removeAttribute(key);
+            Logger.d(TAG, "remove general props of: " + key);
+        }
+    }
+
     @TrackThread
     public BaseEvent onGenerateGEvent(BaseEvent.BaseBuilder<?> gEvent) {
         dispatchEventWillBuild(gEvent);
 
         if (!filterEvent(gEvent)) return null;
+
+        addGeneralPropsToEvent(gEvent);
         gEvent.readPropertyInTrackThread(context);
 
         BaseEvent event = gEvent.build();
         dispatchEventDidBuild(event);
 
         return event;
+    }
+
+    private void addGeneralPropsToEvent(BaseEvent.BaseBuilder<?> gEvent) {
+        if (gEvent.getEventType().equals(TrackEventType.CUSTOM)) {
+            if (gEvent instanceof CustomEvent.Builder) {
+                CustomEvent.Builder customEventBuilder = (CustomEvent.Builder) gEvent;
+                customEventBuilder.setGeneralProps(generalProps.build());
+            }
+        }
     }
 
     public void removeEventBuildInterceptor(EventBuildInterceptor interceptor) {

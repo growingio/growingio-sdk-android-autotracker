@@ -42,7 +42,7 @@ public class TrackerTest {
     public void initTest() {
         try {
             Tracker nullTracker = new Tracker(null);
-        }catch (Exception e){
+        } catch (Exception e) {
             assertThat(e).isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -64,6 +64,10 @@ public class TrackerTest {
         tracker.setLocation(0d, 1d);
         tracker.cleanLocation();
         tracker.onActivityNewIntent(null, null);
+
+        tracker.setGeneralProps(valueMap);
+        tracker.removeGeneralProps("user");
+        tracker.clearGeneralProps();
 
         WebView webView = new WebView(application);
         tracker.bridgeWebView(webView);

@@ -33,8 +33,6 @@ public abstract class SuperWebView<T extends View> {
         return mRealWebView;
     }
 
-    private boolean hasAddJavaScript = false;
-
     public void getLocationOnScreen(int[] outLocation) {
         getRealWebView().getLocationOnScreen(outLocation);
     }

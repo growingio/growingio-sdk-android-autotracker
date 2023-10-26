@@ -137,7 +137,7 @@ public class ViewNodeV4Test {
         MenuItem testItem = new RoboMenuItem().setTitle("test menu item")
                 .setActionView(testEt);
         activity.onContextItemSelected(testItem);
-        ViewNodeV4 pageNode = ViewNodeV4.generateMenuItemViewNode(activity, testItem);
+        ViewNodeV4 pageNode = ViewNodeV4.generateMenuItemViewNode(activity, new ActivityPage(activity), testItem);
         Truth.assertThat(pageNode.getXPath()).isEqualTo("/MenuView/MenuItem");
         Truth.assertThat(pageNode.getXIndex()).isEqualTo("/0/0");
 

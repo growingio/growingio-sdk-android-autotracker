@@ -31,6 +31,7 @@ import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.base.BaseField;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
 import com.growingio.android.sdk.track.middleware.GEvent;
+import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +39,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Config(manifest = Config.NONE)
@@ -90,7 +92,7 @@ public class EventBuilderProviderFilterTest {
 
     @Test
     public void filterEventType() {
-        EventBuilderProvider eventBuilderProvider = context.getProvider(EventBuilderProvider.class);
+        EventBuilderProvider eventBuilderProvider = context.getEventBuilderProvider();
 
         eventBuilderProvider.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
@@ -112,7 +114,7 @@ public class EventBuilderProviderFilterTest {
 
     @Test
     public void filterEventName() {
-        EventBuilderProvider eventBuilderProvider = context.getProvider(EventBuilderProvider.class);
+        EventBuilderProvider eventBuilderProvider = context.getEventBuilderProvider();
         eventBuilderProvider.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
@@ -132,7 +134,7 @@ public class EventBuilderProviderFilterTest {
 
     @Test
     public void filterEventField() {
-        EventBuilderProvider eventBuilderProvider = context.getProvider(EventBuilderProvider.class);
+        EventBuilderProvider eventBuilderProvider = context.getEventBuilderProvider();
         eventBuilderProvider.addEventBuildInterceptor(new EventBuildInterceptor() {
             @Override
             public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
@@ -149,6 +151,32 @@ public class EventBuilderProviderFilterTest {
             }
         });
         eventBuilderProvider.onGenerateGEvent(new CustomEvent.Builder().setEventName("cpacm"));
+    }
+
+    @Test
+    public void generalPropsTest(){
+        EventBuilderProvider eventBuilderProvider = context.getEventBuilderProvider();
+        Map<String,String> generalProps = new HashMap<>();
+        generalProps.put("project","sdk");
+        generalProps.put("feature","test");
+        eventBuilderProvider.setGeneralProps(generalProps);
+        eventBuilderProvider.addEventBuildInterceptor(new EventBuildInterceptor() {
+            @Override
+            public void eventWillBuild(BaseEvent.BaseBuilder<?> eventBuilder) {
+            }
+
+            @Override
+            public void eventDidBuild(GEvent event) {
+                if (event instanceof CustomEvent) {
+                    CustomEvent customEvent = (CustomEvent) event;
+                    Truth.assertThat(customEvent.getAttributes()).isNotNull();
+                    Truth.assertThat(customEvent.getAttributes().get("feature")).isEqualTo("test");
+                    Truth.assertThat(customEvent.getAttributes().get("project")).isEqualTo("sdk");
+                    Truth.assertThat(customEvent.getEventName()).isEqualTo("cpacm");
+                }
+            }
+        });
+        eventBuilderProvider.onGenerateGEvent(new CustomEvent.Builder().setCustomEventType(ConstantPool.CUSTOM_TYPE_USER).setEventName("cpacm"));
     }
 
 }

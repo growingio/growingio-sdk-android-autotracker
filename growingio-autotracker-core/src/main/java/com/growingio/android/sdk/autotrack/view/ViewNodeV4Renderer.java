@@ -66,7 +66,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
     @Override
     public void generateMenuItemEvent(Activity activity, MenuItem menuItem) {
         Page<?> page = PageProvider.get().searchActivityPage(activity);
-        ViewNodeV4 viewNode = renderMenuItemViewNode(activity, menuItem);
+        ViewNodeV4 viewNode = renderMenuItemViewNode(activity, page, menuItem);
         if (page != null && viewNode != null) {
             StringBuilder xpath = new StringBuilder();
             StringBuilder xIndex = new StringBuilder();
@@ -88,8 +88,8 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
         }
     }
 
-    private ViewNodeV4 renderMenuItemViewNode(Context context, MenuItem menuItem) {
-        return ViewNodeV4.generateMenuItemViewNode(context, menuItem);
+    private ViewNodeV4 renderMenuItemViewNode(Context context, Page page, MenuItem menuItem) {
+        return ViewNodeV4.generateMenuItemViewNode(context, page, menuItem);
     }
 
     @Override
@@ -106,7 +106,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
 
         ViewNodeV4 viewNode = renderViewNode(view);
         if (viewNode != null) {
-            Page<?> page = PageProvider.get().findPage(view);
+            Page<?> page = viewNode.getPage();
             if (page == null) {
                 Logger.w(TAG, "sendClickEvent: page is NULL");
                 return;
@@ -160,7 +160,7 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
 
         ViewNodeV4 viewNode = renderViewNode(view);
         if (viewNode != null) {
-            Page<?> page = PageProvider.get().findPage(view);
+            Page<?> page = viewNode.getPage();
             if (page == null) {
                 Logger.w(TAG, "sendChangeEvent: page is NULL");
                 return;
@@ -198,9 +198,10 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
     ViewNodeV4 renderViewNode(View childView) {
         // judge Menu Item
         if (ListMenuItemViewShadow.isListMenuItemView(childView) && childView.getContext() != null) {
+            Page page = PageProvider.get().findPage(childView);
             MenuItem menuItem = new ListMenuItemViewShadow(childView).getMenuItem();
             if (menuItem != null) {
-                return renderMenuItemViewNode(childView.getContext(), menuItem);
+                return renderMenuItemViewNode(childView.getContext(), page, menuItem);
             }
         }
 
@@ -257,9 +258,10 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
             xIndex.append("/0");
         } else {
             String prefix = PageHelper.getWindowPrefix(rootView);
-            findPage = new WindowPage(prefix);
-            Page parentPage = PageProvider.get().findPage(rootView);
-            findPage.assignParent(parentPage);
+            findPage = PageProvider.get().findPage(rootView);
+            if (findPage == null) {
+                findPage = new WindowPage(prefix);
+            }
             // PopupDecorView 这个class是在Android 6.0的时候才引入的，为了兼容6.0以下的版本，需要手动添加这个class层级
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && prefix.equals(PageHelper.POPUP_WINDOW_PREFIX) && !POPUP_DECOR_VIEW_CLASS_NAME.equals(ClassUtil.getSimpleClassName(rootView.getClass()))) {
                 xpath.append("/").append(POPUP_DECOR_VIEW_CLASS_NAME).append("/").append(ClassUtil.getSimpleClassName(rootView.getClass()));

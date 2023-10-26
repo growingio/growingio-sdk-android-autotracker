@@ -197,10 +197,10 @@ internal class ConfigurationGenerator(
     ): MethodSpec {
         val methodSpec = MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PUBLIC)
-            .addParameter(String::class.java, "projectId")
+            .addParameter(String::class.java, "accountId")
             .addParameter(String::class.java, "urlScheme")
             .addStatement(
-                "this.coreConfiguration = new \$T(projectId,urlScheme)",
+                "this.coreConfiguration = new \$T(accountId,urlScheme)",
                 coreConfigurationClass,
             )
 

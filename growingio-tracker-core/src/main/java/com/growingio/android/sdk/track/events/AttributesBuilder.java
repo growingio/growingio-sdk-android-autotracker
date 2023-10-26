@@ -164,6 +164,19 @@ public class AttributesBuilder {
         }
     }
 
+    public void clear() {
+        attributes.clear();
+    }
+
+    public int size() {
+        return attributes.size();
+    }
+
+    public AttributesBuilder removeAttribute(String key) {
+        attributes.remove(key);
+        return this;
+    }
+
     public Map<String, String> build() {
         if (attributes == null || attributes.isEmpty()) {
             return null;

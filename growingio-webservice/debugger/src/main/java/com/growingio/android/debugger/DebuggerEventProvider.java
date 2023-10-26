@@ -55,7 +55,7 @@ public class DebuggerEventProvider implements EventBuildInterceptor, TrackerLife
     @Override
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
-        eventBuilderProvider = context.getProvider(EventBuilderProvider.class);
+        eventBuilderProvider = context.getEventBuilderProvider();
         // before debugger start, cache events.
         eventBuilderProvider.addEventBuildInterceptor(this);
     }

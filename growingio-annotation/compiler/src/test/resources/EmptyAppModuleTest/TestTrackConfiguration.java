@@ -33,8 +33,8 @@ public final class TestTrackConfiguration {
 
     private final HashMap<Class<? extends Configurable>, Configurable> MODULE_CONFIGURATIONS = new HashMap<Class<? extends Configurable>, Configurable>();
 
-    public TestTrackConfiguration(String projectId, String urlScheme) {
-        this.coreConfiguration = new CoreConfiguration(projectId,urlScheme);
+    public TestTrackConfiguration(String accountId, String urlScheme) {
+        this.coreConfiguration = new CoreConfiguration(accountId,urlScheme);
         addConfiguration(new EmptyConfig());
     }
 
