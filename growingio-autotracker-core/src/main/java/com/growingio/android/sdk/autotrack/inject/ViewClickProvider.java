@@ -103,6 +103,7 @@ class ViewClickProvider {
             Logger.i(TAG, "AutotrackOptions: tablayout tab select enable is false");
             return;
         }
+        if (tab == null) return;
         viewOnClick(tab.view);
     }
 

@@ -135,6 +135,10 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
             Logger.e(TAG, "Autotracker do not initialized successfully");
         }
 
+        if (view == null) {
+            return;
+        }
+
         ViewNode viewNode = ViewHelper.getChangeViewNode(view);
         if (viewNode == null) {
             Logger.e(TAG, "ViewNode is NULL with the View: " + view.getClass().getSimpleName());
