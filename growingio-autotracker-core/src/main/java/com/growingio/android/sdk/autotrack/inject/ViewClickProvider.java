@@ -182,18 +182,24 @@ class ViewClickProvider {
     }
 
     public static void viewOnClick(View view) {
-        if (!TrackerContext.initializedSuccessfully()) {
-            Logger.e(TAG, "Autotracker do not initialized successfully");
+        if (view == null) {
+            Logger.e(TAG, "The clicked view is null");
             return;
         }
 
-        if (ViewAttributeUtil.isIgnoreViewClick(view)) {
+        if (!TrackerContext.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
 
         // 为了防止click事件重复发送
         if (ClassUtil.isDuplicateClick(view)) {
             Logger.w(TAG, "Duplicate Click");
+            return;
+        }
+
+        if (ViewAttributeUtil.isIgnoreViewClick(view)) {
+            Logger.w(TAG, "The View's click event is ignored");
             return;
         }
 

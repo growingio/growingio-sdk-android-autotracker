@@ -54,7 +54,7 @@ public class AutotrackOptions {
         return activityMenuItemClickEnabled;
     }
 
-    public void setActivityMenuItemClickEnabled(boolean activityMenuItemClickEnabled) {
+    private void setActivityMenuItemClickEnabled(boolean activityMenuItemClickEnabled) {
         this.activityMenuItemClickEnabled = activityMenuItemClickEnabled;
     }
 
@@ -62,7 +62,7 @@ public class AutotrackOptions {
         return toolbarMenuItemClickEnabled;
     }
 
-    public void setToolbarMenuItemClickEnabled(boolean toolbarMenuItemClickEnabled) {
+    private void setToolbarMenuItemClickEnabled(boolean toolbarMenuItemClickEnabled) {
         this.toolbarMenuItemClickEnabled = toolbarMenuItemClickEnabled;
     }
 
@@ -70,7 +70,7 @@ public class AutotrackOptions {
         return actionMenuItemClickEnabled;
     }
 
-    public void setActionMenuItemClickEnabled(boolean actionMenuItemClickEnabled) {
+    private void setActionMenuItemClickEnabled(boolean actionMenuItemClickEnabled) {
         this.actionMenuItemClickEnabled = actionMenuItemClickEnabled;
     }
 
@@ -78,7 +78,7 @@ public class AutotrackOptions {
         return popupMenuItemClickEnabled;
     }
 
-    public void setPopupMenuItemClickEnabled(boolean popupMenuItemClickEnabled) {
+    private void setPopupMenuItemClickEnabled(boolean popupMenuItemClickEnabled) {
         this.popupMenuItemClickEnabled = popupMenuItemClickEnabled;
     }
 
@@ -86,7 +86,7 @@ public class AutotrackOptions {
         return fragmentPageEnabled;
     }
 
-    public void setFragmentPageEnabled(boolean fragmentPageEnabled) {
+    private void setFragmentPageEnabled(boolean fragmentPageEnabled) {
         this.fragmentPageEnabled = fragmentPageEnabled;
     }
 
@@ -94,7 +94,7 @@ public class AutotrackOptions {
         return activityPageEnabled;
     }
 
-    public void setActivityPageEnabled(boolean activityPageEnabled) {
+    private void setActivityPageEnabled(boolean activityPageEnabled) {
         this.activityPageEnabled = activityPageEnabled;
     }
 
@@ -102,7 +102,7 @@ public class AutotrackOptions {
         return dialogClickEnabled;
     }
 
-    public void setDialogClickEnabled(boolean dialogClickEnabled) {
+    private void setDialogClickEnabled(boolean dialogClickEnabled) {
         this.dialogClickEnabled = dialogClickEnabled;
     }
 
@@ -110,7 +110,7 @@ public class AutotrackOptions {
         return viewClickEnabled;
     }
 
-    public void setViewClickEnabled(boolean viewClickEnabled) {
+    private void setViewClickEnabled(boolean viewClickEnabled) {
         this.viewClickEnabled = viewClickEnabled;
     }
 
@@ -118,7 +118,7 @@ public class AutotrackOptions {
         return editTextChangeEnabled;
     }
 
-    public void setEditTextChangeEnabled(boolean editTextChangeEnabled) {
+    private void setEditTextChangeEnabled(boolean editTextChangeEnabled) {
         this.editTextChangeEnabled = editTextChangeEnabled;
     }
 
@@ -126,7 +126,7 @@ public class AutotrackOptions {
         return seekbarChangeEnabled;
     }
 
-    public void setSeekbarChangeEnabled(boolean seekbarChangeEnabled) {
+    private void setSeekbarChangeEnabled(boolean seekbarChangeEnabled) {
         this.seekbarChangeEnabled = seekbarChangeEnabled;
     }
 
@@ -134,7 +134,7 @@ public class AutotrackOptions {
         return adapterViewItemClickEnabled;
     }
 
-    public void setAdapterViewItemClickEnabled(boolean adapterViewItemClickEnabled) {
+    private void setAdapterViewItemClickEnabled(boolean adapterViewItemClickEnabled) {
         this.adapterViewItemClickEnabled = adapterViewItemClickEnabled;
     }
 
@@ -142,7 +142,7 @@ public class AutotrackOptions {
         return expandableListGroupClickEnabled;
     }
 
-    public void setExpandableListGroupClickEnabled(boolean expandableListGroupClickEnabled) {
+    private void setExpandableListGroupClickEnabled(boolean expandableListGroupClickEnabled) {
         this.expandableListGroupClickEnabled = expandableListGroupClickEnabled;
     }
 
@@ -150,7 +150,7 @@ public class AutotrackOptions {
         return expandableListChildClickEnabled;
     }
 
-    public void setExpandableListChildClickEnabled(boolean expandableListChildClickEnabled) {
+    private void setExpandableListChildClickEnabled(boolean expandableListChildClickEnabled) {
         this.expandableListChildClickEnabled = expandableListChildClickEnabled;
     }
 
@@ -158,7 +158,7 @@ public class AutotrackOptions {
         return compoundButtonCheckEnabled;
     }
 
-    public void setCompoundButtonCheckEnabled(boolean compoundButtonCheckEnabled) {
+    private void setCompoundButtonCheckEnabled(boolean compoundButtonCheckEnabled) {
         this.compoundButtonCheckEnabled = compoundButtonCheckEnabled;
     }
 
@@ -166,7 +166,7 @@ public class AutotrackOptions {
         return radioGroupCheckEnabled;
     }
 
-    public void setRadioGroupCheckEnabled(boolean radioGroupCheckEnabled) {
+    private void setRadioGroupCheckEnabled(boolean radioGroupCheckEnabled) {
         this.radioGroupCheckEnabled = radioGroupCheckEnabled;
     }
 
@@ -174,7 +174,7 @@ public class AutotrackOptions {
         return ratingBarChangeEnabled;
     }
 
-    public void setRatingBarChangeEnabled(boolean ratingBarChangeEnabled) {
+    private void setRatingBarChangeEnabled(boolean ratingBarChangeEnabled) {
         this.ratingBarChangeEnabled = ratingBarChangeEnabled;
     }
 
@@ -182,7 +182,7 @@ public class AutotrackOptions {
         return spinnerItemClickSelectEnabled;
     }
 
-    public void setSpinnerItemClickSelectEnabled(boolean spinnerItemClickSelectEnabled) {
+    private void setSpinnerItemClickSelectEnabled(boolean spinnerItemClickSelectEnabled) {
         this.spinnerItemClickSelectEnabled = spinnerItemClickSelectEnabled;
     }
 
@@ -190,7 +190,7 @@ public class AutotrackOptions {
         return materialToggleGroupButtonCheckEnabled;
     }
 
-    public void setMaterialToggleGroupButtonCheckEnabled(boolean materialToggleGroupButtonCheckEnabled) {
+    private void setMaterialToggleGroupButtonCheckEnabled(boolean materialToggleGroupButtonCheckEnabled) {
         this.materialToggleGroupButtonCheckEnabled = materialToggleGroupButtonCheckEnabled;
     }
 
@@ -198,7 +198,7 @@ public class AutotrackOptions {
         return tabLayoutTabSelectedEnabled;
     }
 
-    public void setTabLayoutTabSelectedEnabled(boolean tabLayoutTabSelectedEnabled) {
+    private void setTabLayoutTabSelectedEnabled(boolean tabLayoutTabSelectedEnabled) {
         this.tabLayoutTabSelectedEnabled = tabLayoutTabSelectedEnabled;
     }
 
@@ -206,7 +206,7 @@ public class AutotrackOptions {
         return contextMenuItemClickEnabled;
     }
 
-    public void setContextMenuItemClickEnabled(boolean contextMenuItemClickEnabled) {
+    private void setContextMenuItemClickEnabled(boolean contextMenuItemClickEnabled) {
         this.contextMenuItemClickEnabled = contextMenuItemClickEnabled;
     }
 
@@ -214,7 +214,7 @@ public class AutotrackOptions {
         return sliderChangeEnabled;
     }
 
-    public void setSliderChangeEnabled(boolean sliderChangeEnabled) {
+    private void setSliderChangeEnabled(boolean sliderChangeEnabled) {
         this.sliderChangeEnabled = sliderChangeEnabled;
     }
 
