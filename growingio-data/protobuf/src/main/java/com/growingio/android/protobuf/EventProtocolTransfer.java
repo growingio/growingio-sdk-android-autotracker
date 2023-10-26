@@ -217,7 +217,9 @@ class EventProtocolTransfer {
             eventBuilder.setPath(vEvent.getPath()); //10
             eventBuilder.setTextValue(vEvent.getTextValue()); //27
             eventBuilder.setXpath(vEvent.getXpath()); //28
-            eventBuilder.setIndex(vEvent.getIndex()); //29
+            if (vEvent.getIndex() >= 0) {
+                eventBuilder.setIndex(vEvent.getIndex()); //29
+            }
             if (vEvent.getPageShowTimestamp() > 0) {
                 eventBuilder.setPageShowTimestamp(vEvent.getPageShowTimestamp());//23
             }
