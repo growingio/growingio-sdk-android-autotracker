@@ -151,17 +151,23 @@ public class Tracker {
 
     public void setGeneralProps(Map<String, String> variables) {
         if (!isInited || variables == null || variables.isEmpty()) return;
-        trackerContext.getEventBuilderProvider().setGeneralProps(variables);
+        TrackMainThread.trackMain().postActionToTrackMain(() ->
+                trackerContext.getEventBuilderProvider().setGeneralProps(variables)
+        );
     }
 
-    public void clearGeneralProps(){
+    public void clearGeneralProps() {
         if (!isInited) return;
-        trackerContext.getEventBuilderProvider().clearGeneralProps();
+        TrackMainThread.trackMain().postActionToTrackMain(() ->
+                trackerContext.getEventBuilderProvider().clearGeneralProps()
+        );
     }
 
-    public void removeGeneralProps(String... keys){
+    public void removeGeneralProps(String... keys) {
         if (!isInited) return;
-        trackerContext.getEventBuilderProvider().removeGeneralProps(keys);
+        TrackMainThread.trackMain().postActionToTrackMain(() ->
+                trackerContext.getEventBuilderProvider().removeGeneralProps(keys)
+        );
     }
 
     private void setConversionVariables(Map<String, String> variables) {

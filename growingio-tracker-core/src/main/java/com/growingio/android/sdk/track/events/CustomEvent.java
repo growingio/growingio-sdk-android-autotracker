@@ -61,7 +61,7 @@ public class CustomEvent extends BaseAttributesEvent {
 
         public Builder setGeneralProps(Map<String, String> generalProps) {
             if (customEventType == ConstantPool.CUSTOM_TYPE_USER) {
-                if (generalProps != null && generalProps.size() > 0) {
+                if (generalProps != null && !generalProps.isEmpty()) {
                     Map<String, String> attributes = getAttributes();
                     if (attributes == null) attributes = new HashMap<>();
                     for (String key : generalProps.keySet()) {
