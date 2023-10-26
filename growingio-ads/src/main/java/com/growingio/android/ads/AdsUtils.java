@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.advert;
+package com.growingio.android.ads;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
@@ -27,7 +27,7 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,10 +44,10 @@ import java.util.Map;
  *
  * @author cpacm 2022/11/23
  */
-class AdvertUtils {
+class AdsUtils {
     private static final String PREF_FILE_NAME = "growing_profile";
     private static final String PREF_DEVICE_ACTIVATED = "pref_device_activated";
-    private static final String TAG = "Advert";
+    private static final String TAG = "Ads";
     private static final String PREF_DEVICE_ACTIVATE_INFO = "pref_device_activate_info";
 
     static final String DEEP_LINK_TYPE = "deep_type"; //defer or inapp
@@ -67,8 +67,8 @@ class AdvertUtils {
         return deeplinkUrl;
     }
 
-    static AdvertData parseDeeplinkResponse(String body) {
-        final AdvertData info = new AdvertData();
+    static AdsData parseDeeplinkResponse(String body) {
+        final AdsData info = new AdsData();
         try {
             JSONObject rep = new JSONObject(body);
             int code = rep.getInt("code");
@@ -93,7 +93,7 @@ class AdvertUtils {
         final Map<String, String> params;
         if (info.errorCode == DeepLinkCallback.SUCCESS) {
             params = new HashMap<>();
-            info.errorCode = AdvertUtils.parseJson(info.customParams, params);
+            info.errorCode = AdsUtils.parseJson(info.customParams, params);
             info.params = params;
         }
         return info;
@@ -103,7 +103,7 @@ class AdvertUtils {
      * @param data json格式
      * @return 广告参数对象
      */
-    static AdvertData parseClipBoardInfo(String data, String urlScheme) {
+    static AdsData parseClipBoardInfo(String data, String urlScheme) {
         try {
             JSONObject jsonObject = new JSONObject(data);
             if (!"gads".equals(jsonObject.getString("type"))) {
@@ -114,12 +114,12 @@ class AdvertUtils {
                 Logger.e(TAG, "非此应用的延迟深度链接， urlsheme 不匹配，期望为：" + urlScheme + "， 实际为：" + jsonObject.getString("scheme"));
                 return null;
             }
-            AdvertData info = new AdvertData();
+            AdsData info = new AdsData();
             info.linkID = jsonObject.getString(DEEP_LINK_ID);
             info.clickID = jsonObject.getString(DEEP_CLICK_ID);
             info.clickTM = jsonObject.getString(DEEP_CLICK_TIME);
             String customParams = jsonObject.getString(DEEP_PARAMS);
-            info.customParams = AdvertUtils.decode(customParams);
+            info.customParams = AdsUtils.decode(customParams);
             info.tm = System.currentTimeMillis();
 
             return info;
@@ -142,7 +142,7 @@ class AdvertUtils {
      * @return true 是 Deffer 延迟深度链接，拿到了有效的剪贴板数据
      * false 是普通打开，剪贴板里没有广告组写进去的数据
      */
-    static boolean checkClipBoard(Context context, AdvertData info, String urlScheme) {
+    static boolean checkClipBoard(Context context, AdsData info, String urlScheme) {
         try {
             @SuppressLint("WrongConstant") ClipboardManager cm = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
             ClipData clipData = cm != null ? cm.getPrimaryClip() : null;
@@ -155,11 +155,11 @@ class AdvertUtils {
             String data = parseZwsData(charSequence);
             if (data == null) return false;
 
-            AdvertData advertData = parseClipBoardInfo(data, urlScheme);
-            if (advertData != null) {
-                info.copy(advertData);
+            AdsData adsData = parseClipBoardInfo(data, urlScheme);
+            if (adsData != null) {
+                info.copy(adsData);
                 //保存剪切板数据
-                AdvertUtils.setActivateInfo(data);
+                AdsUtils.setActivateInfo(data);
                 //clean up the clip board
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     cm.clearPrimaryClip();
@@ -203,10 +203,10 @@ class AdvertUtils {
         return listString.toString();
     }
 
-    private AdvertUtils() {
+    private AdsUtils() {
     }
 
-    static void clearAdvertSharedPreferences() {
+    static void clearAdsSharedPreferences() {
         getSharedPreferences().edit().putBoolean(PREF_DEVICE_ACTIVATED, false).apply();
         getSharedPreferences().edit().putString(PREF_DEVICE_ACTIVATE_INFO, "").apply();
     }

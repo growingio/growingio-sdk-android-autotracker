@@ -26,7 +26,7 @@ import android.view.View;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
@@ -165,6 +165,10 @@ public class Tracker {
 
     public void removeGeneralProps(String... keys) {
         if (!isInited) return;
+        if (keys == null || keys.length == 0) {
+            Logger.w(TAG, "keys is NULL or empty.");
+            return;
+        }
         TrackMainThread.trackMain().postActionToTrackMain(() ->
                 trackerContext.getEventBuilderProvider().removeGeneralProps(keys)
         );
@@ -173,7 +177,7 @@ public class Tracker {
     private void setConversionVariables(Map<String, String> variables) {
         if (!isInited) return;
         if (variables == null || variables.isEmpty()) {
-            Logger.e(TAG, "setConversionVariables: variables is NULL, and skip it.");
+            Logger.w(TAG, "setConversionVariables: variables is NULL, and skip it.");
             return;
         }
         TrackEventGenerator.generateConversionVariablesEvent(new HashMap<>(variables));

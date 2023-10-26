@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.advert;
+package com.growingio.android.ads;
 
 import android.app.Activity;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 
-
-import static com.growingio.android.advert.AdvertUtils.DEEP_CLICK_ID;
-import static com.growingio.android.advert.AdvertUtils.DEEP_CLICK_TIME;
-import static com.growingio.android.advert.AdvertUtils.DEEP_LINK_ID;
-import static com.growingio.android.advert.AdvertUtils.DEEP_PARAMS;
 
 import android.net.Uri;
 import android.os.Build;
@@ -32,9 +27,9 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.ActivateEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.advert.Activate;
-import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.ads.Activate;
+import com.growingio.android.sdk.track.middleware.ads.AdsResult;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
@@ -56,7 +51,7 @@ import java.util.Map;
  *
  * @author cpacm 2022/11/23
  */
-public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertResult> {
+public class AdsActivateDataLoader implements ModelLoader<Activate, AdsResult> {
 
     private final static int DEEPLINK_TYPE_NONE = 0; //doesn't contain deeplink.
     private final static int DEEPLINK_TYPE_URI = 1; //web jump,contains ads params.
@@ -65,15 +60,15 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
 
     private final TrackerContext context;
 
-    public AdvertActivateDataLoader(TrackerContext context) {
+    public AdsActivateDataLoader(TrackerContext context) {
         this.context = context;
     }
 
     @Override
-    public LoadData<AdvertResult> buildLoadData(Activate activate) {
+    public LoadData<AdsResult> buildLoadData(Activate activate) {
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
-        AdvertConfig config = configurationProvider.getConfiguration(AdvertConfig.class);
-        if (config == null) config = new AdvertConfig();
+        AdsConfig config = configurationProvider.getConfiguration(AdsConfig.class);
+        if (config == null) config = new AdsConfig();
         String deepLinkHost = config.getDeepLinkHost();
         if (deepLinkHost == null || deepLinkHost.isEmpty()) {
             deepLinkHost = configurationProvider.core().getDataCollectionServerHost();
@@ -88,7 +83,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
     }
 
 
-    public static class Factory implements ModelLoaderFactory<Activate, AdvertResult> {
+    public static class Factory implements ModelLoaderFactory<Activate, AdsResult> {
         private final TrackerContext context;
 
         public Factory(TrackerContext context) {
@@ -96,12 +91,12 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         }
 
         @Override
-        public ModelLoader<Activate, AdvertResult> build() {
-            return new AdvertActivateDataLoader(this.context);
+        public ModelLoader<Activate, AdsResult> build() {
+            return new AdsActivateDataLoader(this.context);
         }
     }
 
-    public static class ActivateDataFetcher implements DataFetcher<AdvertResult> {
+    public static class ActivateDataFetcher implements DataFetcher<AdsResult> {
 
         private final Uri uri;
         private final DeepLinkCallback deepLinkCallback;
@@ -119,11 +114,11 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         }
 
         @Override
-        public AdvertResult executeData() {
-            AdvertResult result = new AdvertResult();
+        public AdsResult executeData() {
+            AdsResult result = new AdsResult();
             Logger.d(TAG, "step1. start checkDeeplink type");
             int checkDeepLinkType = checkDeepLinkType();
-            boolean isActivated = AdvertUtils.isDeviceActivated();
+            boolean isActivated = AdsUtils.isDeviceActivated();
             Logger.d(TAG, "step2. get deeplink type:" + checkDeepLinkType + " & device activate status:" + isActivated);
             // step3-1. uri not null and contain deeplink
             if (checkDeepLinkType != DEEPLINK_TYPE_NONE) {
@@ -173,7 +168,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         }
 
         private void dealWithUriLink(Uri data) {
-            if (TextUtils.isEmpty(data.getQueryParameter(DEEP_LINK_ID))) {
+            if (TextUtils.isEmpty(data.getQueryParameter(AdsUtils.DEEP_LINK_ID))) {
                 Logger.e(TAG, "onValidSchemaUrlIntent, but not found link_id, return");
                 return;
             }
@@ -188,9 +183,9 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             final long wakeTime = System.currentTimeMillis();
 
             // 短链接Uri没有参数，需要请求接口获取参数。
-            if (TextUtils.isEmpty(data.getQueryParameter(DEEP_LINK_ID))) {
+            if (TextUtils.isEmpty(data.getQueryParameter(AdsUtils.DEEP_LINK_ID))) {
                 TrackMainThread.trackMain().postActionToTrackMain(() ->
-                        requestDeepLinkParamsByTrackId(AdvertUtils.parseTrackerId(data.toString()), wakeTime, isInApp));
+                        requestDeepLinkParamsByTrackId(AdsUtils.parseTrackerId(data.toString()), wakeTime, isInApp));
             } else {
                 // 已转长链的连接 依然可以通过 Applink 唤起，path匹配规则均为*
                 onParseDeeplinkArgs(data);
@@ -198,18 +193,18 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         }
 
         void onParseDeeplinkArgs(Uri data) {
-            AdvertData deeplinkInfo = new AdvertData();
+            AdsData deeplinkInfo = new AdsData();
             String dataUri = data.toString();
             Uri uri = Uri.parse(dataUri.replace("&amp;", "&"));
-            deeplinkInfo.linkID = uri.getQueryParameter(DEEP_LINK_ID);
-            deeplinkInfo.clickID = uri.getQueryParameter(DEEP_CLICK_ID) != null ? uri.getQueryParameter(DEEP_CLICK_ID) : "";
-            deeplinkInfo.clickTM = uri.getQueryParameter(DEEP_CLICK_TIME) != null ? uri.getQueryParameter(DEEP_CLICK_TIME) : "";
-            deeplinkInfo.customParams = uri.getQueryParameter(DEEP_PARAMS);
+            deeplinkInfo.linkID = uri.getQueryParameter(AdsUtils.DEEP_LINK_ID);
+            deeplinkInfo.clickID = uri.getQueryParameter(AdsUtils.DEEP_CLICK_ID) != null ? uri.getQueryParameter(AdsUtils.DEEP_CLICK_ID) : "";
+            deeplinkInfo.clickTM = uri.getQueryParameter(AdsUtils.DEEP_CLICK_TIME) != null ? uri.getQueryParameter(AdsUtils.DEEP_CLICK_TIME) : "";
+            deeplinkInfo.customParams = uri.getQueryParameter(AdsUtils.DEEP_PARAMS);
             deeplinkInfo.tm = System.currentTimeMillis();
             sendReengage(deeplinkInfo);
 
             final Map<String, String> params = new HashMap<>();
-            int result = AdvertUtils.parseJson(deeplinkInfo.customParams, params);
+            int result = AdsUtils.parseJson(deeplinkInfo.customParams, params);
             sendDeepLinkCallback(result, params, 0);
         }
 
@@ -224,7 +219,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             String projectId = configurationProvider.core().getProjectId();
             String dataSourceId = configurationProvider.core().getDataSourceId();
             String deepType = isInApp ? "inapp" : "defer";
-            String url = AdvertUtils.getRequestDeepLinkUrl(deepLinkHost.toString(), deepType, projectId, dataSourceId, trackId);
+            String url = AdsUtils.getRequestDeepLinkUrl(deepLinkHost.toString(), deepType, projectId, dataSourceId, trackId);
             EventUrl eventUrl = new EventUrl(url, System.currentTimeMillis()).addHeader("User-Agent", deviceInfoProvider.getUserAgent());
             //.addHeader("ip", AdvertUtils.getIP());
             trackerContext.getRegistry().loadData(eventUrl, EventUrl.class, EventResponse.class, new LoadDataFetcher.DataCallback<EventResponse>() {
@@ -237,11 +232,11 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
                         while ((len = inputStream.read(buffer)) != -1) {
                             outputStream.write(buffer, 0, len);
                         }
-                        AdvertData advertData = AdvertUtils.parseDeeplinkResponse(outputStream.toString("UTF-8"));
-                        if (advertData.errorCode == DeepLinkCallback.SUCCESS) {
-                            sendReengage(advertData);
+                        AdsData adsData = AdsUtils.parseDeeplinkResponse(outputStream.toString("UTF-8"));
+                        if (adsData.errorCode == DeepLinkCallback.SUCCESS) {
+                            sendReengage(adsData);
                         }
-                        sendDeepLinkCallback(advertData.errorCode, advertData.params, wakeTime);
+                        sendDeepLinkCallback(adsData.errorCode, adsData.params, wakeTime);
                     } catch (IOException e) {
                         Logger.e(TAG, e);
                     }
@@ -255,13 +250,13 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         }
 
         @Override
-        public Class<AdvertResult> getDataClass() {
-            return AdvertResult.class;
+        public Class<AdsResult> getDataClass() {
+            return AdsResult.class;
         }
 
 
         private void activateDevice() {
-            if (AdvertUtils.isDeviceActivated()) {
+            if (AdsUtils.isDeviceActivated()) {
                 return;
             }
             Logger.d(TAG, "send activate event");
@@ -269,7 +264,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             final ActivateEvent.Builder builder = new ActivateEvent.Builder().
                     activate();
             sendEventToMain(builder);
-            AdvertUtils.setDeviceActivated();
+            AdsUtils.setDeviceActivated();
         }
 
         /**
@@ -279,7 +274,7 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
          */
         private void activateDeviceWithClipBoard() {
             ConfigurationProvider configurationProvider = trackerContext.getConfigurationProvider();
-            AdvertConfig config = configurationProvider.getConfiguration(AdvertConfig.class);
+            AdsConfig config = configurationProvider.getConfiguration(AdsConfig.class);
             if (config != null && !config.isReadClipBoardEnable()) {
                 activateDevice();
                 return;
@@ -297,24 +292,24 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
         private void checkClipBoardAndSendActivateEvent() {
             ConfigurationProvider configurationProvider = trackerContext.getConfigurationProvider();
             String urlScheme = configurationProvider.core().getUrlScheme();
-            final AdvertData tempData = new AdvertData();
-            final boolean success = AdvertUtils.checkClipBoard(trackerContext.getBaseContext(), tempData, urlScheme);
+            final AdsData tempData = new AdsData();
+            final boolean success = AdsUtils.checkClipBoard(trackerContext.getBaseContext(), tempData, urlScheme);
             if (success) {
                 activateDeviceDefer(tempData);
                 final Map<String, String> params = new HashMap<>();
-                int result = AdvertUtils.parseJson(tempData.customParams, params);
+                int result = AdsUtils.parseJson(tempData.customParams, params);
                 sendDeepLinkCallback(result, params, 0);
                 Logger.d(TAG, "用户通过延迟深度链接方式打开，收到参数准备传给 DeepLinkCallback");
             } else {
                 Logger.d(TAG, "非延迟深度链接方式打开应用");
                 // 若无最新的剪贴板信息，则加载上一次未发送的激活信息
-                String data = AdvertUtils.getActivateInfo();
+                String data = AdsUtils.getActivateInfo();
                 if (data != null && !TextUtils.isEmpty(data)) {
-                    AdvertData cacheData = AdvertUtils.parseClipBoardInfo(data, urlScheme);
+                    AdsData cacheData = AdsUtils.parseClipBoardInfo(data, urlScheme);
                     if (cacheData != null) tempData.copy(cacheData);
                     activateDeviceDefer(tempData);
                     final Map<String, String> params = new HashMap<>();
-                    int result = AdvertUtils.parseJson(tempData.customParams, params);
+                    int result = AdsUtils.parseJson(tempData.customParams, params);
                     sendDeepLinkCallback(result, params, 0);
                 } else {
                     // 普通的激活信息
@@ -323,19 +318,19 @@ public class AdvertActivateDataLoader implements ModelLoader<Activate, AdvertRes
             }
         }
 
-        private void activateDeviceDefer(AdvertData data) {
-            if (AdvertUtils.isDeviceActivated()) {
+        private void activateDeviceDefer(AdsData data) {
+            if (AdsUtils.isDeviceActivated()) {
                 return;
             }
             final ActivateEvent.Builder builder = new ActivateEvent.Builder()
                     .clipDefer()
                     .setAdvertData(data.linkID, data.clickID, data.clickTM, data.customParams);
             sendEventToMain(builder);
-            AdvertUtils.setDeviceActivated();
-            AdvertUtils.setActivateInfo(""); //清空剪贴板数据
+            AdsUtils.setDeviceActivated();
+            AdsUtils.setActivateInfo(""); //清空剪贴板数据
         }
 
-        private void sendReengage(AdvertData data) {
+        private void sendReengage(AdsData data) {
             if (TextUtils.isEmpty(data.customParams)) {
                 data.customParams = "{}";
             }

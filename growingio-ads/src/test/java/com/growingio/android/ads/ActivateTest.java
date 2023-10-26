@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.advert;
+package com.growingio.android.ads;
 
 import static org.robolectric.Shadows.shadowOf;
 
@@ -32,9 +32,9 @@ import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.middleware.advert.Activate;
-import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.ads.Activate;
+import com.growingio.android.sdk.track.middleware.ads.AdsResult;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.utils.ConstantPool;
@@ -76,44 +76,44 @@ public class ActivateTest {
     @Test
     @LooperMode(LooperMode.Mode.PAUSED)
     public void activate() {
-        AdvertLibraryGioModule module = new AdvertLibraryGioModule();
+        AdsLibraryGioModule module = new AdsLibraryGioModule();
         module.registerComponents(context);
 
-        AdvertUtils.clearAdvertSharedPreferences();
-        Truth.assertThat(AdvertUtils.isDeviceActivated()).isFalse();
+        AdsUtils.clearAdsSharedPreferences();
+        Truth.assertThat(AdsUtils.isDeviceActivated()).isFalse();
 
-        context.getRegistry().executeData(Activate.activate(), Activate.class, AdvertResult.class);
+        context.getRegistry().executeData(Activate.activate(), Activate.class, AdsResult.class);
         // 等待 view.post 完成
         shadowOf(Looper.getMainLooper()).idle();
-        Truth.assertThat(AdvertUtils.isDeviceActivated()).isTrue();
+        Truth.assertThat(AdsUtils.isDeviceActivated()).isTrue();
     }
 
 
     @Test
     @LooperMode(LooperMode.Mode.PAUSED)
     public void deeplinkUri() {
-        AdvertConfig config = new AdvertConfig();
+        AdsConfig config = new AdsConfig();
         config.setDeepLinkCallback((params, error, appAwakePassedTime) -> {
             Truth.assertThat(error).isEqualTo(0);
             Truth.assertThat(params.toString()).isEqualTo("{name=cpacm}");
         });
         context.getConfigurationProvider().addConfiguration(config);
-        AdvertLibraryGioModule module = new AdvertLibraryGioModule();
+        AdsLibraryGioModule module = new AdsLibraryGioModule();
         module.registerComponents(context);
         Uri uri = Uri.parse("growing.test://customPath?deep_link_id=1111&deep_click_id=2222&deep_click_time=3333&deep_params={\"name\":\"cpacm\"}");
-        context.getRegistry().executeData(Activate.deeplink(uri), Activate.class, AdvertResult.class);
+        context.getRegistry().executeData(Activate.deeplink(uri), Activate.class, AdsResult.class);
         shadowOf(Looper.getMainLooper()).idle();
     }
 
     @Test
     @LooperMode(LooperMode.Mode.PAUSED)
     public void clipBoardTest() {
-        AdvertConfig config = new AdvertConfig();
+        AdsConfig config = new AdsConfig();
         config.setDeepLinkCallback((params, error, appAwakePassedTime) -> {
             Truth.assertThat(params.toString()).isEqualTo("{name=cpacm}");
         });
         context.getConfigurationProvider().addConfiguration(config);
-        AdvertLibraryGioModule module = new AdvertLibraryGioModule();
+        AdsLibraryGioModule module = new AdsLibraryGioModule();
         module.registerComponents(context);
 
         String clipData = "{\n" +
@@ -127,7 +127,7 @@ public class ActivateTest {
 
         ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         cm.setPrimaryClip(ClipData.newPlainText(null, convertToZws(clipData)));
-        context.getRegistry().executeData(Activate.activate(), Activate.class, AdvertResult.class);
+        context.getRegistry().executeData(Activate.activate(), Activate.class, AdsResult.class);
         shadowOf(Looper.getMainLooper()).idle();
     }
 
@@ -158,20 +158,20 @@ public class ActivateTest {
     public void zwsConvertTest() {
         String data = "cpacm";
         String content = convertToZws(data);
-        Truth.assertThat(AdvertUtils.parseZwsData(content)).isEqualTo(data);
+        Truth.assertThat(AdsUtils.parseZwsData(content)).isEqualTo(data);
     }
 
     @Test
     @LooperMode(LooperMode.Mode.PAUSED)
     @Config(shadows = {ShadowDeviceInfoProvider.class, ShadowThreadUtils.class})
     public void shortUrlTest() {
-        AdvertConfig config = new AdvertConfig();
+        AdsConfig config = new AdsConfig();
         config.setDeepLinkHost("https://www.google.com");
         context.getConfigurationProvider().addConfiguration(config);
-        AdvertLibraryGioModule module = new AdvertLibraryGioModule();
+        AdsLibraryGioModule module = new AdsLibraryGioModule();
         module.registerComponents(context);
 
-        AdvertUtils.clearAdvertSharedPreferences();
+        AdsUtils.clearAdsSharedPreferences();
 
         Uri uri = Uri.parse("https://www.google.com/eujsasjf");
         context.getRegistry().executeData(Activate.handleDeeplink(uri, new DeepLinkCallback() {
@@ -179,7 +179,7 @@ public class ActivateTest {
             public void onReceive(Map<String, String> params, int error, long appAwakePassedTime) {
                 Truth.assertThat(error).isEqualTo(DeepLinkCallback.ERROR_NET_FAIL);
             }
-        }), Activate.class, AdvertResult.class);
+        }), Activate.class, AdsResult.class);
         shadowOf(Looper.getMainLooper()).idle();
     }
 

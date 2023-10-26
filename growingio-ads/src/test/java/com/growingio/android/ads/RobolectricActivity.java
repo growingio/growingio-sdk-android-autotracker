@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.advert;
+package com.growingio.android.ads;
 
 import static android.widget.LinearLayout.VERTICAL;
 import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent.EVENT_TYPE.ON_CREATED;

@@ -13,29 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk.track.middleware.advert;
-
-import java.util.Map;
+package com.growingio.android.sdk.track.middleware.ads;
 
 /**
  * <p>
  *
- * @author cpacm 2022/11/23
+ * @author cpacm 2022/8/2
  */
-public interface DeepLinkCallback {
-    int SUCCESS = 0x0;
-    int PARSE_ERROR = 0x1;
-    int ILLEGAL_URI = 0X2;
-    int NO_QUERY = 0X3;
+public class AdsResult {
+    private boolean hasDealWithDeepLink = false;
 
-    int ERROR_NET_FAIL = 0x5;
-    int ERROR_EXCEPTION = 0x6;
+    public AdsResult() {
+    }
 
-    int ERROR_UNKNOWN = 400;
-    int ERROR_LINK_NOT_EXIST = 404;
-    int ERROR_TIMEOUT = 408;
-    int ERROR_APP_NOT_ACCEPT = 406;
-    int ERROR_URL_FORMAT_ERROR = 412;
+    public AdsResult(boolean hasDealWithDeepLink) {
+        this.hasDealWithDeepLink = hasDealWithDeepLink;
+    }
 
-    void onReceive(Map<String, String> params, int error, long appAwakePassedTime);
+    public boolean hasDealWithDeepLink() {
+        return hasDealWithDeepLink;
+    }
+
+    public void setHasDealWithDeepLink(boolean hasDealWithDeepLink) {
+        this.hasDealWithDeepLink = hasDealWithDeepLink;
+    }
 }

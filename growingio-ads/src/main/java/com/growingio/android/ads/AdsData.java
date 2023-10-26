@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.advert;
+package com.growingio.android.ads;
 
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Map;
  *
  * @author cpacm 2022/8/4
  */
-class AdvertData implements Serializable {
+class AdsData implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
@@ -48,7 +48,7 @@ class AdvertData implements Serializable {
     public long tm = 0L;
     public Map<String, String> params;
 
-    public void copy(AdvertData another) {
+    public void copy(AdsData another) {
         this.errorCode = another.errorCode;
         this.linkID = another.linkID;
         this.clickID = another.clickID;

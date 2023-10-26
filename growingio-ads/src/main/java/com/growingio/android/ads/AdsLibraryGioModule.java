@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.advert;
+package com.growingio.android.ads;
 
 import com.growingio.android.sdk.LibraryGioModule;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.middleware.advert.Activate;
-import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
+import com.growingio.android.sdk.track.middleware.ads.Activate;
+import com.growingio.android.sdk.track.middleware.ads.AdsResult;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
@@ -27,9 +27,9 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
  * @author cpacm 2022/08/02
  */
 @GIOLibraryModule
-public class AdvertLibraryGioModule extends LibraryGioModule {
+public class AdsLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(TrackerContext context) {
-        context.getRegistry().register(Activate.class, AdvertResult.class, new AdvertActivateDataLoader.Factory(context));
+        context.getRegistry().register(Activate.class, AdsResult.class, new AdsActivateDataLoader.Factory(context));
     }
 }

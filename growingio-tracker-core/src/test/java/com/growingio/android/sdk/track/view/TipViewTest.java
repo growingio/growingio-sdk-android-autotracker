@@ -23,7 +23,7 @@ import android.view.WindowManager;
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
 import com.growingio.android.sdk.track.middleware.webservice.Circler;
 import com.growingio.android.sdk.track.middleware.webservice.Debugger;
-import com.growingio.android.sdk.track.middleware.advert.DeepLink;
+import com.growingio.android.sdk.track.middleware.ads.DeepLink;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

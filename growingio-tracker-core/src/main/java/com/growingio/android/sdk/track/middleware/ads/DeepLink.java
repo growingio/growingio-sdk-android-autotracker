@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk.track.middleware.advert;
+package com.growingio.android.sdk.track.middleware.ads;
 
 import android.net.Uri;
 

@@ -44,7 +44,7 @@ include ':growingio-webservice:debugger'
 include ':growingio-webservice:circler'
 
 include ':growingio-apm'
-include ':growingio-advert'
+include ':growingio-ads'
 
 include ':growingio-data:protobuf'
 include ':growingio-data:json'

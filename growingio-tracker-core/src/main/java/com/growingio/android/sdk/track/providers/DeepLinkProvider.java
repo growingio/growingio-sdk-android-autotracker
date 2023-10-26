@@ -25,9 +25,9 @@ import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.advert.Activate;
-import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.ads.Activate;
+import com.growingio.android.sdk.track.middleware.ads.AdsResult;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.middleware.webservice.Circler;
@@ -104,7 +104,7 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
                 }
                 if (lastIntentRef != null && lastIntentRef.get() == event.getIntent()) return;
                 lastIntentRef = new WeakReference<>(event.getIntent());
-                AdvertResult result = handleDeepLink(data);
+                AdsResult result = handleDeepLink(data);
                 if (result != null && result.hasDealWithDeepLink()) {
                     event.getIntent().setData(null);
                 }
@@ -117,14 +117,14 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
         }
     }
 
-    private AdvertResult handleDeepLink(Uri data) {
+    private AdsResult handleDeepLink(Uri data) {
         if (configurationProvider.core().isDataCollectionEnabled()) {
             if (data != null) {
                 needResendUri = null;
-                return registry.executeData(Activate.deeplink(data), Activate.class, AdvertResult.class);
+                return registry.executeData(Activate.deeplink(data), Activate.class, AdsResult.class);
             } else {
                 needResendActivate = false;
-                return registry.executeData(Activate.activate(), Activate.class, AdvertResult.class);
+                return registry.executeData(Activate.activate(), Activate.class, AdsResult.class);
             }
         } else {
             if (data != null) {
@@ -141,7 +141,7 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
             return false;
         }
         Uri uri = Uri.parse(url);
-        AdvertResult result = registry.executeData(Activate.handleDeeplink(uri, callback), Activate.class, AdvertResult.class);
+        AdsResult result = registry.executeData(Activate.handleDeeplink(uri, callback), Activate.class, AdsResult.class);
         if (result == null) {
             Logger.e(TAG, "AdvertModule is null, please register advert component first.");
             return false;

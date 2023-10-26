@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-	namespace 'com.growingio.android.advert'
+	namespace 'com.growingio.android.ads'
 	compileSdkVersion buildConfiguration.compileVersion
 	defaultConfig {
 		minSdkVersion buildConfiguration.minSdkVersion

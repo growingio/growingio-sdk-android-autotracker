@@ -67,7 +67,7 @@ growingio-json = { module = "com.growingio.android:json", version.ref = "growing
 growingio-protobuf = { module = "com.growingio.android:protobuf", version.ref = "growingio" }
 growingio-encoder = { module = "com.growingio.android:encoder", version.ref = "growingio" }
 growingio-oaid = { module = "com.growingio.android:oaid", version.ref = "growingio" }
-growingio-advert = { module = "com.growingio.android:advert", version.ref = "growingio" }
+growingio-ads = { module = "com.growingio.android:ads", version.ref = "growingio" }
 growingio-flutter = { module = "com.growingio.android:flutter", version.ref = "growingio" }
 growingio-apm = { module = "com.growingio.android:apm", version.ref = "growingio" }
 growingio-gmonitor = "com.growingio.android:gmonitor:2.0.0"

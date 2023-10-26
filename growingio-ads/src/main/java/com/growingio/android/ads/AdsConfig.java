@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.advert;
+package com.growingio.android.ads;
 
-import static com.growingio.android.advert.AdvertUtils.DEEPLINK_AD_HOST;
+import static com.growingio.android.ads.AdsUtils.DEEPLINK_AD_HOST;
 
 import com.growingio.android.sdk.Configurable;
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 
 /**
  * <p>
  *
  * @author cpacm 2022/8/3
  */
-public class AdvertConfig implements Configurable {
+public class AdsConfig implements Configurable {
 
     private boolean readClipBoardEnable = false;
     private String deepLinkHost = DEEPLINK_AD_HOST;
     private DeepLinkCallback deepLinkCallback;
 
-    public AdvertConfig setReadClipBoardEnable(boolean readClipBoardEnable) {
+    public AdsConfig setReadClipBoardEnable(boolean readClipBoardEnable) {
         this.readClipBoardEnable = readClipBoardEnable;
         return this;
     }
 
-    public AdvertConfig setDeepLinkCallback(DeepLinkCallback advertReceiveCallback) {
+    public AdsConfig setDeepLinkCallback(DeepLinkCallback advertReceiveCallback) {
         this.deepLinkCallback = advertReceiveCallback;
         return this;
     }
@@ -45,7 +45,7 @@ public class AdvertConfig implements Configurable {
         return deepLinkHost;
     }
 
-    public AdvertConfig setDeepLinkHost(String deeplinkHost) {
+    public AdsConfig setDeepLinkHost(String deeplinkHost) {
         if (deeplinkHost == null || deeplinkHost.isEmpty()) {
             throw new IllegalArgumentException("deepLink must not be empty");
         }
