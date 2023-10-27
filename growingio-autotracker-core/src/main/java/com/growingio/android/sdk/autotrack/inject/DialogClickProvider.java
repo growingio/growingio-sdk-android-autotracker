@@ -45,6 +45,7 @@ class DialogClickProvider {
      */
     public static void alertDialogXOnClick(androidx.appcompat.app.AlertDialog dialog, int which) {
         Logger.d(TAG, "alertDialogXOnClick: which = " + which);
+        if (dialog == null) return;
         if (which < 0) {
             Button button = dialog.getButton(which);
             if (button != null) {
@@ -60,6 +61,7 @@ class DialogClickProvider {
 
     public static void alertDialogSupportOnClick(android.support.v7.app.AlertDialog dialog, int which) {
         Logger.d(TAG, "alertDialogSupportOnClick: which = " + which);
+        if (dialog == null) return;
         if (which < 0) {
             Button button = dialog.getButton(which);
             if (button != null) {
@@ -74,6 +76,7 @@ class DialogClickProvider {
     }
 
     public static void alertDialogOnClick(AlertDialog dialog, int which) {
+        if (dialog == null) return;
         Logger.d(TAG, "alertDialogOnClick: which = " + which);
         if (which < 0) {
             Button button = dialog.getButton(which);

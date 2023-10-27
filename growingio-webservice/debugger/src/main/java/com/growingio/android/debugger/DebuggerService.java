@@ -202,7 +202,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>, IActivityLi
         }
         socketState.set(SOCKET_STATE_CLOSED);
         safeTipView.setErrorMessage(R.string.growing_debugger_connected_to_web_failed);
-        Logger.e(TAG, "Start CirclerService Failed");
+        Logger.e(TAG, "Start DebuggerService Failed");
         safeTipView.showQuitedDialog(this::exitDebugger);
     }
 
