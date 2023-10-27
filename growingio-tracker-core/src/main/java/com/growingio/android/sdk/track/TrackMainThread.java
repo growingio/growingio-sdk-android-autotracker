@@ -126,7 +126,7 @@ public final class TrackMainThread {
     }
 
     public void releaseCaches() {
-        if (caches.size() > 0 && coreConfiguration != null && coreConfiguration.isDataCollectionEnabled()) {
+        if (!caches.isEmpty() && coreConfiguration != null && coreConfiguration.isDataCollectionEnabled()) {
             for (BaseEvent.BaseBuilder<?> eventBuilder : caches) {
                 TrackMainThread.trackMain().postEventToTrackMain(eventBuilder);
             }
@@ -136,6 +136,7 @@ public final class TrackMainThread {
     }
 
     public void cacheEventToTrackMain(BaseEvent.BaseBuilder<?> eventBuilder) {
+        if (eventBuilder == null) return;
         if (coreConfiguration == null || !coreConfiguration.isDataCollectionEnabled()) {
             Logger.w(TAG, "cache event before sdk init: " + eventBuilder.getEventType());
             caches.add(eventBuilder);
@@ -148,6 +149,7 @@ public final class TrackMainThread {
      * cache events in the current thread
      */
     public void cacheEventSync(final BaseEvent.BaseBuilder<?> eventBuilder) {
+        if (eventBuilder == null) return;
         if (coreConfiguration == null || !coreConfiguration.isDataCollectionEnabled()) {
             Logger.w(TAG, "cache event before sdk init: " + eventBuilder.getEventType());
             caches.add(eventBuilder);
