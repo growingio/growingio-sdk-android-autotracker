@@ -28,6 +28,7 @@ import java.lang.Deprecated
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+import kotlin.Boolean
 import kotlin.IllegalStateException
 import kotlin.String
 import kotlin.apply
@@ -81,6 +82,10 @@ import kotlin.check
  *      }
  *      _gioTracker = null;
  *    }
+ *
+ *   public static boolean isRunning(){
+ *     return _gioTracker != null && TrackerContext.initializedSuccessfully();
+ *   }
  *
  *    private static Tracker empty() {
  *        return new Tracker(null);
@@ -163,6 +168,7 @@ class GioTrackerGenerator(
             .addMethod(generateStartConfigurationMethod(appModule, trackerClass, configClass))
             .addMethod(generateEmptyMethod(trackerClass))
             .addMethod(generateShutdownMethod())
+            .addMethod(generateIsRunningMethod())
             .addMethod(generateSuccessMethod())
             .build()
 
@@ -210,7 +216,7 @@ class GioTrackerGenerator(
             // .addAnnotation(java.lang.Deprecated::class.java)
             .addParameter(ClassName.get(context), "context")
             .addParameter(configClass, "trackConfiguration")
-            .beginControlFlow("if (_gioTracker != null)")
+            .beginControlFlow("if (isRunning())")
             .addStatement(
                 "\$T.e(TAG, \$S)",
                 ClassName.get(logger),
@@ -251,7 +257,7 @@ class GioTrackerGenerator(
         val getMethod = MethodSpec.methodBuilder("start")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(ClassName.get(context), "context")
-            .beginControlFlow("if (_gioTracker != null)")
+            .beginControlFlow("if (isRunning())")
             .addStatement(
                 "\$T.e(TAG, \$S)",
                 ClassName.get(logger),
@@ -307,6 +313,20 @@ class GioTrackerGenerator(
             .endControlFlow()
             .addStatement("_gioTracker = null")
         return shutdownMethod.build()
+    }
+
+    private fun generateIsRunningMethod(): MethodSpec {
+        val isRunningMethod = MethodSpec.methodBuilder("isRunning")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addStatement(
+                "return _gioTracker != null && \$T.initializedSuccessfully()",
+                ClassName.get(
+                    ProcessUtils.GIO_TRACKER_CONTEXT_PACKAGE,
+                    ProcessUtils.GIO_TRACKER_CONTEXT_NAME
+                )
+            )
+            .returns(Boolean::class.java)
+        return isRunningMethod.build()
     }
 
     private fun generateEmptyMethod(trackerClass: ClassName): MethodSpec {

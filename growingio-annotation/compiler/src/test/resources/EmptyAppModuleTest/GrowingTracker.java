@@ -18,6 +18,7 @@ package com.growingio.android.sdk.test;
 import android.content.Context;
 
 import com.growingio.android.sdk.Tracker;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
@@ -48,7 +49,7 @@ public final class GrowingTracker {
     }
 
     public static void start(Context context) {
-        if (_gioTracker != null) {
+        if (isRunning()) {
             Logger.e(TAG, "Tracker is running");
             return;
         }
@@ -57,7 +58,7 @@ public final class GrowingTracker {
 
     public static void startWithConfiguration(Context context,
                                               TestTrackConfiguration trackConfiguration) {
-        if (_gioTracker != null) {
+        if (isRunning()) {
             Logger.e(TAG, "Tracker is running");
             return;
         }
@@ -77,6 +78,10 @@ public final class GrowingTracker {
             _gioTracker.shutdown();
         }
         _gioTracker = null;
+    }
+
+    public static boolean isRunning() {
+        return _gioTracker != null && TrackerContext.initializedSuccessfully();
     }
 
     private static void initSuccess(String message) {
