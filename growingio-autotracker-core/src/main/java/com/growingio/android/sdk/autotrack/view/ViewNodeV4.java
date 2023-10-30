@@ -361,7 +361,7 @@ class ViewNodeV4 implements ViewNode {
         this.index = this.viewPosition;
         xPath.append("/").append(viewName);
         xIndex.delete(0, xIndex.length()).append(indeedXIndex).append("/-");
-        indeedXIndex.append("/-");
+        indeedXIndex.append("/").append(this.viewPosition);
     }
 
     private void calculateDefaultViewGroup(ViewGroup parent, String viewName, StringBuilder xPath, StringBuilder indeedXIndex, StringBuilder xIndex) {
