@@ -184,6 +184,11 @@ class ViewNodeV4 implements ViewNode {
         calculateViewPosition();
         calculateViewXPath();
         calculateViewContent();
+
+        // index start with 1
+        if (this.index > -1) {
+            this.index += 1;
+        }
     }
 
     private void calculateViewPosition() {

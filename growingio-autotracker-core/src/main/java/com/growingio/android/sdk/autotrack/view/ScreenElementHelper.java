@@ -169,7 +169,7 @@ public class ScreenElementHelper {
             json.put(PAGE_TOP, ((Double) data.get(PAGE_TOP)).intValue());
             json.put(PAGE_WIDTH, ((Double) data.get(PAGE_WIDTH)).intValue());
             json.put(PAGE_HEIGHT, ((Double) data.get(PAGE_HEIGHT)).intValue());
-            if(data.containsKey(PAGE_IGNORED)) {
+            if (data.containsKey(PAGE_IGNORED)) {
                 json.put(PAGE_IGNORED, (boolean) data.get(PAGE_IGNORED));
             }
             return json;
