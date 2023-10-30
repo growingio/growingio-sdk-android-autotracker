@@ -184,11 +184,6 @@ class ViewNodeV4 implements ViewNode {
         calculateViewPosition();
         calculateViewXPath();
         calculateViewContent();
-
-        // index start with 1
-        if (this.index > -1) {
-            this.index += 1;
-        }
     }
 
     private void calculateViewPosition() {
@@ -354,11 +349,14 @@ class ViewNodeV4 implements ViewNode {
                 xIndex.delete(0, xIndex.length()).append(indeedXIndex).append("/-").append("/0");
                 indeedXIndex.append("/").append(groupIdx).append("/0");
             }
+            // index start with 1
+            this.index += 1;
         }
     }
 
     private void calculateListView(String viewName, StringBuilder xPath, StringBuilder indeedXIndex, StringBuilder xIndex) {
-        this.index = this.viewPosition;
+        // index start with 1
+        this.index = this.viewPosition + 1;
         xPath.append("/").append(viewName);
         xIndex.delete(0, xIndex.length()).append(indeedXIndex).append("/-");
         indeedXIndex.append("/").append(this.viewPosition);
