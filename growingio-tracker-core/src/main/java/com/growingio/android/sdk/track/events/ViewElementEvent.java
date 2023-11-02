@@ -37,7 +37,7 @@ public class ViewElementEvent extends BaseAttributesEvent {
     @IntRange(from = 0)
     private final long pageShowTimestamp;
     private final String xpath;
-    @IntRange(from = -1)
+    @IntRange(from = 0)
     private final int index;
 
     /**
