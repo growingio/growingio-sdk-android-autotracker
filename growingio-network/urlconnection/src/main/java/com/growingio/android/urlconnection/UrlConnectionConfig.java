@@ -22,8 +22,9 @@ import java.util.concurrent.TimeUnit;
 
 public class UrlConnectionConfig implements Configurable {
 
-    private int connectTimeout = 5_000;
-    private int readTimeout = 5_000;
+    public static final int DEFAULT_URL_CONNECTION_TIMEOUT = 15_000;
+    private int connectTimeout = DEFAULT_URL_CONNECTION_TIMEOUT;
+    private int readTimeout = DEFAULT_URL_CONNECTION_TIMEOUT;
 
     public UrlConnectionConfig setConnectTimeout(long connectTimeout, TimeUnit unit) {
         this.connectTimeout = checkDuration("connectTimeout", connectTimeout, unit);
@@ -44,7 +45,7 @@ public class UrlConnectionConfig implements Configurable {
     }
 
     private static int checkDuration(String name, long duration, TimeUnit unit) {
-        if (duration < 0) throw new IllegalArgumentException(name + " < 0");
+        if (duration <= 0) throw new IllegalArgumentException(name + " <= 0");
         if (unit == null) throw new NullPointerException("unit == null");
         long millis = unit.toMillis(duration);
         if (millis > Integer.MAX_VALUE) throw new IllegalArgumentException(name + " too large.");

@@ -69,7 +69,7 @@ public class VolleyDataFetcher implements HttpDataFetcher<EventResponse> {
         if (config != null) {
             timeout = config.getVolleyTimeout();
         } else {
-            timeout = 5_000;
+            timeout = VolleyConfig.DEFAULT_VOLLEY_TIMEOUT;
         }
     }
 

@@ -37,7 +37,7 @@ public class OkHttpConfig implements Configurable {
      *
      * <p>Default: connectTimeout + readTimeout + writeTimeout = 30s
      */
-    public OkHttpConfig setOkHttpCallTimeout(long timeout, TimeUnit unit) {
+    public OkHttpConfig setRequestTimeout(long timeout, TimeUnit unit) {
         callTimeout = checkDuration("timeout", timeout, unit);
         return this;
     }
@@ -51,7 +51,7 @@ public class OkHttpConfig implements Configurable {
      *
      * <p>Default: connectTimeout + readTimeout + writeTimeout = 30s
      */
-    public OkHttpConfig setOkHttpTimeout(long connectTimeout, long readTimeout, long writeTimeout, TimeUnit unit) {
+    public OkHttpConfig setRequestDetailTimeout(long connectTimeout, long readTimeout, long writeTimeout, TimeUnit unit) {
         this.callTimeout = 0;
         this.connectTimeout = checkDuration("callTimeout", connectTimeout, unit);
         this.readTimeout = checkDuration("readTimeout", readTimeout, unit);

@@ -16,6 +16,8 @@
 
 package com.growingio.android.urlconnection;
 
+import static com.growingio.android.urlconnection.UrlConnectionConfig.DEFAULT_URL_CONNECTION_TIMEOUT;
+
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
@@ -42,7 +44,6 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
     private static final String TAG = "UrlConnectionFetcher";
 
     private static final int MAXIMUM_REDIRECTS = 2;
-    private static final int TIME_OUT = 5000;
     private static final String REDIRECT_HEADER_FIELD = "Location";
     private static final int INVALID_STATUS_CODE = -1;
     private static final HttpUrlConnectionFactory DEFAULT_CONNECTION_FACTORY =
@@ -65,8 +66,8 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             connectTimeout = config.getConnectTimeout();
             readTimeout = config.getReadTimeout();
         } else {
-            connectTimeout = TIME_OUT;
-            readTimeout = TIME_OUT;
+            connectTimeout = DEFAULT_URL_CONNECTION_TIMEOUT;
+            readTimeout = DEFAULT_URL_CONNECTION_TIMEOUT;
         }
     }
 

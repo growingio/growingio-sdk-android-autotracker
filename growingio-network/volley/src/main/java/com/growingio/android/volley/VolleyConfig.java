@@ -22,9 +22,11 @@ import java.util.concurrent.TimeUnit;
 
 public class VolleyConfig implements Configurable {
 
-    private int timeout = 5_000;
+    public static final int DEFAULT_VOLLEY_TIMEOUT = 30_000;
 
-    public VolleyConfig setVolleyTimeout(long timeout, TimeUnit unit) {
+    private int timeout = DEFAULT_VOLLEY_TIMEOUT;
+
+    public VolleyConfig setRequestTimeout(long timeout, TimeUnit unit) {
         this.timeout = checkDuration("timeout", timeout, unit);
         return this;
     }
@@ -34,7 +36,7 @@ public class VolleyConfig implements Configurable {
     }
 
     private static int checkDuration(String name, long duration, TimeUnit unit) {
-        if (duration < 0) throw new IllegalArgumentException(name + " < 0");
+        if (duration <= 0) throw new IllegalArgumentException(name + " <= 0");
         if (unit == null) throw new NullPointerException("unit == null");
         long millis = unit.toMillis(duration);
         if (millis > Integer.MAX_VALUE) throw new IllegalArgumentException(name + " too large.");
