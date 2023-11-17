@@ -322,8 +322,8 @@ class GioTrackerGenerator(
                 "return _gioTracker != null && \$T.initializedSuccessfully()",
                 ClassName.get(
                     ProcessUtils.GIO_TRACKER_CONTEXT_PACKAGE,
-                    ProcessUtils.GIO_TRACKER_CONTEXT_NAME
-                )
+                    ProcessUtils.GIO_TRACKER_CONTEXT_NAME,
+                ),
             )
             .returns(Boolean::class.java)
         return isRunningMethod.build()
