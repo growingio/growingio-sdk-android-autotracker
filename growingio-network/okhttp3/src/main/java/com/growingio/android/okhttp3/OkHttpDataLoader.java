@@ -48,27 +48,29 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
         private static volatile Call.Factory sInternalClient;
         private final Call.Factory client;
 
-        private static final int DEFAULT_CONNECT_TIMEOUT = 5;
-        private static final int DEFAULT_READ_TIMEOUT = 10;
-
-        private static Call.Factory getsInternalClient() {
+        private static Call.Factory getsInternalClient(OkHttpConfig config) {
             if (sInternalClient == null) {
                 synchronized (Factory.class) {
                     if (sInternalClient == null) {
-                        sInternalClient = new OkHttpClient.Builder()
-                                .connectTimeout(DEFAULT_CONNECT_TIMEOUT, TimeUnit.SECONDS)
-                                .readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.SECONDS)
-                                .addInterceptor(new SecurityExceptionInterceptor())
-                                //.addInterceptor(new HttpLoggingInterceptor(message -> Logger.d("OKHTTP Logging", message)).setLevel(HttpLoggingInterceptor.Level.HEADERS))
-                                .build();
+                        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                        if (config.getHttpCallTimeout() > 0) {
+                            builder.callTimeout(config.getHttpCallTimeout(), TimeUnit.MILLISECONDS);
+                        } else {
+                            builder.connectTimeout(config.getConnectTimeout(), TimeUnit.MILLISECONDS);
+                            builder.readTimeout(config.getReadTimeout(), TimeUnit.MILLISECONDS);
+                            builder.writeTimeout(config.getWriteTimeout(), TimeUnit.MILLISECONDS);
+                        }
+                        builder.addInterceptor(new SecurityExceptionInterceptor());
+                        //builder.addInterceptor(new HttpLoggingInterceptor(message -> Logger.d("OKHTTP Logging", message)).setLevel(HttpLoggingInterceptor.Level.HEADERS))
+                        sInternalClient = builder.build();
                     }
                 }
             }
             return sInternalClient;
         }
 
-        public Factory() {
-            this(getsInternalClient());
+        public Factory(OkHttpConfig config) {
+            this(getsInternalClient(config));
         }
 
         public Factory(Call.Factory client) {

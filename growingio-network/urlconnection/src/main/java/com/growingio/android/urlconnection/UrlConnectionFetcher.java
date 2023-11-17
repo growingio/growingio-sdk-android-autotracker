@@ -16,12 +16,15 @@
 
 package com.growingio.android.urlconnection;
 
+import static com.growingio.android.urlconnection.UrlConnectionConfig.DEFAULT_URL_CONNECTION_TIMEOUT;
+
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +44,6 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
     private static final String TAG = "UrlConnectionFetcher";
 
     private static final int MAXIMUM_REDIRECTS = 2;
-    private static final int TIME_OUT = 5000;
     private static final String REDIRECT_HEADER_FIELD = "Location";
     private static final int INVALID_STATUS_CODE = -1;
     private static final HttpUrlConnectionFactory DEFAULT_CONNECTION_FACTORY =
@@ -54,8 +56,19 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
     private InputStream stream;
     private volatile boolean isCancelled;
 
+    private final int connectTimeout;
+    private final int readTimeout;
+
     public UrlConnectionFetcher(EventUrl eventUrl) {
         this.eventUrl = eventUrl;
+        UrlConnectionConfig config = ConfigurationProvider.get().getConfiguration(UrlConnectionConfig.class);
+        if (config != null) {
+            connectTimeout = config.getConnectTimeout();
+            readTimeout = config.getReadTimeout();
+        } else {
+            connectTimeout = DEFAULT_URL_CONNECTION_TIMEOUT;
+            readTimeout = DEFAULT_URL_CONNECTION_TIMEOUT;
+        }
     }
 
     @Override
@@ -150,8 +163,8 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
                 urlConnection.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
             }
             urlConnection.setRequestMethod("POST");
-            urlConnection.setConnectTimeout(TIME_OUT);
-            urlConnection.setReadTimeout(TIME_OUT);
+            urlConnection.setConnectTimeout(connectTimeout);
+            urlConnection.setReadTimeout(readTimeout);
             urlConnection.setUseCaches(false);
             urlConnection.setDoInput(true);
             if (data != null) {
