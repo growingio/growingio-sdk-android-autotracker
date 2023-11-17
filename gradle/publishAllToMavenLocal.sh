@@ -11,7 +11,6 @@
 && ./gradlew :growingio-data:encoder:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-network:okhttp3:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-network:urlconnection:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :growingio-network:volley:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-hybrid:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-ads:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:debugger:publishMavenAgentPublicationToMavenLocal \

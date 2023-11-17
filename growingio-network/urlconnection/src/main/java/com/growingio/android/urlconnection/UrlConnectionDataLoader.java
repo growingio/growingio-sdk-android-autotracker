@@ -27,19 +27,28 @@ import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
  */
 public class UrlConnectionDataLoader implements ModelLoader<EventUrl, EventResponse> {
 
-    public UrlConnectionDataLoader() {
+    private final UrlConnectionConfig config;
+
+    public UrlConnectionDataLoader(UrlConnectionConfig config) {
+        this.config = config;
     }
 
     @Override
     public LoadData<EventResponse> buildLoadData(EventUrl eventUrl) {
-        return new LoadData<>(new UrlConnectionFetcher(eventUrl));
+        return new LoadData<>(new UrlConnectionFetcher(config, eventUrl));
     }
 
     public static class Factory implements ModelLoaderFactory<EventUrl, EventResponse> {
 
+        private final UrlConnectionConfig config;
+
+        public Factory(UrlConnectionConfig config) {
+            this.config = config;
+        }
+
         @Override
         public ModelLoader<EventUrl, EventResponse> build() {
-            return new UrlConnectionDataLoader();
+            return new UrlConnectionDataLoader(config);
         }
     }
 }

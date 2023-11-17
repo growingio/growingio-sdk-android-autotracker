@@ -23,7 +23,6 @@ import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +48,6 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             new DefaultHttpUrlConnectionFactory();
 
     private final EventUrl eventUrl;
-    private DataCallback<? super EventResponse> callback;
 
     private HttpURLConnection urlConnection;
     private InputStream stream;
@@ -58,9 +56,8 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
     private final int connectTimeout;
     private final int readTimeout;
 
-    public UrlConnectionFetcher(EventUrl eventUrl) {
+    public UrlConnectionFetcher(UrlConnectionConfig config, EventUrl eventUrl) {
         this.eventUrl = eventUrl;
-        UrlConnectionConfig config = ConfigurationProvider.get().getConfiguration(UrlConnectionConfig.class);
         if (config != null) {
             connectTimeout = config.getConnectTimeout();
             readTimeout = config.getReadTimeout();

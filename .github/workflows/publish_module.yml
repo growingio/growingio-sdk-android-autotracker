@@ -12,7 +12,6 @@ on:
             - autotracker-bom
             - hybrid
             - okhttp3
-            - volley
             - urlconnection
             - database
             - debugger

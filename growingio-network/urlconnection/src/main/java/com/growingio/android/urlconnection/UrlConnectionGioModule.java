@@ -31,6 +31,8 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 public class UrlConnectionGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(TrackerContext context) {
-        context.getRegistry().register(EventUrl.class, EventResponse.class, new UrlConnectionDataLoader.Factory());
+        UrlConnectionConfig config = context.getConfigurationProvider().getConfiguration(UrlConnectionConfig.class);
+        if (config == null) config = new UrlConnectionConfig();
+        context.getRegistry().register(EventUrl.class, EventResponse.class, new UrlConnectionDataLoader.Factory(config));
     }
 }

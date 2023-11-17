@@ -38,7 +38,6 @@ include ':growingio-hybrid'
 
 include ':growingio-network:okhttp3'
 include ':growingio-network:urlconnection'
-include ':growingio-network:volley'
 
 include ':growingio-webservice:debugger'
 include ':growingio-webservice:circler'

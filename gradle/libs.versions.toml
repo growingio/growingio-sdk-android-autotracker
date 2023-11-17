@@ -58,7 +58,6 @@ growingio-compiler = { module = "com.growingio.android:compiler", version.ref = 
 # modules
 growingio-hybrid = { module = "com.growingio.android:hybrid", version.ref = "growingio" }
 growingio-okhttp3 = { module = "com.growingio.android:okhttp3", version.ref = "growingio" }
-growingio-volley = { module = "com.growingio.android:volley", version.ref = "growingio" }
 growingio-urlconnection = { module = "com.growingio.android:urlconnection", version.ref = "growingio" }
 growingio-database = { module = "com.growingio.android:database", version.ref = "growingio" }
 growingio-debugger = { module = "com.growingio.android:debugger", version.ref = "growingio" }
@@ -125,7 +124,6 @@ google-analytics = "com.google.firebase:firebase-analytics-ktx:20.0.2"
 google-crashlytics = "com.google.firebase:firebase-crashlytics-ktx:18.2.6"
 google-crashlyticsGradle = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
 google-gmsGoogleServices = "com.google.gms:google-services:4.3.10"
-google-volley = "com.android.volley:volley:1.2.1"
 
 google-auto-service = "com.google.auto.service:auto-service:1.1.0"
 google-auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1.0"
