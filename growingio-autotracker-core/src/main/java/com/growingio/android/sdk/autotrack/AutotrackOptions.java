@@ -85,7 +85,7 @@ public class AutotrackOptions {
         return fragmentPageEnabled;
     }
 
-    private void setFragmentPageEnabled(boolean fragmentPageEnabled) {
+    public void setFragmentPageEnabled(boolean fragmentPageEnabled) {
         this.fragmentPageEnabled = fragmentPageEnabled;
     }
 
@@ -93,7 +93,7 @@ public class AutotrackOptions {
         return activityPageEnabled;
     }
 
-    private void setActivityPageEnabled(boolean activityPageEnabled) {
+    public void setActivityPageEnabled(boolean activityPageEnabled) {
         this.activityPageEnabled = activityPageEnabled;
     }
 

@@ -45,10 +45,6 @@ public class AutotrackConfig implements Configurable {
         return mAutotrackOptions.isWebViewBridgeEnabled();
     }
 
-//    public AutotrackConfig setAutotrackOptions(AutotrackOptions options) {
-//        this.mAutotrackOptions = options;
-//        return this;
-//    }
 
     public AutotrackOptions getAutotrackOptions() {
         return mAutotrackOptions;
