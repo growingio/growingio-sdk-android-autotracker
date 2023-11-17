@@ -27,10 +27,14 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
  *
  * @author cpacm 4/28/21
  */
-@GIOLibraryModule
+@GIOLibraryModule(config = OkHttpConfig.class)
 public class OkhttpLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(TrackerContext context) {
-        context.getRegistry().register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory());
+        OkHttpConfig config = context.getConfigurationProvider().getConfiguration(OkHttpConfig.class);
+        if (config == null) {
+            config = new OkHttpConfig();
+        }
+        context.getRegistry().register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory(config));
     }
 }

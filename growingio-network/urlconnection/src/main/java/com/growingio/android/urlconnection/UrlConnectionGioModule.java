@@ -27,7 +27,7 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
  *
  * @author cpacm 4/28/21
  */
-@GIOLibraryModule
+@GIOLibraryModule(config = UrlConnectionConfig.class)
 public class UrlConnectionGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(TrackerContext context) {

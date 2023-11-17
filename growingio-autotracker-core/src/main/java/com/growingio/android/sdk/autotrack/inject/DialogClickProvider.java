@@ -59,6 +59,7 @@ class DialogClickProvider implements TrackerLifecycleProvider {
      */
     public void alertDialogXOnClick(androidx.appcompat.app.AlertDialog dialog, int which) {
         Logger.d(TAG, "alertDialogXOnClick: which = " + which);
+        if (dialog == null) return;
         if (which < 0) {
             Button button = dialog.getButton(which);
             if (button != null) {
@@ -74,6 +75,7 @@ class DialogClickProvider implements TrackerLifecycleProvider {
 
     public void alertDialogSupportOnClick(android.support.v7.app.AlertDialog dialog, int which) {
         Logger.d(TAG, "alertDialogSupportOnClick: which = " + which);
+        if (dialog == null) return;
         if (which < 0) {
             Button button = dialog.getButton(which);
             if (button != null) {
@@ -89,6 +91,7 @@ class DialogClickProvider implements TrackerLifecycleProvider {
 
     public void alertDialogOnClick(AlertDialog dialog, int which) {
         Logger.d(TAG, "alertDialogOnClick: which = " + which);
+        if (dialog == null) return;
         if (which < 0) {
             Button button = dialog.getButton(which);
             if (button != null) {

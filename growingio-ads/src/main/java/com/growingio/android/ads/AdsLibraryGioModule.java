@@ -26,7 +26,7 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
  *
  * @author cpacm 2022/08/02
  */
-@GIOLibraryModule
+@GIOLibraryModule(config = AdvertConfig.class)
 public class AdsLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(TrackerContext context) {

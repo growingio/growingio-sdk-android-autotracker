@@ -103,7 +103,9 @@ class ViewClickProvider implements TrackerLifecycleProvider {
             Logger.i(TAG, "AutotrackOptions: tablayout tab select enable is false");
             return;
         }
-        viewOnClick(tab.view);
+        if (tab != null) {
+            viewOnClick(tab.view);
+        }
     }
 
     public void compoundButtonOnCheck(CompoundButton button) {
@@ -177,6 +179,11 @@ class ViewClickProvider implements TrackerLifecycleProvider {
     public void viewOnClick(View view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        if (view == null) {
+            Logger.e(TAG, "viewOnClick: view is NULL");
             return;
         }
 

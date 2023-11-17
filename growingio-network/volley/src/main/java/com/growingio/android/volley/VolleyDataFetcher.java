@@ -29,6 +29,7 @@ import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
@@ -52,6 +53,8 @@ public class VolleyDataFetcher implements HttpDataFetcher<EventResponse> {
     private final EventUrl url;
     private volatile com.android.volley.Request<byte[]> request;
 
+    private final long timeout;
+
     public VolleyDataFetcher(RequestQueue requestQueue, EventUrl eventUrl) {
         this(requestQueue, eventUrl, DEFAULT_REQUEST_FACTORY);
     }
@@ -61,6 +64,12 @@ public class VolleyDataFetcher implements HttpDataFetcher<EventResponse> {
         this.requestQueue = requestQueue;
         this.url = url;
         this.requestFactory = requestFactory;
+        VolleyConfig config = ConfigurationProvider.get().getConfiguration(VolleyConfig.class);
+        if (config != null) {
+            timeout = config.getVolleyTimeout();
+        } else {
+            timeout = VolleyConfig.DEFAULT_VOLLEY_TIMEOUT;
+        }
     }
 
 
@@ -83,7 +92,7 @@ public class VolleyDataFetcher implements HttpDataFetcher<EventResponse> {
         request = requestFactory.create(url.toUrl(), url.getHeaders(), url.getMediaType(), url.getRequestBody(), future, future);
         requestQueue.add(request);
         try {
-            return future.get(5L, TimeUnit.SECONDS);
+            return future.get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Logger.e(TAG, e, "executeData interrupted");
             Thread.currentThread().interrupt();

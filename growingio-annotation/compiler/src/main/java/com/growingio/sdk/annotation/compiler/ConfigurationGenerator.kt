@@ -293,7 +293,7 @@ internal class ConfigurationGenerator(
         val enclosingClass = method.enclosingElement
         require(!enclosingClass.modifiers.contains(Modifier.ABSTRACT)) { "Cannot transform method on abstract class $enclosingClass" }
         var modifiers = method.modifiers
-        if (modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)) {
+        if (!modifiers.contains(Modifier.PUBLIC)) {
             processUtils.debugLog("cannot transform method with modifiers: $modifiers")
             return null
         }
