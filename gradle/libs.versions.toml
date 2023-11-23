@@ -29,7 +29,7 @@ powermock = "2.0.9"
 # !!! SDK VERSION !!!
 growingio = "4.0.0-SNAPSHOT"
 growingioCode = "40000"
-growingioPlugin = "3.5.0"
+growingioPlugin = "4.0.0-SNAPSHOT"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "pluginGradle" }

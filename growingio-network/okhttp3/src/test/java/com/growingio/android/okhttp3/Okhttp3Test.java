@@ -32,6 +32,7 @@ import org.junit.runners.JUnit4;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -94,7 +95,11 @@ public class Okhttp3Test extends MockServer {
     @Test
     public void sendTest() {
         TrackerRegistry trackerRegistry = new TrackerRegistry();
-        trackerRegistry.register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory());
+        OkHttpConfig config = new OkHttpConfig();
+        config.setRequestDetailTimeout(10L,10L,10L, TimeUnit.SECONDS);
+        Truth.assertThat(config.getHttpCallTimeout()).isEqualTo(0);
+
+        trackerRegistry.register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory(config));
 
         ModelLoader<EventUrl, EventResponse> modelLoader = trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
         EventUrl eventUrl = initEventUrl("http://localhost:8910/");

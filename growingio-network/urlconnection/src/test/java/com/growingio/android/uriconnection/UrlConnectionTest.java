@@ -29,6 +29,7 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.urlconnection.HttpException;
 import com.growingio.android.urlconnection.LogTime;
+import com.growingio.android.urlconnection.UrlConnectionConfig;
 import com.growingio.android.urlconnection.UrlConnectionDataLoader;
 
 import org.junit.Before;
@@ -40,6 +41,7 @@ import org.robolectric.annotation.Config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -98,7 +100,10 @@ public class UrlConnectionTest {
     public void sendTest() throws IOException {
         mockWebServer.start(8910);
         TrackerRegistry trackerRegistry = new TrackerRegistry();
-        trackerRegistry.register(EventUrl.class, EventResponse.class, new UrlConnectionDataLoader.Factory());
+        UrlConnectionConfig config = new UrlConnectionConfig();
+        config.setConnectTimeout(15L, TimeUnit.SECONDS);
+        config.setReadTimeout(15L, TimeUnit.SECONDS);
+        trackerRegistry.register(EventUrl.class, EventResponse.class, new UrlConnectionDataLoader.Factory(config));
 
         ModelLoader<EventUrl, EventResponse> modelLoader = trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
         EventUrl eventUrl = initEventUrl("http://localhost:8910/");
