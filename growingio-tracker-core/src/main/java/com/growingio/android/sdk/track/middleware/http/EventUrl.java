@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 public class EventUrl {
+
+    public static int GET = 0;
+    public static int POST = 1;
     private final String mHost;
     private final Map<String, String> mHeaders = new HashMap<>();
     private final List<String> mPaths = new ArrayList<>();
@@ -28,6 +31,8 @@ public class EventUrl {
     private byte[] mBodyData;
     private final long mTime;
     private String mMediaType = "application/json"; //or "application/x-www-form-urlencoded" for data
+
+    private int mRequestMethod = GET;
 
     public EventUrl(String host, long time) {
         mHost = host;
@@ -68,6 +73,11 @@ public class EventUrl {
 
     public EventUrl setMediaType(String mMediaType) {
         this.mMediaType = mMediaType;
+        return this;
+    }
+
+    public EventUrl setRequestMethod(int mRequestMethod) {
+        this.mRequestMethod = mRequestMethod;
         return this;
     }
 
@@ -114,5 +124,9 @@ public class EventUrl {
         }
 
         return urlBuilder.toString();
+    }
+
+    public int getRequestMethod() {
+        return mRequestMethod;
     }
 }

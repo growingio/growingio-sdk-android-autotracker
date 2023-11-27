@@ -17,6 +17,8 @@ package com.growingio.android.ads;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
+import static com.growingio.android.sdk.track.utils.ConstantPool.PREF_FILE_NAME;
+
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -45,7 +47,6 @@ import java.util.Map;
  * @author cpacm 2022/11/23
  */
 class AdsUtils {
-    private static final String PREF_FILE_NAME = "growing_profile";
     private static final String PREF_DEVICE_ACTIVATED = "pref_device_activated";
     private static final String TAG = "Ads";
     private static final String PREF_DEVICE_ACTIVATE_INFO = "pref_device_activate_info";

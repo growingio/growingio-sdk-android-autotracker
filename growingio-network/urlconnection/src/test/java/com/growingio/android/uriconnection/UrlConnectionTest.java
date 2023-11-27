@@ -32,6 +32,7 @@ import com.growingio.android.urlconnection.LogTime;
 import com.growingio.android.urlconnection.UrlConnectionConfig;
 import com.growingio.android.urlconnection.UrlConnectionDataLoader;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,6 +76,11 @@ public class UrlConnectionTest {
                 return new MockResponse().setResponseCode(200);
             }
         });
+    }
+
+    @After
+    public void shutdownServer() throws IOException {
+        mockWebServer.shutdown();
     }
 
     private void checkPath(String path) {

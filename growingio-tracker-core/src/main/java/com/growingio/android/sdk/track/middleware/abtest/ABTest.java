@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk.autotrack.view;
+package com.growingio.android.sdk.track.middleware.abtest;
 
-import android.view.View;
+public class ABTest {
+    final String layerId;
 
-/**
- * <p>
- *
- * @author cpacm 2023/9/12
- */
-public interface ViewNode {
+    final ABTestCallback abTestCallback;
 
-    View getView();
+    public ABTest(String layerId, ABTestCallback abTestCallback) {
+        this.layerId = layerId;
+        this.abTestCallback = abTestCallback;
+    }
 
-    String getXPath();
+    public String getLayerId() {
+        return layerId;
+    }
 
-    String getViewContent();
-
-    int getIndex();
-
-    String getXIndex();
+    public ABTestCallback getAbTestCallback() {
+        return abTestCallback;
+    }
 }

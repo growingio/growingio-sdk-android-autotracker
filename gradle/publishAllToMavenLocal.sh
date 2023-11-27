@@ -13,6 +13,7 @@
 && ./gradlew :growingio-network:urlconnection:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-hybrid:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-ads:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-abtest:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:debugger:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:circler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-apm:publishMavenAgentPublicationToMavenLocal \

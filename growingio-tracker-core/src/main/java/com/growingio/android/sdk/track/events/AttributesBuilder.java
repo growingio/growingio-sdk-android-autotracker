@@ -74,6 +74,20 @@ public class AttributesBuilder {
         return this;
     }
 
+    public AttributesBuilder addAttribute(String key, long value) {
+        if (key != null) {
+            attributes.put(key, String.valueOf(value));
+        }
+        return this;
+    }
+
+    public AttributesBuilder addAttribute(String key, int value) {
+        if (key != null) {
+            attributes.put(key, String.valueOf(value));
+        }
+        return this;
+    }
+
     public <T> AttributesBuilder addAttribute(String key, List<T> value) {
         if (key != null && value != null && !value.isEmpty()) {
             StringBuilder valueBuilder = new StringBuilder();

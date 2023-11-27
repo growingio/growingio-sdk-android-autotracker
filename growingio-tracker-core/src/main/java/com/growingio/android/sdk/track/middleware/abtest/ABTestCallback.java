@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk.autotrack.view;
+package com.growingio.android.sdk.track.middleware.abtest;
 
-import android.view.View;
+public interface ABTestCallback {
 
-/**
- * <p>
- *
- * @author cpacm 2023/9/12
- */
-public interface ViewNode {
+    public static final int ABTEST_CACHE = 0; //data load from cache.
+    public static final int ABTEST_HTTP = 1; //data load from server.
 
-    View getView();
+    void onABExperimentReceived(ABExperiment experiment, int dataType);
 
-    String getXPath();
-
-    String getViewContent();
-
-    int getIndex();
-
-    String getXIndex();
+    void onABExperimentFailed(Exception error);
 }

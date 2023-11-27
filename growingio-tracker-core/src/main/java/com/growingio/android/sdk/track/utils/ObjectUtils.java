@@ -17,6 +17,8 @@ package com.growingio.android.sdk.track.utils;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class ObjectUtils {
 
@@ -66,5 +68,20 @@ public class ObjectUtils {
                 builder.append("\t").append(fieldName).append(": ").append(fieldValue).append("\n");
             }
         }
+    }
+
+    public static String sha1(String text) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA1");
+            digest.update(text.getBytes());
+            byte[] bytes = digest.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte aByte : bytes) {
+                sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException ignored) {
+        }
+        return text;
     }
 }

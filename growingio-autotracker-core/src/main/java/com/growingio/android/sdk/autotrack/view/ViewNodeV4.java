@@ -75,14 +75,6 @@ class ViewNodeV4 implements ViewNode {
         return xPath;
     }
 
-    @Override
-    public int getViewPosition() {
-        if (hasListParent) {
-            return viewPosition;
-        }
-        return -1;
-    }
-
     ViewNodeV4 setClickableParentXPath(String clickableParentXPath) {
         this.clickableParentXPath = clickableParentXPath;
         return this;
@@ -134,7 +126,8 @@ class ViewNodeV4 implements ViewNode {
         return this;
     }
 
-    int getIndex() {
+    @Override
+    public int getIndex() {
         return index;
     }
 

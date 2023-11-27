@@ -1,16 +1,17 @@
-
 plugins {
-	id 'com.android.library'
+	alias(libs.plugins.android.library)
 }
 
 android {
-	namespace 'com.growingio.android.ads'
+	namespace 'com.growingio.android.abtest'
 	compileSdkVersion buildConfiguration.compileVersion
 	defaultConfig {
 		minSdkVersion buildConfiguration.minSdkVersion
 		targetSdkVersion buildConfiguration.targetSdkVersion
 		versionName libs.versions.growingio.get()
 		versionCode libs.versions.growingioCode.get().toInteger()
+
+		consumerProguardFiles "consumer-rules.pro"
 	}
 
 	buildTypes {
@@ -45,6 +46,8 @@ dependencies {
 
 	testImplementation libs.bundles.test
 	testImplementation libs.androidx.test.core
+	testImplementation libs.okhttp3.mockwebserver
+	testImplementation project(':growingio-network:okhttp3')
 
 	implementation project(':growingio-tracker-core')
 

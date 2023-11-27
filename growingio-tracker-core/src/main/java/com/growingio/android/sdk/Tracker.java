@@ -23,9 +23,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.UiThread;
+
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.abtest.ABExperiment;
+import com.growingio.android.sdk.track.middleware.abtest.ABTest;
+import com.growingio.android.sdk.track.middleware.abtest.ABTestCallback;
 import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
@@ -174,6 +179,32 @@ public class Tracker {
         );
     }
 
+    public void getAbTest(String layerId, ABTestCallback abTestCallback) {
+        if (!isInited) return;
+        if (layerId == null || layerId.isEmpty() || abTestCallback == null) {
+            Logger.e(TAG, "getAbTest:params is illegal");
+            return;
+        }
+        ModelLoader<ABTest, ABExperiment> modelLoader = trackerContext.getRegistry().getModelLoader(ABTest.class, ABExperiment.class);
+        if (modelLoader == null) {
+            Logger.e(TAG, "getAbTest:please register ABTest Module before use it.");
+            return;
+        }
+        TrackMainThread.trackMain().postActionToTrackMain(() -> modelLoader.buildLoadData(new ABTest(layerId, new ABTestCallback() {
+            @Override
+            public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                TrackMainThread.trackMain().runOnUiThread(() -> abTestCallback.onABExperimentReceived(experiment, dataType));
+            }
+
+            @Override
+            public void onABExperimentFailed(Exception error) {
+                TrackMainThread.trackMain().runOnUiThread(() -> abTestCallback.onABExperimentFailed(error));
+
+            }
+        })).fetcher.executeData());
+
+    }
+
     private void setConversionVariables(Map<String, String> variables) {
         if (!isInited) return;
         if (variables == null || variables.isEmpty()) {
@@ -268,6 +299,7 @@ public class Tracker {
      *
      * @param webView:WebView or com.tencent.smtt.sdk.WebView or com.uc.webview.export.WebView
      */
+    @UiThread
     public void bridgeWebView(View webView) {
         if (!isInited) return;
         if (ClassExistHelper.isWebView(webView)) {

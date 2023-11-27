@@ -20,7 +20,10 @@ import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -75,6 +78,13 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
         }
         if (eventUrl.getRequestBody() != null) {
             requestBuilder.post(RequestBody.create(MediaType.parse(eventUrl.getMediaType()), eventUrl.getRequestBody()));
+        } else {
+            if (eventUrl.getRequestMethod() == EventUrl.POST) {
+                RequestBody requestBody = RequestBody.create(MediaType.parse(eventUrl.getMediaType()), new byte[0]);
+                requestBuilder.post(requestBody);
+            } else {
+                requestBuilder.get();
+            }
         }
         Request request = requestBuilder.build();
         try {
@@ -84,7 +94,7 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
             if (response.isSuccessful()) {
                 boolean successed = true;
                 long contentLength = responseBody.contentLength();
-                return new EventResponse(successed, responseBody.byteStream(), contentLength);
+                return new EventResponse(successed, copyResponse(responseBody.byteStream()), contentLength);
             } else {
                 Logger.e(TAG, "OkHttpSender failed with code:" + response.code());
                 return new EventResponse(false);
@@ -99,6 +109,18 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
             cleanup();
         }
     }
+
+    private InputStream copyResponse(InputStream input) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = input.read(buffer)) > -1) {
+            baos.write(buffer, 0, len);
+        }
+        baos.flush();
+        return new ByteArrayInputStream(baos.toByteArray());
+    }
+
 
     @Override
     public void cleanup() {

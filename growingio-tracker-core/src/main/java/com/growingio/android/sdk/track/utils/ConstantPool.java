@@ -24,4 +24,6 @@ public class ConstantPool {
 
     public static final int CUSTOM_TYPE_SYSTEM = 0;
     public static final int CUSTOM_TYPE_USER = 1;
+
+    public static final String PREF_FILE_NAME = "growing_profile";
 }
