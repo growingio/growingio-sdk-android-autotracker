@@ -167,6 +167,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                             Logger.d(TAG, "get Cached ABTestExperiment when refreshing data failed");
                             ABExperiment abExperiment = abCachedResponse.getABExperiment();
                             abTestCallback.onABExperimentReceived(abExperiment, ABTestCallback.ABTEST_CACHE);
+                            return abExperiment;
                         }
                     }
                 }
