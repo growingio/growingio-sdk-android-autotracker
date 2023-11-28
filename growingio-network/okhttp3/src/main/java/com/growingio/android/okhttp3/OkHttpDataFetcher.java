@@ -55,22 +55,13 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
 
     @Override
     public void loadData(DataCallback<? super EventResponse> callback) {
-        Request.Builder requestBuilder = new Request.Builder().url(eventUrl.toUrl());
-        if (eventUrl.getRequestBody() != null) {
-            requestBuilder.post(RequestBody.create(MediaType.parse(eventUrl.getMediaType()), eventUrl.getRequestBody()));
-        }
-        for (Map.Entry<String, String> headerEntry : eventUrl.getHeaders().entrySet()) {
-            String key = headerEntry.getKey();
-            requestBuilder.addHeader(key, headerEntry.getValue());
-        }
+        Request request = buildRequestWithEventUrl();
         this.callback = callback;
-        Request request = requestBuilder.build();
         call = client.newCall(request);
         call.enqueue(this);
     }
 
-    @Override
-    public EventResponse executeData() {
+    private Request buildRequestWithEventUrl(){
         Request.Builder requestBuilder = new Request.Builder().url(eventUrl.toUrl());
         for (Map.Entry<String, String> headerEntry : eventUrl.getHeaders().entrySet()) {
             String key = headerEntry.getKey();
@@ -86,7 +77,13 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
                 requestBuilder.get();
             }
         }
-        Request request = requestBuilder.build();
+        return requestBuilder.build();
+    }
+
+
+    @Override
+    public EventResponse executeData() {
+        Request request = buildRequestWithEventUrl();
         try {
             call = client.newCall(request);
             Response response = call.execute();
