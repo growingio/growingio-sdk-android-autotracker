@@ -48,7 +48,7 @@ import java.io.InputStream;
  * 2. ABTest cache data will be stored in the sharedPreferences, and the validity period of the cache data is a natural day.
  * 3. ABTest data is requested by sdk api: getABTest(layerId,callback)
  *
- * @author cpacm 2022/11/24
+ * @author cpacm 2023/11/24
  */
 public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
 
@@ -120,7 +120,6 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             ABTestCallback abTestCallback = abTest.getAbTestCallback();
             String abTestKey = ObjectUtils.sha1(deviceId + layerId);
 
-            // 1. get abTest data from cache
             String abTestData = sharedPreferences.getString(abTestKey, null);
             if (abTestData != null) {
                 ABTestResponse abCachedResponse = ABTestResponse.parseSavedJson(abTestData);
@@ -178,6 +177,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             if (abHttpResponse.isSucceed()) {
                 saveABExperiment(abTestKey, abHttpResponse);
                 ABExperiment abExperiment = abHttpResponse.getABExperiment();
+                sendAbTestTrackEvent(abExperiment);
                 abTestCallback.onABExperimentReceived(abExperiment, ABTestCallback.ABTEST_HTTP);
                 return abHttpResponse.getABExperiment();
             } else {
