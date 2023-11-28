@@ -18,6 +18,7 @@ package com.growingio.android.abtest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
@@ -214,13 +215,13 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             EventUrl eventUrl = new EventUrl(host, System.currentTimeMillis())
                     .addPath("diversion")
                     .addPath("specified-layer-variables")
-                    .addParam("accountId", coreConfiguration.getProjectId())
-                    .addParam("datasourceId", coreConfiguration.getDataSourceId())
-                    .addParam("distinctId", deviceInfoProvider.getDeviceId())
-                    .addParam("layerId", layerId)
                     .setRequestMethod(EventUrl.POST)
                     .setMediaType("application/x-www-form-urlencoded");
-
+            String sb = "accountId=" + Uri.encode(coreConfiguration.getProjectId()) +
+                    "&datasourceId=" + Uri.encode(coreConfiguration.getDataSourceId()) +
+                    "&distinctId=" + Uri.encode(deviceInfoProvider.getDeviceId()) +
+                    "&layerId=" + Uri.encode(layerId);
+            eventUrl.setBodyData(sb.getBytes());
             EventResponse response = trackerContext.getRegistry().executeData(eventUrl, EventUrl.class, EventResponse.class);
             ABTestResponse outABTestResponse = new ABTestResponse();
             if (response.isSucceeded()) {

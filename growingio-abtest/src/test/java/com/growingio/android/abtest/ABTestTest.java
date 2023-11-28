@@ -45,6 +45,7 @@ import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +65,7 @@ public class ABTestTest extends MockServer {
     @Before
     public void setup() throws IOException {
         Map<Class<? extends Configurable>, Configurable> sModuleConfigs = new HashMap<>();
-        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration(ConstantPool.UNKNOWN, "growing.test"), sModuleConfigs);
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration(ConstantPool.UNKNOWN, "growing.test").setDataSourceId("ABTest"), sModuleConfigs);
 
         Tracker tracker = new Tracker(application);
         context = tracker.getContext();
@@ -97,11 +98,12 @@ public class ABTestTest extends MockServer {
                 URI uri = URI.create(url);
                 String expectedPath = "/diversion/specified-layer-variables";
                 Truth.assertThat(uri.getPath()).isEqualTo(expectedPath);
-                String query = uri.getQuery();
-                Truth.assertThat(query).contains("accountId=");
-                Truth.assertThat(query).contains("datasourceId=");
-                Truth.assertThat(query).contains("distinctId=");
-                Truth.assertThat(query).contains("layerId=");
+                Truth.assertThat(request.getMethod()).ignoringCase().isEqualTo("post");
+                String body = request.getBody().readString(StandardCharsets.UTF_8);
+                Truth.assertThat(body).contains("accountId=");
+                Truth.assertThat(body).contains("datasourceId=");
+                Truth.assertThat(body).contains("distinctId=");
+                Truth.assertThat(body).contains("layerId=");
                 return getMockResponse();
             }
         };
