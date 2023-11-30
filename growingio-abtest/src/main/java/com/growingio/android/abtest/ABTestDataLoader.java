@@ -118,11 +118,12 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
         public ABExperiment executeData() {
             String deviceId = deviceInfoProvider.getDeviceId();
             String layerId = abTest.getLayerId();
+            boolean requestImmediately = abTest.isRequestImmediately();
             ABTestCallback abTestCallback = abTest.getAbTestCallback();
             String abTestKey = ObjectUtils.sha1(deviceId + layerId);
 
             String abTestData = sharedPreferences.getString(abTestKey, null);
-            if (abTestData != null) {
+            if (!requestImmediately && abTestData != null) {
                 ABTestResponse abCachedResponse = ABTestResponse.parseSavedJson(abTestData);
                 if (abCachedResponse != null && abCachedResponse.getABExperiment() != null) {
                     Logger.d(TAG, "get ABTestExperiment from cache at first.");
@@ -143,9 +144,9 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                             sendAbTestTrackEvent(abExperiment);
                             return abExperiment;
                         } else {
-                            Logger.d(TAG, "get Cached ABTestExperiment only once and delete it when refreshing data failed");
+                            Logger.d(TAG, "get Expired ABTestExperiment only once and delete it when refreshing data failed");
                             ABExperiment abExperiment = abCachedResponse.getABExperiment();
-                            abTestCallback.onABExperimentReceived(abExperiment, ABTestCallback.ABTEST_CACHE);
+                            abTestCallback.onABExperimentReceived(abExperiment, ABTestCallback.ABTEST_EXPIRED);
                             sharedPreferences.edit().remove(abTestKey).apply();
                             return abExperiment;
                         }
@@ -164,16 +165,17 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                             abTestCallback.onABExperimentReceived(abExperiment, ABTestCallback.ABTEST_HTTP);
                             return abExperiment;
                         } else {
-                            Logger.d(TAG, "get Cached ABTestExperiment when refreshing data failed");
+                            Logger.d(TAG, "get Expired ABTestExperiment when refreshing data failed");
                             ABExperiment abExperiment = abCachedResponse.getABExperiment();
-                            abTestCallback.onABExperimentReceived(abExperiment, ABTestCallback.ABTEST_CACHE);
+                            abTestCallback.onABExperimentReceived(abExperiment, ABTestCallback.ABTEST_EXPIRED);
                             return abExperiment;
                         }
                     }
                 }
             }
 
-            Logger.d(TAG, "No Cached ABTestExperiment, just request new data.");
+            Logger.d(TAG, "No Cached ABTestExperiment or request immediately, request new data from server.");
+            if (requestImmediately) sharedPreferences.edit().remove(abTestKey).apply();
             ABTestResponse abHttpResponse = requestABTestExperimentData(layerId);
             if (abHttpResponse.isSucceed()) {
                 saveABExperiment(abTestKey, abHttpResponse);

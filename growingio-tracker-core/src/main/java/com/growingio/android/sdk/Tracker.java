@@ -179,8 +179,7 @@ public class Tracker {
         );
     }
 
-    public void getAbTest(String layerId, ABTestCallback abTestCallback) {
-        if (!isInited) return;
+    private void requestABExperiment(String layerId, ABTestCallback abTestCallback, boolean requestImmediately) {
         if (layerId == null || layerId.isEmpty() || abTestCallback == null) {
             Logger.e(TAG, "getAbTest:params is illegal");
             return;
@@ -201,8 +200,18 @@ public class Tracker {
                 TrackMainThread.trackMain().runOnUiThread(() -> abTestCallback.onABExperimentFailed(error));
 
             }
-        })).fetcher.executeData());
+        }, requestImmediately)).fetcher.executeData());
 
+    }
+
+    public void getAbTestImmediately(String layerId, ABTestCallback abTestCallback) {
+        if (!isInited) return;
+        requestABExperiment(layerId, abTestCallback, true);
+    }
+
+    public void getAbTest(String layerId, ABTestCallback abTestCallback) {
+        if (!isInited) return;
+        requestABExperiment(layerId, abTestCallback, false);
     }
 
     private void setConversionVariables(Map<String, String> variables) {

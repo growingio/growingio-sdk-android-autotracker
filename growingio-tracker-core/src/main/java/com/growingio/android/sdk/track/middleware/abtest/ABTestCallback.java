@@ -19,6 +19,7 @@ public interface ABTestCallback {
 
     public static final int ABTEST_CACHE = 0; //data load from cache.
     public static final int ABTEST_HTTP = 1; //data load from server.
+    public static final int ABTEST_EXPIRED = 2; //data expired and load from server failed.
 
     void onABExperimentReceived(ABExperiment experiment, int dataType);
 

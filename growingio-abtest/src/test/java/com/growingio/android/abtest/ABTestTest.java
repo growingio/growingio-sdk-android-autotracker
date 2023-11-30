@@ -275,7 +275,7 @@ public class ABTestTest extends MockServer {
                 Truth.assertThat(experiment.getStrategyId()).isEqualTo(100);
                 Truth.assertThat(experiment.getVariables().size()).isEqualTo(2);
 
-                Truth.assertThat(dataType).isEqualTo(ABTestCallback.ABTEST_CACHE);
+                Truth.assertThat(dataType).isEqualTo(ABTestCallback.ABTEST_EXPIRED);
             }
 
             @Override

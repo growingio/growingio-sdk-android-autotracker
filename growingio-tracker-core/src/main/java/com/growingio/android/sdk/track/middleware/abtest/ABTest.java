@@ -20,9 +20,18 @@ public class ABTest {
 
     final ABTestCallback abTestCallback;
 
+    final boolean requestImmediately;
+
     public ABTest(String layerId, ABTestCallback abTestCallback) {
         this.layerId = layerId;
         this.abTestCallback = abTestCallback;
+        this.requestImmediately = false;
+    }
+
+    public ABTest(String layerId, ABTestCallback abTestCallback, boolean immediately) {
+        this.layerId = layerId;
+        this.abTestCallback = abTestCallback;
+        this.requestImmediately = immediately;
     }
 
     public String getLayerId() {
@@ -31,5 +40,9 @@ public class ABTest {
 
     public ABTestCallback getAbTestCallback() {
         return abTestCallback;
+    }
+
+    public boolean isRequestImmediately() {
+        return requestImmediately;
     }
 }
