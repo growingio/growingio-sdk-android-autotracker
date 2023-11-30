@@ -48,8 +48,8 @@ class ABTestResponse {
             int code = jsonObject.getInt("code");
             response.code = code;
             if (code == 0) {
-                long experimentId = jsonObject.getLong("experimentId");
-                long strategyId = jsonObject.optLong("strategyId", -1L);
+                long experimentId = jsonObject.optLong("experimentId");
+                long strategyId = jsonObject.optLong("strategyId");
                 JSONObject variables = jsonObject.optJSONObject("variables");
                 Map<String, String> variableMap = new HashMap<>();
                 if (variables != null) {
@@ -67,7 +67,7 @@ class ABTestResponse {
             }
         } catch (JSONException e) {
             response.code = -1;
-            response.errorMsg = "parse error:Empty ABExperiment ID";
+            response.errorMsg = "parse error:Illegal ABExperiment";
         }
         return response;
     }
