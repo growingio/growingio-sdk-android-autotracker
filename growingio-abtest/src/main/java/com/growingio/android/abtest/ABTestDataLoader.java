@@ -97,9 +97,6 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             if (abTestConfig == null) {
                 abTestConfig = new ABTestConfig();
             }
-            if (abTestConfig.getAbTestServerHost() == null) {
-                abTestConfig.setAbTestServerHost(trackerContext.getConfigurationProvider().core().getDataCollectionServerHost());
-            }
             sharedPreferences = trackerContext.getSharedPreferences(ConstantPool.PREF_FILE_NAME, Context.MODE_PRIVATE);
             this.abTest = abTest;
         }

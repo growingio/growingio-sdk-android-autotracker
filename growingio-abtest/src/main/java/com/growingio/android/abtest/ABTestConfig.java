@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * @author cpacm 2023/11/24
  */
 public class ABTestConfig implements Configurable {
-    private String abTestServerHost;
+    private String abTestServerHost = "https://ab.growingio.com";
     private long abTestExpired = 300_000L;
 
     public String getAbTestServerHost() {
@@ -48,6 +48,9 @@ public class ABTestConfig implements Configurable {
         if (host == null) throw new NullPointerException("host == null");
         if (host.isEmpty()) throw new IllegalArgumentException("host.length() == 0");
         if (host != null && host.endsWith("/")) host = host.substring(0, host.length() - 1);
+        if (!host.startsWith("http")) {
+            host = "https://" + host;
+        }
         return host;
     }
 
