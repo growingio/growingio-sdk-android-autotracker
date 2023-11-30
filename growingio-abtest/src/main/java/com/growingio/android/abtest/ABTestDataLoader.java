@@ -188,6 +188,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
         }
 
         private void sendAbTestTrackEvent(ABExperiment abExperiment) {
+            if (abExperiment.getExperimentId() == 0 && abExperiment.getStrategyId() == 0) return;
             AttributesBuilder attributesBuilder = new AttributesBuilder();
             attributesBuilder
                     .addAttribute("$exp_id", abExperiment.getExperimentId())
