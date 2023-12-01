@@ -139,7 +139,7 @@ public class DeviceInfoProvider {
 
     public String getAndroidId() {
         // ensure androidid call once in a process
-        if (TextUtils.isEmpty(mAndroidId)) {
+        if (TextUtils.isEmpty(mAndroidId) && ConfigurationProvider.core().isAndroidIdEnabled()) {
             try {
                 mAndroidId = Settings.System.getString(getContext().getContentResolver(), Settings.System.ANDROID_ID);
                 if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
@@ -151,7 +151,7 @@ public class DeviceInfoProvider {
                 mAndroidId = MAGIC_ANDROID_ID;
             }
         }
-        return mAndroidId.equals(MAGIC_ANDROID_ID) ? null : mAndroidId;
+        return MAGIC_ANDROID_ID.equals(mAndroidId) ? null : mAndroidId;
     }
 
     public String getOaid() {

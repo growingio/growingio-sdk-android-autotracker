@@ -43,6 +43,8 @@ public class CoreConfiguration implements Configurable {
 
     private boolean mImeiEnabled = false;
 
+    private boolean mAndroidIdEnabled = false;
+
     public CoreConfiguration(String projectId, String urlScheme) {
         mProjectId = projectId;
         mUrlScheme = urlScheme;
@@ -187,6 +189,15 @@ public class CoreConfiguration implements Configurable {
 
     public CoreConfiguration setImeiEnabled(boolean mImeiEnabled) {
         this.mImeiEnabled = mImeiEnabled;
+        return this;
+    }
+
+    public boolean isAndroidIdEnabled() {
+        return mAndroidIdEnabled;
+    }
+
+    public CoreConfiguration setAndroidIdEnabled(boolean androidIdEnabled) {
+        this.mAndroidIdEnabled = androidIdEnabled;
         return this;
     }
 }
