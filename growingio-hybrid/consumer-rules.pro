@@ -1,0 +1,2 @@
+-dontwarn com.uc.webview.**
+-dontwarn com.tencent.smtt.**
