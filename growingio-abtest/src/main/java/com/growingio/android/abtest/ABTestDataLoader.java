@@ -217,7 +217,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                     .addPath("diversion")
                     .addPath("specified-layer-variables")
                     .setRequestMethod(EventUrl.POST)
-                    .setConnectionTimeout(timeout)
+                    .setCallTimeout(timeout)
                     .setMediaType("application/x-www-form-urlencoded");
             String sb = "accountId=" + Uri.encode(coreConfiguration.getProjectId()) +
                     "&datasourceId=" + Uri.encode(coreConfiguration.getDataSourceId()) +

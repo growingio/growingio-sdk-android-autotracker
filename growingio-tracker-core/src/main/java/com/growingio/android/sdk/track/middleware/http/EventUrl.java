@@ -31,7 +31,7 @@ public class EventUrl {
     private final long mTime;
     private String mMediaType = "application/json"; //or "application/x-www-form-urlencoded" for data
 
-    private int mConnectionTimeout = -1;
+    private int mCallTimeout = -1;
 
     private int mRequestMethod = GET;
 
@@ -86,12 +86,12 @@ public class EventUrl {
         return mHeaders;
     }
 
-    public int getConnectionTimeout() {
-        return mConnectionTimeout;
+    public int getCallTimeout() {
+        return mCallTimeout;
     }
 
-    public EventUrl setConnectionTimeout(int connectionTimeout) {
-        this.mConnectionTimeout = connectionTimeout;
+    public EventUrl setCallTimeout(int callTimeout) {
+        this.mCallTimeout = callTimeout;
         return this;
     }
 
