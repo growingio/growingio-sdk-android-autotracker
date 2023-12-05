@@ -115,6 +115,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
         public ABExperiment executeData() {
             String deviceId = deviceInfoProvider.getDeviceId();
             String layerId = abTest.getLayerId();
+            int timeout = (int) abTestConfig.getAbTestTimeout();
             boolean requestImmediately = abTest.isRequestImmediately();
             ABTestCallback abTestCallback = abTest.getAbTestCallback();
             String abTestKey = ObjectUtils.sha1(deviceId + layerId);
@@ -132,7 +133,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                     }
 
                     if (abCachedResponse.naturalDaytime < System.currentTimeMillis()) {
-                        ABTestResponse abHttpResponse = requestABTestExperimentData(layerId);
+                        ABTestResponse abHttpResponse = requestABTestExperimentData(layerId, timeout);
                         if (abHttpResponse.isSucceed()) {
                             Logger.d(TAG, "Refresh ABTestExperiment when entering a new natural day. And send an ABExperiment event.");
                             saveABExperiment(abTestKey, abHttpResponse);
@@ -150,7 +151,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                     }
 
                     if (abCachedResponse.expiredTime < System.currentTimeMillis()) {
-                        ABTestResponse abHttpResponse = requestABTestExperimentData(layerId);
+                        ABTestResponse abHttpResponse = requestABTestExperimentData(layerId, timeout);
                         if (abHttpResponse.isSucceed()) {
                             Logger.d(TAG, "Refresh ABTestExperiment when it has expired.");
                             saveABExperiment(abTestKey, abHttpResponse);
@@ -173,7 +174,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
 
             Logger.d(TAG, "No Cached ABTestExperiment or request immediately, request new data from server.");
             if (requestImmediately) sharedPreferences.edit().remove(abTestKey).apply();
-            ABTestResponse abHttpResponse = requestABTestExperimentData(layerId);
+            ABTestResponse abHttpResponse = requestABTestExperimentData(layerId, timeout);
             if (abHttpResponse.isSucceed()) {
                 saveABExperiment(abTestKey, abHttpResponse);
                 ABExperiment abExperiment = abHttpResponse.getABExperiment();
@@ -207,7 +208,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             sharedPreferences.edit().putString(key, abTestResponse.toSavedJson()).apply();
         }
 
-        private ABTestResponse requestABTestExperimentData(String layerId) {
+        private ABTestResponse requestABTestExperimentData(String layerId, int timeout) {
             //String path = "/diversion/specified-layer-variables";
             CoreConfiguration coreConfiguration = trackerContext.getConfigurationProvider().core();
             String host = abTestConfig.getAbTestServerHost();
@@ -216,6 +217,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                     .addPath("diversion")
                     .addPath("specified-layer-variables")
                     .setRequestMethod(EventUrl.POST)
+                    .setConnectionTimeout(timeout)
                     .setMediaType("application/x-www-form-urlencoded");
             String sb = "accountId=" + Uri.encode(coreConfiguration.getProjectId()) +
                     "&datasourceId=" + Uri.encode(coreConfiguration.getDataSourceId()) +

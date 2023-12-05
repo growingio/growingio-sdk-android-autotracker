@@ -165,7 +165,11 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             } else {
                 urlConnection.setRequestMethod("GET");
             }
-            urlConnection.setConnectTimeout(connectTimeout);
+            int connectionTimeout = connectTimeout;
+            if (eventUrl.getConnectionTimeout() > 0) {
+                connectionTimeout = eventUrl.getConnectionTimeout();
+            }
+            urlConnection.setConnectTimeout(connectionTimeout);
             urlConnection.setReadTimeout(readTimeout);
             urlConnection.setUseCaches(false);
             urlConnection.setDoInput(true);

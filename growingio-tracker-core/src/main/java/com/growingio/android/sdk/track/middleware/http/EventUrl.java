@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 public class EventUrl {
-
     public static int GET = 0;
     public static int POST = 1;
     private final String mHost;
@@ -31,6 +30,8 @@ public class EventUrl {
     private byte[] mBodyData;
     private final long mTime;
     private String mMediaType = "application/json"; //or "application/x-www-form-urlencoded" for data
+
+    private int mConnectionTimeout = -1;
 
     private int mRequestMethod = GET;
 
@@ -83,6 +84,15 @@ public class EventUrl {
 
     public Map<String, String> getHeaders() {
         return mHeaders;
+    }
+
+    public int getConnectionTimeout() {
+        return mConnectionTimeout;
+    }
+
+    public EventUrl setConnectionTimeout(int connectionTimeout) {
+        this.mConnectionTimeout = connectionTimeout;
+        return this;
     }
 
     public String toUrl() {

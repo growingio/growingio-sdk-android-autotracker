@@ -33,6 +33,7 @@ import okhttp3.OkHttpClient;
 public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
 
     private final Call.Factory client;
+    private OkHttpClient customClient; // for special request.
 
     public OkHttpDataLoader(Call.Factory client) {
         this.client = client;
@@ -40,7 +41,26 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
 
     @Override
     public LoadData<EventResponse> buildLoadData(EventUrl eventUrl) {
-        return new LoadData<>(new OkHttpDataFetcher(client, eventUrl));
+        Call.Factory loadClient = client;
+        if (eventUrl.getConnectionTimeout() > 0) {
+            loadClient = newCustomClient(eventUrl.getConnectionTimeout());
+        }
+        return new LoadData<>(new OkHttpDataFetcher(loadClient, eventUrl));
+    }
+
+    private Call.Factory newCustomClient(long connectionTimeout) {
+        if (customClient != null && customClient.connectTimeoutMillis() == connectionTimeout) {
+            return customClient;
+        }
+        if (client instanceof OkHttpClient) {
+            OkHttpClient internalClient = (OkHttpClient) client;
+            OkHttpClient.Builder builder = internalClient.newBuilder();
+            builder.connectTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
+            customClient = builder.build();
+            return customClient;
+        }
+        return client;
+
     }
 
     public static class Factory implements ModelLoaderFactory<EventUrl, EventResponse> {

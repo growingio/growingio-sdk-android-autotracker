@@ -27,21 +27,39 @@ import java.util.concurrent.TimeUnit;
 public class ABTestConfig implements Configurable {
     private String abTestServerHost = "https://ab.growingio.com";
     private long abTestExpired = 300_000L;
+    private long abTestTimeout = 5_000L;
 
     public String getAbTestServerHost() {
         return abTestServerHost;
     }
 
-    public void setAbTestServerHost(String abTestServerHost) {
+    public ABTestConfig setAbTestServerHost(String abTestServerHost) {
         this.abTestServerHost = checkHost(abTestServerHost);
+        return this;
     }
 
     public long getAbTestExpired() {
         return abTestExpired;
     }
 
-    public void setAbTestExpired(long duration, TimeUnit unit) {
-        this.abTestExpired = checkDuration("ABTestExpired", duration, unit);
+    /**
+     * set abTest expired: 1m ~ 24h, default is 5m.
+     */
+    public ABTestConfig setAbTestExpired(long duration, TimeUnit unit) {
+        this.abTestExpired = checkDuration(duration, unit);
+        return this;
+    }
+
+    public long getAbTestTimeout() {
+        return abTestTimeout;
+    }
+
+    /**
+     * set abTest timeout: at least 1000ms, default is 5s.
+     */
+    public ABTestConfig setAbTestTimeout(long duration, TimeUnit unit) {
+        this.abTestTimeout = checkTimeoutDuration(duration, unit);
+        return this;
     }
 
     private String checkHost(String host) {
@@ -54,12 +72,21 @@ public class ABTestConfig implements Configurable {
         return host;
     }
 
-    private long checkDuration(String name, long duration, TimeUnit unit) {
-        if (duration < 0) throw new IllegalArgumentException(name + " < 0");
+    private long checkDuration(long duration, TimeUnit unit) {
+        if (duration < 0) throw new IllegalArgumentException("ABTestExpired" + " < 0");
         if (unit == null) throw new NullPointerException("unit == null");
         long millis = unit.toMillis(duration);
-        if (millis > 3600 * 1000 * 24) throw new IllegalArgumentException(name + " too large.");
-        if (millis < 5 * 60 * 1000) throw new IllegalArgumentException(name + " too small.");
+        if (millis > 3600 * 1000 * 24) throw new IllegalArgumentException("ABTestExpired" + " too large.");
+        if (millis < 60 * 1000) throw new IllegalArgumentException("ABTestExpired" + " too small.");
+        return millis;
+    }
+
+    private long checkTimeoutDuration(long duration, TimeUnit unit) {
+        if (duration < 0) throw new IllegalArgumentException("ABTestTimeout" + " < 0");
+        if (unit == null) throw new NullPointerException("unit == null");
+        long millis = unit.toMillis(duration);
+        if (millis > Integer.MAX_VALUE) throw new IllegalArgumentException("ABTestTimeout" + " too large.");
+        if (millis < 1000) throw new IllegalArgumentException("ABTestTimeout" + " too small.");
         return millis;
     }
 }

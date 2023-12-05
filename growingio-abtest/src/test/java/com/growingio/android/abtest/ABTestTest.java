@@ -132,8 +132,10 @@ public class ABTestTest extends MockServer {
 
     @Test
     public void requestABTest() {
-        ABTestConfig abTestConfig = new ABTestConfig();
-        abTestConfig.setAbTestServerHost(MOCK_SERVER_HOST);
+        ABTestConfig abTestConfig = new ABTestConfig()
+                .setAbTestServerHost(MOCK_SERVER_HOST)
+                .setAbTestExpired(5, TimeUnit.MINUTES)
+                .setAbTestTimeout(5, TimeUnit.SECONDS);
         context.getConfigurationProvider().addConfiguration(abTestConfig);
         ABTest abTest = new ABTest("100", new ABTestCallback() {
             @Override
@@ -198,8 +200,8 @@ public class ABTestTest extends MockServer {
 
     @Test
     public void expiredABTest() {
-        ABTestConfig abTestConfig = new ABTestConfig();
-        abTestConfig.setAbTestServerHost(MOCK_SERVER_HOST);
+        ABTestConfig abTestConfig = new ABTestConfig()
+                .setAbTestServerHost(MOCK_SERVER_HOST);
         context.getConfigurationProvider().addConfiguration(abTestConfig);
         setExpiredABTest("200", System.currentTimeMillis() - 10 * 60 * 1000, ABTestResponse.tomorrowMill());
         ABTest abTest = new ABTest("200", new ABTestCallback() {
