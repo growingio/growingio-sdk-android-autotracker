@@ -15,22 +15,27 @@
  */
 package com.growingio.android.sdk.track.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.hardware.display.DisplayManager;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.WindowManager;
 
 public class DeviceUtil {
     private DeviceUtil() {
     }
 
+    @SuppressLint("WrongConstant")
     public static DisplayMetrics getDisplayMetrics(Context context) {
         DisplayMetrics metrics = new DisplayMetrics();
-        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        if (display == null) return context.getResources().getDisplayMetrics();
-        display.getRealMetrics(metrics);
-        return metrics;
+        DisplayManager displayManager = ((DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE));
+        if (displayManager != null) {
+            Display display = displayManager.getDisplay(Display.DEFAULT_DISPLAY);
+            if (display != null) display.getRealMetrics(metrics);
+            return metrics;
+        }
+        return context.getResources().getDisplayMetrics();
     }
 
     public static boolean isPhone(Context context) {
