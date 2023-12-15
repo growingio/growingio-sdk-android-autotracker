@@ -1,15 +1,17 @@
 plugins {
-	id 'com.android.library'
+	alias(libs.plugins.android.library)
 }
 
 android {
-	namespace 'com.growingio.android.database'
+	namespace 'com.growingio.android.abtest'
 	compileSdkVersion buildConfiguration.compileVersion
 	defaultConfig {
 		minSdkVersion buildConfiguration.minSdkVersion
 		targetSdkVersion buildConfiguration.targetSdkVersion
 		versionName libs.versions.growingio.get()
 		versionCode libs.versions.growingioCode.get().toInteger()
+
+		consumerProguardFiles "consumer-rules.pro"
 	}
 
 	buildTypes {
@@ -28,6 +30,7 @@ android {
 	testOptions {
 		unitTests.all {
 			jacoco {
+				jvmArgs '-noverify'
 				includeNoLocationClasses = true
 				excludes = ['jdk.internal.*']
 			}
@@ -39,18 +42,18 @@ android {
 	}
 }
 
-
 dependencies {
+
 	testImplementation libs.bundles.test
 	testImplementation libs.androidx.test.core
-	testImplementation project(path: ':growingio-data:protobuf')
-	testImplementation project(path: ':growingio-data:json')
+	testImplementation libs.okhttp3.mockwebserver
+	testImplementation project(':growingio-network:okhttp3')
 
 	implementation project(':growingio-tracker-core')
-	compileOnly libs.growingio.gmonitor
 
 	implementation project(":growingio-annotation")
 	annotationProcessor project(":growingio-annotation:compiler")
 }
+
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
 apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"

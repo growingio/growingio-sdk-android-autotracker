@@ -24,6 +24,7 @@ import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +53,11 @@ public class Okhttp3Test extends MockServer {
     public void prepare() throws IOException {
         mockEventsApiServer();
         start();
+    }
+
+    @After
+    public void shutdownServer() throws IOException {
+        shutdown();
     }
 
     public void mockEventsApiServer() {
@@ -96,7 +102,7 @@ public class Okhttp3Test extends MockServer {
     public void sendTest() {
         TrackerRegistry trackerRegistry = new TrackerRegistry();
         OkHttpConfig config = new OkHttpConfig();
-        config.setRequestDetailTimeout(10L,10L,10L, TimeUnit.SECONDS);
+        config.setRequestDetailTimeout(10L, 10L, 10L, TimeUnit.SECONDS);
         Truth.assertThat(config.getHttpCallTimeout()).isEqualTo(0);
 
         trackerRegistry.register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory(config));

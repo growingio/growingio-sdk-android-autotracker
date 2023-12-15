@@ -32,6 +32,7 @@ import com.growingio.android.urlconnection.LogTime;
 import com.growingio.android.urlconnection.UrlConnectionConfig;
 import com.growingio.android.urlconnection.UrlConnectionDataLoader;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,6 +78,11 @@ public class UrlConnectionTest {
         });
     }
 
+    @After
+    public void shutdownServer() throws IOException {
+        mockWebServer.shutdown();
+    }
+
     private void checkPath(String path) {
         String expectedPath = "/v3/projects/bfc5d6a3693a110d/collect";
         Truth.assertThat(path).isEqualTo(expectedPath);
@@ -100,9 +106,9 @@ public class UrlConnectionTest {
     public void sendTest() throws IOException {
         mockWebServer.start(8910);
         TrackerRegistry trackerRegistry = new TrackerRegistry();
-        UrlConnectionConfig config = new UrlConnectionConfig();
-        config.setConnectTimeout(15L, TimeUnit.SECONDS);
-        config.setReadTimeout(15L, TimeUnit.SECONDS);
+        UrlConnectionConfig config = new UrlConnectionConfig()
+                .setConnectTimeout(15L, TimeUnit.SECONDS)
+                .setReadTimeout(15L, TimeUnit.SECONDS);
         trackerRegistry.register(EventUrl.class, EventResponse.class, new UrlConnectionDataLoader.Factory(config));
 
         ModelLoader<EventUrl, EventResponse> modelLoader = trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);

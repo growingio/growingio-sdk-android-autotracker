@@ -73,14 +73,6 @@ class ViewNodeV3 implements ViewNode {
     }
 
     @Override
-    public int getViewPosition() {
-        if (hasListParent) {
-            return viewPosition;
-        }
-        return -1;
-    }
-
-    @Override
     public String getXIndex() {
         return null;
     }
@@ -136,7 +128,8 @@ class ViewNodeV3 implements ViewNode {
         return this;
     }
 
-    int getIndex() {
+    @Override
+    public int getIndex() {
         return index;
     }
 

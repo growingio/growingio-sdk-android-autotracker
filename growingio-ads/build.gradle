@@ -46,7 +46,6 @@ dependencies {
 	testImplementation libs.bundles.test
 	testImplementation libs.androidx.test.core
 
-	compileOnly fileTree(include: ['*.jar'], dir: '../thirdLibs')
 	implementation project(':growingio-tracker-core')
 
 	implementation project(":growingio-annotation")
