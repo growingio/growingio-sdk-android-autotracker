@@ -46,7 +46,6 @@ dependencies {
 				}
 
 		api "com.growingio.android:analytics-fa:4.0.0"
-		api "com.growingio.android:analytics-ga:4.0.0"
 		api "com.growingio.android:analytics-sa:4.0.0"
 		api "com.growingio.android:dummy-sa:4.0.0"
 
