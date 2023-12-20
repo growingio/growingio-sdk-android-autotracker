@@ -65,11 +65,12 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
 
     private WebViewJavascriptBridgeConfiguration getJavascriptBridgeConfiguration() {
         String projectId = configurationProvider.core().getProjectId();
+        String datasourceId = configurationProvider.core().getDataSourceId();
         String appId = configurationProvider.core().getUrlScheme();
         String appPackage = appInfoProvider.getPackageName();
         String nativeSdkVersion = isDownGrade ? SDKConfig.SDK_VERSION_DOWNGRADE : SDKConfig.SDK_VERSION;
         int nativeSdkVersionCode = isDownGrade ? SDKConfig.SDK_VERSION_CODE_DOWNGRADE : SDKConfig.SDK_VERSION_CODE;
-        return new WebViewJavascriptBridgeConfiguration(projectId, appId, appPackage, nativeSdkVersion, nativeSdkVersionCode);
+        return new WebViewJavascriptBridgeConfiguration(projectId, datasourceId, appId, appPackage, nativeSdkVersion, nativeSdkVersionCode);
     }
 
     public void onDomChanged() {

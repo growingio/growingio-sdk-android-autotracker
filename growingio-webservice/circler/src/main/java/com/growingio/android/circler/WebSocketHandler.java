@@ -113,7 +113,7 @@ class WebSocketHandler extends WebSocketListener {
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        Logger.e(TAG, t, "webSocket on onFailure, reason: ");
+        Logger.e(TAG, t, "webSocket on onFailure, reason: " + t.getMessage());
         TrackMainThread.trackMain().runOnUiThread(webSocketListener::onFailed);
     }
 

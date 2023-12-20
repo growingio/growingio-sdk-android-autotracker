@@ -102,6 +102,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>,
             }
             return;
         }
+        socketState.set(SOCKET_STATE_INITIALIZE);
         Request request = new Request.Builder().url(wsUrl).build();
         client.newWebSocket(request, webSocketHandler);
         //client.dispatcher().executorService().shutdown()

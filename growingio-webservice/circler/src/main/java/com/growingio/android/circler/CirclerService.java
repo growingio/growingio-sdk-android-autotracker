@@ -92,6 +92,7 @@ public class CirclerService implements LoadDataFetcher<WebService>,
             }
             return;
         }
+        socketState.set(SOCKET_STATE_INITIALIZE);
         Request request = new Request.Builder().url(wsUrl).build();
         client.newWebSocket(request, webSocketHandler);
 

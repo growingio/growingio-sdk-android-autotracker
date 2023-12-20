@@ -140,7 +140,7 @@ public class HybridTest {
         UserInfoProvider userInfoProvider = context.getUserInfoProvider();
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
 
-        WebViewJavascriptBridgeConfiguration configuration = new WebViewJavascriptBridgeConfiguration("test", "test", "test", "test", 23);
+        WebViewJavascriptBridgeConfiguration configuration = new WebViewJavascriptBridgeConfiguration("test", "test","test", "test", "test", 23);
         WebViewBridgeJavascriptInterface webInterface = new WebViewBridgeJavascriptInterface(configuration, hybridBridgeProvider, userInfoProvider);
         webInterface.setNativeUserId("cpacm");
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
