@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.utils;
 
 public class ConstantPool {
@@ -22,4 +21,9 @@ public class ConstantPool {
 
     public static final String UNKNOWN = "UNKNOWN";
     public static final String ANDROID = "Android";
+
+    public static final int CUSTOM_TYPE_SYSTEM = 0;
+    public static final int CUSTOM_TYPE_USER = 1;
+
+    public static final String PREF_FILE_NAME = "growing_profile";
 }

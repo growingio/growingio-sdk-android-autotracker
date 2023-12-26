@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.impression;
 
 import android.app.Application;
@@ -26,9 +25,9 @@ import com.growingio.android.sdk.Configurable;
 import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.view.ViewStateChangedEvent;
 
 import org.junit.Before;
@@ -45,33 +44,38 @@ import java.util.concurrent.TimeUnit;
 public class ImpressionTest {
 
     Application application = ApplicationProvider.getApplicationContext();
+    TrackerContext context;
 
     @Before
     public void setup() {
-        TrackerContext.init(application);
+
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
         map.put(AutotrackConfig.class, new AutotrackConfig());
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
+
+        Autotracker tracker = new Autotracker(application);
+        context = tracker.getContext();
+
     }
 
     @Test
     public void impressionTest() {
         RobolectricActivity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
-        ActivityStateProvider.get().onActivityResumed(activity);
         Map<String, String> attrMap = new HashMap<>();
         attrMap.put("username", "cpacm");
-        ImpressionProvider.get().trackViewImpression(activity.getTextView(), "cpacm", attrMap);
-        boolean result = ImpressionProvider.get().hasTrackViewImpression(activity.getTextView());
+        ImpressionProvider impressionProvider = context.getProvider(ImpressionProvider.class);
+        impressionProvider.trackViewImpression(activity.getTextView(), "cpacm", attrMap);
+        boolean result = impressionProvider.hasTrackViewImpression(activity.getTextView());
         Truth.assertThat(result).isTrue();
 
         ViewStateChangedEvent vscEvent = new ViewStateChangedEvent(ViewStateChangedEvent.StateType.LAYOUT_CHANGED);
         Truth.assertThat(vscEvent.getNewFocus()).isNull();
-        ImpressionProvider.get().onViewStateChanged(vscEvent);
+        impressionProvider.onViewStateChanged(vscEvent);
         Robolectric.flushForegroundThreadScheduler();
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
 
-        ImpressionProvider.get().stopTrackViewImpression(activity.getTextView());
-        boolean result2 = ImpressionProvider.get().hasTrackViewImpression(activity.getTextView());
+        impressionProvider.stopTrackViewImpression(activity.getTextView());
+        boolean result2 = impressionProvider.hasTrackViewImpression(activity.getTextView());
         Truth.assertThat(result2).isFalse();
     }
 }

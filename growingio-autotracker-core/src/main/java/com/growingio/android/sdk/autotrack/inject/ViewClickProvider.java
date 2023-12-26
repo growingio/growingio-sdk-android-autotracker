@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.inject;
 
 import android.app.Activity;
@@ -26,99 +25,99 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
-import com.growingio.android.sdk.track.events.AutotrackEventType;
-import com.growingio.android.sdk.track.events.ViewElementEvent;
-import com.growingio.android.sdk.autotrack.page.Page;
-import com.growingio.android.sdk.autotrack.page.PageProvider;
-import com.growingio.android.sdk.autotrack.view.ViewHelper;
-import com.growingio.android.sdk.autotrack.view.ViewNode;
+import com.growingio.android.sdk.autotrack.view.ViewNodeProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 
-class ViewClickProvider {
+class ViewClickProvider implements TrackerLifecycleProvider {
     private static final String TAG = "ViewClickProvider";
 
-    private ViewClickProvider() {
+    ViewClickProvider() {
     }
 
-    public static void adapterViewItemClick(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isAdapterViewItemClickEnabled()) {
+    private AutotrackConfig autotrackConfig;
+    private ViewNodeProvider viewNodeProvider;
+
+    @Override
+    public void setup(TrackerContext context) {
+        autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
+        viewNodeProvider = context.getProvider(ViewNodeProvider.class);
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
+
+    public void adapterViewItemClick(View view) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isAdapterViewItemClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: adapter view item click enable is false");
             return;
         }
         viewOnClick(view);
     }
 
-    public static void spinnerViewOnClick(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isSpinnerItemClickSelectEnabled()) {
+    public void spinnerViewOnClick(View view) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isSpinnerItemClickSelectEnabled()) {
             Logger.i(TAG, "AutotrackOptions: spinner item click select is false");
             return;
         }
         viewOnClick(view);
     }
 
-    public static void expandableListViewOnGroupClick(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isExpandableListGroupClickEnabled()) {
+    public void expandableListViewOnGroupClick(View view) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isExpandableListGroupClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: expandable list group click enable is false");
             return;
         }
         viewOnClick(view);
     }
 
-    public static void expandableListViewOnChildClick(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isExpandableListChildClickEnabled()) {
+    public void expandableListViewOnChildClick(View view) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isExpandableListChildClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: expandable list child click enable is false");
             return;
         }
         viewOnClick(view);
     }
 
-    public static void radioGroupOnCheck(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isRadioGroupCheckEnabled()) {
+    public void radioGroupOnCheck(View view) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isRadioGroupCheckEnabled()) {
             Logger.i(TAG, "AutotrackOptions: radio group check enable is false");
             return;
         }
         viewOnClick(view);
     }
 
-    public static void materialButtonToggleGroupOnButtonCheck(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isMaterialToggleGroupButtonCheckEnabled()) {
+    public void materialButtonToggleGroupOnButtonCheck(View view) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isMaterialToggleGroupButtonCheckEnabled()) {
             Logger.i(TAG, "AutotrackOptions: material toggle group check enable is false");
             return;
         }
         viewOnClick(view);
     }
 
-    public static void tabLayoutOnTabSelected(TabLayout.Tab tab) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isTabLayoutTabSelectedEnabled()) {
+    public void tabLayoutOnTabSelected(TabLayout.Tab tab) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isTabLayoutTabSelectedEnabled()) {
             Logger.i(TAG, "AutotrackOptions: tablayout tab select enable is false");
             return;
         }
-        if (tab == null) return;
-        viewOnClick(tab.view);
+        if (tab != null) {
+            viewOnClick(tab.view);
+        }
     }
 
-    public static void compoundButtonOnCheck(CompoundButton button) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isCompoundButtonCheckEnabled()) {
+    public void compoundButtonOnCheck(CompoundButton button) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isCompoundButtonCheckEnabled()) {
             Logger.i(TAG, "AutotrackOptions: compound button check enable is false");
             return;
         }
         viewOnClick(button);
     }
 
-    public static void viewOnClickListener(View view) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isViewClickEnabled()) {
+    public void viewOnClickListener(View view) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isViewClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: view click enable is false");
             return;
         }
@@ -126,9 +125,8 @@ class ViewClickProvider {
     }
 
 
-    public static void activityOptionsItemOnClick(Activity activity, MenuItem menuItem) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isActivityMenuItemClickEnabled()) {
+    public void activityOptionsItemOnClick(Activity activity, MenuItem menuItem) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isActivityMenuItemClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: activityMenuItemClickEnabled is false");
             return;
         }
@@ -136,60 +134,60 @@ class ViewClickProvider {
     }
 
 
-    public static void toolbarMenuItemOnClick(MenuItem menuItem) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isToolbarMenuItemClickEnabled()) {
+    public void toolbarMenuItemOnClick(MenuItem menuItem) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isToolbarMenuItemClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: toolbarMenuItemClickEnabled is false");
             return;
         }
         menuItemOnClick(menuItem);
     }
 
-    public static void actionMenuItemOnClick(MenuItem menuItem) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isActionMenuItemClickEnabled()) {
+    public void actionMenuItemOnClick(MenuItem menuItem) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isActionMenuItemClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: actionMenuItemClickEnabled is false");
             return;
         }
         menuItemOnClick(menuItem);
     }
 
-    public static void popupMenuItemOnClick(MenuItem menuItem) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isPopupMenuItemClickEnabled()) {
+    public void popupMenuItemOnClick(MenuItem menuItem) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isPopupMenuItemClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: popupMenuItemClickEnabled is false");
             return;
         }
         menuItemOnClick(menuItem);
     }
 
-    public static void contextMenuItemOnClick(MenuItem menuItem) {
-        AutotrackConfig config = ConfigurationProvider.get().getConfiguration(AutotrackConfig.class);
-        if (config != null && !config.getAutotrackOptions().isContextMenuItemClickEnabled()) {
+    public void contextMenuItemOnClick(MenuItem menuItem) {
+        if (autotrackConfig != null && !autotrackConfig.getAutotrackOptions().isContextMenuItemClickEnabled()) {
             Logger.i(TAG, "AutotrackOptions: contextMenuItemClickEnabled is false");
             return;
         }
         menuItemOnClick(menuItem);
     }
 
-    private static void menuItemOnClick(MenuItem menuItem) {
+    private void menuItemOnClick(MenuItem menuItem) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
 
-        Activity activity = ActivityStateProvider.get().getForegroundActivity();
+        Activity activity = TrackMainThread.trackMain().getForegroundActivity();
         menuItemOnClick(activity, menuItem);
     }
 
-    public static void viewOnClick(View view) {
-        if (view == null) {
-            Logger.e(TAG, "The clicked view is null");
+    public void viewOnClick(View view) {
+        if (!TrackerContext.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
         }
 
-        if (!TrackerContext.initializedSuccessfully()) {
-            Logger.e(TAG, "Autotracker do not initialized successfully");
+        if (view == null) {
+            Logger.e(TAG, "viewOnClick: view is NULL");
+            return;
+        }
+
+        if (ViewAttributeUtil.isIgnoreViewClick(view)) {
             return;
         }
 
@@ -198,22 +196,12 @@ class ViewClickProvider {
             Logger.w(TAG, "Duplicate Click");
             return;
         }
-
-        if (ViewAttributeUtil.isIgnoreViewClick(view)) {
-            Logger.w(TAG, "The View's click event is ignored");
-            return;
-        }
-
-        ViewNode viewNode = ViewHelper.getClickViewNode(view);
-        if (viewNode != null) {
-            Page<?> page = PageProvider.get().findPage(view);
-            sendClickEvent(page, viewNode);
-        } else {
-            Logger.e(TAG, "ViewNode is NULL");
+        if (viewNodeProvider != null) {
+            viewNodeProvider.generateViewClickEvent(view);
         }
     }
 
-    public static void menuItemOnClick(Activity activity, MenuItem menuItem) {
+    public void menuItemOnClick(Activity activity, MenuItem menuItem) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
             return;
@@ -224,27 +212,9 @@ class ViewClickProvider {
             return;
         }
 
-        Page<?> page = PageProvider.get().findPage(activity);
-        ViewNode viewNode = ViewHelper.getMenuItemViewNode(page, menuItem);
-        if (viewNode != null) {
-            sendClickEvent(page, viewNode);
-        } else {
-            Logger.e(TAG, "MenuItem ViewNode is NULL");
+        if (viewNodeProvider != null) {
+            viewNodeProvider.generateMenuItemEvent(activity, menuItem);
         }
     }
 
-    private static void sendClickEvent(Page<?> page, ViewNode viewNode) {
-        if (page == null) {
-            Logger.w(TAG, "sendClickEvent page Activity is NULL");
-            return;
-        }
-        TrackMainThread.trackMain().postEventToTrackMain(
-                new ViewElementEvent.Builder(AutotrackEventType.VIEW_CLICK)
-                        .setPath(page.path())
-                        .setPageShowTimestamp(page.getShowTimestamp())
-                        .setXpath(viewNode.getXPath())
-                        .setIndex(viewNode.getIndex())
-                        .setTextValue(viewNode.getViewContent())
-        );
-    }
 }

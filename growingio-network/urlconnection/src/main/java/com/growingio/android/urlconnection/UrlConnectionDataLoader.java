@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.urlconnection;
 
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
@@ -28,19 +27,28 @@ import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
  */
 public class UrlConnectionDataLoader implements ModelLoader<EventUrl, EventResponse> {
 
-    public UrlConnectionDataLoader() {
+    private final UrlConnectionConfig config;
+
+    public UrlConnectionDataLoader(UrlConnectionConfig config) {
+        this.config = config;
     }
 
     @Override
     public LoadData<EventResponse> buildLoadData(EventUrl eventUrl) {
-        return new LoadData<>(new UrlConnectionFetcher(eventUrl));
+        return new LoadData<>(new UrlConnectionFetcher(config, eventUrl));
     }
 
     public static class Factory implements ModelLoaderFactory<EventUrl, EventResponse> {
 
+        private final UrlConnectionConfig config;
+
+        public Factory(UrlConnectionConfig config) {
+            this.config = config;
+        }
+
         @Override
         public ModelLoader<EventUrl, EventResponse> build() {
-            return new UrlConnectionDataLoader();
+            return new UrlConnectionDataLoader(config);
         }
     }
 }

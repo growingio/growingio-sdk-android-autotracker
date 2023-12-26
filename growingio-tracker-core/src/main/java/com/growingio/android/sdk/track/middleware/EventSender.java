@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.middleware;
 
 import android.annotation.SuppressLint;
@@ -27,10 +26,10 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.ipc.ProcessLock;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
 
 import java.text.SimpleDateFormat;
@@ -59,6 +58,8 @@ public class EventSender {
 
     private int mCacheEventNum = 0;
 
+    private final TrackerRegistry mRegistry;
+
     /**
      * 事件发送管理类
      *
@@ -67,8 +68,9 @@ public class EventSender {
      * @param cellularDataLimit  事件发送的移动网络的流量限制，单位 MB
      */
     @SuppressLint("WrongConstant")
-    public EventSender(IEventNetSender sender, long dataUploadInterval, long cellularDataLimit) {
-        mContext = TrackerContext.get().getApplicationContext();
+    public EventSender(Context context, TrackerRegistry registry, IEventNetSender sender, long dataUploadInterval, long cellularDataLimit) {
+        mContext = context.getApplicationContext();
+        mRegistry = registry;
         mCellularDataLimit = cellularDataLimit * 1024L * 1024L;
         mDataUploadInterval = dataUploadInterval * 1000L;
         mEventNetSender = sender;
@@ -80,7 +82,7 @@ public class EventSender {
     }
 
     private ModelLoader<EventDatabase, EventDbResult> getDatabaseModelLoader() {
-        return TrackerContext.get().getRegistry().getModelLoader(EventDatabase.class, EventDbResult.class);
+        return mRegistry.getModelLoader(EventDatabase.class, EventDbResult.class);
     }
 
     private EventDbResult databaseOperation(EventDatabase eventDatabase) {
@@ -220,15 +222,20 @@ public class EventSender {
                 }
                 EventDbResult dbResult = databaseOperation(EventDatabase.query(policy, numOfMaxEventsPerRequest()));
                 if (dbResult.isSuccess() && dbResult.getSum() > 0) {
-                    SendResponse sendResponse = mEventNetSender.send(dbResult.getData(), dbResult.getMediaType());
-                    succeeded = sendResponse.isSucceeded();
-                    if (succeeded) {
-                        String eventType = dbResult.getEventType();
-                        databaseOperation(EventDatabase.delete(dbResult.getLastId(), policy, eventType));
-                        if (networkState.isMobileData()) {
-                            todayBytes(sendResponse.getUsedBytes());
+                    if (mEventNetSender == null) {
+                        succeeded = false;
+                    } else {
+                        SendResponse sendResponse = mEventNetSender.send(dbResult.getData(), dbResult.getMediaType());
+                        succeeded = sendResponse.isSucceeded();
+                        if (succeeded) {
+                            String eventType = dbResult.getEventType();
+                            databaseOperation(EventDatabase.delete(dbResult.getLastId(), policy, eventType));
+                            if (networkState.isMobileData()) {
+                                todayBytes(sendResponse.getUsedBytes());
+                            }
                         }
                     }
+
                 } else {
                     break;
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.okhttp3;
 
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
@@ -34,6 +33,7 @@ import okhttp3.OkHttpClient;
 public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
 
     private final Call.Factory client;
+    private OkHttpClient customClient; // for special request.
 
     public OkHttpDataLoader(Call.Factory client) {
         this.client = client;
@@ -41,7 +41,26 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
 
     @Override
     public LoadData<EventResponse> buildLoadData(EventUrl eventUrl) {
-        return new LoadData<>(new OkHttpDataFetcher(client, eventUrl));
+        Call.Factory loadClient = client;
+        if (eventUrl.getCallTimeout() > 0) {
+            loadClient = newCustomClient(eventUrl.getCallTimeout());
+        }
+        return new LoadData<>(new OkHttpDataFetcher(loadClient, eventUrl));
+    }
+
+    private Call.Factory newCustomClient(long callTimeout) {
+        if (customClient != null && customClient.callTimeoutMillis() == callTimeout) {
+            return customClient;
+        }
+        if (client instanceof OkHttpClient) {
+            OkHttpClient internalClient = (OkHttpClient) client;
+            OkHttpClient.Builder builder = internalClient.newBuilder();
+            builder.callTimeout(callTimeout, TimeUnit.MILLISECONDS);
+            customClient = builder.build();
+            return customClient;
+        }
+        return client;
+
     }
 
     public static class Factory implements ModelLoaderFactory<EventUrl, EventResponse> {

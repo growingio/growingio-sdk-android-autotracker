@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package com.growingio.android.okhttp3;
 
-import android.content.Context;
-import android.util.Log;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
@@ -26,40 +24,40 @@ import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.runners.JUnit4;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
  * <p>
  *
  * @author cpacm 2021/6/3
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Log.class)
-@PowerMockIgnore("javax.net.ssl.*")
+@RunWith(JUnit4.class)
 public class Okhttp3Test extends MockServer {
 
     @Before
     public void prepare() throws IOException {
-        mockStatic(Log.class);
         mockEventsApiServer();
         start();
+    }
+
+    @After
+    public void shutdownServer() throws IOException {
+        shutdown();
     }
 
     public void mockEventsApiServer() {
@@ -78,9 +76,6 @@ public class Okhttp3Test extends MockServer {
         };
         setDispatcher(dispatcher);
     }
-
-    @Mock
-    Context fakeContext;
 
     private EventUrl initEventUrl(String host) {
         long time = System.currentTimeMillis();
@@ -105,9 +100,12 @@ public class Okhttp3Test extends MockServer {
 
     @Test
     public void sendTest() {
-        OkhttpLibraryGioModule module = new OkhttpLibraryGioModule();
         TrackerRegistry trackerRegistry = new TrackerRegistry();
-        module.registerComponents(fakeContext, trackerRegistry);
+        OkHttpConfig config = new OkHttpConfig();
+        config.setRequestDetailTimeout(10L, 10L, 10L, TimeUnit.SECONDS);
+        Truth.assertThat(config.getHttpCallTimeout()).isEqualTo(0);
+
+        trackerRegistry.register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory(config));
 
         ModelLoader<EventUrl, EventResponse> modelLoader = trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
         EventUrl eventUrl = initEventUrl("http://localhost:8910/");

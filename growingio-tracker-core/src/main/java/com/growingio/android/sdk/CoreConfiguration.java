@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk;
 
 import android.text.TextUtils;
@@ -34,22 +33,22 @@ public class CoreConfiguration implements Configurable {
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
 
-    private boolean mUploadExceptionEnabled = true;
-    private boolean mRequireAppProcessesEnabled = true;
+    private boolean mRequireAppProcessesEnabled = false;
     private String mDataCollectionServerHost = "http://napi.growingio.com";
     private EventFilterInterceptor mEventFilterInterceptor;
     private final List<LibraryGioModule> mComponents = new ArrayList<>();
     private boolean mIdMappingEnabled = false;
 
     private boolean mImeiEnabled = false;
+    private boolean mAndroidIdEnabled = false;
 
-    public CoreConfiguration(String projectId, String urlScheme) {
-        mProjectId = projectId;
+    public CoreConfiguration(String accountId, String urlScheme) {
+        mProjectId = accountId;
         mUrlScheme = urlScheme;
     }
 
-    public CoreConfiguration setProject(String projectId, String urlScheme) {
-        mProjectId = projectId;
+    public CoreConfiguration setProject(String accountId, String urlScheme) {
+        mProjectId = accountId;
         mUrlScheme = urlScheme;
         return this;
     }
@@ -185,8 +184,17 @@ public class CoreConfiguration implements Configurable {
         return mImeiEnabled;
     }
 
-    public CoreConfiguration setImeiEnabled(boolean mImeiEnabled) {
-        this.mImeiEnabled = mImeiEnabled;
+    public CoreConfiguration setImeiEnabled(boolean imeiEnabled) {
+        this.mImeiEnabled = imeiEnabled;
+        return this;
+    }
+
+    public boolean isAndroidIdEnabled() {
+        return mAndroidIdEnabled;
+    }
+
+    public CoreConfiguration setAndroidIdEnabled(boolean androidIdEnabled) {
+        this.mAndroidIdEnabled = androidIdEnabled;
         return this;
     }
 }

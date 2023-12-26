@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.urlconnection;
 
 import static com.growingio.android.urlconnection.UrlConnectionConfig.DEFAULT_URL_CONNECTION_TIMEOUT;
@@ -24,8 +23,9 @@ import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.http.HttpDataFetcher;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,7 +50,6 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             new DefaultHttpUrlConnectionFactory();
 
     private final EventUrl eventUrl;
-    private DataCallback<? super EventResponse> callback;
 
     private HttpURLConnection urlConnection;
     private InputStream stream;
@@ -59,9 +58,8 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
     private final int connectTimeout;
     private final int readTimeout;
 
-    public UrlConnectionFetcher(EventUrl eventUrl) {
+    public UrlConnectionFetcher(UrlConnectionConfig config, EventUrl eventUrl) {
         this.eventUrl = eventUrl;
-        UrlConnectionConfig config = ConfigurationProvider.get().getConfiguration(UrlConnectionConfig.class);
         if (config != null) {
             connectTimeout = config.getConnectTimeout();
             readTimeout = config.getReadTimeout();
@@ -162,9 +160,17 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             for (Map.Entry<String, String> headerEntry : headers.entrySet()) {
                 urlConnection.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
             }
-            urlConnection.setRequestMethod("POST");
+            if (data != null || eventUrl.getRequestMethod() == EventUrl.POST) {
+                urlConnection.setRequestMethod("POST");
+            } else {
+                urlConnection.setRequestMethod("GET");
+            }
+            int callTimeout = readTimeout;
+            if (eventUrl.getCallTimeout() > 0) {
+                callTimeout = eventUrl.getCallTimeout();
+            }
             urlConnection.setConnectTimeout(connectTimeout);
-            urlConnection.setReadTimeout(readTimeout);
+            urlConnection.setReadTimeout(callTimeout);
             urlConnection.setUseCaches(false);
             urlConnection.setDoInput(true);
             if (data != null) {
@@ -203,12 +209,22 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
                 Logger.d(TAG, "Got non empty content encoding: " + urlConnection.getContentEncoding());
             }
             stream = urlConnection.getInputStream();
-            return new EventResponse(true, urlConnection.getInputStream(), contentLength);
+            return new EventResponse(true, copyResponse(urlConnection.getInputStream()), contentLength);
         } catch (IOException e) {
             throw new HttpException("Failed to obtain InputStream", getHttpStatusCodeOrInvalid(urlConnection), e);
         }
     }
 
+    private InputStream copyResponse(InputStream input) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = input.read(buffer)) > -1) {
+            baos.write(buffer, 0, len);
+        }
+        baos.flush();
+        return new ByteArrayInputStream(baos.toByteArray());
+    }
 
     @Override
     public EventResponse executeData() {

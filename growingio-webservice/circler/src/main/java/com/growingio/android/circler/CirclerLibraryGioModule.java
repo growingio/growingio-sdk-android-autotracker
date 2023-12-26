@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  */
 package com.growingio.android.circler;
 
-import android.content.Context;
-
 import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.webservices.Circler;
-import com.growingio.android.sdk.track.webservices.WebService;
+import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
+import com.growingio.android.sdk.track.middleware.webservice.Circler;
+import com.growingio.android.sdk.track.middleware.webservice.WebService;
 import com.growingio.sdk.annotation.GIOLibraryModule;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -31,7 +32,12 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 @GIOLibraryModule
 public class CirclerLibraryGioModule extends LibraryGioModule {
     @Override
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(Circler.class, WebService.class, new CirclerDataLoader.Factory());
+    public void registerComponents(TrackerContext context) {
+        context.getRegistry().register(Circler.class, WebService.class, new CirclerDataLoader.Factory(context));
+    }
+
+    @Override
+    protected void setupProviders(Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providerStore) {
+        providerStore.put(ScreenshotProvider.class, new ScreenshotProvider());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.view;
 
+import android.app.Activity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.WebView;
 import android.widget.AbsSeekBar;
@@ -34,9 +35,12 @@ import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.tabs.TabLayout;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 public class ViewUtil {
+
+    private static int mCurrentRootWindowsHashCode = -1;
 
     private ViewUtil() {
     }
@@ -119,6 +123,7 @@ public class ViewUtil {
             }
         }
 
+        // must put at last
         if (widget instanceof TextView) {
             if (((TextView) widget).getText() != null) {
                 return ((TextView) widget).getText().toString();
@@ -143,6 +148,28 @@ public class ViewUtil {
         } else {
             return content + "[" + status + "]";
         }
+    }
+
+    private static String defaultViewGroupContentValue(ViewGroup viewGroup) {
+        String value = null;
+        if (viewGroup instanceof Spinner) {
+            Object item = ((Spinner) viewGroup).getSelectedItem();
+            if (item instanceof String) {
+                value = (String) item;
+            } else {
+                View selected = ((Spinner) viewGroup).getSelectedView();
+                if (selected instanceof TextView && ((TextView) selected).getText() != null) {
+                    value = ((TextView) selected).getText().toString();
+                }
+            }
+        } else if (viewGroup instanceof RadioGroup) {
+            RadioGroup group = (RadioGroup) viewGroup;
+            View selected = group.findViewById(group.getCheckedRadioButtonId());
+            if (selected instanceof RadioButton && ((RadioButton) selected).getText() != null) {
+                value = ((RadioButton) selected).getText().toString();
+            }
+        }
+        return value;
     }
 
     private static String defaultWidgetContentValue(View view) {
@@ -187,5 +214,16 @@ public class ViewUtil {
                 || variation == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_WEB_PASSWORD)
                 || variation == (EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD)
                 || variation == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+    }
+
+
+    public static int getCurrentRootWindowsHashCode() {
+        Activity mForegroundActivity = TrackMainThread.trackMain().getForegroundActivity();
+        if (mCurrentRootWindowsHashCode == -1
+                && mForegroundActivity != null) {
+            //该时间点， 用户理论上setContentView已经结束
+            mCurrentRootWindowsHashCode = mForegroundActivity.getWindow().getDecorView().hashCode();
+        }
+        return mCurrentRootWindowsHashCode;
     }
 }

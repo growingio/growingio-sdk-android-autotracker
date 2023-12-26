@@ -1,0 +1,25 @@
+plugins {
+	id 'java-library'
+	id 'kotlin'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+
+dependencies {
+
+
+	testImplementation libs.junit
+
+	implementation libs.kotlin.stdlib
+
+	annotationProcessor libs.google.auto.service
+	compileOnly libs.google.auto.service.annotations
+	implementation libs.square.javapoet
+
+	implementation project(":growingio-annotation")
+	implementation "androidx.annotation:annotation:1.3.0"
+}

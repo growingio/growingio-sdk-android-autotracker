@@ -1,12 +1,36 @@
-apply from: 'gradle/publicFun.gradle'
-
-if (!isExcludeDemos()) {
-    apply from: 'demos/settings-parent.gradle'
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+        mavenCentral()
+        // Used for snapshots
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
 }
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
+        // Used for snapshots
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+
+        flatDir {
+            dirs 'thirdLibs'
+        }
+    }
+}
+
+enableFeaturePreview("VERSION_CATALOGS")
+rootProject.name = "GrowingIO SDK"
+
 
 // tools
 include ':growingio-annotation'
 include ':growingio-annotation:compiler'
+include ':growingio-annotation:json-serializer'
 
 include ':growingio-tracker-core'
 include ':growingio-autotracker-core'
@@ -14,13 +38,13 @@ include ':growingio-hybrid'
 
 include ':growingio-network:okhttp3'
 include ':growingio-network:urlconnection'
-include ':growingio-network:volley'
 
 include ':growingio-webservice:debugger'
 include ':growingio-webservice:circler'
 
 include ':growingio-apm'
-include ':growingio-advert'
+include ':growingio-ads'
+include ':growingio-abtest'
 
 include ':growingio-data:protobuf'
 include ':growingio-data:json'
@@ -31,10 +55,9 @@ include ':growingio-tools:snappy'
 include ':growingio-tools:oaid'
 
 // sdks
-include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:tracker'
-include ':gio-sdk:autotracker-cdp'
 include ':gio-sdk:autotracker'
+include ':gio-sdk:autotracker-saas'
 
 include ':growingio-sdk-bom'
 include ':growingio-flutter'

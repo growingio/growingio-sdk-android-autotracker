@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,59 +13,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
+import com.growingio.android.sdk.track.utils.ConstantPool;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.util.HashMap;
 import java.util.Map;
 
+@JsonSerializer
 public class CustomEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mEventName;
+    private final String eventName;
 
     protected CustomEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mEventName = eventBuilder.mEventName;
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("eventName", getEventName());
-        } catch (JSONException ignored) {
-        }
-        return json;
+        eventName = eventBuilder.eventName;
     }
 
     public String getEventName() {
-        return checkValueSafe(mEventName);
+        return checkValueSafe(eventName);
     }
 
     public static class Builder extends BaseAttributesEvent.Builder<CustomEvent> {
-        private String mEventName;
+        private String eventName;
+        private int customEventType = ConstantPool.CUSTOM_TYPE_SYSTEM;
 
         public Builder() {
             super(TrackEventType.CUSTOM);
         }
 
         public Builder setEventName(String eventName) {
-            mEventName = eventName;
+            this.eventName = eventName;
             return this;
         }
 
         public String getEventName() {
-            return mEventName;
+            return eventName;
         }
 
-        @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
+        public Builder setCustomEventType(int customEventType) {
+            this.customEventType = customEventType;
+            return this;
+        }
+
+        public Builder setGeneralProps(Map<String, String> generalProps) {
+            if (customEventType == ConstantPool.CUSTOM_TYPE_USER) {
+                if (generalProps != null && !generalProps.isEmpty()) {
+                    Map<String, String> attributes = getAttributes();
+                    if (attributes == null) attributes = new HashMap<>();
+                    for (String key : generalProps.keySet()) {
+                        if (attributes.containsKey(key)) continue;
+                        String value = generalProps.get(key);
+                        attributes.put(key, value);
+                    }
+                    setAttributes(attributes);
+                }
+            }
             return this;
         }
 

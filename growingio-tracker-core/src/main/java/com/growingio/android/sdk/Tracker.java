@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,37 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk;
 
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.UiThread;
+
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
-import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.abtest.ABExperiment;
+import com.growingio.android.sdk.track.middleware.abtest.ABTest;
+import com.growingio.android.sdk.track.middleware.abtest.ABTestCallback;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.providers.CacheEventProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeepLinkProvider;
-import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.providers.SessionProvider;
-import com.growingio.android.sdk.track.providers.UserInfoProvider;
-import com.growingio.android.sdk.track.timer.TimerCenter;
-import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -52,78 +47,94 @@ import java.util.Map;
 
 public class Tracker {
 
+    private final TrackerContext trackerContext;
+
     private static final String TAG = "Tracker";
 
     protected volatile boolean isInited;
 
     public Tracker(Context context) {
+        isInited = false;
         if (context == null) {
-            isInited = false;
-            Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized before use API");
+            Logger.e(TAG, "GrowingAutotracker SDK is UNINITIALIZED, please initialized before use API");
+            trackerContext = null;
             return;
         }
-        // 配置
-        setup(context);
 
-        TrackerContext.initSuccess();
-        // 业务逻辑
-        start(context);
+        if ((!(context instanceof Application) && !(context instanceof Activity))) {
+            Logger.e(TAG, "GrowingAutotracker SDK is UNINITIALIZED, please initialized SDK with Application or Activity");
+            trackerContext = null;
+            return;
+        }
+        // 初始化
+        trackerContext = initTrackerContext(context);
+
+        // 注册所有的模块
+        loadAnnotationGeneratedModule(context);
+
+        // 配置业务逻辑
+        trackerContext.setup();
 
         isInited = true;
+
+        TrackMainThread.trackMain().setupWithContext(trackerContext); //need setup
+
+        startAfterSdkSetup(trackerContext);
     }
 
-    @CallSuper
-    protected void setup(Context context) {
-        if (context instanceof Application) {
-            Application application = (Application) context;
-            application.registerActivityLifecycleCallbacks(ActivityStateProvider.get());
-        } else if (context instanceof Activity) {
-            Activity activity = (Activity) context;
-            activity.getApplication().registerActivityLifecycleCallbacks(ActivityStateProvider.get());
-        } else {
-            Logger.e(TAG, "GrowingIO Track SDK is UNINITIALIZED, please initialized SDK with Application or Activity");
-            return;
-        }
-        TrackerContext.init(context.getApplicationContext());
-        // init core service
-        DeepLinkProvider.get().init();
-        SessionProvider.get().init();
-        PersistentDataProvider.get().setup();
+    private TrackerContext initTrackerContext(Context context) {
 
+        // add Providers in order.
+        TrackerLifecycleProviderFactory.create().createActivityStateProvider(context);
+        TrackerLifecycleProviderFactory.create().createPersistentDataProvider(context);
+
+        Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providers = TrackerLifecycleProviderFactory.create().providers();
+        Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> extraProviders = extraProviders();
+        providers.putAll(extraProviders);
+
+        return new TrackerContext(context.getApplicationContext(), providers);
+    }
+
+    private void loadAnnotationGeneratedModule(Context context) {
         loadAnnotationGeneratedModules(context);
         // 支持配置中注册模块, 如加密模块等事件模块需要先于所有事件发送注册
-        for (LibraryGioModule component : ConfigurationProvider.core().getPreloadComponents()) {
-            component.registerComponents(context, TrackerContext.get().getRegistry());
+        for (LibraryGioModule component : trackerContext.getConfigurationProvider().core().getPreloadComponents()) {
+            // add component provider first.
+            component.setupProviders(trackerContext.getProviderStore());
+            component.registerComponents(trackerContext);
         }
     }
 
-    private void start(Context context) {
-        PersistentDataProvider.get().start();
-
-        CacheEventProvider.get().releaseCaches();
-
-        makeupActivityLifecycle(context);
+    protected Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> extraProviders() {
+        return TrackerLifecycleProviderFactory.emptyMap();
     }
 
-    private void makeupActivityLifecycle(Context context) {
-        if (context instanceof Activity) {
-            Activity activity = (Activity) context;
-            ActivityLifecycleEvent.EVENT_TYPE state = ActivityUtil.judgeContextState(activity);
-            if (state != null) {
-                Logger.i(TAG, "initSdk with Activity, makeup ActivityLifecycle before current state:" + state.name());
-                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_CREATED) >= 0) {
-                    ActivityStateProvider.get().onActivityCreated(activity, null);
-                }
-                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) >= 0) {
-                    ActivityStateProvider.get().onActivityStarted(activity);
-                }
-                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) >= 0) {
-                    ActivityStateProvider.get().onActivityResumed(activity);
-                }
-            }
+    public TrackerContext getContext() {
+        if (!isInited || null == trackerContext) {
+            Logger.e(TAG, new NullPointerException("You should init growingio sdk first!!"));
         }
+        return trackerContext;
     }
 
+    private void startAfterSdkSetup(TrackerContext trackerContext) {
+
+        //generate first visit
+        SessionProvider sessionProvider = trackerContext.getProvider(SessionProvider.class);
+        sessionProvider.createVisitAfterAppStart();
+
+        // release event caches
+        TrackMainThread.trackMain().releaseCaches();
+
+        // makeup activity lifecycle
+        trackerContext.getActivityStateProvider().makeupActivityLifecycle();
+
+    }
+
+    public void shutdown() {
+        isInited = false;
+        this.trackerContext.shutdown();
+        TrackMainThread.trackMain().shutdown();
+    }
 
     public void trackCustomEvent(String eventName) {
         if (!isInited) return;
@@ -143,10 +154,70 @@ public class Tracker {
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
-    public void setConversionVariables(Map<String, String> variables) {
+    public void setGeneralProps(Map<String, String> variables) {
+        if (!isInited || variables == null || variables.isEmpty()) return;
+        TrackMainThread.trackMain().postActionToTrackMain(() ->
+                trackerContext.getEventBuilderProvider().setGeneralProps(variables)
+        );
+    }
+
+    public void clearGeneralProps() {
+        if (!isInited) return;
+        TrackMainThread.trackMain().postActionToTrackMain(() ->
+                trackerContext.getEventBuilderProvider().clearGeneralProps()
+        );
+    }
+
+    public void removeGeneralProps(String... keys) {
+        if (!isInited) return;
+        if (keys == null || keys.length == 0) {
+            Logger.w(TAG, "keys is NULL or empty.");
+            return;
+        }
+        TrackMainThread.trackMain().postActionToTrackMain(() ->
+                trackerContext.getEventBuilderProvider().removeGeneralProps(keys)
+        );
+    }
+
+    private void requestABExperiment(String layerId, ABTestCallback abTestCallback, boolean requestImmediately) {
+        if (layerId == null || layerId.isEmpty() || abTestCallback == null) {
+            Logger.e(TAG, "getAbTest:params is illegal");
+            return;
+        }
+        ModelLoader<ABTest, ABExperiment> modelLoader = trackerContext.getRegistry().getModelLoader(ABTest.class, ABExperiment.class);
+        if (modelLoader == null) {
+            Logger.e(TAG, "getAbTest:please register ABTest Module before use it.");
+            return;
+        }
+        TrackMainThread.trackMain().postActionToTrackMain(() -> modelLoader.buildLoadData(new ABTest(layerId, new ABTestCallback() {
+            @Override
+            public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                TrackMainThread.trackMain().runOnUiThread(() -> abTestCallback.onABExperimentReceived(experiment, dataType));
+            }
+
+            @Override
+            public void onABExperimentFailed(Exception error) {
+                TrackMainThread.trackMain().runOnUiThread(() -> abTestCallback.onABExperimentFailed(error));
+
+            }
+        }, requestImmediately)).fetcher.executeData());
+
+    }
+
+    public void getAbTestImmediately(String layerId, ABTestCallback abTestCallback) {
+        if (!isInited) return;
+        requestABExperiment(layerId, abTestCallback, true);
+    }
+
+    public void getAbTest(String layerId, ABTestCallback abTestCallback) {
+        if (!isInited) return;
+        requestABExperiment(layerId, abTestCallback, false);
+    }
+
+    private void setConversionVariables(Map<String, String> variables) {
         if (!isInited) return;
         if (variables == null || variables.isEmpty()) {
-            Logger.e(TAG, "setConversionVariables: variables is NULL, and skip it.");
+            Logger.w(TAG, "setConversionVariables: variables is NULL, and skip it.");
             return;
         }
         TrackEventGenerator.generateConversionVariablesEvent(new HashMap<>(variables));
@@ -161,7 +232,7 @@ public class Tracker {
         TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>(attributes));
     }
 
-    public void setVisitorAttributes(Map<String, String> attributes) {
+    private void setVisitorAttributes(Map<String, String> attributes) {
         if (!isInited) return;
         if (attributes == null || attributes.isEmpty()) {
             Logger.e(TAG, "setVisitorAttributes: attributes is NULL, and skip it");
@@ -170,10 +241,9 @@ public class Tracker {
         TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>(attributes));
     }
 
-    @Nullable
     public String getDeviceId() {
         if (!isInited) return "UNKNOWN";
-        return DeviceInfoProvider.get().getDeviceId();
+        return trackerContext.getDeviceInfoProvider().getDeviceId();
     }
 
     public void setDataCollectionEnabled(boolean enabled) {
@@ -181,16 +251,21 @@ public class Tracker {
         TrackMainThread.trackMain().postActionToTrackMain(new Runnable() {
             @Override
             public void run() {
-                if (enabled != ConfigurationProvider.core().isDataCollectionEnabled()) {
+                ConfigurationProvider configurationProvider = trackerContext.getConfigurationProvider();
+                if (enabled != configurationProvider.core().isDataCollectionEnabled()) {
                     Logger.d(TAG, "isDataCollectionEnabled = " + enabled);
-                    ConfigurationProvider.core().setDataCollectionEnabled(enabled);
+                    configurationProvider.core().setDataCollectionEnabled(enabled);
                     if (enabled) {
-                        SessionProvider.get().generateVisit();
+                        SessionProvider sessionProvider = trackerContext.getProvider(SessionProvider.class);
+                        sessionProvider.refreshSessionId();
+                        sessionProvider.generateVisit();
+
+                        TrackMainThread.trackMain().releaseCaches();
                     } else {
-                        TimerCenter.get().clearTimer();
+                        trackerContext.getTimingEventProvider().clearTimer();
                     }
                     // use for modules
-                    ConfigurationProvider.get().onDataCollectionChanged(enabled);
+                    configurationProvider.onDataCollectionChanged(enabled);
                 }
             }
         });
@@ -198,32 +273,34 @@ public class Tracker {
 
     public void setLoginUserId(final String userId) {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(() -> UserInfoProvider.get().setLoginUserId(userId));
+        TrackMainThread.trackMain().postActionToTrackMain(() -> trackerContext.getUserInfoProvider().setLoginUserId(userId));
     }
 
     public void setLoginUserId(final String userId, final String userKey) {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(() -> UserInfoProvider.get().setLoginUserId(userId, userKey));
+        TrackMainThread.trackMain().postActionToTrackMain(() -> trackerContext.getUserInfoProvider().setLoginUserId(userId, userKey));
     }
 
     public void cleanLoginUserId() {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(() -> UserInfoProvider.get().setLoginUserId(null));
+        TrackMainThread.trackMain().postActionToTrackMain(() -> trackerContext.getUserInfoProvider().setLoginUserId(null));
     }
 
     public void setLocation(final double latitude, final double longitude) {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(() -> SessionProvider.get().setLocation(latitude, longitude));
+        TrackMainThread.trackMain().postActionToTrackMain(() ->
+                trackerContext.getDeviceInfoProvider().setLocation(latitude, longitude)
+        );
     }
 
     public void cleanLocation() {
         if (!isInited) return;
-        TrackMainThread.trackMain().postActionToTrackMain(() -> SessionProvider.get().cleanLocation());
+        TrackMainThread.trackMain().postActionToTrackMain(() -> trackerContext.getDeviceInfoProvider().cleanLocation());
     }
 
-    public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
+    public void onActivityNewIntent(Activity activity, Intent intent) {
         if (!isInited) return;
-        ActivityStateProvider.get().onActivityNewIntent(activity, intent);
+        trackerContext.getActivityStateProvider().onActivityNewIntent(activity, intent);
     }
 
     /**
@@ -231,6 +308,7 @@ public class Tracker {
      *
      * @param webView:WebView or com.tencent.smtt.sdk.WebView or com.uc.webview.export.WebView
      */
+    @UiThread
     public void bridgeWebView(View webView) {
         if (!isInited) return;
         if (ClassExistHelper.isWebView(webView)) {
@@ -242,7 +320,7 @@ public class Tracker {
 
     private void bridgeInnerWebView(View view) {
         boolean result = false;
-        ModelLoader<HybridBridge, Boolean> modelLoader = TrackerContext.get().getRegistry().getModelLoader(HybridBridge.class, Boolean.class);
+        ModelLoader<HybridBridge, Boolean> modelLoader = trackerContext.getRegistry().getModelLoader(HybridBridge.class, Boolean.class);
         if (modelLoader != null) {
             result = modelLoader.buildLoadData(new HybridBridge(view)).fetcher.executeData();
         }
@@ -253,53 +331,54 @@ public class Tracker {
         if (!isInited || TextUtils.isEmpty(eventName)) {
             return null;
         }
-        return TimerCenter.get().startTimer(eventName);
+        return trackerContext.getTimingEventProvider().startTimer(eventName);
     }
 
     public void trackTimerPause(final String timerId) {
         if (!isInited || TextUtils.isEmpty(timerId)) {
             return;
         }
-        TimerCenter.get().updateTimer(timerId, false);
+        trackerContext.getTimingEventProvider().updateTimer(timerId, false);
     }
 
     public void trackTimerResume(final String timerId) {
         if (!isInited || TextUtils.isEmpty(timerId)) {
             return;
         }
-        TimerCenter.get().updateTimer(timerId, true);
+        trackerContext.getTimingEventProvider().updateTimer(timerId, true);
     }
 
     public void trackTimerEnd(final String timerId) {
         if (!isInited || TextUtils.isEmpty(timerId)) {
             return;
         }
-        TimerCenter.get().endTimer(timerId);
+        trackerContext.getTimingEventProvider().endTimer(timerId);
     }
 
     public void trackTimerEnd(final String timerId, Map<String, String> attributes) {
         if (!isInited || TextUtils.isEmpty(timerId)) {
             return;
         }
-        TimerCenter.get().endTimer(timerId, attributes);
+        trackerContext.getTimingEventProvider().endTimer(timerId, attributes);
     }
 
     public void removeTimer(final String timerId) {
         if (!isInited || TextUtils.isEmpty(timerId)) {
             return;
         }
-        TimerCenter.get().removeTimer(timerId);
+        trackerContext.getTimingEventProvider().removeTimer(timerId);
     }
 
     public void clearTrackTimer() {
         if (!isInited) {
             return;
         }
-        TimerCenter.get().clearTimer();
+        trackerContext.getTimingEventProvider().clearTimer();
     }
 
     public boolean doDeepLinkByUrl(String url, DeepLinkCallback callback) {
-        return DeepLinkProvider.get().doDeepLinkByUrl(url, callback);
+        DeepLinkProvider deepLinkProvider = trackerContext.getProvider(DeepLinkProvider.class);
+        return deepLinkProvider.doDeepLinkByUrl(url, callback);
     }
 
     @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
@@ -308,8 +387,8 @@ public class Tracker {
             Class<GeneratedGioModule> clazz =
                     (Class<GeneratedGioModule>)
                             Class.forName("com.growingio.android.sdk.GeneratedGioModuleImpl");
-            GeneratedGioModule generatedGioModule = clazz.getDeclaredConstructor(Context.class).newInstance(context.getApplicationContext());
-            generatedGioModule.registerComponents(context, TrackerContext.get().getRegistry());
+            GeneratedGioModule generatedGioModule = clazz.getDeclaredConstructor().newInstance();
+            generatedGioModule.registerComponents(trackerContext);
         } catch (ClassNotFoundException e) {
             if (Log.isLoggable(TAG, Log.WARN)) {
                 Log.w(
@@ -337,14 +416,29 @@ public class Tracker {
      * @param module GIOLibraryModule
      */
     public void registerComponent(LibraryGioModule module) {
-        if (!isInited || module == null) return;
-        module.registerComponents(TrackerContext.get(), TrackerContext.get().getRegistry());
+        addComponent(module, null);
     }
 
     public void registerComponent(LibraryGioModule module, Configurable config) {
-        if (!isInited || module == null || config == null) return;
-        ConfigurationProvider.get().addConfiguration(config);
-        module.registerComponents(TrackerContext.get(), TrackerContext.get().getRegistry());
+        addComponent(module, config);
+    }
+
+    private void addComponent(LibraryGioModule module, Configurable config) {
+        if (module == null) return;
+        if (config != null) {
+            trackerContext.getConfigurationProvider().addConfiguration(config);
+        }
+        Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> emptyMap = TrackerLifecycleProviderFactory.emptyMap();
+        module.setupProviders(emptyMap);
+        for (Class<? extends TrackerLifecycleProvider> key : emptyMap.keySet()) {
+            TrackerLifecycleProvider provider = emptyMap.get(key);
+            if (isInited) {
+                provider.setup(trackerContext);
+            }
+            trackerContext.getProviderStore().put(key, provider);
+        }
+        module.registerComponents(trackerContext);
+
     }
 
     private void throwIncorrectGioModule(Exception e) {

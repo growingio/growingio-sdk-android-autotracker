@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events;
 
 import android.content.res.Configuration;
@@ -22,14 +21,12 @@ import androidx.annotation.StringDef;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Map;
 
+@JsonSerializer
 public class PageEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
@@ -41,80 +38,67 @@ public class PageEvent extends BaseAttributesEvent {
     public @interface Orientation {
     }
 
-    private final String mPath;
-    private final String mOrientation;
-    private final String mTitle;
-    private final String mReferralPage;
+    private final String path;
+    private final String orientation;
+    private final String title;
+    private final String referralPage;
 
     protected PageEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mPath = eventBuilder.mPath;
-        mOrientation = eventBuilder.mOrientation;
-        mTitle = eventBuilder.mTitle;
-        mReferralPage = eventBuilder.mReferralPage;
+        path = eventBuilder.path;
+        orientation = eventBuilder.orientation;
+        title = eventBuilder.title;
+        referralPage = eventBuilder.referralPage;
     }
 
     public String getPath() {
-        return checkValueSafe(mPath);
+        return checkValueSafe(path);
     }
 
     public String getOrientation() {
-        return checkValueSafe(mOrientation);
+        return checkValueSafe(orientation);
     }
 
     public String getTitle() {
-        return checkValueSafe(mTitle);
+        return checkValueSafe(title);
     }
 
     public String getReferralPage() {
-        return checkValueSafe(mReferralPage);
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("path", getPath());
-            json.put("orientation", getOrientation());
-            json.put("title", getTitle());
-            json.put("referralPage", getReferralPage());
-        } catch (JSONException ignored) {
-        }
-        return json;
+        return checkValueSafe(referralPage);
     }
 
     public static class Builder extends BaseAttributesEvent.Builder<PageEvent> {
-        private String mPath;
-        private String mOrientation;
-        private String mTitle;
-        private String mReferralPage = "";
+        private String path;
+        private String orientation;
+        private String title;
+        private String referralPage = "";
 
         public Builder() {
             super(AutotrackEventType.PAGE);
         }
 
         public Builder setPath(String path) {
-            mPath = path;
+            this.path = path;
             return this;
         }
 
         public Builder setTitle(String title) {
-            mTitle = title;
+            this.title = title;
             return this;
         }
 
         public Builder setReferralPage(String referralPage) {
-            mReferralPage = referralPage;
+            this.referralPage = referralPage;
             return this;
         }
 
         public Builder setOrientation(@Orientation String orientation) {
-            mOrientation = orientation;
+            this.orientation = orientation;
             return this;
         }
 
         public String getPath() {
-            return mPath;
+            return path;
         }
 
         @Override
@@ -123,21 +107,15 @@ public class PageEvent extends BaseAttributesEvent {
         }
 
         @Override
-        public void readPropertyInTrackThread() {
-            if (mOrientation == null) {
-                mOrientation = TrackerContext.get().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
+        public void readPropertyInTrackThread(TrackerContext context) {
+            if (orientation == null) {
+                orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
             }
-            super.readPropertyInTrackThread();
+            super.readPropertyInTrackThread(context);
         }
 
         public Builder setTimestamp(long timestamp) {
-            mTimestamp = timestamp;
-            return this;
-        }
-
-        @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
+            this.timestamp = timestamp;
             return this;
         }
     }

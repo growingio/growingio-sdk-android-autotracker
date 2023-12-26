@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.util;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.View;
 
 import com.growingio.android.sdk.autotrack.R;
 
-
-@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
 public class ClassUtil {
     private static final String ANONYMOUS_CLASS_NAME = "Anonymous";
 
@@ -56,6 +51,10 @@ public class ClassUtil {
         } catch (Exception ignored) {
         }
         return false;
+    }
+
+    public static CharSequence getSupportToolBarTitle(View view) {
+        return ((android.support.v7.widget.Toolbar) view).getTitle();
     }
 }
 

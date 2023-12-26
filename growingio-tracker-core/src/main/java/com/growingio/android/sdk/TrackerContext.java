@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,75 +13,96 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk;
 
 import android.content.Context;
 import android.content.ContextWrapper;
 
-import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.modelloader.DataFetcher;
-import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
-import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
+import com.growingio.android.sdk.track.providers.TimingEventProvider;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
+import com.growingio.android.sdk.track.providers.UserInfoProvider;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class TrackerContext extends ContextWrapper {
-    private final static String TAG = "ContextProvider";
-    private static volatile TrackerContext INSTANCE = null;
+    private final static String TAG = "TrackerContext";
     private static volatile boolean sInitializedSuccessfully = false;
 
     public static boolean initializedSuccessfully() {
-        if (INSTANCE == null) return false;
         return sInitializedSuccessfully;
     }
 
-    public static void initSuccess() {
+    private final LinkedHashMap<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providerStore;
+
+    public TrackerContext(Context context, Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providers) {
+        super(context);
+        registry = new TrackerRegistry();
+
+        providerStore = new LinkedHashMap<>();
+        providerStore.putAll(providers);
+        providers.clear();
+    }
+
+    LinkedHashMap<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> getProviderStore() {
+        return providerStore;
+    }
+
+    void setup() {
+        for (Class<? extends TrackerLifecycleProvider> key : providerStore.keySet()) {
+            TrackerLifecycleProvider provider = providerStore.get(key);
+            provider.setup(this);
+        }
         sInitializedSuccessfully = true;
     }
 
-    private TrackerContext(Context context) {
-        super(context);
-        registry = new TrackerRegistry();
-    }
-
-    public static void init(Context context) {
-        synchronized (TrackerContext.class) {
-            if (null == INSTANCE) {
-                INSTANCE = new TrackerContext(context);
-            }
+    void shutdown() {
+        sInitializedSuccessfully = false;
+        for (Class<? extends TrackerLifecycleProvider> key : providerStore.keySet()) {
+            TrackerLifecycleProvider provider = providerStore.get(key);
+            provider.shutdown();
         }
     }
 
-    public static TrackerContext get() {
-        if (null == INSTANCE) {
-            Logger.e(TAG, new NullPointerException("you should init growingio sdk first"));
-        }
-        return INSTANCE;
+    @SuppressWarnings("unchecked")
+    public <T> T getProvider(Class<? extends TrackerLifecycleProvider> clazz) {
+        return (T) providerStore.get(clazz);
+    }
+
+    public ActivityStateProvider getActivityStateProvider() {
+        return getProvider(ActivityStateProvider.class);
+    }
+
+    public ConfigurationProvider getConfigurationProvider() {
+        ConfigurationProvider configurationProvider = getProvider(ConfigurationProvider.class);
+        if (configurationProvider == null) return ConfigurationProvider.empty();
+        return configurationProvider;
+    }
+
+    public DeviceInfoProvider getDeviceInfoProvider() {
+        return getProvider(DeviceInfoProvider.class);
+    }
+
+    public UserInfoProvider getUserInfoProvider() {
+        return getProvider(UserInfoProvider.class);
+    }
+
+    public TimingEventProvider getTimingEventProvider() {
+        return getProvider(TimingEventProvider.class);
+    }
+
+    public EventBuilderProvider getEventBuilderProvider() {
+        return getProvider(EventBuilderProvider.class);
     }
 
     private final TrackerRegistry registry;
 
     public TrackerRegistry getRegistry() {
         return registry;
-    }
-
-    public <Model, Data> Data executeData(Model model, Class<Model> modelClass, Class<Data> dataClass) {
-        ModelLoader<Model, Data> modelLoader = getRegistry().getModelLoader(modelClass, dataClass);
-        if (modelLoader != null) {
-            return modelLoader.buildLoadData(model).fetcher.executeData();
-        }
-        return null;
-    }
-
-    public <Model, Data> void loadData(Model model, Class<Model> modelClass, Class<Data> dataClass, LoadDataFetcher.DataCallback<Data> callback) {
-        ModelLoader<Model, Data> modelLoader = getRegistry().getModelLoader(modelClass, dataClass);
-        if (modelLoader != null) {
-            DataFetcher<Data> fetcher = modelLoader.buildLoadData(model).fetcher;
-            if (fetcher instanceof LoadDataFetcher) {
-                ((LoadDataFetcher<Data>) fetcher).loadData(callback);
-            }
-        } else {
-            callback.onLoadFailed(new NullPointerException(String.format("please register %s component first", modelClass.getSimpleName())));
-        }
     }
 }

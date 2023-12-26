@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.circler;
 
 import android.app.Activity;
@@ -25,14 +24,13 @@ import android.view.WindowManager;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.circler.screenshot.CircleScreenshot;
-import com.growingio.android.circler.screenshot.ScreenshotProvider;
 import com.growingio.android.circler.shadow.ShadowHandler;
 import com.growingio.android.circler.shadow.ShadowWH;
 import com.growingio.android.hybrid.HybridLibraryGioModule;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.autotrack.view.ViewNodeProvider;
+import com.growingio.android.sdk.track.listener.Callback;
 import com.growingio.android.sdk.track.view.DecorView;
 
 import org.junit.Before;
@@ -50,33 +48,37 @@ import java.util.List;
 public class ScreenShotTest {
 
     Application application = ApplicationProvider.getApplicationContext();
+    private TrackerContext context;
 
     @Before
     public void setup() {
-        TrackerContext.init(application);
+        Tracker tracker = new Tracker(application);
+        context = tracker.getContext();
         HybridLibraryGioModule module = new HybridLibraryGioModule();
-        module.registerComponents(application, TrackerContext.get().getRegistry());
+        tracker.registerComponent(module);
+
+        CirclerLibraryGioModule cModule = new CirclerLibraryGioModule();
+        tracker.registerComponent(cModule);
     }
 
     @Test
     public void dispatchTest() {
+        ScreenshotProvider screenshotProvider = context.getProvider(ScreenshotProvider.class);
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
-        ActivityStateProvider.get().onActivityResumed(activity);
         ShadowWH.activity = activity;
         ScreenshotProvider.OnScreenshotRefreshedListener dispatchListener = screenshot -> {
-            System.out.println(screenshot.toJSONObject());
             Truth.assertThat(screenshot).isNotNull();
         };
-        ScreenshotProvider.get().registerScreenshotRefreshedListener(dispatchListener);
-        ScreenshotProvider.get().refreshScreenshot();
+        screenshotProvider.registerScreenshotRefreshedListener(dispatchListener);
 
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener();
+        screenshotProvider.unregisterScreenshotRefreshedListener();
     }
 
     @Test
     public void circlerScreenShotTest() {
+        ScreenshotProvider screenshotProvider = context.getProvider(ScreenshotProvider.class);
+        ViewNodeProvider viewNodeProvider = context.getProvider(ViewNodeProvider.class);
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
-        ActivityStateProvider.get().onActivityResumed(activity);
         ShadowWH.activity = activity;
 
         ScreenshotProvider.OnScreenshotRefreshedListener baseListener = screenshot -> {
@@ -84,16 +86,16 @@ public class ScreenShotTest {
                     "{\"screenWidth\":320,\"screenHeight\":470,\"scale\":100,\"screenshot\":\"this is test base64\",\"msgType\":\"refreshScreenshot\",\"snapshotKey\":0,\"elements\":[],\"pages\":[]}"
             );
         };
-        ScreenshotProvider.get().registerScreenshotRefreshedListener(baseListener);
+        screenshotProvider.registerScreenshotRefreshedListener(baseListener);
 
-        new CircleScreenshot.Builder()
+        new CircleScreenshot.Builder(1920, 1680)
                 .setScale(100)
                 .setScreenshot("this is test base64")
                 .setSnapshotKey(0)
-                .build(getAllWindowDecorViews(), new Callback<CircleScreenshot>() {
+                .build(getAllWindowDecorViews(), viewNodeProvider, new Callback<CircleScreenshot>() {
                     @Override
                     public void onSuccess(CircleScreenshot result) {
-                        ScreenshotProvider.get().sendScreenshot(result);
+                        screenshotProvider.sendScreenshot(result);
                     }
 
                     @Override
@@ -101,13 +103,11 @@ public class ScreenShotTest {
 
                     }
                 });
-        ScreenshotProvider.get().unregisterScreenshotRefreshedListener();
+        screenshotProvider.unregisterScreenshotRefreshedListener();
     }
 
     public List<DecorView> getAllWindowDecorViews() {
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
-        ActivityStateProvider.get().onActivityCreated(activity, null);
-        ActivityStateProvider.get().onActivityResumed(activity);
         View view = activity.getWindow().getDecorView();
 
         List<DecorView> decorViews = new ArrayList<>();

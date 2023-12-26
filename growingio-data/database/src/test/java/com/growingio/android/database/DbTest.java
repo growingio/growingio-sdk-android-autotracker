@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.database;
 
 import android.app.Application;
@@ -23,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.growingio.android.json.JsonDataLoader;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.PageEvent;
@@ -32,7 +32,6 @@ import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.protobuf.ProtobufDataLoader;
 
 import org.json.JSONArray;
@@ -60,11 +59,14 @@ public class DbTest {
     private ProviderInfo providerInfo;
     private EventDataManager sqLite;
 
+    private TrackerContext trackerContext;
+
     @Before
     public void setup() {
-        TrackerContext.init(application);
+        Tracker tracker = new Tracker(application);
+        trackerContext = tracker.getContext();
         providerInfo = new ProviderInfo();
-        sqLite = new EventDataManager(application);
+        sqLite = new EventDataManager(trackerContext);
         providerInfo.authority = application.getPackageName() + "." + EventDataContentProvider.class.getSimpleName();
     }
 
@@ -85,16 +87,15 @@ public class DbTest {
 
     @Test
     public void dataModuleTest() {
-        TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
+        trackerContext.getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
         DatabaseLibraryModule module = new DatabaseLibraryModule();
-        TrackerRegistry trackerRegistry = new TrackerRegistry();
-        module.registerComponents(application, trackerRegistry);
+        module.registerComponents(trackerContext);
 
         CustomEvent customEvent = new CustomEvent.Builder()
                 .setEventName("databaseTest")
                 .build();
 
-        ModelLoader<EventDatabase, EventDbResult> modelLoader = trackerRegistry.getModelLoader(EventDatabase.class, EventDbResult.class);
+        ModelLoader<EventDatabase, EventDbResult> modelLoader = trackerContext.getRegistry().getModelLoader(EventDatabase.class, EventDbResult.class);
         ModelLoader.LoadData<EventDbResult> loadData = modelLoader.buildLoadData(EventDatabase.insert(customEvent));
         DataFetcher<EventDbResult> dataFetcher = loadData.fetcher;
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(EventDbResult.class);
@@ -137,7 +138,7 @@ public class DbTest {
 
     @Test
     public void contentProviderTest() {
-        TrackerContext.get().getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
+        trackerContext.getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
         controller.create(providerInfo).get();
         sqLite.removeOverdueEvents();
         CustomEvent customEvent = new CustomEvent.Builder()
@@ -188,7 +189,8 @@ public class DbTest {
 
     @Test
     public void migrateTest() {
-        EventDataManager dataManager = new EventDataManager(application);
+        trackerContext.getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
+        EventDataManager dataManager = new EventDataManager(trackerContext);
         DeprecatedEventSQLite sqLite = new DeprecatedEventSQLite(application, dataManager);
         CustomEvent customEvent = new CustomEvent.Builder()
                 .setEventName("databaseTest")

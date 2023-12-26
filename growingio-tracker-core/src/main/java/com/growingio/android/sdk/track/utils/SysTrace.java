@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.utils;
 
 import android.os.Build;
 import android.os.Trace;
 
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 /**
  * Just Delegate to Trace
@@ -29,14 +27,14 @@ public final class SysTrace {
     private SysTrace() {
     }
 
-    public static void beginSection(String sectionName) {
-        if (ConfigurationProvider.core().isDebugEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+    public static void beginSection(String sectionName, boolean enabled) {
+        if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection(sectionName);
         }
     }
 
-    public static void endSection() {
-        if (ConfigurationProvider.core().isDebugEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+    public static void endSection(boolean enabled) {
+        if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.endSection();
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.utils;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
-import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
 
 public class PermissionUtil {
@@ -55,7 +54,7 @@ public class PermissionUtil {
 
     private static boolean checkPermission(String permissionName, int flag) {
         if (sPackageManager == null) {
-            Context context = TrackerContext.get().getApplicationContext();
+            Context context = TrackMainThread.trackMain().getContext();
             sPackageManager = context.getPackageManager();
             sPackageName = context.getPackageName();
         }

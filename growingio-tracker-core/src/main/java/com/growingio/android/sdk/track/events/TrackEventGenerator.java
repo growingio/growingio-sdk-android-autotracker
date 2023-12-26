@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import java.util.Map;
 
@@ -33,6 +33,7 @@ public class TrackEventGenerator {
     public static void generateCustomEvent(String name, Map<String, String> attributes) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new CustomEvent.Builder()
+                        .setCustomEventType(ConstantPool.CUSTOM_TYPE_USER)
                         .setEventName(name)
                         .setAttributes(attributes)
         );

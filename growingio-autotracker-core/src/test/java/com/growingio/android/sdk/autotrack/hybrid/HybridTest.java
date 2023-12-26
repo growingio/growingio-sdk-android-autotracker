@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.hybrid;
 
 
@@ -22,15 +21,11 @@ import android.webkit.WebView;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.growingio.android.sdk.Configurable;
-import com.growingio.android.sdk.CoreConfiguration;
-import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
 import com.growingio.android.sdk.autotrack.inject.UcWebViewInjector;
 import com.growingio.android.sdk.autotrack.inject.WebViewInjector;
 import com.growingio.android.sdk.autotrack.inject.X5WebViewInjector;
-import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +35,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Config(manifest = Config.NONE, sdk = 23)
 @RunWith(RobolectricTestRunner.class)
@@ -50,12 +44,7 @@ public class HybridTest {
 
     @Before
     public void setup() {
-        TrackerContext.init(application);
-        TrackerContext.initSuccess();
-
-        Map<Class<? extends Configurable>, Configurable> modules = new HashMap<>();
-        modules.put(AutotrackConfig.class, new AutotrackConfig());
-        ConfigurationProvider.initWithConfig(new CoreConfiguration("HybridTest", "growingio.hybridtest"), modules);
+        Autotracker autotracker = new Autotracker(application);
     }
 
     @Test

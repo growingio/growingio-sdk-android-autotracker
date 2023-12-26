@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.middleware.http;
 
 import java.util.ArrayList;
@@ -22,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 public class EventUrl {
+    public static int GET = 0;
+    public static int POST = 1;
     private final String mHost;
     private final Map<String, String> mHeaders = new HashMap<>();
     private final List<String> mPaths = new ArrayList<>();
@@ -29,6 +30,10 @@ public class EventUrl {
     private byte[] mBodyData;
     private final long mTime;
     private String mMediaType = "application/json"; //or "application/x-www-form-urlencoded" for data
+
+    private int mCallTimeout = -1;
+
+    private int mRequestMethod = GET;
 
     public EventUrl(String host, long time) {
         mHost = host;
@@ -72,8 +77,22 @@ public class EventUrl {
         return this;
     }
 
+    public EventUrl setRequestMethod(int mRequestMethod) {
+        this.mRequestMethod = mRequestMethod;
+        return this;
+    }
+
     public Map<String, String> getHeaders() {
         return mHeaders;
+    }
+
+    public int getCallTimeout() {
+        return mCallTimeout;
+    }
+
+    public EventUrl setCallTimeout(int callTimeout) {
+        this.mCallTimeout = callTimeout;
+        return this;
     }
 
     public String toUrl() {
@@ -115,5 +134,9 @@ public class EventUrl {
         }
 
         return urlBuilder.toString();
+    }
+
+    public int getRequestMethod() {
+        return mRequestMethod;
     }
 }

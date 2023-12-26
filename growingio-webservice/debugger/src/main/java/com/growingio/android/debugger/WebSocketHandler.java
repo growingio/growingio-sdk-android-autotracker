@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package com.growingio.android.debugger;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.growingio.android.sdk.track.utils.ThreadUtils;
-import com.growingio.android.sdk.track.webservices.message.QuitMessage;
-import com.growingio.android.sdk.track.webservices.message.ReadyMessage;
+import com.growingio.android.sdk.track.TrackMainThread;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +39,10 @@ class WebSocketHandler extends WebSocketListener {
     private WebSocket webSocket;
     private static final String TAG = "WebSocketHandler";
 
-    WebSocketHandler(OnWebSocketListener webSocketListener) {
+    private final ScreenshotProvider screenshotProvider;
+
+    WebSocketHandler(OnWebSocketListener webSocketListener, ScreenshotProvider screenshotProvider) {
+        this.screenshotProvider = screenshotProvider;
         this.webSocketListener = webSocketListener;
     }
 
@@ -54,11 +55,11 @@ class WebSocketHandler extends WebSocketListener {
 
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
-        if (webSocket.send(ReadyMessage.createMessage().toJSONObject().toString())) {
+        if (webSocket.send(screenshotProvider.buildReadyMessage())) {
             this.webSocket = webSocket;
         } else {
             Log.e(TAG, "send ready message failed");
-            ThreadUtils.runOnUiThread(new Runnable() {
+            TrackMainThread.trackMain().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     webSocketListener.onFailed();
@@ -75,24 +76,24 @@ class WebSocketHandler extends WebSocketListener {
         Log.d(TAG, "Received message is " + text);
 
         if (text.contains("had disconnected")) {
-            ThreadUtils.runOnUiThread(() -> webSocketListener.onQuited());
+            TrackMainThread.trackMain().runOnUiThread(() -> webSocketListener.onQuited());
             return;
         }
         try {
             JSONObject message = new JSONObject(text);
             String msgType = message.optString("msgType");
-            if (ReadyMessage.MSG_TYPE.equals(msgType)) {
+            if (ScreenshotProvider.MSG_READY_TYPE.equals(msgType)) {
                 Log.d(TAG, "Web is ready");
-                ThreadUtils.runOnUiThread(new Runnable() {
+                TrackMainThread.trackMain().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         webSocketListener.onReady();
                     }
                 });
                 return;
-            } else if (QuitMessage.MSG_TYPE.equals(msgType)) {
+            } else if (ScreenshotProvider.MSG_QUIT_TYPE.equals(msgType)) {
                 Log.d(TAG, "Web is quited");
-                ThreadUtils.runOnUiThread(new Runnable() {
+                TrackMainThread.trackMain().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         webSocketListener.onQuited();
@@ -103,7 +104,7 @@ class WebSocketHandler extends WebSocketListener {
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }
-        ThreadUtils.runOnUiThread(new Runnable() {
+        TrackMainThread.trackMain().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 webSocketListener.onMessage(text);
@@ -114,7 +115,7 @@ class WebSocketHandler extends WebSocketListener {
     @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
         Log.e(TAG, "webSocket on onClosed, reason: " + reason);
-        ThreadUtils.runOnUiThread(new Runnable() {
+        TrackMainThread.trackMain().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 webSocketListener.onQuited();
@@ -125,7 +126,7 @@ class WebSocketHandler extends WebSocketListener {
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
         Log.e(TAG, "webSocket on onFailure, reason: " + t.getMessage());
-        ThreadUtils.runOnUiThread(new Runnable() {
+        TrackMainThread.trackMain().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 webSocketListener.onFailed();

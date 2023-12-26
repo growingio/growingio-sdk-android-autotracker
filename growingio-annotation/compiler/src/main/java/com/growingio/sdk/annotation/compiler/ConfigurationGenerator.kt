@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,23 @@ import com.growingio.sdk.annotation.GIOAppModule
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_CONFIGURABLE
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_CONFIGURATION
 import com.growingio.sdk.annotation.compiler.ProcessUtils.Companion.GIO_DEFAULT_LIBRARY_MODULE
-import com.squareup.javapoet.*
+import com.squareup.javapoet.AnnotationSpec
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.FieldSpec
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterSpec
+import com.squareup.javapoet.ParameterizedTypeName
+import com.squareup.javapoet.TypeName
+import com.squareup.javapoet.TypeSpec
+import com.squareup.javapoet.TypeVariableName
+import com.squareup.javapoet.WildcardTypeName
 import java.lang.StringBuilder
-import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.*
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.Modifier
+import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeVariable
 import javax.lang.model.util.ElementFilter
 import kotlin.collections.HashMap
@@ -77,7 +89,8 @@ import kotlin.collections.HashMap
  * @author cpacm 4/29/21
  */
 internal class ConfigurationGenerator(
-    private val processEnv: ProcessingEnvironment, private val processUtils: ProcessUtils
+    private val processEnv: ProcessingEnvironment,
+    private val processUtils: ProcessUtils,
 ) {
 
     private val methodMap = HashMap<String, String>()
@@ -99,22 +112,22 @@ internal class ConfigurationGenerator(
                             
                             <p>This class is generated and should not be modified
                             
-                            """.trimIndent()
+                """.trimIndent(),
             )
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            //private final CoreConfiguration coreCoreConfiguration;
+            // private final CoreConfiguration coreCoreConfiguration;
             .addField(
                 coreConfigurationClass,
                 "coreConfiguration",
                 Modifier.PRIVATE,
-                Modifier.FINAL
+                Modifier.FINAL,
             )
         val libraryModuleClass = ClassName.get(
             processEnv.elementUtils.getTypeElement(
-                GIO_DEFAULT_LIBRARY_MODULE
-            )
+                GIO_DEFAULT_LIBRARY_MODULE,
+            ),
         )
-        //private final Map<Class<? extends Configurable>, Configurable> MODULE_CONFIGURATIONS = new HashMap<>();
+        // private final Map<Class<? extends Configurable>, Configurable> MODULE_CONFIGURATIONS = new HashMap<>();
         val configurable = processEnv.elementUtils.getTypeElement(GIO_DEFAULT_CONFIGURABLE)
         val configurableClass = ClassName.get(configurable)
         val wildcard: TypeName = WildcardTypeName.subtypeOf(configurableClass)
@@ -122,15 +135,15 @@ internal class ConfigurationGenerator(
         val mapOfConfigAndClass = ParameterizedTypeName.get(
             ClassName.get(HashMap::class.java),
             classAny,
-            configurableClass
+            configurableClass,
         )
         configBuilder.addField(
             FieldSpec.builder(mapOfConfigAndClass, "MODULE_CONFIGURATIONS")
                 .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                 .initializer("new \$T()", mapOfConfigAndClass)
-                .build()
+                .build(),
         )
-            .addMethod(generateConstructor(coreConfigurationClass, gioConfigs))//构造方法
+            .addMethod(generateConstructor(coreConfigurationClass, gioConfigs)) // 构造方法
             .addMethod(generateCore(coreConfigurationClass))
             .addMethod(generateGetConfigModules(mapOfConfigAndClass))
             .addMethod(generateAddConfiguration(generateClass, configurableClass))
@@ -139,7 +152,7 @@ internal class ConfigurationGenerator(
                     generateClass,
                     libraryModuleClass,
                     configurableClass,
-                )
+                ),
             )
             .addMethod(generateGetConfiguration())
 
@@ -175,21 +188,20 @@ internal class ConfigurationGenerator(
                     break
                 }
             }
-
         }
     }
 
     private fun generateConstructor(
         coreConfigurationClass: ClassName,
-        gioConfigs: Set<String>
+        gioConfigs: Set<String>,
     ): MethodSpec {
         val methodSpec = MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PUBLIC)
-            .addParameter(String::class.java, "projectId")
+            .addParameter(String::class.java, "accountId")
             .addParameter(String::class.java, "urlScheme")
             .addStatement(
-                "this.coreConfiguration = new \$T(projectId,urlScheme)",
-                coreConfigurationClass
+                "this.coreConfiguration = new \$T(accountId,urlScheme)",
+                coreConfigurationClass,
             )
 
         for (config in gioConfigs) {
@@ -199,7 +211,8 @@ internal class ConfigurationGenerator(
                 throw IllegalStateException("Implement Error: $config should implement $GIO_DEFAULT_CONFIGURABLE?")
             }
             methodSpec.addStatement(
-                "addConfiguration(new \$T())", ClassName.get(configType)
+                "addConfiguration(new \$T())",
+                ClassName.get(configType),
             )
         }
 
@@ -226,7 +239,7 @@ internal class ConfigurationGenerator(
         val addMethod = MethodSpec.methodBuilder("addConfiguration")
             .addParameter(config, "config")
             .addModifiers(Modifier.PRIVATE)
-            //.addAnnotation(AnnotationSpec.builder(java.lang.Deprecated::class.java).build())
+            // .addAnnotation(AnnotationSpec.builder(java.lang.Deprecated::class.java).build())
             .beginControlFlow("if (config != null)")
             .addStatement("MODULE_CONFIGURATIONS.put(config.getClass(), config)")
             .endControlFlow()
@@ -238,7 +251,7 @@ internal class ConfigurationGenerator(
     private fun generateAddModuleWithConfiguration(
         generateClass: ClassName,
         libraryModule: ClassName,
-        config: ClassName
+        config: ClassName,
     ): MethodSpec {
         val addMethod = MethodSpec.methodBuilder("addPreloadComponent")
             .addParameter(libraryModule, "module")
@@ -253,7 +266,6 @@ internal class ConfigurationGenerator(
         return addMethod.build()
     }
 
-
     private fun generateGetConfiguration(): MethodSpec {
         val wildcard: TypeName = TypeVariableName.get("T")
         val classAny = ParameterizedTypeName.get(ClassName.get(Class::class.java), wildcard)
@@ -264,7 +276,7 @@ internal class ConfigurationGenerator(
             .addAnnotation(
                 AnnotationSpec.builder(SuppressWarnings::class.java)
                     .addMember("value", "\$S", "unchecked")
-                    .build()
+                    .build(),
             )
             .returns(TypeVariableName.get("T"))
             .addParameter(classAny, "clazz")
@@ -276,7 +288,7 @@ internal class ConfigurationGenerator(
         generateClass: ClassName,
         config: TypeElement,
         method: ExecutableElement,
-        isCore: Boolean = false
+        isCore: Boolean = false,
     ): MethodSpec? {
         val enclosingClass = method.enclosingElement
         require(!enclosingClass.modifiers.contains(Modifier.ABSTRACT)) { "Cannot transform method on abstract class $enclosingClass" }
@@ -290,7 +302,7 @@ internal class ConfigurationGenerator(
             throw IllegalStateException(
                 "Duplicate method name \"$methodName\" with ${
                     methodMap[methodName]
-                } and ${config.qualifiedName}"
+                } and ${config.qualifiedName}",
             )
         }
         methodMap[methodName] = config.qualifiedName.toString()
@@ -340,7 +352,7 @@ internal class ConfigurationGenerator(
             stateSb.append(")")
         }
         processUtils.debugLog(
-            "[config method]:$generateClass----${TypeName.get(method.returnType)}"
+            "[config method]:$generateClass----${TypeName.get(method.returnType)}",
         )
         if (TypeName.get(method.returnType) != TypeName.VOID) {
             if (ClassName.get(config).canonicalName() == TypeName.get(method.returnType)

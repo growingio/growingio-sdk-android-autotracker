@@ -1,28 +1,23 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.protobuf;
 
-import android.app.Application;
-
-import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.AppClosedEvent;
 import com.growingio.android.sdk.track.events.ConversionVariablesEvent;
 import com.growingio.android.sdk.track.events.CustomEvent;
@@ -31,19 +26,19 @@ import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
-import com.growingio.android.sdk.track.events.cdp.ResourceItem;
-import com.growingio.android.sdk.track.events.cdp.ResourceItemCustomEvent;
+import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridCustomEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridPageEvent;
 import com.growingio.android.sdk.track.events.hybrid.HybridViewElementEvent;
 import com.growingio.android.sdk.track.middleware.GEvent;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,13 +48,6 @@ import java.util.Map;
  */
 @RunWith(RobolectricTestRunner.class)
 public class ProtocolTest {
-    private final Application application = ApplicationProvider.getApplicationContext();
-
-    @Before
-    public void setup() {
-        TrackerContext.init(application);
-    }
-
     @Test
     public void protocolTest() throws InvalidProtocolBufferException {
         Map<String, String> defaultMap = new HashMap<>();
@@ -84,11 +72,7 @@ public class ProtocolTest {
 
         PageLevelCustomEvent plcEnent = new PageLevelCustomEvent.Builder()
                 .setPath("PageLevelCustomEvent")
-                .setAttributes(defaultMap)
-                .setEventName("page_level")
                 .build();
-        Truth.assertThat(protocol(plcEnent).getEventName()).isEqualTo("page_level");
-        Truth.assertThat(protocol(plcEnent).getAttributesOrDefault("user", "gio")).isEqualTo("cpacm");
         Truth.assertThat(protocol(plcEnent).getPath()).isEqualTo("PageLevelCustomEvent");
 
         ViewElementEvent vEvent = new ViewElementEvent.Builder("VIEW_CHANGE")
@@ -100,11 +84,9 @@ public class ProtocolTest {
         Truth.assertThat(protocol(vEvent).getIndex()).isEqualTo(0);
 
         HybridCustomEvent hcEvent = new HybridCustomEvent.Builder()
-                .setEventName("hybrid")
-                .setAttributes(defaultMap)
+                .setQuery("hybrid")
                 .build();
-        Truth.assertThat(protocol(hcEvent).getAttributesOrDefault("user", "gio")).isEqualTo("cpacm");
-        Truth.assertThat(protocol(hcEvent).getEventName()).isEqualTo("hybrid");
+        Truth.assertThat(protocol(hcEvent).getQuery()).isEqualTo("hybrid");
 
         HybridPageEvent hpEvent = new HybridPageEvent.Builder()
                 .setProtocolType("protobuf")
@@ -115,16 +97,8 @@ public class ProtocolTest {
 
         HybridViewElementEvent hvEvent = new HybridViewElementEvent.Builder("test")
                 .setHyperlink("www.cpacm.net")
-                .setTextValue("cpacm")
                 .build();
-        Truth.assertThat(protocol(hvEvent).getTextValue()).isEqualTo("cpacm");
         Truth.assertThat(protocol(hvEvent).getHyperlink()).isEqualTo("www.cpacm.net");
-
-        ResourceItemCustomEvent ricEvent = new ResourceItemCustomEvent.Builder()
-                .setResourceItem(new ResourceItem("key", "value"))
-                .build();
-        Truth.assertThat(protocol(ricEvent).getResourceItem().getKey()).isEqualTo("key");
-        Truth.assertThat(protocol(ricEvent).getResourceItem().getId()).isEqualTo("value");
 
         VisitorAttributesEvent vaEvent = new VisitorAttributesEvent.Builder()
                 .setAttributes(defaultMap)
@@ -148,8 +122,37 @@ public class ProtocolTest {
     }
 
     private EventV3Protocol.EventV3Dto protocol(GEvent gEvent) throws InvalidProtocolBufferException {
-        byte[] data = EventProtocolTransfer.protocol(gEvent);
+        byte[] data = EventProtocolTransfer.protocolByte(gEvent);
         return EventV3Protocol.EventV3Dto.parseFrom(data);
     }
 
+    @Test
+    public void protocolListTest() throws InvalidProtocolBufferException {
+        Map<String, String> defaultMap = new HashMap<>();
+        defaultMap.put("user", "cpacm");
+        defaultMap.put("age", "24");
+        List<BaseEvent> events = new ArrayList<>();
+
+        CustomEvent customEvent = new CustomEvent.Builder()
+                .setEventName("pbTest")
+                .setAttributes(defaultMap)
+                .build();
+        events.add(customEvent);
+
+
+        EventV3Protocol.EventV3List.Builder listBuilder = EventV3Protocol.EventV3List.newBuilder();
+
+        for (BaseEvent event : events) {
+            listBuilder.addValues(protocol(event));
+        }
+
+        byte[] result = listBuilder.build().toByteArray();
+
+        EventV3Protocol.EventV3List parser = EventV3Protocol.EventV3List.parseFrom(result);
+        for (EventV3Protocol.EventV3Dto dto : parser.getValuesList()) {
+            Truth.assertThat(dto.getAttributesCount()).isEqualTo(2);
+            Truth.assertThat(dto.getAttributesMap()).containsEntry("user", "cpacm");
+        }
+
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class RobolectricActivity extends Activity {
         });
 
         ImageView imageView = new ImageView(this);
-        imageView.setTag(com.growingio.android.sdk.autotrack.R.id.growing_tracker_view_page, new ActivityPage(this));
+        imageView.setTag(R.id.growing_tracker_view_page, new ActivityPage(this));
 
         WebView webView = new WebView(this);
         webView.loadUrl("https://www.growingio.com/");

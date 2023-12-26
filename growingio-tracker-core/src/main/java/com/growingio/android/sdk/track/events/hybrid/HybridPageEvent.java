@@ -1,77 +1,59 @@
 /*
- *   Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events.hybrid;
 
 import com.growingio.android.sdk.track.events.PageEvent;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+@JsonSerializer
 public class HybridPageEvent extends PageEvent {
     private static final long serialVersionUID = 1L;
 
-    private final String mProtocolType;
-    private final String mQuery;
+    private final String protocolType;
+    private final String query;
 
     protected HybridPageEvent(Builder eventBuilder) {
         super(eventBuilder);
-        mProtocolType = eventBuilder.mProtocolType;
-        mQuery = eventBuilder.mQuery;
+        protocolType = eventBuilder.protocolType;
+        query = eventBuilder.query;
     }
 
     public String getQuery() {
-        return checkValueSafe(mQuery);
+        return checkValueSafe(query);
     }
 
     public String getProtocolType() {
-        return checkValueSafe(mProtocolType);
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject json = super.toJSONObject();
-        try {
-            json.put("protocolType", mProtocolType);
-            json.put("query", mQuery);
-        } catch (JSONException ignored) {
-        }
-        return json;
+        return checkValueSafe(protocolType);
     }
 
     public static class Builder extends PageEvent.Builder {
-        private String mProtocolType;
-        private String mQuery;
+        private String protocolType;
+        private String query;
 
         public Builder() {
             super();
         }
 
         public Builder setProtocolType(String protocolType) {
-            mProtocolType = protocolType;
+            this.protocolType = protocolType;
             return this;
         }
 
         public Builder setQuery(String query) {
-            mQuery = query;
-            return this;
-        }
-
-        public Builder setDomain(String domain) {
-            mDomain = domain;
+            this.query = query;
             return this;
         }
 
@@ -80,34 +62,5 @@ public class HybridPageEvent extends PageEvent {
             return new HybridPageEvent(this);
         }
 
-        @Override
-        public Builder setPath(String path) {
-            super.setPath(path);
-            return this;
-        }
-
-        @Override
-        public Builder setTitle(String title) {
-            super.setTitle(title);
-            return this;
-        }
-
-        @Override
-        public Builder setReferralPage(String referralPage) {
-            super.setReferralPage(referralPage);
-            return this;
-        }
-
-        @Override
-        public Builder setTimestamp(long timestamp) {
-            super.setTimestamp(timestamp);
-            return this;
-        }
-
-        @Override
-        public Builder setOrientation(String orientation) {
-            super.setOrientation(orientation);
-            return this;
-        }
     }
 }

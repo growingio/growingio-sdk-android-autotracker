@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,7 @@
  */
 package com.growingio.android.debugger;
 
-import android.util.DisplayMetrics;
-
-import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.async.Callback;
-import com.growingio.android.sdk.track.utils.DeviceUtil;
+import com.growingio.android.sdk.track.listener.Callback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,6 +64,11 @@ public class DebuggerScreenshot {
         private long mSnapshotKey;
         private Callback<DebuggerScreenshot> mScreenshotResultCallback;
 
+        Builder(int width, int height) {
+            this.mScreenWidth = width;
+            this.mScreenHeight = height;
+        }
+
         public Builder setScale(float scale) {
             mScale = scale;
             return this;
@@ -88,10 +89,6 @@ public class DebuggerScreenshot {
                 return;
             }
             mScreenshotResultCallback = callback;
-            DisplayMetrics displayMetrics = DeviceUtil.getDisplayMetrics(TrackerContext.get().getApplicationContext());
-            mScreenWidth = displayMetrics.widthPixels;
-            mScreenHeight = displayMetrics.heightPixels;
-
             callResultOnSuccess();
         }
 

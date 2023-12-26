@@ -18,14 +18,14 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 def getSelectVersion(){
-    def version = releaseConfiguration.releaseVersion
-    if (project.hasProperty('CI_SELECT_MODULE') && project.hasProperty("CI_SELECT_VERSION")) {
-        def cmdModuleId = CI_SELECT_MODULE
-        def moduleId = POM_ARTIFACT_ID
-        if (cmdModuleId == moduleId && CI_SELECT_VERSION != "DEFAULT")
-            return CI_SELECT_VERSION
-    }
-    return version
+	def version = libs.versions.growingio.get()
+	if (project.hasProperty('CI_SELECT_MODULE') && project.hasProperty("CI_SELECT_VERSION")) {
+		def cmdModuleId = CI_SELECT_MODULE
+		def moduleId = POM_ARTIFACT_ID
+		if (cmdModuleId == moduleId && CI_SELECT_VERSION != "DEFAULT")
+			return CI_SELECT_VERSION
+	}
+	return version
 }
 
 version = getSelectVersion()
@@ -33,98 +33,98 @@ group = GROUP
 
 @SuppressWarnings("GrMethodMayBeStatic")
 def isReleaseBuild() {
-    return !version.contains("SNAPSHOT")
+	return !version.contains("SNAPSHOT")
 }
 
 def getReleaseRepositoryUrl() {
-    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+	return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+			: 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+	return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+			: 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
 }
 
 def getRepositoryUsername() {
-    return hasProperty('USERNAME') ? USERNAME : (hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : '')
+	return hasProperty('USERNAME') ? USERNAME : (hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : '')
 }
 
 def getRepositoryPassword() {
-    return hasProperty('PASSWORD') ? PASSWORD : (hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : '')
+	return hasProperty('PASSWORD') ? PASSWORD : (hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : '')
 }
 
 def configurePom(pom) {
-    pom.name = POM_NAME
-    pom.description = POM_DESCRIPTION
-    pom.url = POM_URL
+	pom.name = POM_NAME
+	pom.description = POM_DESCRIPTION
+	pom.url = POM_URL
 
-    pom.scm {
-        url = POM_SCM_URL
-        connection = POM_SCM_CONNECTION
-        developerConnection = POM_SCM_DEV_CONNECTION
-        tag = 'HEAD'
-    }
+	pom.scm {
+		url = POM_SCM_URL
+		connection = POM_SCM_CONNECTION
+		developerConnection = POM_SCM_DEV_CONNECTION
+		tag = 'HEAD'
+	}
 
-    pom.licenses {
-        license {
-            name = POM_LICENCE_NAME
-            url = POM_LICENCE_URL
-            distribution = POM_LICENCE_DIST
-        }
-    }
+	pom.licenses {
+		license {
+			name = POM_LICENCE_NAME
+			url = POM_LICENCE_URL
+			distribution = POM_LICENCE_DIST
+		}
+	}
 
-    pom.issueManagement {
-        system = 'GitHub Issues'
-        url = POM_SCM_ISSUES
-    }
+	pom.issueManagement {
+		system = 'GitHub Issues'
+		url = POM_SCM_ISSUES
+	}
 
-    pom.organization {
-        name = POM_COMPANY
-        url = POM_OFFICIAL_WEBSITE
-    }
+	pom.organization {
+		name = POM_COMPANY
+		url = POM_OFFICIAL_WEBSITE
+	}
 
-    pom.developers {
-        developer {
-            id = POM_DEVELOPER_ID
-            name = POM_DEVELOPER_NAME
-            email = POM_DEVELOPER_EMAIL
-        }
-    }
+	pom.developers {
+		developer {
+			id = POM_DEVELOPER_ID
+			name = POM_DEVELOPER_NAME
+			email = POM_DEVELOPER_EMAIL
+		}
+	}
 }
 
 
 publishing {
-    publications {
-        bom(MavenPublication) {
-            from components.javaPlatform
+	publications {
+		bom(MavenPublication) {
+			from components.javaPlatform
 
-            artifactId = POM_ARTIFACT_ID
-            version = version
-            pom {
-                configurePom(owner)
-            }
-        }
-    }
-    // Publish to build output repository.
-    repositories {
-        maven {
-            def releasesRepoUrl = getReleaseRepositoryUrl()
-            def snapshotsRepoUrl = getSnapshotRepositoryUrl()
-            url = isReleaseBuild() ? releasesRepoUrl : snapshotsRepoUrl
-            credentials(PasswordCredentials) {
-                username = getRepositoryUsername()
-                password = getRepositoryPassword()
-            }
-        }
-    }
+			artifactId = POM_ARTIFACT_ID
+			version = version
+			pom {
+				configurePom(owner)
+			}
+		}
+	}
+	// Publish to build output repository.
+	repositories {
+		maven {
+			def releasesRepoUrl = getReleaseRepositoryUrl()
+			def snapshotsRepoUrl = getSnapshotRepositoryUrl()
+			url = isReleaseBuild() ? releasesRepoUrl : snapshotsRepoUrl
+			credentials(PasswordCredentials) {
+				username = getRepositoryUsername()
+				password = getRepositoryPassword()
+			}
+		}
+	}
 }
 
 signing {
-    required { isReleaseBuild() && gradle.taskGraph.hasTask("publish") }
-    publishing.publications.all { publication ->
-        sign publication
-    }
+	required { isReleaseBuild() && gradle.taskGraph.hasTask("publish") }
+	publishing.publications.all { publication ->
+		sign publication
+	}
 }
 
 apply from: "${rootProject.projectDir}/gradle/existDenpendices.gradle"

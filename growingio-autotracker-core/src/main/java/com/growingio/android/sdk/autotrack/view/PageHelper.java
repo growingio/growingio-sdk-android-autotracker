@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.view;
 
 import android.view.View;
@@ -21,7 +20,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.growingio.android.sdk.autotrack.page.Page;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
 /**
  * <p>
@@ -30,13 +28,13 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
  */
 class PageHelper {
 
-    public static final String PAGE_PREFIX = "/Page";
-    public static final String IGNORE_PAGE_PREFIX = "/IgnorePage";
+    public static final String PAGE_PREFIX = "Page";
+    public static final String MAIN_WINDOW_PREFIX = "MainWindow";
+    public static final String DIALOG_WINDOW_PREFIX = "DialogWindow";
+    public static final String POPUP_WINDOW_PREFIX = "PopupWindow";
+    public static final String CUSTOM_WINDOW_PREFIX = "CustomWindow";
 
-    public static final String MAIN_WINDOW_PREFIX = "/MainWindow";
-    public static final String DIALOG_WINDOW_PREFIX = "/DialogWindow";
-    public static final String POPUP_WINDOW_PREFIX = "/PopupWindow";
-    public static final String CUSTOM_WINDOW_PREFIX = "/CustomWindow";
+    public static final String POPUP_DECOR_VIEW_CLASS_NAME = "PopupDecorView";
 
     private PageHelper() {
     }
@@ -49,12 +47,8 @@ class PageHelper {
         String windowPrefix;
         Page<?> page = ViewAttributeUtil.getViewPage(root);
         if (page != null) {
-            if (page.isIgnored()) {
-                windowPrefix = IGNORE_PAGE_PREFIX;
-            } else {
-                windowPrefix = PAGE_PREFIX;
-            }
-        } else if (root.hashCode() == ActivityStateProvider.get().getCurrentRootWindowsHashCode()) {
+            windowPrefix = PAGE_PREFIX;
+        } else if (root.hashCode() == ViewUtil.getCurrentRootWindowsHashCode()) {
             windowPrefix = getMainWindowPrefix();
         } else {
             windowPrefix = getSubWindowPrefix(root);

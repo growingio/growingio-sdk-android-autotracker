@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.utils;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class ObjectUtils {
 
@@ -68,39 +63,25 @@ public class ObjectUtils {
         for (final Field field : fields) {
             final String fieldName = field.getName();
             // Reject field from inner class
-            if (!fieldName.contains("$") && !customProcess(builder, o, field)) {
+            if (!fieldName.contains("$")) {
                 final Object fieldValue = field.get(o);
                 builder.append("\t").append(fieldName).append(": ").append(fieldValue).append("\n");
             }
         }
     }
 
-    private static boolean customProcess(StringBuilder builder, Object o, Field field) {
+    public static String sha1(String text) {
         try {
-            if (field.isAnnotationPresent(FieldToString.class)) {
-                for (Annotation annotation : field.getAnnotations()) {
-                    if (annotation instanceof FieldToString) {
-                        FieldToString fieldToStringAnnotation = (FieldToString) annotation;
-                        Method fieldToStringMethod = fieldToStringAnnotation.clazz().getMethod(fieldToStringAnnotation.method(), fieldToStringAnnotation.parameterTypes());
-                        fieldToStringMethod.setAccessible(true);
-                        builder.append("\t").append(field.getName()).append(": ").append(fieldToStringMethod.invoke(o, field.get(o))).append("\n");
-                        return true;
-                    }
-                }
+            MessageDigest digest = MessageDigest.getInstance("SHA1");
+            digest.update(text.getBytes());
+            byte[] bytes = digest.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte aByte : bytes) {
+                sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
             }
-        } catch (Throwable ignored) {
+            return sb.toString();
+        } catch (NoSuchAlgorithmException ignored) {
         }
-
-        return false;
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    public @interface FieldToString {
-        Class<?> clazz();
-
-        String method();
-
-        Class<?>[] parameterTypes() default {};
+        return text;
     }
 }

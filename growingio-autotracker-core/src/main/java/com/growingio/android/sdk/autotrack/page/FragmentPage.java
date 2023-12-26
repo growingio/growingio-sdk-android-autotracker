@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.page;
 
-import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
+
 public class FragmentPage extends Page<SuperFragment<?>> {
+
+    private AutotrackConfig autotrackConfig;
+
     public FragmentPage(SuperFragment<?> carrier) {
         super(carrier);
+    }
+
+    public FragmentPage(SuperFragment<?> carrier, AutotrackConfig autotrackConfig) {
+        super(carrier);
+        this.autotrackConfig = autotrackConfig;
     }
 
     @Override
@@ -30,13 +38,12 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         if (!TextUtils.isEmpty(getAlias())) {
             return getAlias();
         }
+        return getClassName();
+    }
 
-        String tag = getTag();
-        if (TextUtils.isEmpty(tag)) {
-            tag = "-";
-        }
-        return "" + getCarrier().getRealFragment().getClass().getSimpleName() +
-                "[" + tag + "]";
+    @Override
+    public String getClassName() {
+        return getCarrier().getSimpleName();
     }
 
     @Override
@@ -45,20 +52,12 @@ public class FragmentPage extends Page<SuperFragment<?>> {
     }
 
     @Override
-    String getTag() {
+    public String getTag() {
         String tag = getCarrier().getTag();
         if (!TextUtils.isEmpty(tag)) {
             return transformSwitcherTag(tag);
         }
-        int id = getCarrier().getId();
-        if (id > 0) {
-            try {
-                return getCarrier().getResources().getResourceEntryName(id);
-            } catch (Resources.NotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        return getCarrier().getResourceEntryName(getCarrier().getId());
     }
 
     /**
@@ -70,7 +69,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         String[] e = tag.split(":");
         if (e.length == 4) {
             try {
-                e[2] = getCarrier().getResources().getResourceEntryName(Integer.parseInt(e[2]));
+                e[2] = getCarrier().getResourceEntryName(Integer.parseInt(e[2]));
             } catch (NumberFormatException ignored) {
             }
             StringBuilder stringBuilder = new StringBuilder(e[0]);
@@ -81,5 +80,13 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         }
 
         return tag;
+    }
+
+    @Override
+    public boolean isAutotrack() {
+        if (autotrackConfig != null && autotrackConfig.getAutotrackOptions().isFragmentPageEnabled()) {
+            return true;
+        }
+        return super.isAutotrack();
     }
 }

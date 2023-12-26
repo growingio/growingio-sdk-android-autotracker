@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import org.json.JSONObject;
-
+@JsonSerializer
 public class AppClosedEvent extends BaseEvent {
     private static final long serialVersionUID = 1L;
 
     protected AppClosedEvent(Builder eventBuilder) {
         super(eventBuilder);
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        return super.toJSONObject();
     }
 
     public static final class Builder extends BaseBuilder<AppClosedEvent> {
@@ -41,11 +35,6 @@ public class AppClosedEvent extends BaseEvent {
         @Override
         public AppClosedEvent build() {
             return new AppClosedEvent(this);
-        }
-
-        @Override
-        public void readPropertyInTrackThread() {
-            super.readPropertyInTrackThread();
         }
     }
 }

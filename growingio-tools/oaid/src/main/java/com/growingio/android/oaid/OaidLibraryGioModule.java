@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.oaid;
 
-import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.middleware.OaidHelper;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 @GIOLibraryModule(config = OaidConfig.class)
 public class OaidLibraryGioModule extends LibraryGioModule {
     @Override
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(OaidHelper.class, String.class, new OaidDataLoader.Factory(context));
+    public void registerComponents(TrackerContext context) {
+        context.getRegistry().register(OaidHelper.class, String.class, new OaidDataLoader.Factory(context));
     }
 }

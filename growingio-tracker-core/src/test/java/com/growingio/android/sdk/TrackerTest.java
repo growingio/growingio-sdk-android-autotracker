@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk;
 
 
 import android.app.Application;
-import android.content.Context;
 import android.webkit.WebView;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +40,11 @@ public class TrackerTest {
 
     @Test
     public void initTest() {
-        Tracker nullTracker = new Tracker(null);
-        assertThat(nullTracker.isInited).isFalse();
+        try {
+            Tracker nullTracker = new Tracker(null);
+        } catch (Exception e) {
+            assertThat(e).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Test
@@ -53,13 +53,9 @@ public class TrackerTest {
         Map<String, String> valueMap = new HashMap<>();
         valueMap.put("user", "cpacm");
         tracker.trackCustomEvent("test");
-        tracker.setConversionVariables(null);
-        tracker.setConversionVariables(valueMap);
         tracker.setLoginUserId("cpacm");
         tracker.setLoginUserAttributes(null);
         tracker.setLoginUserAttributes(valueMap);
-        tracker.setVisitorAttributes(null);
-        tracker.setVisitorAttributes(valueMap);
         assertThat(tracker.getDeviceId()).isNotEmpty();
 
         tracker.setDataCollectionEnabled(true);
@@ -69,6 +65,10 @@ public class TrackerTest {
         tracker.cleanLocation();
         tracker.onActivityNewIntent(null, null);
 
+        tracker.setGeneralProps(valueMap);
+        tracker.removeGeneralProps("user");
+        tracker.clearGeneralProps();
+
         WebView webView = new WebView(application);
         tracker.bridgeWebView(webView);
 
@@ -77,8 +77,7 @@ public class TrackerTest {
         tracker.cleanLoginUserId();
 
         TestLibraryGioModule testLibraryGioModule = new TestLibraryGioModule();
-        testLibraryGioModule.registerComponents(application, TrackerContext.get().getRegistry());
-        testLibraryGioModule.getConfiguration(TestLibraryGioModule.class);
+        testLibraryGioModule.registerComponents(tracker.getContext());
 
         tracker.registerComponent(testLibraryGioModule);
     }
@@ -101,8 +100,8 @@ public class TrackerTest {
 
     public static class TestLibraryGioModule extends LibraryGioModule implements Configurable {
         @Override
-        public void registerComponents(Context context, TrackerRegistry registry) {
-            super.registerComponents(context, registry);
+        public void registerComponents(TrackerContext context) {
+            super.registerComponents(context);
         }
     }
 

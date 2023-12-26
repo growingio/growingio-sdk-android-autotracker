@@ -58,6 +58,10 @@ message EventV3Dto {
     string project_key = 53;
     int64 send_time = 54;
     string user_key = 55;
+
+    //new in sdk 4.0
+    string xcontent = 56;
+    string timezone_offset = 57;
 }
 
 message ResourceItem {

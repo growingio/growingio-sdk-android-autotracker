@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.database;
 
 import android.annotation.SuppressLint;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteFullException;
 import android.net.Uri;
@@ -34,6 +32,7 @@ import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,18 +41,17 @@ import static com.growingio.android.database.EventDataTable.COLUMN_EVENT_TYPE;
 import static com.growingio.android.database.EventDataTable.COLUMN_ID;
 import static com.growingio.android.database.EventDataTable.COLUMN_POLICY;
 import static com.growingio.android.database.EventDataTable.TABLE_EVENTS;
-import static com.growingio.android.database.EventDataTable.getContentUri;
 
 public class EventDataManager {
     private static final String TAG = "EventDataManager";
 
     private static final long EVENT_VALID_PERIOD_MILLS = 7L * 24 * 60 * 60_000;
 
-    private final Context context;
+    private final TrackerContext context;
     private final String eventsInfoAuthority;
     private boolean ignoreOperations = false;
 
-    EventDataManager(Context context) {
+    EventDataManager(TrackerContext context) {
         this.context = context;
         eventsInfoAuthority = context.getPackageName() + "." + EventDataContentProvider.CONTENT_PROVIDER_NAME;
 
@@ -65,7 +63,7 @@ public class EventDataManager {
     }
 
     private EventByteArray formatData(EventFormatData data) {
-        ModelLoader<EventFormatData, EventByteArray> modelLoader = TrackerContext.get().getRegistry().getModelLoader(EventFormatData.class, EventByteArray.class);
+        ModelLoader<EventFormatData, EventByteArray> modelLoader = context.getRegistry().getModelLoader(EventFormatData.class, EventByteArray.class);
         if (modelLoader == null) {
             Logger.e(TAG, "please register eventformat component first");
             return null;
@@ -78,6 +76,7 @@ public class EventDataManager {
         int count = 0;
         for (GEvent event : events) {
             Uri uri = insertEvent(event);
+            //GioDatabase.insertEvent(uri,event);
             if (uri != null) count++;
         }
         return count;
@@ -95,7 +94,6 @@ public class EventDataManager {
             EventByteArray data = formatData(EventFormatData.format(gEvent));
             if (data != null && data.getBodyData() != null) {
                 ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), gEvent.getEventType(), gEvent.getSendPolicy());
-                //GioDatabase.insert(insert, gEvent);
                 return contentResolver.insert(uri, contentValues);
             }
         } catch (SQLiteFullException e) {
@@ -281,6 +279,10 @@ public class EventDataManager {
         } catch (Exception e) {
             Logger.e(TAG, e, "removeAllEvents failed");
         }
+    }
+
+    public Uri getContentUri() {
+        return Uri.parse("content://" + context.getPackageName() + "." + EventDataContentProvider.CONTENT_PROVIDER_NAME + File.separator + TABLE_EVENTS);
     }
 
     private void onDiskFull(SQLiteFullException e) {

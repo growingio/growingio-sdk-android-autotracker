@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,37 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.providers;
 
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.ErrorLog;
-import com.growingio.android.sdk.track.ipc.PersistentDataProvider;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 
-public class UserInfoProvider {
+public class UserInfoProvider implements TrackerLifecycleProvider {
     private static final String TAG = "UserInfoPolicy";
 
-    private static class SingleInstance {
-        private static final UserInfoProvider INSTANCE = new UserInfoProvider();
+    private PersistentDataProvider persistentDataProvider;
+    private SessionProvider sessionProvider;
+    private ConfigurationProvider configurationProvider;
+
+    UserInfoProvider() {
     }
 
-    private UserInfoProvider() {
+    @Override
+    public void setup(TrackerContext context) {
+        configurationProvider = context.getConfigurationProvider();
+        persistentDataProvider = context.getProvider(PersistentDataProvider.class);
+        sessionProvider = context.getProvider(SessionProvider.class);
     }
 
-    public static UserInfoProvider get() {
-        return SingleInstance.INSTANCE;
+    @Override
+    public void shutdown() {
+
     }
+
 
     public String getLoginUserKey() {
-        return PersistentDataProvider.get().getLoginUserKey();
+        return persistentDataProvider.getLoginUserKey();
     }
 
     public String getLoginUserId() {
-        return PersistentDataProvider.get().getLoginUserId();
+        return persistentDataProvider.getLoginUserId();
     }
 
     @TrackThread
@@ -52,7 +59,7 @@ public class UserInfoProvider {
     }
 
     public void setLoginUserId(String userId, String userKey) {
-        if (!ConfigurationProvider.core().isIdMappingEnabled()) {
+        if (!configurationProvider.core().isIdMappingEnabled()) {
             if (userKey != null) {
                 Logger.w(TAG, "setUserId with UserKey should enable idMapping in sdk Configuration.");
                 userKey = null;
@@ -61,17 +68,17 @@ public class UserInfoProvider {
 
         // 考虑DataSharer存储限制
         if (userKey != null && userKey.length() > 1000) {
-            Logger.e(TAG, ErrorLog.USER_KEY_TOO_LONG);
+            Logger.e(TAG, "userKey max length is 1000.");
             return;
         }
         if (userId != null && userId.length() > 1000) {
-            Logger.e(TAG, ErrorLog.USER_ID_TOO_LONG);
+            Logger.e(TAG, "userId max length is 1000.");
             return;
         }
 
         if (TextUtils.isEmpty(userId)) {
             // to null, never send visit, just return
-            PersistentDataProvider.get().setLoginUserIdAndUserKey(null, null);
+            persistentDataProvider.setLoginUserIdAndUserKey(null, null);
             Logger.d(TAG, "clean the userId (and will also clean the userKey");
             return;
         }
@@ -80,7 +87,7 @@ public class UserInfoProvider {
         if (ObjectUtils.equals(userId, lastUserId)) {
             if (!ObjectUtils.equals(getLoginUserKey(), userKey)) {
                 Logger.d(TAG, "setUserId, the userId=" + userId + " is same as the old userId, but the userKey=" + userKey + " is different.");
-                PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, userKey);
+                persistentDataProvider.setLoginUserIdAndUserKey(userId, userKey);
             } else {
                 Logger.d(TAG, "setUserId, the userId is same as the old userId, just return");
             }
@@ -88,25 +95,20 @@ public class UserInfoProvider {
         }
 
         Logger.d(TAG, "userIdChange: newUserId = " + userId + ", latestUserId = " + lastUserId);
-        PersistentDataProvider.get().setGioId(userId);
-        PersistentDataProvider.get().setLoginUserIdAndUserKey(userId, (TextUtils.isEmpty(userKey) ? null : userKey));
+        persistentDataProvider.setLoginUserIdAndUserKey(userId, (TextUtils.isEmpty(userKey) ? null : userKey));
         needSendVisit(userId);
     }
 
     @TrackThread
     private void needSendVisit(String newUserId) {
-        String mLatestNonNullUserId = PersistentDataProvider.get().getLatestNonNullUserId();
-        Logger.d(TAG, "resend visit after UserIdChanged");
+        String mLatestNonNullUserId = persistentDataProvider.getLatestNonNullUserId();
         if (newUserId != null && newUserId.length() != 0) {
-            if (TextUtils.isEmpty(mLatestNonNullUserId)) {
-                SessionProvider.get().generateVisit();
-            } else {
-                if (!newUserId.equals(mLatestNonNullUserId)) {
-                    SessionProvider.get().refreshSessionId();
-                    SessionProvider.get().generateVisit();
-                }
+            if (!TextUtils.isEmpty(mLatestNonNullUserId) && !newUserId.equals(mLatestNonNullUserId)) {
+                Logger.d(TAG, "resend visit after UserIdChanged");
+                sessionProvider.refreshSessionId();
+                sessionProvider.generateVisit();
             }
-            PersistentDataProvider.get().setLatestNonNullUserId(newUserId);
+            persistentDataProvider.setLatestNonNullUserId(newUserId);
         }
     }
 }

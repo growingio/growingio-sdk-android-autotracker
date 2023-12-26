@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.hybrid;
 
 import com.growingio.android.sdk.track.log.Logger;
@@ -25,13 +24,16 @@ class WebViewJavascriptBridgeConfiguration {
     private static final String TAG = "WebViewJavascriptBridgeConfiguration";
 
     private final String mProjectId;
+
+    private final String mDataSourceId;
     private final String mAppId;
     private final String mAppPackage;
     private final String mNativeSdkVersion;
     private final int mNativeSdkVersionCode;
 
-    WebViewJavascriptBridgeConfiguration(String projectId, String appId, String appPackage, String nativeSdkVersion, int nativeSdkVersionCode) {
+    WebViewJavascriptBridgeConfiguration(String projectId, String dataSourceId, String appId, String appPackage, String nativeSdkVersion, int nativeSdkVersionCode) {
         mProjectId = projectId;
+        mDataSourceId = dataSourceId;
         mAppId = appId;
         mAppPackage = appPackage;
         mNativeSdkVersion = nativeSdkVersion;
@@ -42,6 +44,7 @@ class WebViewJavascriptBridgeConfiguration {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("projectId", mProjectId);
+            jsonObject.put("dataSourceId", mDataSourceId);
             jsonObject.put("appId", mAppId);
             jsonObject.put("appPackage", mAppPackage);
             jsonObject.put("nativeSdkVersion", mNativeSdkVersion);

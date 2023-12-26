@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.okhttp3;
 
-import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
@@ -32,11 +30,11 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 @GIOLibraryModule(config = OkHttpConfig.class)
 public class OkhttpLibraryGioModule extends LibraryGioModule {
     @Override
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        OkHttpConfig config = getConfiguration(OkHttpConfig.class);
+    public void registerComponents(TrackerContext context) {
+        OkHttpConfig config = context.getConfigurationProvider().getConfiguration(OkHttpConfig.class);
         if (config == null) {
             config = new OkHttpConfig();
         }
-        registry.register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory(config));
+        context.getRegistry().register(EventUrl.class, EventResponse.class, new OkHttpDataLoader.Factory(config));
     }
 }

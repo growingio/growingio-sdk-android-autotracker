@@ -1,54 +1,53 @@
 plugins {
-    id 'com.android.library'
+	id 'com.android.library'
 }
 
 android {
-    compileSdkVersion buildConfiguration.compileVersion
-    defaultConfig {
-        minSdkVersion buildConfiguration.minSdkVersion
-        targetSdkVersion buildConfiguration.targetSdkVersion
-        versionName releaseConfiguration.releaseVersion
-        versionCode releaseConfiguration.releaseVersionCode
-    }
+	namespace 'com.growingio.android.encoder'
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+		versionName libs.versions.growingio.get()
+		versionCode libs.versions.growingioCode.get().toInteger()
+	}
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		}
+	}
 
-    compileOptions {
-        sourceCompatibility buildConfiguration.sourceCompatibility
-        targetCompatibility buildConfiguration.targetCompatibility
-    }
+	compileOptions {
+		sourceCompatibility buildConfiguration.sourceCompatibility
+		targetCompatibility buildConfiguration.targetCompatibility
+	}
 
-    testOptions {
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-        }
-        unitTests {
-            returnDefaultValues = true
-            includeAndroidResources = true
-        }
-    }
+	testOptions {
+		unitTests.all {
+			jacoco {
+				includeNoLocationClasses = true
+				excludes = ['jdk.internal.*']
+			}
+		}
+		unitTests {
+			returnDefaultValues = true
+			includeAndroidResources = true
+		}
+	}
 }
 
 dependencies {
-    testImplementation libraries.test.junit
-    testImplementation libraries.test.truth
-    testImplementation libraries.test.androidx_core
-    testImplementation libraries.test.robolectric
+	testImplementation libs.bundles.test
+	testImplementation libs.androidx.test.core
 
-    implementation project(':growingio-tracker-core')
-    debugApi project(':growingio-tools:snappy')
-    releaseApi libraries.growingio.snappy
+	implementation project(':growingio-tracker-core')
+	debugImplementation project(':growingio-tools:snappy')
+	releaseImplementation libs.growingio.snappy
 
-    implementation project(":growingio-annotation")
-    annotationProcessor project(":growingio-annotation:compiler")
+	implementation project(":growingio-annotation")
+	annotationProcessor project(":growingio-annotation:compiler")
 }
 apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
 apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"

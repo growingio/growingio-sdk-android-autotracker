@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package com.growingio.android.circler;
 
-import android.app.Activity;
 import android.app.Application;
 import android.os.Looper;
 
@@ -24,24 +23,18 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.circler.shadow.ShadowThreadUtils;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.utils.ThreadUtils;
-import com.growingio.android.sdk.track.webservices.Circler;
-import com.growingio.android.sdk.track.webservices.WebService;
-import com.growingio.android.sdk.track.webservices.message.QuitMessage;
-import com.growingio.android.sdk.track.webservices.message.ReadyMessage;
+import com.growingio.android.sdk.track.middleware.webservice.Circler;
+import com.growingio.android.sdk.track.middleware.webservice.WebService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -64,7 +57,10 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
     private WebSocketHandler webSocketHandler;
     private OkHttpClient client;
     private MockWebServer mockWebServer;
-    private final Application context = ApplicationProvider.getApplicationContext();
+    private final Application application = ApplicationProvider.getApplicationContext();
+
+    private TrackerContext context;
+    private ScreenshotProvider screenshotProvider;
 
     protected String getWsUrl() {
         String hostName = mockWebServer.getHostName();
@@ -82,7 +78,12 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
 
     @Before
     public void setup() {
-        webSocketHandler = new WebSocketHandler(this);
+        Tracker tracker = new Tracker(application);
+        CirclerLibraryGioModule dModule = new CirclerLibraryGioModule();
+        tracker.registerComponent(dModule);
+        context = tracker.getContext();
+        screenshotProvider = context.getProvider(ScreenshotProvider.class);
+        webSocketHandler = new WebSocketHandler(this,screenshotProvider);
         mockWebServer = new MockWebServer();
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -100,11 +101,11 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
                             JSONObject message = new JSONObject(text);
                             String msgType = message.optString("msgType");
                             switch (msgType) {
-                                case ReadyMessage.MSG_TYPE:
-                                    sendMessage(webSocket, ReadyMessage.MSG_TYPE);
+                                case ScreenshotProvider.MSG_READY_TYPE:
+                                    sendMessage(webSocket,ScreenshotProvider.MSG_READY_TYPE);
                                     break;
-                                case QuitMessage.MSG_TYPE:
-                                    sendMessage(webSocket, QuitMessage.MSG_TYPE);
+                                case ScreenshotProvider.MSG_QUIT_TYPE:
+                                    sendMessage(webSocket, ScreenshotProvider.MSG_QUIT_TYPE);
                                     break;
                                 default:
                                     webSocket.send("error data");
@@ -116,7 +117,6 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
                 });
             }
         });
-        TrackerContext.init(context);
         client = new OkHttpClient.Builder()
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(5, TimeUnit.SECONDS)
@@ -125,7 +125,6 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
                     try {
                         Looper.prepare();
                         System.out.println("[intercept]:" + Looper.myLooper());
-                        ThreadUtils.setUiThread(Looper.myLooper());
                     } catch (Exception ignored) {
                     }
                     return chain.proceed(chain.request());
@@ -165,10 +164,7 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
 
     @Test
     public void circlerModelTest() {
-        CirclerLibraryGioModule module = new CirclerLibraryGioModule();
-        TrackerRegistry registry = new TrackerRegistry();
-        module.registerComponents(context, registry);
-        ModelLoader<Circler, WebService> dataLoader = registry.getModelLoader(Circler.class, WebService.class);
+        ModelLoader<Circler, WebService> dataLoader = context.getRegistry().getModelLoader(Circler.class, WebService.class);
 
         HashMap<String, String> param = new HashMap<>();
         param.put("wsUrl", getWsUrl());
@@ -177,20 +173,6 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
         dataFetcher.executeData();
 
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-        if (dataLoader instanceof CirclerDataLoader) {
-            serviceTest(((CirclerDataLoader) dataLoader).getCirclerService());
-        }
     }
 
-    public void serviceTest(CirclerService circlerService) {
-        Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
-        ActivityStateProvider.get().onActivityResumed(activity);
-        circlerService.sendMessage("test");
-        circlerService.socketState.getAndSet(1);
-        circlerService.onScreenshotRefreshed(null);
-        circlerService.onActivityLifecycle(ActivityLifecycleEvent.createOnStartedEvent(activity));
-        circlerService.onFailed();
-        circlerService.exitCircler();
-        circlerService.onQuited();
-    }
 }

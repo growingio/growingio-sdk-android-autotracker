@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,38 +13,72 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.providers;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.utils.ActivityUtil;
 import com.growingio.android.sdk.track.utils.SysTrace;
 
 import java.lang.ref.WeakReference;
 
-public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle, ActivityLifecycleEvent> implements Application.ActivityLifecycleCallbacks {
+public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle, ActivityLifecycleEvent> implements Application.ActivityLifecycleCallbacks, TrackerLifecycleProvider {
 
+    private static final String TAG = "ActivityStateProvider";
     private WeakReference<Activity> mResumeActivity = new WeakReference<>(null);
     private WeakReference<Activity> mForegroundActivity = new WeakReference<>(null);
-    private int mCurrentRootWindowsHashCode = -1;
+    private ConfigurationProvider configurationProvider;
 
-    private static class SingleInstance {
-        private static final ActivityStateProvider INSTANCE = new ActivityStateProvider();
+    private WeakReference<Application> applicationWeakReference;
+
+    ActivityStateProvider(Context context) {
+        if (context instanceof Application) {
+            Application application = (Application) context;
+            applicationWeakReference = new WeakReference<>(application);
+            application.registerActivityLifecycleCallbacks(this);
+        } else if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            mForegroundActivity = new WeakReference<>(activity);
+            applicationWeakReference = new WeakReference<>(activity.getApplication());
+            activity.getApplication().registerActivityLifecycleCallbacks(this);
+        }/* else {
+            // inaccessible
+        }*/
     }
 
-    private ActivityStateProvider() {
+    @Override
+    public void setup(TrackerContext context) {
+        configurationProvider = context.getConfigurationProvider();
     }
 
-    public static ActivityStateProvider get() {
-        return SingleInstance.INSTANCE;
+    public void makeupActivityLifecycle() {
+        Activity activity = mForegroundActivity.get();
+        if (activity != null) {
+            ActivityLifecycleEvent.EVENT_TYPE state = ActivityUtil.judgeContextState(activity);
+            if (state != null) {
+                Logger.i(TAG, "initSdk with Activity, makeup ActivityLifecycle before current state:" + state.name());
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_CREATED) >= 0) {
+                    onActivityCreated(activity, null);
+                }
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED) >= 0) {
+                    onActivityStarted(activity);
+                }
+                if (state.compareTo(ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) >= 0) {
+                    onActivityResumed(activity);
+                }
+            } else if (!activity.isDestroyed()) {
+                setResumeActivity(activity);
+            }
+        }
     }
 
     private void dispatchActivityLifecycle(ActivityLifecycleEvent event) {
@@ -88,15 +122,6 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
         mForegroundActivity = new WeakReference<>(activity);
     }
 
-    public int getCurrentRootWindowsHashCode() {
-        if (mCurrentRootWindowsHashCode == -1
-                && mForegroundActivity != null && mForegroundActivity.get() != null) {
-            //该时间点， 用户理论上setContentView已经结束
-            mCurrentRootWindowsHashCode = mForegroundActivity.get().getWindow().getDecorView().hashCode();
-        }
-        return mCurrentRootWindowsHashCode;
-    }
-
     public void registerActivityLifecycleListener(IActivityLifecycle lifecycle) {
         register(lifecycle);
     }
@@ -106,49 +131,53 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
     }
 
     @Override
-    public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        SysTrace.beginSection("gio.ActivityOnCreate");
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        boolean debug = configurationProvider.core().isDebugEnabled();
+        SysTrace.beginSection("gio.ActivityOnCreate", debug);
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnCreatedEvent(activity, savedInstanceState));
-        SysTrace.endSection();
+        SysTrace.endSection(debug);
     }
 
     @Override
-    public void onActivityStarted(@NonNull Activity activity) {
-        SysTrace.beginSection("gio.onActivityStart");
+    public void onActivityStarted(Activity activity) {
+        boolean debug = configurationProvider.core().isDebugEnabled();
+        SysTrace.beginSection("gio.onActivityStart", debug);
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnStartedEvent(activity));
-        SysTrace.endSection();
+        SysTrace.endSection(debug);
     }
 
     @Override
-    public void onActivityResumed(@NonNull Activity activity) {
-        SysTrace.beginSection("gio.onActivityResumed");
+    public void onActivityResumed(Activity activity) {
+        boolean debug = configurationProvider.core().isDebugEnabled();
+        SysTrace.beginSection("gio.onActivityResumed", debug);
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnResumedEvent(activity));
-        SysTrace.endSection();
+        SysTrace.endSection(debug);
     }
 
     @Override
-    public void onActivityPaused(@NonNull Activity activity) {
-        SysTrace.beginSection("gio.onActivityPaused");
+    public void onActivityPaused(Activity activity) {
+        boolean debug = configurationProvider.core().isDebugEnabled();
+        SysTrace.beginSection("gio.onActivityPaused", debug);
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnPausedEvent(activity));
-        SysTrace.endSection();
+        SysTrace.endSection(debug);
     }
 
     @Override
-    public void onActivityStopped(@NonNull Activity activity) {
+    public void onActivityStopped(Activity activity) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnStoppedEvent(activity));
     }
 
     @Override
-    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnSaveInstanceStateEvent(activity, outState));
     }
 
     @Override
-    public void onActivityDestroyed(@NonNull Activity activity) {
+    public void onActivityDestroyed(Activity activity) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnDestroyedEvent(activity));
     }
 
-    public void onActivityNewIntent(@NonNull Activity activity, Intent intent) {
+    public void onActivityNewIntent(Activity activity, Intent intent) {
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnNewIntentEvent(activity, intent));
     }
 
@@ -157,4 +186,13 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
         listener.onActivityLifecycle(action);
     }
 
+    @Override
+    public void shutdown() {
+        if (applicationWeakReference != null) {
+            Application application = applicationWeakReference.get();
+            if (application != null) {
+                application.unregisterActivityLifecycleCallbacks(this);
+            }
+        }
+    }
 }

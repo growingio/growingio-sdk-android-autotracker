@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
+import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import java.util.Map;
-
+@JsonSerializer
 public final class LoginUserAttributesEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
-    protected LoginUserAttributesEvent(Builder eventBuilder) {
+    private LoginUserAttributesEvent(Builder eventBuilder) {
         super(eventBuilder);
     }
 
@@ -35,12 +34,6 @@ public final class LoginUserAttributesEvent extends BaseAttributesEvent {
         @Override
         public LoginUserAttributesEvent build() {
             return new LoginUserAttributesEvent(this);
-        }
-
-        @Override
-        public Builder setAttributes(Map<String, String> attributes) {
-            super.setAttributes(attributes);
-            return this;
         }
     }
 }

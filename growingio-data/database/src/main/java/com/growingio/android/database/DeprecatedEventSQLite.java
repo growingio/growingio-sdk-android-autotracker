@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.database;
 
 import android.annotation.SuppressLint;
@@ -28,6 +27,7 @@ import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.Serializer;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -111,7 +111,7 @@ public class DeprecatedEventSQLite {
                         if (event != null) {
                             events.add(event);
                             if (event instanceof BaseEvent) {
-                                Logger.printJson(TAG, "migrate data:", ((BaseEvent) event).toJSONObject().toString());
+                                Logger.printJson(TAG, "migrate data:", EventBuilderProvider.toJson((BaseEvent) event).toString());
                             }
                         }
                     }

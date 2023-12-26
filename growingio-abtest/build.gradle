@@ -1,0 +1,59 @@
+plugins {
+	alias(libs.plugins.android.library)
+}
+
+android {
+	namespace 'com.growingio.android.abtest'
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+		versionName libs.versions.growingio.get()
+		versionCode libs.versions.growingioCode.get().toInteger()
+
+		consumerProguardFiles "consumer-rules.pro"
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+			consumerProguardFiles 'consumer-rules.pro'
+		}
+	}
+
+	compileOptions {
+		sourceCompatibility buildConfiguration.sourceCompatibility
+		targetCompatibility buildConfiguration.targetCompatibility
+	}
+
+	testOptions {
+		unitTests.all {
+			jacoco {
+				jvmArgs '-noverify'
+				includeNoLocationClasses = true
+				excludes = ['jdk.internal.*']
+			}
+		}
+		unitTests {
+			returnDefaultValues = true
+			includeAndroidResources = true
+		}
+	}
+}
+
+dependencies {
+
+	testImplementation libs.bundles.test
+	testImplementation libs.androidx.test.core
+	testImplementation libs.okhttp3.mockwebserver
+	testImplementation project(':growingio-network:okhttp3')
+
+	implementation project(':growingio-tracker-core')
+
+	implementation project(":growingio-annotation")
+	annotationProcessor project(":growingio-annotation:compiler")
+}
+
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"

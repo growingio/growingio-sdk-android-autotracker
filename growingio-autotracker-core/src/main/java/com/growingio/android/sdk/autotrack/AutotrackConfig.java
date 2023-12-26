@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack;
 
 import com.growingio.android.sdk.Configurable;
 
 public class AutotrackConfig implements Configurable {
     private float mImpressionScale = 0;
+    private boolean mDowngrade = false;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
     public AutotrackConfig setImpressionScale(float scale) {
@@ -45,12 +45,22 @@ public class AutotrackConfig implements Configurable {
         return mAutotrackOptions.isWebViewBridgeEnabled();
     }
 
-//    public AutotrackConfig setAutotrackOptions(AutotrackOptions options) {
-//        this.mAutotrackOptions = options;
-//        return this;
-//    }
-//
+
     public AutotrackOptions getAutotrackOptions() {
         return mAutotrackOptions;
+    }
+
+    /**
+     * You must understand what you are doing before using
+     */
+    public AutotrackConfig downgrade() {
+        this.mDowngrade = true;
+        mAutotrackOptions.setFragmentPageEnabled(true);
+        mAutotrackOptions.setActivityPageEnabled(true);
+        return this;
+    }
+
+    public boolean isDowngrade() {
+        return this.mDowngrade;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.view;
 
 import android.app.Activity;
@@ -21,20 +20,17 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WindowHelper {
     private static final String TAG = "WindowHelper";
-
 
     private final WindowManagerShadow mWindowManager;
 
@@ -95,17 +91,16 @@ public class WindowHelper {
         return !(rootView.getParent() instanceof View);
     }
 
-    @NonNull
     public List<DecorView> getTopActivityViews() {
         List<DecorView> topViews = new ArrayList<>();
-        Activity activity = ActivityStateProvider.get().getForegroundActivity();
-        if (activity == null) return topViews;
+        Activity activity = TrackMainThread.trackMain().getForegroundActivity();
+        if (activity == null) return null;
         List<DecorView> decorViews = getAllWindowDecorViews();
+        View activityView = activity.getWindow().getDecorView();
         boolean findTopActivity = false;
         for (DecorView decorView : decorViews) {
             View view = decorView.getView();
-            if (view == activity.getWindow().getDecorView()
-                    || view.getContext() == activity) {
+            if (view == activityView || view.getContext() == activity) {
                 topViews.add(decorView);
                 findTopActivity = true;
             } else if (findTopActivity) {
@@ -133,9 +128,8 @@ public class WindowHelper {
         return decorViews;
     }
 
-    @Nullable
     public View getTopActivityDecorView() {
-        Activity current = ActivityStateProvider.get().getForegroundActivity();
+        Activity current = TrackMainThread.trackMain().getForegroundActivity();
         if (current != null) {
             try {
                 return current.getWindow().getDecorView();

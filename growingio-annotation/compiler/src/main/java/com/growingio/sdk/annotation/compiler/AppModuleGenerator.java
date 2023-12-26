@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.sdk.annotation.compiler;
 
 import com.squareup.javapoet.AnnotationSpec;
@@ -30,8 +29,9 @@ import javax.lang.model.element.TypeElement;
 import static com.growingio.sdk.annotation.compiler.ProcessUtils.GENERATED_APP_MODULE_IMPL_SIMPLE_NAME;
 import static com.growingio.sdk.annotation.compiler.ProcessUtils.GENERATED_ROOT_MODULE_SIMPLE_NAME;
 import static com.growingio.sdk.annotation.compiler.ProcessUtils.GIO_LOG_TAG;
-import static com.growingio.sdk.annotation.compiler.ProcessUtils.GIO_TRACKER_REGISTRY_NAME;
-import static com.growingio.sdk.annotation.compiler.ProcessUtils.GIO_TRACKER_REGISTRY_PACKAGE_NAME;
+import static com.growingio.sdk.annotation.compiler.ProcessUtils.GIO_TRACKER_CONTEXT_NAME;
+import static com.growingio.sdk.annotation.compiler.ProcessUtils.GIO_TRACKER_CONTEXT_PACKAGE;
+import static com.growingio.sdk.annotation.compiler.ProcessUtils.GROWINGIO_MODULE_NAME;
 import static com.growingio.sdk.annotation.compiler.ProcessUtils.GROWINGIO_MODULE_PACKAGE_NAME;
 
 
@@ -44,15 +44,20 @@ import static com.growingio.sdk.annotation.compiler.ProcessUtils.GROWINGIO_MODUL
  * final class GeneratedGioModuleImpl extends GeneratedGioModule {
  *  private final GrowingAppModule appModule;
  *
- *  public GeneratedGioModuleImpl(Context context) {
+ *  public GeneratedGioModuleImpl() {
  *      Log.d("GIO", "Discovered GIOModule from annotation: com.growingio.android.okhttp3.OkhttpLibraryGioModule");
  *      appModule = new GrowingAppModule();
  *  }
  *
  *  {@literal @Override}
- *  public void registerComponents(Context context, TrackerRegistry registry) {
- *      new OkhttpLibraryGioModule().registerComponents(context,registry);
- *      appModule.registerComponents(context,registry);
+ *  public void registerComponents(TrackerContext context) {
+ *      registerModule(new OkhttpLibraryGioModule(), context);
+ *      registerModule(appModule, context);
+ *  }
+ *
+ *  private void registerModule(LibraryGioModule module, TrackerContext context) {
+ *      module.setupProviders(context.getProviderStore());
+ *      module.registerComponents(context);
  *  }
  * }
  * </code>
@@ -73,10 +78,7 @@ final class AppModuleGenerator {
         // constructor
         MethodSpec.Builder constructorBuilder =
                 MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PUBLIC)
-                        .addParameter(
-                                ParameterSpec.builder(ClassName.get("android.content", "Context"), "context")
-                                        .build());
+                        .addModifiers(Modifier.PUBLIC);
         ClassName androidLogName = ClassName.get("android.util", "Log");
         for (String moduleName : gioModules) {
             constructorBuilder.addStatement(
@@ -94,18 +96,14 @@ final class AppModuleGenerator {
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Override.class)
                         .addParameter(
-                                ParameterSpec.builder(ClassName.get("android.content", "Context"), "context")
+                                ParameterSpec.builder(ClassName.get(GIO_TRACKER_CONTEXT_PACKAGE, GIO_TRACKER_CONTEXT_NAME), "context")
                                         //.addAnnotation(processorUtil.nonNull())
-                                        .build())
-                        .addParameter(
-                                ParameterSpec.builder(ClassName.get(GIO_TRACKER_REGISTRY_PACKAGE_NAME, GIO_TRACKER_REGISTRY_NAME), "registry")
                                         .build());
         for (String module : gioModules) {
             ClassName moduleClassName = ClassName.bestGuess(module);
-            registerComponents.addStatement(
-                    "new $T().registerComponents(context,registry)", moduleClassName);
+            registerComponents.addStatement("registerModule(new $T(), context)", moduleClassName);
         }
-        registerComponents.addStatement("appModule.registerComponents(context,registry)");
+        registerComponents.addStatement("registerModule(appModule, context)");
         MethodSpec registerMethod = registerComponents.build();
 
         TypeSpec.Builder builder =
@@ -120,10 +118,22 @@ final class AppModuleGenerator {
                                         GROWINGIO_MODULE_PACKAGE_NAME, GENERATED_ROOT_MODULE_SIMPLE_NAME))
                         .addField(appModuleClassName, "appModule", Modifier.PRIVATE, Modifier.FINAL)
                         .addMethod(constructor)
-                        .addMethod(registerMethod);
+                        .addMethod(registerMethod)
+                        .addMethod(generateModuleRegisterMethod());
 
         TypeSpec generatedGIOModule = builder.build();
         writeGioModule(generatedGIOModule);
+    }
+
+    private MethodSpec generateModuleRegisterMethod() {
+        MethodSpec.Builder registerModule = MethodSpec.methodBuilder("registerModule")
+                .addModifiers(Modifier.PRIVATE)
+                .addParameter(ParameterSpec.builder(ClassName.get(GROWINGIO_MODULE_PACKAGE_NAME, GROWINGIO_MODULE_NAME), "module").build())
+                .addParameter(ParameterSpec.builder(ClassName.get(GIO_TRACKER_CONTEXT_PACKAGE, GIO_TRACKER_CONTEXT_NAME), "context").build())
+                .addStatement("module.setupProviders(context.getProviderStore())")
+                .addStatement("module.registerComponents(context)");
+
+        return registerModule.build();
     }
 
     private void writeGioModule(TypeSpec appModule) {

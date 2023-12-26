@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.autotrack.page;
 
 import android.app.Activity;
@@ -23,11 +22,15 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import java.lang.ref.WeakReference;
+
 public abstract class SuperFragment<T> {
-    private final T mRealFragment;
+    private final WeakReference<T> mRealFragment;
+    private final String simpleName;
 
     protected SuperFragment(T realFragment) {
-        mRealFragment = realFragment;
+        simpleName = realFragment.getClass().getSimpleName();
+        mRealFragment = new WeakReference<>(realFragment);
     }
 
     @Nullable
@@ -54,20 +57,28 @@ public abstract class SuperFragment<T> {
         return new AndroidXFragment(fragment);
     }
 
+    @Nullable
     public T getRealFragment() {
-        return mRealFragment;
+        return mRealFragment.get();
+    }
+
+    public String getSimpleName() {
+        return simpleName;
     }
 
     public abstract int getId();
 
     public abstract String getTag();
 
+    @Nullable
     public abstract View getView();
 
-    public abstract Resources getResources();
+    public abstract String getResourceEntryName(int id);
 
+    @Nullable
     public abstract Activity getActivity();
 
+    @Nullable
     public abstract SuperFragment<T> getParentFragment();
 
     public abstract boolean getUserVisibleHint();
@@ -80,8 +91,10 @@ public abstract class SuperFragment<T> {
         if (o == null || getClass() != o.getClass()) return false;
 
         SuperFragment<?> that = (SuperFragment<?>) o;
-
-        return mRealFragment != null ? mRealFragment.equals(that.mRealFragment) : that.mRealFragment == null;
+        if (mRealFragment.get() == null) {
+            return false;
+        }
+        return mRealFragment.get().equals(that.mRealFragment.get());
     }
 
     @Override
@@ -93,156 +106,220 @@ public abstract class SuperFragment<T> {
 
     private static class SystemFragment extends SuperFragment<Fragment> {
 
+        private final String tag;
+        private final int id;
+
         protected SystemFragment(Fragment realFragment) {
             super(realFragment);
+            tag = realFragment.getTag();
+            id = realFragment.getId();
         }
 
         @Override
         public int getId() {
-            return getRealFragment().getId();
+            return id;
         }
 
         @Override
         public String getTag() {
-            return getRealFragment().getTag();
+            return tag;
         }
 
+        @Nullable
         @Override
         public View getView() {
-            return getRealFragment().getView();
+            if (getRealFragment() != null) return getRealFragment().getView();
+            return null;
         }
 
         @Override
-        public Resources getResources() {
-            return getRealFragment().getResources();
+        public String getResourceEntryName(int id) {
+            if (getRealFragment() == null) return "SystemFragment";
+            try {
+                if (id == -1) {
+                    id = getRealFragment().getId();
+                }
+                return getRealFragment().getResources().getResourceEntryName(id);
+            } catch (Resources.NotFoundException ignored) {
+            }
+            return "SystemFragment";
         }
 
+        @Nullable
         @Override
         public Activity getActivity() {
-            return getRealFragment().getActivity();
+            if (getRealFragment() != null) return getRealFragment().getActivity();
+            return null;
         }
 
+        @Nullable
         @Override
         public SuperFragment<Fragment> getParentFragment() {
-            return make(getRealFragment().getParentFragment());
+            if (getRealFragment() != null) return make(getRealFragment().getParentFragment());
+            return null;
         }
 
         @Override
         public boolean getUserVisibleHint() {
-            return getRealFragment().getUserVisibleHint();
+            if (getRealFragment() != null) return getRealFragment().getUserVisibleHint();
+            return false;
         }
 
         @Override
         public boolean isResumed() {
-            return getRealFragment().isResumed();
+            if (getRealFragment() != null) return getRealFragment().isResumed();
+            return false;
         }
 
         @Override
         public boolean isHidden() {
-            return getRealFragment().isHidden();
+            if (getRealFragment() != null) return getRealFragment().isHidden();
+            return true;
         }
     }
 
     private static class V4Fragment extends SuperFragment<android.support.v4.app.Fragment> {
+
+        private final String tag;
+        private final int id;
+
         protected V4Fragment(android.support.v4.app.Fragment realFragment) {
             super(realFragment);
+            tag = realFragment.getTag();
+            id = realFragment.getId();
         }
 
         @Override
         public int getId() {
-            return getRealFragment().getId();
+            return id;
         }
 
         @Override
         public String getTag() {
-            return getRealFragment().getTag();
+            return tag;
         }
 
+        @Nullable
         @Override
         public View getView() {
-            return getRealFragment().getView();
+            if (getRealFragment() != null) return getRealFragment().getView();
+            return null;
         }
 
         @Override
-        public Resources getResources() {
-            return getRealFragment().getResources();
+        public String getResourceEntryName(int id) {
+            if (getRealFragment() == null) return "SystemFragment";
+            try {
+                if (id == -1) {
+                    id = getRealFragment().getId();
+                }
+                return getRealFragment().getResources().getResourceEntryName(id);
+            } catch (Resources.NotFoundException ignored) {
+            }
+            return "SystemFragment";
         }
 
+        @Nullable
         @Override
         public Activity getActivity() {
-            return getRealFragment().getActivity();
+            if (getRealFragment() != null) return getRealFragment().getActivity();
+            return null;
         }
 
         @Override
         public SuperFragment<android.support.v4.app.Fragment> getParentFragment() {
-            return makeSupport(getRealFragment().getParentFragment());
+            if (getRealFragment() != null)
+                return makeSupport(getRealFragment().getParentFragment());
+            return null;
         }
 
         @Override
         public boolean getUserVisibleHint() {
-            return getRealFragment().getUserVisibleHint();
+            if (getRealFragment() != null) return getRealFragment().getUserVisibleHint();
+            return false;
         }
 
         @Override
         public boolean isResumed() {
-            return getRealFragment().isResumed();
+            if (getRealFragment() != null) return getRealFragment().isResumed();
+            return false;
         }
 
         @Override
         public boolean isHidden() {
-            return getRealFragment().isHidden();
+            if (getRealFragment() != null) return getRealFragment().isHidden();
+            return true;
         }
     }
 
     private static class AndroidXFragment extends SuperFragment<androidx.fragment.app.Fragment> {
+
+        private final String tag;
+        private final int id;
+
         protected AndroidXFragment(androidx.fragment.app.Fragment realFragment) {
             super(realFragment);
+            tag = realFragment.getTag();
+            id = realFragment.getId();
         }
 
         @Override
         public int getId() {
-            return getRealFragment().getId();
+            return id;
         }
 
         @Override
         public String getTag() {
-            return getRealFragment().getTag();
+            return tag;
         }
 
+        @Nullable
         @Override
         public View getView() {
-            return getRealFragment().getView();
+            if (getRealFragment() != null) return getRealFragment().getView();
+            return null;
         }
 
         @Override
-        public Resources getResources() {
-            return getRealFragment().getResources();
+        public String getResourceEntryName(int id) {
+            if (getRealFragment() == null || id == View.NO_ID) return null;
+            try {
+                return getRealFragment().getResources().getResourceEntryName(id);
+            } catch (Resources.NotFoundException ignored) {
+            }
+            return null;
         }
 
+        @Nullable
         @Override
         public Activity getActivity() {
-            return getRealFragment().getActivity();
+            if (getRealFragment() != null) return getRealFragment().getActivity();
+            return null;
         }
 
         @Nullable
         @Override
         public SuperFragment<androidx.fragment.app.Fragment> getParentFragment() {
-            return makeX(getRealFragment().getParentFragment());
+            if (getRealFragment() != null) return makeX(getRealFragment().getParentFragment());
+            return null;
         }
 
         @Override
         public boolean getUserVisibleHint() {
-            return getRealFragment().getUserVisibleHint();
+            if (getRealFragment() != null) return getRealFragment().getUserVisibleHint();
+            return false;
         }
 
         @Override
         public boolean isResumed() {
-            return getRealFragment().isResumed();
+            if (getRealFragment() != null) return getRealFragment().isResumed();
+            return false;
         }
 
         @Override
         public boolean isHidden() {
-            return getRealFragment().isHidden();
+            if (getRealFragment() != null) return getRealFragment().isHidden();
+            return true;
         }
     }
 }

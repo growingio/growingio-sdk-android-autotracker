@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package com.growingio.android.debugger;
 
+import static com.google.common.truth.Truth.assertThat;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Looper;
@@ -24,19 +27,15 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.debugger.shadow.ShadowThreadUtils;
+import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.CustomEvent;
-import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
-import com.growingio.android.sdk.track.providers.ActivityStateProvider;
-import com.growingio.android.sdk.track.utils.ThreadUtils;
-import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.webservices.WebService;
-import com.growingio.android.sdk.track.webservices.message.QuitMessage;
-import com.growingio.android.sdk.track.webservices.message.ReadyMessage;
+import com.growingio.android.sdk.track.middleware.webservice.Debugger;
+import com.growingio.android.sdk.track.middleware.webservice.WebService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,8 +68,11 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
     private WebSocketHandler webSocketHandler;
     private OkHttpClient client;
     private MockWebServer mockWebServer;
-    private final Application context = ApplicationProvider.getApplicationContext();
+    private final Application application = ApplicationProvider.getApplicationContext();
     private int round = 0;
+
+    private TrackerContext context;
+    private ScreenshotProvider screenshotProvider;
 
     protected String getWsUrl() {
         String hostName = mockWebServer.getHostName();
@@ -88,7 +90,12 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
 
     @Before
     public void setup() {
-        webSocketHandler = new WebSocketHandler(this);
+        Tracker tracker = new Tracker(application);
+        DebuggerLibraryGioModule dModule = new DebuggerLibraryGioModule();
+        tracker.registerComponent(dModule);
+        context = tracker.getContext();
+        screenshotProvider = context.getProvider(ScreenshotProvider.class);
+        webSocketHandler = new WebSocketHandler(this, screenshotProvider);
         mockWebServer = new MockWebServer();
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -106,25 +113,25 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
                             JSONObject message = new JSONObject(text);
                             String msgType = message.optString("msgType");
                             switch (msgType) {
-                                case ReadyMessage.MSG_TYPE:
+                                case ScreenshotProvider.MSG_READY_TYPE:
                                     round = 1;
-                                    sendMessage(webSocket, ReadyMessage.MSG_TYPE);
+                                    sendMessage(webSocket, ScreenshotProvider.MSG_READY_TYPE);
                                     break;
-                                case DebuggerEventWrapper.SERVICE_LOGGER_OPEN:
+                                case DebuggerEventProvider.SERVICE_LOGGER_OPEN:
                                     round = 2;
-                                    sendMessage(webSocket, DebuggerEventWrapper.SERVICE_LOGGER_OPEN);
+                                    sendMessage(webSocket, DebuggerEventProvider.SERVICE_LOGGER_OPEN);
                                     break;
-                                case DebuggerEventWrapper.SERVICE_LOGGER_CLOSE:
+                                case DebuggerEventProvider.SERVICE_LOGGER_CLOSE:
                                     round = 3;
-                                    sendMessage(webSocket, DebuggerEventWrapper.SERVICE_LOGGER_CLOSE);
+                                    sendMessage(webSocket, DebuggerEventProvider.SERVICE_LOGGER_CLOSE);
                                     break;
-                                case DebuggerEventWrapper.SERVICE_DEBUGGER_TYPE:
+                                case DebuggerEventProvider.SERVICE_DEBUGGER_TYPE:
                                     round = 4;
-                                    sendMessage(webSocket, DebuggerEventWrapper.SERVICE_DEBUGGER_TYPE);
+                                    sendMessage(webSocket, DebuggerEventProvider.SERVICE_DEBUGGER_TYPE);
                                     break;
-                                case QuitMessage.MSG_TYPE:
+                                case ScreenshotProvider.MSG_QUIT_TYPE:
                                     round = 5;
-                                    sendMessage(webSocket, QuitMessage.MSG_TYPE);
+                                    sendMessage(webSocket, ScreenshotProvider.MSG_QUIT_TYPE);
                                     break;
                                 default:
                                     webSocket.send("error data");
@@ -136,7 +143,6 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
                 });
             }
         });
-        TrackerContext.init(context);
         client = new OkHttpClient.Builder()
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(5, TimeUnit.SECONDS)
@@ -145,7 +151,6 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
                     try {
                         Looper.prepare();
                         System.out.println("[intercept]:" + Looper.myLooper());
-                        ThreadUtils.setUiThread(Looper.myLooper());
                     } catch (Exception ignored) {
                     }
                     return chain.proceed(chain.request());
@@ -165,7 +170,7 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
     public void onReady() {
         System.out.println("[client]:onReady");
         Truth.assertThat(round).isEqualTo(1);
-        sendMessage(webSocketHandler.getWebSocket(), DebuggerEventWrapper.SERVICE_LOGGER_OPEN);
+        sendMessage(webSocketHandler.getWebSocket(), DebuggerEventProvider.SERVICE_LOGGER_OPEN);
     }
 
     @Override
@@ -187,15 +192,15 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
         try {
             JSONObject message = new JSONObject(msg);
             String msgType = message.optString("msgType");
-            if (msgType.equals(DebuggerEventWrapper.SERVICE_LOGGER_OPEN)) {
+            if (msgType.equals(DebuggerEventProvider.SERVICE_LOGGER_OPEN)) {
                 Truth.assertThat(round).isEqualTo(2);
-                sendMessage(webSocketHandler.getWebSocket(), DebuggerEventWrapper.SERVICE_LOGGER_CLOSE);
-            } else if (msgType.equals(DebuggerEventWrapper.SERVICE_LOGGER_CLOSE)) {
+                sendMessage(webSocketHandler.getWebSocket(), DebuggerEventProvider.SERVICE_LOGGER_CLOSE);
+            } else if (msgType.equals(DebuggerEventProvider.SERVICE_LOGGER_CLOSE)) {
                 Truth.assertThat(round).isEqualTo(3);
-                sendMessage(webSocketHandler.getWebSocket(), DebuggerEventWrapper.SERVICE_DEBUGGER_TYPE);
-            } else if (msgType.equals(DebuggerEventWrapper.SERVICE_DEBUGGER_TYPE)) {
+                sendMessage(webSocketHandler.getWebSocket(), DebuggerEventProvider.SERVICE_DEBUGGER_TYPE);
+            } else if (msgType.equals(DebuggerEventProvider.SERVICE_DEBUGGER_TYPE)) {
                 Truth.assertThat(round).isEqualTo(4);
-                sendMessage(webSocketHandler.getWebSocket(), QuitMessage.MSG_TYPE);
+                sendMessage(webSocketHandler.getWebSocket(), ScreenshotProvider.MSG_QUIT_TYPE);
             }
         } catch (JSONException e) {
             System.out.println("[client]:error json data");
@@ -206,13 +211,13 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
     @Test
     public void debuggerModelTest() throws JSONException {
         DebuggerLibraryGioModule module = new DebuggerLibraryGioModule();
-        TrackerRegistry registry = new TrackerRegistry();
-        module.registerComponents(context, registry);
-        ModelLoader<Debugger, WebService> dataLoader = registry.getModelLoader(Debugger.class, WebService.class);
+        module.registerComponents(context);
+        ModelLoader<Debugger, WebService> dataLoader = context.getRegistry().getModelLoader(Debugger.class, WebService.class);
 
         HashMap<String, String> param = new HashMap<>();
         param.put("wsUrl", getWsUrl());
-        DataFetcher<WebService> dataFetcher = dataLoader.buildLoadData(new Debugger(param)).fetcher;
+        DataFetcher<WebService> dataFetcher =
+                dataLoader.buildLoadData(new Debugger(param)).fetcher;
         Truth.assertThat(dataFetcher.getDataClass()).isAssignableTo(WebService.class);
         dataFetcher.executeData();
 
@@ -223,11 +228,9 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
 
     public void serviceTest(DebuggerService service) throws JSONException {
         Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
-        ActivityStateProvider.get().onActivityResumed(activity);
         service.sendMessage("test");
         service.socketState.getAndSet(1);
-        service.onMessage(new JSONObject().put("msgType", DebuggerEventWrapper.SERVICE_LOGGER_OPEN).toString());
-        service.onActivityLifecycle(ActivityLifecycleEvent.createOnStartedEvent(activity));
+        service.onMessage(new JSONObject().put("msgType", DebuggerEventProvider.SERVICE_LOGGER_OPEN).toString());
         service.onFailed();
         service.exitDebugger();
         service.onQuited();
@@ -235,14 +238,15 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
 
     @Test
     public void debuggerEventTest() {
-        DebuggerEventWrapper.get().ready();
-        DebuggerEventWrapper.get().registerDebuggerEventListener(new DebuggerEventWrapper.OnDebuggerEventListener() {
+        DebuggerEventProvider debuggerEventProvider = context.getProvider(DebuggerEventProvider.class);
+        debuggerEventProvider.ready();
+        debuggerEventProvider.registerDebuggerEventListener(new DebuggerEventProvider.OnDebuggerEventListener() {
             @Override
             public void onDebuggerMessage(String message) {
                 try {
                     System.out.println(message);
                     JSONObject jsonObject = new JSONObject(message);
-                    if (Objects.equals(jsonObject.opt("msgType"), DebuggerEventWrapper.SERVICE_DEBUGGER_TYPE)) {
+                    if (Objects.equals(jsonObject.opt("msgType"), DebuggerEventProvider.SERVICE_DEBUGGER_TYPE)) {
                         Truth.assertThat(jsonObject.getJSONObject("data").opt("eventName")).isEqualTo("custom");
                     }
                 } catch (JSONException e) {
@@ -254,6 +258,24 @@ public class DebuggerTest implements WebSocketHandler.OnWebSocketListener {
                 .setEventName("custom"));
 
         Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    public void logTest() {
+        WsLogger wsLogger = new WsLogger();
+        wsLogger.setCallback(new WsLogger.Callback() {
+            @SuppressLint("CheckResult")
+            @Override
+            public void disposeLog(String logMessage) {
+                assertThat(logMessage.contains("this is test log"));
+            }
+        });
+        wsLogger.openLog();
+        Logger.v("test", "this is test log");
+        wsLogger.closeLog();
+        wsLogger.printOut();
+        wsLogger.setCallback(null);
+
     }
 
 }

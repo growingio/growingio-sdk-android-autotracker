@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.providers;
 
 import android.content.Intent;
@@ -26,13 +25,14 @@ import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.advert.Activate;
-import com.growingio.android.sdk.track.middleware.advert.AdvertResult;
-import com.growingio.android.sdk.track.middleware.advert.DeepLinkCallback;
+import com.growingio.android.sdk.track.middleware.ads.Activate;
+import com.growingio.android.sdk.track.middleware.ads.AdsResult;
+import com.growingio.android.sdk.track.middleware.ads.DeepLinkCallback;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
-import com.growingio.android.sdk.track.webservices.Circler;
-import com.growingio.android.sdk.track.webservices.Debugger;
-import com.growingio.android.sdk.track.webservices.WebService;
+import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
+import com.growingio.android.sdk.track.middleware.webservice.Circler;
+import com.growingio.android.sdk.track.middleware.webservice.Debugger;
+import com.growingio.android.sdk.track.middleware.webservice.WebService;
 
 
 import java.lang.ref.WeakReference;
@@ -49,7 +49,7 @@ import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEv
  *
  * @author cpacm 2021/3/25
  */
-public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChangeListener {
+public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChangeListener, TrackerLifecycleProvider {
 
     private static final String TAG = "DeepLinkProvider";
 
@@ -57,11 +57,27 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
     private Uri needResendUri = null;
     private boolean needResendActivate = false;
 
-    private static class SingleInstance {
-        private static final DeepLinkProvider INSTANCE = new DeepLinkProvider();
+    private ConfigurationProvider configurationProvider;
+    private ActivityStateProvider activityStateProvider;
+
+    private TrackerRegistry registry;
+
+    DeepLinkProvider() {
     }
 
-    private DeepLinkProvider() {
+    @Override
+    public void setup(TrackerContext context) {
+        configurationProvider = context.getConfigurationProvider();
+        configurationProvider.addConfigurationListener(this);
+        activityStateProvider = context.getActivityStateProvider();
+        activityStateProvider.registerActivityLifecycleListener(this);
+        registry = context.getRegistry();
+    }
+
+    @Override
+    public void shutdown() {
+        configurationProvider.removeConfigurationListener(this);
+        activityStateProvider.unregisterActivityLifecycleListener(this);
     }
 
     @Override
@@ -76,28 +92,19 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
         }
     }
 
-    public void init() {
-        ActivityStateProvider.get().registerActivityLifecycleListener(this);
-        ConfigurationProvider.get().addConfigurationListener(this);
-    }
-
-    public static DeepLinkProvider get() {
-        return DeepLinkProvider.SingleInstance.INSTANCE;
-    }
-
     @Override
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
         if (event.eventType == ON_CREATED || event.eventType == ON_NEW_INTENT) {
             if (checkIsValid(event.getIntent())) {
                 Uri data = event.getIntent().getData();
-                String urlScheme = ConfigurationProvider.core().getUrlScheme();
+                String urlScheme = configurationProvider.core().getUrlScheme();
                 if (urlScheme.equals(data.getScheme()) && WEB_SERVICES_HOST.equals(data.getHost()) && WEB_SERVICES_PATH.equals(data.getPath())) {
                     TrackMainThread.trackMain().postActionToTrackMain(() -> dispatchWebServiceUri(data));
                     return;
                 }
                 if (lastIntentRef != null && lastIntentRef.get() == event.getIntent()) return;
                 lastIntentRef = new WeakReference<>(event.getIntent());
-                AdvertResult result = handleDeepLink(data);
+                AdsResult result = handleDeepLink(data);
                 if (result != null && result.hasDealWithDeepLink()) {
                     event.getIntent().setData(null);
                 }
@@ -110,14 +117,14 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
         }
     }
 
-    private AdvertResult handleDeepLink(Uri data) {
-        if (ConfigurationProvider.core().isDataCollectionEnabled()) {
+    private AdsResult handleDeepLink(Uri data) {
+        if (configurationProvider.core().isDataCollectionEnabled()) {
             if (data != null) {
                 needResendUri = null;
-                return TrackerContext.get().executeData(Activate.deeplink(data), Activate.class, AdvertResult.class);
+                return registry.executeData(Activate.deeplink(data), Activate.class, AdsResult.class);
             } else {
                 needResendActivate = false;
-                return TrackerContext.get().executeData(Activate.activate(), Activate.class, AdvertResult.class);
+                return registry.executeData(Activate.activate(), Activate.class, AdsResult.class);
             }
         } else {
             if (data != null) {
@@ -134,7 +141,7 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
             return false;
         }
         Uri uri = Uri.parse(url);
-        AdvertResult result = TrackerContext.get().executeData(Activate.handleDeeplink(uri, callback), Activate.class, AdvertResult.class);
+        AdsResult result = registry.executeData(Activate.handleDeeplink(uri, callback), Activate.class, AdsResult.class);
         if (result == null) {
             Logger.e(TAG, "AdvertModule is null, please register advert component first.");
             return false;
@@ -163,7 +170,7 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
                 params.put(parameterName, data.getQueryParameter(parameterName));
             }
             if (serviceType.equals(SERVICE_DEBUGGER_TYPE)) {
-                TrackerContext.get().loadData(new Debugger(params), Debugger.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
+                registry.loadData(new Debugger(params), Debugger.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
                     @Override
                     public void onDataReady(WebService data) {
                         Logger.d(TAG, "start debugger success");
@@ -175,7 +182,7 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
                     }
                 });
             } else if (serviceType.equals(SERVICE_CIRCLE_TYPE)) {
-                TrackerContext.get().loadData(new Circler(params), Circler.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
+                registry.loadData(new Circler(params), Circler.class, WebService.class, new LoadDataFetcher.DataCallback<WebService>() {
                     @Override
                     public void onDataReady(WebService data) {
                         Logger.d(TAG, "start circle choose success");

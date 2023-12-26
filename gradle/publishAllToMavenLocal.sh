@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export IS_EXCLUDE_DEMOS=true
 ./gradlew clean \
 && ./gradlew :growingio-annotation:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-annotation:compiler:publishMavenAgentPublicationToMavenLocal \
@@ -12,18 +11,16 @@ export IS_EXCLUDE_DEMOS=true
 && ./gradlew :growingio-data:encoder:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-network:okhttp3:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-network:urlconnection:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :growingio-network:volley:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-hybrid:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :growingio-advert:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-ads:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-abtest:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:debugger:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-webservice:circler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-apm:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-flutter:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tools:oaid:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :gio-sdk:tracker-cdp:publishMavenAgentPublicationToMavenLocal \
-&& ./gradlew :gio-sdk:autotracker-cdp:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :gio-sdk:autotracker-saas:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-sdk-bom:publishBomPublicationToMavenLocal \
 && ./gradlew clean
-export IS_EXCLUDE_DEMOS=false

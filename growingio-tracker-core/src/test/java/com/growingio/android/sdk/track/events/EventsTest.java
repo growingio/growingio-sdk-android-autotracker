@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.growingio.android.sdk.track.events;
 
-import android.app.Application;
-
-import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
-import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.events.base.BaseEventJsonSerializableFactory;
 
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -39,20 +35,12 @@ import java.util.Map;
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class EventsTest {
-
-    Application application = ApplicationProvider.getApplicationContext();
-
-    @Before
-    public void setup() {
-        TrackerContext.init(application);
-    }
-
     @Test
     public void eventAppClose() {
         AppClosedEvent event = new AppClosedEvent.Builder().build();
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.APP_CLOSED);
         //TrackEventGenerator.generateAppClosedEvent();
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
     @Test
@@ -62,7 +50,7 @@ public class EventsTest {
                 .build();
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.CONVERSION_VARIABLES);
         //TrackEventGenerator.generateConversionVariablesEvent(new HashMap<>());
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
     @Test
@@ -73,7 +61,7 @@ public class EventsTest {
                 .build();
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.CUSTOM);
         //TrackEventGenerator.generateCustomEvent("test", new HashMap<>());
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
     @Test
@@ -111,7 +99,7 @@ public class EventsTest {
                 .build();
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.LOGIN_USER_ATTRIBUTES);
         //TrackEventGenerator.generateLoginUserAttributesEvent(new HashMap<>());
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
     @Test
@@ -151,19 +139,16 @@ public class EventsTest {
                 .setTimestamp(System.currentTimeMillis())
                 .build();
         Truth.assertThat(event.getEventType()).isEqualTo(AutotrackEventType.PAGE);
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
     @Test
     public void eventPageLevel() {
         PageLevelCustomEvent event = new PageLevelCustomEvent.Builder()
                 .setPath("/blank")
-                .setAttributes(new HashMap<>())
-                .setPageShowTimestamp(System.currentTimeMillis())
-                .setEventName("test")
                 .build();
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.CUSTOM);
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
     @Test
@@ -176,19 +161,17 @@ public class EventsTest {
                 .setPageShowTimestamp(System.currentTimeMillis())
                 .build();
         Truth.assertThat(event.getEventType()).isEqualTo(AutotrackEventType.VIEW_CLICK);
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
     @Test
     public void eventVisit() {
         VisitEvent event = new VisitEvent.Builder()
                 .setExtraSdk(new HashMap<>())
-                .setTimestamp(System.currentTimeMillis())
-                .setSessionId("adfajls")
                 .build();
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.VISIT);
         //TrackEventGenerator.generateVisitEvent("adfajls", System.currentTimeMillis());
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
     @Test
@@ -198,10 +181,12 @@ public class EventsTest {
                 .build();
         Truth.assertThat(event.getEventType()).isEqualTo(TrackEventType.VISITOR_ATTRIBUTES);
         //TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>());
-        inRobolectric(event.toJSONObject());
+        inRobolectric(event);
     }
 
-    public void inRobolectric(JSONObject jsonObject) {
+    public void inRobolectric(BaseEvent event) {
+        JSONObject jsonObject = new JSONObject();
+        BaseEventJsonSerializableFactory.create().toJson(jsonObject, event);
         Truth.assertThat(jsonObject.opt("platform")).isEqualTo("Android");
     }
 

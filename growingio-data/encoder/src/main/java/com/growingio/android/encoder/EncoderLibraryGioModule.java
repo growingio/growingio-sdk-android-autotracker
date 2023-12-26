@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
+ * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 package com.growingio.android.encoder;
 
-import android.content.Context;
 
 import com.growingio.android.sdk.LibraryGioModule;
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.middleware.http.EventEncoder;
-import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
 /**
@@ -30,7 +29,7 @@ import com.growingio.sdk.annotation.GIOLibraryModule;
 @GIOLibraryModule
 public class EncoderLibraryGioModule extends LibraryGioModule {
     @Override
-    public void registerComponents(Context context, TrackerRegistry registry) {
-        registry.register(EventEncoder.class, EventEncoder.class, new EncoderDataLoader.Factory());
+    public void registerComponents(TrackerContext context) {
+        context.getRegistry().register(EventEncoder.class, EventEncoder.class, new EncoderDataLoader.Factory());
     }
 }
