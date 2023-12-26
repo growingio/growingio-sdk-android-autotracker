@@ -27,9 +27,9 @@ protobuf = "3.22.3"
 powermock = "2.0.9"
 
 # !!! SDK VERSION !!!
-growingio = "4.0.0-SNAPSHOT"
+growingio = "4.0.0"
 growingioCode = "40000"
-growingioPlugin = "4.0.0-SNAPSHOT"
+growingioPlugin = "4.0.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "pluginGradle" }
