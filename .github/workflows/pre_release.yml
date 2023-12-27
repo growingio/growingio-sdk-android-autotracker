@@ -56,12 +56,11 @@ jobs:
       - name: Run demo ui tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
+          api-level: 31
           target: google_apis
           arch: x86_64
           disk-size: 2048M
           ram-size: 2048M
-          disable-animations: true
           working-directory: ./demo
           script: ./gradlew :app:connectedAndroidTest --stacktrace
 
