@@ -61,7 +61,6 @@ jobs:
           arch: x86_64
           disk-size: 2048M
           ram-size: 2048M
-          heap-size: 512M
           disable-animations: true
           working-directory: ./demo
           script: ./gradlew :app:connectedAndroidTest --stacktrace
