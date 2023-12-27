@@ -62,7 +62,6 @@ jobs:
           ram-size: 4096M
           cores: 4
           arch: x86_64
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           working-directory: ./demo
           script: ./gradlew :app:connectedAndroidTest --stacktrace
 
