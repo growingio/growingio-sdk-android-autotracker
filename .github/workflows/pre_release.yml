@@ -63,7 +63,7 @@ jobs:
           cores: 4
           arch: x86_64
           working-directory: ./demo
-          script: ./gradlew :app:connectedAndroidTest --stacktrace
+          script: ./gradlew :app:connectedAndroidTest --info
 
       - name: Run sdk unit tests
         run: |
