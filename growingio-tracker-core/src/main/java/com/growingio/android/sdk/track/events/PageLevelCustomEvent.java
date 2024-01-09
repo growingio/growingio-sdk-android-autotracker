@@ -15,6 +15,8 @@
  */
 package com.growingio.android.sdk.track.events;
 
+import androidx.annotation.IntRange;
+
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
 @JsonSerializer
@@ -22,6 +24,9 @@ public class PageLevelCustomEvent extends CustomEvent {
     private static final long serialVersionUID = 1L;
 
     private final String path;
+
+    @Deprecated
+    @IntRange(from = 0)
     private final long pageShowTimestamp;
 
     protected PageLevelCustomEvent(Builder eventBuilder) {
