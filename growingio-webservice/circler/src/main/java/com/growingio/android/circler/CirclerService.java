@@ -77,9 +77,7 @@ public class CirclerService implements LoadDataFetcher<WebService>,
             return;
         }
         if (circleDataType != Circler.CIRCLE_INIT) {
-            if (callback != null) {
-                callback.onLoadFailed(new IllegalStateException("WebSocketService isn't ready"));
-            }
+            // send data by screenshotProvider directly
             return;
         }
         if (webSocketHandler.getWebSocket() != null) {
