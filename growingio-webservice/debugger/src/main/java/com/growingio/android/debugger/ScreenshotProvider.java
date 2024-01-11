@@ -28,6 +28,7 @@ import com.growingio.android.sdk.track.listener.Callback;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.EventFlutter;
+import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
@@ -160,6 +161,11 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         unRegister();
 
         registry.executeData(EventFlutter.flutterDebugger(false), EventFlutter.class, Void.class);
+    }
+
+    @Override
+    public boolean enableManualState() {
+        return registry.getModelLoader(EventFlutter.class) == null;
     }
 
     public interface OnScreenshotRefreshedListener {
