@@ -128,8 +128,8 @@ public class FlutterPluginProvider implements TrackerLifecycleProvider {
             String title = (String) args.get("textValue");
             int index = (int) args.get("index");
             String xIndex = "";
-            if (args.containsKey("xIndex")) {
-                xIndex = (String) args.get("xIndex");
+            if (args.containsKey("xcontent")) {
+                xIndex = (String) args.get("xcontent");
             }
             AttributesBuilder attributesBuilder = new AttributesBuilder();
             if (args.containsKey("attributes")) {
