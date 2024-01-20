@@ -197,7 +197,6 @@ class EventProtocolTransfer {
             eventBuilder.setDeviceBrand(baseEvent.getDeviceBrand()); //37
             eventBuilder.setDeviceModel(baseEvent.getDeviceModel()); //38
             eventBuilder.setDeviceType(baseEvent.getDeviceType()); //39
-            eventBuilder.setOperatingSystem(baseEvent.getPlatformVersion()); //40
             eventBuilder.setAppName(baseEvent.getAppName()); //42
             eventBuilder.setLatitude(baseEvent.getLatitude()); //44
             eventBuilder.setLongitude(baseEvent.getLongitude()); //45
