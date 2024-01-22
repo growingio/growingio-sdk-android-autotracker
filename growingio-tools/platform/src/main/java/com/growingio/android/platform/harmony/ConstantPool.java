@@ -18,7 +18,7 @@ public class ConstantPool {
     private ConstantPool() {
     }
 
-    public static final String HARMONY = "Harmony";
+    public static final String HARMONY = "HarmonyOS";
 
     public static final String HARMONY_VERSION_KEY = "hw_sc.build.platform.version";
 

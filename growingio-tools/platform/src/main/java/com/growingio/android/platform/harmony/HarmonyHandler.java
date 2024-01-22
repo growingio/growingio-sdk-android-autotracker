@@ -15,6 +15,7 @@
  */
 package com.growingio.android.platform.harmony;
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
@@ -42,6 +43,7 @@ public class HarmonyHandler {
         }
     }
 
+    @SuppressLint("PrivateApi")
     private static String tryGetHarmonyVersionFromProp() throws Exception {
         Class<?> systemProperties = Class.forName(ConstantPool.CLASS_SYSTEM_PROPERTIES);
         Method getMethod = systemProperties.getDeclaredMethod(ConstantPool.GET_METHOD, String.class);
