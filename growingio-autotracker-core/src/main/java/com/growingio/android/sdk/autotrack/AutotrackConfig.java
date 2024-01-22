@@ -52,17 +52,13 @@ public class AutotrackConfig implements Configurable {
         return mAutotrackOptions;
     }
 
-    public AutotrackConfig setFragmentTagSupport(boolean support) {
+    public AutotrackConfig setSupportFragmentTag(boolean support) {
         this.supportFragmentTag = support;
         return this;
     }
 
     public boolean isSupportFragmentTag() {
         return supportFragmentTag;
-    }
-
-    public void setSupportFragmentTag(boolean supportFragmentTag) {
-        this.supportFragmentTag = supportFragmentTag;
     }
 
     /**
