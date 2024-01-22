@@ -20,6 +20,8 @@ import com.growingio.android.sdk.Configurable;
 public class AutotrackConfig implements Configurable {
     private float mImpressionScale = 0;
     private boolean mDowngrade = false;
+
+    private boolean supportFragmentTag = false;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
     public AutotrackConfig setImpressionScale(float scale) {
@@ -48,6 +50,19 @@ public class AutotrackConfig implements Configurable {
 
     public AutotrackOptions getAutotrackOptions() {
         return mAutotrackOptions;
+    }
+
+    public AutotrackConfig setFragmentTagSupport(boolean support) {
+        this.supportFragmentTag = support;
+        return this;
+    }
+
+    public boolean isSupportFragmentTag() {
+        return supportFragmentTag;
+    }
+
+    public void setSupportFragmentTag(boolean supportFragmentTag) {
+        this.supportFragmentTag = supportFragmentTag;
     }
 
     /**
