@@ -21,7 +21,7 @@ public class AutotrackConfig implements Configurable {
     private float mImpressionScale = 0;
     private boolean mDowngrade = false;
 
-    private boolean supportFragmentTag = false;
+    private boolean enableFragmentTag = false;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
     public AutotrackConfig setImpressionScale(float scale) {
@@ -52,13 +52,13 @@ public class AutotrackConfig implements Configurable {
         return mAutotrackOptions;
     }
 
-    public AutotrackConfig setSupportFragmentTag(boolean support) {
-        this.supportFragmentTag = support;
+    public AutotrackConfig enableFragmentTag(boolean enable) {
+        this.enableFragmentTag = enable;
         return this;
     }
 
-    public boolean isSupportFragmentTag() {
-        return supportFragmentTag;
+    public boolean isEnableFragmentTag() {
+        return enableFragmentTag;
     }
 
     /**
