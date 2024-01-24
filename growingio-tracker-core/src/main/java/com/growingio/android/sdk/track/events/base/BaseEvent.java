@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
+import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
 import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
@@ -346,7 +347,6 @@ public abstract class BaseEvent extends GEvent {
             appChannel = getFieldDefault(BaseField.APP_CHANNEL) ? configurationProvider.core().getChannel() : null;
 
             DeviceInfoProvider deviceInfo = context.getDeviceInfoProvider();
-            platformVersion = deviceInfo.getOperatingSystemVersion();
             deviceId = deviceInfo.getDeviceId();
             screenHeight = getFieldDefault(BaseField.SCREEN_HEIGHT) ? deviceInfo.getScreenHeight() : 0;
             screenWidth = getFieldDefault(BaseField.SCREEN_WIDTH) ? deviceInfo.getScreenWidth() : 0;
@@ -356,6 +356,9 @@ public abstract class BaseEvent extends GEvent {
             latitude = getFieldDefault(BaseField.LATITUDE) ? deviceInfo.getLatitude() : 0;
             longitude = getFieldDefault(BaseField.LONGITUDE) ? deviceInfo.getLongitude() : 0;
             timezoneOffset = getFieldDefault(BaseField.TIMEZONE_OFFSET) ? String.valueOf(deviceInfo.getTimezoneOffset()) : null;
+            PlatformInfo platformInfo = deviceInfo.getPlatformInfo();
+            platformVersion = platformInfo.getPlatformVersion();
+            platform = platformInfo.getPlatform();
 
             AppInfoProvider appInfo = context.getProvider(AppInfoProvider.class);
             appName = getFieldDefault(BaseField.APP_NAME) ? appInfo.getAppName() : null;
@@ -369,7 +372,6 @@ public abstract class BaseEvent extends GEvent {
             networkState = getFieldDefault(BaseField.NETWORK_STATE) ? NetworkUtil.getActiveNetworkState(context).getNetworkName() : null;
             sdkVersion = getFieldDefault(BaseField.SDK_VERSION) ? SDKConfig.SDK_VERSION : null;
             language = getFieldDefault(BaseField.LANGUAGE) ? Locale.getDefault().getLanguage() : null;
-            platform = ConstantPool.ANDROID;
         }
 
         protected Boolean getFieldDefault(String key) {
