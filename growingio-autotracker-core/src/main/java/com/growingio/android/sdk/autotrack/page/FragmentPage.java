@@ -53,9 +53,11 @@ public class FragmentPage extends Page<SuperFragment<?>> {
 
     @Override
     public String getTag() {
-        String tag = getCarrier().getTag();
-        if (!TextUtils.isEmpty(tag)) {
-            return transformSwitcherTag(tag);
+        if (autotrackConfig.isEnableFragmentTag()) {
+            String tag = getCarrier().getTag();
+            if (!TextUtils.isEmpty(tag)) {
+                return transformSwitcherTag(tag);
+            }
         }
         return getCarrier().getResourceEntryName(getCarrier().getId());
     }

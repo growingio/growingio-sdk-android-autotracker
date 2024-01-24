@@ -59,7 +59,7 @@ public class PageTest {
     @Before
     public void setup() {
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
-        map.put(AutotrackConfig.class, new AutotrackConfig());
+        map.put(AutotrackConfig.class, new AutotrackConfig().enableFragmentTag(true));
         TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("PageTest", "growingio://impression"), map);
 
         Autotracker autotracker = new Autotracker(application);

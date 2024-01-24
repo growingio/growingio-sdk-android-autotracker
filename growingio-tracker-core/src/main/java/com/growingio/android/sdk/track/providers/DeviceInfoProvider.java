@@ -28,6 +28,8 @@ import android.webkit.WebView;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.platform.PlatformHelper;
+import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
@@ -46,7 +48,6 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     private static final String MAGIC_ANDROID_ID = "9774d56d682e549c"; // Error AndroidID
 
-    private String mOperatingSystemVersion;
     private String mDeviceBrand;
     private String mDeviceModel;
     private String mDeviceType;
@@ -59,6 +60,7 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
     private String mOaid;
     private String mGoogleAdId;
     private String mDeviceId;
+    private PlatformInfo mPlatformInfo;
     private int mTimezoneOffset = Integer.MIN_VALUE;
 
     private double mLatitude = 0;
@@ -79,7 +81,6 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         this.registry = context.getRegistry();
         this.configurationProvider = context.getConfigurationProvider();
         this.persistentDataProvider = context.getProvider(PersistentDataProvider.class);
-
     }
 
     @Override
@@ -87,11 +88,15 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     }
 
-    public String getOperatingSystemVersion() {
-        if (TextUtils.isEmpty(mOperatingSystemVersion)) {
-            mOperatingSystemVersion = Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE;
+    public PlatformInfo getPlatformInfo() {
+        if (mPlatformInfo == null) {
+            mPlatformInfo = registry.executeData(null, PlatformHelper.class, PlatformInfo.class);
+            if (mPlatformInfo == null) {
+                mPlatformInfo = new PlatformInfo(ConstantPool.ANDROID,
+                        Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE);
+            }
         }
-        return mOperatingSystemVersion;
+        return mPlatformInfo;
     }
 
     public String getDeviceBrand() {

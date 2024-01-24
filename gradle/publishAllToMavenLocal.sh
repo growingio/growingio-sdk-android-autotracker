@@ -18,6 +18,7 @@
 && ./gradlew :growingio-webservice:circler:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-apm:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-flutter:publishMavenAgentPublicationToMavenLocal \
+&& ./gradlew :growingio-tools:platform:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :growingio-tools:oaid:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker:publishMavenAgentPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenAgentPublicationToMavenLocal \

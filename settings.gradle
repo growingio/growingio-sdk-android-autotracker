@@ -53,6 +53,7 @@ include ':growingio-data:database'
 
 include ':growingio-tools:snappy'
 include ':growingio-tools:oaid'
+include ':growingio-tools:platform'
 
 // sdks
 include ':gio-sdk:tracker'
