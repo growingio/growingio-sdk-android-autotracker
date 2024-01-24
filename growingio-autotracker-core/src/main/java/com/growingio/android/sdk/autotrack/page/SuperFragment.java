@@ -134,15 +134,12 @@ public abstract class SuperFragment<T> {
 
         @Override
         public String getResourceEntryName(int id) {
-            if (getRealFragment() == null) return "SystemFragment";
+            if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
-                if (id == -1) {
-                    id = getRealFragment().getId();
-                }
                 return getRealFragment().getResources().getResourceEntryName(id);
             } catch (Resources.NotFoundException ignored) {
             }
-            return "SystemFragment";
+            return null;
         }
 
         @Nullable
@@ -208,15 +205,12 @@ public abstract class SuperFragment<T> {
 
         @Override
         public String getResourceEntryName(int id) {
-            if (getRealFragment() == null) return "SystemFragment";
+            if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
-                if (id == -1) {
-                    id = getRealFragment().getId();
-                }
                 return getRealFragment().getResources().getResourceEntryName(id);
             } catch (Resources.NotFoundException ignored) {
             }
-            return "SystemFragment";
+            return null;
         }
 
         @Nullable
