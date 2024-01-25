@@ -342,14 +342,14 @@ internal class JsonSerializerGenerator(
                     parseFromMethod.addStatement(
                         "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optFloat(\"$fieldName\")",
+                            "jsonObject.optDouble(\"$fieldName\", 0)",
                         ),
                     )
                 } else if (field.asType().kind == TypeKind.DOUBLE) {
                     parseFromMethod.addStatement(
                         "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optDouble(\"$fieldName\")",
+                            "jsonObject.optDouble(\"$fieldName\", 0.0)",
                         ),
                     )
                 } else if (field.asType().kind == TypeKind.BOOLEAN) {

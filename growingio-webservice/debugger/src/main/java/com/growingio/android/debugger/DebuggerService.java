@@ -87,9 +87,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>,
             return;
         }
         if (debuggerDataType != Debugger.DEBUGGER_INIT) {
-            if (callback != null) {
-                callback.onLoadFailed(new IllegalStateException("WebSocketService isn't ready"));
-            }
+            // send data by screenshotProvider directly
             return;
         }
         if (webSocketHandler.getWebSocket() != null) {

@@ -153,14 +153,19 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         refreshListener = listener;
         refreshScreenshot();
 
-        registry.executeData(EventFlutter.flutterCircle(true), EventFlutter.class, Void.class);
+        registry.executeData(EventFlutter.flutterDebugger(true), EventFlutter.class, Void.class);
     }
 
     public void unregisterScreenshotRefreshedListener() {
         refreshListener = null;
         unRegister();
 
-        registry.executeData(EventFlutter.flutterCircle(false), EventFlutter.class, Void.class);
+        registry.executeData(EventFlutter.flutterDebugger(false), EventFlutter.class, Void.class);
+    }
+
+    @Override
+    public boolean enableManualState() {
+        return registry.getModelLoader(EventFlutter.class) == null;
     }
 
     public interface OnScreenshotRefreshedListener {

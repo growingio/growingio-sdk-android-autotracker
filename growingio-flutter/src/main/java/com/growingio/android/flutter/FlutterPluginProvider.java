@@ -107,7 +107,7 @@ public class FlutterPluginProvider implements TrackerLifecycleProvider {
             if (args.containsKey("timestamp")) {
                 timeStamp = (Long) args.get("timestamp");
             }
-            TrackMainThread.trackMain().cacheEventToTrackMain(
+            TrackMainThread.trackMain().postEventToTrackMain(
                     new PageEvent.Builder()
                             .setPath(path)
                             .setTitle(title)
@@ -128,14 +128,14 @@ public class FlutterPluginProvider implements TrackerLifecycleProvider {
             String title = (String) args.get("textValue");
             int index = (int) args.get("index");
             String xIndex = "";
-            if (args.containsKey("xIndex")) {
-                xIndex = (String) args.get("xIndex");
+            if (args.containsKey("xcontent")) {
+                xIndex = (String) args.get("xcontent");
             }
             AttributesBuilder attributesBuilder = new AttributesBuilder();
             if (args.containsKey("attributes")) {
                 attributesBuilder.addAttribute((Map<String, Object>) args.get("attributes"));
             }
-            TrackMainThread.trackMain().cacheEventToTrackMain(
+            TrackMainThread.trackMain().postEventToTrackMain(
                     new ViewElementEvent.Builder(eventType)
                             .setPath(path)
                             .setXpath(xpath)

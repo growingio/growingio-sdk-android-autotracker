@@ -93,6 +93,12 @@ public abstract class ViewTreeStatusListener implements IActivityLifecycle, OnVi
 
     @Override
     public void eventDidBuild(GEvent event) {
-        viewTreeStatusObserver.sendManualStateChangedEvent();
+        if (enableManualState()) {
+            viewTreeStatusObserver.sendManualStateChangedEvent();
+        }
+    }
+
+    public boolean enableManualState() {
+        return true;
     }
 }
