@@ -255,12 +255,20 @@ internal class JsonSerializerGenerator(
                 ) {
                     val annotation = field.getAnnotation(Nullable::class.java)
                     if (annotation != null) {
-                        toJsonMethod.beginControlFlow(
-                            "if(event.$fieldMethod != null && !event.$fieldMethod.isEmpty())",
-                        ).addStatement(
-                            "jsonObject.put(\"${fieldName}\", new \$T(event.$fieldMethod))",
-                            ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
-                        ).endControlFlow()
+                        toJsonMethod.addStatement(
+                            "\$T $fieldName = event.$fieldMethod;",
+                            ParameterizedTypeName.get(
+                                ClassName.get(Map::class.java),
+                                ClassName.get(String::class.java),
+                                ClassName.get(String::class.java),
+                            )
+                        )
+                        toJsonMethod.beginControlFlow("if($fieldName != null && !$fieldName.isEmpty())")
+                            .addStatement("$fieldName.remove(null)")
+                            .addStatement(
+                                "jsonObject.put(\"${fieldName}\", new \$T(event.$fieldMethod))",
+                                ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
+                            ).endControlFlow()
                     } else {
                         toJsonMethod.addStatement(
                             "jsonObject.put(\"${fieldName}\", new \$T(event.$fieldMethod))",
@@ -372,6 +380,9 @@ internal class JsonSerializerGenerator(
                     parseFromMethod.addStatement(
                         "\$T json = jsonObject.optJSONObject(\"$fieldName\")",
                         ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
+                    )
+                    parseFromMethod.addStatement(
+                        "if(json == null) return"
                     )
                     parseFromMethod.addStatement(
                         "\$T map = new \$T()",
