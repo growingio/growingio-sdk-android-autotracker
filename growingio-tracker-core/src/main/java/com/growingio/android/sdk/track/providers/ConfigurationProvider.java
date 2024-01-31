@@ -25,6 +25,7 @@ import com.growingio.android.sdk.track.listener.ListenerDispatcher;
 import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.CdpConfig;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 
@@ -35,8 +36,6 @@ public class ConfigurationProvider extends ListenerDispatcher<OnConfigurationCha
     private static final String TAG = "ConfigurationProvider";
     private final CoreConfiguration mCoreConfiguration;
     private final Map<Class<? extends Configurable>, Configurable> sModuleConfigs = new HashMap<>();
-
-    private boolean isDowngrade = false;
 
     ConfigurationProvider(CoreConfiguration coreConfiguration, Map<Class<? extends Configurable>, Configurable> moduleConfigs) {
         if (TextUtils.isEmpty(coreConfiguration.getProjectId())) {
@@ -128,14 +127,9 @@ public class ConfigurationProvider extends ListenerDispatcher<OnConfigurationCha
     }
 
     public boolean isDowngrade() {
-        return isDowngrade;
-    }
-
-    /**
-     * You must understand what you are doing before using
-     */
-    public void downgrade() {
-        isDowngrade = true;
+        CdpConfig config = getConfiguration(CdpConfig.class);
+        if (config == null) return false;
+        return config.isDowngrade();
     }
 
     @Override

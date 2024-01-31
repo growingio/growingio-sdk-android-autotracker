@@ -18,10 +18,11 @@ package com.growingio.android.sdk.autotrack;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.AppGioModule;
+import com.growingio.android.sdk.track.middleware.CdpConfig;
 import com.growingio.sdk.annotation.GIOAppModule;
 import com.growingio.sdk.annotation.GIOTracker;
 
-@GIOAppModule(name = "GrowingAutotracker", configName = "CdpAutotrackConfiguration")
+@GIOAppModule(name = "GrowingAutotracker", configName = "CdpAutotrackConfiguration", config = CdpConfig.class)
 public class GrowingAutoAppModule extends AppGioModule {
 
     @GIOTracker(path = CdpAutotracker.class)

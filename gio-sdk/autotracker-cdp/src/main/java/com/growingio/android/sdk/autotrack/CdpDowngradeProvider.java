@@ -16,23 +16,27 @@
 package com.growingio.android.sdk.autotrack;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.middleware.CdpConfig;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 
 public class CdpDowngradeProvider implements TrackerLifecycleProvider {
     private static final String TAG = "CdpDowngradeProvider";
     private ConfigurationProvider configurationProvider;
+
     @Override
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
-        downgrade();
+        CdpConfig config = configurationProvider.getConfiguration(CdpConfig.class);
+        if (config.isDowngrade()) {
+            downgrade();
+        }
     }
 
     /**
      * Downgrade the autotrack config to the version before 4.0.0.
      */
-    private void downgrade(){
-        configurationProvider.downgrade();
+    private void downgrade() {
         AutotrackConfig config = configurationProvider.getConfiguration(AutotrackConfig.class);
         config.getAutotrackOptions().setFragmentPageEnabled(true);
         config.getAutotrackOptions().setActivityPageEnabled(true);

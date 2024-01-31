@@ -19,7 +19,7 @@ import android.text.TextUtils;
 
 import com.growingio.android.sdk.AppGioModule;
 import com.growingio.android.sdk.Tracker;
-import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
+import com.growingio.android.sdk.track.middleware.CdpConfig;
 import com.growingio.sdk.annotation.GIOAppModule;
 import com.growingio.sdk.annotation.GIOTracker;
 
@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * @author cpacm 4/28/21
  */
-@GIOAppModule(configName = "CdpTrackConfiguration")
+@GIOAppModule(configName = "CdpTrackConfiguration", config = CdpConfig.class)
 public final class GrowingAppModule extends AppGioModule {
 
     @GIOTracker(path = Tracker.class)
@@ -38,10 +38,5 @@ public final class GrowingAppModule extends AppGioModule {
         if (TextUtils.isEmpty(configuration.getDataSourceId())) {
             throw new IllegalStateException("DataSourceId is NULL");
         }
-    }
-
-    @Override
-    protected void setupProviders(Map<Class<? extends TrackerLifecycleProvider>, TrackerLifecycleProvider> providerStore) {
-        providerStore.put(CdpDowngradeProvider.class, new CdpDowngradeProvider());
     }
 }
