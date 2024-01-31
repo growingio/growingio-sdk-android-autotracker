@@ -19,9 +19,7 @@ import android.view.View;
 import android.view.Window;
 
 public class WindowPage extends Page<Window> {
-
     private String name;
-
 
     public WindowPage(String name) {
         super(null);

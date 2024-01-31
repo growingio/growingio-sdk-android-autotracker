@@ -355,7 +355,6 @@ public abstract class BaseEvent extends GEvent {
             deviceType = getFieldDefault(BaseField.DEVICE_TYPE) ? deviceInfo.getDeviceType() : null;
             latitude = getFieldDefault(BaseField.LATITUDE) ? deviceInfo.getLatitude() : 0;
             longitude = getFieldDefault(BaseField.LONGITUDE) ? deviceInfo.getLongitude() : 0;
-            timezoneOffset = getFieldDefault(BaseField.TIMEZONE_OFFSET) ? String.valueOf(deviceInfo.getTimezoneOffset()) : null;
             PlatformInfo platformInfo = deviceInfo.getPlatformInfo();
             platformVersion = platformInfo.getPlatformVersion();
             platform = platformInfo.getPlatform();
@@ -372,6 +371,16 @@ public abstract class BaseEvent extends GEvent {
             networkState = getFieldDefault(BaseField.NETWORK_STATE) ? NetworkUtil.getActiveNetworkState(context).getNetworkName() : null;
             sdkVersion = getFieldDefault(BaseField.SDK_VERSION) ? SDKConfig.SDK_VERSION : null;
             language = getFieldDefault(BaseField.LANGUAGE) ? Locale.getDefault().getLanguage() : null;
+        }
+
+        /**
+         * read new property in track thread.
+         * Additional processing is required due to server's JSON incompatibility with new fields
+         */
+        @TrackThread
+        public void readNewPropertyInTrackThread(TrackerContext context) {
+            DeviceInfoProvider deviceInfo = context.getDeviceInfoProvider();
+            timezoneOffset = getFieldDefault(BaseField.TIMEZONE_OFFSET) ? String.valueOf(deviceInfo.getTimezoneOffset()) : null;
         }
 
         protected Boolean getFieldDefault(String key) {

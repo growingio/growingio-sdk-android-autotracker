@@ -50,8 +50,9 @@ public class ActivityPage extends Page<SuperActivity> {
 
     @Override
     public boolean isAutotrack() {
+        // cdp downgrade when activity page is enabled
         if (autotrackConfig != null && autotrackConfig.getAutotrackOptions().isActivityPageEnabled()) {
-            return true;
+            return !isIgnored();
         }
         return super.isAutotrack();
     }

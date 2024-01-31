@@ -340,28 +340,6 @@ public class Autotracker extends Tracker {
         autotrackPage(page, alias);
     }
 
-    @Deprecated
-    public void ignorePage(final Activity page, final IgnorePolicy policy) {
-        Logger.w(TAG, "Ignore page is no longer supported");
-    }
-
-    @Deprecated
-    public void ignorePage(final android.app.Fragment page, final IgnorePolicy policy) {
-        Logger.w(TAG, "Ignore page is no longer supported");
-    }
-
-    @Deprecated
-    public void ignorePageSupport(final android.support.v4.app.Fragment page,
-                                  final IgnorePolicy policy) {
-        Logger.w(TAG, "Ignore page is no longer supported");
-    }
-
-    @Deprecated
-    public void ignorePageX(final androidx.fragment.app.Fragment page,
-                            final IgnorePolicy policy) {
-        Logger.w(TAG, "Ignore page is no longer supported");
-    }
-
     public void ignoreView(final View view, final IgnorePolicy policy) {
         if (!isInited) return;
         if (view == null || policy == null) {

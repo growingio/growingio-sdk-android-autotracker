@@ -39,6 +39,8 @@ public abstract class Page<T> {
     private Page<?> mParent;
     private long mShowTimestamp;
     private boolean mIsAutotrack = false; //是否标记为可发送
+
+    private boolean mIsIgnored = false;
     private String mAlias;
     private String mTitle;
     private String mPath;
@@ -68,6 +70,14 @@ public abstract class Page<T> {
 
     public void setIsAutotrack(boolean mIsAutotrack) {
         this.mIsAutotrack = mIsAutotrack;
+    }
+
+    public boolean isIgnored() {
+        return mIsIgnored;
+    }
+
+    public void setIgnore(boolean ignore) {
+        this.mIsIgnored = ignore;
     }
 
     public long getShowTimestamp() {

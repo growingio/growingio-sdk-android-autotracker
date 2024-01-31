@@ -36,6 +36,8 @@ public class ConfigurationProvider extends ListenerDispatcher<OnConfigurationCha
     private final CoreConfiguration mCoreConfiguration;
     private final Map<Class<? extends Configurable>, Configurable> sModuleConfigs = new HashMap<>();
 
+    private boolean isDowngrade = false;
+
     ConfigurationProvider(CoreConfiguration coreConfiguration, Map<Class<? extends Configurable>, Configurable> moduleConfigs) {
         if (TextUtils.isEmpty(coreConfiguration.getProjectId())) {
             throw new IllegalStateException("ProjectId is NULL");
@@ -123,6 +125,17 @@ public class ConfigurationProvider extends ListenerDispatcher<OnConfigurationCha
                 }
             }
         }
+    }
+
+    public boolean isDowngrade() {
+        return isDowngrade;
+    }
+
+    /**
+     * You must understand what you are doing before using
+     */
+    public void downgrade() {
+        isDowngrade = true;
     }
 
     @Override

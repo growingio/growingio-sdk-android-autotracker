@@ -19,8 +19,6 @@ import com.growingio.android.sdk.Configurable;
 
 public class AutotrackConfig implements Configurable {
     private float mImpressionScale = 0;
-    private boolean mDowngrade = false;
-
     private boolean enableFragmentTag = false;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
@@ -61,17 +59,4 @@ public class AutotrackConfig implements Configurable {
         return enableFragmentTag;
     }
 
-    /**
-     * You must understand what you are doing before using
-     */
-    public AutotrackConfig downgrade() {
-        this.mDowngrade = true;
-        mAutotrackOptions.setFragmentPageEnabled(true);
-        mAutotrackOptions.setActivityPageEnabled(true);
-        return this;
-    }
-
-    public boolean isDowngrade() {
-        return this.mDowngrade;
-    }
 }

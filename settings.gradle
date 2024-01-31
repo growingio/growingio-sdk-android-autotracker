@@ -57,7 +57,9 @@ include ':growingio-tools:platform'
 
 // sdks
 include ':gio-sdk:tracker'
+include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:autotracker'
+include ':gio-sdk:autotracker-cdp'
 include ':gio-sdk:autotracker-saas'
 
 include ':growingio-sdk-bom'

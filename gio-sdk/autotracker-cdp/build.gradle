@@ -1,0 +1,53 @@
+apply plugin: 'com.android.library'
+
+android {
+	namespace 'com.growingio.android.sdk.autotracker.cdp'
+	compileSdkVersion buildConfiguration.compileVersion
+	defaultConfig {
+		minSdkVersion buildConfiguration.minSdkVersion
+		targetSdkVersion buildConfiguration.targetSdkVersion
+		versionName libs.versions.growingio.get()
+		versionCode libs.versions.growingioCode.get().toInteger()
+	}
+
+	buildTypes {
+		debug {
+			testCoverageEnabled = true
+		}
+
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			consumerProguardFiles 'consumer-proguard-rules.pro'
+		}
+	}
+	compileOptions {
+		sourceCompatibility buildConfiguration.sourceCompatibility
+		targetCompatibility buildConfiguration.targetCompatibility
+	}
+	lintOptions {
+		abortOnError false
+	}
+}
+
+dependencies {
+	debugApi project(':growingio-tracker-core')
+	debugApi project(':growingio-autotracker-core')
+	debugApi project(':growingio-network:okhttp3')
+	debugApi project(':growingio-data:database')
+	debugApi project(':growingio-data:protobuf')
+	debugApi project(':growingio-webservice:circler')
+	debugApi project(':growingio-webservice:debugger')
+	debugApi project(':growingio-hybrid')
+
+	releaseApi libs.bundles.growingio.autotracker.sdk
+
+	compileOnly libs.androidx.appcompat
+	compileOnly libs.support.appcompat
+
+	releaseImplementation libs.growingio.annotation
+	debugImplementation project(":growingio-annotation")
+	annotationProcessor project(":growingio-annotation:compiler")
+}
+
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

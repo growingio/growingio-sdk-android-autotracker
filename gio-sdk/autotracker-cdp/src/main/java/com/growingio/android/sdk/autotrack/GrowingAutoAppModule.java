@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk.track.middleware.hybrid;
+package com.growingio.android.sdk.autotrack;
 
+import android.text.TextUtils;
 
-import android.view.View;
+import com.growingio.android.sdk.AppGioModule;
+import com.growingio.sdk.annotation.GIOAppModule;
+import com.growingio.sdk.annotation.GIOTracker;
 
-public class HybridBridge {
-    private final View view;
+@GIOAppModule(name = "GrowingAutotracker", configName = "CdpAutotrackConfiguration")
+public class GrowingAutoAppModule extends AppGioModule {
 
-    public HybridBridge(View view) {
-        this.view = view;
-    }
-
-    public View getView() {
-        return view;
+    @GIOTracker(path = CdpAutotracker.class)
+    public void config(CdpAutotrackConfiguration configuration) {
+        if (TextUtils.isEmpty(configuration.getDataSourceId())) {
+            throw new IllegalStateException("DataSourceId is NULL");
+        }
     }
 }

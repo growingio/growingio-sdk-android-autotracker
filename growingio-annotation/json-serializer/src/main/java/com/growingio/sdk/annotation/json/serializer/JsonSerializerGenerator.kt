@@ -261,7 +261,7 @@ internal class JsonSerializerGenerator(
                                 ClassName.get(Map::class.java),
                                 ClassName.get(String::class.java),
                                 ClassName.get(String::class.java),
-                            )
+                            ),
                         )
                         toJsonMethod.beginControlFlow("if($fieldName != null && !$fieldName.isEmpty())")
                             .addStatement("$fieldName.remove(null)")
@@ -382,7 +382,7 @@ internal class JsonSerializerGenerator(
                         ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
                     )
                     parseFromMethod.addStatement(
-                        "if(json == null) return"
+                        "if(json == null) return",
                     )
                     parseFromMethod.addStatement(
                         "\$T map = new \$T()",
