@@ -23,8 +23,6 @@ import com.growingio.android.sdk.track.middleware.CdpConfig;
 import com.growingio.sdk.annotation.GIOAppModule;
 import com.growingio.sdk.annotation.GIOTracker;
 
-import java.util.Map;
-
 /**
  * <p>
  *
