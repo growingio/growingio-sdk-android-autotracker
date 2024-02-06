@@ -333,31 +333,39 @@ internal class JsonSerializerGenerator(
                     return@forEach
                 }
                 if (field.asType().kind == TypeKind.INT) {
+                    val annotation = field.getAnnotation(IntRange::class.java)
+                    val defaultValue = annotation?.from ?: 0
                     parseFromMethod.addStatement(
                         "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optInt(\"$fieldName\")",
+                            "jsonObject.optInt(\"$fieldName\", $defaultValue)",
                         ),
                     )
                 } else if (field.asType().kind == TypeKind.LONG) {
+                    val annotation = field.getAnnotation(IntRange::class.java)
+                    val defaultValue = annotation?.from ?: 0
                     parseFromMethod.addStatement(
                         "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optLong(\"$fieldName\")",
+                            "jsonObject.optLong(\"$fieldName\", $defaultValue)",
                         ),
                     )
                 } else if (field.asType().kind == TypeKind.FLOAT) {
+                    val annotation = field.getAnnotation(FloatRange::class.java)
+                    val defaultValue = annotation?.from ?: 0f
                     parseFromMethod.addStatement(
                         "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optDouble(\"$fieldName\", 0)",
+                            "jsonObject.optDouble(\"$fieldName\", $defaultValue)",
                         ),
                     )
                 } else if (field.asType().kind == TypeKind.DOUBLE) {
+                    val annotation = field.getAnnotation(FloatRange::class.java)
+                    val defaultValue = annotation?.from ?: 0f
                     parseFromMethod.addStatement(
                         "builder.$fieldMethod".replace(
                             FIELD_REPLACE_REG,
-                            "jsonObject.optDouble(\"$fieldName\", 0.0)",
+                            "jsonObject.optDouble(\"$fieldName\", $defaultValue)",
                         ),
                     )
                 } else if (field.asType().kind == TypeKind.BOOLEAN) {
