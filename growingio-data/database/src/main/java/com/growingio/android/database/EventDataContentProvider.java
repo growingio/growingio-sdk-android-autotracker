@@ -56,8 +56,11 @@ public class EventDataContentProvider extends ContentProvider {
     }
 
     private void trackAppStart() {
-        if (ClassExistHelper.hasClass("com.growingio.android.gmonitor.GMonitor")) {
-            com.growingio.android.gmonitor.GMonitor.appStart();
+        try {
+            if (ClassExistHelper.hasClass("com.growingio.android.gmonitor.GMonitor")) {
+                com.growingio.android.gmonitor.GMonitor.appStart();
+            }
+        } catch (Throwable ignored) {
         }
     }
 

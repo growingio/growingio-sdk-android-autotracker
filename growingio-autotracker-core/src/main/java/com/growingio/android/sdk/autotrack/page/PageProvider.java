@@ -24,6 +24,7 @@ import androidx.annotation.UiThread;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.util.XmlParserUtil;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -34,8 +35,10 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
+
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -69,7 +72,11 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         activityStateProvider = context.getActivityStateProvider();
         autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
         activityStateProvider.registerActivityLifecycleListener(this);
+
+        List<PageRule> pageRuleList = XmlParserUtil.loadPageRuleXml(context, autotrackConfig.getPageXmlRes());
+        autotrackConfig.getPageRules().addAll(0, pageRuleList);
     }
+
 
     @Override
     public void shutdown() {
@@ -375,7 +382,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         fragmentPage.setAttributes(attributes);
     }
 
-    public void ignoreFragment(SuperFragment<?> fragment, boolean ignored){
+    public void ignoreFragment(SuperFragment<?> fragment, boolean ignored) {
         if (fragment.getActivity() == null) return;
         // find activity page
         ActivityPage page = findOrCreateActivityPage(fragment.getActivity());

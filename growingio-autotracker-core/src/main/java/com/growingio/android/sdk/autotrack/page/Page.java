@@ -259,4 +259,26 @@ public abstract class Page<T> {
         this.mPath = originPath(true);
         return this.mPath;
     }
+
+    protected void loadPageRule(List<PageRule> pageRuleList, String fullPageClassPath) {
+        if (pageRuleList == null || fullPageClassPath == null) return;
+        // match exactly page classpath at first
+        for (PageRule pageRule : pageRuleList) {
+            if (!pageRule.isRegMatch() && fullPageClassPath.equals(pageRule.getPageClassPath())) {
+                setAlias(pageRule.getPageName());
+                setAttributes(Collections.unmodifiableMap(pageRule.getAttributes()));
+                setIsAutotrack(true);
+            }
+        }
+        if (!mIsAutotrack) {
+            // match reg page classpath secondly
+            for (PageRule pageRule : pageRuleList) {
+                if (pageRule.isRegMatch() && fullPageClassPath.matches(pageRule.getPageClassPath())) {
+                    setAlias(getName());
+                    setAttributes(Collections.unmodifiableMap(pageRule.getAttributes()));
+                    setIsAutotrack(true);
+                }
+            }
+        }
+    }
 }

@@ -181,9 +181,9 @@ public class EventSender {
     private int numOfMaxEventsPerRequest() {
         ActivityManager.MemoryInfo info = getMemoryInfo();
         if (info.lowMemory) {
-            return 3;
+            return 10;
         }
-        return 50;
+        return 500;
     }
 
     /**
