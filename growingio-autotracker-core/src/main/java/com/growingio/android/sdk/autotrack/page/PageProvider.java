@@ -73,8 +73,10 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
         activityStateProvider.registerActivityLifecycleListener(this);
 
-        List<PageRule> pageRuleList = XmlParserUtil.loadPageRuleXml(context, autotrackConfig.getPageXmlRes());
-        autotrackConfig.getPageRules().addAll(0, pageRuleList);
+        if (autotrackConfig != null) {
+            List<PageRule> pageRuleList = XmlParserUtil.loadPageRuleXml(context, autotrackConfig.getPageXmlRes());
+            autotrackConfig.getPageRules().addAll(0, pageRuleList);
+        }
     }
 
 

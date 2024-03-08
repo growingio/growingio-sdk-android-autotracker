@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 public abstract class Page<T> {
     private final static int MAX_PAGE_LEVEL = 3;
@@ -273,12 +274,20 @@ public abstract class Page<T> {
         if (!mIsAutotrack) {
             // match reg page classpath secondly
             for (PageRule pageRule : pageRuleList) {
-                if (pageRule.isRegMatch() && fullPageClassPath.matches(pageRule.getPageClassPath())) {
+                if (pageRule.isRegMatch() && matchPageRule(fullPageClassPath, pageRule.getPageClassPath())) {
                     setAlias(getName());
                     setAttributes(Collections.unmodifiableMap(pageRule.getAttributes()));
                     setIsAutotrack(true);
                 }
             }
+        }
+    }
+
+    private boolean matchPageRule(String input, String regex) {
+        try {
+            return input.matches(regex);
+        } catch (PatternSyntaxException e) {
+            return false;
         }
     }
 }

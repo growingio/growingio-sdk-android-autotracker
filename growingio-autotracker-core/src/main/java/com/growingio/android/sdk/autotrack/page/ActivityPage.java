@@ -33,8 +33,10 @@ public class ActivityPage extends Page<SuperActivity> {
         super(new SuperActivity(carrier));
         this.autotrackConfig = autotrackConfig;
 
-        String fullPageClassPath = getCarrier().getRealActivity().getClass().getName();
-        loadPageRule(this.autotrackConfig.getPageRules(), fullPageClassPath);
+        if (this.autotrackConfig != null) {
+            String fullPageClassPath = getCarrier().getRealActivity().getClass().getName();
+            loadPageRule(this.autotrackConfig.getPageRules(), fullPageClassPath);
+        }
     }
 
     @Override

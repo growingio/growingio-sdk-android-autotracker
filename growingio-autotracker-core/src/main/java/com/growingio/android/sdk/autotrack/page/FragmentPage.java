@@ -31,8 +31,10 @@ public class FragmentPage extends Page<SuperFragment<?>> {
     public FragmentPage(SuperFragment<?> carrier, AutotrackConfig autotrackConfig) {
         super(carrier);
         this.autotrackConfig = autotrackConfig;
-        String fullPageClassPath = getCarrier().getRealFragment().getClass().getName();
-        loadPageRule(this.autotrackConfig.getPageRules(), fullPageClassPath);
+        if (this.autotrackConfig != null) {
+            String fullPageClassPath = getCarrier().getRealFragment().getClass().getName();
+            loadPageRule(this.autotrackConfig.getPageRules(), fullPageClassPath);
+        }
     }
 
     @Override
