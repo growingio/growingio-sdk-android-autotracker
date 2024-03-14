@@ -236,17 +236,28 @@ public abstract class Page<T> {
         return mOriginPath;
     }
 
+    public boolean isDowngrade() {
+        return false;
+    }
+
+
     public String path() {
-        if (!TextUtils.isEmpty(mAlias)) {
-            mPath = "/" + mAlias;
-            return mPath;
+        if (isDowngrade()) {
+            if (!TextUtils.isEmpty(mPath)) {
+                return mPath;
+            }
+            this.mPath = originPath(isDowngrade());
+            return this.mPath;
+        } else {
+            if (!TextUtils.isEmpty(mAlias)) {
+                mPath = "/" + mAlias;
+                return mPath;
+            }
+            if (!TextUtils.isEmpty(mPath)) {
+                return mPath;
+            }
+            this.mPath = "/" + getClassName();
+            return this.mPath;
         }
-
-        if (!TextUtils.isEmpty(mPath)) {
-            return mPath;
-        }
-
-        this.mPath = originPath(true);
-        return this.mPath;
     }
 }

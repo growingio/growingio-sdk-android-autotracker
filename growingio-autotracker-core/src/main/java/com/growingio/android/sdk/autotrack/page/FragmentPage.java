@@ -91,4 +91,9 @@ public class FragmentPage extends Page<SuperFragment<?>> {
         }
         return super.isAutotrack();
     }
+
+    @Override
+    public boolean isDowngrade() {
+        return autotrackConfig != null && autotrackConfig.isDowngrade();
+    }
 }
