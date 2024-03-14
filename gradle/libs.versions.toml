@@ -27,7 +27,7 @@ protobuf = "3.22.3"
 powermock = "2.0.9"
 
 # !!! SDK VERSION !!!
-growingio = "4.1.0"
+growingio = "4.1.0-SNAPSHOT"
 growingioCode = "40100"
 growingioPlugin = "4.0.0"
 

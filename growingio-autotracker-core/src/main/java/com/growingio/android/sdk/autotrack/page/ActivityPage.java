@@ -77,4 +77,9 @@ public class ActivityPage extends Page<SuperActivity> {
         }
         return super.getTitle();
     }
+
+    @Override
+    public boolean isDowngrade() {
+        return autotrackConfig != null && autotrackConfig.isDowngrade();
+    }
 }
