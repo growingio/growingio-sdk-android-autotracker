@@ -257,8 +257,12 @@ public abstract class Page<T> {
             return mPath;
         }
 
-        this.mPath = originPath(true);
+        this.mPath = pagePath();
         return this.mPath;
+    }
+
+    protected String pagePath() {
+        return "/" + getClassName();
     }
 
     protected void loadPageRule(List<PageRule> pageRuleList, String fullPageClassPath) {

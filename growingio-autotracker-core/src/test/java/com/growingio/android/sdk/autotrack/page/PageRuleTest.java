@@ -37,6 +37,14 @@ public class PageRuleTest {
         Truth.assertThat(match(pageRule, "com.growingio.BaseFragment")).isFalse();
     }
 
+    @Test
+    public void testAllPageMatchRule() {
+        PageRule pageRule = new PageRule(".*");
+
+        Truth.assertThat(match(pageRule, "com.growingio.MainActivity")).isTrue();
+        Truth.assertThat(match(pageRule, "ksld")).isTrue();
+    }
+
     private boolean match(PageRule pageRule, String inputPageClassPath) {
         String pageClassPath = pageRule.getPageClassPath();
         boolean regMatch = pageRule.isRegMatch();
