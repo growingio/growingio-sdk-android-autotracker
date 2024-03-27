@@ -65,7 +65,6 @@ public class HybridBridgeLoader implements ModelLoader<HybridBridge, Boolean> {
         public HybridDataFetcher(HybridBridge eventData, HybridBridgeProvider hybridBridgeProvider) {
             this.bridge = eventData;
             this.hybridBridgeProvider = hybridBridgeProvider;
-            this.hybridBridgeProvider.setDownGrade(bridge.isDownGrade());
         }
 
 

@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.sdk.track.middleware.hybrid;
+package com.growingio.android.sdk.track.middleware;
 
+import com.growingio.android.sdk.Configurable;
 
-import android.view.View;
+public class CdpConfig implements Configurable {
+    private boolean isDowngrade = true;
 
-public class HybridBridge {
-    private final View view;
-
-    public HybridBridge(View view) {
-        this.view = view;
+    public boolean isDowngrade() {
+        return isDowngrade;
     }
 
-    public View getView() {
-        return view;
+    private void setDowngrade(boolean downgrade) {
+        isDowngrade = downgrade;
     }
 }

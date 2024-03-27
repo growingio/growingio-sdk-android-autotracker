@@ -20,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
@@ -52,8 +51,7 @@ public class ViewNodeProvider implements ViewNodeRenderer, TrackerLifecycleProvi
     @Override
     public void setup(TrackerContext context) {
         registry = context.getRegistry();
-        AutotrackConfig config = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
-        boolean isV4 = config == null || !config.isDowngrade();
+        boolean isV4 = !context.getConfigurationProvider().isDowngrade();
         if (isV4) {
             renderer = new ViewNodeV4Renderer(this);
         } else {

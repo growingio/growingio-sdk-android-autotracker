@@ -45,6 +45,7 @@ public class AttributesBuilder {
     public AttributesBuilder addAttribute(Map<String, Object> map) {
         if (map != null && map.keySet() != null) {
             for (String key : map.keySet()) {
+                if (key == null) continue;
                 Object value = map.get(key);
                 if (value instanceof List<?>) {
                     List<?> tempValue = (List<?>) value;

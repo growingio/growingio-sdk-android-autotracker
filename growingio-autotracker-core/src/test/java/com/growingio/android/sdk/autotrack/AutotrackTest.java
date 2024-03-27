@@ -76,9 +76,6 @@ public class AutotrackTest {
         autotracker.setPageAlias(activity, "TestActivity");
         autotracker.setPageAlias(new Fragment(), "TestFragment");
         autotracker.setPageAliasX(new androidx.fragment.app.Fragment(), "TestFragmentX");
-        autotracker.ignorePage(activity, IgnorePolicy.IGNORE_SELF);
-        autotracker.ignorePage(new Fragment(), IgnorePolicy.IGNORE_SELF);
-        autotracker.ignorePageX(new androidx.fragment.app.Fragment(), IgnorePolicy.IGNORE_SELF);
         autotracker.ignoreView(activity.getTextView(), IgnorePolicy.IGNORE_SELF);
 
     }
