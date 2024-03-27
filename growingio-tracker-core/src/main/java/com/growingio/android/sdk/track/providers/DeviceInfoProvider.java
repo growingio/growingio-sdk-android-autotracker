@@ -37,7 +37,9 @@ import com.growingio.android.sdk.track.middleware.OaidHelper;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 public class DeviceInfoProvider implements TrackerLifecycleProvider {
@@ -45,8 +47,13 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     private static final String DEVICE_TYPE_PHONE = "PHONE";
     private static final String DEVICE_TYPE_PAD = "PAD";
-
-    private static final String MAGIC_ANDROID_ID = "9774d56d682e549c"; // Error AndroidID
+    private static final List<String> MAGIC_ANDROID_IDS = new ArrayList<String>() {
+        {
+            add("9774d56d682e549c");
+            add("0123456789abcdef");
+            add("0000000000000000");
+        }
+    };
 
     private String mDeviceBrand;
     private String mDeviceModel;
@@ -160,16 +167,16 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         if (TextUtils.isEmpty(mAndroidId) && configurationProvider.core().isAndroidIdEnabled()) {
             try {
                 mAndroidId = Settings.System.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-                if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
-                    mAndroidId = MAGIC_ANDROID_ID;
+                if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_IDS.contains(mAndroidId)) {
+                    mAndroidId = MAGIC_ANDROID_IDS.get(0);
                 } else {
                     Logger.i(TAG, "get AndroidId success, and androidId is " + mAndroidId);
                 }
             } catch (Throwable e) {
-                mAndroidId = MAGIC_ANDROID_ID;
+                mAndroidId = MAGIC_ANDROID_IDS.get(0);
             }
         }
-        return MAGIC_ANDROID_ID.equals(mAndroidId) ? null : mAndroidId;
+        return MAGIC_ANDROID_IDS.contains(mAndroidId) ? null : mAndroidId;
     }
 
     public String getOaid() {
