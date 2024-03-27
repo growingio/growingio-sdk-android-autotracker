@@ -54,7 +54,6 @@ subprojects {
     spotless {
         java {
             target '**/*.java'
-            licenseHeaderFile rootProject.file('gradle/java.header')
 
             removeUnusedImports()
         }
@@ -63,7 +62,6 @@ subprojects {
             targetExclude("$buildDir/**/*.kt")
 
             ktlint()
-            licenseHeaderFile rootProject.file('gradle/java.header')
         }
         groovyGradle {
             target '*.gradle'

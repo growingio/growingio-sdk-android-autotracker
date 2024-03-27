@@ -18,19 +18,21 @@ package com.growingio.android.sdk.autotrack.page;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.growingio.android.sdk.autotrack.AutotrackConfig;
-
 public class FragmentPage extends Page<SuperFragment<?>> {
 
-    private AutotrackConfig autotrackConfig;
+    private PageConfig pageConfig;
 
     public FragmentPage(SuperFragment<?> carrier) {
         super(carrier);
     }
 
-    public FragmentPage(SuperFragment<?> carrier, AutotrackConfig autotrackConfig) {
+    public FragmentPage(SuperFragment<?> carrier, PageConfig pageConfig) {
         super(carrier);
-        this.autotrackConfig = autotrackConfig;
+        this.pageConfig = pageConfig;
+        if (this.pageConfig != null) {
+            String fullPageClassPath = getCarrier().getRealFragment().getClass().getName();
+            loadPageRule(this.pageConfig.getPageRules(), fullPageClassPath);
+        }
     }
 
     @Override
@@ -53,7 +55,7 @@ public class FragmentPage extends Page<SuperFragment<?>> {
 
     @Override
     public String getTag() {
-        if (autotrackConfig.isEnableFragmentTag()) {
+        if (pageConfig.isEnableFragmentTag()) {
             String tag = getCarrier().getTag();
             if (!TextUtils.isEmpty(tag)) {
                 return transformSwitcherTag(tag);
@@ -87,9 +89,18 @@ public class FragmentPage extends Page<SuperFragment<?>> {
     @Override
     public boolean isAutotrack() {
         // cdp downgrade when fragment page is enabled
-        if (autotrackConfig != null && autotrackConfig.getAutotrackOptions().isFragmentPageEnabled()) {
+        if (pageConfig != null && pageConfig.isFragmentPageEnabled()) {
             return !isIgnored();
         }
         return super.isAutotrack();
+    }
+
+    @Override
+    public String pagePath() {
+        if (pageConfig != null && pageConfig.isDowngrade()) {
+            return originPath(true);
+        } else {
+            return "/" + getName();
+        }
     }
 }

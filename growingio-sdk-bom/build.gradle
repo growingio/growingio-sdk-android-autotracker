@@ -46,8 +46,8 @@ dependencies {
 				}
 
 		api "com.growingio.android:analytics-fa:4.0.0"
-		api "com.growingio.android:analytics-sa:4.0.0"
-		api "com.growingio.android:dummy-sa:4.0.0"
+		api "com.growingio.android:analytics-sa:4.1.0"
+		api "com.growingio.android:dummy-sa:4.1.0"
 
 		// giokit
 		api 'com.growingio.giokit:giokit:2.0.0'
