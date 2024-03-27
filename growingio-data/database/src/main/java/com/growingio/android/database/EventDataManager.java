@@ -46,7 +46,7 @@ public class EventDataManager {
     private static final String TAG = "EventDataManager";
 
     private static final long EVENT_VALID_PERIOD_MILLS = 7L * 24 * 60 * 60_000;
-    private static final double EVENT_DATA_MAX_SIZE = 2 * 1024 * 1024;
+    private static final double EVENT_DATA_MAX_SIZE = 2 * 1000 * 1024; // 2M
 
     private final TrackerContext context;
     private final String eventsInfoAuthority;
