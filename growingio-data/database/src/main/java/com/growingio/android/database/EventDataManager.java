@@ -94,6 +94,12 @@ public class EventDataManager {
 
             EventByteArray data = formatData(EventFormatData.format(gEvent));
             if (data != null && data.getBodyData() != null) {
+                if (data.getBodyData().length > EVENT_DATA_MAX_SIZE) {
+                    // SQLiteBlobTooBigException: Row too big to fit into CursorWindow
+                    // cursor window default is 2M, so we should limit the data size
+                    Logger.e(TAG, "event data is too large, ignore it.");
+                    return null;
+                }
                 ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), gEvent.getEventType(), gEvent.getSendPolicy());
                 return contentResolver.insert(uri, contentValues);
             }
