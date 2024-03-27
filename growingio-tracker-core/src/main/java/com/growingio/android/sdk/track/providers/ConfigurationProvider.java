@@ -25,6 +25,7 @@ import com.growingio.android.sdk.track.listener.ListenerDispatcher;
 import com.growingio.android.sdk.track.listener.OnConfigurationChangeListener;
 import com.growingio.android.sdk.track.log.DebugLogger;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.CdpConfig;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 
@@ -123,6 +124,12 @@ public class ConfigurationProvider extends ListenerDispatcher<OnConfigurationCha
                 }
             }
         }
+    }
+
+    public boolean isDowngrade() {
+        CdpConfig config = getConfiguration(CdpConfig.class);
+        if (config == null) return false;
+        return config.isDowngrade();
     }
 
     @Override

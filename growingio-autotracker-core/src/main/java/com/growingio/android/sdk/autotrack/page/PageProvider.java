@@ -154,6 +154,21 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         page.setAttributes(attributes);
     }
 
+    public void ignoreActivity(Activity activity, boolean ignored) {
+        ActivityPage page = ALL_PAGE_TREE.get(activity);
+        if (page != null) {
+            page.setIgnore(ignored);
+            return;
+        }
+        if (CACHE_PAGES.containsKey(activity)) {
+            page = (ActivityPage) CACHE_PAGES.get(activity);
+        } else {
+            page = new ActivityPage(activity, autotrackConfig);
+            CACHE_PAGES.put(activity, page);
+        }
+        page.setIgnore(ignored);
+    }
+
     public ActivityPage searchActivityPage(Activity activity) {
         ActivityPage page = ALL_PAGE_TREE.get(activity);
         if (page != null) {
@@ -358,6 +373,27 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         fragmentPage.setIsAutotrack(true);
         if (alias != null) fragmentPage.setAlias(alias);
         fragmentPage.setAttributes(attributes);
+    }
+
+    public void ignoreFragment(SuperFragment<?> fragment, boolean ignored){
+        if (fragment.getActivity() == null) return;
+        // find activity page
+        ActivityPage page = findOrCreateActivityPage(fragment.getActivity());
+
+        // find fragment page
+        Page<?> fragmentPage = searchFragmentPage(fragment, page);
+        if (fragmentPage != null) {
+            fragmentPage.setIgnore(ignored);
+            return;
+        }
+        Object realFragment = fragment.getRealFragment();
+        if (CACHE_PAGES.containsKey(realFragment)) {
+            fragmentPage = (FragmentPage) CACHE_PAGES.get(realFragment);
+        } else {
+            fragmentPage = new FragmentPage(fragment, autotrackConfig);
+            CACHE_PAGES.put(realFragment, fragmentPage);
+        }
+        fragmentPage.setIgnore(ignored);
     }
 
     @UiThread

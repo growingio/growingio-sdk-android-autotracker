@@ -60,9 +60,10 @@ public class ViewNodeV3Test {
 
     @Before
     public void setup() {
-        CoreConfiguration coreConfiguration = new CoreConfiguration("ViewNodeV3Test", "growingio://apm");
+        CoreConfiguration coreConfiguration = new CoreConfiguration("ViewNodeV3Test", "growingio://nodeV3");
         AutotrackConfig autotrackConfig = new AutotrackConfig();
-        autotrackConfig.downgrade();
+        autotrackConfig.getAutotrackOptions().setActivityPageEnabled(true);
+        autotrackConfig.getAutotrackOptions().setFragmentPageEnabled(true);
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
         map.put(AutotrackConfig.class, autotrackConfig);
         TrackerLifecycleProviderFactory.create()

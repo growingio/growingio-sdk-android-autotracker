@@ -24,6 +24,6 @@ public class SDKConfig {
     public static final String SDK_BUILD_TIME = BuildConfig.BUILD_TIME;
     public static final String SDK_BUILD_GIT_SHA = BuildConfig.GIT_SHA;
 
-    public static final String SDK_VERSION_DOWNGRADE = "3.5.1";
-    public static final int SDK_VERSION_CODE_DOWNGRADE = 30501;
+    public static final String SDK_VERSION_DOWNGRADE = "3.5.3";
+    public static final int SDK_VERSION_CODE_DOWNGRADE = 30503;
 }
