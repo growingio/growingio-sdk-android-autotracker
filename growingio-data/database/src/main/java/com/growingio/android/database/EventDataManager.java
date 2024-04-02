@@ -46,6 +46,7 @@ public class EventDataManager {
     private static final String TAG = "EventDataManager";
 
     private static final long EVENT_VALID_PERIOD_MILLS = 7L * 24 * 60 * 60_000;
+    private static final double EVENT_DATA_MAX_SIZE = 2 * 1000 * 1024; // 2M
 
     private final TrackerContext context;
     private final String eventsInfoAuthority;
@@ -93,6 +94,12 @@ public class EventDataManager {
 
             EventByteArray data = formatData(EventFormatData.format(gEvent));
             if (data != null && data.getBodyData() != null) {
+                if (data.getBodyData().length > EVENT_DATA_MAX_SIZE) {
+                    // SQLiteBlobTooBigException: Row too big to fit into CursorWindow
+                    // cursor window default is 2M, so we should limit the data size
+                    Logger.e(TAG, "event data is too large, ignore it.");
+                    return null;
+                }
                 ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), gEvent.getEventType(), gEvent.getSendPolicy());
                 return contentResolver.insert(uri, contentValues);
             }
@@ -131,23 +138,27 @@ public class EventDataManager {
             dbResult.setSuccess(false);
             return;
         }
-        long lastId = -1;
         List<byte[]> queryList = new ArrayList<>();
         ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(eventsInfoAuthority);
         try (Cursor cursor = queryEvents(client, policy, limit)) {
             int count = 0;
+            double dataSize = 0;
             while (cursor.moveToNext()) {
                 count++;
                 String eventType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EVENT_TYPE));
                 dbResult.setEventType(eventType);
-                if (cursor.isLast()) {
-                    lastId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
-                    dbResult.setLastId(lastId);
-                }
                 byte[] data = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DATA));
-                if (data != null) {
+                if (data != null && data.length < EVENT_DATA_MAX_SIZE) {
+                    dataSize += data.length;
+                    if (dataSize > EVENT_DATA_MAX_SIZE) {
+                        break;
+                    }
                     queryList.add(data);
+                    long lastId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                    dbResult.setLastId(lastId);
                 } else {
+                    Logger.e(TAG, "event data is too large or null, delete it.");
+                    // event data is illegal, delete it.
                     long delId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
                     removeEventById(client, delId);
                 }
@@ -182,14 +193,18 @@ public class EventDataManager {
         List<byte[]> queryList = new ArrayList<>();
         try (Cursor cursor = queryEvents(client, policy, limit)) {
             int count = 0;
+            double dataSize = 0;
             while (cursor.moveToNext()) {
                 count++;
-                if (cursor.isLast()) {
-                    cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
-                }
                 byte[] data = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DATA));
-                if (data != null) {
+                if (data != null && data.length < EVENT_DATA_MAX_SIZE) {
+                    dataSize += data.length;
+                    if (dataSize > EVENT_DATA_MAX_SIZE) {
+                        break;
+                    }
                     queryList.add(data);
+                    long lastId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                    dbResult.setLastId(lastId);
                 }
                 long delId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
                 removeEventById(client, delId);
