@@ -19,19 +19,23 @@ import android.app.Activity;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.growingio.android.sdk.autotrack.AutotrackConfig;
 
 public class ActivityPage extends Page<SuperActivity> {
 
-    private AutotrackConfig autotrackConfig;
+    private PageConfig pageConfig;
 
     public ActivityPage(Activity carrier) {
         super(new SuperActivity(carrier));
     }
 
-    public ActivityPage(Activity carrier, AutotrackConfig autotrackConfig) {
+    public ActivityPage(Activity carrier, PageConfig pageConfig) {
         super(new SuperActivity(carrier));
-        this.autotrackConfig = autotrackConfig;
+        this.pageConfig = pageConfig;
+
+        if (this.pageConfig != null) {
+            String fullPageClassPath = getCarrier().getRealActivity().getClass().getName();
+            loadPageRule(this.pageConfig.getPageRules(), fullPageClassPath);
+        }
     }
 
     @Override
@@ -51,7 +55,7 @@ public class ActivityPage extends Page<SuperActivity> {
     @Override
     public boolean isAutotrack() {
         // cdp downgrade when activity page is enabled
-        if (autotrackConfig != null && autotrackConfig.getAutotrackOptions().isActivityPageEnabled()) {
+        if (pageConfig != null && pageConfig.isActivityPageEnabled()) {
             return !isIgnored();
         }
         return super.isAutotrack();
@@ -77,5 +81,14 @@ public class ActivityPage extends Page<SuperActivity> {
             return activity.getTitle().toString();
         }
         return super.getTitle();
+    }
+
+    @Override
+    public String pagePath() {
+        if (pageConfig != null && pageConfig.isDowngrade()) {
+            return originPath(true);
+        } else {
+            return "/" + getName();
+        }
     }
 }

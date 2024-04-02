@@ -264,11 +264,25 @@ internal class JsonSerializerGenerator(
                             ),
                         )
                         toJsonMethod.beginControlFlow("if($fieldName != null && !$fieldName.isEmpty())")
-                            .addStatement("$fieldName.remove(null)")
                             .addStatement(
-                                "jsonObject.put(\"${fieldName}\", new \$T(event.$fieldMethod))",
+                                "\$T keys = $fieldName.keySet()",
+                                ParameterizedTypeName.get(
+                                    ClassName.get(Set::class.java),
+                                    ClassName.get(String::class.java),
+                                ),
+                            )
+                            .addStatement(
+                                "\$T attrObject = new \$T()",
                                 ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
-                            ).endControlFlow()
+                                ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
+                            )
+                            .beginControlFlow("for (String key : keys)")
+                            .beginControlFlow("if (key != null)")
+                            .addStatement("attrObject.put(key, $fieldName.get(key))")
+                            .endControlFlow()
+                            .endControlFlow()
+                            .addStatement("jsonObject.put(\"${fieldName}\", attrObject)")
+                            .endControlFlow()
                     } else {
                         toJsonMethod.addStatement(
                             "jsonObject.put(\"${fieldName}\", new \$T(event.$fieldMethod))",

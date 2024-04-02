@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 public abstract class Page<T> {
     private final static int MAX_PAGE_LEVEL = 3;
@@ -256,7 +257,41 @@ public abstract class Page<T> {
             return mPath;
         }
 
-        this.mPath = originPath(true);
+        this.mPath = pagePath();
         return this.mPath;
+    }
+
+    protected String pagePath() {
+        return "/" + getClassName();
+    }
+
+    protected void loadPageRule(List<PageRule> pageRuleList, String fullPageClassPath) {
+        if (pageRuleList == null || fullPageClassPath == null) return;
+        // match exactly page classpath at first
+        for (PageRule pageRule : pageRuleList) {
+            if (!pageRule.isRegMatch() && fullPageClassPath.equals(pageRule.getPageClassPath())) {
+                setAlias(pageRule.getPageName());
+                setAttributes(pageRule.getAttributes());
+                setIsAutotrack(true);
+            }
+        }
+        if (!mIsAutotrack) {
+            // match reg page classpath secondly
+            for (PageRule pageRule : pageRuleList) {
+                if (pageRule.isRegMatch() && matchPageRule(fullPageClassPath, pageRule.getPageClassPath())) {
+                    setAlias(getName());
+                    setAttributes(pageRule.getAttributes());
+                    setIsAutotrack(true);
+                }
+            }
+        }
+    }
+
+    private boolean matchPageRule(String input, String regex) {
+        try {
+            return input.matches(regex);
+        } catch (PatternSyntaxException e) {
+            return false;
+        }
     }
 }

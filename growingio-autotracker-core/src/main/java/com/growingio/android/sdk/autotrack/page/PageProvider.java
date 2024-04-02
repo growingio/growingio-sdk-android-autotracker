@@ -24,6 +24,7 @@ import androidx.annotation.UiThread;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.autotrack.util.XmlParserUtil;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.TrackMainThread;
@@ -31,11 +32,15 @@ import com.growingio.android.sdk.track.listener.IActivityLifecycle;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -57,7 +62,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     private ActivityStateProvider activityStateProvider;
-    private AutotrackConfig autotrackConfig;
+    private PageConfig pageConfig;
 
     private PageProvider() {
         ALL_PAGE_TREE.clear();
@@ -67,9 +72,28 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     @Override
     public void setup(TrackerContext context) {
         activityStateProvider = context.getActivityStateProvider();
-        autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
         activityStateProvider.registerActivityLifecycleListener(this);
+        loadPageConfig(context);
     }
+
+    private void loadPageConfig(TrackerContext context) {
+        ConfigurationProvider configurationProvider = context.getConfigurationProvider();
+        AutotrackConfig autotrackConfig = configurationProvider.getConfiguration(AutotrackConfig.class);
+        boolean isDowngrade = configurationProvider.isDowngrade();
+        if (autotrackConfig != null) {
+            boolean isActivityPageEnabled = autotrackConfig.getAutotrackOptions().isActivityPageEnabled();
+            boolean isFragmentPageEnabled = autotrackConfig.getAutotrackOptions().isFragmentPageEnabled();
+            boolean enableFragmentTag = autotrackConfig.isEnableFragmentTag();
+            List<PageRule> pageRuleList = XmlParserUtil.loadPageRuleXml(context, autotrackConfig.getPageXmlRes());
+            autotrackConfig.getPageRules().addAll(0, pageRuleList);
+
+            List<PageRule> pageRules = Collections.unmodifiableList(autotrackConfig.getPageRules());
+            pageConfig = new PageConfig(pageRules, isActivityPageEnabled, isFragmentPageEnabled, enableFragmentTag, isDowngrade);
+        } else {
+            pageConfig = new PageConfig(null, isDowngrade, isDowngrade, false, isDowngrade);
+        }
+    }
+
 
     @Override
     public void shutdown() {
@@ -109,7 +133,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             CACHE_PAGES.remove(activity);
         }
         if (page == null) {
-            page = new ActivityPage(activity, autotrackConfig);
+            page = new ActivityPage(activity, pageConfig);
         }
         ALL_PAGE_TREE.put(activity, page);
         return page;
@@ -126,7 +150,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             return page;
         }
         if (page == null) {
-            page = new ActivityPage(activity, autotrackConfig);
+            page = new ActivityPage(activity, pageConfig);
             CACHE_PAGES.put(activity, page);
         }
         return page;
@@ -146,7 +170,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         if (CACHE_PAGES.containsKey(activity)) {
             page = (ActivityPage) CACHE_PAGES.get(activity);
         } else {
-            page = new ActivityPage(activity, autotrackConfig);
+            page = new ActivityPage(activity, pageConfig);
             CACHE_PAGES.put(activity, page);
         }
         page.setIsAutotrack(true);
@@ -163,7 +187,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         if (CACHE_PAGES.containsKey(activity)) {
             page = (ActivityPage) CACHE_PAGES.get(activity);
         } else {
-            page = new ActivityPage(activity, autotrackConfig);
+            page = new ActivityPage(activity, pageConfig);
             CACHE_PAGES.put(activity, page);
         }
         page.setIgnore(ignored);
@@ -229,7 +253,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         if (CACHE_PAGES.containsKey(realFragment)) {
             return (FragmentPage) CACHE_PAGES.get(realFragment);
         }
-        FragmentPage fragmentPage = new FragmentPage(fragment, autotrackConfig);
+        FragmentPage fragmentPage = new FragmentPage(fragment, pageConfig);
         CACHE_PAGES.put(realFragment, fragmentPage);
         return fragmentPage;
     }
@@ -344,7 +368,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             CACHE_PAGES.remove(realFragment);
             return fragmentPage;
         }
-        return new FragmentPage(fragment, autotrackConfig);
+        return new FragmentPage(fragment, pageConfig);
     }
 
     public void autotrackFragment(SuperFragment<?> fragment, String alias, Map<String, String> attributes) {
@@ -367,7 +391,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         if (CACHE_PAGES.containsKey(realFragment)) {
             fragmentPage = (FragmentPage) CACHE_PAGES.get(realFragment);
         } else {
-            fragmentPage = new FragmentPage(fragment, autotrackConfig);
+            fragmentPage = new FragmentPage(fragment, pageConfig);
             CACHE_PAGES.put(realFragment, fragmentPage);
         }
         fragmentPage.setIsAutotrack(true);
@@ -375,7 +399,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         fragmentPage.setAttributes(attributes);
     }
 
-    public void ignoreFragment(SuperFragment<?> fragment, boolean ignored){
+    public void ignoreFragment(SuperFragment<?> fragment, boolean ignored) {
         if (fragment.getActivity() == null) return;
         // find activity page
         ActivityPage page = findOrCreateActivityPage(fragment.getActivity());
@@ -390,7 +414,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         if (CACHE_PAGES.containsKey(realFragment)) {
             fragmentPage = (FragmentPage) CACHE_PAGES.get(realFragment);
         } else {
-            fragmentPage = new FragmentPage(fragment, autotrackConfig);
+            fragmentPage = new FragmentPage(fragment, pageConfig);
             CACHE_PAGES.put(realFragment, fragmentPage);
         }
         fragmentPage.setIgnore(ignored);
