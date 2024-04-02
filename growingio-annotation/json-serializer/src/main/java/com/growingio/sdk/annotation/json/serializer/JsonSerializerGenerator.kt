@@ -265,15 +265,16 @@ internal class JsonSerializerGenerator(
                         )
                         toJsonMethod.beginControlFlow("if($fieldName != null && !$fieldName.isEmpty())")
                             .addStatement(
-                                "\$T keys = $fieldName.keySet()", ParameterizedTypeName.get(
+                                "\$T keys = $fieldName.keySet()",
+                                ParameterizedTypeName.get(
                                     ClassName.get(Set::class.java),
-                                    ClassName.get(String::class.java)
-                                )
+                                    ClassName.get(String::class.java),
+                                ),
                             )
                             .addStatement(
                                 "\$T attrObject = new \$T()",
                                 ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
-                                ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS)
+                                ClassName.get(JSON_OBJECT_PACKAGE, JSON_OBJECT_CLASS),
                             )
                             .beginControlFlow("for (String key : keys)")
                             .beginControlFlow("if (key != null)")
