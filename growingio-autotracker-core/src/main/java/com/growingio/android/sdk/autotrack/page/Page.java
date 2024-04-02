@@ -271,7 +271,7 @@ public abstract class Page<T> {
         for (PageRule pageRule : pageRuleList) {
             if (!pageRule.isRegMatch() && fullPageClassPath.equals(pageRule.getPageClassPath())) {
                 setAlias(pageRule.getPageName());
-                setAttributes(Collections.unmodifiableMap(pageRule.getAttributes()));
+                setAttributes(pageRule.getAttributes());
                 setIsAutotrack(true);
             }
         }
@@ -280,7 +280,7 @@ public abstract class Page<T> {
             for (PageRule pageRule : pageRuleList) {
                 if (pageRule.isRegMatch() && matchPageRule(fullPageClassPath, pageRule.getPageClassPath())) {
                     setAlias(getName());
-                    setAttributes(Collections.unmodifiableMap(pageRule.getAttributes()));
+                    setAttributes(pageRule.getAttributes());
                     setIsAutotrack(true);
                 }
             }
