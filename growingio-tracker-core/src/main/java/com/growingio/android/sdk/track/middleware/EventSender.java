@@ -183,7 +183,7 @@ public class EventSender {
         if (info.lowMemory) {
             return 10;
         }
-        return 500;
+        return 100;
     }
 
     /**
