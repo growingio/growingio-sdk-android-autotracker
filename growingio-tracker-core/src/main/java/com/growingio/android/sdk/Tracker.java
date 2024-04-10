@@ -423,6 +423,21 @@ public class Tracker {
         addComponent(module, config);
     }
 
+    /**
+     * uninstall module
+     */
+    protected void uninstallComponent(Class modelClazz, Class dataClazz, Class<? extends Configurable> configClazz, Class<? extends TrackerLifecycleProvider> providerClazz) {
+        if (modelClazz == null) return;
+        if (configClazz != null) {
+            trackerContext.getConfigurationProvider().removeConfiguration(configClazz);
+        }
+        trackerContext.getRegistry().unregister(modelClazz, dataClazz);
+        if (providerClazz != null) {
+            TrackerLifecycleProvider provider = trackerContext.getProviderStore().remove(providerClazz);
+            if (provider != null) provider.shutdown();
+        }
+    }
+
     private void addComponent(LibraryGioModule module, Configurable config) {
         if (module == null) return;
         if (config != null) {

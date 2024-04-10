@@ -83,6 +83,12 @@ public class ConfigurationProvider extends ListenerDispatcher<OnConfigurationCha
         }
     }
 
+    public void removeConfiguration(Class configClazz) {
+        if (configClazz != null) {
+            sModuleConfigs.remove(configClazz);
+        }
+    }
+
     public String printAllConfigurationInfo() {
         StringBuilder info = new StringBuilder();
         if (!mCoreConfiguration.isDebugEnabled()) {

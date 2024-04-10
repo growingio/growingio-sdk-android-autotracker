@@ -27,6 +27,7 @@ public class AutotrackConfig implements Configurable {
     private boolean enableFragmentTag = false;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
+    private boolean autotrackEnabled = true;
     private int pageXmlRes = 0;
     private final List<PageRule> pageRules = new ArrayList<>();
 
@@ -143,5 +144,14 @@ public class AutotrackConfig implements Configurable {
 
     public int getPageXmlRes() {
         return pageXmlRes;
+    }
+
+    public boolean isAutotrack() {
+        return autotrackEnabled;
+    }
+
+    public AutotrackConfig autotrack(boolean enabled) {
+        this.autotrackEnabled = enabled;
+        return this;
     }
 }

@@ -182,6 +182,11 @@ class ViewClickProvider implements TrackerLifecycleProvider {
             return;
         }
 
+        if (autotrackConfig == null || !autotrackConfig.isAutotrack()) {
+            Logger.d(TAG, "autotrack is not enabled");
+            return;
+        }
+
         if (view == null) {
             Logger.e(TAG, "viewOnClick: view is NULL");
             return;
@@ -204,6 +209,11 @@ class ViewClickProvider implements TrackerLifecycleProvider {
     public void menuItemOnClick(Activity activity, MenuItem menuItem) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        if (autotrackConfig == null || !autotrackConfig.isAutotrack()) {
+            Logger.d(TAG, "autotrack is not enabled");
             return;
         }
 

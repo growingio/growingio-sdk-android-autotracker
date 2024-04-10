@@ -72,14 +72,16 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     @Override
     public void setup(TrackerContext context) {
         activityStateProvider = context.getActivityStateProvider();
-        activityStateProvider.registerActivityLifecycleListener(this);
-        loadPageConfig(context);
-    }
 
-    private void loadPageConfig(TrackerContext context) {
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
         AutotrackConfig autotrackConfig = configurationProvider.getConfiguration(AutotrackConfig.class);
-        boolean isDowngrade = configurationProvider.isDowngrade();
+
+        loadPageConfig(context, autotrackConfig, configurationProvider.isDowngrade());
+
+        activityStateProvider.registerActivityLifecycleListener(this);
+    }
+
+    private void loadPageConfig(TrackerContext context, AutotrackConfig autotrackConfig, boolean isDowngrade) {
         if (autotrackConfig != null) {
             boolean isActivityPageEnabled = autotrackConfig.getAutotrackOptions().isActivityPageEnabled();
             boolean isFragmentPageEnabled = autotrackConfig.getAutotrackOptions().isFragmentPageEnabled();
@@ -88,15 +90,17 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             autotrackConfig.getPageRules().addAll(0, pageRuleList);
 
             List<PageRule> pageRules = Collections.unmodifiableList(autotrackConfig.getPageRules());
-            pageConfig = new PageConfig(pageRules, isActivityPageEnabled, isFragmentPageEnabled, enableFragmentTag, isDowngrade);
+            pageConfig = new PageConfig(pageRules, isActivityPageEnabled, isFragmentPageEnabled, enableFragmentTag, isDowngrade, autotrackConfig.isAutotrack());
         } else {
-            pageConfig = new PageConfig(null, isDowngrade, isDowngrade, false, isDowngrade);
+            pageConfig = new PageConfig(null, isDowngrade, isDowngrade, false, isDowngrade, true);
         }
     }
 
 
     @Override
     public void shutdown() {
+        ALL_PAGE_TREE.clear();
+        CACHE_PAGES.clear();
         activityStateProvider.unregisterActivityLifecycleListener(this);
     }
 
