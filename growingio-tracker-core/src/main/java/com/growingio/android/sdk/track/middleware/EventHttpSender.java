@@ -18,6 +18,7 @@ package com.growingio.android.sdk.track.middleware;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.middleware.http.EventEncoder;
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
@@ -44,14 +45,15 @@ public class EventHttpSender implements IEventNetSender {
         return trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
     }
 
+    @TrackThread
     @Override
     public SendResponse send(byte[] events, String mediaType) {
         if (events == null || events.length == 0) {
-            return new SendResponse(false, 0);
+            return new SendResponse(0, 0);
         }
         if (getNetworkModelLoader() == null) {
             Logger.e(TAG, "please register http request component first");
-            return new SendResponse(false, 0);
+            return new SendResponse(0, 0);
         }
         long time = System.currentTimeMillis();
         EventUrl eventUrl = new EventUrl(mServerHost, time)
@@ -60,6 +62,7 @@ public class EventHttpSender implements IEventNetSender {
                 .addPath(mProjectId)
                 .addPath("collect")
                 .addParam("stm", String.valueOf(time))
+                .previewOptions(true)
                 .setBodyData(events);
         if (!TextUtils.isEmpty(mediaType)) eventUrl.setMediaType(mediaType);
         //data encoder - https://codes.growingio.com/w/api_v3_interface/
@@ -71,16 +74,14 @@ public class EventHttpSender implements IEventNetSender {
         byte[] data = eventUrl.getRequestBody();
         Logger.d(TAG, "send event to url: " + eventUrl.toString());
 
-
         ModelLoader.LoadData<EventResponse> loadData = getNetworkModelLoader().buildLoadData(eventUrl);
         if (!loadData.fetcher.getDataClass().isAssignableFrom(EventResponse.class)) {
             Logger.e(TAG, new IllegalArgumentException("illegal data class for http response."));
-            return new SendResponse(false, 0);
+            return new SendResponse(0, 0);
         }
         EventResponse response = loadData.fetcher.executeData();
-
-        boolean successful = response != null && response.isSucceeded();
+        int responseCode = response != null ? response.getResponseCode() : 0;
         long totalUsed = data == null ? 0L : data.length;
-        return new SendResponse(successful, totalUsed);
+        return new SendResponse(responseCode, totalUsed);
     }
 }

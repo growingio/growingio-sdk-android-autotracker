@@ -15,6 +15,7 @@
  */
 package com.growingio.android.okhttp3;
 
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * <p>
@@ -72,6 +74,7 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
                 synchronized (Factory.class) {
                     if (sInternalClient == null) {
                         OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                        builder.retryOnConnectionFailure(false);
                         if (config.getHttpCallTimeout() > 0) {
                             builder.callTimeout(config.getHttpCallTimeout(), TimeUnit.MILLISECONDS);
                         } else {
@@ -80,7 +83,8 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
                             builder.writeTimeout(config.getWriteTimeout(), TimeUnit.MILLISECONDS);
                         }
                         builder.addInterceptor(new SecurityExceptionInterceptor());
-                        //builder.addInterceptor(new HttpLoggingInterceptor(message -> Logger.d("OKHTTP Logging", message)).setLevel(HttpLoggingInterceptor.Level.HEADERS))
+                        builder.addInterceptor(new RequestOptionsInterceptor());
+                        builder.addInterceptor(new HttpLoggingInterceptor(message -> Logger.d("OKHTTP Logging", message)).setLevel(HttpLoggingInterceptor.Level.BODY));
                         sInternalClient = builder.build();
                     }
                 }

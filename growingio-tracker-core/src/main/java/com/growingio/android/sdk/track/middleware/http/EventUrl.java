@@ -32,8 +32,9 @@ public class EventUrl {
     private String mMediaType = "application/json"; //or "application/x-www-form-urlencoded" for data
 
     private int mCallTimeout = -1;
-
     private int mRequestMethod = GET;
+
+    private boolean previewOptions = false;
 
     public EventUrl(String host, long time) {
         mHost = host;
@@ -93,6 +94,15 @@ public class EventUrl {
     public EventUrl setCallTimeout(int callTimeout) {
         this.mCallTimeout = callTimeout;
         return this;
+    }
+
+    public EventUrl previewOptions(boolean needOptions) {
+        this.previewOptions = needOptions;
+        return this;
+    }
+
+    public boolean hasPreviewOptions() {
+        return previewOptions;
     }
 
     public String toUrl() {
