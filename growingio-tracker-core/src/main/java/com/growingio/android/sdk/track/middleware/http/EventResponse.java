@@ -19,7 +19,7 @@ import java.io.InputStream;
 
 public class EventResponse {
     private final boolean succeeded;
-    private final InputStream stream; //it's useless
+    private final InputStream stream;
     private final long usedBytes; //it's useless
 
     public EventResponse(boolean succeeded) {

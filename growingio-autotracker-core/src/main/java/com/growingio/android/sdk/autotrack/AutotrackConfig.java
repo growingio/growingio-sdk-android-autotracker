@@ -150,7 +150,7 @@ public class AutotrackConfig implements Configurable {
         return autotrackEnabled;
     }
 
-    public AutotrackConfig autotrack(boolean enabled) {
+    public AutotrackConfig setAutotrack(boolean enabled) {
         this.autotrackEnabled = enabled;
         return this;
     }
