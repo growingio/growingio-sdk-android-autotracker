@@ -30,27 +30,29 @@ class RequestOptionsInterceptor implements Interceptor {
     private static final String TAG = "RequestOptionsInterceptor";
 
     public static final String PREVIEW_OPTIONS = "previewOptions";
-    private final Map<String, Boolean> previewOptionsMap = new HashMap<>();
+
+    private final boolean requestPreflight;
+
+    RequestOptionsInterceptor(boolean requestPreflight) {
+        this.requestPreflight = requestPreflight;
+    }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         String preview = request.tag(String.class);
-        String host = request.url().host();
         boolean needPreviewOptions = preview != null
-                && preview.equals(PREVIEW_OPTIONS)
-                && host != null && !previewOptionsMap.containsKey(host);
+                && preview.equals(PREVIEW_OPTIONS) && requestPreflight;
         if (needPreviewOptions) {
             Request optionsRequest = request.newBuilder()
-                    //.get()
-                    .method("OPTIONS", null)
+                    .get()
+                    //.method("OPTIONS", null)
                     .build();
             Response optionsResponse = chain.proceed(optionsRequest);
             if (optionsResponse.isSuccessful()) {
-                previewOptionsMap.put(host, true);
                 return chain.proceed(request);
             }
-            Logger.e(TAG, "Failed to get preview options for host: " + host);
+            Logger.e(TAG, "Failed to get preview options for host: " + request.url());
             return optionsResponse.newBuilder().code(451).build();
             // return optionsResponse;
         }

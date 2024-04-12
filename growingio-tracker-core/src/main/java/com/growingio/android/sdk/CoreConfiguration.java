@@ -42,6 +42,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mImeiEnabled = false;
     private boolean mAndroidIdEnabled = false;
 
+
     public CoreConfiguration(String accountId, String urlScheme) {
         mProjectId = accountId;
         mUrlScheme = urlScheme;

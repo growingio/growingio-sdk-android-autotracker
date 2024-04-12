@@ -27,12 +27,17 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class EventHttpSender implements IEventNetSender {
     private static final String TAG = "EventHttpSender";
 
     private final String mProjectId;
     private final String mServerHost;
     private final TrackerRegistry trackerRegistry;
+
+    private boolean requestPreflightChecked = false;
 
     public EventHttpSender(TrackerContext context) {
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
@@ -62,7 +67,7 @@ public class EventHttpSender implements IEventNetSender {
                 .addPath(mProjectId)
                 .addPath("collect")
                 .addParam("stm", String.valueOf(time))
-                .previewOptions(true)
+                .previewOptions(!requestPreflightChecked)
                 .setBodyData(events);
         if (!TextUtils.isEmpty(mediaType)) eventUrl.setMediaType(mediaType);
         //data encoder - https://codes.growingio.com/w/api_v3_interface/
@@ -81,6 +86,9 @@ public class EventHttpSender implements IEventNetSender {
         }
         EventResponse response = loadData.fetcher.executeData();
         int responseCode = response != null ? response.getResponseCode() : 0;
+        if (responseCode >= 200 && responseCode < 300) {
+            requestPreflightChecked = true;
+        }
         long totalUsed = data == null ? 0L : data.length;
         return new SendResponse(responseCode, totalUsed);
     }

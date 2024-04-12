@@ -205,7 +205,7 @@ public class EventSender {
         boolean succeeded = true;
         for (int policy : uploadEvents) {
             if (!succeeded) {
-                Logger.e(TAG, "action: sendEvents, break with http failed.");
+                Logger.e(TAG, "upload events break with http failed.");
                 break;
             }
             do {
@@ -245,7 +245,7 @@ public class EventSender {
                             break;
                         } else if (responseCode >= 500) {
                             // 5xx Service Unavailable
-                            // 服务器当前无法处理请求
+                            mSendHandler.backoff();
                             Logger.e(TAG, "action: sendEvents, service unavailable with responseCode: " + responseCode);
                             break;
                         }
@@ -268,7 +268,7 @@ public class EventSender {
         private static final int MSG_SEND_INSTANT_EVENTS = 1;
         private static final int MSG_SEND_UNINSTANT_EVENTS = 2;
 
-        private static final long EVENTS_UPLOAD_INTERVAL_MAX = 60 * 60 * 1000; // 1 hour
+        private static final long EVENTS_UPLOAD_INTERVAL_MAX = 5 * 60 * 1000; // 5 minutes
         private static final int EVENTS_BULK_SIZE = 100;
 
         private final long mDataUploadInterval;
