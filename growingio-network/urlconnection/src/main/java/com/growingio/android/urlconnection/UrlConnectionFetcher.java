@@ -77,6 +77,12 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             headers.put("content-type", eventUrl.getMediaType());
             EventResponse result = loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, headers, eventUrl.getRequestBody());
             callback.onDataReady(result);
+        } catch (HttpException httpException) {
+            if (httpException.getStatusCode() == INVALID_STATUS_CODE) {
+                callback.onLoadFailed(httpException);
+            } else {
+                callback.onDataReady(new EventResponse(httpException.getStatusCode()));
+            }
         } catch (IOException e) {
             Logger.e(TAG, "Failed to load data for url", e);
             callback.onLoadFailed(e);
@@ -202,6 +208,7 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
     private EventResponse getStreamForSuccessfulRequest(HttpURLConnection urlConnection)
             throws HttpException {
         try {
+            int responseCode = urlConnection.getResponseCode();
             long contentLength = 0L;
             if (TextUtils.isEmpty(urlConnection.getContentEncoding())) {
                 contentLength = urlConnection.getContentLength();
@@ -209,7 +216,7 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
                 Logger.d(TAG, "Got non empty content encoding: " + urlConnection.getContentEncoding());
             }
             stream = urlConnection.getInputStream();
-            return new EventResponse(true, copyResponse(urlConnection.getInputStream()), contentLength);
+            return new EventResponse(responseCode, copyResponse(urlConnection.getInputStream()), contentLength);
         } catch (IOException e) {
             throw new HttpException("Failed to obtain InputStream", getHttpStatusCodeOrInvalid(urlConnection), e);
         }
@@ -233,13 +240,19 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             Map<String, String> headers = eventUrl.getHeaders();
             headers.put("content-type", eventUrl.getMediaType());
             return loadDataWithRedirects(new URL(eventUrl.toUrl()), 0, null, headers, eventUrl.getRequestBody());
+        } catch (HttpException httpException) {
+            if (httpException.getStatusCode() == INVALID_STATUS_CODE) {
+                return new EventResponse(0);
+            } else {
+                return new EventResponse(httpException.getStatusCode());
+            }
         } catch (IOException e) {
             Logger.d(TAG, "Failed to load data for url", e);
         } finally {
             cleanup();
             Logger.v(TAG, "Finished http url fetcher fetch in " + LogTime.getElapsedMillis(startTime));
         }
-        return new EventResponse(false);
+        return new EventResponse(0);
     }
 
     @Override
