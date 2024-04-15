@@ -23,8 +23,6 @@ public class OkHttpConfig implements Configurable {
     private static final int DEFAULT_OKHTTP_TIMEOUT = 10;
     private int callTimeout = 0;
 
-    private boolean requestPreflight = true;
-
     private int connectTimeout = checkDuration("connectTimeout", DEFAULT_OKHTTP_TIMEOUT, TimeUnit.SECONDS);
     private int readTimeout = checkDuration("readTimeout", DEFAULT_OKHTTP_TIMEOUT, TimeUnit.SECONDS);
     private int writeTimeout = checkDuration("writeTimeout", DEFAULT_OKHTTP_TIMEOUT, TimeUnit.SECONDS);
@@ -84,19 +82,5 @@ public class OkHttpConfig implements Configurable {
 
     int getWriteTimeout() {
         return writeTimeout;
-    }
-
-    public boolean isRequestPreflight() {
-        return requestPreflight;
-    }
-
-    /**
-     * Sets whether to send a preflight request before the actual request.
-     * <p>
-     * Default: true
-     */
-    public OkHttpConfig setRequestPreflight(boolean requestPreflight) {
-        this.requestPreflight = requestPreflight;
-        return this;
     }
 }

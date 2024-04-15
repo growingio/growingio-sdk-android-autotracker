@@ -15,8 +15,6 @@
  */
 package com.growingio.android.okhttp3;
 
-import static com.growingio.android.okhttp3.RequestOptionsInterceptor.PREVIEW_OPTIONS;
-
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
 import com.growingio.android.sdk.track.log.Logger;
@@ -78,9 +76,6 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
             } else {
                 requestBuilder.get();
             }
-        }
-        if (eventUrl.hasPreviewOptions()) {
-            requestBuilder.tag(String.class, PREVIEW_OPTIONS);
         }
         return requestBuilder.build();
     }

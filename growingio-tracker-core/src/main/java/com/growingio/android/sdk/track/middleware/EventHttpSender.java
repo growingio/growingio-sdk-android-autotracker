@@ -27,9 +27,6 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class EventHttpSender implements IEventNetSender {
     private static final String TAG = "EventHttpSender";
 
@@ -37,17 +34,38 @@ public class EventHttpSender implements IEventNetSender {
     private final String mServerHost;
     private final TrackerRegistry trackerRegistry;
 
-    private boolean requestPreflightChecked = false;
+    private boolean requestPreflightChecked;
 
     public EventHttpSender(TrackerContext context) {
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
         this.trackerRegistry = context.getRegistry();
         mProjectId = configurationProvider.core().getProjectId();
         mServerHost = configurationProvider.core().getDataCollectionServerHost();
+        requestPreflightChecked = !configurationProvider.core().isRequestPreflight();
     }
 
     private ModelLoader<EventUrl, EventResponse> getNetworkModelLoader() {
         return trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
+    }
+
+    private EventResponse requestPreflight(long time) {
+        EventUrl eventUrl = new EventUrl(mServerHost, time)
+                .setRequestMethod(EventUrl.GET)
+                .addPath("v3")
+                .addPath("projects")
+                .addPath(mProjectId)
+                .addPath("collect")
+                .addParam("stm", String.valueOf(time));
+        ModelLoader.LoadData<EventResponse> loadData = getNetworkModelLoader().buildLoadData(eventUrl);
+        if (!loadData.fetcher.getDataClass().isAssignableFrom(EventResponse.class)) {
+            Logger.e(TAG, new IllegalArgumentException("illegal data class for http response."));
+            return new EventResponse(0);
+        }
+        EventResponse response = loadData.fetcher.executeData();
+        if (response.isSucceeded()) {
+            requestPreflightChecked = true;
+        }
+        return response;
     }
 
     @TrackThread
@@ -61,13 +79,19 @@ public class EventHttpSender implements IEventNetSender {
             return new SendResponse(0, 0);
         }
         long time = System.currentTimeMillis();
+        if (!requestPreflightChecked) {
+            EventResponse response = requestPreflight(time);
+            if (!response.isSucceeded()) {
+                Logger.e(TAG, "Failed to get request preflight for host: " + mServerHost);
+                return new SendResponse(451, 0);
+            }
+        }
         EventUrl eventUrl = new EventUrl(mServerHost, time)
                 .addPath("v3")
                 .addPath("projects")
                 .addPath(mProjectId)
                 .addPath("collect")
                 .addParam("stm", String.valueOf(time))
-                .previewOptions(!requestPreflightChecked)
                 .setBodyData(events);
         if (!TextUtils.isEmpty(mediaType)) eventUrl.setMediaType(mediaType);
         //data encoder - https://codes.growingio.com/w/api_v3_interface/
