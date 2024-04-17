@@ -28,6 +28,7 @@ import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
+import com.growingio.android.sdk.track.events.helper.DynamicGeneralPropGenerator;
 import com.growingio.android.sdk.track.events.helper.JsonSerializableFactory;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
@@ -51,6 +52,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
     private final List<EventBuildInterceptor> mEventBuildInterceptors = new ArrayList<>();
     private EventFilterInterceptor defaultFilterInterceptor;
+    private DynamicGeneralPropGenerator dynamicGeneralPropGenerator;
 
     private static final JsonSerializableFactory serializableFactory = new JsonSerializableFactory();
 
@@ -128,18 +130,17 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     }
 
     private void addDynamicPropsToCustomEvent(BaseEvent.BaseBuilder<?> gEvent) {
-        EventFilterInterceptor eventFilterInterceptor = getEventFilterInterceptor();
-        if (eventFilterInterceptor == null) return;
+        if (dynamicGeneralPropGenerator == null) return;
         try {
             if (gEvent.getEventType().equals(TrackEventType.CUSTOM)) {
                 if (gEvent instanceof CustomEvent.Builder) {
                     CustomEvent.Builder customEventBuilder = (CustomEvent.Builder) gEvent;
-                    Map<String, String> dynamicProps = eventFilterInterceptor.registerDynamicGeneralProps();
+                    Map<String, String> dynamicProps = dynamicGeneralPropGenerator.generateDynamicGeneralProps();
                     customEventBuilder.setGeneralProps(dynamicProps);
                 }
             }
         } catch (Exception e) {
-            Logger.e(TAG, "eventFilterInterceptor addDynamicProps callback error", e);
+            Logger.e(TAG, "dynamicGeneralPropGenerator generateDynamicGeneralProps error", e);
         }
     }
 
@@ -272,5 +273,9 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
             return ((PageLevelCustomEvent.Builder) eventBuilder).getPath();
         }
         return null;
+    }
+
+    public void setDynamicGeneralPropGenerator(DynamicGeneralPropGenerator dynamicGeneralPropGenerator) {
+        this.dynamicGeneralPropGenerator = dynamicGeneralPropGenerator;
     }
 }

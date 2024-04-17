@@ -56,11 +56,6 @@ public class DefaultEventFilterInterceptor implements EventFilterInterceptor {
         return fieldArea;
     }
 
-    @Override
-    public Map<String, String> registerDynamicGeneralProps() {
-        return null;
-    }
-
     public static class FilterEventType {
         public static final String VISIT = TrackEventType.VISIT;
         public static final String CUSTOM = TrackEventType.CUSTOM;

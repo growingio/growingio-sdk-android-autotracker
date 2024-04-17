@@ -51,6 +51,4 @@ public interface EventFilterInterceptor {
      * @return map. if the value is true,the field will pass,and if the value is false, sdk will make the field blank.
      */
     Map<String, Boolean> filterEventField(String type, Map<String, Boolean> fieldArea);
-
-    Map<String, String> registerDynamicGeneralProps();
 }
