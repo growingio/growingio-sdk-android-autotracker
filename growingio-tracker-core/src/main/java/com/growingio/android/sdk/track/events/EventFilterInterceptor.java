@@ -52,5 +52,5 @@ public interface EventFilterInterceptor {
      */
     Map<String, Boolean> filterEventField(String type, Map<String, Boolean> fieldArea);
 
-    Map<String, String> addDynamicProps();
+    Map<String, String> registerDynamicGeneralProps();
 }

@@ -57,7 +57,7 @@ public class DefaultEventFilterInterceptor implements EventFilterInterceptor {
     }
 
     @Override
-    public Map<String, String> addDynamicProps() {
+    public Map<String, String> registerDynamicGeneralProps() {
         return null;
     }
 

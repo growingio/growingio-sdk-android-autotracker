@@ -26,7 +26,6 @@ import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
-import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
 import com.growingio.android.sdk.track.events.helper.JsonSerializableFactory;
@@ -135,7 +134,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
             if (gEvent.getEventType().equals(TrackEventType.CUSTOM)) {
                 if (gEvent instanceof CustomEvent.Builder) {
                     CustomEvent.Builder customEventBuilder = (CustomEvent.Builder) gEvent;
-                    Map<String, String> dynamicProps = eventFilterInterceptor.addDynamicProps();
+                    Map<String, String> dynamicProps = eventFilterInterceptor.registerDynamicGeneralProps();
                     customEventBuilder.setGeneralProps(dynamicProps);
                 }
             }
