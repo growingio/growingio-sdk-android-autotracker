@@ -116,8 +116,8 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
         if (!filterEvent(gEvent)) return null;
 
-        addDynamicPropsToCustomEvent(gEvent);
-        addGeneralPropsToCustomEvent(gEvent);
+        addDynamicPropsToAllEvent(gEvent);
+        addGeneralPropsToAllEvent(gEvent);
         gEvent.readPropertyInTrackThread(context);
         if (!configurationProvider.isDowngrade()) {
             gEvent.readNewPropertyInTrackThread(context);
@@ -129,7 +129,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         return event;
     }
 
-    private void addDynamicPropsToCustomEvent(BaseEvent.BaseBuilder<?> gEvent) {
+    private void addDynamicPropsToAllEvent(BaseEvent.BaseBuilder<?> gEvent) {
         if (dynamicGeneralPropGenerator == null) return;
         try {
             if (gEvent instanceof BaseAttributesEvent.Builder) {
@@ -142,7 +142,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         }
     }
 
-    private void addGeneralPropsToCustomEvent(BaseEvent.BaseBuilder<?> gEvent) {
+    private void addGeneralPropsToAllEvent(BaseEvent.BaseBuilder<?> gEvent) {
         if (gEvent instanceof BaseAttributesEvent.Builder) {
             BaseAttributesEvent.Builder attrEventBuilder = (BaseAttributesEvent.Builder) gEvent;
             attrEventBuilder.setGeneralProps(generalProps.build());
