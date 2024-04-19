@@ -18,14 +18,14 @@ package com.growingio.android.sdk.track.events;
 import androidx.annotation.Nullable;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
 import java.util.Map;
 
 @JsonSerializer
-public final class VisitEvent extends BaseEvent {
+public final class VisitEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
     @Nullable
@@ -78,7 +78,7 @@ public final class VisitEvent extends BaseEvent {
         return extraSdk;
     }
 
-    public static final class Builder extends BaseBuilder<VisitEvent> {
+    public static final class Builder extends BaseAttributesEvent.Builder<VisitEvent> {
         String imei;
         String androidId;
         String oaid;

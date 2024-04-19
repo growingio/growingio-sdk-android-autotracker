@@ -24,8 +24,8 @@ import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
-import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
 import com.growingio.android.sdk.track.events.helper.DynamicGeneralPropGenerator;
@@ -132,12 +132,10 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     private void addDynamicPropsToCustomEvent(BaseEvent.BaseBuilder<?> gEvent) {
         if (dynamicGeneralPropGenerator == null) return;
         try {
-            if (gEvent.getEventType().equals(TrackEventType.CUSTOM)) {
-                if (gEvent instanceof CustomEvent.Builder) {
-                    CustomEvent.Builder customEventBuilder = (CustomEvent.Builder) gEvent;
-                    Map<String, String> dynamicProps = dynamicGeneralPropGenerator.generateDynamicGeneralProps();
-                    customEventBuilder.setGeneralProps(dynamicProps);
-                }
+            if (gEvent instanceof BaseAttributesEvent.Builder) {
+                BaseAttributesEvent.Builder attrEventBuilder = (BaseAttributesEvent.Builder) gEvent;
+                Map<String, String> dynamicProps = dynamicGeneralPropGenerator.generateDynamicGeneralProps();
+                attrEventBuilder.setGeneralProps(dynamicProps);
             }
         } catch (Exception e) {
             Logger.e(TAG, "dynamicGeneralPropGenerator generateDynamicGeneralProps error", e);
@@ -145,11 +143,9 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     }
 
     private void addGeneralPropsToCustomEvent(BaseEvent.BaseBuilder<?> gEvent) {
-        if (gEvent.getEventType().equals(TrackEventType.CUSTOM)) {
-            if (gEvent instanceof CustomEvent.Builder) {
-                CustomEvent.Builder customEventBuilder = (CustomEvent.Builder) gEvent;
-                customEventBuilder.setGeneralProps(generalProps.build());
-            }
+        if (gEvent instanceof BaseAttributesEvent.Builder) {
+            BaseAttributesEvent.Builder attrEventBuilder = (BaseAttributesEvent.Builder) gEvent;
+            attrEventBuilder.setGeneralProps(generalProps.build());
         }
     }
 

@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @JsonSerializer
@@ -41,6 +42,20 @@ public abstract class BaseAttributesEvent extends BaseEvent {
 
         protected Builder(String eventType) {
             super(eventType);
+        }
+
+        public Builder<T> setGeneralProps(Map<String, String> generalProps) {
+            if (generalProps != null && !generalProps.isEmpty()) {
+                Map<String, String> attributes = getAttributes();
+                if (attributes == null) attributes = new HashMap<>();
+                for (String key : generalProps.keySet()) {
+                    if (attributes.containsKey(key)) continue;
+                    String value = generalProps.get(key);
+                    attributes.put(key, value);
+                }
+                setAttributes(attributes);
+            }
+            return this;
         }
 
         public Builder<T> setAttributes(Map<String, String> attributes) {

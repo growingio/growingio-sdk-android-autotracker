@@ -19,9 +19,6 @@ import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @JsonSerializer
 public class CustomEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
@@ -59,20 +56,8 @@ public class CustomEvent extends BaseAttributesEvent {
             return this;
         }
 
-        public Builder setGeneralProps(Map<String, String> generalProps) {
-            if (customEventType == ConstantPool.CUSTOM_TYPE_USER) {
-                if (generalProps != null && !generalProps.isEmpty()) {
-                    Map<String, String> attributes = getAttributes();
-                    if (attributes == null) attributes = new HashMap<>();
-                    for (String key : generalProps.keySet()) {
-                        if (attributes.containsKey(key)) continue;
-                        String value = generalProps.get(key);
-                        attributes.put(key, value);
-                    }
-                    setAttributes(attributes);
-                }
-            }
-            return this;
+        public int getCustomEventType() {
+            return customEventType;
         }
 
         @Override
