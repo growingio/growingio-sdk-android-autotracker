@@ -28,6 +28,7 @@ import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,13 +121,15 @@ public class EventsTest {
                 .addAttribute("key9", list)
                 .addAttribute("", Arrays.asList("", "", ""))
                 .addAttribute("key10", Arrays.asList(null, "1"))
+                .addAttribute("key11",new Date(1713774942168L))
                 .build();
-        Truth.assertThat(map.size()).isEqualTo(6);
+        Truth.assertThat(map.size()).isEqualTo(7);
         Truth.assertThat(map.containsKey("key5")).isFalse();
         Truth.assertThat("1||2||3||4").isEqualTo(map.get("key2"));
         Truth.assertThat("1111||2222").isEqualTo(map.get("key9"));
         Truth.assertThat("||||").isEqualTo(map.get(""));
         Truth.assertThat("||1").isEqualTo(map.get("key10"));
+        Truth.assertThat("2024-04-22 16:35:42.168").isEqualTo(map.get("key11"));
     }
 
     @Test

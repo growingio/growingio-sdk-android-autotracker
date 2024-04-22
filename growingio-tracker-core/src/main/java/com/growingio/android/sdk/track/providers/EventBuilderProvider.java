@@ -28,7 +28,7 @@ import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
-import com.growingio.android.sdk.track.events.helper.DynamicGeneralPropGenerator;
+import com.growingio.android.sdk.track.events.helper.DynamicGeneralPropsGenerator;
 import com.growingio.android.sdk.track.events.helper.JsonSerializableFactory;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
@@ -52,7 +52,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
     private final List<EventBuildInterceptor> mEventBuildInterceptors = new ArrayList<>();
     private EventFilterInterceptor defaultFilterInterceptor;
-    private DynamicGeneralPropGenerator dynamicGeneralPropGenerator;
+    private DynamicGeneralPropsGenerator dynamicGeneralPropsGenerator;
 
     private static final JsonSerializableFactory serializableFactory = new JsonSerializableFactory();
 
@@ -130,11 +130,11 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     }
 
     private void addDynamicPropsToAllEvent(BaseEvent.BaseBuilder<?> gEvent) {
-        if (dynamicGeneralPropGenerator == null) return;
+        if (dynamicGeneralPropsGenerator == null) return;
         try {
             if (gEvent instanceof BaseAttributesEvent.Builder) {
                 BaseAttributesEvent.Builder attrEventBuilder = (BaseAttributesEvent.Builder) gEvent;
-                Map<String, String> dynamicProps = dynamicGeneralPropGenerator.generateDynamicGeneralProps();
+                Map<String, String> dynamicProps = dynamicGeneralPropsGenerator.generateDynamicGeneralProps();
                 attrEventBuilder.setGeneralProps(dynamicProps);
             }
         } catch (Exception e) {
@@ -271,7 +271,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         return null;
     }
 
-    public void setDynamicGeneralPropGenerator(DynamicGeneralPropGenerator dynamicGeneralPropGenerator) {
-        this.dynamicGeneralPropGenerator = dynamicGeneralPropGenerator;
+    public void setDynamicGeneralPropGenerator(DynamicGeneralPropsGenerator dynamicGeneralPropsGenerator) {
+        this.dynamicGeneralPropsGenerator = dynamicGeneralPropsGenerator;
     }
 }

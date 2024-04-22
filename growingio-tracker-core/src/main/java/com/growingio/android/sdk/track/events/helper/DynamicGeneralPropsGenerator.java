@@ -18,6 +18,6 @@ package com.growingio.android.sdk.track.events.helper;
 
 import java.util.Map;
 
-public interface DynamicGeneralPropGenerator {
+public interface DynamicGeneralPropsGenerator {
     Map<String, String> generateDynamicGeneralProps();
 }
