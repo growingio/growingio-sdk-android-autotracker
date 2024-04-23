@@ -50,11 +50,13 @@ public class EventHttpSender implements IEventNetSender {
 
     private EventResponse requestPreflight(long time) {
         EventUrl eventUrl = new EventUrl(mServerHost, time)
-                .setRequestMethod(EventUrl.GET)
+                .setRequestMethod(EventUrl.OPTIONS)
                 .addPath("v3")
                 .addPath("projects")
                 .addPath(mProjectId)
                 .addPath("collect")
+                .addHeader("Access-Control-Request-Method", "POST")
+                .addHeader("Origin", mServerHost)
                 .addParam("stm", String.valueOf(time));
         ModelLoader.LoadData<EventResponse> loadData = getNetworkModelLoader().buildLoadData(eventUrl);
         if (!loadData.fetcher.getDataClass().isAssignableFrom(EventResponse.class)) {

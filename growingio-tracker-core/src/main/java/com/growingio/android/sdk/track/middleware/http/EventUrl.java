@@ -23,6 +23,9 @@ import java.util.Map;
 public class EventUrl {
     public static int GET = 0;
     public static int POST = 1;
+
+    public static int HEAD = 4;
+    public static int OPTIONS = 6;
     private final String mHost;
     private final Map<String, String> mHeaders = new HashMap<>();
     private final List<String> mPaths = new ArrayList<>();
