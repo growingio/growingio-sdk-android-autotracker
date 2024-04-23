@@ -188,7 +188,7 @@ public abstract class Page<T> {
     public Map<String, String> activeAttributes() {
         Page<?> activePage = lastActivePage();
         if (activePage != null) return activePage.getAttributes();
-        return Collections.emptyMap();
+        return null;
     }
 
     public String getXIndex() {
