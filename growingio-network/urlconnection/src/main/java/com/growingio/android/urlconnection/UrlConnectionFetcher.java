@@ -168,6 +168,10 @@ public class UrlConnectionFetcher implements HttpDataFetcher<EventResponse> {
             }
             if (data != null || eventUrl.getRequestMethod() == EventUrl.POST) {
                 urlConnection.setRequestMethod("POST");
+            } else if (eventUrl.getRequestMethod() == EventUrl.HEAD) {
+                urlConnection.setRequestMethod("HEAD");
+            } else if (eventUrl.getRequestMethod() == EventUrl.OPTIONS) {
+                urlConnection.setRequestMethod("OPTIONS");
             } else {
                 urlConnection.setRequestMethod("GET");
             }

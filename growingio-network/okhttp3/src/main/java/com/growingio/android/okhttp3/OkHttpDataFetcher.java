@@ -69,14 +69,17 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
         }
         if (eventUrl.getRequestBody() != null) {
             requestBuilder.post(RequestBody.create(MediaType.parse(eventUrl.getMediaType()), eventUrl.getRequestBody()));
+        } else if (eventUrl.getRequestMethod() == EventUrl.POST) {
+            RequestBody requestBody = RequestBody.create(MediaType.parse(eventUrl.getMediaType()), new byte[0]);
+            requestBuilder.post(requestBody);
+        } else if (eventUrl.getRequestMethod() == EventUrl.OPTIONS) {
+            requestBuilder.method("OPTIONS", null);
+        } else if (eventUrl.getRequestMethod() == EventUrl.HEAD) {
+            requestBuilder.head();
         } else {
-            if (eventUrl.getRequestMethod() == EventUrl.POST) {
-                RequestBody requestBody = RequestBody.create(MediaType.parse(eventUrl.getMediaType()), new byte[0]);
-                requestBuilder.post(requestBody);
-            } else {
-                requestBuilder.get();
-            }
+            requestBuilder.get();
         }
+
         return requestBuilder.build();
     }
 
