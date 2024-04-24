@@ -87,7 +87,7 @@ public abstract class Page<T> {
 
     public Map<String, String> getAttributes() {
         if (mAttributes == null) return null;
-        return new HashMap<>(mAttributes);
+        return mAttributes;
     }
 
     public void setAttributes(Map<String, String> attributes) {
