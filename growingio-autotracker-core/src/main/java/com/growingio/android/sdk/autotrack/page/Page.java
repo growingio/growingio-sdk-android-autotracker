@@ -93,6 +93,7 @@ public abstract class Page<T> {
     public void setAttributes(Map<String, String> attributes) {
         if (mAttributes == null) mAttributes = new HashMap<>();
         mAttributes.clear();
+        if (attributes == null) return;
         mAttributes.putAll(attributes);
     }
 
