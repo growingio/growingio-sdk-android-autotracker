@@ -517,8 +517,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     private void setPageAttributes(Page<?> page, Map<String, String> attributes) {
-        if (page == null) return;
-        if (attributes == null) attributes = new HashMap<>();
+        if (page == null || attributes == null) return;
         if (attributes.equals(page.getAttributes())) {
             Logger.w(TAG, "setPageAttributes is equals page.getAttributes");
             return;
