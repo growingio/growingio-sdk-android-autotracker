@@ -46,14 +46,14 @@ public abstract class BaseAttributesEvent extends BaseEvent {
 
         public Builder<T> setGeneralProps(Map<String, String> generalProps) {
             if (generalProps != null && !generalProps.isEmpty()) {
-                Map<String, String> attributes = getAttributes();
-                if (attributes == null) attributes = new HashMap<>();
+                Map<String, String> newAttributes = new HashMap<>();
+                if (this.attributes != null) newAttributes.putAll(this.attributes);
                 for (String key : generalProps.keySet()) {
-                    if (attributes.containsKey(key)) continue;
+                    if (newAttributes.containsKey(key)) continue;
                     String value = generalProps.get(key);
-                    attributes.put(key, value);
+                    newAttributes.put(key, value);
                 }
-                setAttributes(attributes);
+                setAttributes(newAttributes);
             }
             return this;
         }
