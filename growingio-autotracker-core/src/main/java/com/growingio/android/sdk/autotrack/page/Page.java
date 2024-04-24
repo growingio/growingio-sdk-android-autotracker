@@ -86,7 +86,6 @@ public abstract class Page<T> {
     }
 
     public Map<String, String> getAttributes() {
-        if (mAttributes == null) return null;
         return mAttributes;
     }
 
