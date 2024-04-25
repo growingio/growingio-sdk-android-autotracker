@@ -16,7 +16,6 @@
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
-import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
 @JsonSerializer
@@ -36,7 +35,6 @@ public class CustomEvent extends BaseAttributesEvent {
 
     public static class Builder extends BaseAttributesEvent.Builder<CustomEvent> {
         private String eventName;
-        private int customEventType = ConstantPool.CUSTOM_TYPE_SYSTEM;
 
         public Builder() {
             super(TrackEventType.CUSTOM);
@@ -49,15 +47,6 @@ public class CustomEvent extends BaseAttributesEvent {
 
         public String getEventName() {
             return eventName;
-        }
-
-        public Builder setCustomEventType(int customEventType) {
-            this.customEventType = customEventType;
-            return this;
-        }
-
-        public int getCustomEventType() {
-            return customEventType;
         }
 
         @Override
