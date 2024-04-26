@@ -33,15 +33,21 @@ public class EventHttpSender implements IEventNetSender {
     private final String mProjectId;
     private final String mServerHost;
     private final TrackerRegistry trackerRegistry;
+    private final boolean defaultPreflight;
 
-    private boolean requestPreflightChecked;
+    private boolean requestPreflightChecked = false;
 
     public EventHttpSender(TrackerContext context) {
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
         this.trackerRegistry = context.getRegistry();
         mProjectId = configurationProvider.core().getProjectId();
         mServerHost = configurationProvider.core().getDataCollectionServerHost();
-        requestPreflightChecked = !configurationProvider.core().isRequestPreflight();
+        defaultPreflight = configurationProvider.core().isRequestPreflight();
+    }
+
+    private boolean isPreflightChecked() {
+        if (defaultPreflight) return requestPreflightChecked;
+        else return true;
     }
 
     private ModelLoader<EventUrl, EventResponse> getNetworkModelLoader() {
@@ -81,7 +87,7 @@ public class EventHttpSender implements IEventNetSender {
             return new SendResponse(0, 0);
         }
         long time = System.currentTimeMillis();
-        if (!requestPreflightChecked) {
+        if (!isPreflightChecked()) {
             EventResponse response = requestPreflight(time);
             if (!response.isSucceeded()) {
                 Logger.e(TAG, "Failed to get request preflight for host: " + mServerHost);
@@ -114,6 +120,8 @@ public class EventHttpSender implements IEventNetSender {
         int responseCode = response != null ? response.getResponseCode() : 0;
         if (responseCode >= 200 && responseCode < 300) {
             requestPreflightChecked = true;
+        } else if (responseCode == 403) {
+            requestPreflightChecked = false;
         }
         long totalUsed = data == null ? 0L : data.length;
         return new SendResponse(responseCode, totalUsed);
