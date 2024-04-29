@@ -42,7 +42,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mImeiEnabled = false;
     private boolean mAndroidIdEnabled = false;
 
-    private boolean requestPreflight = true;
+    private boolean requestPreflight = false;
 
 
     public CoreConfiguration(String accountId, String urlScheme) {

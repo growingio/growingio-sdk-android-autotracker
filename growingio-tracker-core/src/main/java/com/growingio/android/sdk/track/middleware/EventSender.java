@@ -230,11 +230,6 @@ public class EventSender {
                                 todayBytes(sendResponse.getUsedBytes());
                             }
                             mSendHandler.resetBackoff();
-                        } else if (responseCode == 451) {
-                            // 451 Unavailable For Legal Reasons
-                            mSendHandler.backoff();
-                            Logger.e(TAG, "action: sendEvents, backoff with some reasons,eg: Unavailable For Legal Reasons");
-                            break;
                         } else if (responseCode == 413) {
                             String eventType = dbResult.getEventType();
                             databaseOperation(EventDatabase.delete(dbResult.getLastId(), policy, eventType));
@@ -244,6 +239,7 @@ public class EventSender {
                             Logger.e(TAG, "action: sendEvents, delete events with responseCode: " + responseCode);
                             break;
                         } else if (responseCode >= 400) {
+                            // Logger.e(TAG, "action: sendEvents, backoff with some reasons,eg: Unavailable For Legal Reasons");
                             // 5xx Service Unavailable
                             mSendHandler.backoff();
                             Logger.e(TAG, "action: sendEvents, service unavailable with responseCode: " + responseCode);
