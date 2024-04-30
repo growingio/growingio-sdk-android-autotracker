@@ -185,7 +185,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>,
         }
         socketState.set(SOCKET_STATE_CLOSED);
 
-        Logger.e(TAG, "Start CirclerService Failed");
+        Logger.e(TAG, "Start DebuggerService Failed");
         screenshotProvider.setTipViewMessage(R.string.growing_debugger_connected_to_web_failed);
         screenshotProvider.showQuitDialog(this::cleanup);
     }

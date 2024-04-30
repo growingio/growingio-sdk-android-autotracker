@@ -190,7 +190,7 @@ public class DeepLinkProvider implements IActivityLifecycle, OnConfigurationChan
 
                     @Override
                     public void onLoadFailed(Exception e) {
-                        Logger.e(TAG, e.getMessage());
+                        Logger.e(TAG, "Are you implement autotrack sdk or set autotrack is true in configuration?");
                     }
                 });
             }
