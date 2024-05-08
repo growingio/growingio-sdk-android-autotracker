@@ -174,7 +174,7 @@ public final class TrackMainThread {
 
     @TrackThread
     private void saveEvent(GEvent event) {
-        if (event instanceof BaseEvent) {
+        if (event instanceof BaseEvent && coreConfiguration.isDebugEnabled()) {
             Logger.printJson(TAG, "save: event, type is " + event.getEventType(), EventBuilderProvider.toJson((BaseEvent) event).toString());
         }
         if (persistentDataProvider != null && !persistentDataProvider.isSendVisitAfterRefreshSessionId()) {
