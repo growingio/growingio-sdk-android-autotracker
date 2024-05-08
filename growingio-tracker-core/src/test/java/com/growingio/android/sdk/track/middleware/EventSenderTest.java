@@ -79,7 +79,7 @@ public class EventSenderTest {
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
             }
-            return new SendResponse(true, 1000L);
+            return new SendResponse(204, 1000L);
         });
         eventSender.sendEvent(new CustomEvent.Builder()
                 .setEventName("cpacm")
@@ -114,7 +114,7 @@ public class EventSenderTest {
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
             }
-            return new SendResponse(true, 1000L);
+            return new SendResponse(204, 1000L);
         });
         eventSender.cacheEvent(ce);
         eventSender.cacheEvent(ce);
@@ -151,7 +151,7 @@ public class EventSenderTest {
                 e.printStackTrace();
             }
 
-            return new SendResponse(true, 1000L);
+            return new SendResponse(204, 1000L);
         });
         eventSender.cacheEvent(ce);
         eventSender.cacheEvent(ce);

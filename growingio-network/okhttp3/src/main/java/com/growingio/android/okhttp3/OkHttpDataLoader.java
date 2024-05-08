@@ -80,7 +80,7 @@ public class OkHttpDataLoader implements ModelLoader<EventUrl, EventResponse> {
                             builder.writeTimeout(config.getWriteTimeout(), TimeUnit.MILLISECONDS);
                         }
                         builder.addInterceptor(new SecurityExceptionInterceptor());
-                        //builder.addInterceptor(new HttpLoggingInterceptor(message -> Logger.d("OKHTTP Logging", message)).setLevel(HttpLoggingInterceptor.Level.HEADERS))
+                        //builder.addInterceptor(new HttpLoggingInterceptor(message -> Logger.d("OKHTTP Logging", message)).setLevel(HttpLoggingInterceptor.Level.BODY));
                         sInternalClient = builder.build();
                     }
                 }

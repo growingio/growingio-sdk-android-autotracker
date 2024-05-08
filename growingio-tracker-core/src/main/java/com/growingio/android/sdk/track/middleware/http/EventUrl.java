@@ -23,6 +23,9 @@ import java.util.Map;
 public class EventUrl {
     public static int GET = 0;
     public static int POST = 1;
+
+    public static int HEAD = 4;
+    public static int OPTIONS = 6;
     private final String mHost;
     private final Map<String, String> mHeaders = new HashMap<>();
     private final List<String> mPaths = new ArrayList<>();
@@ -32,7 +35,6 @@ public class EventUrl {
     private String mMediaType = "application/json"; //or "application/x-www-form-urlencoded" for data
 
     private int mCallTimeout = -1;
-
     private int mRequestMethod = GET;
 
     public EventUrl(String host, long time) {

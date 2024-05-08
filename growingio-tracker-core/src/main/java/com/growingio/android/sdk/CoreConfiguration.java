@@ -28,7 +28,7 @@ public class CoreConfiguration implements Configurable {
     private String mDataSourceId;
     private String mChannel;
     private boolean mDebugEnabled = false;
-    private int mCellularDataLimit = 10;
+    private int mCellularDataLimit = 20;
     private int mDataUploadInterval = 15;
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
@@ -41,6 +41,9 @@ public class CoreConfiguration implements Configurable {
 
     private boolean mImeiEnabled = false;
     private boolean mAndroidIdEnabled = false;
+
+    private boolean requestPreflight = false;
+
 
     public CoreConfiguration(String accountId, String urlScheme) {
         mProjectId = accountId;
@@ -195,6 +198,20 @@ public class CoreConfiguration implements Configurable {
 
     public CoreConfiguration setAndroidIdEnabled(boolean androidIdEnabled) {
         this.mAndroidIdEnabled = androidIdEnabled;
+        return this;
+    }
+
+    public boolean isRequestPreflight() {
+        return requestPreflight;
+    }
+
+    /**
+     * Sets whether to send a preflight request before the actual request.
+     * <p>
+     * Default: true
+     */
+    public CoreConfiguration setRequestPreflight(boolean requestPreflight) {
+        this.requestPreflight = requestPreflight;
         return this;
     }
 }

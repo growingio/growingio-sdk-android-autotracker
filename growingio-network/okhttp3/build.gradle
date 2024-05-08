@@ -46,7 +46,7 @@ dependencies {
 
 	implementation project(':growingio-tracker-core')
 	implementation libs.okhttp3
-	//debugImplementation libs.okhttp3.logging
+	//implementation libs.okhttp3.logging
 
 	implementation project(":growingio-annotation")
 	annotationProcessor project(":growingio-annotation:compiler")

@@ -15,6 +15,9 @@
  */
 package com.growingio.android.sdk.track.middleware;
 
+import com.growingio.android.sdk.track.listener.TrackThread;
+
 public interface IEventNetSender {
+    @TrackThread
     SendResponse send(byte[] events, String mediaType);
 }

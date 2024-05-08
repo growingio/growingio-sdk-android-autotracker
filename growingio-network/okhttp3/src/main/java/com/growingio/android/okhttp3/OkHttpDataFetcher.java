@@ -61,7 +61,7 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
         call.enqueue(this);
     }
 
-    private Request buildRequestWithEventUrl(){
+    private Request buildRequestWithEventUrl() {
         Request.Builder requestBuilder = new Request.Builder().url(eventUrl.toUrl());
         for (Map.Entry<String, String> headerEntry : eventUrl.getHeaders().entrySet()) {
             String key = headerEntry.getKey();
@@ -69,14 +69,17 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
         }
         if (eventUrl.getRequestBody() != null) {
             requestBuilder.post(RequestBody.create(MediaType.parse(eventUrl.getMediaType()), eventUrl.getRequestBody()));
+        } else if (eventUrl.getRequestMethod() == EventUrl.POST) {
+            RequestBody requestBody = RequestBody.create(MediaType.parse(eventUrl.getMediaType()), new byte[0]);
+            requestBuilder.post(requestBody);
+        } else if (eventUrl.getRequestMethod() == EventUrl.OPTIONS) {
+            requestBuilder.method("OPTIONS", null);
+        } else if (eventUrl.getRequestMethod() == EventUrl.HEAD) {
+            requestBuilder.head();
         } else {
-            if (eventUrl.getRequestMethod() == EventUrl.POST) {
-                RequestBody requestBody = RequestBody.create(MediaType.parse(eventUrl.getMediaType()), new byte[0]);
-                requestBuilder.post(requestBody);
-            } else {
-                requestBuilder.get();
-            }
+            requestBuilder.get();
         }
+
         return requestBuilder.build();
     }
 
@@ -94,7 +97,7 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
                 return new EventResponse(successed, copyResponse(responseBody.byteStream()), contentLength);
             } else {
                 Logger.e(TAG, "OkHttpSender failed with code:" + response.code());
-                return new EventResponse(false);
+                return new EventResponse(response.code());
             }
         } catch (IOException e) {
             Logger.e(TAG, e);
@@ -149,16 +152,13 @@ public class OkHttpDataFetcher implements HttpDataFetcher<EventResponse>, Callba
     @Override
     public void onResponse(Call call, Response response) {
         try {
-            responseBody = response.body();
             if (response.isSuccessful()) {
-                if (responseBody == null) {
-                    throw new IllegalArgumentException("Must not be null or empty");
-                }
+                responseBody = response.body();
                 long contentLength = responseBody.contentLength();
-                EventResponse eventResponse = new EventResponse(true, responseBody.byteStream(), contentLength);
+                EventResponse eventResponse = new EventResponse(response.code(), responseBody.byteStream(), contentLength);
                 callback.onDataReady(eventResponse);
             } else {
-                callback.onLoadFailed(new Exception(response.message()));
+                callback.onDataReady(new EventResponse(response.code()));
             }
         } finally {
             cleanup();

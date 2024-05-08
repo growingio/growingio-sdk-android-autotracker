@@ -86,6 +86,7 @@ public final class TrackMainThread {
         this.persistentDataProvider = null;
         this.sessionProvider = null;
         this.activityStateProvider = null;
+        this.eventSender.shutdown();
         this.eventSender = null;
     }
 
