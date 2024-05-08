@@ -142,7 +142,7 @@ public class DbTest {
     public void contentProviderTest() {
         trackerContext.getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
         controller.create(providerInfo).get();
-        sqLite.removeOverdueEvents();
+        sqLite.removeOverdueEvents(7);
         CustomEvent customEvent = new CustomEvent.Builder()
                 .setEventName("contentProvider")
                 .build();

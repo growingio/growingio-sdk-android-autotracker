@@ -51,7 +51,6 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
         }
     }
 
-
     private EventDbResult executeDatabase(EventDatabase database) throws IllegalArgumentException {
         EventDbResult dbResult = new EventDbResult();
         if (database.getDbOp() == EventDatabase.DATABASE_OP_INSERT) {
@@ -61,7 +60,8 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
             dbResult.setSuccess(count == database.getEvents().size());
             return dbResult;
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_OUTDATED) {
-            int sum = dataManager.removeOverdueEvents();
+            int day = database.getLimit();
+            int sum = dataManager.removeOverdueEvents(day);
             dbResult.setSum(sum);
             dbResult.setSuccess(sum >= 0);
             return dbResult;

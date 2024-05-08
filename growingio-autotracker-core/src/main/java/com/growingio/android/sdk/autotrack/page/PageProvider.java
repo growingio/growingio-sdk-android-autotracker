@@ -38,7 +38,6 @@ import com.growingio.android.sdk.track.utils.ActivityUtil;
 
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -517,8 +516,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     private void setPageAttributes(Page<?> page, Map<String, String> attributes) {
-        if (page == null) return;
-        if (attributes == null) attributes = new HashMap<>();
+        if (page == null || attributes == null) return;
         if (attributes.equals(page.getAttributes())) {
             Logger.w(TAG, "setPageAttributes is equals page.getAttributes");
             return;

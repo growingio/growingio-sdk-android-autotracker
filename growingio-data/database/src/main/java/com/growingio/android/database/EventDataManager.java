@@ -45,7 +45,7 @@ import static com.growingio.android.database.EventDataTable.TABLE_EVENTS;
 public class EventDataManager {
     private static final String TAG = "EventDataManager";
 
-    private static final long EVENT_VALID_PERIOD_MILLS = 7L * 24 * 60 * 60_000;
+    private static final long EVENT_VALID_PERIOD_MILLS = 24 * 60 * 60_000L;
     private static final double EVENT_DATA_MAX_SIZE = 2 * 1000 * 1024; // 2M
 
     private final TrackerContext context;
@@ -60,7 +60,8 @@ public class EventDataManager {
         deprecatedEventSQLite.migrateEvents();
 
         // when sdk start,removeOverdueEvents
-        removeOverdueEvents();
+        int day = context.getConfigurationProvider().core().getDataValidityPeriod();
+        removeOverdueEvents(day);
     }
 
     private EventByteArray formatData(EventFormatData data) {
@@ -112,13 +113,15 @@ public class EventDataManager {
         return null;
     }
 
-    int removeOverdueEvents() {
+    int removeOverdueEvents(int day) {
         if (ignoreOperations) {
             return -1;
         }
         try {
             long current = System.currentTimeMillis();
-            long sevenDayAgo = current - EVENT_VALID_PERIOD_MILLS;
+            if (day > 30) day = 30;
+            if (day < 3) day = 3;
+            long sevenDayAgo = current - day * EVENT_VALID_PERIOD_MILLS;
 
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();

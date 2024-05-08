@@ -31,7 +31,6 @@ import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.base.BaseField;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
 import com.growingio.android.sdk.track.middleware.GEvent;
-import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -176,7 +175,7 @@ public class EventBuilderProviderFilterTest {
                 }
             }
         });
-        eventBuilderProvider.onGenerateGEvent(new CustomEvent.Builder().setCustomEventType(ConstantPool.CUSTOM_TYPE_USER).setEventName("cpacm"));
+        eventBuilderProvider.onGenerateGEvent(new CustomEvent.Builder().setEventName("cpacm"));
     }
 
 }

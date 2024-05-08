@@ -19,6 +19,7 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -45,19 +46,12 @@ import static com.growingio.android.sdk.track.middleware.GEvent.SEND_POLICY_INST
 public class EventSender {
     private static final String TAG = "EventSender";
 
-    private static final int EVENTS_BULK_SIZE = 100;
-
     private final Context mContext;
     private IEventNetSender mEventNetSender;
     private final SharedPreferences mSharedPreferences;
     private final SendHandler mSendHandler;
     private final ProcessLock mProcessLock;
-
-    private final long mDataUploadInterval;
     private final long mCellularDataLimit;
-
-    private int mCacheEventNum = 0;
-
     private final TrackerRegistry mRegistry;
 
     /**
@@ -72,13 +66,22 @@ public class EventSender {
         mContext = context.getApplicationContext();
         mRegistry = registry;
         mCellularDataLimit = cellularDataLimit * 1024L * 1024L;
-        mDataUploadInterval = dataUploadInterval * 1000L;
         mEventNetSender = sender;
         mProcessLock = new ProcessLock(mContext, EventSender.class.getName());
         mSharedPreferences = mContext.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
         HandlerThread thread = new HandlerThread(EventSender.class.getName());
         thread.start();
-        mSendHandler = new SendHandler(thread.getLooper());
+        mSendHandler = new SendHandler(thread.getLooper(), dataUploadInterval * 1000L);
+    }
+
+    public void shutdown() {
+        mProcessLock.release();
+        mSendHandler.removeCallbacksAndMessages(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            mSendHandler.getLooper().quitSafely();
+        } else {
+            mSendHandler.getLooper().quit();
+        }
     }
 
     private ModelLoader<EventDatabase, EventDbResult> getDatabaseModelLoader() {
@@ -100,28 +103,16 @@ public class EventSender {
     }
 
     public void cacheEvent(GEvent event) {
-        databaseOperation(EventDatabase.insert(event));
         // 避免不触发非INSTANT事件时（如埋点SDK），cache事件不被发送
-        if (mDataUploadInterval <= 0) {
-            mSendHandler.uploadUninstantEvents();
-        }
+        databaseOperation(EventDatabase.insert(event));
     }
 
     public void sendEvent(GEvent event) {
         databaseOperation(EventDatabase.insert(event));
         if (event.getSendPolicy() == SEND_POLICY_INSTANT) {
-            mSendHandler.uploadInstantEvents();
+            mSendHandler.uploadInstantEvent();
         } else {
-            if (mDataUploadInterval > 0) {
-                mCacheEventNum++;
-                if (mCacheEventNum >= EVENTS_BULK_SIZE) {
-                    Logger.w(TAG, "cacheEventNum >= EVENTS_BULK_SIZE, toggle one send action");
-                    mSendHandler.uploadUninstantEvents();
-                    mCacheEventNum = 0;
-                }
-            } else {
-                mSendHandler.uploadUninstantEvents();
-            }
+            mSendHandler.uploadUninstantEvent();
         }
     }
 
@@ -211,8 +202,12 @@ public class EventSender {
             uploadEvents = new int[]{SEND_POLICY_INSTANT, GEvent.SEND_POLICY_MOBILE_DATA};
         }
 
+        boolean succeeded = true;
         for (int policy : uploadEvents) {
-            boolean succeeded;
+            if (!succeeded) {
+                Logger.e(TAG, "upload events break with http failed.");
+                break;
+            }
             do {
                 if (policy != SEND_POLICY_INSTANT
                         && networkState.isMobileData()
@@ -227,12 +222,28 @@ public class EventSender {
                     } else {
                         SendResponse sendResponse = mEventNetSender.send(dbResult.getData(), dbResult.getMediaType());
                         succeeded = sendResponse.isSucceeded();
+                        int responseCode = sendResponse.getResponseCode();
                         if (succeeded) {
                             String eventType = dbResult.getEventType();
                             databaseOperation(EventDatabase.delete(dbResult.getLastId(), policy, eventType));
                             if (networkState.isMobileData()) {
                                 todayBytes(sendResponse.getUsedBytes());
                             }
+                            mSendHandler.resetBackoff();
+                        } else if (responseCode == 413) {
+                            String eventType = dbResult.getEventType();
+                            databaseOperation(EventDatabase.delete(dbResult.getLastId(), policy, eventType));
+                            if (networkState.isMobileData()) {
+                                todayBytes(sendResponse.getUsedBytes());
+                            }
+                            Logger.e(TAG, "action: sendEvents, delete events with responseCode: " + responseCode);
+                            break;
+                        } else if (responseCode >= 400) {
+                            // Logger.e(TAG, "action: sendEvents, backoff with some reasons,eg: Unavailable For Legal Reasons");
+                            // 5xx Service Unavailable
+                            mSendHandler.backoff();
+                            Logger.e(TAG, "action: sendEvents, service unavailable with responseCode: " + responseCode);
+                            break;
                         }
                     }
 
@@ -253,21 +264,68 @@ public class EventSender {
         private static final int MSG_SEND_INSTANT_EVENTS = 1;
         private static final int MSG_SEND_UNINSTANT_EVENTS = 2;
 
-        private SendHandler(@NonNull Looper looper) {
+        private static final long EVENTS_UPLOAD_INTERVAL_MAX = 5 * 60 * 1000; // 5 minutes
+        private static final int EVENTS_BULK_SIZE = 100;
+
+        private final long mDataUploadInterval;
+        private long backoffUploadInterval;
+        private int cacheEventNum = 0;
+
+        private SendHandler(@NonNull Looper looper, long dataUploadInterval) {
             super(looper);
-            if (mDataUploadInterval > 0) {
-                sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, mDataUploadInterval);
+            this.mDataUploadInterval = dataUploadInterval;
+            backoffUploadInterval = mDataUploadInterval;
+            if (backoffUploadInterval > 0) {
+                sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, backoffUploadInterval);
             }
         }
 
-        private void uploadInstantEvents() {
-            removeMessages(MSG_SEND_INSTANT_EVENTS);
-            sendEmptyMessage(MSG_SEND_INSTANT_EVENTS);
+        void backoff() {
+            if (backoffUploadInterval > 0) {
+                backoffUploadInterval = Math.min(backoffUploadInterval * 2, EVENTS_UPLOAD_INTERVAL_MAX);
+            } else {
+                backoffUploadInterval = 15000L;
+            }
+            removeCallbacksAndMessages(null);
+            sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, backoffUploadInterval);
         }
 
-        private void uploadUninstantEvents() {
-            removeMessages(MSG_SEND_UNINSTANT_EVENTS);
-            sendEmptyMessage(MSG_SEND_UNINSTANT_EVENTS);
+        void resetBackoff() {
+            if (isNotBackoffState()) return;
+            backoffUploadInterval = mDataUploadInterval;
+            removeCallbacksAndMessages(null);
+            if (backoffUploadInterval > 0) {
+                sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, backoffUploadInterval);
+            }
+        }
+
+        boolean isNotBackoffState() {
+            return backoffUploadInterval == mDataUploadInterval;
+        }
+
+        private void uploadInstantEvent() {
+            if (isNotBackoffState()) {
+                removeMessages(MSG_SEND_INSTANT_EVENTS);
+                sendEmptyMessage(MSG_SEND_INSTANT_EVENTS);
+            }
+        }
+
+        private void uploadUninstantEvent() {
+            if (backoffUploadInterval > 0) {
+                cacheEventNum++;
+                // If it is a non-real-time event,
+                // it will be sent immediately when the number of cached events reaches a certain amount,
+                // provided that it is not in a backoff state.
+                if (cacheEventNum >= EVENTS_BULK_SIZE && isNotBackoffState()) {
+                    Logger.w(TAG, "cacheEventNum >= EVENTS_BULK_SIZE, merge events and send.");
+                    cacheEventNum = 0;
+                    removeMessages(MSG_SEND_UNINSTANT_EVENTS);
+                    sendEmptyMessage(MSG_SEND_UNINSTANT_EVENTS);
+                }
+            } else {
+                removeMessages(MSG_SEND_UNINSTANT_EVENTS);
+                sendEmptyMessage(MSG_SEND_UNINSTANT_EVENTS);
+            }
         }
 
         @Override
@@ -279,8 +337,8 @@ public class EventSender {
                 case MSG_SEND_UNINSTANT_EVENTS:
                     removeMessages(MSG_SEND_UNINSTANT_EVENTS);
                     sendEvents(false);
-                    if (mDataUploadInterval > 0) {
-                        sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, mDataUploadInterval);
+                    if (backoffUploadInterval > 0) {
+                        sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, backoffUploadInterval);
                     }
                     break;
                 default:
