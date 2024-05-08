@@ -157,10 +157,6 @@ public class Tracker {
 
     public void setDynamicGeneralPropsGenerator(DynamicGeneralPropsGenerator generator) {
         if (!isInited) return;
-        if (generator == null) {
-            Logger.e(TAG, "setDynamicGeneralPropsGenerator: generator is NULL");
-            return;
-        }
         trackerContext.getEventBuilderProvider().setDynamicGeneralPropGenerator(generator);
     }
 

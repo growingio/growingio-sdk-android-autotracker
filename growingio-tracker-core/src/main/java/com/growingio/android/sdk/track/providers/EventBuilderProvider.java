@@ -73,6 +73,8 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     @Override
     public void shutdown() {
         mEventBuildInterceptors.clear();
+        generalProps.clear();
+        dynamicGeneralPropsGenerator = null;
     }
 
     public static JSONObject toJson(BaseEvent event) {
