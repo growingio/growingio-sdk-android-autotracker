@@ -39,7 +39,6 @@ public class EventDatabase {
     private long lastId;
     private String eventType;
 
-
     public int getDbOp() {
         return dbOp;
     }
@@ -83,6 +82,14 @@ public class EventDatabase {
     public static EventDatabase outDated() {
         EventDatabase ed = new EventDatabase();
         ed.dbOp = DATABASE_OP_OUTDATED;
+        ed.limit = 7;
+        return ed;
+    }
+
+    public static EventDatabase outDated(int day) {
+        EventDatabase ed = new EventDatabase();
+        ed.dbOp = DATABASE_OP_OUTDATED;
+        ed.limit = day;
         return ed;
     }
 

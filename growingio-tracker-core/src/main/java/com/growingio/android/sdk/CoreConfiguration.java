@@ -42,6 +42,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mImeiEnabled = false;
     private boolean mAndroidIdEnabled = false;
 
+    private int mDataValidityPeriod = 7;
     private boolean requestPreflight = true;
 
 
@@ -212,6 +213,21 @@ public class CoreConfiguration implements Configurable {
      */
     public CoreConfiguration setRequestPreflight(boolean requestPreflight) {
         this.requestPreflight = requestPreflight;
+        return this;
+    }
+
+    public int getDataValidityPeriod() {
+        return mDataValidityPeriod;
+    }
+
+    /**
+     * Sets the cache data validity period. From 3 days to 30 days.
+     * <p> Default: 7 days.
+     *
+     * @param dataValidityPeriod data validity period, in days. for example, 7 means that the cache data is valid for 7 days.
+     */
+    public CoreConfiguration setDataValidityPeriod(int dataValidityPeriod) {
+        this.mDataValidityPeriod = dataValidityPeriod;
         return this;
     }
 }
