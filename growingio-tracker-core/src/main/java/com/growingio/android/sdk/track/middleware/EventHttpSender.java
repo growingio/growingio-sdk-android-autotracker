@@ -42,7 +42,7 @@ public class EventHttpSender implements IEventNetSender {
         this.trackerRegistry = context.getRegistry();
         mProjectId = configurationProvider.core().getProjectId();
         mServerHost = configurationProvider.core().getDataCollectionServerHost();
-        defaultPreflight = configurationProvider.core().isRequestPreflight();
+        defaultPreflight = false;
     }
 
     private boolean isPreflightChecked() {
@@ -87,13 +87,6 @@ public class EventHttpSender implements IEventNetSender {
             return new SendResponse(0, 0);
         }
         long time = System.currentTimeMillis();
-        if (!isPreflightChecked()) {
-            EventResponse response = requestPreflight(time);
-            if (!response.isSucceeded()) {
-                Logger.e(TAG, "Failed to get request preflight for host: " + mServerHost);
-                return new SendResponse(451, 0);
-            }
-        }
         EventUrl eventUrl = new EventUrl(mServerHost, time)
                 .addPath("v3")
                 .addPath("projects")
