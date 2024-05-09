@@ -88,8 +88,11 @@ public class FragmentPage extends Page<SuperFragment<?>> {
 
     @Override
     public boolean isAutotrack() {
+        if (pageConfig == null || !pageConfig.isAutotrack()) {
+            return false;
+        }
         // cdp downgrade when fragment page is enabled
-        if (pageConfig != null && pageConfig.isFragmentPageEnabled()) {
+        if (pageConfig.isFragmentPageEnabled()) {
             return !isIgnored();
         }
         return super.isAutotrack();

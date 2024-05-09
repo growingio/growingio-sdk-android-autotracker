@@ -139,8 +139,9 @@ public class ActivateEvent extends BaseAttributesEvent {
 
         @Override
         public ActivateEvent build() {
-            Map<String, String> map = getAttributes();
-            if (map == null) map = new HashMap<>();
+            Map<String, String> map = new HashMap<>();
+            Map<String, String> oldData = getAttributes();
+            if (oldData != null) map.putAll(oldData);
             if (!TextUtils.isEmpty(ua)) map.put("userAgent", ua);
             if (!TextUtils.isEmpty(classification)) map.put("deep_type", classification);
             if (!TextUtils.isEmpty(linkId)) map.put("deep_link_id", linkId);

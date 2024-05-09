@@ -25,12 +25,15 @@ class PageConfig {
     private boolean isFragmentPageEnabled = true;
     private boolean isDowngrade = false;
 
-    public PageConfig(List<PageRule> pageRuleList, boolean isActivityPageEnabled, boolean isFragmentPageEnabled, boolean enableFragmentTag, boolean isDowngrade) {
+    private boolean autotrack = true;
+
+    public PageConfig(List<PageRule> pageRuleList, boolean isActivityPageEnabled, boolean isFragmentPageEnabled, boolean enableFragmentTag, boolean isDowngrade,boolean autotrack) {
         this.pageRuleList = pageRuleList;
         this.isActivityPageEnabled = isActivityPageEnabled;
         this.isFragmentPageEnabled = isFragmentPageEnabled;
         this.enableFragmentTag = enableFragmentTag;
         this.isDowngrade = isDowngrade;
+        this.autotrack = autotrack;
     }
 
     public boolean isEnableFragmentTag() {
@@ -51,5 +54,9 @@ class PageConfig {
 
     public boolean isDowngrade() {
         return isDowngrade;
+    }
+
+    public boolean isAutotrack() {
+        return autotrack;
     }
 }

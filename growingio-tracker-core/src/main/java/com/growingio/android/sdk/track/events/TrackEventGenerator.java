@@ -16,7 +16,6 @@
 package com.growingio.android.sdk.track.events;
 
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import java.util.Map;
 
@@ -33,7 +32,6 @@ public class TrackEventGenerator {
     public static void generateCustomEvent(String name, Map<String, String> attributes) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new CustomEvent.Builder()
-                        .setCustomEventType(ConstantPool.CUSTOM_TYPE_USER)
                         .setEventName(name)
                         .setAttributes(attributes)
         );

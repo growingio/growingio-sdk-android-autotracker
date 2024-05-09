@@ -36,6 +36,7 @@ import com.google.android.material.slider.Slider;
 import com.google.android.material.tabs.TabLayout;
 import com.growingio.android.sdk.autotrack.shadow.ListMenuItemViewShadow;
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 public class ViewUtil {
@@ -107,8 +108,13 @@ public class ViewUtil {
             return compoundButtonContentValue((CompoundButton) widget);
         }
         if (ClassExistHelper.hasClass("com.google.android.material.tabs.TabLayout")) {
-            if (widget instanceof TabLayout.TabView) {
-                return tabViewContentValue((TabLayout.TabView) widget);
+            try {
+                if (widget instanceof TabLayout.TabView) {
+                    return tabViewContentValue((TabLayout.TabView) widget);
+                }
+            } catch (IllegalAccessError e) {
+                // TabLayout.TabView在1.1.0版本才开始修改为public访问权限
+                Logger.e("ViewUtil", "TabLayout version is low.");
             }
         }
         if (ClassExistHelper.hasClass("com.google.android.material.slider.Slider")) {

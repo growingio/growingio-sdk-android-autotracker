@@ -20,10 +20,13 @@ import android.util.SparseArray;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,12 +63,26 @@ public class AttributesBuilder {
                     addAttribute(key, tempValue);
                 } else if (value instanceof JSONArray) {
                     addAttribute(key, (JSONArray) value);
+                } else if (value instanceof Date) {
+                    addAttribute(key, (Date) value);
                 } else {
                     addAttribute(key, String.valueOf(value));
                 }
             }
         }
         return this;
+    }
+
+    public AttributesBuilder addAttribute(String key, Date date) {
+        if (key != null && date != null) {
+            attributes.put(key, formatDate(date));
+        }
+        return this;
+    }
+
+    private String formatDate(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
+        return formatter.format(date);
     }
 
     public AttributesBuilder addAttribute(String key, String value) {

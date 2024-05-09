@@ -26,7 +26,7 @@ import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +90,10 @@ public abstract class Page<T> {
     }
 
     public void setAttributes(Map<String, String> attributes) {
-        mAttributes = attributes;
+        if (mAttributes == null) mAttributes = new HashMap<>();
+        mAttributes.clear();
+        if (attributes == null) return;
+        mAttributes.putAll(attributes);
     }
 
     public abstract String getName();
@@ -188,7 +191,7 @@ public abstract class Page<T> {
     public Map<String, String> activeAttributes() {
         Page<?> activePage = lastActivePage();
         if (activePage != null) return activePage.getAttributes();
-        return Collections.emptyMap();
+        return null;
     }
 
     public String getXIndex() {

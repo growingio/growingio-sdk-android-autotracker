@@ -60,6 +60,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
     private final ViewTreeStatusObserver viewTreeStatusObserver;
     private ActivityStateProvider activityStateProvider;
+    private AutotrackConfig autotrackConfig;
 
     public ImpressionProvider() {
         viewTreeStatusObserver = new ViewTreeStatusObserver(this);
@@ -68,10 +69,13 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
     @Override
     public void setup(TrackerContext context) {
 
-        AutotrackConfig configuration = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
-        impressionScale = configuration == null ? 0f : configuration.getImpressionScale();
-
+        autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
+        impressionScale = autotrackConfig == null ? 0f : autotrackConfig.getImpressionScale();
         activityStateProvider = context.getActivityStateProvider();
+
+        if (autotrackConfig == null || !autotrackConfig.isAutotrack()) {
+            return;
+        }
         activityStateProvider.registerActivityLifecycleListener(this);
     }
 
@@ -165,6 +169,10 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
             return;
         }
+        if (autotrackConfig == null || !autotrackConfig.isAutotrack()) {
+            Logger.d(TAG, "autotrack is not enabled");
+            return;
+        }
         if (ViewAttributeUtil.isIgnoredView(view)) {
             Logger.w(TAG, "Current view is set to ignore");
             return;
@@ -213,6 +221,10 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
     public void stopTrackViewImpression(View trackedView) {
         if (trackedView == null) {
+            return;
+        }
+        if (autotrackConfig == null || !autotrackConfig.isAutotrack()) {
+            Logger.d(TAG, "autotrack is not enabled");
             return;
         }
         Activity activity = findViewActivity(trackedView);

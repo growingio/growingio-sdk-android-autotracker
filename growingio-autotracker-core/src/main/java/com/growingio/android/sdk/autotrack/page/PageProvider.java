@@ -38,7 +38,6 @@ import com.growingio.android.sdk.track.utils.ActivityUtil;
 
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -72,14 +71,16 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     @Override
     public void setup(TrackerContext context) {
         activityStateProvider = context.getActivityStateProvider();
-        activityStateProvider.registerActivityLifecycleListener(this);
-        loadPageConfig(context);
-    }
 
-    private void loadPageConfig(TrackerContext context) {
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
         AutotrackConfig autotrackConfig = configurationProvider.getConfiguration(AutotrackConfig.class);
-        boolean isDowngrade = configurationProvider.isDowngrade();
+
+        loadPageConfig(context, autotrackConfig, configurationProvider.isDowngrade());
+
+        activityStateProvider.registerActivityLifecycleListener(this);
+    }
+
+    private void loadPageConfig(TrackerContext context, AutotrackConfig autotrackConfig, boolean isDowngrade) {
         if (autotrackConfig != null) {
             boolean isActivityPageEnabled = autotrackConfig.getAutotrackOptions().isActivityPageEnabled();
             boolean isFragmentPageEnabled = autotrackConfig.getAutotrackOptions().isFragmentPageEnabled();
@@ -88,15 +89,17 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             autotrackConfig.getPageRules().addAll(0, pageRuleList);
 
             List<PageRule> pageRules = Collections.unmodifiableList(autotrackConfig.getPageRules());
-            pageConfig = new PageConfig(pageRules, isActivityPageEnabled, isFragmentPageEnabled, enableFragmentTag, isDowngrade);
+            pageConfig = new PageConfig(pageRules, isActivityPageEnabled, isFragmentPageEnabled, enableFragmentTag, isDowngrade, autotrackConfig.isAutotrack());
         } else {
-            pageConfig = new PageConfig(null, isDowngrade, isDowngrade, false, isDowngrade);
+            pageConfig = new PageConfig(null, isDowngrade, isDowngrade, false, isDowngrade, true);
         }
     }
 
 
     @Override
     public void shutdown() {
+        ALL_PAGE_TREE.clear();
+        CACHE_PAGES.clear();
         activityStateProvider.unregisterActivityLifecycleListener(this);
     }
 
@@ -513,8 +516,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     private void setPageAttributes(Page<?> page, Map<String, String> attributes) {
-        if (page == null) return;
-        if (attributes == null) attributes = new HashMap<>();
+        if (page == null || attributes == null) return;
         if (attributes.equals(page.getAttributes())) {
             Logger.w(TAG, "setPageAttributes is equals page.getAttributes");
             return;

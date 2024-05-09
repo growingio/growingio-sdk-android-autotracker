@@ -19,11 +19,20 @@ import java.io.InputStream;
 
 public class EventResponse {
     private final boolean succeeded;
-    private final InputStream stream; //it's useless
+    private final InputStream stream;
     private final long usedBytes; //it's useless
+    private final int responseCode;
+
+    public EventResponse(int code) {
+        this.responseCode = code;
+        this.succeeded = responseCode >= 200 && responseCode < 300;
+        usedBytes = 0L;
+        stream = null;
+    }
 
     public EventResponse(boolean succeeded) {
         this.succeeded = succeeded;
+        this.responseCode = 0;
         usedBytes = 0L;
         stream = null;
     }
@@ -32,11 +41,13 @@ public class EventResponse {
         this.succeeded = succeeded;
         this.usedBytes = usedBytes;
         this.stream = stream;
+        this.responseCode = 204;
     }
 
-    public EventResponse(boolean succeeded, InputStream stream) {
-        this.succeeded = succeeded;
-        usedBytes = 0L;
+    public EventResponse(int responseCode, InputStream stream, long usedBytes) {
+        this.responseCode = responseCode;
+        this.succeeded = responseCode >= 200 && responseCode < 300;
+        this.usedBytes = usedBytes;
         this.stream = stream;
     }
 
@@ -50,5 +61,9 @@ public class EventResponse {
 
     public InputStream getStream() {
         return stream;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
     }
 }

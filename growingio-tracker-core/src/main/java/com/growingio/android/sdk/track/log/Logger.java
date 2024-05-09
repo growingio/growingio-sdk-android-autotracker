@@ -204,16 +204,20 @@ public class Logger {
     public static void printJson(String tag, String headString, String jsonStr) {
         String message;
         try {
-            if (jsonStr.startsWith("{")) {
-                JSONObject jsonObject = new JSONObject(jsonStr);
-                message = jsonObject.toString(2);
-                message = message.replace("\\/", "/");
-            } else if (jsonStr.startsWith("[")) {
-                JSONArray jsonArray = new JSONArray(jsonStr);
-                message = jsonArray.toString(2);
-                message = message.replace("\\/", "/");
+            if (jsonStr.length() > 10 * 1024) {
+                message = jsonStr.substring(0, 10 * 1024) + "...(json is too long, it's length is " + jsonStr.getBytes().length + ")";
             } else {
-                message = jsonStr;
+                if (jsonStr.startsWith("{")) {
+                    JSONObject jsonObject = new JSONObject(jsonStr);
+                    message = jsonObject.toString(2);
+                    message = message.replace("\\/", "/");
+                } else if (jsonStr.startsWith("[")) {
+                    JSONArray jsonArray = new JSONArray(jsonStr);
+                    message = jsonArray.toString(2);
+                    message = message.replace("\\/", "/");
+                } else {
+                    message = jsonStr;
+                }
             }
         } catch (JSONException e) {
             message = jsonStr;

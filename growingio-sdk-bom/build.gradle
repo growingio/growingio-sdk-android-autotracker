@@ -46,12 +46,12 @@ dependencies {
 				}
 
 		api "com.growingio.android:analytics-fa:4.0.0"
-		api "com.growingio.android:analytics-sa:4.1.0"
-		api "com.growingio.android:dummy-sa:4.1.0"
+		api "com.growingio.android:analytics-sa:4.3.0"
+		api "com.growingio.android:dummy-sa:4.3.0"
 
 		// giokit
-		api 'com.growingio.giokit:giokit:2.0.0'
-		api 'com.growingio.giokit:giokit-no-op:2.0.0'
+		api 'com.growingio.giokit:giokit:2.1.2'
+		api 'com.growingio.giokit:giokit-no-op:2.1.2'
 
 		// saas sdk
 		//api 'com.growingio.android:vds-android-agent:autotrack-2.9.13'

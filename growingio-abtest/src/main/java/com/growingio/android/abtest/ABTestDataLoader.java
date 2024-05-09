@@ -197,7 +197,6 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                     .addAttribute("$exp_layer_id", abExperiment.getLayerId());
             CustomEvent.Builder customEventBuilder = new CustomEvent.Builder();
             customEventBuilder.setEventName("$exp_hit");
-            customEventBuilder.setCustomEventType(ConstantPool.CUSTOM_TYPE_SYSTEM);
             customEventBuilder.setAttributes(attributesBuilder.build());
             TrackMainThread.trackMain().cacheEventToTrackMain(customEventBuilder);
         }

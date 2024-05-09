@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+	testImplementation libs.google.material
 	testImplementation libs.bundles.test
 	testImplementation libs.okhttp3.mockwebserver
 	testImplementation libs.androidx.test.core
