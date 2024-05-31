@@ -18,6 +18,8 @@ package com.growingio.android.sdk.track.events;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
+import java.util.Map;
+
 @JsonSerializer
 public class CustomEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
@@ -47,6 +49,11 @@ public class CustomEvent extends BaseAttributesEvent {
 
         public String getEventName() {
             return eventName;
+        }
+
+        @Override
+        public Map<String,String> getAttributes() {
+            return super.getAttributes();
         }
 
         @Override

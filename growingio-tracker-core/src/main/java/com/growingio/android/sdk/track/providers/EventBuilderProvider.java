@@ -24,6 +24,7 @@ import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
+import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
@@ -37,6 +38,7 @@ import com.growingio.android.sdk.track.middleware.GEvent;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +126,8 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         if (!configurationProvider.isDowngrade()) {
             gEvent.readNewPropertyInTrackThread(context);
         }
+
+        filterCustomEventAttributes(gEvent);
 
         BaseEvent event = gEvent.build();
         dispatchEventDidBuild(event);
@@ -222,6 +226,22 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
                 defaultFilterInterceptor = new DefaultEventFilterInterceptor();
             }
             return defaultFilterInterceptor;
+        }
+    }
+
+    void filterCustomEventAttributes(BaseEvent.BaseBuilder<?> eventBuilder) {
+        if (eventBuilder.getEventType().equals(TrackEventType.CUSTOM)) {
+            try {
+                CustomEvent.Builder customEventBuilder = (CustomEvent.Builder) eventBuilder;
+                Map<String, String> attributes = customEventBuilder.getAttributes();
+                if (attributes == null) {
+                    attributes = new HashMap<>();
+                    customEventBuilder.setAttributes(attributes);
+                }
+                getEventFilterInterceptor().filterCustomEventAttributes(customEventBuilder.getEventName(), customEventBuilder.getAttributes());
+            } catch (Exception e) {
+                Logger.e(TAG, " set custom event Attributes error", e);
+            }
         }
     }
 
