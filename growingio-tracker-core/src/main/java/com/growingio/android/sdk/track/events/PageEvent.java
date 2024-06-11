@@ -108,7 +108,7 @@ public class PageEvent extends BaseAttributesEvent {
 
         @Override
         public void readPropertyInTrackThread(TrackerContext context) {
-            if (orientation == null) {
+            if (orientation == null || orientation.isEmpty()) {
                 orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
             }
             super.readPropertyInTrackThread(context);
