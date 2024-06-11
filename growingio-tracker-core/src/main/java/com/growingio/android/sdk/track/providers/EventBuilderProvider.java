@@ -126,7 +126,6 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         if (!configurationProvider.isDowngrade()) {
             gEvent.readNewPropertyInTrackThread(context);
         }
-
         filterCustomEventAttributes(gEvent);
 
         BaseEvent event = gEvent.build();
