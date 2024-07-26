@@ -1,11 +1,14 @@
 [versions]
+compileSdk = "33"
+minSdk = "17"
+
 # https://developer.android.google.cn/jetpack/androidx/explorer?hl=en&case=all
 androidxlifecycle = "2.6.1"
 androidxtest = "1.5.0"
 navigation = "2.5.3"
 
-pluginGradle = "7.4.1" # 4.2.2-7.4.1
-kotlin = "1.8.20"
+pluginGradle = "7.4.2" # 4.2.2-7.4.2
+kotlin = "1.9.21"
 
 spotless = "6.20.0"
 
@@ -30,6 +33,7 @@ powermock = "2.0.9"
 growingio = "4.3.0"
 growingioCode = "40300"
 growingioPlugin = "4.2.0"
+junit = "1.1.5"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "pluginGradle" }
@@ -170,6 +174,7 @@ powermock-module-junit4 = { module = "org.powermock:powermock-module-junit4", ve
 powermock-module-junit4-rule = { module = "org.powermock:powermock-module-junit4-rule", version.ref = "powermock" }
 powermock-classloading-xstream = { module = "org.powermock:powermock-classloading-xstream", version.ref = "powermock" }
 powermock-reflect = { module = "org.powermock:powermock-reflect", version.ref = "powermock" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 
 [bundles]
 android-support = ["support-annotations", "support-appcompat", "support-fragment", "support-constraint", "support-recyclerview", "support-design", "support-navigation-fragment", "support-navigation-ui"]

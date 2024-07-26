@@ -1,5 +1,5 @@
 plugins {
-	id 'com.android.library'
+	alias libs.plugins.android.library
 	//id 'org.jetbrains.kotlin.android'
 }
 
@@ -8,10 +8,9 @@ def buildTime = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+8"
 
 android {
 	namespace 'com.growingio.android.sdk.track'
-	compileSdkVersion buildConfiguration.compileVersion
+	compileSdk libs.getVersions().getCompileSdk().get().toInteger()
 	defaultConfig {
-		minSdkVersion buildConfiguration.minSdkVersion
-		targetSdkVersion buildConfiguration.targetSdkVersion
+		minSdk libs.getVersions().getMinSdk().get().toInteger()
 		versionName libs.versions.growingio.get()
 		versionCode libs.versions.growingioCode.get().toInteger()
 
@@ -34,8 +33,8 @@ android {
 	}
 
 	compileOptions {
-		sourceCompatibility buildConfiguration.sourceCompatibility
-		targetCompatibility buildConfiguration.targetCompatibility
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
 	}
 
 	testOptions {

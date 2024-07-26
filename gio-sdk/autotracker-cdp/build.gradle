@@ -1,11 +1,12 @@
-apply plugin: 'com.android.library'
+plugins {
+	alias libs.plugins.android.library
+}
 
 android {
 	namespace 'com.growingio.android.sdk.autotracker.cdp'
-	compileSdkVersion buildConfiguration.compileVersion
+	compileSdk libs.getVersions().getCompileSdk().get().toInteger()
 	defaultConfig {
-		minSdkVersion buildConfiguration.minSdkVersion
-		targetSdkVersion buildConfiguration.targetSdkVersion
+		minSdk libs.getVersions().getMinSdk().get().toInteger()
 		versionName libs.versions.growingio.get()
 		versionCode libs.versions.growingioCode.get().toInteger()
 	}
@@ -22,8 +23,8 @@ android {
 		}
 	}
 	compileOptions {
-		sourceCompatibility buildConfiguration.sourceCompatibility
-		targetCompatibility buildConfiguration.targetCompatibility
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
 	}
 	lintOptions {
 		abortOnError false
