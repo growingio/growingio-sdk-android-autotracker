@@ -27,6 +27,8 @@ import com.growingio.android.hybrid.HybridLibraryGioModule;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,8 +74,18 @@ public class ScreenShotTest {
         screenshotProvider.registerScreenshotRefreshedListener(new ScreenshotProvider.OnScreenshotRefreshedListener() {
             @Override
             public void onScreenshotRefreshed(DebuggerScreenshot screenshot) {
-                Truth.assertThat(screenshot.toJSONObject().toString()).isEqualTo(
-                        "{\"screenWidth\":320,\"screenHeight\":470,\"scale\":100,\"screenshot\":\"this test base64\",\"msgType\":\"refreshScreenshot\",\"snapshotKey\":0}");
+                JSONObject json = screenshot.toJSONObject();
+                try {
+                    Truth.assertThat(json.getInt("screenWidth")).isEqualTo(320);
+                    Truth.assertThat(json.getInt("screenHeight")).isEqualTo(470);
+                    Truth.assertThat(json.getInt("scale")).isEqualTo(100);
+                    Truth.assertThat(json.getString("msgType")).isEqualTo("refreshScreenshot");
+                    Truth.assertThat(json.getInt("snapshotKey")).isEqualTo(0);
+                    Truth.assertThat(json.getInt("snapshotKey")).isEqualTo(0);
+                    Truth.assertThat(json.getString("screenshot")).isEqualTo("this test base64");
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         screenshotProvider.sendScreenshotRefreshed("this test base64", 100);

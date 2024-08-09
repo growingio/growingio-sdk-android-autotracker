@@ -23,7 +23,6 @@ dependencyResolutionManagement {
     }
 }
 
-enableFeaturePreview("VERSION_CATALOGS")
 rootProject.name = "GrowingIO SDK"
 
 

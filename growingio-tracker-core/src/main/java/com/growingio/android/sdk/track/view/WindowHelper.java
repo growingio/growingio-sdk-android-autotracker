@@ -144,7 +144,8 @@ public class WindowHelper {
     private View[] getWindowViews() {
         if (mWindowManager != null) {
             try {
-                return mWindowManager.getAllWindowViews();
+                View[] result = mWindowManager.getAllWindowViews();
+                if (result != null) return result;
             } catch (Exception e) {
                 Logger.e(TAG, e);
             }

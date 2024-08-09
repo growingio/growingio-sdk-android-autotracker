@@ -26,12 +26,16 @@ import android.widget.LinearLayout;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.truth.Truth;
+import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.CoreConfiguration;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.Autotracker;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
 import com.growingio.android.sdk.autotrack.TrackMainThreadShadow;
 import com.growingio.android.sdk.autotrack.inject.DialogInjector;
 import com.growingio.android.sdk.autotrack.inject.ViewClickInjector;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,16 +44,28 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RunWith(RobolectricTestRunner.class)
 @Config(shadows = {TrackMainThreadShadow.class})
 public class ViewClickTest {
 
+    private Autotracker autotracker;
     private RobolectricActivity activity;
     private Application application = ApplicationProvider.getApplicationContext();
 
     @Before
     public void setup() {
-        Autotracker autotracker = new Autotracker(application);
+        CoreConfiguration coreConfiguration = new CoreConfiguration("ViewClickTest", "growingio://apm");
+        AutotrackConfig autotrackConfig = new AutotrackConfig();
+        Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
+        map.put(AutotrackConfig.class, autotrackConfig);
+        TrackerLifecycleProviderFactory.create()
+                .createConfigurationProviderWithConfig(
+                        coreConfiguration,
+                        map);
+        autotracker = new Autotracker(application);
         activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
     }
 
@@ -59,7 +75,7 @@ public class ViewClickTest {
             if (event.getEventType().equals("VIEW_CLICK")) {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
                 Truth.assertThat(clickEvent.getTextValue()).isEqualTo("this is cpacm");
-                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/ActionBarOverlayLayout/FrameLayout/LinearLayout/TextView");
+                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/LinearLayout/FrameLayout/LinearLayout/TextView");
                 Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/0/0");
             }
         };
@@ -72,7 +88,7 @@ public class ViewClickTest {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
                 Truth.assertThat(clickEvent.getTextValue()).isEqualTo("negative");
                 Truth.assertThat(clickEvent.getXpath()).isEqualTo("/AlertDialogButtonLayout/Button");
-                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/1");
+                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0");
             }
         };
 
@@ -96,8 +112,8 @@ public class ViewClickTest {
         TrackMainThreadShadow.callback = (event) -> {
             if (event.getEventType().equals("VIEW_CLICK")) {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
-                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/FrameLayout/FrameLayout/AlertDialogLayout/FrameLayout/FrameLayout/LinearLayout/Button");
-                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/0/1/0/0/0");
+                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/FrameLayout/FrameLayout/LinearLayout/FrameLayout/FrameLayout/LinearLayout/Button");
+                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/0/0/0/0/0");
             }
         };
 

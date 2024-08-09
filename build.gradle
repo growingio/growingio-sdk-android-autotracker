@@ -1,18 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
-buildscript {
-    ext {
-        buildConfiguration = [
-                compileVersion     : 33,
-                minSdkVersion      : 17,
-                targetSdkVersion   : 33,
-                sourceCompatibility: JavaVersion.VERSION_1_8,
-                targetCompatibility: JavaVersion.VERSION_1_8,
-        ]
-    }
-
-}
-
 plugins {
     alias libs.plugins.android.application apply false
     alias libs.plugins.android.library apply false

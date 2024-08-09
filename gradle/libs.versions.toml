@@ -1,11 +1,14 @@
 [versions]
+compileSdk = "33"
+minSdk = "17"
+
 # https://developer.android.google.cn/jetpack/androidx/explorer?hl=en&case=all
 androidxlifecycle = "2.6.1"
 androidxtest = "1.5.0"
 navigation = "2.5.3"
 
-pluginGradle = "7.4.1" # 4.2.2-7.4.1
-kotlin = "1.8.20"
+pluginGradle = "7.4.2" # 4.2.2-7.4.2
+kotlin = "1.9.21"
 
 spotless = "6.20.0"
 
@@ -27,9 +30,10 @@ protobuf = "3.22.3"
 powermock = "2.0.9"
 
 # !!! SDK VERSION !!!
-growingio = "4.3.0"
-growingioCode = "40300"
-growingioPlugin = "4.2.0"
+growingio = "4.3.1"
+growingioCode = "40301"
+growingioPlugin = "4.3.0"
+junit = "1.1.5"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "pluginGradle" }
@@ -84,15 +88,6 @@ androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 androidx-recyclerview = "androidx.recyclerview:recyclerview:1.1.0"
 
-androidx-archCoreTesting = "androidx.arch.core:core-testing:2.1.0"
-androidx-collection = "androidx.collection:collection-ktx:1.2.0"
-
-androidx-datastore = "androidx.datastore:datastore:1.0.0"
-androidx-dynamicanimation = "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
-androidx-dynamicanimation-ktx = "androidx.dynamicanimation:dynamicanimation-ktx:1.0.0-alpha03"
-
-androidx-work-runtime = "androidx.work:work-runtime-ktx:2.8.1"
-androidx-palette = "androidx.palette:palette:1.0.0"
 
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidxlifecycle" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidxlifecycle" }
@@ -107,7 +102,7 @@ support-annotations = { module = "com.android.support:support-annotations", vers
 support-appcompat = { module = "com.android.support:appcompat-v7", version = "28.0.0" }
 support-fragment = { module = "com.android.support:support-fragment", version = "28.0.0" }
 support-design = { module = "com.android.support:design", version = "28.0.0" }
-support-constraint = { module = "com.android.support.constraint:constraint-layout", version = "2.0.1" }
+support-constraint = { module = "com.android.support.constraint:constraint-layout", version = "2.0.4" }
 support-recyclerview = { module = "com.android.support:recyclerview-v7", version = "28.0.0" }
 support-navigation-fragment = { module = "android.arch.navigation:navigation-fragment", version = "1.0.0" }
 support-navigation-ui = { module = "android.arch.navigation:navigation-ui", version = "1.0.0" }
@@ -121,10 +116,6 @@ protobufc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
 
 google-material = "com.google.android.material:material:1.7.0"
-google-analytics = "com.google.firebase:firebase-analytics-ktx:20.0.2"
-google-crashlytics = "com.google.firebase:firebase-crashlytics-ktx:18.2.6"
-google-crashlyticsGradle = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
-google-gmsGoogleServices = "com.google.gms:google-services:4.3.10"
 
 google-auto-service = "com.google.auto.service:auto-service:1.1.0"
 google-auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1.0"
@@ -158,7 +149,6 @@ androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxt
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxtest" }
 androidx-test-truth = { module = "androidx.test.ext:truth", version.ref = "androidxtest" }
 # orchestrator can prevent crash to interrupt the whole test
-orchestrator = { module = "androidx.test:orchestrator", version = "1.4.2" }
 espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.5.1" }
 espresso-web = { module = "androidx.test.espresso:espresso-web", version = "3.5.1" }
 
@@ -170,6 +160,7 @@ powermock-module-junit4 = { module = "org.powermock:powermock-module-junit4", ve
 powermock-module-junit4-rule = { module = "org.powermock:powermock-module-junit4-rule", version.ref = "powermock" }
 powermock-classloading-xstream = { module = "org.powermock:powermock-classloading-xstream", version.ref = "powermock" }
 powermock-reflect = { module = "org.powermock:powermock-reflect", version.ref = "powermock" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 
 [bundles]
 android-support = ["support-annotations", "support-appcompat", "support-fragment", "support-constraint", "support-recyclerview", "support-design", "support-navigation-fragment", "support-navigation-ui"]
