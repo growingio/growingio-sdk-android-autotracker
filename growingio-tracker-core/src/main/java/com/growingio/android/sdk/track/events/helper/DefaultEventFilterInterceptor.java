@@ -56,6 +56,10 @@ public class DefaultEventFilterInterceptor implements EventFilterInterceptor {
         return fieldArea;
     }
 
+    @Override
+    public void filterCustomEventAttributes(String eventName, Map<String, String> attributes) {
+    }
+
     public static class FilterEventType {
         public static final String VISIT = TrackEventType.VISIT;
         public static final String CUSTOM = TrackEventType.CUSTOM;
