@@ -4,6 +4,7 @@ plugins {
     alias libs.plugins.android.library apply false
     alias libs.plugins.kotlin.android apply false
     alias libs.plugins.kotlin.jvm apply false
+    alias libs.plugins.compose apply false
 
     alias libs.plugins.nexus.staging apply false
     alias libs.plugins.sonarqube apply false
@@ -13,7 +14,6 @@ plugins {
     alias libs.plugins.growingio.plugin apply false
 
     alias libs.plugins.spotless apply false
-
 }
 
 apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"

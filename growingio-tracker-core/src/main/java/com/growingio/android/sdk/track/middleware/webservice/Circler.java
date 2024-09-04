@@ -28,6 +28,7 @@ public class Circler {
 
     public final static int CIRCLE_INIT = 0;
     public final static int CIRCLE_DATA = 1;
+    public final static int CIRCLE_REFRESH = 2;
 
     public final int circleDataType;
     private Map<String, String> params;
@@ -35,6 +36,10 @@ public class Circler {
     public Circler(Map<String, String> params) {
         circleDataType = CIRCLE_INIT;
         this.params = params;
+    }
+
+    public Circler(int type) {
+        circleDataType = type;
     }
 
     public Map<String, String> getParams() {
