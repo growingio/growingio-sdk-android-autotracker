@@ -75,6 +75,7 @@ public class ComposeAndroidView {
     public void click(MotionEvent event) {
         if (owner == null) {
             Logger.w(TAG, "Can't find Compose View in activity.");
+            return;
         }
         TrackMainThread.trackMain().postActionToTrackMain(() -> locate(event.getX(), event.getY()));
     }
