@@ -17,8 +17,12 @@ package com.growingio.android.compose
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.geometry.Rect
 import androidx.core.view.children
+import com.growingio.android.compose.GrowingComposeKt.path
 import com.growingio.android.sdk.TrackerContext
+import com.growingio.android.sdk.track.TrackMainThread
+import com.growingio.android.sdk.track.events.PageEvent
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider
 import com.growingio.android.sdk.track.view.OnDecorViewsObserver
@@ -26,11 +30,42 @@ import com.growingio.android.sdk.track.view.WindowHelper
 
 class ComposeAutotrackProvider : TrackerLifecycleProvider, OnDecorViewsObserver {
 
+    companion object {
+        private var pageCache: LinkedHashSet<ComposePageNode> = linkedSetOf()
+
+        fun addOrResumeComposePage(alias: String, attributes: Map<String, String>? = null) {
+            if (!TrackerContext.initializedSuccessfully()) return
+            val pageNode = ComposePageNode(alias, Rect.Zero, attributes)
+            pageCache.add(pageNode)
+
+            TrackMainThread.trackMain().postEventToTrackMain(
+                PageEvent.Builder()
+                    .setPath(alias.path())
+                    .setTitle(alias)
+                    .setTimestamp(System.currentTimeMillis())
+                    .setAttributes(attributes),
+            )
+        }
+
+        fun removeComposePage(alias: String) {
+            val findPage = pageCache.findLast { it.alias == alias }
+            if (findPage == null) {
+                return
+            }
+            pageCache.remove(findPage)
+        }
+
+        fun findComposePageAttribute(alias: String): Map<String, String>? {
+            return pageCache.findLast { it.alias == alias }?.attributes
+        }
+    }
+
     // Map<DecorView.HashCode,Window.Callback>
     private val composeMaps: HashMap<Int, GrowingWindowCallback?> = hashMapOf()
     private var registry: TrackerRegistry? = null
 
     override fun setup(context: TrackerContext) {
+        // compose not support when sdk is cdp
         if (context.configurationProvider.isDowngrade) return
         this.registry = context.registry
         WindowHelper.get().addWindowManagerViewsObserver(this)
@@ -60,6 +95,7 @@ class ComposeAutotrackProvider : TrackerLifecycleProvider, OnDecorViewsObserver 
 
     override fun shutdown() {
         WindowHelper.get().removeWindowManagerViewsObserver(this)
+        pageCache.clear()
     }
 
     private fun findComposeView(composeViews: ArrayList<View>, view: View) {

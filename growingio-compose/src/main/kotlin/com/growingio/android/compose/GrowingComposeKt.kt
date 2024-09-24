@@ -15,9 +15,6 @@
  */
 package com.growingio.android.compose
 
-import com.growingio.android.sdk.track.TrackMainThread
-import com.growingio.android.sdk.track.events.PageEvent
-
 internal object GrowingComposeKt {
 
     fun String.path(): String {
@@ -26,15 +23,5 @@ internal object GrowingComposeKt {
         } else {
             "/$this"
         }
-    }
-
-    fun trackComposePage(alias: String, attributes: Map<String, String>? = null) {
-        TrackMainThread.trackMain().postEventToTrackMain(
-            PageEvent.Builder()
-                .setPath(alias.path())
-                .setTitle(alias)
-                .setTimestamp(System.currentTimeMillis())
-                .setAttributes(attributes),
-        )
     }
 }

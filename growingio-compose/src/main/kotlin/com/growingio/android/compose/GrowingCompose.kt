@@ -19,9 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.semantics
-import com.growingio.android.compose.GrowingComposeKt.trackComposePage
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 
 object GrowingCompose {
 
@@ -87,7 +90,7 @@ object GrowingCompose {
         )
     }
 
-    fun Modifier.growingPage(alias: String): Modifier {
+    private fun Modifier.growingPage(alias: String): Modifier {
         return semantics(
             properties = {
                 this[GROWING_PAGE_TAG] = alias
@@ -96,13 +99,28 @@ object GrowingCompose {
     }
 
     @Composable
-    fun GrowingComposePage(alias: String, attributes: Map<String, String> = hashMapOf(), content: @Composable () -> Unit) {
+    fun GrowingComposePage(
+        alias: String,
+        attributes: Map<String, String> = hashMapOf(),
+        content: @Composable () -> Unit,
+    ) {
+        val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
         DisposableEffect(alias) {
-            trackComposePage(alias, attributes)
+            val observer = LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    ComposeAutotrackProvider.addOrResumeComposePage(alias, attributes)
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
             onDispose {
+                ComposeAutotrackProvider.removeComposePage(alias)
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
-        Layout(content = content, modifier = Modifier.growingPage(alias)) { measurables, constraints ->
+        Layout(
+            content = content,
+            modifier = Modifier.growingPage(alias),
+        ) { measurables, constraints ->
             layout(constraints.maxWidth, constraints.maxHeight) {
                 measurables.forEach { measurable ->
                     val placeable = measurable.measure(constraints)

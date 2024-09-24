@@ -21,7 +21,19 @@ import com.growingio.android.compose.GrowingComposeKt.path
 data class ComposePageNode(
     val alias: String,
     val bound: Rect,
-)
+    val attributes: Map<String, String>? = null,
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ComposePageNode) return false
+        if (other.alias == alias) return true
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return alias.hashCode()
+    }
+}
 
 class ComposeNode(val layoutNode: Any) {
 
@@ -40,6 +52,7 @@ class ComposeNode(val layoutNode: Any) {
 
     var parent: ComposeNode? = null
     var children: List<ComposeNode> = arrayListOf()
+    var attributes: Map<String, String>? = null
 
     // inner
     private var index: Int = -1
@@ -82,13 +95,15 @@ class ComposeNode(val layoutNode: Any) {
         }
         if (alias != null) {
             path = if (alias!!.startsWith("/")) alias else "/$alias"
+            attributes = ComposeAutotrackProvider.findComposePageAttribute(alias!!)
             return path ?: ""
         }
 
         if (parent == null) {
             path = ""
         } else {
-            path = parent?.calculatePath()
+            path = parent?.path
+            attributes = parent?.attributes
         }
         return path ?: ""
     }

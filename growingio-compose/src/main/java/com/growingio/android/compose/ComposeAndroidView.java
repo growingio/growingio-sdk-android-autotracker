@@ -136,6 +136,7 @@ public class ComposeAndroidView {
                         .setXpath(targetNode.xpath())
                         .setIndex(targetNode.index())
                         .setXIndex(targetNode.xIndex())
+                        .setAttributes(targetNode.getAttributes())
         );
 
     }
@@ -248,7 +249,7 @@ public class ComposeAndroidView {
                                 Rect bounds = getLayoutNodeBounds(node);
                                 if (bounds != null) {
                                     Rect offsetRect = bounds.translate(ownerOffsetX, ownerOffsetY);
-                                    pages.add(new ComposePageNode(alias, offsetRect));
+                                    pages.add(new ComposePageNode(alias, offsetRect, null));
                                 }
                             }
                         }
