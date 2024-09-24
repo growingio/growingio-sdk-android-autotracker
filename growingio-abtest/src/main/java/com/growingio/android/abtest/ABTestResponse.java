@@ -28,11 +28,11 @@ import java.util.Map;
 class ABTestResponse {
 
     private static final String LAYER_ID = "layerId";
-    private static final String LAYER_NAME = "expLayerName";
+    private static final String LAYER_NAME = "layerName";
     private static final String STRATEGY_ID = "strategyId";
-    private static final String STRATEGY_NAME = "expStrategyName";
+    private static final String STRATEGY_NAME = "strategyName";
     private static final String EXPERIMENT_ID = "experimentId";
-    private static final String EXPERIMENT_NAME = "expName";
+    private static final String EXPERIMENT_NAME = "experimentName";
     private static final String VARIABLES = "variables";
 
     private int code = -1;
