@@ -144,7 +144,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     }
 
     private BaseEvent.BaseBuilder<?> transformEventBuilder(BaseEvent.BaseBuilder<?> gEvent) {
-        if (customEventReferPage.isPageRefer && !customEventReferPage.pagePath.isEmpty()&& gEvent instanceof CustomEvent.Builder) {
+        if (customEventReferPage.isPageRefer && gEvent instanceof CustomEvent.Builder) {
             CustomEvent.Builder customBuilder = (CustomEvent.Builder) gEvent;
             PageLevelCustomEvent.Builder newBuilder = new PageLevelCustomEvent.Builder();
             newBuilder.setAttributes(customBuilder.getAttributes());
