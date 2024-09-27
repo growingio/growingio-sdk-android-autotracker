@@ -152,7 +152,7 @@ public class Tracker {
         if (attributes != null) {
             attributes = new HashMap<>(attributes);
         }
-        TrackEventGenerator.generateCustomEvent(eventName, attributes);
+        TrackEventGenerator.generatePageCustomEvent(eventName, attributes,"/fake");
     }
 
     public void setDynamicGeneralPropsGenerator(DynamicGeneralPropsGenerator generator) {

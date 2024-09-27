@@ -25,6 +25,7 @@ import java.util.Map;
 public class AutotrackConfig implements Configurable {
     private float mImpressionScale = 0;
     private boolean enableFragmentTag = false;
+    private boolean customEventWithPage = true;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
     private boolean autotrackEnabled = true;
@@ -153,5 +154,17 @@ public class AutotrackConfig implements Configurable {
     public AutotrackConfig setAutotrack(boolean enabled) {
         this.autotrackEnabled = enabled;
         return this;
+    }
+
+    /**
+     * Refer the custom event with the page. If called, the custom event will be associated with the page path.
+     */
+    public AutotrackConfig referCustomEventWithPage() {
+        this.customEventWithPage = true;
+        return this;
+    }
+
+    public boolean isReferCustomEventWithPage() {
+        return this.customEventWithPage;
     }
 }

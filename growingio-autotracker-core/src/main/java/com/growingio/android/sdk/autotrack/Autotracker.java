@@ -21,14 +21,17 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.inject.InjectorProvider;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
+import com.growingio.android.sdk.autotrack.page.Page;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.autotrack.view.ViewNodeProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 
@@ -54,6 +57,46 @@ public class Autotracker extends Tracker {
 
         return providerMap;
     }
+
+
+    @Override
+    public void trackCustomEvent(String eventName) {
+        if (!isInited) return;
+        if (TextUtils.isEmpty(eventName)) {
+            Logger.e(TAG, "trackCustomEvent: eventName is NULL");
+            return;
+        }
+        trackCustomEvent(eventName, null);
+    }
+
+    @Override
+    public void trackCustomEvent(String eventName, Map<String, String> attributes) {
+        if (!isInited) return;
+        if (TextUtils.isEmpty(eventName)) {
+            Logger.e(TAG, "trackCustomEvent: eventName is NULL");
+            return;
+        }
+        TrackMainThread.trackMain().runOnUiThread(() -> {
+            TrackerContext trackerContext = getContext();
+            if (trackerContext == null) {
+                return;
+            }
+            AutotrackConfig config = trackerContext.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
+            if (config == null || !config.isReferCustomEventWithPage()) {
+                super.trackCustomEvent(eventName, attributes);
+                return;
+            }
+            Page<?> lastPage = PageProvider.get().findLatestPage();
+            if (lastPage == null) {
+                super.trackCustomEvent(eventName, attributes);
+                return;
+            }
+            String path = lastPage.activePath();
+            if (path.isEmpty()) path = lastPage.path();
+            TrackEventGenerator.generatePageCustomEvent(eventName, attributes, path);
+        });
+    }
+
 
     /**
      * Generate an event for the current page

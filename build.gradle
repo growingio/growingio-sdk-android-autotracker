@@ -46,8 +46,10 @@ subprojects {
         kotlin {
             target '**/*.kt'
             targetExclude("$buildDir/**/*.kt")
-
-            ktlint()
+            ktlint().editorConfigOverride([
+                    "ktlint_standard_comment-wrapping": "disabled",
+                    "max_line_length"                 : 2147483647,
+            ])
         }
         groovyGradle {
             target '*.gradle'

@@ -37,6 +37,15 @@ public class TrackEventGenerator {
         );
     }
 
+    public static void generatePageCustomEvent(String name, Map<String, String> attributes, String path) {
+        TrackMainThread.trackMain().postEventToTrackMain(
+                new PageLevelCustomEvent.Builder()
+                        .setPath(path)
+                        .setEventName(name)
+                        .setAttributes(attributes)
+        );
+    }
+
     public static void generateConversionVariablesEvent(Map<String, String> variables) {
         TrackMainThread.trackMain().postEventToTrackMain(
                 new ConversionVariablesEvent.Builder()

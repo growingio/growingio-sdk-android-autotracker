@@ -545,4 +545,21 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         }
         return null;
     }
+
+    public Page<?> findLatestPage(){
+        if (ALL_PAGE_TREE.isEmpty()) {
+            return null;
+        }
+        Page<?> page = null;
+        for (ActivityPage activityPage : ALL_PAGE_TREE.values()) {
+            if (page == null) {
+                page = activityPage;
+            } else {
+                if (activityPage.getShowTimestamp() > page.getShowTimestamp()) {
+                    page = activityPage;
+                }
+            }
+        }
+        return page;
+    }
 }
