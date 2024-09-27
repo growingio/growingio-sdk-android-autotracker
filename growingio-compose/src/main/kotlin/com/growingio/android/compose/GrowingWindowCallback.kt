@@ -78,13 +78,14 @@ internal class GrowingWindowCallback(val context: Context, private val window: W
                 return false
             }
 
-            override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
                 return false
             }
 
             override fun onLongPress(e: MotionEvent) {}
 
-            override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 return false
             }
         },
