@@ -60,6 +60,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     private TrackerContext context;
 
     private final AttributesBuilder generalProps = new AttributesBuilder();
+    private final CustomEventReferPage customEventReferPage = new CustomEventReferPage();
 
     EventBuilderProvider() {
     }
@@ -116,19 +117,45 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     public BaseEvent onGenerateGEvent(BaseEvent.BaseBuilder<?> gEvent) {
         dispatchEventWillBuild(gEvent);
 
-        if (!filterEvent(gEvent)) return null;
+        BaseEvent.BaseBuilder<?> eventBuilder = transformEventBuilder(gEvent);
+        if (!filterEvent(eventBuilder)) return null;
 
-        addDynamicPropsToAllEvent(gEvent);
-        addGeneralPropsToAllEvent(gEvent);
-        gEvent.readPropertyInTrackThread(context);
+        addDynamicPropsToAllEvent(eventBuilder);
+        addGeneralPropsToAllEvent(eventBuilder);
+
+        eventBuilder.readPropertyInTrackThread(context);
         if (!configurationProvider.isDowngrade()) {
-            gEvent.readNewPropertyInTrackThread(context);
+            eventBuilder.readNewPropertyInTrackThread(context);
         }
 
-        BaseEvent event = gEvent.build();
+        BaseEvent event = eventBuilder.build();
         dispatchEventDidBuild(event);
 
         return event;
+    }
+
+    public void enableCustomEventRefer(boolean enable) {
+        customEventReferPage.isPageRefer = enable;
+    }
+
+    public void setCustomEventReferPage(String pagePath, long timeStamp) {
+        customEventReferPage.pagePath = pagePath;
+        customEventReferPage.timeStamp = timeStamp;
+    }
+
+    private BaseEvent.BaseBuilder<?> transformEventBuilder(BaseEvent.BaseBuilder<?> gEvent) {
+        if (customEventReferPage.isPageRefer && gEvent instanceof CustomEvent.Builder) {
+            CustomEvent.Builder customBuilder = (CustomEvent.Builder) gEvent;
+            PageLevelCustomEvent.Builder newBuilder = new PageLevelCustomEvent.Builder();
+            newBuilder.setAttributes(customBuilder.getAttributes());
+            newBuilder.setEventName(customBuilder.getEventName());
+            if (configurationProvider.isDowngrade()) {
+                newBuilder.setPageShowTimestamp(customEventReferPage.timeStamp);
+            }
+            newBuilder.setPath(customEventReferPage.pagePath);
+            return newBuilder;
+        }
+        return gEvent;
     }
 
     private void addDynamicPropsToAllEvent(BaseEvent.BaseBuilder<?> gEvent) {
@@ -275,5 +302,11 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
     public void setDynamicGeneralPropGenerator(DynamicGeneralPropsGenerator dynamicGeneralPropsGenerator) {
         this.dynamicGeneralPropsGenerator = dynamicGeneralPropsGenerator;
+    }
+
+    private static class CustomEventReferPage {
+        private boolean isPageRefer = false;
+        private String pagePath = "/fake";
+        private long timeStamp = 0L;
     }
 }

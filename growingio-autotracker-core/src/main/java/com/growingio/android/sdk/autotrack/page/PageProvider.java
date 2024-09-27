@@ -33,6 +33,7 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
@@ -60,6 +61,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         private static final PageProvider INSTANCE = new PageProvider();
     }
 
+    private EventBuilderProvider eventBuilderProvider;
     private ActivityStateProvider activityStateProvider;
     private PageConfig pageConfig;
 
@@ -71,12 +73,14 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     @Override
     public void setup(TrackerContext context) {
         activityStateProvider = context.getActivityStateProvider();
+        eventBuilderProvider = context.getEventBuilderProvider();
 
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
         AutotrackConfig autotrackConfig = configurationProvider.getConfiguration(AutotrackConfig.class);
 
         loadPageConfig(context, autotrackConfig, configurationProvider.isDowngrade());
 
+        eventBuilderProvider.enableCustomEventRefer(autotrackConfig.isReferCustomEventWithPage());
         activityStateProvider.registerActivityLifecycleListener(this);
     }
 
@@ -229,6 +233,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     private void generatePageEvent(Page<?> page) {
+        eventBuilderProvider.setCustomEventReferPage(page.activePath(), page.getShowTimestamp());
         String orientation = TrackMainThread.trackMain().getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
         TrackMainThread.trackMain().postEventToTrackMain(
@@ -544,22 +549,5 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             return findOrCreateActivityPage(activity);
         }
         return null;
-    }
-
-    public Page<?> findLatestPage(){
-        if (ALL_PAGE_TREE.isEmpty()) {
-            return null;
-        }
-        Page<?> page = null;
-        for (ActivityPage activityPage : ALL_PAGE_TREE.values()) {
-            if (page == null) {
-                page = activityPage;
-            } else {
-                if (activityPage.getShowTimestamp() > page.getShowTimestamp()) {
-                    page = activityPage;
-                }
-            }
-        }
-        return page;
     }
 }
