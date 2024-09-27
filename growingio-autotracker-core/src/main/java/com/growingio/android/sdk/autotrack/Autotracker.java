@@ -62,10 +62,6 @@ public class Autotracker extends Tracker {
     @Override
     public void trackCustomEvent(String eventName) {
         if (!isInited) return;
-        if (TextUtils.isEmpty(eventName)) {
-            Logger.e(TAG, "trackCustomEvent: eventName is NULL");
-            return;
-        }
         trackCustomEvent(eventName, null);
     }
 
@@ -93,7 +89,8 @@ public class Autotracker extends Tracker {
             }
             String path = lastPage.activePath();
             if (path.isEmpty()) path = lastPage.path();
-            TrackEventGenerator.generatePageCustomEvent(eventName, attributes, path);
+            Map<String, String> attrs = attributes != null ? new HashMap<>(attributes) : null;
+            TrackEventGenerator.generatePageCustomEvent(eventName, attrs, path);
         });
     }
 
