@@ -68,7 +68,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     @Override
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
-        customEventReferPage.isPageRefer = configurationProvider.core().isReferCustomEventWithPage();
+        customEventReferPage.isPageRefer = configurationProvider.core().isCustomEventWithPage();
         this.context = context;
     }
 

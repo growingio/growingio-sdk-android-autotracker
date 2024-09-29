@@ -217,14 +217,14 @@ public class CoreConfiguration implements Configurable {
     }
 
     /**
-     * Refer the custom event with the page. If called, the custom event will be associated with the page path.
+     * Bring page path to custom event. If called, the custom event will be associated with the page path.
      */
-    public CoreConfiguration referCustomEventWithPage() {
+    public CoreConfiguration embedPathInCustomEvent() {
         this.mCustomEventWithPage = true;
         return this;
     }
 
-    public boolean isReferCustomEventWithPage() {
+    public boolean isCustomEventWithPage() {
         return mCustomEventWithPage;
     }
 }
