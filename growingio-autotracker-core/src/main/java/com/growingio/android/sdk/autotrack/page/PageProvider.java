@@ -80,7 +80,6 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
 
         loadPageConfig(context, autotrackConfig, configurationProvider.isDowngrade());
 
-        eventBuilderProvider.enableCustomEventRefer(autotrackConfig.isReferCustomEventWithPage());
         activityStateProvider.registerActivityLifecycleListener(this);
     }
 

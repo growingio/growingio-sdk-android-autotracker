@@ -33,6 +33,7 @@ public class CoreConfiguration implements Configurable {
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
 
+    private boolean mCustomEventWithPage = false;
     private boolean mRequireAppProcessesEnabled = false;
     private String mDataCollectionServerHost = "https://napi.growingio.com";
     private EventFilterInterceptor mEventFilterInterceptor;
@@ -213,5 +214,17 @@ public class CoreConfiguration implements Configurable {
     public CoreConfiguration setDataValidityPeriod(int dataValidityPeriod) {
         this.mDataValidityPeriod = dataValidityPeriod;
         return this;
+    }
+
+    /**
+     * Refer the custom event with the page. If called, the custom event will be associated with the page path.
+     */
+    public CoreConfiguration referCustomEventWithPage() {
+        this.mCustomEventWithPage = true;
+        return this;
+    }
+
+    public boolean isReferCustomEventWithPage() {
+        return mCustomEventWithPage;
     }
 }

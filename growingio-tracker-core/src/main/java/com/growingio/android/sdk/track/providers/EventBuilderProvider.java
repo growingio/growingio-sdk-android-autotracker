@@ -68,6 +68,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     @Override
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
+        customEventReferPage.isPageRefer = configurationProvider.core().isReferCustomEventWithPage();
         this.context = context;
     }
 
@@ -134,9 +135,6 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         return event;
     }
 
-    public void enableCustomEventRefer(boolean enable) {
-        customEventReferPage.isPageRefer = enable;
-    }
 
     public void setCustomEventReferPage(String pagePath, long timeStamp) {
         customEventReferPage.pagePath = pagePath;
@@ -308,7 +306,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     }
 
     private static class CustomEventReferPage {
-        private boolean isPageRefer = true;
+        private boolean isPageRefer = false;
         private String pagePath = "/";
         private long timeStamp = 0L;
     }
