@@ -237,7 +237,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         if (activePage != null) {
             eventBuilderProvider.setCustomEventReferPage(activePage.path(), activePage.getShowTimestamp());
         } else {
-            eventBuilderProvider.setCustomEventReferPage("", 0);
+            eventBuilderProvider.setCustomEventReferPage("/", 0);
         }
         String orientation = TrackMainThread.trackMain().getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
