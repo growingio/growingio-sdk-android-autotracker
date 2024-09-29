@@ -305,7 +305,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     }
 
     private static class CustomEventReferPage {
-        private boolean isPageRefer = false;
+        private boolean isPageRefer = true;
         private String pagePath = "/";
         private long timeStamp = 0L;
     }
