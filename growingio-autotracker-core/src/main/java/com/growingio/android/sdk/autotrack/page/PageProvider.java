@@ -33,6 +33,7 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
 
@@ -60,6 +61,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         private static final PageProvider INSTANCE = new PageProvider();
     }
 
+    private EventBuilderProvider eventBuilderProvider;
     private ActivityStateProvider activityStateProvider;
     private PageConfig pageConfig;
 
@@ -71,6 +73,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     @Override
     public void setup(TrackerContext context) {
         activityStateProvider = context.getActivityStateProvider();
+        eventBuilderProvider = context.getEventBuilderProvider();
 
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
         AutotrackConfig autotrackConfig = configurationProvider.getConfiguration(AutotrackConfig.class);
@@ -229,6 +232,12 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     private void generatePageEvent(Page<?> page) {
+        Page<?> activePage = page.lastActivePage();
+        if (activePage != null) {
+            eventBuilderProvider.setCustomEventReferPage(activePage.path(), activePage.getShowTimestamp());
+        } else {
+            eventBuilderProvider.setCustomEventReferPage("/", 0);
+        }
         String orientation = TrackMainThread.trackMain().getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 ? PageEvent.ORIENTATION_PORTRAIT : PageEvent.ORIENTATION_LANDSCAPE;
         TrackMainThread.trackMain().postEventToTrackMain(

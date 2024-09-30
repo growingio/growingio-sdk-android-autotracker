@@ -26,6 +26,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 class ABTestResponse {
+
+    private static final String LAYER_ID = "layerId";
+    private static final String LAYER_NAME = "layerName";
+    private static final String STRATEGY_ID = "strategyId";
+    private static final String STRATEGY_NAME = "strategyName";
+    private static final String EXPERIMENT_ID = "experimentId";
+    private static final String EXPERIMENT_NAME = "experimentName";
+    private static final String VARIABLES = "variables";
+
     private int code = -1;
     private String errorMsg;
 
@@ -48,9 +57,9 @@ class ABTestResponse {
             int code = jsonObject.getInt("code");
             response.code = code;
             if (code == 0) {
-                long experimentId = jsonObject.optLong("experimentId");
-                long strategyId = jsonObject.optLong("strategyId");
-                JSONObject variables = jsonObject.optJSONObject("variables");
+                long experimentId = jsonObject.optLong(EXPERIMENT_ID);
+                long strategyId = jsonObject.optLong(STRATEGY_ID);
+                JSONObject variables = jsonObject.optJSONObject(VARIABLES);
                 Map<String, String> variableMap = new HashMap<>();
                 if (variables != null) {
                     Iterator<String> keys = variables.keys();
@@ -62,6 +71,10 @@ class ABTestResponse {
                 response.expiredTime = System.currentTimeMillis() + expiredTime;
                 response.naturalDaytime = tomorrowMill();
                 response.abExperiment = new ABExperiment(layerId, strategyId, experimentId, variableMap);
+                String expLayerName = jsonObject.optString(LAYER_NAME);
+                String expName = jsonObject.optString(EXPERIMENT_NAME);
+                String expStrategyName = jsonObject.optString(STRATEGY_NAME);
+                response.abExperiment.setExperimentNames(expLayerName, expName, expStrategyName);
             } else {
                 response.errorMsg = jsonObject.getString("errorMsg");
             }
@@ -104,9 +117,9 @@ class ABTestResponse {
             jsonObject.put("expiredTime", expiredTime);
             jsonObject.put("naturalDaytime", naturalDaytime);
             if (abExperiment != null) {
-                jsonObject.put("layerId", abExperiment.getLayerId());
-                jsonObject.put("strategyId", abExperiment.getStrategyId());
-                jsonObject.put("experimentId", abExperiment.getExperimentId());
+                jsonObject.put(LAYER_ID, abExperiment.getLayerId());
+                jsonObject.put(STRATEGY_ID, abExperiment.getStrategyId());
+                jsonObject.put(EXPERIMENT_ID, abExperiment.getExperimentId());
                 Map<String, String> variableMap = abExperiment.getVariables();
                 Iterator<String> keys = variableMap.keySet().iterator();
                 JSONObject variablesJson = new JSONObject();
@@ -114,7 +127,10 @@ class ABTestResponse {
                     String key = keys.next();
                     variablesJson.put(key, variableMap.get(key));
                 }
-                jsonObject.put("variables", variablesJson);
+                jsonObject.put(VARIABLES, variablesJson);
+                jsonObject.put(LAYER_NAME, abExperiment.getExpLayerName());
+                jsonObject.put(EXPERIMENT_NAME, abExperiment.getExpName());
+                jsonObject.put(STRATEGY_NAME, abExperiment.getExpStrategyName());
             }
 
             return jsonObject.toString();
@@ -133,10 +149,10 @@ class ABTestResponse {
             abTestResponse.expiredTime = expiredTime;
             abTestResponse.naturalDaytime = naturalDaytime;
 
-            String layerId = jsonObject.getString("layerId");
-            long strategyId = jsonObject.getLong("strategyId");
-            long experimentId = jsonObject.getLong("experimentId");
-            JSONObject variables = jsonObject.getJSONObject("variables");
+            String layerId = jsonObject.getString(LAYER_ID);
+            long strategyId = jsonObject.getLong(STRATEGY_ID);
+            long experimentId = jsonObject.getLong(EXPERIMENT_ID);
+            JSONObject variables = jsonObject.getJSONObject(VARIABLES);
             Iterator<String> keys = variables.keys();
             Map<String, String> variableMap = new HashMap<>();
             while (keys.hasNext()) {
@@ -144,6 +160,10 @@ class ABTestResponse {
                 variableMap.put(key, variables.get(key).toString());
             }
             abTestResponse.abExperiment = new ABExperiment(layerId, strategyId, experimentId, variableMap);
+            String expLayerName = jsonObject.optString(LAYER_NAME);
+            String expName = jsonObject.optString(EXPERIMENT_NAME);
+            String expStrategyName = jsonObject.optString(STRATEGY_NAME);
+            abTestResponse.abExperiment.setExperimentNames(expLayerName, expName, expStrategyName);
             return abTestResponse;
         } catch (JSONException e) {
             return null;

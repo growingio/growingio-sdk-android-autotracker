@@ -10,7 +10,7 @@ navigation = "2.5.3"
 pluginGradle = "7.4.2" # 4.2.2-7.4.2
 kotlin = "1.9.21"
 
-spotless = "6.20.0"
+spotless = "6.25.0"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-compiler
 # composeBom = "2023.04.00"
@@ -30,8 +30,8 @@ protobuf = "3.22.3"
 powermock = "2.0.9"
 
 # !!! SDK VERSION !!!
-growingio = "4.3.1"
-growingioCode = "40301"
+growingio = "4.3.2"
+growingioCode = "40302"
 growingioPlugin = "4.3.0"
 junit = "1.1.5"
 

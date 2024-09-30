@@ -63,7 +63,7 @@ public abstract class BaseAttributesEvent extends BaseEvent {
             return this;
         }
 
-        protected Map<String, String> getAttributes() {
+        public Map<String, String> getAttributes() {
             return attributes;
         }
     }

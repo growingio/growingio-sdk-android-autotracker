@@ -194,7 +194,10 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             attributesBuilder
                     .addAttribute("$exp_id", abExperiment.getExperimentId())
                     .addAttribute("$exp_strategy_id", abExperiment.getStrategyId())
-                    .addAttribute("$exp_layer_id", abExperiment.getLayerId());
+                    .addAttribute("$exp_layer_id", abExperiment.getLayerId())
+                    .addAttribute("$exp_layer_name", abExperiment.getExpLayerName())
+                    .addAttribute("$exp_name", abExperiment.getExpName())
+                    .addAttribute("$exp_strategy_name", abExperiment.getExpStrategyName());
             CustomEvent.Builder customEventBuilder = new CustomEvent.Builder();
             customEventBuilder.setEventName("$exp_hit");
             customEventBuilder.setAttributes(attributesBuilder.build());

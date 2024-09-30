@@ -47,7 +47,15 @@ public class AutotrackTest {
         Application application = ApplicationProvider.getApplicationContext();
 
         Map<Class<? extends Configurable>, Configurable> modules = new HashMap<>();
-        modules.put(AutotrackConfig.class, new AutotrackConfig().setImpressionScale(0.5f));
+        modules.put(AutotrackConfig.class,
+                new AutotrackConfig().setImpressionScale(0.5f)
+                        .setWebViewBridgeEnabled(true)
+                        .setPageRuleXml(0)
+                        .addPageRule("MainActivity", "com.growingio.android.sdk.autotrack.RobolectricActivity")
+                        .addPageMatchRule(".*")
+                        .enableFragmentTag(false)
+
+        );
         TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("AutotrackTest", "growingio://autotrack"), modules);
         autotracker = new Autotracker(application);
     }
