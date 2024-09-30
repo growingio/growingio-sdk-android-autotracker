@@ -84,9 +84,9 @@ internal class JsonSerializerGenerator(
         val builderType = ClassName.get(eventBuilderType)
 
         val superinterface = ParameterizedTypeName.get(
-            ClassName.get(JSON_SERIALIZABLE_PACKAGE, JSON_SERIALIZABLE_CLASS), // rawType
-            ClassName.get(eventType), // the value for T
-            builderType, // the value for R
+            ClassName.get(JSON_SERIALIZABLE_PACKAGE, JSON_SERIALIZABLE_CLASS),
+            ClassName.get(eventType),
+            builderType,
         )
 
         val jonSerialBuilder = TypeSpec.classBuilder(generateClass).addJavadoc(
