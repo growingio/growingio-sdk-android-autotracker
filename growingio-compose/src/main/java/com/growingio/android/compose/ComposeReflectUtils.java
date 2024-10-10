@@ -66,6 +66,7 @@ public class ComposeReflectUtils {
     }
 
     public static boolean isClickableElement(Modifier modifier) {
+        if (modifier == null) return false;
         final @Nullable String type = modifier.getClass().getCanonicalName();
         if (CLICKABLE_ELEMENT_CLASSNAME.equals(type)) {
             if (clickableElementField == null) {
@@ -146,6 +147,7 @@ public class ComposeReflectUtils {
     }
 
     public static String getTextFromTextElement(Modifier modifier) {
+        if (modifier == null) return null;
         final @Nullable String type = modifier.getClass().getCanonicalName();
         if (TEXT_STRING_SIMPLE_ELEMENT_CLASSNAME.equals(type)) {
             if (textStringSimpleElementField == null) {
