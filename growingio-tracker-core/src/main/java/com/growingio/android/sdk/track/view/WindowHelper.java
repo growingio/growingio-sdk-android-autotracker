@@ -21,18 +21,24 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class WindowHelper {
     private static final String TAG = "WindowHelper";
 
     private final WindowManagerShadow mWindowManager;
+
+    private final HashSet<OnDecorViewsObserver> observers = new HashSet<>();
+    private ObserverArrayList observerArrayList;
+
 
     private WindowHelper() {
         WindowManagerShadow managerShadow = null;
@@ -46,6 +52,52 @@ public class WindowHelper {
 
     private static class SingleInstance {
         private static final WindowHelper INSTANCE = new WindowHelper();
+    }
+
+    public void addWindowManagerViewsObserver(OnDecorViewsObserver observer) {
+        if (observer != null) observers.add(observer);
+        if (observerArrayList == null) {
+            observerArrayList = new ObserverArrayList();
+            try {
+                mWindowManager.swapWindowManagerObserverViews(observerArrayList);
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            }
+        }
+    }
+
+    public Window pullWindow(View decorView) {
+        if (decorView == null) return null;
+        Window window = null;
+        try {
+            window = mWindowManager.pullWindowFromDecorView(decorView);
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+        return window;
+    }
+
+    public void removeWindowManagerViewsObserver(OnDecorViewsObserver observer) {
+        observers.remove(observer);
+    }
+
+    class ObserverArrayList extends ArrayList<View> {
+        @Override
+        public boolean add(View view) {
+            for (OnDecorViewsObserver observer : observers) {
+                observer.onDecorViewAdded(view);
+            }
+            return super.add(view);
+        }
+
+        @Override
+        public View remove(int index) {
+            View removedView = super.remove(index);
+            for (OnDecorViewsObserver observer : observers) {
+                observer.onDecorViewRemoved(removedView);
+            }
+            return removedView;
+        }
     }
 
     public static WindowHelper get() {

@@ -58,6 +58,10 @@ public class CirclerService implements LoadDataFetcher<WebService>,
             this.params = circler.getParams();
         } else if (circleDataType == Circler.CIRCLE_DATA) {
             screenshotProvider.generateCircleData(circler.getCirclerData());
+        } else if (circleDataType == Circler.CIRCLE_REFRESH) {
+            if (socketState.get() == SOCKET_STATE_READIED) {
+                screenshotProvider.refreshScreenshot();
+            }
         }
     }
 
