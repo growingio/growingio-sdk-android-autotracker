@@ -28,13 +28,26 @@ public class ComposeReflectUtils {
     private final static String TAG = "ComposeReflectUtils";
     private final static String CLICKABLE_ELEMENT_CLASSNAME = "androidx.compose.foundation.ClickableElement";
     private final static String COMBINED_CLICKABLE_ELEMENT_CLASSNAME = "androidx.compose.foundation.CombinedClickableElement";
+
+    // select/toggle
+    private final static String SELECTABLE_ELEMENT_CLASSNAME = "androidx.compose.foundation.selection.SelectableElement";
+    private final static String TOGGLEABLE_ELEMENT_CLASSNAME = "androidx.compose.foundation.selection.ToggleableElement";
+    private final static String TRI_TOGGLEABLE_ELEMENT_CLASSNAME = "androidx.compose.foundation.selection.TriStateToggleableElement";
+
+    // text
     private final static String TEXT_STRING_SIMPLE_ELEMENT_CLASSNAME = "androidx.compose.foundation.text.modifiers.TextStringSimpleElement";
     private final static String TEXT_ANNOTATED_STRING_ELEMENT_CLASSNAME = "androidx.compose.foundation.text.modifiers.TextAnnotatedStringElement";
     private final static String SELECTABLE_TEXT_ANNOTATED_STRING_ELEMENT_CLASSNAME = "androidx.compose.foundation.text.modifiers.SelectableTextAnnotatedStringElement";
 
+
     private static Field layoutDelegateField = null;
+
     private static Field clickableElementField = null;
     private static Field combinedClickableElementField = null;
+    private static Field selectableElementField = null;
+    private static Field toggleableElementField = null;
+    private static Field triToggleableElementField = null;
+
     private static Field textStringSimpleElementField = null;
     private static Field textAnnotatedStringElementField = null;
     private static Field selectableTextAnnotatedStringElementField = null;
@@ -84,6 +97,50 @@ public class ComposeReflectUtils {
                 Logger.e(TAG, "Failed to get clickable field value from ClickableElement.");
             }
             return false;
+        } else if (SELECTABLE_ELEMENT_CLASSNAME.equals(type)){
+            if (selectableElementField == null) {
+                try {
+                    selectableElementField = modifier.getClass().getDeclaredField("enabled");
+                    selectableElementField.setAccessible(true);
+                } catch (Exception e) {
+                    Logger.e(TAG, "Failed to get clickable field from SelectableElement.");
+                }
+            }
+            try {
+                return (Boolean) selectableElementField.get(modifier);
+            } catch (Exception e) {
+                Logger.e(TAG, "Failed to get clickable field value from SelectableElement.");
+            }
+            return false;
+        } else if (TOGGLEABLE_ELEMENT_CLASSNAME.equals(type)){
+            if (toggleableElementField == null) {
+                try {
+                    toggleableElementField = modifier.getClass().getDeclaredField("enabled");
+                    toggleableElementField.setAccessible(true);
+                } catch (Exception e) {
+                    Logger.e(TAG, "Failed to get clickable field from ToggleableElement.");
+                }
+            }
+            try {
+                return (Boolean) toggleableElementField.get(modifier);
+            } catch (Exception e) {
+                Logger.e(TAG, "Failed to get clickable field value from ToggleableElement.");
+            }
+            return false;
+        } else if (TRI_TOGGLEABLE_ELEMENT_CLASSNAME.equals(type)){
+            if (triToggleableElementField == null) {
+                try {
+                    triToggleableElementField = modifier.getClass().getDeclaredField("enabled");
+                    triToggleableElementField.setAccessible(true);
+                } catch (Exception e) {
+                    Logger.e(TAG, "Failed to get clickable field from TriStateToggleableElement.");
+                }
+            }
+            try {
+                return (Boolean) triToggleableElementField.get(modifier);
+            } catch (Exception e) {
+                Logger.e(TAG, "Failed to get clickable field value from TriStateToggleableElement.");
+            }
         }
         return false;
     }
