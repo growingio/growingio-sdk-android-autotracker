@@ -43,7 +43,7 @@ internal object GrowingComposeKt {
     fun reflectModifierNode(
         nodeInfo: ComposeNode,
         modifierNode: LayoutModifierNode,
-        layoutDirection: LayoutDirection
+        layoutDirection: LayoutDirection,
     ) {
         val className = modifierNode::class.java.canonicalName
         val context = TrackMainThread.trackMain().context ?: return
@@ -66,7 +66,7 @@ internal object GrowingComposeKt {
 
                 nodeInfo.offset =
                     IntOffset(if (rtl && layoutDirection == LayoutDirection.Rtl) -xPx else xPx, yPx)
-                Logger.d(TAG, "nodeInfo offset: ${nodeInfo.offset}");
+                Logger.d(TAG, "nodeInfo offset: ${nodeInfo.offset}")
             } else if (OFFSET_PX_NODE_CLASSNAME == className) {
                 val density = context.resources.displayMetrics.density
                 val offsetField = modifierNode::class.java.getDeclaredField("offset")
@@ -80,13 +80,12 @@ internal object GrowingComposeKt {
 
                 nodeInfo.offset = IntOffset(
                     if (rtl && layoutDirection == LayoutDirection.Rtl) -value.x else value.x,
-                    value.y
+                    value.y,
                 )
                 Logger.d(TAG, "nodeInfo offset: ${nodeInfo.offset}")
             }
         } catch (e: Exception) {
             Logger.e(TAG, "reflectModifierNode error: ${e.message}")
         }
-
     }
 }

@@ -6,7 +6,7 @@ minSdk = "17"
 androidxlifecycle = "2.8.2"
 androidxtest = "1.5.0"
 navigation = "2.5.3"
-androidx-compose-bom = "2024.08.00"
+androidx-compose-bom = "2024.09.00"
 androidx-activity-compose = "1.9.1"
 
 pluginGradle = "7.4.2" # 4.2.2-7.4.2
@@ -31,8 +31,8 @@ protobufPlugin = "0.9.1"
 protobuf = "3.22.3"
 
 # !!! SDK VERSION !!!
-growingio = "4.3.2"
-growingioCode = "40302"
+growingio = "4.4.0-SNAPSHOT"
+growingioCode = "40400"
 growingioPlugin = "4.3.0"
 junit = "1.1.5"
 

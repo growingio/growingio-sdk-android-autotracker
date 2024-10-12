@@ -22,7 +22,7 @@ import com.growingio.android.compose.GrowingComposeKt.path
 data class ComposePageNode(
     val alias: String,
     val bound: Rect,
-    val attributes: Map<String, String>? = null
+    val attributes: Map<String, String>? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -94,19 +94,19 @@ class ComposeNode(val layoutNode: Any) {
     }
 
     private fun isInLazyList(): Boolean {
-        return parent?.callName == "LazyRow"
-                || parent?.callName == "LazyColumn"
-                || parent?.callName == "LazyVerticalGrid"
-                || parent?.callName == "LazyHorizontalGrid"
+        return parent?.callName == "LazyRow" ||
+            parent?.callName == "LazyColumn" ||
+            parent?.callName == "LazyVerticalGrid" ||
+            parent?.callName == "LazyHorizontalGrid"
     }
 
     private fun isList(): Boolean {
-        return callName == "LazyRow"
-                || callName == "LazyColumn"
-                || callName == "LazyVerticalGrid"
-                || callName == "LazyHorizontalGrid"
-                || callName == "Column"
-                || callName == "Row"
+        return callName == "LazyRow" ||
+            callName == "LazyColumn" ||
+            callName == "LazyVerticalGrid" ||
+            callName == "LazyHorizontalGrid" ||
+            callName == "Column" ||
+            callName == "Row"
     }
 
     private fun calculatePath(): String {
@@ -136,20 +136,25 @@ class ComposeNode(val layoutNode: Any) {
 
         // 当前组件手动设置了 Modifier.growingTag(tag) 时, 优先取tag值
         val tempXpath = tag.takeIf { !it.isNullOrEmpty() }?.path()
-        // 取调用的组件名为路径名称
+            // 取调用的组件名为路径名称
             ?: callName.takeIf { !it.isNullOrEmpty() }?.path()
             // 在 plugin 中未获得组件调用名时, 以测量策略的前缀作为路径名称
             ?: measurePolicy.takeIf { !it.isNullOrEmpty() }?.replace("MeasurePolicy", "")?.path()
             // 无法取到值，一律设为layout
             ?: "/Layout"
 
-        val tempXIndex = if (tempXpath.isEmpty()) "" else {
+        val tempXIndex = if (tempXpath.isEmpty()) {
+            ""
+        } else {
             // 过滤 placeOrder 过大值
-            if (placeOrder in 1..100000) "/$placeOrder"
-            else "/0"
+            if (placeOrder in 1..100000) {
+                "/$placeOrder"
+            } else {
+                "/0"
+            }
         }
 
-        //Logger.d("Compose Node","tempXpath: $tempXpath, tempXIndex: $tempXIndex")
+        // Logger.d("Compose Node","tempXpath: $tempXpath, tempXIndex: $tempXIndex")
 
         // 当前组件为页面时，则将该节点作为根节点
         if (!alias.isNullOrEmpty()) {

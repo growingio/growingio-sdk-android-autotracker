@@ -293,7 +293,6 @@ public class ComposeAndroidView {
         final List<ComposeNode> clickViews = new ArrayList<>();
         ComposeNode rootNode = new ComposeNode(owner.getRoot());
         queue.add(rootNode);
-        int zLevel = 0;
 
         while (!queue.isEmpty()) {
             final ComposeNode nodeInfo = queue.poll();
