@@ -15,13 +15,24 @@
  */
 package com.growingio.android.compose;
 
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.compose.ui.Modifier;
+import androidx.compose.ui.node.LayoutNode;
+import androidx.compose.ui.node.Owner;
 import androidx.compose.ui.text.AnnotatedString;
+import androidx.compose.ui.viewinterop.AndroidViewHolder;
 
 import com.growingio.android.sdk.track.log.Logger;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 public class ComposeReflectUtils {
 
@@ -39,6 +50,9 @@ public class ComposeReflectUtils {
     private final static String TEXT_ANNOTATED_STRING_ELEMENT_CLASSNAME = "androidx.compose.foundation.text.modifiers.TextAnnotatedStringElement";
     private final static String SELECTABLE_TEXT_ANNOTATED_STRING_ELEMENT_CLASSNAME = "androidx.compose.foundation.text.modifiers.SelectableTextAnnotatedStringElement";
 
+    // LayoutNode
+    private final static String LAYOUT_NODE_CLASSNAME = "androidx.compose.ui.node.LayoutNode";
+    private final static String ANDROID_VIEWHOLDER_LAYOUT_NODE_CLASSNAME = "androidx.compose.ui.viewinterop.AndroidViewHolder$layoutNode";
 
     private static Field layoutDelegateField = null;
 
@@ -52,10 +66,36 @@ public class ComposeReflectUtils {
     private static Field textAnnotatedStringElementField = null;
     private static Field selectableTextAnnotatedStringElementField = null;
 
+
+    public static List<LayoutNode> getAndroidComposeViewNode(@NonNull LayoutNode node) {
+        AndroidViewHolder viewHolder = node.getInteropViewFactoryHolder$ui_release();
+        if (viewHolder == null) return null;
+        View rootView = viewHolder.getInteropView();
+        if (rootView == null) return null;
+        List<LayoutNode> layoutNodes = new ArrayList<>();
+
+        final Queue<View> queue = new LinkedList<>();
+        queue.add(rootView);
+
+        while (!queue.isEmpty()) {
+            View view = queue.poll();
+            if (ComposeAndroidView.isComposeView(view)) {
+                LayoutNode viewLayoutNode = ((Owner) view).getRoot();
+                layoutNodes.add(viewLayoutNode);
+            } else if (view instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) view;
+                for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                    queue.add(viewGroup.getChildAt(i));
+                }
+            }
+        }
+        return layoutNodes;
+    }
+
     public static Field getLayoutDelegateField() {
         if (layoutDelegateField == null) {
             try {
-                final Class<?> clazz = Class.forName("androidx.compose.ui.node.LayoutNode");
+                final Class<?> clazz = Class.forName(LAYOUT_NODE_CLASSNAME);
                 layoutDelegateField = clazz.getDeclaredField("layoutDelegate");
                 layoutDelegateField.setAccessible(true);
             } catch (Exception ignored) {
@@ -98,7 +138,7 @@ public class ComposeReflectUtils {
                 Logger.e(TAG, "Failed to get clickable field value from ClickableElement.");
             }
             return false;
-        } else if (SELECTABLE_ELEMENT_CLASSNAME.equals(type)){
+        } else if (SELECTABLE_ELEMENT_CLASSNAME.equals(type)) {
             if (selectableElementField == null) {
                 try {
                     selectableElementField = modifier.getClass().getDeclaredField("enabled");
@@ -113,7 +153,7 @@ public class ComposeReflectUtils {
                 Logger.e(TAG, "Failed to get clickable field value from SelectableElement.");
             }
             return false;
-        } else if (TOGGLEABLE_ELEMENT_CLASSNAME.equals(type)){
+        } else if (TOGGLEABLE_ELEMENT_CLASSNAME.equals(type)) {
             if (toggleableElementField == null) {
                 try {
                     toggleableElementField = modifier.getClass().getDeclaredField("enabled");
@@ -128,7 +168,7 @@ public class ComposeReflectUtils {
                 Logger.e(TAG, "Failed to get clickable field value from ToggleableElement.");
             }
             return false;
-        } else if (TRI_TOGGLEABLE_ELEMENT_CLASSNAME.equals(type)){
+        } else if (TRI_TOGGLEABLE_ELEMENT_CLASSNAME.equals(type)) {
             if (triToggleableElementField == null) {
                 try {
                     triToggleableElementField = modifier.getClass().getDeclaredField("enabled");

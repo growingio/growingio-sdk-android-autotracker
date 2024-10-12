@@ -28,6 +28,7 @@ import androidx.compose.ui.geometry.Rect;
 import androidx.compose.ui.layout.LayoutCoordinates;
 import androidx.compose.ui.layout.LayoutCoordinatesKt;
 import androidx.compose.ui.layout.ModifierInfo;
+import androidx.compose.ui.node.LayoutModifierNode;
 import androidx.compose.ui.node.LayoutNode;
 import androidx.compose.ui.node.LayoutNodeLayoutDelegate;
 import androidx.compose.ui.node.Owner;
@@ -53,6 +54,7 @@ public class ComposeAndroidView {
 
     private Owner owner;
 
+    // for screen offset:circler choose the right view
     private final int ownerOffsetX;
     private final int ownerOffsetY;
 
@@ -75,11 +77,18 @@ public class ComposeAndroidView {
     public void click(MotionEvent event) {
         if (owner == null) {
             Logger.w(TAG, "Can't find Compose View in activity.");
-            return;
         }
-
         locate(event.getX(), event.getY());
         //TrackMainThread.trackMain().postActionToTrackMain(() -> locate(event.getX(), event.getY()));
+    }
+
+    private void translateLayoutNodeOffset(ComposeNode nodeInfo) {
+        LayoutNode node = (LayoutNode) nodeInfo.getLayoutNode();
+        node.forEachCoordinator$ui_release(coordinator -> {
+            LayoutModifierNode modifierNode = coordinator.getLayoutModifierNode();
+            GrowingComposeKt.INSTANCE.reflectModifierNode(nodeInfo, modifierNode, node.getLayoutDirection());
+            return null;
+        });
     }
 
 
@@ -100,6 +109,9 @@ public class ComposeAndroidView {
             if (bounds == null) {
                 continue;
             }
+            // check offset node
+            translateLayoutNodeOffset(nodeInfo);
+            bounds = nodeInfo.translateRect(bounds);
             if (x < bounds.getLeft() || x > bounds.getRight() || y < bounds.getTop() || y > bounds.getBottom()) {
                 continue;
             }
@@ -108,6 +120,7 @@ public class ComposeAndroidView {
             nodeInfo.calculate();
 
             if (nodeInfo.isClickNode()) {
+                Logger.d(TAG, "found clickNode");
                 if (targetNode != null && targetNode.isEnd()) {
                     Logger.d(TAG, "found targetNode");
                 } else {
@@ -115,16 +128,21 @@ public class ComposeAndroidView {
                 }
             }
 
-            List<LayoutNode> children = node.getZSortedChildren().asMutableList();
-            for (LayoutNode layoutNode : children) {
-                ComposeNode tempNode = new ComposeNode(layoutNode);
-                tempNode.setParent(nodeInfo);
-                tempNode.setEnd(nodeInfo.isEnd());
-                nodeInfo.getChildren().add(tempNode);
-                queue.add(tempNode);
+            List<LayoutNode> children;
+            // check the node maybe has a native view.
+            List<LayoutNode> androidViewNodes = ComposeReflectUtils.getAndroidComposeViewNode(node);
+            if (androidViewNodes != null && !androidViewNodes.isEmpty()) {
+                children = androidViewNodes;
+            } else {
+                // warn:if the node has a native view, don't call getZSortedChildren, maybe cause a crash.
+                children = node.getZSortedChildren().asMutableList();
             }
-        }
+            for (LayoutNode layoutNode : children) {
+                ComposeNode childNode = nodeInfo.appendChildNode(layoutNode);
+                queue.add(childNode);
+            }
 
+        }
         sendClickEvent(targetNode);
     }
 
@@ -166,11 +184,13 @@ public class ComposeAndroidView {
                         if (entry.getValue() instanceof String) {
                             String composableTag = (String) entry.getValue();
                             nodeInfo.setComposableName(composableTag);
+                            Logger.d(TAG, "[COMPOSABLE] " + composableTag);
                         }
                     } else if (GrowingCompose.CALL.equals(key) && nodeInfo.getCallName() == null) {
                         if (entry.getValue() instanceof String) {
                             String callName = (String) entry.getValue();
                             nodeInfo.setCallName(callName);
+                            Logger.d(TAG, "[CALLNAME] " + callName);
                         }
                     } else if (GrowingCompose.PAGE_TAG.equals(key)) {
                         if (entry.getValue() instanceof String) {
@@ -179,6 +199,7 @@ public class ComposeAndroidView {
                         }
                     } else if (GrowingCompose.INTERRUPT_CLICK.equals(key)) {
                         nodeInfo.setEnd(true);
+                        Logger.d("targetNode setEnd:", "INTERRUPT_CLICK");
                     }
                 }
             } else {
@@ -283,6 +304,11 @@ public class ComposeAndroidView {
             if (bounds == null) {
                 continue;
             }
+
+            // check offset node
+            translateLayoutNodeOffset(nodeInfo);
+            bounds = nodeInfo.translateRect(bounds);
+
             Rect offsetRect = bounds.translate(ownerOffsetX, ownerOffsetY);
             nodeInfo.setBounds(offsetRect);
             calculateLayoutNode(node, nodeInfo);
@@ -294,15 +320,18 @@ public class ComposeAndroidView {
                 }
             }
 
-            zLevel = nodeInfo.getZLevel();
-            List<LayoutNode> children = node.getZSortedChildren().asMutableList();
+            List<LayoutNode> children;
+            // check the node maybe has a native view.
+            List<LayoutNode> androidViewNodes = ComposeReflectUtils.getAndroidComposeViewNode(node);
+            if (androidViewNodes != null && !androidViewNodes.isEmpty()) {
+                children = androidViewNodes;
+            } else {
+                // warn:if the node has a native view, don't call getZSortedChildren, maybe cause a crash.
+                children = node.getZSortedChildren().asMutableList();
+            }
             for (LayoutNode layoutNode : children) {
-                ComposeNode tempNode = new ComposeNode(layoutNode);
-                tempNode.setParent(nodeInfo);
-                tempNode.setEnd(nodeInfo.isEnd());
-                tempNode.setZLevel(zLevel + 1);
-                nodeInfo.getChildren().add(tempNode);
-                queue.add(tempNode);
+                ComposeNode childNode = nodeInfo.appendChildNode(layoutNode);
+                queue.add(childNode);
             }
         }
 
