@@ -30,10 +30,12 @@ class WebViewJavascriptBridgeConfiguration {
     private final String mAppPackage;
     private final String mNativeSdkVersion;
     private final int mNativeSdkVersionCode;
+    private final String mServerUrl;
 
-    WebViewJavascriptBridgeConfiguration(String projectId, String dataSourceId, String appId, String appPackage, String nativeSdkVersion, int nativeSdkVersionCode) {
+    WebViewJavascriptBridgeConfiguration(String projectId, String dataSourceId, String serverUrl, String appId, String appPackage, String nativeSdkVersion, int nativeSdkVersionCode) {
         mProjectId = projectId;
         mDataSourceId = dataSourceId;
+        mServerUrl = serverUrl;
         mAppId = appId;
         mAppPackage = appPackage;
         mNativeSdkVersion = nativeSdkVersion;
@@ -54,5 +56,28 @@ class WebViewJavascriptBridgeConfiguration {
             Logger.e(TAG, e.getMessage(), e);
         }
         return jsonObject;
+    }
+
+
+    public String injectScriptFile(String id, String scriptSrc) {
+        String js = "javascript:(function(){try{" +
+                "var jsNode = document.getElementById('%s');\n" +
+                "if (jsNode==null) {\n" +
+                "    var p = document.createElement('script');\n" +
+                "    p.src = '%s';\n" +
+                "    p.id = '%s';\n" +
+                "    document.head.appendChild(p);\n" + initJsSDK() +
+                "}}catch(e){}})()";
+        return String.format(js, id, scriptSrc, id);
+    }
+
+    private String initJsSDK() {
+        String initScript = "p.onload=function(){" +
+                "  gdp('init', '%s', '%s', {\n" +
+                "    serverUrl: '%s',\n" +
+                "  });" +
+                "};\n";
+
+        return String.format(initScript, mProjectId, mDataSourceId, mServerUrl);
     }
 }
