@@ -1,0 +1,2 @@
+-keep class androidx.compose.foundation.** {*;}
+-keep class androidx.compose.ui.node.LayoutNode
