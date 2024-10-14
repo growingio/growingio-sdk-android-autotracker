@@ -58,6 +58,9 @@ class WebChromeClientX5Delegate extends com.tencent.smtt.sdk.WebChromeClient {
         @Override
         public void run() {
             WebView webView = weakReference.get();
+            if (webView == null) {
+                return;
+            }
             String jsId = "_growing_js_sdk";
             String jsSrc = "https://assets.giocdn.com/sdk/webjs/gdp-full.js";
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
