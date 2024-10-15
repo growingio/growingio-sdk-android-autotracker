@@ -73,6 +73,7 @@ class WebViewJavascriptBridgeConfiguration {
 
     private String initJsSDK() {
         String initScript = "p.onload=function(){" +
+                "  window._gr_ignore_local_rule = true;\n" +
                 "  gdp('init', '%s', '%s', {\n" +
                 "    serverUrl: '%s',\n" +
                 "  });" +
