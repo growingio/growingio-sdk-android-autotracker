@@ -25,15 +25,15 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.utils.ReflectUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.WeakHashMap;
 
 /**
  * Android 4.2
@@ -52,7 +52,7 @@ class WindowManagerShadow {
     private static final String TAG = "WindowManagerShadow";
 
     private Object realWindowManager;
-    private final Map<CacheFieldKey, Field> fieldsMap = new HashMap<>();
+    private final WeakHashMap<CacheFieldKey, Field> fieldsMap = new WeakHashMap<>();
     private final int[] outLocation = new int[2];
     private final String wmClassName;
 
@@ -173,15 +173,10 @@ class WindowManagerShadow {
             return fieldsMap.get(key);
         } else {
             Class<?> clazz = target.getClass();
-            while (clazz != null) {
-                for (Field field : clazz.getDeclaredFields()) {
-                    if (field.getName().equals(fieldName)) {
-                        field.setAccessible(true);
-                        fieldsMap.put(key, field);
-                        return field;
-                    }
-                }
-                clazz = clazz.getSuperclass();
+            Field field = ReflectUtil.getFieldRecursive(fieldName, target);
+            if (field != null) {
+                fieldsMap.put(key, field);
+                return field;
             }
             throw new NoSuchFieldException("Field " + fieldName + " not found for class " + clazz);
         }

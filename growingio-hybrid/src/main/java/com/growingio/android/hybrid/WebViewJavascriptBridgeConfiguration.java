@@ -30,10 +30,12 @@ class WebViewJavascriptBridgeConfiguration {
     private final String mAppPackage;
     private final String mNativeSdkVersion;
     private final int mNativeSdkVersionCode;
+    private final String mServerUrl;
 
-    WebViewJavascriptBridgeConfiguration(String projectId, String dataSourceId, String appId, String appPackage, String nativeSdkVersion, int nativeSdkVersionCode) {
+    WebViewJavascriptBridgeConfiguration(String projectId, String dataSourceId, String serverUrl, String appId, String appPackage, String nativeSdkVersion, int nativeSdkVersionCode) {
         mProjectId = projectId;
         mDataSourceId = dataSourceId;
+        mServerUrl = serverUrl;
         mAppId = appId;
         mAppPackage = appPackage;
         mNativeSdkVersion = nativeSdkVersion;
@@ -54,5 +56,53 @@ class WebViewJavascriptBridgeConfiguration {
             Logger.e(TAG, e.getMessage(), e);
         }
         return jsonObject;
+    }
+
+
+    public String injectScriptFile(String id, String scriptSrc) {
+        String js = "javascript:(function(){try{" +
+                "var jsNode = document.getElementById('%s');\n" +
+                "if (jsNode==null) {\n" +
+                    "!(function (e, n, t, s, c) {\n" +
+                    "      e[s] =\n" +
+                    "        e[s] ||\n" +
+                    "        function () {\n" +
+                    "          (e[s].q = e[s].q || []).push(arguments);\n" +
+                    "        };\n" +
+                    "      (e._gio_local_vds = c = c || 'vds'),\n" +
+                    "        (e[c] = e[c] || {}),\n" +
+                    "        (e[c].namespace = s);\n" +
+                    "      var d = n.createElement('script');\n" +
+                    "      var i = n.getElementsByTagName('script')[0];\n" +
+                    "      (d.async = !0), (d.src = t), (d.id = '%s'); \n" +
+                    "      i ? i.parentNode.insertBefore(d, i) : n.head.appendChild(d);\n" +
+                    "    })(window, document, '%s', 'gdp');"
+                    + initJsSDK() +
+                "}}catch(e){}})()";
+        return String.format(js, id, id, scriptSrc);
+    }
+
+    private String initJsSDK() {
+        String initScript = "var _growing_init_func = function() {\n" +
+                "      window._gr_ignore_local_rule = true;\n" +
+                "      gdp('init', '%s', '%s', {\n" +
+                "        serverUrl: '%s',\n" +
+                "      });\n" +
+                "    };\n" +
+                "\n" +
+                "    if (['interactive', 'complete'].indexOf(document.readyState) >= 0) {\n" +
+                "      _growing_init_func();\n" +
+                "    } else {\n" +
+                "      document.addEventListener('readystatechange',\n" +
+                "        () => {\n" +
+                "          if (['interactive', 'complete'].indexOf(document.readyState) >= 0) {\n" +
+                "            _growing_init_func();\n" +
+                "          }\n" +
+                "        },\n" +
+                "        { once: true }\n" +
+                "      );\n" +
+                "  }";
+
+        return String.format(initScript, mProjectId, mDataSourceId, mServerUrl);
     }
 }

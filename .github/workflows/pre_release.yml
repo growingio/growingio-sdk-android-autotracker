@@ -76,11 +76,8 @@ jobs:
         with:
           api-level: 31
           target: default
-          ram-size: 4096M
           arch: x86_64
           disable-animations: true
-          disk-size: 6000M
-          heap-size: 600M
           working-directory: ./demo
           script: ./gradlew :app:connectedAndroidTest --stacktrace
 
