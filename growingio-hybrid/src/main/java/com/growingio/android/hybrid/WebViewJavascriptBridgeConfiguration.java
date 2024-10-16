@@ -63,21 +63,37 @@ class WebViewJavascriptBridgeConfiguration {
         String js = "javascript:(function(){try{" +
                 "var jsNode = document.getElementById('%s');\n" +
                 "if (jsNode==null) {\n" +
-                "    var p = document.createElement('script');\n" +
-                "    p.src = '%s';\n" +
-                "    p.id = '%s';\n" +
-                "    document.head.appendChild(p);\n" + initJsSDK() +
+                    "!(function (e, n, t, s, c) {\n" +
+                    "      e[s] =\n" +
+                    "        e[s] ||\n" +
+                    "        function () {\n" +
+                    "          (e[s].q = e[s].q || []).push(arguments);\n" +
+                    "        };\n" +
+                    "      (e._gio_local_vds = c = c || 'vds'),\n" +
+                    "        (e[c] = e[c] || {}),\n" +
+                    "        (e[c].namespace = s);\n" +
+                    "      var d = n.createElement('script');\n" +
+                    "      var i = n.getElementsByTagName('script')[0];\n" +
+                    "      (d.async = !0), (d.src = t), (d.id = '%s'); \n" +
+                    "      i ? i.parentNode.insertBefore(d, i) : n.head.appendChild(d);\n" +
+                    "    })(window, document, '%s', 'gdp');"
+                    + initJsSDK() +
                 "}}catch(e){}})()";
-        return String.format(js, id, scriptSrc, id);
+        return String.format(js, id, id, scriptSrc);
     }
 
     private String initJsSDK() {
-        String initScript = "p.onload=function(){" +
-                "  window._gr_ignore_local_rule = true;\n" +
-                "  gdp('init', '%s', '%s', {\n" +
-                "    serverUrl: '%s',\n" +
-                "  });" +
-                "};\n";
+        String initScript = "document.addEventListener('readystatechange',\n" +
+                "      () => {\n" +
+                "        if (['interactive', 'complete'].indexOf(document.readyState) >= 0) {\n" +
+                "          window._gr_ignore_local_rule = true;\n" +
+                "          gdp('init', '%s', '%s', {\n" +
+                "            serverUrl: '%s',\n" +
+                "          });\n" +
+                "        }\n" +
+                "      },\n" +
+                "      { once: true }\n" +
+                "    );";
 
         return String.format(initScript, mProjectId, mDataSourceId, mServerUrl);
     }
