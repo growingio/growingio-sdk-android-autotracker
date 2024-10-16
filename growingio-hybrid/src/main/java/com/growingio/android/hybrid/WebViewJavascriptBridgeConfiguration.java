@@ -87,7 +87,6 @@ class WebViewJavascriptBridgeConfiguration {
                 "      window._gr_ignore_local_rule = true;\n" +
                 "      gdp('init', '%s', '%s', {\n" +
                 "        serverUrl: '%s',\n" +
-                "        debug: true," +
                 "      });\n" +
                 "    };\n" +
                 "\n" +
