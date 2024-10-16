@@ -83,17 +83,26 @@ class WebViewJavascriptBridgeConfiguration {
     }
 
     private String initJsSDK() {
-        String initScript = "document.addEventListener('readystatechange',\n" +
-                "      () => {\n" +
-                "        if (['interactive', 'complete'].indexOf(document.readyState) >= 0) {\n" +
-                "          window._gr_ignore_local_rule = true;\n" +
-                "          gdp('init', '%s', '%s', {\n" +
-                "            serverUrl: '%s',\n" +
-                "          });\n" +
-                "        }\n" +
-                "      },\n" +
-                "      { once: true }\n" +
-                "    );";
+        String initScript = "var _growing_init_func = function() {\n" +
+                "      window._gr_ignore_local_rule = true;\n" +
+                "      gdp('init', '%s', '%s', {\n" +
+                "        serverUrl: '%s',\n" +
+                "        debug: true," +
+                "      });\n" +
+                "    };\n" +
+                "\n" +
+                "    if (['interactive', 'complete'].indexOf(document.readyState) >= 0) {\n" +
+                "      _growing_init_func();\n" +
+                "    } else {\n" +
+                "      document.addEventListener('readystatechange',\n" +
+                "        () => {\n" +
+                "          if (['interactive', 'complete'].indexOf(document.readyState) >= 0) {\n" +
+                "            _growing_init_func();\n" +
+                "          }\n" +
+                "        },\n" +
+                "        { once: true }\n" +
+                "      );\n" +
+                "  }";
 
         return String.format(initScript, mProjectId, mDataSourceId, mServerUrl);
     }
