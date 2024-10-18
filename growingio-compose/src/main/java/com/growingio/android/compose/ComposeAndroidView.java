@@ -122,8 +122,10 @@ public class ComposeAndroidView {
 
             if (nodeInfo.isClickNode()) {
                 Logger.d(TAG, "found clickNode");
-                if (targetNode != null && targetNode.isEnd()) {
-                    Logger.d(TAG, "found targetNode");
+                if (nodeInfo.isEnd()) {
+                    Logger.d(TAG, "found targetNode isEnd");
+                    targetNode = nodeInfo;
+                    break;
                 } else {
                     targetNode = nodeInfo;
                 }
@@ -142,9 +144,40 @@ public class ComposeAndroidView {
                 ComposeNode childNode = nodeInfo.appendChildNode(layoutNode);
                 queue.add(childNode);
             }
-
         }
+
+        calculateClickNodeText(targetNode);
         sendClickEvent(targetNode);
+    }
+
+    private void calculateClickNodeText(ComposeNode targetNode) {
+        if (targetNode == null) return;
+        targetNode.getChildren().clear();
+        final Queue<ComposeNode> queue = new LinkedList<>();
+        queue.add(targetNode);
+        while (!queue.isEmpty()) {
+            final ComposeNode nodeInfo = queue.poll();
+            final LayoutNode node = nodeInfo == null ? null : (LayoutNode) nodeInfo.getLayoutNode();
+            if (node == null || !node.isPlaced()) {
+                continue;
+            }
+
+            final List<ModifierInfo> modifiers = node.getModifierInfo();
+            for (ModifierInfo modifierInfo : modifiers) {
+                String text = ComposeReflectUtils.getTextFromTextElement(modifierInfo.getModifier());
+                if (text != null) {
+                    Logger.d(TAG, "text: " + text + " with: " + modifierInfo.getModifier().getClass().getCanonicalName());
+                    nodeInfo.setText(text);
+                }
+            }
+
+            List<LayoutNode> children = node.getZSortedChildren().asMutableList();
+            for (LayoutNode layoutNode : children) {
+                ComposeNode childNode = nodeInfo.appendChildNode(layoutNode);
+                queue.add(childNode);
+            }
+        }
+
     }
 
     private void sendClickEvent(ComposeNode targetNode) {
