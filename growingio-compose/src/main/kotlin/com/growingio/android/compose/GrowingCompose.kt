@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.Lifecycle
@@ -105,7 +103,7 @@ object GrowingCompose {
         attributes: Map<String, String> = hashMapOf(),
         content: @Composable () -> Unit,
     ) {
-        val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+        val lifecycleOwner: LifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
         DisposableEffect(alias) {
             val observer = LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
                 if (event == Lifecycle.Event.ON_RESUME) {
