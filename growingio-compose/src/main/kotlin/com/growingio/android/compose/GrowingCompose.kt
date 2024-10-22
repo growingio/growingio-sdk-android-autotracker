@@ -15,6 +15,7 @@
  */
 package com.growingio.android.compose
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
@@ -117,16 +118,6 @@ object GrowingCompose {
                 lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
-        Layout(
-            content = content,
-            modifier = Modifier.growingPage(alias),
-        ) { measurables, constraints ->
-            layout(constraints.maxWidth, constraints.maxHeight) {
-                measurables.forEach { measurable ->
-                    val placeable = measurable.measure(constraints)
-                    placeable.place(0, 0)
-                }
-            }
-        }
+        Box(modifier = Modifier.growingPage(alias)) { content() }
     }
 }
