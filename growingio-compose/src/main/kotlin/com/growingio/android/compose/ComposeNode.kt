@@ -136,6 +136,7 @@ class ComposeNode(val layoutNode: Any) {
 
         // 当前组件手动设置了 Modifier.growingTag(tag) 时, 优先取tag值
         val tempXpath = tag.takeIf { !it.isNullOrEmpty() }?.path()
+            ?: composableName.takeIf { !it.isNullOrEmpty() }?.path()
             // 取调用的组件名为路径名称
             ?: callName.takeIf { !it.isNullOrEmpty() }?.path()
             // 在 plugin 中未获得组件调用名时, 以测量策略的前缀作为路径名称
@@ -156,17 +157,11 @@ class ComposeNode(val layoutNode: Any) {
 
         // Logger.d("Compose Node","tempXpath: $tempXpath, tempXIndex: $tempXIndex")
 
-        // 当前组件为页面时，则将该节点作为根节点
+        // 当前组件为页面时，则将该节点作为根节点，不计入节点计算
         if (!alias.isNullOrEmpty()) {
-            if (composableName.isNullOrEmpty()) {
-                xpath = tempXpath
-                xIndex = tempXIndex
-                originXIndexWithoutList = xIndex
-            } else {
-                xpath = "/$composableName$tempXpath"
-                xIndex = "/0$tempXIndex"
-                originXIndexWithoutList = xIndex
-            }
+            xpath = ""
+            xIndex = ""
+            originXIndexWithoutList = xIndex
             return
         }
 

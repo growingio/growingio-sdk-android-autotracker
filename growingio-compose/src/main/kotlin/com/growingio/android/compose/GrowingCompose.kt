@@ -100,6 +100,7 @@ object GrowingCompose {
     @Composable
     fun GrowingComposePage(
         alias: String,
+        modifier: Modifier = Modifier,
         attributes: Map<String, String> = hashMapOf(),
         content: @Composable () -> Unit,
     ) {
@@ -116,6 +117,6 @@ object GrowingCompose {
                 lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
-        Box(modifier = Modifier.growingPage(alias)) { content() }
+        Box(modifier = modifier.growingPage(alias)) { content() }
     }
 }
