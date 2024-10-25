@@ -169,7 +169,11 @@ public class EventDataManager {
             Logger.e(TAG, t, t.getMessage());
         } finally {
             if (client != null) {
-                client.release();
+                try {
+                    client.release();
+                } catch (java.lang.NullPointerException e) {
+                    // does nothing, Binder connection already null
+                }
             }
         }
     }
@@ -209,7 +213,11 @@ public class EventDataManager {
             Logger.e(TAG, t, t.getMessage());
         } finally {
             if (client != null) {
-                client.release();
+                try {
+                    client.release();
+                } catch (java.lang.NullPointerException e) {
+                    // does nothing, Binder connection already null
+                }
             }
         }
     }
