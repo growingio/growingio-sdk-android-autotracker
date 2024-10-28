@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @author cpacm 5/19/21
  */
-@GIOLibraryModule
+@GIOLibraryModule(config = HybridConfig.class)
 public class HybridLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(TrackerContext context) {

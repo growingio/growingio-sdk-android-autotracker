@@ -19,10 +19,17 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.view.View;
 import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
+import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.utils.ReflectUtil;
+import com.uc.webview.export.internal.android.WebViewAndroid;
 
-public abstract class SuperWebView<T extends View> {
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+abstract class SuperWebView<T extends View> {
     private final T mRealWebView;
 
     protected SuperWebView(T realWebView) {
@@ -51,6 +58,8 @@ public abstract class SuperWebView<T extends View> {
 
     public abstract void evaluateJavascript(String script, ValueCallback<String> resultCallback);
 
+    public abstract void wrapperWebChromeClient(WebViewJavascriptBridgeConfiguration bridgeConfiguration);
+
     public boolean hasAddJavaScripted() {
         return mRealWebView.getTag(R.id.growing_tracker_has_add_java_script) != null;
     }
@@ -71,7 +80,49 @@ public abstract class SuperWebView<T extends View> {
         return new UCWebView(webView);
     }
 
-    private static final class SystemWebView extends SuperWebView<WebView> {
+    protected WebChromeClient getWebChromeClientReflect(WebView webView) {
+        try {
+            Object provider = ReflectUtil.getFieldRecursive("mProvider", webView);
+            if (provider == null) return null;
+            Method providerChromeClientMethod = ReflectUtil.getMethod(provider.getClass(), "getWebChromeClient");
+            if (providerChromeClientMethod != null) {
+                return (WebChromeClient) providerChromeClientMethod.invoke(provider);
+            }
+        } catch (NoSuchFieldException ignored) {
+        } catch (NoSuchMethodException ignored) {
+        } catch (InvocationTargetException ignored) {
+        } catch (IllegalAccessException ignored) {
+        } catch (ClassCastException ignored) {
+        }
+
+        return null;
+    }
+
+    protected void setWebChromeClientAvoidThreadCheck(WebView webView, WebChromeClient client) {
+        try {
+            Object provider = ReflectUtil.getFieldRecursive("mProvider", webView);
+            if (provider != null) {
+                Method method = ReflectUtil.getMethod(provider.getClass(), "setWebChromeClient", WebChromeClient.class);
+                if (method != null) {
+                    method.invoke(provider, client);
+                    return;
+                }
+            }
+        } catch (NoSuchFieldException ignored) {
+        } catch (NoSuchMethodException ignored) {
+        } catch (InvocationTargetException ignored) {
+        } catch (IllegalAccessException ignored) {
+        } catch (ClassCastException ignored) {
+        }
+
+        try {
+            webView.setWebChromeClient(client);
+        } catch (Exception e) {
+            Logger.e("SystemWebView", "setDelegateWebChromeClient failed: " + e);
+        }
+    }
+
+    private static class SystemWebView extends SuperWebView<WebView> {
 
         protected SystemWebView(WebView realWebView) {
             super(realWebView);
@@ -94,6 +145,30 @@ public abstract class SuperWebView<T extends View> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 getRealWebView().evaluateJavascript(script, resultCallback);
             }
+        }
+
+
+        @SuppressLint("WebViewApiAvailability")
+        @Override
+        public void wrapperWebChromeClient(WebViewJavascriptBridgeConfiguration bridgeConfiguration) {
+            WebView webView = getRealWebView();
+            if (webView == null) return;
+
+            WebChromeClient existChromeClient;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                existChromeClient = webView.getWebChromeClient();
+            } else {
+                existChromeClient = getWebChromeClientReflect(webView);
+            }
+            if (existChromeClient instanceof WebChromeClientDelegate) {
+                Logger.d("SystemWebView", "setWebChromeClient: existChromeClient is WebChromeClientDelegate");
+                return;
+            }
+
+            WebChromeClientDelegate delegateClient = new WebChromeClientDelegate(
+                    existChromeClient == null ? new WebChromeClient() : existChromeClient,
+                    bridgeConfiguration);
+            setWebChromeClientAvoidThreadCheck(webView, delegateClient);
         }
     }
 
@@ -124,6 +199,20 @@ public abstract class SuperWebView<T extends View> {
                 }
             });
         }
+
+        @Override
+        public void wrapperWebChromeClient(WebViewJavascriptBridgeConfiguration bridgeConfiguration) {
+            com.tencent.smtt.sdk.WebView webView = getRealWebView();
+            com.tencent.smtt.sdk.WebChromeClient existChromeClient = webView.getWebChromeClient();
+            if (existChromeClient instanceof WebChromeClientX5Delegate) {
+                Logger.d("X5WebView", "setWebChromeClient: existChromeClient is WebChromeClientX5Delegate");
+                return;
+            }
+            WebChromeClientX5Delegate delegateClient = new WebChromeClientX5Delegate(
+                    existChromeClient == null ? new com.tencent.smtt.sdk.WebChromeClient() : existChromeClient,
+                    bridgeConfiguration);
+            webView.setWebChromeClient(delegateClient);
+        }
     }
 
     private static final class UCWebView extends SuperWebView<com.uc.webview.export.WebView> {
@@ -145,6 +234,32 @@ public abstract class SuperWebView<T extends View> {
         @Override
         public void evaluateJavascript(String script, final ValueCallback<String> resultCallback) {
             getRealWebView().evaluateJavascript(script, resultCallback);
+        }
+
+        @SuppressLint("WebViewApiAvailability")
+        @Override
+        public void wrapperWebChromeClient(WebViewJavascriptBridgeConfiguration bridgeConfiguration) {
+            com.uc.webview.export.WebView ucWebView = getRealWebView();
+            if (ucWebView == null || ucWebView.getCoreView() == null || !(ucWebView.getCoreView() instanceof WebViewAndroid)) {
+                return;
+            }
+            WebView webView = (WebViewAndroid) (ucWebView.getCoreView());
+
+            WebChromeClient existChromeClient;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                existChromeClient = webView.getWebChromeClient();
+            } else {
+                existChromeClient = getWebChromeClientReflect(webView);
+            }
+            if (existChromeClient instanceof WebChromeClientDelegate) {
+                Logger.d("SystemWebView", "setWebChromeClient: existChromeClient is WebChromeClientDelegate");
+                return;
+            }
+
+            WebChromeClientDelegate delegateClient = new WebChromeClientDelegate(
+                    existChromeClient == null ? new WebChromeClient() : existChromeClient,
+                    bridgeConfiguration);
+            setWebChromeClientAvoidThreadCheck(webView, delegateClient);
         }
     }
 }

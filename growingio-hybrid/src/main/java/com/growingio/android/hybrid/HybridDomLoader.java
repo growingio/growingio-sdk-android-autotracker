@@ -103,7 +103,7 @@ public class HybridDomLoader implements ModelLoader<HybridDom, HybridJson> {
             });
         }
 
-        public SuperWebView<? extends View> getSuperWebView() {
+        public SuperWebView getSuperWebView() {
             if (dom.getView() instanceof WebView) {
                 return SuperWebView.make((WebView) dom.getView());
             } else if (ClassExistHelper.instanceOfX5WebView(dom.getView())) {
