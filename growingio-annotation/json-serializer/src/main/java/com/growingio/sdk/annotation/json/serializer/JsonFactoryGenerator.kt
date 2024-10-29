@@ -77,9 +77,9 @@ internal class JsonFactoryGenerator(
             ClassName.get(
                 ProcessUtils.JSON_SERIALIZABLE_PACKAGE,
                 ProcessUtils.JSON_SERIALIZABLE_CLASS,
-            ), // rawType
-            ClassName.get(eventType), // the value for T
-            builderType, // the value for R
+            ),
+            ClassName.get(eventType),
+            builderType,
         )
 
         val jonSerialBuilder = TypeSpec.classBuilder(generateClass).addJavadoc(

@@ -27,6 +27,9 @@ public class ABExperiment {
     private final String layerId;
     private final long strategyId;
     private final long experimentId;
+    private String expLayerName;
+    private String expName;
+    private String expStrategyName;
     private final Map<String, String> variables;
 
     public ABExperiment(String layerId, long strategyId, long experimentId, Map<String, String> variables) {
@@ -38,6 +41,12 @@ public class ABExperiment {
         } else {
             this.variables = variables;
         }
+    }
+
+    public void setExperimentNames(String expLayerName, String expName, String expStrategyName) {
+        this.expLayerName = expLayerName;
+        this.expName = expName;
+        this.expStrategyName = expStrategyName;
     }
 
     public String getLayerId() {
@@ -54,6 +63,18 @@ public class ABExperiment {
 
     public Map<String, String> getVariables() {
         return variables;
+    }
+
+    public String getExpLayerName() {
+        return expLayerName;
+    }
+
+    public String getExpName() {
+        return expName;
+    }
+
+    public String getExpStrategyName() {
+        return expStrategyName;
     }
 
     @Override
