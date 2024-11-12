@@ -13,7 +13,7 @@ pluginGradle = "7.4.2" # 4.2.2-7.4.2
 # pluginGradle = "8.5.2" # 4.2.2-7.4.2
 kotlin = "2.0.0"
 
-spotless = "6.20.0"
+spotless = "6.25.0"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-compiler
 # composeBom = "2023.04.00"
