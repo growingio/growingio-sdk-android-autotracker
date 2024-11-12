@@ -24,6 +24,7 @@ import android.view.Window
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.children
 import com.growingio.android.sdk.track.middleware.webservice.Circler
+import com.growingio.android.sdk.track.middleware.webservice.Debugger
 import com.growingio.android.sdk.track.middleware.webservice.WebService
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry
 
@@ -106,6 +107,7 @@ internal class GrowingWindowCallback(val context: Context, private val window: W
 
             if (event.action == MotionEvent.ACTION_UP) {
                 registry?.executeData(Circler(Circler.CIRCLE_REFRESH), Circler::class.java, WebService::class.java)
+                registry?.executeData(Debugger(Debugger.DEBUGGER_REFRESH), Debugger::class.java, WebService::class.java)
             }
         }
         return super.dispatchTouchEvent(event)

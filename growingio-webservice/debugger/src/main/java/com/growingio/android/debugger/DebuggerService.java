@@ -20,6 +20,7 @@ import android.util.Base64;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.webservice.Circler;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.middleware.webservice.Debugger;
 import com.growingio.android.sdk.track.middleware.webservice.WebService;
@@ -66,6 +67,10 @@ public class DebuggerService implements LoadDataFetcher<WebService>,
             if (screenshot != null) {
                 String screenshotBase64 = "data:image/jpeg;base64," + Base64.encodeToString(screenshot, Base64.DEFAULT);
                 screenshotProvider.generateDebuggerData(screenshotBase64);
+            }
+        } else if (debuggerDataType == Debugger.DEBUGGER_REFRESH) {
+            if (socketState.get() == SOCKET_STATE_READIED) {
+                screenshotProvider.refreshScreenshot();
             }
         }
     }
