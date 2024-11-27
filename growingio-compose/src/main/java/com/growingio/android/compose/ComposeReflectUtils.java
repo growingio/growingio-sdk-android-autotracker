@@ -34,7 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class ComposeReflectUtils {
+class ComposeReflectUtils {
 
     private final static String TAG = "ComposeReflectUtils";
     private final static String CLICKABLE_ELEMENT_CLASSNAME = "androidx.compose.foundation.ClickableElement";

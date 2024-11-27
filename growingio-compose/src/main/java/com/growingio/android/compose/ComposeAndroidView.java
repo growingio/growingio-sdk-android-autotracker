@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-public class ComposeAndroidView {
+class ComposeAndroidView {
 
     private final static String TAG = "ComposeAndroidView";
 

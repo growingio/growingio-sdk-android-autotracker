@@ -19,7 +19,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.IntOffset
 import com.growingio.android.compose.GrowingComposeKt.path
 
-data class ComposePageNode(
+internal data class ComposePageNode(
     val alias: String,
     val bound: Rect,
     val attributes: Map<String, String>? = null,
@@ -95,18 +95,18 @@ class ComposeNode(val layoutNode: Any) {
 
     private fun isInLazyList(): Boolean {
         return parent?.callName == "LazyRow" ||
-            parent?.callName == "LazyColumn" ||
-            parent?.callName == "LazyVerticalGrid" ||
-            parent?.callName == "LazyHorizontalGrid"
+                parent?.callName == "LazyColumn" ||
+                parent?.callName == "LazyVerticalGrid" ||
+                parent?.callName == "LazyHorizontalGrid"
     }
 
     private fun isList(): Boolean {
         return callName == "LazyRow" ||
-            callName == "LazyColumn" ||
-            callName == "LazyVerticalGrid" ||
-            callName == "LazyHorizontalGrid" ||
-            callName == "Column" ||
-            callName == "Row"
+                callName == "LazyColumn" ||
+                callName == "LazyVerticalGrid" ||
+                callName == "LazyHorizontalGrid" ||
+                callName == "Column" ||
+                callName == "Row"
     }
 
     private fun calculatePath(): String {
@@ -136,7 +136,7 @@ class ComposeNode(val layoutNode: Any) {
 
         // 当前组件手动设置了 Modifier.growingTag(tag) 时, 优先取tag值
         val tempXpath = tag.takeIf { !it.isNullOrEmpty() }?.path()
-            ?: composableName.takeIf { !it.isNullOrEmpty() }?.path()
+            ?: composableName.takeIf { !it.isNullOrEmpty() && !it.equals("<anonymous>", true) }?.path()
             // 取调用的组件名为路径名称
             ?: callName.takeIf { !it.isNullOrEmpty() }?.path()
             // 在 plugin 中未获得组件调用名时, 以测量策略的前缀作为路径名称
@@ -148,7 +148,7 @@ class ComposeNode(val layoutNode: Any) {
             ""
         } else {
             // 过滤 placeOrder 过大值
-            if (placeOrder in 1..100000) {
+            if (placeOrder in 1..10000) {
                 "/$placeOrder"
             } else {
                 "/0"

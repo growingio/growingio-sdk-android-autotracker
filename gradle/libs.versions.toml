@@ -75,6 +75,7 @@ growingio-oaid = { module = "com.growingio.android:oaid", version.ref = "growing
 growingio-ads = { module = "com.growingio.android:ads", version.ref = "growingio" }
 growingio-abtest = { module = "com.growingio.android:abtest", version.ref = "growingio" }
 growingio-flutter = { module = "com.growingio.android:flutter", version.ref = "growingio" }
+growingio-compose = { module = "com.growingio.android:compose", version.ref = "growingio" }
 growingio-apm = { module = "com.growingio.android:apm", version.ref = "growingio" }
 growingio-gmonitor = "com.growingio.android:gmonitor:2.0.0"
 growingio-snappy = "com.growingio.android:snappy:1.1.0"
