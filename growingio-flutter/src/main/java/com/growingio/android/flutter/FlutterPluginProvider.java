@@ -70,6 +70,17 @@ public class FlutterPluginProvider implements TrackerLifecycleProvider {
 
     public void setFlutterMethodInterface(FlutterMethodInterface flutterMethodInterface) {
         this.flutterMethodInterface = flutterMethodInterface;
+        // check sdk is inCircle or inDebugger
+        WebService webService = registry.executeData(new Circler(Circler.CIRCLE_REFRESH), Circler.class, WebService.class);
+        if (webService != null && webService.isRunning()) {
+            startFlutterCircle();
+            return;
+        }
+
+        webService = registry.executeData(new Debugger(Debugger.DEBUGGER_REFRESH), Debugger.class, WebService.class);
+        if (webService != null && webService.isRunning()) {
+            startFlutterDebugger();
+        }
     }
 
     public void startFlutterCircle() {

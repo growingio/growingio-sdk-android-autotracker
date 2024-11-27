@@ -48,7 +48,7 @@ public class CirclerService implements LoadDataFetcher<WebService>,
     private final WebSocketHandler webSocketHandler;
     private Map<String, String> params;
     private int circleDataType;
-    protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_INITIALIZE);
+    protected final AtomicInteger socketState = new AtomicInteger(SOCKET_STATE_CLOSED);
 
     private final ScreenshotProvider screenshotProvider;
 
@@ -76,7 +76,7 @@ public class CirclerService implements LoadDataFetcher<WebService>,
         // restart, and it doesn't mean if you set different wsurl after websocket started.
         if (socketState.get() == SOCKET_STATE_READIED) {
             if (callback != null) {
-                callback.onDataReady(new WebService());
+                callback.onDataReady(new WebService(true));
             }
             return;
         }
@@ -116,7 +116,8 @@ public class CirclerService implements LoadDataFetcher<WebService>,
     @Override
     public WebService executeData() {
         loadData(null);
-        return new WebService();
+        boolean isClosed = socketState.get() == SOCKET_STATE_CLOSED;
+        return new WebService(!isClosed);
     }
 
     public void cleanup() {
