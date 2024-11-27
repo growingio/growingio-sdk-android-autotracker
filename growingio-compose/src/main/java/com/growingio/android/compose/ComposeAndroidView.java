@@ -131,25 +131,15 @@ class ComposeAndroidView {
                 }
             }
 
-            List<LayoutNode> children;
-            // check the node maybe has a native view.
-            List<LayoutNode> androidViewNodes = ComposeReflectUtils.getAndroidComposeViewNode(node);
-            if (androidViewNodes != null && !androidViewNodes.isEmpty()) {
-                children = androidViewNodes;
-            } else {
-                // warn:if the node has a native view, don't call getZSortedChildren, maybe cause a crash.
-                children = node.getZSortedChildren().asMutableList();
-            }
+            List<LayoutNode> children = childrenWithNativeView(node);
             for (LayoutNode layoutNode : children) {
                 ComposeNode childNode = nodeInfo.appendChildNode(layoutNode);
                 queue.add(childNode);
             }
         }
 
-        if (targetNode != null && targetNode.isContainInPage()) {
-            calculateClickNodeText(targetNode);
-            sendClickEvent(targetNode);
-        }
+        calculateClickNodeText(targetNode);
+        sendClickEvent(targetNode);
     }
 
     private void calculateClickNodeText(ComposeNode targetNode) {
@@ -355,15 +345,7 @@ class ComposeAndroidView {
                 }
             }
 
-            List<LayoutNode> children;
-            // check the node maybe has a native view.
-            List<LayoutNode> androidViewNodes = ComposeReflectUtils.getAndroidComposeViewNode(node);
-            if (androidViewNodes != null && !androidViewNodes.isEmpty()) {
-                children = androidViewNodes;
-            } else {
-                // warn:if the node has a native view, don't call getZSortedChildren, maybe cause a crash.
-                children = node.getZSortedChildren().asMutableList();
-            }
+            List<LayoutNode> children = childrenWithNativeView(node);
             for (LayoutNode layoutNode : children) {
                 ComposeNode childNode = nodeInfo.appendChildNode(layoutNode);
                 queue.add(childNode);
@@ -371,6 +353,21 @@ class ComposeAndroidView {
         }
 
         return clickViews;
+    }
+
+    private List<LayoutNode> childrenWithNativeView(LayoutNode node) {
+        try {
+            List<LayoutNode> children = node.getZSortedChildren().asMutableList();
+            // check the node maybe has a native view.
+            List<LayoutNode> androidViewNodes = ComposeReflectUtils.getAndroidComposeViewNode(node);
+            if (androidViewNodes != null && !androidViewNodes.isEmpty()) {
+                children = androidViewNodes;
+            }
+            return children;
+        } catch (Exception e) {
+            Logger.e(TAG, "childrenWithNativeView error", e);
+        }
+        return new ArrayList<>();
     }
 
     static boolean isComposeView(View view) {

@@ -95,18 +95,18 @@ class ComposeNode(val layoutNode: Any) {
 
     private fun isInLazyList(): Boolean {
         return parent?.callName == "LazyRow" ||
-                parent?.callName == "LazyColumn" ||
-                parent?.callName == "LazyVerticalGrid" ||
-                parent?.callName == "LazyHorizontalGrid"
+            parent?.callName == "LazyColumn" ||
+            parent?.callName == "LazyVerticalGrid" ||
+            parent?.callName == "LazyHorizontalGrid"
     }
 
     private fun isList(): Boolean {
         return callName == "LazyRow" ||
-                callName == "LazyColumn" ||
-                callName == "LazyVerticalGrid" ||
-                callName == "LazyHorizontalGrid" ||
-                callName == "Column" ||
-                callName == "Row"
+            callName == "LazyColumn" ||
+            callName == "LazyVerticalGrid" ||
+            callName == "LazyHorizontalGrid" ||
+            callName == "Column" ||
+            callName == "Row"
     }
 
     private fun calculatePath(): String {
