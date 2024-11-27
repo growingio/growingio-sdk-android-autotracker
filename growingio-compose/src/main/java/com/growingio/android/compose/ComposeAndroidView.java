@@ -146,8 +146,10 @@ class ComposeAndroidView {
             }
         }
 
-        calculateClickNodeText(targetNode);
-        sendClickEvent(targetNode);
+        if (targetNode != null && targetNode.isContainInPage()) {
+            calculateClickNodeText(targetNode);
+            sendClickEvent(targetNode);
+        }
     }
 
     private void calculateClickNodeText(ComposeNode targetNode) {

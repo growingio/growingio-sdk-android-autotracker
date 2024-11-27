@@ -95,18 +95,18 @@ class ComposeNode(val layoutNode: Any) {
 
     private fun isInLazyList(): Boolean {
         return parent?.callName == "LazyRow" ||
-            parent?.callName == "LazyColumn" ||
-            parent?.callName == "LazyVerticalGrid" ||
-            parent?.callName == "LazyHorizontalGrid"
+                parent?.callName == "LazyColumn" ||
+                parent?.callName == "LazyVerticalGrid" ||
+                parent?.callName == "LazyHorizontalGrid"
     }
 
     private fun isList(): Boolean {
         return callName == "LazyRow" ||
-            callName == "LazyColumn" ||
-            callName == "LazyVerticalGrid" ||
-            callName == "LazyHorizontalGrid" ||
-            callName == "Column" ||
-            callName == "Row"
+                callName == "LazyColumn" ||
+                callName == "LazyVerticalGrid" ||
+                callName == "LazyHorizontalGrid" ||
+                callName == "Column" ||
+                callName == "Row"
     }
 
     private fun calculatePath(): String {
@@ -136,7 +136,8 @@ class ComposeNode(val layoutNode: Any) {
 
         // 当前组件手动设置了 Modifier.growingTag(tag) 时, 优先取tag值
         val tempXpath = tag.takeIf { !it.isNullOrEmpty() }?.path()
-            ?: composableName.takeIf { !it.isNullOrEmpty() && !it.equals("<anonymous>", true) }?.path()
+            ?: composableName.takeIf { !it.isNullOrEmpty() && !it.equals("<anonymous>", true) }
+                ?.path()
             // 取调用的组件名为路径名称
             ?: callName.takeIf { !it.isNullOrEmpty() }?.path()
             // 在 plugin 中未获得组件调用名时, 以测量策略的前缀作为路径名称
@@ -230,4 +231,10 @@ class ComposeNode(val layoutNode: Any) {
     fun clickableParentXPath() = clickableParentXPath
     fun clickableParentXIndex() = clickableParentXIndex
     fun nodeType() = nodeType
+    fun isContainInPage(): Boolean {
+        if (path.isNullOrEmpty()) {
+            return false
+        }
+        return true
+    }
 }
