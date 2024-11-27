@@ -20,7 +20,6 @@ import android.util.Base64;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.webservice.Circler;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.middleware.webservice.Debugger;
 import com.growingio.android.sdk.track.middleware.webservice.WebService;

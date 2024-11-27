@@ -97,6 +97,7 @@ object GrowingCompose {
         )
     }
 
+    @Suppress("FunctionName")
     @Composable
     fun GrowingComposePage(
         alias: String,
