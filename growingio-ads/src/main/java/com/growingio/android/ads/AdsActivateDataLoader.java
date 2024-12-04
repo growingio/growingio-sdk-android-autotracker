@@ -53,9 +53,9 @@ import java.util.Map;
  */
 public class AdsActivateDataLoader implements ModelLoader<Activate, AdsResult> {
 
-    private final static int DEEPLINK_TYPE_NONE = 0; //doesn't contain deeplink.
-    private final static int DEEPLINK_TYPE_URI = 1; //web jump,contains ads params.
-    private final static int DEEPLINK_TYPE_SHORT = 2; //short scheme,doesn't contain data.
+     final static int DEEPLINK_TYPE_NONE = 0; //doesn't contain deeplink.
+     final static int DEEPLINK_TYPE_URI = 1; //web jump,contains ads params.
+     final static int DEEPLINK_TYPE_SHORT = 2; //short scheme,doesn't contain data.
 
 
     private final TrackerContext context;
@@ -79,7 +79,15 @@ public class AdsActivateDataLoader implements ModelLoader<Activate, AdsResult> {
             isInApp = true;
             callback = activate.getCallback();
         }
-        return new LoadData<>(new ActivateDataFetcher(context, activate.getUri(), deepLinkHost, callback, isInApp));
+
+        Uri uri = activate.getUri();
+        if (config.isSaasDeepLinkSupport()) {
+            boolean isSaasUri = AdsSaasDeepLinkFetcher.isSaasDeepLink(uri);
+            if (isSaasUri) {
+                return new LoadData<>(new AdsSaasDeepLinkFetcher(context, uri, deepLinkHost, callback, isInApp));
+            }
+        }
+        return new LoadData<>(new ActivateDataFetcher(context, uri, deepLinkHost, callback, isInApp));
     }
 
 

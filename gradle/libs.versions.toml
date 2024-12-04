@@ -30,8 +30,8 @@ protobuf = "3.22.3"
 powermock = "2.0.9"
 
 # !!! SDK VERSION !!!
-growingio = "4.3.2"
-growingioCode = "40302"
+growingio = "4.3.3"
+growingioCode = "40303"
 growingioPlugin = "4.3.0"
 junit = "1.1.5"
 
