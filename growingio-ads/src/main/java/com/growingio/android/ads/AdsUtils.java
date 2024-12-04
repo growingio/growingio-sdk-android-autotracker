@@ -57,6 +57,13 @@ class AdsUtils {
     static final String DEEP_CLICK_TIME = "deep_click_time"; //timestamp
     static final String DEEP_PARAMS = "deep_params"; //{}
 
+    static final String SAAS_LINK_ID = "link_id";
+    static final String SAAS_CLICK_ID = "click_id";
+    static final String SAAS_CLICK_TIME = "tm_click";
+    static final String SAAS_PARAMS = "custom_params";
+    static final String SAAS_DEEPLINK_AD_HOST_EXPIRED = "gio.ren";
+    static final String SAAS_DEEPLINK_AD_HOST = "datayi.cn";
+
     static final String DEEPLINK_AD_HOST = "https://link.growingio.com";
 
     static final String DEEPLINK_PARAMS_REQUEST_URL = "%1$s/deep/v1/%2$s/android/%3$s/%4$s/%5$s";

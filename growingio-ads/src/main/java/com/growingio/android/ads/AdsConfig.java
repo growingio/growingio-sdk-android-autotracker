@@ -29,6 +29,7 @@ public class AdsConfig implements Configurable {
     private boolean readClipBoardEnable = false;
     private String deepLinkHost = DEEPLINK_AD_HOST;
     private DeepLinkCallback deepLinkCallback;
+    private boolean saasDeepLinkSupport = false;
 
     public AdsConfig setReadClipBoardEnable(boolean readClipBoardEnable) {
         this.readClipBoardEnable = readClipBoardEnable;
@@ -61,5 +62,13 @@ public class AdsConfig implements Configurable {
 
     public DeepLinkCallback getDeepLinkCallback() {
         return deepLinkCallback;
+    }
+
+    public boolean isSaasDeepLinkSupport() {
+        return saasDeepLinkSupport;
+    }
+
+    public void setSaasDeepLinkSupport(boolean saasDeepLinkSupport) {
+        this.saasDeepLinkSupport = saasDeepLinkSupport;
     }
 }
