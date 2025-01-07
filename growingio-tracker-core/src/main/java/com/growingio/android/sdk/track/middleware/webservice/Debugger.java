@@ -28,6 +28,7 @@ public class Debugger {
 
     public final static int DEBUGGER_INIT = 0;
     public final static int DEBUGGER_SCREENSHOT = 1;
+    public final static int DEBUGGER_REFRESH = 2;
 
     public final int debuggerDataType;
 
@@ -37,6 +38,12 @@ public class Debugger {
         this.params = params;
         screenshot = null;
         debuggerDataType = DEBUGGER_INIT;
+    }
+
+    public Debugger(int type){
+        params = new HashMap<>();
+        screenshot = null;
+        debuggerDataType = type;
     }
 
     private final byte[] screenshot;

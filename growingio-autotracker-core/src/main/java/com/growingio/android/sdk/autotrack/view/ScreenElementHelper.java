@@ -36,22 +36,22 @@ public class ScreenElementHelper {
     private ScreenElementHelper() {
     }
 
-    private static final String VIEW_XPATH = "xpath";
-    private static final String VIEW_PARENT_XPATH = "parentXPath";
-    private static final String VIEW_PARENT_XINDEX = "parentXContent"; //new for v4
-    private static final String VIEW_XINDEX = "xcontent"; //new for v4
-    private static final String VIEW_LEFT = "left";
-    private static final String VIEW_TOP = "top";
-    private static final String VIEW_WIDTH = "width";
-    private static final String VIEW_HEIGHT = "height";
-    private static final String VIEW_NODE_TYPE = "nodeType";
-    private static final String VIEW_CONTENT = "content";
-    private static final String VIEW_PAGE = "page";
+    public static final String VIEW_XPATH = "xpath";
+    public static final String VIEW_PARENT_XPATH = "parentXPath";
+    public static final String VIEW_PARENT_XINDEX = "parentXContent"; //new for v4
+    public static final String VIEW_XINDEX = "xcontent"; //new for v4
+    public static final String VIEW_LEFT = "left";
+    public static final String VIEW_TOP = "top";
+    public static final String VIEW_WIDTH = "width";
+    public static final String VIEW_HEIGHT = "height";
+    public static final String VIEW_NODE_TYPE = "nodeType";
+    public static final String VIEW_CONTENT = "content";
+    public static final String VIEW_PAGE = "page";
 
     //private static final String VIEW_PATH = "path"; //new for v4.0, replace with page
-    private static final String VIEW_Z_LEVEL = "zLevel";
-    private static final String VIEW_INDEX = "index";
-    private static final String VIEW_WEBVIEW = "webView";
+    public static final String VIEW_Z_LEVEL = "zLevel";
+    public static final String VIEW_INDEX = "index";
+    public static final String VIEW_WEBVIEW = "webView";
 
     /**
      * data from flutter or ReactNative etc.
@@ -152,13 +152,13 @@ public class ScreenElementHelper {
     }
 
 
-    private static final String PAGE_PATH = "path";
-    private static final String PAGE_TITLE = "title";
-    private static final String PAGE_LEFT = "left";
-    private static final String PAGE_TOP = "top";
-    private static final String PAGE_WIDTH = "width";
-    private static final String PAGE_HEIGHT = "height";
-    private static final String PAGE_IGNORED = "isIgnored";
+    public static final String PAGE_PATH = "path";
+    public static final String PAGE_TITLE = "title";
+    public static final String PAGE_LEFT = "left";
+    public static final String PAGE_TOP = "top";
+    public static final String PAGE_WIDTH = "width";
+    public static final String PAGE_HEIGHT = "height";
+    public static final String PAGE_IGNORED = "isIgnored";
 
     public static JSONObject createPageElementWithMap(Map<String, Object> data) {
         try {

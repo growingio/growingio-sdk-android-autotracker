@@ -46,6 +46,11 @@ public class ViewUtil {
     private ViewUtil() {
     }
 
+    public static boolean maybeComposeView(View view) {
+        String className = view.getClass().getName();
+        return className.equals("androidx.compose.ui.platform.ComposeView") || className.contains("AndroidComposeView");
+    }
+
     public static boolean canCircle(View view) {
         return view instanceof WebView
                 || isChangeTypeView(view)

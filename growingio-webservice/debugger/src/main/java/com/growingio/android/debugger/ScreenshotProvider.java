@@ -131,7 +131,7 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
         screenshotHandler.postDelayed(refreshScreenshotRunnable, duration);
     }
 
-    private void refreshScreenshot() {
+    void refreshScreenshot() {
         refreshScreenshot(MIN_REFRESH_INTERVAL);
     }
 

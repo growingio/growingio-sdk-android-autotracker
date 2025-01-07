@@ -33,6 +33,7 @@ import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.middleware.compose.ComposeJson;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
 import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
@@ -42,6 +43,7 @@ import com.growingio.android.sdk.track.view.DecorView;
 import com.growingio.android.sdk.track.view.TipView;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -307,8 +309,27 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
                     container.put(pageJson);
                 }
             }
-            getPageFromTree(viewPage, container);
-            return;
+
+            if (!viewNodeProvider.hasComposeModule()) {
+                getPageFromTree(viewPage, container);
+                return;
+            }
+        }
+
+        if (ViewUtil.maybeComposeView(view)) {
+            ComposeJson composeJson = viewNodeProvider.buildComposeScreenPages(view);
+            if (composeJson != null) {
+                // if find compose pages, cut off the loop.
+                JSONArray composePages = composeJson.getResult();
+                if (composePages == null) return;
+                for (int i = 0; i < composePages.length(); i++) {
+                    try {
+                        container.put(composePages.getJSONObject(i));
+                    } catch (JSONException ignored) {
+                    }
+                }
+                return;
+            }
         }
 
         if (view instanceof ViewGroup) {
@@ -359,7 +380,8 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
         return findViewNodes;
     }
 
-    private void traverseViewNodeWithCircle(ViewNodeV4 viewNode, List<ViewNode> findViewNodes) {
+    private void traverseViewNodeWithCircle(ViewNodeV4
+                                                    viewNode, List<ViewNode> findViewNodes) {
         if (ViewAttributeUtil.isViewInvisible(viewNode.getView())) return;
 
         if (ClassExistHelper.isWebView(viewNode.getView())) {
@@ -412,6 +434,20 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
                 viewNode.setViewContent(content);
             }
             container.put(ScreenElementHelper.createViewElementData(viewNode, container.length(), null));
+        } else if (ViewUtil.maybeComposeView(viewNode.getView())) {
+            ComposeJson composeJson = viewNodeProvider.buildComposeScreenViews(viewNode.getView());
+            if (composeJson != null) {
+                // if find compose views, cut off the loop.
+                JSONArray composeViews = composeJson.getResult();
+                if (composeViews == null) return;
+                for (int i = 0; i < composeViews.length(); i++) {
+                    try {
+                        container.put(composeViews.getJSONObject(i));
+                    } catch (JSONException ignored) {
+                    }
+                }
+                return;
+            }
         }
 
         if (viewNode.getView() instanceof ViewGroup) {
@@ -439,7 +475,8 @@ class ViewNodeV4Renderer implements ViewNodeRenderer {
         return originViewNode.append(childView, index);
     }
 
-    private void disposeWebView(ViewNodeV4 viewNode, JSONArray container, final CountDownLatch latch) {
+    private void disposeWebView(ViewNodeV4 viewNode, JSONArray container,
+                                final CountDownLatch latch) {
         ModelLoader<HybridDom, HybridJson> modelLoader = viewNodeProvider.getHybridModelLoader();
         if (modelLoader == null) {
             latch.countDown();

@@ -67,6 +67,10 @@ public class DebuggerService implements LoadDataFetcher<WebService>,
                 String screenshotBase64 = "data:image/jpeg;base64," + Base64.encodeToString(screenshot, Base64.DEFAULT);
                 screenshotProvider.generateDebuggerData(screenshotBase64);
             }
+        } else if (debuggerDataType == Debugger.DEBUGGER_REFRESH) {
+            if (socketState.get() == SOCKET_STATE_READIED) {
+                screenshotProvider.refreshScreenshot();
+            }
         }
     }
 
@@ -82,7 +86,7 @@ public class DebuggerService implements LoadDataFetcher<WebService>,
         // restart, and it doesn't mean if you set different wsurl after websocket started.
         if (socketState.get() == SOCKET_STATE_READIED) {
             if (callback != null) {
-                callback.onDataReady(new WebService());
+                callback.onDataReady(new WebService(true));
             }
             return;
         }
@@ -123,7 +127,8 @@ public class DebuggerService implements LoadDataFetcher<WebService>,
     @Override
     public WebService executeData() {
         loadData(null);
-        return new WebService();
+        boolean isClosed = socketState.get() == SOCKET_STATE_CLOSED;
+        return new WebService(!isClosed);
     }
 
     public void cleanup() {
