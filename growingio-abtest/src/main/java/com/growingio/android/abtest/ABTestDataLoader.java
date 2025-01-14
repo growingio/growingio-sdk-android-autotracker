@@ -230,7 +230,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                     "&layerId=" + Uri.encode(layerId);
             boolean isNewDevice = persistentDataProvider.isNewDevice();
             if (isNewDevice) {
-                sb += "&isNewDevice=true";
+                sb += "&newDevice=true";
             }
             eventUrl.setBodyData(sb.getBytes());
             EventResponse response = trackerContext.getRegistry().executeData(eventUrl, EventUrl.class, EventResponse.class);
