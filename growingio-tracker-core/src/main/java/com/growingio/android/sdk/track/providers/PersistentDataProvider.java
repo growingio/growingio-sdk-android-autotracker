@@ -131,9 +131,13 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
                 return false;
             }
             int pid = android.os.Process.myPid();
-            if (tokenCondition[1].equals(String.valueOf(pid)) || tokenCondition[1].equals("0")) {
+            if (tokenCondition[1].equals("0")) {
                 return true;
             }
+            if (!tokenCondition[1].equals(String.valueOf(pid))) {
+                return false;
+            }
+
             String currentSession = getSessionId();
             String tokenSession = tokenCondition[2];
             boolean isNewDevice = currentSession.equals(tokenSession);
