@@ -51,7 +51,7 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
     private static final String KEY_LATEST_PAUSE_TIME = "LATEST_PAUSE_TIME";
     private static final String KEY_ACTIVITY_COUNT = "ACTIVITY_COUNT";
     private static final String KEY_SEND_VISIT_AFTER_REFRESH_SESSION_ID = "SEND_VISIT_AFTER_REFRESH_SESSION_ID";
-    // [true|false]::[pid]::[time]
+    // [true|false]::[pid]::[session]
     private static final String KEY_NEW_DEVICE_TOKEN = "NEW_DEVICE_TOKEN";
 
     private final IDataSharer dataSharer;
@@ -105,10 +105,11 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
 
     public void setNewDeviceToken(boolean isNewDevice) {
         if (isNewDevice) {
-            String token = "true::" + Process.myPid() + "::" + System.currentTimeMillis();
+            String session = getSessionId();
+            String token = "true::" + Process.myPid() + "::" + session;
             dataSharer.putString(KEY_NEW_DEVICE_TOKEN, token);
         } else {
-            dataSharer.putString(KEY_NEW_DEVICE_TOKEN, "false::1::0");
+            dataSharer.putString(KEY_NEW_DEVICE_TOKEN, "false::1::NULL");
         }
     }
 
@@ -116,11 +117,11 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
      * judge whether the device is new
      * 1. if the token enable is false, return false
      * 2. if the token pid is 0 or equal current pid, return true
-     * 3. if the token time is less than 5 minutes, return true
+     * 3. if the token session is fresh, return true
      */
     public boolean isNewDevice() {
         try {
-            String token = dataSharer.getString(KEY_NEW_DEVICE_TOKEN, "true::0::0");
+            String token = dataSharer.getString(KEY_NEW_DEVICE_TOKEN, "true::0::");
             String[] tokenCondition = token.split("::");
             if (tokenCondition.length != 3) {
                 setNewDeviceToken(false);
@@ -133,9 +134,9 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
             if (tokenCondition[1].equals(String.valueOf(pid)) || tokenCondition[1].equals("0")) {
                 return true;
             }
-            long currentTime = System.currentTimeMillis();
-            long tokenTime = Long.parseLong(tokenCondition[2]);
-            boolean isNewDevice = currentTime - tokenTime < 5 * 60_1000L;
+            String currentSession = getSessionId();
+            String tokenSession = tokenCondition[2];
+            boolean isNewDevice = currentSession.equals(tokenSession);
             if (!isNewDevice) {
                 setNewDeviceToken(false);
             }
