@@ -51,6 +51,8 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
     private static final String KEY_LATEST_PAUSE_TIME = "LATEST_PAUSE_TIME";
     private static final String KEY_ACTIVITY_COUNT = "ACTIVITY_COUNT";
     private static final String KEY_SEND_VISIT_AFTER_REFRESH_SESSION_ID = "SEND_VISIT_AFTER_REFRESH_SESSION_ID";
+    // [true|false]::[pid]::[session]
+    private static final String KEY_NEW_DEVICE_TOKEN = "NEW_DEVICE_TOKEN";
 
     private final IDataSharer dataSharer;
     private final ProcessLock processLock;
@@ -97,7 +99,55 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
         if (TextUtils.isEmpty(deviceId)) {
             return;
         }
+        setNewDeviceToken(true);
         dataSharer.putString(KEY_DEVICE_ID, deviceId);
+    }
+
+    public void setNewDeviceToken(boolean isNewDevice) {
+        if (isNewDevice) {
+            String session = getSessionId();
+            String token = "true::" + Process.myPid() + "::" + session;
+            dataSharer.putString(KEY_NEW_DEVICE_TOKEN, token);
+        } else {
+            dataSharer.putString(KEY_NEW_DEVICE_TOKEN, "false::1::NULL");
+        }
+    }
+
+    /**
+     * judge whether the device is new
+     * 1. if the token enable is false, return false
+     * 2. if the token pid is 0 or equal current pid, return true
+     * 3. if the token session is fresh, return true
+     */
+    public boolean isNewDevice() {
+        try {
+            String token = dataSharer.getString(KEY_NEW_DEVICE_TOKEN, "true::0::");
+            String[] tokenCondition = token.split("::");
+            if (tokenCondition.length != 3) {
+                setNewDeviceToken(false);
+                return false;
+            }
+            if (tokenCondition[0].equalsIgnoreCase("false")) {
+                return false;
+            }
+            int pid = android.os.Process.myPid();
+            if (tokenCondition[1].equals("0")) {
+                return true;
+            }
+            if (!tokenCondition[1].equals(String.valueOf(pid))) {
+                return false;
+            }
+
+            String currentSession = getSessionId();
+            String tokenSession = tokenCondition[2];
+            boolean isNewDevice = currentSession.equals(tokenSession);
+            if (!isNewDevice) {
+                setNewDeviceToken(false);
+            }
+            return isNewDevice;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public String getLoginUserKey() {
