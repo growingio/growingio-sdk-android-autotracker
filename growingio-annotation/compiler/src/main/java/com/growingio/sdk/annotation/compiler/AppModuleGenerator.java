@@ -80,13 +80,16 @@ final class AppModuleGenerator {
                 MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC);
         ClassName androidLogName = ClassName.get("android.util", "Log");
+        StringBuilder moduleInfo = new StringBuilder("Discovered GIOModule from annotation: ");
         for (String moduleName : gioModules) {
-            constructorBuilder.addStatement(
-                    "$T.d($S, $S)",
-                    androidLogName,
-                    GIO_LOG_TAG,
-                    "Discovered GIOModule from annotation: " + moduleName);
+            moduleInfo.append(simpleClassName(moduleName)).append(" ");
         }
+        constructorBuilder.addStatement(
+                "$T.d($S, $S)",
+                androidLogName,
+                GIO_LOG_TAG,
+                moduleInfo.toString());
+
         constructorBuilder.addStatement("appModule = new $T()", appModule);
         MethodSpec constructor = constructorBuilder.build();
 
@@ -134,6 +137,14 @@ final class AppModuleGenerator {
                 .addStatement("module.registerComponents(context)");
 
         return registerModule.build();
+    }
+
+    private String simpleClassName(String className) {
+        try {
+            return className.substring(className.lastIndexOf(".") + 1);
+        } catch (Exception e) {
+            return className;
+        }
     }
 
     private void writeGioModule(TypeSpec appModule) {
