@@ -44,7 +44,7 @@ public abstract class BaseAttributesEvent extends BaseEvent {
             super(eventType);
         }
 
-        public Builder<T> setGeneralProps(Map<String, String> generalProps) {
+        public void setGeneralProps(Map<String, String> generalProps) {
             if (generalProps != null && !generalProps.isEmpty()) {
                 Map<String, String> newAttributes = new HashMap<>();
                 if (this.attributes != null) newAttributes.putAll(this.attributes);
@@ -55,7 +55,6 @@ public abstract class BaseAttributesEvent extends BaseEvent {
                 }
                 setAttributes(newAttributes);
             }
-            return this;
         }
 
         public Builder<T> setAttributes(Map<String, String> attributes) {

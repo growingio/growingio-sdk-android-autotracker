@@ -26,6 +26,7 @@ import android.view.View;
 import androidx.annotation.UiThread;
 
 import com.growingio.android.sdk.track.TrackMainThread;
+import com.growingio.android.sdk.track.events.EventFilterInterceptor;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
 import com.growingio.android.sdk.track.events.helper.DynamicGeneralPropsGenerator;
 import com.growingio.android.sdk.track.log.Logger;
@@ -182,6 +183,13 @@ public class Tracker {
         }
         TrackMainThread.trackMain().postActionToTrackMain(() ->
                 trackerContext.getEventBuilderProvider().removeGeneralProps(keys)
+        );
+    }
+
+    public void setEventFilterInterceptor(EventFilterInterceptor eventFilterInterceptor) {
+        if (!isInited || eventFilterInterceptor == null) return;
+        TrackMainThread.trackMain().postActionToTrackMain(() ->
+                trackerContext.getConfigurationProvider().core().setEventFilterInterceptor(eventFilterInterceptor)
         );
     }
 
