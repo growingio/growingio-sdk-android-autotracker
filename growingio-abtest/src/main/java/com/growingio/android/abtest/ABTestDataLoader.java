@@ -35,6 +35,7 @@ import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
 
@@ -84,6 +85,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
 
         private final TrackerContext trackerContext;
         private final DeviceInfoProvider deviceInfoProvider;
+        private final PersistentDataProvider persistentDataProvider;
         private final SharedPreferences sharedPreferences;
 
         private ABTestConfig abTestConfig;
@@ -93,6 +95,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
         public ABTestDataFetcher(TrackerContext trackerContext, ABTest abTest) {
             this.trackerContext = trackerContext;
             this.deviceInfoProvider = trackerContext.getDeviceInfoProvider();
+            this.persistentDataProvider = trackerContext.getProvider(PersistentDataProvider.class);
             this.abTestConfig = trackerContext.getConfigurationProvider().getConfiguration(ABTestConfig.class);
             if (abTestConfig == null) {
                 abTestConfig = new ABTestConfig();
@@ -225,6 +228,10 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                     "&datasourceId=" + Uri.encode(coreConfiguration.getDataSourceId()) +
                     "&distinctId=" + Uri.encode(deviceInfoProvider.getDeviceId()) +
                     "&layerId=" + Uri.encode(layerId);
+            boolean isNewDevice = persistentDataProvider.isNewDevice();
+            if (isNewDevice) {
+                sb += "&newDevice=true";
+            }
             eventUrl.setBodyData(sb.getBytes());
             EventResponse response = trackerContext.getRegistry().executeData(eventUrl, EventUrl.class, EventResponse.class);
             ABTestResponse outABTestResponse = new ABTestResponse();
