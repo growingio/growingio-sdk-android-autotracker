@@ -84,11 +84,13 @@ final class AppModuleGenerator {
         for (String moduleName : gioModules) {
             moduleInfo.append(simpleClassName(moduleName)).append(" ");
         }
-        constructorBuilder.addStatement(
-                "$T.d($S, $S)",
-                androidLogName,
-                GIO_LOG_TAG,
-                moduleInfo.toString());
+        if (!gioModules.isEmpty()) {
+            constructorBuilder.addStatement(
+                    "$T.d($S, $S)",
+                    androidLogName,
+                    GIO_LOG_TAG,
+                    moduleInfo.toString());
+        }
 
         constructorBuilder.addStatement("appModule = new $T()", appModule);
         MethodSpec constructor = constructorBuilder.build();
