@@ -492,6 +492,33 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         }
     }
 
+    @UiThread
+    public void fragmentOnStop(SuperFragment<?> fragment) {
+        if (!TrackerContext.initializedSuccessfully()) {
+            Logger.e(TAG, "Autotracker do not initialized successfully");
+            return;
+        }
+
+        if (fragment == null) {
+            Logger.w(TAG, "fragmentOnStop: this fragment can not make superFragment");
+            return;
+        }
+
+        Logger.d(TAG, "fragmentOnStop: fragment is " + fragment.getSimpleName());
+
+        if (pageConfig.isPageLeaveEnabled()) {
+            Activity activity = fragment.getActivity();
+            if (activity == null) return;
+            Page<?> page = ALL_PAGE_TREE.get(activity);
+            if (page != null) {
+                Page<?> fragmentPage = searchFragmentPage(fragment, page);
+                if (fragmentPage != null) {
+                    PageLeave.buildPageLeaveEvent(fragmentPage);
+                }
+            }
+        }
+    }
+
     private Page<?> removePageFromTree(SuperFragment<?> carrier, Page<?> page) {
         Iterator<Page<?>> iterator = page.getAllChildren().iterator();
         while (iterator.hasNext()) {

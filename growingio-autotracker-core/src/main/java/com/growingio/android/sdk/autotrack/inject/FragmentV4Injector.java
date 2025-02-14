@@ -30,10 +30,17 @@ public class FragmentV4Injector {
         PageProvider.get().createOrResumePage(SuperFragment.makeSupport(fragment));
     }
 
+    public static void v4FragmentOnStop(android.support.v4.app.Fragment fragment) {
+        Logger.d(TAG, "v4FragmentOnStop: fragment = " + fragment.getClass().getName());
+        PageProvider.get().fragmentOnStop(SuperFragment.makeSupport(fragment));
+    }
+
     public static void v4FragmentSetUserVisibleHint(android.support.v4.app.Fragment fragment, boolean isVisibleToUser) {
         Logger.d(TAG, "v4FragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
             PageProvider.get().createOrResumePage(SuperFragment.makeSupport(fragment));
+        } else {
+            PageProvider.get().fragmentOnHiddenChanged(SuperFragment.makeSupport(fragment), true);
         }
     }
 
