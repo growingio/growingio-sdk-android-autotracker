@@ -88,13 +88,18 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             boolean isActivityPageEnabled = autotrackConfig.getAutotrackOptions().isActivityPageEnabled();
             boolean isFragmentPageEnabled = autotrackConfig.getAutotrackOptions().isFragmentPageEnabled();
             boolean enableFragmentTag = autotrackConfig.isEnableFragmentTag();
+            boolean enablePageLeave = autotrackConfig.isEnablePageLeave();
             List<PageRule> pageRuleList = XmlParserUtil.loadPageRuleXml(context, autotrackConfig.getPageXmlRes());
             autotrackConfig.getPageRules().addAll(0, pageRuleList);
 
             List<PageRule> pageRules = Collections.unmodifiableList(autotrackConfig.getPageRules());
-            pageConfig = new PageConfig(pageRules, isActivityPageEnabled, isFragmentPageEnabled, enableFragmentTag, isDowngrade, autotrackConfig.isAutotrack());
+            pageConfig = new PageConfig(pageRules, isActivityPageEnabled, isFragmentPageEnabled,
+                    enableFragmentTag, enablePageLeave,
+                    isDowngrade, autotrackConfig.isAutotrack());
         } else {
-            pageConfig = new PageConfig(null, isDowngrade, isDowngrade, false, isDowngrade, true);
+            pageConfig = new PageConfig(null, isDowngrade, isDowngrade,
+                    false, false,
+                    isDowngrade, true);
         }
     }
 
@@ -119,6 +124,8 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
 
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
             createOrResumeActivity(activity);
+        } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED) {
+            sendActivityPageLeave(activity);
         } else if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_DESTROYED) {
             destroyActivity(activity);
         }
@@ -271,6 +278,16 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     @UiThread
+    private void sendActivityPageLeave(Activity activity) {
+        if (!pageConfig.isPageLeaveEnabled()) return;
+        ActivityPage page = ALL_PAGE_TREE.get(activity);
+        if (page != null) {
+            Logger.d(TAG, "sendActivityPageLeave: path = " + page.path());
+            PageLeave.buildPageLeaveEvent(page);
+        }
+    }
+
+    @UiThread
     private void destroyActivity(Activity activity) {
         Logger.d(TAG, "removePage: activity is " + activity);
         ALL_PAGE_TREE.remove(activity);
@@ -309,6 +326,19 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
                     Logger.w(TAG, "fragmentOnHiddenChanged: fragment is NULL");
                 } else {
                     showPagesFromHidden(fragmentPage);
+                }
+            }
+        } else {
+            // hidden fragment and send page leave event
+            if (pageConfig.isPageLeaveEnabled()) {
+                Activity activity = fragment.getActivity();
+                if (activity == null) return;
+                Page<?> page = ALL_PAGE_TREE.get(activity);
+                if (page != null) {
+                    Page<?> fragmentPage = searchFragmentPage(fragment, page);
+                    if (fragmentPage != null) {
+                        PageLeave.buildPageLeaveEvent(page);
+                    }
                 }
             }
         }
@@ -454,6 +484,9 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
                 Page<?> removePage = removePageFromTree(fragment, page);
                 if (removePage != null) {
                     CACHE_PAGES.put(realFragment, removePage);
+                    if (pageConfig.isPageLeaveEnabled()) {
+                        PageLeave.buildPageLeaveEvent(removePage);
+                    }
                 }
             }
         }
@@ -494,6 +527,22 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             }
         }
         return pageParent;
+    }
+
+    void sendAllPagesLeave() {
+        if (!pageConfig.isPageLeaveEnabled()) return;
+        for (Map.Entry<Activity, ActivityPage> entry : ALL_PAGE_TREE.entrySet()) {
+            ActivityPage page = entry.getValue();
+            if (page != null) {
+                if (page.hasChildren()) {
+                    Set<Page<?>> children = page.getAllChildren();
+                    for (Page<?> child : children) {
+                        PageLeave.buildPageLeaveEvent(child, true);
+                    }
+                }
+                PageLeave.buildPageLeaveEvent(page, true);
+            }
+        }
     }
 
     protected Page<?> searchFragmentPage(SuperFragment<?> carrier, Page<?> page) {

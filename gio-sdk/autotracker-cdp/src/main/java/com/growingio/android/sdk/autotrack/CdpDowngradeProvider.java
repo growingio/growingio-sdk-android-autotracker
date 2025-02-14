@@ -38,6 +38,7 @@ public class CdpDowngradeProvider implements TrackerLifecycleProvider {
      */
     private void downgrade() {
         AutotrackConfig config = configurationProvider.getConfiguration(AutotrackConfig.class);
+        config.enablePageLeave(true);
         config.getAutotrackOptions().setFragmentPageEnabled(true);
         config.getAutotrackOptions().setActivityPageEnabled(true);
     }
