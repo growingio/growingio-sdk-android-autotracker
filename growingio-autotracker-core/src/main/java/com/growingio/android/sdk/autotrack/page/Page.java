@@ -39,6 +39,7 @@ public abstract class Page<T> {
     private final T mCarrier;
     private Page<?> mParent;
     private long mShowTimestamp;
+    private boolean mIsLeave = false;
     private boolean mIsAutotrack = false; //是否标记为可发送
 
     private boolean mIsIgnored = false;
@@ -62,6 +63,7 @@ public abstract class Page<T> {
     }
 
     public void refreshShowTimestamp() {
+        mIsLeave = false;
         mShowTimestamp = System.currentTimeMillis();
     }
 
@@ -83,6 +85,14 @@ public abstract class Page<T> {
 
     public long getShowTimestamp() {
         return mShowTimestamp;
+    }
+
+    public void setIsLeave(boolean isLeave) {
+        this.mIsLeave = isLeave;
+    }
+
+    public boolean isLeave() {
+        return mIsLeave;
     }
 
     public Map<String, String> getAttributes() {
@@ -297,4 +307,5 @@ public abstract class Page<T> {
             return false;
         }
     }
+
 }

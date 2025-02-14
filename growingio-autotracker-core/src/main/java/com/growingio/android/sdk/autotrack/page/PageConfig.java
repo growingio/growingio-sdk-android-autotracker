@@ -20,6 +20,7 @@ import java.util.List;
 
 class PageConfig {
     private boolean enableFragmentTag = false;
+    private boolean enablePageLeave = false;
     private List<PageRule> pageRuleList;
     private boolean isActivityPageEnabled = true;
     private boolean isFragmentPageEnabled = true;
@@ -27,11 +28,15 @@ class PageConfig {
 
     private boolean autotrack = true;
 
-    public PageConfig(List<PageRule> pageRuleList, boolean isActivityPageEnabled, boolean isFragmentPageEnabled, boolean enableFragmentTag, boolean isDowngrade,boolean autotrack) {
+    public PageConfig(List<PageRule> pageRuleList, boolean isActivityPageEnabled, boolean isFragmentPageEnabled,
+                      boolean enableFragmentTag, boolean enablePageLeave,
+                      boolean isDowngrade,
+                      boolean autotrack) {
         this.pageRuleList = pageRuleList;
         this.isActivityPageEnabled = isActivityPageEnabled;
         this.isFragmentPageEnabled = isFragmentPageEnabled;
         this.enableFragmentTag = enableFragmentTag;
+        this.enablePageLeave = enablePageLeave;
         this.isDowngrade = isDowngrade;
         this.autotrack = autotrack;
     }
@@ -54,6 +59,10 @@ class PageConfig {
 
     public boolean isDowngrade() {
         return isDowngrade;
+    }
+
+    public boolean isPageLeaveEnabled() {
+        return enablePageLeave;
     }
 
     public boolean isAutotrack() {
