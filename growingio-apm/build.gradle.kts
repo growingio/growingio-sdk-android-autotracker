@@ -38,8 +38,9 @@ dependencies {
     implementation(project(":growingio-annotation"))
     annotationProcessor(project(":growingio-annotation:compiler"))
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.junit)
+    testImplementation(libs.bundles.test)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.appcompat)
     androidTestImplementation(libs.kotlin.coroutines.test)
 }
 
