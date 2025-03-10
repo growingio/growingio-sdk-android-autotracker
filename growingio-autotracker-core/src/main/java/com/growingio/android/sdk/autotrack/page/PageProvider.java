@@ -88,7 +88,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
             boolean isActivityPageEnabled = autotrackConfig.getAutotrackOptions().isActivityPageEnabled();
             boolean isFragmentPageEnabled = autotrackConfig.getAutotrackOptions().isFragmentPageEnabled();
             boolean enableFragmentTag = autotrackConfig.isEnableFragmentTag();
-            boolean enablePageLeave = autotrackConfig.isEnablePageLeave();
+            boolean enablePageLeave = autotrackConfig.isPageLeaveEnabled();
             List<PageRule> pageRuleList = XmlParserUtil.loadPageRuleXml(context, autotrackConfig.getPageXmlRes());
             autotrackConfig.getPageRules().addAll(0, pageRuleList);
 

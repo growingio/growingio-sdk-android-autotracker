@@ -30,7 +30,7 @@ public class AutotrackConfig implements Configurable {
     private boolean autotrackEnabled = true;
     private int pageXmlRes = 0;
     private final List<PageRule> pageRules = new ArrayList<>();
-    private boolean enablePageLeave = false;
+    private boolean pageLeaveEnabled = false;
 
     public AutotrackConfig setImpressionScale(float scale) {
         if (scale < 0) {
@@ -139,13 +139,13 @@ public class AutotrackConfig implements Configurable {
         return enableFragmentTag;
     }
 
-    public AutotrackConfig enablePageLeave(boolean enable) {
-        this.enablePageLeave = enable;
+    public AutotrackConfig setPageLeaveEnabled(boolean enable) {
+        this.pageLeaveEnabled = enable;
         return this;
     }
 
-    public boolean isEnablePageLeave() {
-        return enablePageLeave;
+    public boolean isPageLeaveEnabled() {
+        return pageLeaveEnabled;
     }
 
     public List<PageRule> getPageRules() {
