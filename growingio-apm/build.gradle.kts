@@ -30,9 +30,6 @@ android {
 }
 
 dependencies {
-    compileOnly(libs.okhttp3)
-    compileOnly(libs.bundles.androidx)
-    compileOnly(libs.bundles.android.support)
 
     implementation(project(":growingio-tracker-core"))
     debugImplementation(project(":growingio-tools:gmonitor"))
