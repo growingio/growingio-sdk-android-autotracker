@@ -35,6 +35,9 @@ dependencies {
     compileOnly(libs.bundles.android.support)
 
     implementation(project(":growingio-tracker-core"))
+    debugImplementation(project(":growingio-tools:gmonitor"))
+    releaseImplementation(libs.growingio.gmonitor)
+
     implementation(project(":growingio-annotation"))
     annotationProcessor(project(":growingio-annotation:compiler"))
 
