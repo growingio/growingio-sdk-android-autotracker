@@ -30,10 +30,16 @@ public class FragmentInjector {
         PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
     }
 
+    public static void systemFragmentOnStop(android.app.Fragment fragment) {
+        Logger.d(TAG, "systemFragmentOnStop: fragment = " + fragment.getClass().getName());
+    }
+
     public static void systemFragmentSetUserVisibleHint(android.app.Fragment fragment, boolean isVisibleToUser) {
         Logger.d(TAG, "systemFragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
             PageProvider.get().createOrResumePage(SuperFragment.make(fragment));
+        } else {
+            PageProvider.get().fragmentOnHiddenChanged(SuperFragment.make(fragment), true);
         }
     }
 
@@ -52,6 +58,10 @@ public class FragmentInjector {
         PageProvider.get().createOrResumePage(SuperFragment.makeX(fragment));
     }
 
+    public static void androidxFragmentOnStop(androidx.fragment.app.Fragment fragment) {
+        Logger.d(TAG, "androidxFragmentOnStop: fragment = " + fragment.getClass().getName());
+    }
+
     /**
      * 新版本的AndroidX Fragment setUserVisibleHint 将通过 FragmentTransaction setMaxLifecycle 来控制生命周期实现
      */
@@ -60,6 +70,8 @@ public class FragmentInjector {
         Logger.d(TAG, "androidxFragmentSetUserVisibleHint: fragment = " + fragment.getClass().getName() + ", isVisibleToUser = " + isVisibleToUser);
         if (isVisibleToUser) {
             PageProvider.get().createOrResumePage(SuperFragment.makeX(fragment));
+        } else {
+            PageProvider.get().fragmentOnHiddenChanged(SuperFragment.makeX(fragment), true);
         }
     }
 

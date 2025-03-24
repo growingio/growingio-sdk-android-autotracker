@@ -127,8 +127,8 @@ public class DebuggerService implements LoadDataFetcher<WebService>,
     @Override
     public WebService executeData() {
         loadData(null);
-        boolean isClosed = socketState.get() == SOCKET_STATE_CLOSED;
-        return new WebService(!isClosed);
+        boolean isRunning = socketState.get() == SOCKET_STATE_READIED;
+        return new WebService(isRunning);
     }
 
     public void cleanup() {
