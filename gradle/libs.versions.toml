@@ -31,8 +31,8 @@ protobufPlugin = "0.9.1"
 protobuf = "3.22.3"
 
 # !!! SDK VERSION !!!
-growingio = "4.4.1"
-growingioCode = "40401"
+growingio = "4.4.2"
+growingioCode = "40402"
 growingioPlugin = "4.4.0"
 junit = "1.1.5"
 
