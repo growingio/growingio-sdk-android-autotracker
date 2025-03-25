@@ -29,7 +29,6 @@ import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.autotrack.view.ViewNodeProvider;
 import com.growingio.android.sdk.track.TrackMainThread;
-import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 
@@ -269,33 +268,6 @@ public class Autotracker extends Tracker {
     public void setPageAttributesX(final androidx.fragment.app.Fragment page,
                                    final Map<String, String> attributes) {
         setPageAttributes(page, attributes);
-    }
-
-    /**
-     * When you need to manually send a page, you can generate a page event by passing in the page's alias.
-     */
-    public void generatePageEvent(String alias, String title, final Map<String, String> attributes) {
-        if (alias == null || alias.isEmpty()) {
-            Logger.e(TAG, "page's alias is empty");
-            return;
-        }
-        if (!alias.startsWith("/")) {
-            alias = "/" + alias;
-        }
-        TrackMainThread.trackMain().postEventToTrackMain(
-                new PageEvent.Builder()
-                        .setPath(alias)
-                        .setTitle(title)
-                        .setTimestamp(System.currentTimeMillis())
-                        .setAttributes(attributes)
-        );
-    }
-
-    /**
-     * When you need to manually send a page, you can generate a page event by passing in the page's alias.
-     */
-    public void generatePageEvent(String alias) {
-        generatePageEvent(alias, null, null);
     }
 
     public void trackViewImpression(View view, String impressionEventName) {
