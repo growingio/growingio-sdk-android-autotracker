@@ -46,7 +46,7 @@ dependencies {
 	testImplementation project(path: ':growingio-data:json')
 
 	implementation project(':growingio-tracker-core')
-	compileOnly libs.growingio.gmonitor
+	compileOnly project(':growingio-tools:gmonitor')
 
 	implementation project(":growingio-annotation")
 	annotationProcessor project(":growingio-annotation:compiler")

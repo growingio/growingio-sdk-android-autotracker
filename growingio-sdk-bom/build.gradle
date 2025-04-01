@@ -36,7 +36,8 @@ dependencies {
 							it.name != "growingio-webservice" &&
 							it.name != "growingio-data" &&
 							it.name != "growingio-adapter" &&
-							it.name != "snappy"
+							it.name != "snappy" &&
+							it.name != "gmonitor"
 				}
 				.map {
 					it.name.replace("growingio-", "")
@@ -59,7 +60,7 @@ dependencies {
 
 		// tool
 		//runtime "com.growingio.android:snappy:1.1.0"
-		//runtime 'com.growingio.android:gmonitor:1.5.0'
+		//runtime "com.growingio.android:gmonitor:2.0.0"
 	}
 }
 

@@ -54,6 +54,7 @@ include ':growingio-data:database'
 include ':growingio-tools:snappy'
 include ':growingio-tools:oaid'
 include ':growingio-tools:platform'
+include ':growingio-tools:gmonitor'
 
 // sdks
 include ':gio-sdk:tracker'
@@ -64,3 +65,4 @@ include ':gio-sdk:autotracker-saas'
 
 include ':growingio-sdk-bom'
 include ':growingio-flutter'
+
