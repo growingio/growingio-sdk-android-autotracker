@@ -77,8 +77,8 @@ growingio-abtest = { module = "com.growingio.android:abtest", version.ref = "gro
 growingio-flutter = { module = "com.growingio.android:flutter", version.ref = "growingio" }
 growingio-compose = { module = "com.growingio.android:compose", version.ref = "growingio" }
 growingio-apm = { module = "com.growingio.android:apm", version.ref = "growingio" }
-growingio-gmonitor = "com.growingio.android:gmonitor:2.0.0"
 growingio-snappy = "com.growingio.android:snappy:1.1.0"
+growingio-gmonitor = "com.growingio.android:gmonitor:2.0.0"
 
 # [AndroidX]
 # https://developer.android.google.cn/jetpack/androidx/releases/core?hl=en
