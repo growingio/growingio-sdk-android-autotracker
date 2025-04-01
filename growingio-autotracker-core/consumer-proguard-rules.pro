@@ -14,3 +14,9 @@
 -keep class androidx.viewpager.widget.ViewPager$**{
     *;
 }
+
+-dontwarn com.google.android.material.button.MaterialButton
+-dontwarn com.google.android.material.slider.RangeSlider
+-dontwarn com.google.android.material.slider.Slider
+-dontwarn com.google.android.material.tabs.TabLayout$Tab
+-dontwarn com.google.android.material.tabs.TabLayout$TabView
