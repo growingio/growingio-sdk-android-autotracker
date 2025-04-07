@@ -19,7 +19,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.track.TrackMainThread;
