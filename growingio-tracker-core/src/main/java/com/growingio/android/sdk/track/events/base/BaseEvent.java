@@ -347,6 +347,10 @@ public abstract class BaseEvent extends GEvent {
             appChannel = getFieldDefault(BaseField.APP_CHANNEL) ? configurationProvider.core().getChannel() : null;
 
             DeviceInfoProvider deviceInfo = context.getDeviceInfoProvider();
+            deviceInfo.loadPlatformInfo();
+
+            platformVersion = deviceInfo.getPlatformVersion();
+            platform = deviceInfo.getPlatform();
             deviceId = deviceInfo.getDeviceId();
             screenHeight = getFieldDefault(BaseField.SCREEN_HEIGHT) ? deviceInfo.getScreenHeight() : 0;
             screenWidth = getFieldDefault(BaseField.SCREEN_WIDTH) ? deviceInfo.getScreenWidth() : 0;
@@ -355,9 +359,6 @@ public abstract class BaseEvent extends GEvent {
             deviceType = getFieldDefault(BaseField.DEVICE_TYPE) ? deviceInfo.getDeviceType() : null;
             latitude = getFieldDefault(BaseField.LATITUDE) ? deviceInfo.getLatitude() : 0;
             longitude = getFieldDefault(BaseField.LONGITUDE) ? deviceInfo.getLongitude() : 0;
-            PlatformInfo platformInfo = deviceInfo.getPlatformInfo();
-            platformVersion = platformInfo.getPlatformVersion();
-            platform = platformInfo.getPlatform();
 
             AppInfoProvider appInfo = context.getProvider(AppInfoProvider.class);
             appName = getFieldDefault(BaseField.APP_NAME) ? appInfo.getAppName() : null;

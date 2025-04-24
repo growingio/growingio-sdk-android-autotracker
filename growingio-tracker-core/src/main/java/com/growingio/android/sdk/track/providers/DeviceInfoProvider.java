@@ -23,7 +23,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.TrackThread;
@@ -66,12 +65,14 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
     private String mImei;
     private String mOaid;
     private String mGoogleAdId;
+    private String mFirebaseId;
     private String mDeviceId;
-    private PlatformInfo mPlatformInfo;
+    private String mPlatform;
+    private String mPlatformVersion;
     private int mTimezoneOffset = Integer.MIN_VALUE;
+    private PlatformInfo mPlatformInfo;
 
     private double mLatitude = 0;
-
     private double mLongitude = 0;
 
     private Context context;
@@ -88,6 +89,9 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         this.registry = context.getRegistry();
         this.configurationProvider = context.getConfigurationProvider();
         this.persistentDataProvider = context.getProvider(PersistentDataProvider.class);
+
+        this.mPlatform = ConstantPool.ANDROID;
+        this.mPlatformVersion = Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE;
     }
 
     @Override
@@ -95,15 +99,32 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     }
 
-    public PlatformInfo getPlatformInfo() {
+    public PlatformInfo loadPlatformInfo() {
         if (mPlatformInfo == null) {
             mPlatformInfo = registry.executeData(null, PlatformHelper.class, PlatformInfo.class);
-            if (mPlatformInfo == null) {
-                mPlatformInfo = new PlatformInfo(ConstantPool.ANDROID,
-                        Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE);
+            if (mPlatformInfo != null) {
+                if (mPlatformInfo.getPlatform() != null) {
+                    this.mPlatform = mPlatformInfo.getPlatform();
+                }
+                if (mPlatformInfo.getPlatformVersion() != null) {
+                    this.mPlatformVersion = mPlatformInfo.getPlatformVersion();
+                }
+                if (mPlatformInfo.getDeviceType() != null) {
+                    this.mDeviceType = mPlatformInfo.getDeviceType();
+                }
+                mGoogleAdId = mPlatformInfo.getGmsId();
+                mFirebaseId = mPlatformInfo.getFirebaseId();
             }
         }
         return mPlatformInfo;
+    }
+
+    public String getPlatformVersion() {
+        return mPlatformVersion;
+    }
+
+    public String getPlatform() {
+        return mPlatform;
     }
 
     public String getDeviceBrand() {
@@ -126,6 +147,7 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         }
         return mDeviceType;
     }
+
 
     public int getScreenHeight() {
         if (mScreenHeight <= 0) {
@@ -190,6 +212,10 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         return mGoogleAdId;
     }
 
+    public String getFirebaseId() {
+        return mFirebaseId;
+    }
+
     public String getDeviceId() {
         if (TextUtils.isEmpty(mDeviceId)) {
             mDeviceId = persistentDataProvider.getDeviceId();
@@ -216,26 +242,21 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
             Logger.w(TAG, "try get AndroidId and fail, sdk generate random uuid as AndroidId");
             result = UUID.randomUUID().toString();
         }
-        if (result != null && result.length() != 0) {
+        if (result != null && !result.isEmpty()) {
             persistentDataProvider.setDeviceId(result);
         }
         return result;
     }
 
+
     public String getUserAgent() {
         if (!TextUtils.isEmpty(mUserAgent)) return mUserAgent;
-        mUserAgent = System.getProperty("http.agent");
-        if (TextUtils.isEmpty(mUserAgent)
-                && PermissionUtil.hasInternetPermission()) {
+        if (TextUtils.isEmpty(mUserAgent)) {
             try {
-                mUserAgent = new WebView(context).getSettings().getUserAgentString();
-            } catch (Exception e) {
-                Logger.e(TAG, e.getMessage());
-                try {
-                    mUserAgent = WebSettings.getDefaultUserAgent(context);
-                } catch (Exception badException) {
-                    Logger.e(TAG, badException.getMessage());
-                }
+                mUserAgent = WebSettings.getDefaultUserAgent(context);
+            } catch (Exception badException) {
+                Logger.e(TAG, badException.getMessage());
+                mUserAgent = System.getProperty("http.agent");
             }
         }
         return mUserAgent;

@@ -21,6 +21,7 @@ import android.hardware.display.DisplayManager;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.WindowManager;
 
 public class DeviceUtil {
     private DeviceUtil() {
@@ -35,12 +36,19 @@ public class DeviceUtil {
             if (display != null) display.getRealMetrics(metrics);
             return metrics;
         }
-        return context.getResources().getDisplayMetrics();
+
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (windowManager != null) {
+            Display display = windowManager.getDefaultDisplay();
+            display.getMetrics(metrics);
+        }
+        return metrics;
     }
 
+    @SuppressLint("WrongConstant")
     public static boolean isPhone(Context context) {
         TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephony == null) return true;
+        if (telephony == null) return false;
         int type = telephony.getPhoneType();
         return type != TelephonyManager.PHONE_TYPE_NONE;
     }

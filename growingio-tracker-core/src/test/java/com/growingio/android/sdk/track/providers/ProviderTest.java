@@ -153,7 +153,7 @@ public class ProviderTest {
         Truth.assertThat(deviceInfoProvider.getGoogleAdId()).isNull();
         Truth.assertThat(deviceInfoProvider.getImei()).isNull();
         Truth.assertThat(deviceInfoProvider.getOaid()).isNull();
-        Truth.assertThat(deviceInfoProvider.getPlatformInfo().getPlatformVersion()).isNotEmpty();
+        Truth.assertThat(deviceInfoProvider.loadPlatformInfo().getPlatformVersion()).isNotEmpty();
         Truth.assertThat(deviceInfoProvider.getScreenHeight()).isEqualTo(470);
         Truth.assertThat(deviceInfoProvider.getScreenWidth()).isEqualTo(320);
 

@@ -21,10 +21,10 @@ import com.growingio.android.sdk.track.middleware.platform.PlatformHelper;
 import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
 import com.growingio.sdk.annotation.GIOLibraryModule;
 
-@GIOLibraryModule
+@GIOLibraryModule(config = PlatformConfig.class)
 public class PlatformLibraryGioModule extends LibraryGioModule {
     @Override
     public void registerComponents(TrackerContext context) {
-        context.getRegistry().register(PlatformHelper.class, PlatformInfo.class, new PlatformDataLoader.Factory());
+        context.getRegistry().register(PlatformHelper.class, PlatformInfo.class, new PlatformDataLoader.Factory(context));
     }
 }
