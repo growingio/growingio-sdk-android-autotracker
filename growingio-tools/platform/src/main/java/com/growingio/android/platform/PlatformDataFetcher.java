@@ -45,8 +45,8 @@ public class PlatformDataFetcher implements DataFetcher<PlatformInfo> {
         String platform = null;
         String platformVersion = null;
         if (config.isHarmonyPlatformEnabled()) {
-            platform = HarmonyHandler.HARMONY;
             platformVersion = HarmonyHandler.proceed();
+            if (platformVersion != null) platform = HarmonyHandler.HARMONY;
         }
 
         String deviceType = null;
