@@ -181,6 +181,7 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
         dispatchActivityLifecycle(ActivityLifecycleEvent.createOnNewIntentEvent(activity, intent));
     }
 
+
     @Override
     protected void singleAction(IActivityLifecycle listener, ActivityLifecycleEvent action) {
         listener.onActivityLifecycle(action);

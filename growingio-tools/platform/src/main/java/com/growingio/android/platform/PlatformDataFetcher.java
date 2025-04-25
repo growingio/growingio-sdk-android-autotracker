@@ -15,9 +15,7 @@
  */
 package com.growingio.android.platform;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.telephony.TelephonyManager;
 
 import com.growingio.android.platform.harmony.HarmonyHandler;
 import com.growingio.android.sdk.TrackerContext;

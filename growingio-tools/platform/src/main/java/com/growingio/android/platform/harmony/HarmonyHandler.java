@@ -18,7 +18,6 @@ package com.growingio.android.platform.harmony;
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

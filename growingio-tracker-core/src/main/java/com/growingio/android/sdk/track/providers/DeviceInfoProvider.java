@@ -46,6 +46,7 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     private static final String DEVICE_TYPE_PHONE = "PHONE";
     private static final String DEVICE_TYPE_PAD = "PAD";
+    private static final String DEVICE_TYPE_FOLD = "FOLD";
     private static final List<String> MAGIC_ANDROID_IDS = new ArrayList<String>() {
         {
             add("9774d56d682e549c");
@@ -70,7 +71,6 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
     private String mPlatform;
     private String mPlatformVersion;
     private int mTimezoneOffset = Integer.MIN_VALUE;
-    private PlatformInfo mPlatformInfo;
 
     private double mLatitude = 0;
     private double mLongitude = 0;
@@ -92,6 +92,8 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
         this.mPlatform = ConstantPool.ANDROID;
         this.mPlatformVersion = Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE;
+
+        loadPlatformInfo();
     }
 
     @Override
@@ -99,24 +101,29 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     }
 
-    public PlatformInfo loadPlatformInfo() {
-        if (mPlatformInfo == null) {
-            mPlatformInfo = registry.executeData(null, PlatformHelper.class, PlatformInfo.class);
-            if (mPlatformInfo != null) {
-                if (mPlatformInfo.getPlatform() != null) {
-                    this.mPlatform = mPlatformInfo.getPlatform();
-                }
-                if (mPlatformInfo.getPlatformVersion() != null) {
-                    this.mPlatformVersion = mPlatformInfo.getPlatformVersion();
-                }
-                if (mPlatformInfo.getDeviceType() != null) {
-                    this.mDeviceType = mPlatformInfo.getDeviceType();
-                }
-                mGoogleAdId = mPlatformInfo.getGmsId();
-                mFirebaseId = mPlatformInfo.getFirebaseId();
+    private void loadPlatformInfo() {
+        PlatformInfo platformInfo = registry.executeData(null, PlatformHelper.class, PlatformInfo.class);
+        if (platformInfo != null) {
+            if (platformInfo.getPlatform() != null) {
+                this.mPlatform = platformInfo.getPlatform();
             }
+            if (platformInfo.getPlatformVersion() != null) {
+                this.mPlatformVersion = platformInfo.getPlatformVersion();
+            }
+            if (platformInfo.getDeviceType() != null) {
+                this.mDeviceType = platformInfo.getDeviceType();
+            }
+            mGoogleAdId = platformInfo.getGmsId();
+            mFirebaseId = platformInfo.getFirebaseId();
         }
-        return mPlatformInfo;
+    }
+
+    public void updateFoldScreenSize() {
+        if (getDeviceType().equalsIgnoreCase(DEVICE_TYPE_FOLD)) {
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
+            mScreenWidth = metrics.widthPixels;
+            mScreenHeight = metrics.heightPixels;
+        }
     }
 
     public String getPlatformVersion() {
@@ -291,7 +298,6 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
     public double getLongitude() {
         return mLongitude;
     }
-
 
     public int getTimezoneOffset() {
         if (mTimezoneOffset == Integer.MIN_VALUE) {

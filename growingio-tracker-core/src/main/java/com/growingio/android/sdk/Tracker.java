@@ -459,7 +459,6 @@ public class Tracker {
             trackerContext.getProviderStore().put(key, provider);
         }
         module.registerComponents(trackerContext);
-
     }
 
     private void throwIncorrectGioModule(Exception e) {

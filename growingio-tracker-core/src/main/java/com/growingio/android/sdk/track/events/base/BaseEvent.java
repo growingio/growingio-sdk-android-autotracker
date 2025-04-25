@@ -22,7 +22,6 @@ import androidx.annotation.Nullable;
 import com.growingio.android.sdk.track.SDKConfig;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
-import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
 import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.middleware.GEvent;
@@ -347,7 +346,7 @@ public abstract class BaseEvent extends GEvent {
             appChannel = getFieldDefault(BaseField.APP_CHANNEL) ? configurationProvider.core().getChannel() : null;
 
             DeviceInfoProvider deviceInfo = context.getDeviceInfoProvider();
-            deviceInfo.loadPlatformInfo();
+            deviceInfo.updateFoldScreenSize();
 
             platformVersion = deviceInfo.getPlatformVersion();
             platform = deviceInfo.getPlatform();
