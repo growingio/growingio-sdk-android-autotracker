@@ -16,20 +16,40 @@
 package com.growingio.android.sdk.track.middleware.platform;
 
 public class PlatformInfo {
-    private String mPlatform;
+    private final String platform;
+    private final String platformVersion;
 
-    private String mPlatformVersion;
+    private final String deviceType;
+    private final String gmsId;
+    private final String firebaseId;
 
-    public PlatformInfo(String platform, String platformVersion) {
-        this.mPlatform = platform;
-        this.mPlatformVersion = platformVersion;
+    public PlatformInfo(
+            String platform, String platformVersion,
+            String deviceType, String gmsId, String firebaseId) {
+        this.platform = platform;
+        this.platformVersion = platformVersion;
+        this.deviceType = deviceType;
+        this.gmsId = gmsId;
+        this.firebaseId = firebaseId;
     }
 
     public String getPlatform() {
-        return mPlatform;
+        return platform;
     }
 
     public String getPlatformVersion() {
-        return mPlatformVersion;
+        return platformVersion;
+    }
+
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public String getGmsId() {
+        return gmsId;
+    }
+
+    public String getFirebaseId() {
+        return firebaseId;
     }
 }

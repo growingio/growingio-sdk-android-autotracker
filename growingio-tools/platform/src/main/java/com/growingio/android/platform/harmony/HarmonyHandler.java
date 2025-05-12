@@ -18,7 +18,6 @@ package com.growingio.android.platform.harmony;
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
-import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -27,12 +26,18 @@ import java.lang.reflect.Method;
 
 public class HarmonyHandler {
 
-    public static PlatformInfo proceed() {
+    public static final String HARMONY = "HarmonyOS";
+    private static final String HARMONY_VERSION_KEY = "hw_sc.build.platform.version";
+    private static final String EXEC_CMD_GETPROP = "/system/bin/getprop";
+    private static final String CLASS_SYSTEM_PROPERTIES = "android.os.SystemProperties";
+    private static final String GET_METHOD = "get";
+
+    public static String proceed() {
         String harmonyVersion = getHarmonyVersion();
         if (TextUtils.isEmpty(harmonyVersion)) {
             return null;
         }
-        return new PlatformInfo(ConstantPool.HARMONY, harmonyVersion);
+        return harmonyVersion;
     }
 
     private static String getHarmonyVersion() {
@@ -45,9 +50,9 @@ public class HarmonyHandler {
 
     @SuppressLint("PrivateApi")
     private static String tryGetHarmonyVersionFromProp() throws Exception {
-        Class<?> systemProperties = Class.forName(ConstantPool.CLASS_SYSTEM_PROPERTIES);
-        Method getMethod = systemProperties.getDeclaredMethod(ConstantPool.GET_METHOD, String.class);
-        String harmonyVersion = (String) getMethod.invoke(null, ConstantPool.HARMONY_VERSION_KEY);
+        Class<?> systemProperties = Class.forName(CLASS_SYSTEM_PROPERTIES);
+        Method getMethod = systemProperties.getDeclaredMethod(GET_METHOD, String.class);
+        String harmonyVersion = (String) getMethod.invoke(null, HARMONY_VERSION_KEY);
         if (!TextUtils.isEmpty(harmonyVersion)) {
             return harmonyVersion;
         }
@@ -58,10 +63,10 @@ public class HarmonyHandler {
     private static String tryGetHarmonyVersionFromRuntime() {
         Process process = null;
         try {
-            process = Runtime.getRuntime().exec(new String[]{ConstantPool.EXEC_CMD_GETPROP, ConstantPool.HARMONY_VERSION_KEY});
+            process = Runtime.getRuntime().exec(new String[]{EXEC_CMD_GETPROP, HARMONY_VERSION_KEY});
             try (InputStream in = process.getInputStream();
-                InputStreamReader ir = new InputStreamReader(in);
-                BufferedReader br = new BufferedReader(ir)) {
+                 InputStreamReader ir = new InputStreamReader(in);
+                 BufferedReader br = new BufferedReader(ir)) {
                 String harmonyVersion = br.readLine();
                 if (!TextUtils.isEmpty(harmonyVersion)) {
                     return harmonyVersion.trim();
