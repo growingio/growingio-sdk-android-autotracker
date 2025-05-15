@@ -20,7 +20,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.growingio.android.sdk.TrackerContext;
-import com.growingio.android.sdk.autotrack.AutotrackConfig;
+import com.growingio.android.sdk.track.middleware.compose.ComposeJson;
+import com.growingio.android.sdk.track.middleware.compose.ComposeData;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
@@ -52,8 +53,7 @@ public class ViewNodeProvider implements ViewNodeRenderer, TrackerLifecycleProvi
     @Override
     public void setup(TrackerContext context) {
         registry = context.getRegistry();
-        AutotrackConfig config = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
-        boolean isV4 = config == null || !config.isDowngrade();
+        boolean isV4 = !context.getConfigurationProvider().isDowngrade();
         if (isV4) {
             renderer = new ViewNodeV4Renderer(this);
         } else {
@@ -98,5 +98,24 @@ public class ViewNodeProvider implements ViewNodeRenderer, TrackerLifecycleProvi
 
     ModelLoader<HybridDom, HybridJson> getHybridModelLoader() {
         return registry.getModelLoader(HybridDom.class, HybridJson.class);
+    }
+
+    public boolean hasComposeModule() {
+        ModelLoader<ComposeData, ComposeJson> modelLoader = registry.getModelLoader(ComposeData.class, ComposeJson.class);
+        return modelLoader != null;
+    }
+
+    public ComposeJson buildComposeScreenPages(View view) {
+        ComposeData data = new ComposeData(view, 0);
+        ModelLoader<ComposeData, ComposeJson> modelLoader = registry.getModelLoader(ComposeData.class, ComposeJson.class);
+        if (modelLoader == null) return null;
+        return modelLoader.buildLoadData(data).fetcher.executeData();
+    }
+
+    public ComposeJson buildComposeScreenViews(View view) {
+        ComposeData data = new ComposeData(view, 1);
+        ModelLoader<ComposeData, ComposeJson> modelLoader = registry.getModelLoader(ComposeData.class, ComposeJson.class);
+        if (modelLoader == null) return null;
+        return modelLoader.buildLoadData(data).fetcher.executeData();
     }
 }

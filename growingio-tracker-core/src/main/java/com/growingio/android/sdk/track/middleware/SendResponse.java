@@ -16,19 +16,23 @@
 package com.growingio.android.sdk.track.middleware;
 
 public class SendResponse {
-    private final boolean mSucceeded;
-    private final long mUsedBytes;
+    private final int responseCode;
+    private final long usedBytes;
 
-    public SendResponse(boolean succeeded, long usedBytes) {
-        mSucceeded = succeeded;
-        mUsedBytes = usedBytes;
+    public SendResponse(int responseCode, long usedBytes) {
+        this.responseCode = responseCode;
+        this.usedBytes = usedBytes;
     }
 
     public boolean isSucceeded() {
-        return mSucceeded;
+        return responseCode >= 200 && responseCode < 300;
     }
 
     public long getUsedBytes() {
-        return mUsedBytes;
+        return usedBytes;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
     }
 }

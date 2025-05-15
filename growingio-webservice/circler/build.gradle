@@ -1,13 +1,12 @@
 plugins {
-	id 'com.android.library'
+	alias libs.plugins.android.library
 }
 
 android {
 	namespace 'com.growingio.android.circler'
-	compileSdkVersion buildConfiguration.compileVersion
+	compileSdk libs.getVersions().getCompileSdk().get().toInteger()
 	defaultConfig {
-		minSdkVersion buildConfiguration.minSdkVersion
-		targetSdkVersion buildConfiguration.targetSdkVersion
+		minSdk libs.getVersions().getMinSdk().get().toInteger()
 		versionName libs.versions.growingio.get()
 		versionCode libs.versions.growingioCode.get().toInteger()
 	}
@@ -20,8 +19,8 @@ android {
 	}
 
 	compileOptions {
-		sourceCompatibility buildConfiguration.sourceCompatibility
-		targetCompatibility buildConfiguration.targetCompatibility
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
 	}
 
 	testOptions {
@@ -39,6 +38,7 @@ android {
 }
 
 dependencies {
+	testImplementation libs.google.material
 	testImplementation libs.bundles.test
 	testImplementation libs.okhttp3.mockwebserver
 	testImplementation libs.androidx.test.core

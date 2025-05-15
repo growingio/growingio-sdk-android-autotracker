@@ -1,23 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
-buildscript {
-    ext {
-        buildConfiguration = [
-                compileVersion     : 33,
-                minSdkVersion      : 17,
-                targetSdkVersion   : 33,
-                sourceCompatibility: JavaVersion.VERSION_1_8,
-                targetCompatibility: JavaVersion.VERSION_1_8,
-        ]
-    }
-
-}
-
 plugins {
     alias libs.plugins.android.application apply false
     alias libs.plugins.android.library apply false
     alias libs.plugins.kotlin.android apply false
     alias libs.plugins.kotlin.jvm apply false
+    alias libs.plugins.compose apply false
 
     alias libs.plugins.nexus.staging apply false
     alias libs.plugins.sonarqube apply false
@@ -27,7 +14,6 @@ plugins {
     alias libs.plugins.growingio.plugin apply false
 
     alias libs.plugins.spotless apply false
-
 }
 
 apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"
@@ -54,16 +40,16 @@ subprojects {
     spotless {
         java {
             target '**/*.java'
-            licenseHeaderFile rootProject.file('gradle/java.header')
 
             removeUnusedImports()
         }
         kotlin {
             target '**/*.kt'
             targetExclude("$buildDir/**/*.kt")
-
-            ktlint()
-            licenseHeaderFile rootProject.file('gradle/java.header')
+            ktlint().editorConfigOverride([
+                    "ktlint_standard_comment-wrapping": "disabled",
+                    "max_line_length"                 : 2147483647,
+            ])
         }
         groovyGradle {
             target '*.gradle'

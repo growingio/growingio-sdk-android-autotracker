@@ -36,7 +36,8 @@ dependencies {
 							it.name != "growingio-webservice" &&
 							it.name != "growingio-data" &&
 							it.name != "growingio-adapter" &&
-							it.name != "snappy"
+							it.name != "snappy" &&
+							it.name != "gmonitor"
 				}
 				.map {
 					it.name.replace("growingio-", "")
@@ -46,12 +47,12 @@ dependencies {
 				}
 
 		api "com.growingio.android:analytics-fa:4.0.0"
-		api "com.growingio.android:analytics-sa:4.1.0"
-		api "com.growingio.android:dummy-sa:4.0.0"
+		api "com.growingio.android:analytics-sa:4.3.0"
+		api "com.growingio.android:dummy-sa:4.3.0"
 
 		// giokit
-		api 'com.growingio.giokit:giokit:2.0.0'
-		api 'com.growingio.giokit:giokit-no-op:2.0.0'
+		api 'com.growingio.giokit:giokit:2.1.2'
+		api 'com.growingio.giokit:giokit-no-op:2.1.2'
 
 		// saas sdk
 		//api 'com.growingio.android:vds-android-agent:autotrack-2.9.13'
@@ -59,7 +60,7 @@ dependencies {
 
 		// tool
 		//runtime "com.growingio.android:snappy:1.1.0"
-		//runtime 'com.growingio.android:gmonitor:1.5.0'
+		//runtime "com.growingio.android:gmonitor:2.0.0"
 	}
 }
 

@@ -1,0 +1,3 @@
+-keep class androidx.compose.foundation.** {*;}
+-keep class androidx.compose.ui.node.LayoutNode
+-keep class com.growingio.android.compose.GrowingCompose

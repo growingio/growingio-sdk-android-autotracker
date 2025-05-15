@@ -16,6 +16,7 @@
 package com.growingio.android.circler;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 import com.growingio.android.sdk.track.middleware.webservice.Circler;
@@ -72,6 +73,11 @@ public class CirclerDataLoader implements ModelLoader<Circler, WebService> {
 
         @Override
         public ModelLoader<Circler, WebService> build() {
+            // circler is enabled when autotrack is enabled
+            AutotrackConfig config = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
+            if (config == null || !config.isAutotrack()) {
+                return null;
+            }
             return new CirclerDataLoader(getsInternalClient(), context);
         }
     }

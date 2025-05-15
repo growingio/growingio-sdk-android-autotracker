@@ -23,12 +23,16 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.growingio.android.circler.shadow.ShadowThreadUtils;
+import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.webservice.Circler;
 import com.growingio.android.sdk.track.middleware.webservice.WebService;
+import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +43,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -78,6 +83,10 @@ public class CirclerTest implements WebSocketHandler.OnWebSocketListener {
 
     @Before
     public void setup() {
+        Map<Class<? extends Configurable>, Configurable> sModuleConfigs = new HashMap<>();
+        sModuleConfigs.put(AutotrackConfig.class, new AutotrackConfig());
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("growing.project", "growing.test"), sModuleConfigs);
+
         Tracker tracker = new Tracker(application);
         CirclerLibraryGioModule dModule = new CirclerLibraryGioModule();
         tracker.registerComponent(dModule);

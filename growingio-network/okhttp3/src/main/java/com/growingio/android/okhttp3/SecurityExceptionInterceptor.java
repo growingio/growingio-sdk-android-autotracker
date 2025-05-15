@@ -27,7 +27,7 @@ import okhttp3.Response;
  * 2.加强保护，将所有异常转为io异常回调失败，避免部分okhttp内部错误导致异常
  * 3.捕获错误
  */
-public class SecurityExceptionInterceptor implements Interceptor {
+class SecurityExceptionInterceptor implements Interceptor {
     private static final String TAG = "SecurityExceptionInterceptor";
 
     @Override

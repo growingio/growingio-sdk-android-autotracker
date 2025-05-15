@@ -23,7 +23,6 @@ dependencyResolutionManagement {
     }
 }
 
-enableFeaturePreview("VERSION_CATALOGS")
 rootProject.name = "GrowingIO SDK"
 
 
@@ -35,6 +34,7 @@ include ':growingio-annotation:json-serializer'
 include ':growingio-tracker-core'
 include ':growingio-autotracker-core'
 include ':growingio-hybrid'
+include ':growingio-compose'
 
 include ':growingio-network:okhttp3'
 include ':growingio-network:urlconnection'
@@ -54,11 +54,15 @@ include ':growingio-data:database'
 include ':growingio-tools:snappy'
 include ':growingio-tools:oaid'
 include ':growingio-tools:platform'
+include ':growingio-tools:gmonitor'
 
 // sdks
 include ':gio-sdk:tracker'
+include ':gio-sdk:tracker-cdp'
 include ':gio-sdk:autotracker'
+include ':gio-sdk:autotracker-cdp'
 include ':gio-sdk:autotracker-saas'
 
 include ':growingio-sdk-bom'
 include ':growingio-flutter'
+

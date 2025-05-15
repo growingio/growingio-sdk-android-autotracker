@@ -51,7 +51,6 @@ public class ThreadSafeTipView {
         this.appVersion = appVersion;
         this.context = context;
         this.activityStateProvider = activityStateProvider;
-        runOnUiThread(this::initView);
     }
 
     public void enableShow() {

@@ -26,11 +26,12 @@ import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.track.utils.ClassExistHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 public abstract class Page<T> {
     private final static int MAX_PAGE_LEVEL = 3;
@@ -39,6 +40,8 @@ public abstract class Page<T> {
     private Page<?> mParent;
     private long mShowTimestamp;
     private boolean mIsAutotrack = false; //是否标记为可发送
+
+    private boolean mIsIgnored = false;
     private String mAlias;
     private String mTitle;
     private String mPath;
@@ -70,6 +73,14 @@ public abstract class Page<T> {
         this.mIsAutotrack = mIsAutotrack;
     }
 
+    public boolean isIgnored() {
+        return mIsIgnored;
+    }
+
+    public void setIgnore(boolean ignore) {
+        this.mIsIgnored = ignore;
+    }
+
     public long getShowTimestamp() {
         return mShowTimestamp;
     }
@@ -79,7 +90,10 @@ public abstract class Page<T> {
     }
 
     public void setAttributes(Map<String, String> attributes) {
-        mAttributes = attributes;
+        if (mAttributes == null) mAttributes = new HashMap<>();
+        mAttributes.clear();
+        if (attributes == null) return;
+        mAttributes.putAll(attributes);
     }
 
     public abstract String getName();
@@ -177,7 +191,7 @@ public abstract class Page<T> {
     public Map<String, String> activeAttributes() {
         Page<?> activePage = lastActivePage();
         if (activePage != null) return activePage.getAttributes();
-        return Collections.emptyMap();
+        return null;
     }
 
     public String getXIndex() {
@@ -236,25 +250,51 @@ public abstract class Page<T> {
         return mOriginPath;
     }
 
-    public boolean isDowngrade() {
-        return false;
-    }
-
-
     public String path() {
         if (!TextUtils.isEmpty(mAlias)) {
             mPath = "/" + mAlias;
             return mPath;
         }
+
         if (!TextUtils.isEmpty(mPath)) {
             return mPath;
         }
-        if (isDowngrade()) {
-            this.mPath = originPath(isDowngrade());
-            return this.mPath;
-        } else {
-            this.mPath = "/" + getClassName();
-            return this.mPath;
+
+        this.mPath = pagePath();
+        return this.mPath;
+    }
+
+    protected String pagePath() {
+        return "/" + getClassName();
+    }
+
+    protected void loadPageRule(List<PageRule> pageRuleList, String fullPageClassPath) {
+        if (pageRuleList == null || fullPageClassPath == null) return;
+        // match exactly page classpath at first
+        for (PageRule pageRule : pageRuleList) {
+            if (!pageRule.isRegMatch() && fullPageClassPath.equals(pageRule.getPageClassPath())) {
+                setAlias(pageRule.getPageName());
+                setAttributes(pageRule.getAttributes());
+                setIsAutotrack(true);
+            }
+        }
+        if (!mIsAutotrack) {
+            // match reg page classpath secondly
+            for (PageRule pageRule : pageRuleList) {
+                if (pageRule.isRegMatch() && matchPageRule(fullPageClassPath, pageRule.getPageClassPath())) {
+                    setAlias(getName());
+                    setAttributes(pageRule.getAttributes());
+                    setIsAutotrack(true);
+                }
+            }
+        }
+    }
+
+    private boolean matchPageRule(String input, String regex) {
+        try {
+            return input.matches(regex);
+        } catch (PatternSyntaxException e) {
+            return false;
         }
     }
 }

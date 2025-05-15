@@ -21,4 +21,13 @@ package com.growingio.android.sdk.track.middleware.webservice;
  * @author cpacm 5/10/21
  */
 public class WebService {
+    boolean isRunning = false;
+
+    public WebService(boolean isRunning) {
+        this.isRunning = isRunning;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
 }

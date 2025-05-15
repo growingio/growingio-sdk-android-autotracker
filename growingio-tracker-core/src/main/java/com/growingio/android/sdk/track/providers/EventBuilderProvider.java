@@ -24,10 +24,11 @@ import com.growingio.android.sdk.track.events.EventBuildInterceptor;
 import com.growingio.android.sdk.track.events.EventFilterInterceptor;
 import com.growingio.android.sdk.track.events.PageEvent;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
-import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.events.ViewElementEvent;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor;
+import com.growingio.android.sdk.track.events.helper.DynamicGeneralPropsGenerator;
 import com.growingio.android.sdk.track.events.helper.JsonSerializableFactory;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
@@ -51,6 +52,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
     private final List<EventBuildInterceptor> mEventBuildInterceptors = new ArrayList<>();
     private EventFilterInterceptor defaultFilterInterceptor;
+    private DynamicGeneralPropsGenerator dynamicGeneralPropsGenerator;
 
     private static final JsonSerializableFactory serializableFactory = new JsonSerializableFactory();
 
@@ -58,6 +60,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     private TrackerContext context;
 
     private final AttributesBuilder generalProps = new AttributesBuilder();
+    private final CustomEventReferPage customEventReferPage = new CustomEventReferPage();
 
     EventBuilderProvider() {
     }
@@ -65,12 +68,15 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     @Override
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
+        customEventReferPage.isPageRefer = configurationProvider.core().isCustomEventWithPath();
         this.context = context;
     }
 
     @Override
     public void shutdown() {
         mEventBuildInterceptors.clear();
+        generalProps.clear();
+        dynamicGeneralPropsGenerator = null;
     }
 
     public static JSONObject toJson(BaseEvent event) {
@@ -112,23 +118,64 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     public BaseEvent onGenerateGEvent(BaseEvent.BaseBuilder<?> gEvent) {
         dispatchEventWillBuild(gEvent);
 
-        if (!filterEvent(gEvent)) return null;
+        BaseEvent.BaseBuilder<?> eventBuilder = transformEventBuilder(gEvent);
+        if (!filterEvent(eventBuilder)) return null;
 
-        addGeneralPropsToEvent(gEvent);
-        gEvent.readPropertyInTrackThread(context);
+        addDynamicPropsToAllEvent(eventBuilder);
+        addGeneralPropsToAllEvent(eventBuilder);
 
-        BaseEvent event = gEvent.build();
+        eventBuilder.readPropertyInTrackThread(context);
+        if (!configurationProvider.isDowngrade()) {
+            eventBuilder.readNewPropertyInTrackThread(context);
+        }
+
+        BaseEvent event = eventBuilder.build();
         dispatchEventDidBuild(event);
 
         return event;
     }
 
-    private void addGeneralPropsToEvent(BaseEvent.BaseBuilder<?> gEvent) {
-        if (gEvent.getEventType().equals(TrackEventType.CUSTOM)) {
-            if (gEvent instanceof CustomEvent.Builder) {
-                CustomEvent.Builder customEventBuilder = (CustomEvent.Builder) gEvent;
-                customEventBuilder.setGeneralProps(generalProps.build());
+
+    public void setCustomEventReferPage(String pagePath, long timeStamp) {
+        customEventReferPage.pagePath = pagePath;
+        customEventReferPage.timeStamp = timeStamp;
+    }
+
+    private BaseEvent.BaseBuilder<?> transformEventBuilder(BaseEvent.BaseBuilder<?> gEvent) {
+        // only for custom event, exclude page level custom event
+        if (customEventReferPage.isPageRefer
+                && gEvent instanceof CustomEvent.Builder
+                && !(gEvent instanceof PageLevelCustomEvent.Builder)) {
+            CustomEvent.Builder customBuilder = (CustomEvent.Builder) gEvent;
+            PageLevelCustomEvent.Builder newBuilder = new PageLevelCustomEvent.Builder();
+            newBuilder.setAttributes(customBuilder.getAttributes());
+            newBuilder.setEventName(customBuilder.getEventName());
+            if (configurationProvider.isDowngrade()) {
+                newBuilder.setPageShowTimestamp(customEventReferPage.timeStamp);
             }
+            newBuilder.setPath(customEventReferPage.pagePath);
+            return newBuilder;
+        }
+        return gEvent;
+    }
+
+    private void addDynamicPropsToAllEvent(BaseEvent.BaseBuilder<?> gEvent) {
+        if (dynamicGeneralPropsGenerator == null) return;
+        try {
+            if (gEvent instanceof BaseAttributesEvent.Builder) {
+                BaseAttributesEvent.Builder attrEventBuilder = (BaseAttributesEvent.Builder) gEvent;
+                Map<String, String> dynamicProps = dynamicGeneralPropsGenerator.generateDynamicGeneralProps();
+                attrEventBuilder.setGeneralProps(dynamicProps);
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, "dynamicGeneralPropGenerator generateDynamicGeneralProps error", e);
+        }
+    }
+
+    private void addGeneralPropsToAllEvent(BaseEvent.BaseBuilder<?> gEvent) {
+        if (gEvent instanceof BaseAttributesEvent.Builder) {
+            BaseAttributesEvent.Builder attrEventBuilder = (BaseAttributesEvent.Builder) gEvent;
+            attrEventBuilder.setGeneralProps(generalProps.build());
         }
     }
 
@@ -252,5 +299,15 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
             return ((PageLevelCustomEvent.Builder) eventBuilder).getPath();
         }
         return null;
+    }
+
+    public void setDynamicGeneralPropGenerator(DynamicGeneralPropsGenerator dynamicGeneralPropsGenerator) {
+        this.dynamicGeneralPropsGenerator = dynamicGeneralPropsGenerator;
+    }
+
+    private static class CustomEventReferPage {
+        private boolean isPageRefer = false;
+        private String pagePath = "/";
+        private long timeStamp = 0L;
     }
 }

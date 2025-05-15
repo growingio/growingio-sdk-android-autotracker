@@ -20,23 +20,12 @@ import android.view.View;
 
 public class HybridBridge {
     private final View view;
-    private final boolean isDownGrade;
 
     public HybridBridge(View view) {
         this.view = view;
-        this.isDownGrade = false;
-    }
-
-    public HybridBridge(View view, boolean isDownGrade) {
-        this.view = view;
-        this.isDownGrade = isDownGrade;
     }
 
     public View getView() {
         return view;
-    }
-
-    public boolean isDownGrade() {
-        return isDownGrade;
     }
 }

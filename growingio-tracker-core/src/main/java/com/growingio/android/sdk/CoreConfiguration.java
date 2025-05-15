@@ -28,19 +28,22 @@ public class CoreConfiguration implements Configurable {
     private String mDataSourceId;
     private String mChannel;
     private boolean mDebugEnabled = false;
-    private int mCellularDataLimit = 10;
+    private int mCellularDataLimit = 20;
     private int mDataUploadInterval = 15;
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
 
+    private boolean mCustomEventWithPath = false;
     private boolean mRequireAppProcessesEnabled = false;
-    private String mDataCollectionServerHost = "http://napi.growingio.com";
+    private String mDataCollectionServerHost = "https://napi.growingio.com";
     private EventFilterInterceptor mEventFilterInterceptor;
     private final List<LibraryGioModule> mComponents = new ArrayList<>();
     private boolean mIdMappingEnabled = false;
 
     private boolean mImeiEnabled = false;
     private boolean mAndroidIdEnabled = false;
+
+    private int mDataValidityPeriod = 7;
 
     public CoreConfiguration(String accountId, String urlScheme) {
         mProjectId = accountId;
@@ -196,5 +199,32 @@ public class CoreConfiguration implements Configurable {
     public CoreConfiguration setAndroidIdEnabled(boolean androidIdEnabled) {
         this.mAndroidIdEnabled = androidIdEnabled;
         return this;
+    }
+
+    public int getDataValidityPeriod() {
+        return mDataValidityPeriod;
+    }
+
+    /**
+     * Sets the cache data validity period. From 3 days to 30 days.
+     * <p> Default: 7 days.
+     *
+     * @param dataValidityPeriod data validity period, in days. for example, 7 means that the cache data is valid for 7 days.
+     */
+    public CoreConfiguration setDataValidityPeriod(int dataValidityPeriod) {
+        this.mDataValidityPeriod = dataValidityPeriod;
+        return this;
+    }
+
+    /**
+     * Bring page path to custom event. If set true, the custom event will be associated with the page path.
+     */
+    public CoreConfiguration setCustomEventWithPath(boolean enable) {
+        this.mCustomEventWithPath = enable;
+        return this;
+    }
+
+    public boolean isCustomEventWithPath() {
+        return mCustomEventWithPath;
     }
 }

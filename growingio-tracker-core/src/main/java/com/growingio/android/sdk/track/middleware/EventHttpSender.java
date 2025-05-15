@@ -18,6 +18,7 @@ package com.growingio.android.sdk.track.middleware;
 import android.text.TextUtils;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.middleware.http.EventEncoder;
 import com.growingio.android.sdk.track.middleware.http.EventResponse;
 import com.growingio.android.sdk.track.middleware.http.EventUrl;
@@ -32,26 +33,58 @@ public class EventHttpSender implements IEventNetSender {
     private final String mProjectId;
     private final String mServerHost;
     private final TrackerRegistry trackerRegistry;
+    private final boolean defaultPreflight;
+
+    private boolean requestPreflightChecked = false;
 
     public EventHttpSender(TrackerContext context) {
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
         this.trackerRegistry = context.getRegistry();
         mProjectId = configurationProvider.core().getProjectId();
         mServerHost = configurationProvider.core().getDataCollectionServerHost();
+        defaultPreflight = false;
+    }
+
+    private boolean isPreflightChecked() {
+        if (defaultPreflight) return requestPreflightChecked;
+        else return true;
     }
 
     private ModelLoader<EventUrl, EventResponse> getNetworkModelLoader() {
         return trackerRegistry.getModelLoader(EventUrl.class, EventResponse.class);
     }
 
+    private EventResponse requestPreflight(long time) {
+        EventUrl eventUrl = new EventUrl(mServerHost, time)
+                .setRequestMethod(EventUrl.OPTIONS)
+                .addPath("v3")
+                .addPath("projects")
+                .addPath(mProjectId)
+                .addPath("collect")
+                .addHeader("Access-Control-Request-Method", "POST")
+                .addHeader("Origin", mServerHost)
+                .addParam("stm", String.valueOf(time));
+        ModelLoader.LoadData<EventResponse> loadData = getNetworkModelLoader().buildLoadData(eventUrl);
+        if (!loadData.fetcher.getDataClass().isAssignableFrom(EventResponse.class)) {
+            Logger.e(TAG, new IllegalArgumentException("illegal data class for http response."));
+            return new EventResponse(0);
+        }
+        EventResponse response = loadData.fetcher.executeData();
+        if (response.isSucceeded()) {
+            requestPreflightChecked = true;
+        }
+        return response;
+    }
+
+    @TrackThread
     @Override
     public SendResponse send(byte[] events, String mediaType) {
         if (events == null || events.length == 0) {
-            return new SendResponse(false, 0);
+            return new SendResponse(0, 0);
         }
         if (getNetworkModelLoader() == null) {
             Logger.e(TAG, "please register http request component first");
-            return new SendResponse(false, 0);
+            return new SendResponse(0, 0);
         }
         long time = System.currentTimeMillis();
         EventUrl eventUrl = new EventUrl(mServerHost, time)
@@ -71,16 +104,19 @@ public class EventHttpSender implements IEventNetSender {
         byte[] data = eventUrl.getRequestBody();
         Logger.d(TAG, "send event to url: " + eventUrl.toString());
 
-
         ModelLoader.LoadData<EventResponse> loadData = getNetworkModelLoader().buildLoadData(eventUrl);
         if (!loadData.fetcher.getDataClass().isAssignableFrom(EventResponse.class)) {
             Logger.e(TAG, new IllegalArgumentException("illegal data class for http response."));
-            return new SendResponse(false, 0);
+            return new SendResponse(0, 0);
         }
         EventResponse response = loadData.fetcher.executeData();
-
-        boolean successful = response != null && response.isSucceeded();
+        int responseCode = response != null ? response.getResponseCode() : 0;
+        if (responseCode >= 200 && responseCode < 300) {
+            requestPreflightChecked = true;
+        } else if (responseCode == 403) {
+            requestPreflightChecked = false;
+        }
         long totalUsed = data == null ? 0L : data.length;
-        return new SendResponse(successful, totalUsed);
+        return new SendResponse(responseCode, totalUsed);
     }
 }

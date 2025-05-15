@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+
+android {
+	namespace 'com.growingio.android.sdk.tracker.cdp'
+	compileSdk libs.getVersions().getCompileSdk().get().toInteger()
+	defaultConfig {
+		minSdk libs.getVersions().getMinSdk().get().toInteger()
+		versionName libs.versions.growingio.get()
+		versionCode libs.versions.growingioCode.get().toInteger()
+	}
+
+	buildTypes {
+		debug {
+			testCoverageEnabled = true
+		}
+
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			consumerProguardFiles 'consumer-proguard-rules.pro'
+		}
+	}
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
+	}
+	lintOptions {
+		abortOnError false
+	}
+}
+
+dependencies {
+	debugApi project(':growingio-tracker-core')
+	debugApi project(':growingio-network:okhttp3')
+	debugApi project(':growingio-data:database')
+	debugApi project(':growingio-data:protobuf')
+	debugApi project(':growingio-webservice:debugger')
+
+	releaseApi libs.bundles.growingio.tracker.sdk
+
+	compileOnly libs.support.appcompat
+
+	releaseImplementation libs.growingio.annotation
+	debugImplementation project(":growingio-annotation")
+	annotationProcessor project(":growingio-annotation:compiler")
+}
+
+apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"

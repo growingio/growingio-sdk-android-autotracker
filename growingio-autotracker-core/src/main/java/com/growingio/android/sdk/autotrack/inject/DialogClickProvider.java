@@ -30,6 +30,7 @@ import com.growingio.android.sdk.autotrack.util.ClassUtil;
 import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 
 class DialogClickProvider implements TrackerLifecycleProvider {
@@ -38,6 +39,7 @@ class DialogClickProvider implements TrackerLifecycleProvider {
     private static final String[] DIALOG_BUTTON_NAMES = new String[]{"BUTTON_NEUTRAL", "BUTTON_NEGATIVE", "BUTTON_POSITIVE"};
 
     private ViewClickProvider viewClickProvider;
+    private ConfigurationProvider configurationProvider;
     private AutotrackConfig autotrackConfig;
 
     DialogClickProvider() {
@@ -46,7 +48,8 @@ class DialogClickProvider implements TrackerLifecycleProvider {
     @Override
     public void setup(TrackerContext context) {
         viewClickProvider = context.getProvider(ViewClickProvider.class);
-        autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
+        configurationProvider = context.getConfigurationProvider();
+        autotrackConfig = configurationProvider.getConfiguration(AutotrackConfig.class);
     }
 
     @Override
@@ -132,7 +135,7 @@ class DialogClickProvider implements TrackerLifecycleProvider {
             return;
         }
 
-        if (autotrackConfig != null && autotrackConfig.isDowngrade()) {
+        if (autotrackConfig != null && configurationProvider.isDowngrade()) {
             alertDialogShowV3(dialog);
         } else {
             alertDialogShowV4(dialog);

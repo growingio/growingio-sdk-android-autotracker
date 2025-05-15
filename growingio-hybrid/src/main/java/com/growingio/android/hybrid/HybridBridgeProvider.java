@@ -41,17 +41,20 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
     HybridBridgeProvider() {
     }
 
-
     private ConfigurationProvider configurationProvider;
     private AppInfoProvider appInfoProvider;
     private UserInfoProvider userInfoProvider;
-    private boolean isDownGrade = false;
+    private boolean autoJsSdkInject = false;
 
     @Override
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
         appInfoProvider = context.getProvider(AppInfoProvider.class);
         userInfoProvider = context.getUserInfoProvider();
+        HybridConfig hybridConfig = configurationProvider.getConfiguration(HybridConfig.class);
+        if (hybridConfig != null) {
+            autoJsSdkInject = hybridConfig.isAutoGrowingJsSdk();
+        }
     }
 
     @Override
@@ -59,18 +62,15 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
 
     }
 
-    public void setDownGrade(boolean downGrade) {
-        isDownGrade = downGrade;
-    }
-
     private WebViewJavascriptBridgeConfiguration getJavascriptBridgeConfiguration() {
         String projectId = configurationProvider.core().getProjectId();
         String dataSourceId = configurationProvider.core().getDataSourceId();
         String appId = configurationProvider.core().getUrlScheme();
+        String serverUrl = configurationProvider.core().getDataCollectionServerHost();
         String appPackage = appInfoProvider.getPackageName();
-        String nativeSdkVersion = isDownGrade ? SDKConfig.SDK_VERSION_DOWNGRADE : SDKConfig.SDK_VERSION;
-        int nativeSdkVersionCode = isDownGrade ? SDKConfig.SDK_VERSION_CODE_DOWNGRADE : SDKConfig.SDK_VERSION_CODE;
-        return new WebViewJavascriptBridgeConfiguration(projectId, dataSourceId, appId, appPackage, nativeSdkVersion, nativeSdkVersionCode);
+        String nativeSdkVersion = configurationProvider.isDowngrade() ? SDKConfig.SDK_VERSION_DOWNGRADE : SDKConfig.SDK_VERSION;
+        int nativeSdkVersionCode = configurationProvider.isDowngrade() ? SDKConfig.SDK_VERSION_CODE_DOWNGRADE : SDKConfig.SDK_VERSION_CODE;
+        return new WebViewJavascriptBridgeConfiguration(projectId, dataSourceId, serverUrl, appId, appPackage, nativeSdkVersion, nativeSdkVersionCode);
     }
 
     public void onDomChanged() {
@@ -86,8 +86,11 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    public void bridgeForWebView(SuperWebView<?> webView) {
+    public void bridgeForWebView(SuperWebView webView) {
         webView.setJavaScriptEnabled(true);
+        if (autoJsSdkInject) {
+            webView.wrapperWebChromeClient(getJavascriptBridgeConfiguration());
+        }
         if (webView.hasAddJavaScripted()) {
             Logger.d(TAG, "JavascriptInterface has already been added to the WebView");
             return;
@@ -98,7 +101,7 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
         webView.setAddJavaScript();
     }
 
-    public void getWebViewDomTree(SuperWebView<?> webView, final Callback<JSONObject> callback) {
+    public void getWebViewDomTree(SuperWebView webView, final Callback<JSONObject> callback) {
         Logger.d(TAG, "getWebViewDomTree");
         if (callback == null) {
             return;

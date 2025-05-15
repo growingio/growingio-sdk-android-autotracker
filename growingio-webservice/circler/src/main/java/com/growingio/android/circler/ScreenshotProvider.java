@@ -30,7 +30,6 @@ import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.listener.Callback;
 import com.growingio.android.sdk.track.middleware.EventFlutter;
-import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridDom;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridJson;
@@ -313,7 +312,7 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
             json.put("domain", appInfoProvider.getPackageName());
             json.put("sdkVersion", SDKConfig.SDK_VERSION);
             json.put("sdkVersionCode", SDKConfig.SDK_VERSION_CODE);
-            json.put("os", deviceInfoProvider.getPlatformInfo().getPlatform());
+            json.put("os", deviceInfoProvider.getPlatform());
             json.put("screenWidth", deviceInfoProvider.getScreenWidth());
             json.put("screenHeight", deviceInfoProvider.getScreenHeight());
             json.put("urlScheme", core.getUrlScheme());
@@ -338,12 +337,11 @@ public class ScreenshotProvider extends ViewTreeStatusListener {
             json.put("msgType", MSG_CLIENT_TYPE);
             json.put("sdkVersion", SDKConfig.SDK_VERSION);
 
-            PlatformInfo platformInfo = deviceInfoProvider.getPlatformInfo();
             JSONObject info = new JSONObject();
-            info.put("os", platformInfo.getPlatform());
+            info.put("os", deviceInfoProvider.getPlatform());
             info.put("appVersion", appInfoProvider.getAppVersion());
             info.put("appChannel", core.getChannel());
-            info.put("osVersion", platformInfo.getPlatformVersion());
+            info.put("osVersion", deviceInfoProvider.getPlatformVersion());
             info.put("deviceType", deviceInfoProvider.getDeviceType());
             info.put("deviceBrand", deviceInfoProvider.getDeviceBrand());
             info.put("deviceModel", deviceInfoProvider.getDeviceModel());

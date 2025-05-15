@@ -47,7 +47,15 @@ public class AutotrackTest {
         Application application = ApplicationProvider.getApplicationContext();
 
         Map<Class<? extends Configurable>, Configurable> modules = new HashMap<>();
-        modules.put(AutotrackConfig.class, new AutotrackConfig().setImpressionScale(0.5f));
+        modules.put(AutotrackConfig.class,
+                new AutotrackConfig().setImpressionScale(0.5f)
+                        .setWebViewBridgeEnabled(true)
+                        .setPageRuleXml(0)
+                        .addPageRule("MainActivity", "com.growingio.android.sdk.autotrack.RobolectricActivity")
+                        .addPageMatchRule(".*")
+                        .enableFragmentTag(false)
+
+        );
         TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(new CoreConfiguration("AutotrackTest", "growingio://autotrack"), modules);
         autotracker = new Autotracker(application);
     }
@@ -76,9 +84,6 @@ public class AutotrackTest {
         autotracker.setPageAlias(activity, "TestActivity");
         autotracker.setPageAlias(new Fragment(), "TestFragment");
         autotracker.setPageAliasX(new androidx.fragment.app.Fragment(), "TestFragmentX");
-        autotracker.ignorePage(activity, IgnorePolicy.IGNORE_SELF);
-        autotracker.ignorePage(new Fragment(), IgnorePolicy.IGNORE_SELF);
-        autotracker.ignorePageX(new androidx.fragment.app.Fragment(), IgnorePolicy.IGNORE_SELF);
         autotracker.ignoreView(activity.getTextView(), IgnorePolicy.IGNORE_SELF);
 
     }

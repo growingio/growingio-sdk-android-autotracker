@@ -11,8 +11,13 @@ test_plugin_version=$(grep "^growingioPlugin =.*" gradle/libs.versions.toml | aw
 # echo $test_sdk_version
 # echo $test_plugin_version
 
-sed -i "" "s/^growingioPlugin =.*/${test_plugin_version}/g" demo/gradle/libs.versions.toml
-sed -i "" "s/^growingio =.*/${test_sdk_version}/g" demo/gradle/libs.versions.toml
+# for macOS
+# sed -i "" "s/^growingioPlugin =.*/${test_plugin_version}/g" demo/gradle/libs.versions.toml
+# sed -i "" "s/^growingio =.*/${test_sdk_version}/g" demo/gradle/libs.versions.toml
+
+# for linux
+sed -i "s/^growingioPlugin =.*/${test_plugin_version}/g" demo/gradle/libs.versions.toml
+sed -i "s/^growingio =.*/${test_sdk_version}/g" demo/gradle/libs.versions.toml
 
 # echo 'apply from: "${rootProject.projectDir.parent}/gradle/jacoco.gradle"' >> demo/app/build.gradle
 

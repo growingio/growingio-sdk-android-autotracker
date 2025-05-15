@@ -60,9 +60,10 @@ public class ViewNodeV3Test {
 
     @Before
     public void setup() {
-        CoreConfiguration coreConfiguration = new CoreConfiguration("ViewNodeV3Test", "growingio://apm");
+        CoreConfiguration coreConfiguration = new CoreConfiguration("ViewNodeV3Test", "growingio://nodeV3");
         AutotrackConfig autotrackConfig = new AutotrackConfig();
-        autotrackConfig.downgrade();
+        autotrackConfig.getAutotrackOptions().setActivityPageEnabled(true);
+        autotrackConfig.getAutotrackOptions().setFragmentPageEnabled(true);
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
         map.put(AutotrackConfig.class, autotrackConfig);
         TrackerLifecycleProviderFactory.create()
@@ -95,18 +96,18 @@ public class ViewNodeV3Test {
         ViewNodeV3Renderer renderer = new ViewNodeV3Renderer(viewNodeProvider);
 
         ViewNodeV3 viewNode = renderer.renderViewNode(activity.getTextView());
-        Truth.assertThat(viewNode.getXPath()).endsWith("/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]");
+        Truth.assertThat(viewNode.getXPath()).endsWith("/DecorView/LinearLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]");
         Truth.assertThat(viewNode.getViewContent()).isEqualTo("this is cpacm");
         Truth.assertThat(viewNode.getNodeType()).isEqualTo("TEXT");
         Truth.assertThat(viewNode.getClickableParentXPath()).isNull();
         Truth.assertThat(viewNode.getIndex()).isEqualTo(-1);
         ViewNodeV3 newNode = viewNode.append(activity.getImageView(), 0, true);
-        Truth.assertThat(newNode.getXPath()).endsWith("/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]/ImageView[0]");
+        Truth.assertThat(newNode.getXPath()).endsWith("/DecorView/LinearLayout[0]/FrameLayout[0]/LinearLayout[0]/TextView[0]/ImageView[0]");
 
         RecyclerView recyclerView = activity.getRecyclerView();
         View itemView = Objects.requireNonNull(recyclerView.findViewHolderForAdapterPosition(2)).itemView;
         ViewNodeV3 listItemNode = renderer.renderViewNode(itemView);
-        Truth.assertThat(listItemNode.getXPath()).endsWith("/DecorView/ActionBarOverlayLayout[0]/FrameLayout[0]/LinearLayout[0]/RecyclerView[0]/TextView[-]");
+        Truth.assertThat(listItemNode.getXPath()).endsWith("/DecorView/LinearLayout[0]/FrameLayout[0]/LinearLayout[0]/RecyclerView[0]/TextView[-]");
     }
 
     @Test

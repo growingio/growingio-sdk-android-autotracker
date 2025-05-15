@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.growingio.android.platform.harmony;
-public class ConstantPool {
-    private ConstantPool() {
+package com.growingio.android.sdk.track.middleware;
+
+import com.growingio.android.sdk.Configurable;
+
+public class CdpConfig implements Configurable {
+    private boolean isDowngrade = true;
+
+    public boolean isDowngrade() {
+        return isDowngrade;
     }
 
-    public static final String HARMONY = "HarmonyOS";
-
-    public static final String HARMONY_VERSION_KEY = "hw_sc.build.platform.version";
-
-    public static final String EXEC_CMD_GETPROP = "/system/bin/getprop";
-
-    public static final String CLASS_SYSTEM_PROPERTIES = "android.os.SystemProperties";
-
-    public static final String GET_METHOD = "get";
+    private void setDowngrade(boolean downgrade) {
+        isDowngrade = downgrade;
+    }
 }

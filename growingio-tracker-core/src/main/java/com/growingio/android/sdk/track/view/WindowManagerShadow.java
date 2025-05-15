@@ -22,18 +22,19 @@ import android.content.ContextWrapper;
 import android.graphics.Rect;
 import android.os.Build;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.utils.ReflectUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.WeakHashMap;
 
 /**
  * Android 4.2
@@ -52,12 +53,61 @@ class WindowManagerShadow {
     private static final String TAG = "WindowManagerShadow";
 
     private Object realWindowManager;
-    private final Map<CacheFieldKey, Field> fieldsMap = new HashMap<>();
+    private final WeakHashMap<CacheFieldKey, Field> fieldsMap = new WeakHashMap<>();
     private final int[] outLocation = new int[2];
     private final String wmClassName;
+    private Class<?> decorViewClass;
 
     WindowManagerShadow(String wmClassName) {
         this.wmClassName = wmClassName;
+    }
+
+    Window pullWindowFromDecorView(View decorView) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
+        View rootView = decorView.getRootView();
+        if (getDecorViewClass().isInstance(rootView)) {
+            int sdkInt = Build.VERSION.SDK_INT;
+            String fieldName = sdkInt >= Build.VERSION_CODES.N ? "mWindow" : "this$0";
+            Field windowField = getNotNullField(fieldName, rootView);
+            windowField.setAccessible(true);
+            return (Window) windowField.get(rootView);
+        }
+        return null;
+    }
+
+    private Class<?> getDecorViewClass() throws ClassNotFoundException {
+        if (decorViewClass == null) {
+            int sdkInt = Build.VERSION.SDK_INT;
+            String decorViewClassName;
+            if (sdkInt >= Build.VERSION_CODES.N) {
+                decorViewClassName = "com.android.internal.policy.DecorView";
+            } else if (sdkInt == Build.VERSION_CODES.M) {
+                decorViewClassName = "com.android.internal.policy.PhoneWindow$DecorView";
+            } else {
+                decorViewClassName = "com.android.internal.policy.impl.PhoneWindow$DecorView";
+            }
+            decorViewClass = Class.forName(decorViewClassName);
+        }
+        return decorViewClass;
+    }
+
+    void swapWindowManagerObserverViews(ArrayList<View> swapList) throws IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
+        Object wm = realWindowManager;
+        if (wm == null) {
+            Class<?> windowManager = Class.forName(wmClassName);
+            Method method = windowManager.getMethod("getInstance");
+            method.setAccessible(true);
+            wm = method.invoke(null);
+            realWindowManager = wm;
+        }
+        Field mViews = getNotNullField("mViews", realWindowManager);
+        mViews.setAccessible(true);
+
+        boolean mIsArrayList = mViews.getType() == ArrayList.class;
+        if (mIsArrayList) {
+            mViews.set(realWindowManager, swapList);
+        } else {
+            Logger.w(TAG, "WindowManager mViews is not ArrayList, can't swap it");
+        }
     }
 
     public View[] getAllWindowViews() throws IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
@@ -115,7 +165,7 @@ class WindowManagerShadow {
             Object root = roots[i];
             Object objectView = getNotNullFieldValue("mView", root);
             if (objectView == null || objectView instanceof View) {
-                Logger.e(TAG, "null View or Window stored in Global window manager, skipping");
+                Logger.d(TAG, "null View or Window stored in Global window manager, skipping");
             }
             View view = (View) objectView;
             Context activityContext = contextIsActivity(view.getContext());
@@ -173,15 +223,10 @@ class WindowManagerShadow {
             return fieldsMap.get(key);
         } else {
             Class<?> clazz = target.getClass();
-            while (clazz != null) {
-                for (Field field : clazz.getDeclaredFields()) {
-                    if (field.getName().equals(fieldName)) {
-                        field.setAccessible(true);
-                        fieldsMap.put(key, field);
-                        return field;
-                    }
-                }
-                clazz = clazz.getSuperclass();
+            Field field = ReflectUtil.getFieldRecursive(fieldName, target);
+            if (field != null) {
+                fieldsMap.put(key, field);
+                return field;
             }
             throw new NoSuchFieldException("Field " + fieldName + " not found for class " + clazz);
         }

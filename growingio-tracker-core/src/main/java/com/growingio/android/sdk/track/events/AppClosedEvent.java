@@ -15,18 +15,18 @@
  */
 package com.growingio.android.sdk.track.events;
 
-import com.growingio.android.sdk.track.events.base.BaseEvent;
+import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
 @JsonSerializer
-public class AppClosedEvent extends BaseEvent {
+public class AppClosedEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
     protected AppClosedEvent(Builder eventBuilder) {
         super(eventBuilder);
     }
 
-    public static final class Builder extends BaseBuilder<AppClosedEvent> {
+    public static final class Builder extends BaseAttributesEvent.Builder<AppClosedEvent> {
 
         public Builder() {
             super(TrackEventType.APP_CLOSED);

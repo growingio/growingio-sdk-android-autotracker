@@ -50,11 +50,12 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
 
     @Override
     public void setup(TrackerContext context) {
-        activityStateProvider = context.getActivityStateProvider();
         autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
-        activityStateProvider.registerActivityLifecycleListener(this);
+        activityStateProvider = context.getActivityStateProvider();
         viewNodeProvider = context.getProvider(ViewNodeProvider.class);
 
+        if (autotrackConfig == null || !autotrackConfig.isAutotrack()) return;
+        activityStateProvider.registerActivityLifecycleListener(this);
         viewTreeStatusObserver = new ViewTreeStatusObserver(false, false, true, false, this,
                 R.id.growing_tracker_monitoring_focus_change);
     }
@@ -67,7 +68,7 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
     @Override
     public void onActivityLifecycle(ActivityLifecycleEvent event) {
         Activity activity = event.getActivity();
-        if (activity == null) {
+        if (activity == null || viewTreeStatusObserver == null) {
             return;
         }
         if (event.eventType == ActivityLifecycleEvent.EVENT_TYPE.ON_RESUMED) {
@@ -136,6 +137,11 @@ public class ViewChangeProvider implements IActivityLifecycle, OnViewStateChange
     private void sendChangeEvent(View view) {
         if (!TrackerContext.initializedSuccessfully()) {
             Logger.e(TAG, "Autotracker do not initialized successfully");
+        }
+
+        if (autotrackConfig == null || !autotrackConfig.isAutotrack()) {
+            Logger.d(TAG, "autotrack is not enabled");
+            return;
         }
 
         if (view == null) {

@@ -15,23 +15,35 @@
  */
 package com.growingio.android.platform;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.middleware.platform.PlatformHelper;
 import com.growingio.android.sdk.track.middleware.platform.PlatformInfo;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 
 public class PlatformDataLoader implements ModelLoader<PlatformHelper, PlatformInfo> {
+    private final TrackerContext context;
+
+    PlatformDataLoader(TrackerContext context) {
+        this.context = context;
+    }
 
     @Override
     public LoadData<PlatformInfo> buildLoadData(PlatformHelper harmonyHelper) {
-        return new LoadData<>(new PlatformDataFetcher());
+        return new LoadData<>(new PlatformDataFetcher(context));
     }
 
-    public static class Factory implements ModelLoaderFactory<PlatformHelper, PlatformInfo> {
+    static class Factory implements ModelLoaderFactory<PlatformHelper, PlatformInfo> {
+
+        private final TrackerContext context;
+
+        public Factory(TrackerContext context) {
+            this.context = context;
+        }
 
         @Override
         public ModelLoader<PlatformHelper, PlatformInfo> build() {
-            return new PlatformDataLoader();
+            return new PlatformDataLoader(context);
         }
     }
 }

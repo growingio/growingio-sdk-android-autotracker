@@ -114,7 +114,7 @@ afterEvaluate { project ->
     }
 
     if (isAndroidProject) {
-        task androidJavadocs(type: Javadoc, dependsOn: assembleDebug) {
+        task androidJavadocs(type: Javadoc, dependsOn: "assembleDebug") {
             source = android.sourceSets.main.java.source
             classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
             // include generated file
@@ -123,14 +123,15 @@ afterEvaluate { project ->
             excludes = ['**/*.kt']
         }
 
-        task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-            classifier = 'javadoc'
+        task androidJavadocsJar(type: Jar, dependsOn: "androidJavadocs") {
+            archiveClassifier.set('javadoc')
             from androidJavadocs.destinationDir
         }
 
         task androidSourcesJar(type: Jar) {
-            classifier = 'sources'
-            from android.sourceSets.main.java.source
+            archiveClassifier.set('sources')
+            from android.sourceSets.main.java.srcDirs
+            from android.sourceSets.main.kotlin.srcDirs
         }
 
         android.libraryVariants.all { variant ->
@@ -141,12 +142,12 @@ afterEvaluate { project ->
     } else {
 
         task sourcesJar(type: Jar, dependsOn: classes) {
-            classifier = 'sources'
+            archiveClassifier.set('sources')
             from sourceSets.main.allSource
         }
 
         task javadocsJar(type: Jar, dependsOn: javadoc) {
-            classifier = 'javadoc'
+            archiveClassifier.set('javadoc')
             from javadoc.destinationDir
         }
 
@@ -243,9 +244,7 @@ afterEvaluate { project ->
 
 signing {
     required { isReleaseBuild() && gradle.taskGraph.hasTask("publish") }
-    publishing.publications.all { publication ->
-        sign publication
-    }
+    sign publishing.publications
 }
 
 apply from: "${rootProject.projectDir}/gradle/existDenpendices.gradle"

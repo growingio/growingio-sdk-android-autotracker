@@ -27,6 +27,7 @@ import androidx.annotation.UiThread;
 
 import com.growingio.android.sdk.track.TrackMainThread;
 import com.growingio.android.sdk.track.events.TrackEventGenerator;
+import com.growingio.android.sdk.track.events.helper.DynamicGeneralPropsGenerator;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.abtest.ABExperiment;
 import com.growingio.android.sdk.track.middleware.abtest.ABTest;
@@ -152,6 +153,11 @@ public class Tracker {
             attributes = new HashMap<>(attributes);
         }
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
+    }
+
+    public void setDynamicGeneralPropsGenerator(DynamicGeneralPropsGenerator generator) {
+        if (!isInited) return;
+        trackerContext.getEventBuilderProvider().setDynamicGeneralPropGenerator(generator);
     }
 
     public void setGeneralProps(Map<String, String> variables) {
@@ -423,6 +429,21 @@ public class Tracker {
         addComponent(module, config);
     }
 
+    /**
+     * uninstall module
+     */
+    protected void uninstallComponent(Class modelClazz, Class dataClazz, Class<? extends Configurable> configClazz, Class<? extends TrackerLifecycleProvider> providerClazz) {
+        if (modelClazz == null) return;
+        if (configClazz != null) {
+            trackerContext.getConfigurationProvider().removeConfiguration(configClazz);
+        }
+        trackerContext.getRegistry().unregister(modelClazz, dataClazz);
+        if (providerClazz != null) {
+            TrackerLifecycleProvider provider = trackerContext.getProviderStore().remove(providerClazz);
+            if (provider != null) provider.shutdown();
+        }
+    }
+
     private void addComponent(LibraryGioModule module, Configurable config) {
         if (module == null) return;
         if (config != null) {
@@ -438,7 +459,6 @@ public class Tracker {
             trackerContext.getProviderStore().put(key, provider);
         }
         module.registerComponents(trackerContext);
-
     }
 
     private void throwIncorrectGioModule(Exception e) {

@@ -240,7 +240,9 @@ class EventProtocolTransfer {
         if (gEvent instanceof PageLevelCustomEvent) {
             PageLevelCustomEvent plEvent = (PageLevelCustomEvent) gEvent;
             eventBuilder.setPath(plEvent.getPath()); //10
-            eventBuilder.setPageShowTimestamp(plEvent.getPageShowTimestamp()); //23
+            if (plEvent.getPageShowTimestamp() > 0) {
+                eventBuilder.setPageShowTimestamp(plEvent.getPageShowTimestamp());//23
+            }
         }
         if (gEvent instanceof VisitEvent) {
             VisitEvent visitEvent = (VisitEvent) gEvent;

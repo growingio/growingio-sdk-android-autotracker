@@ -1,13 +1,12 @@
 plugins {
-	id 'com.android.library'
+	alias libs.plugins.android.library
 }
 
 android {
 	namespace 'com.growingio.android.database'
-	compileSdkVersion buildConfiguration.compileVersion
+	compileSdk libs.getVersions().getCompileSdk().get().toInteger()
 	defaultConfig {
-		minSdkVersion buildConfiguration.minSdkVersion
-		targetSdkVersion buildConfiguration.targetSdkVersion
+		minSdk libs.getVersions().getMinSdk().get().toInteger()
 		versionName libs.versions.growingio.get()
 		versionCode libs.versions.growingioCode.get().toInteger()
 	}
@@ -21,8 +20,8 @@ android {
 	}
 
 	compileOptions {
-		sourceCompatibility buildConfiguration.sourceCompatibility
-		targetCompatibility buildConfiguration.targetCompatibility
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
 	}
 
 	testOptions {
@@ -47,7 +46,7 @@ dependencies {
 	testImplementation project(path: ':growingio-data:json')
 
 	implementation project(':growingio-tracker-core')
-	compileOnly libs.growingio.gmonitor
+	compileOnly project(':growingio-tools:gmonitor')
 
 	implementation project(":growingio-annotation")
 	annotationProcessor project(":growingio-annotation:compiler")

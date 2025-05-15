@@ -26,7 +26,6 @@ import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.EventBuilderProvider;
-import com.growingio.android.sdk.track.utils.ConstantPool;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,8 +49,6 @@ public class HybridTransformerImp implements HybridTransformer {
                 return transformViewElementEventBuilder(type, eventJson);
             } else if (TrackEventType.CUSTOM.equals(type)) {
                 HybridCustomEvent.Builder builder = new HybridCustomEvent.Builder();
-                int customType = eventJson.optInt("customEventType", ConstantPool.CUSTOM_TYPE_SYSTEM);
-                builder.setCustomEventType(customType);
                 EventBuilderProvider.parseFrom(builder, eventJson);
                 return builder;
             } else if (TrackEventType.LOGIN_USER_ATTRIBUTES.equals(type)) {

@@ -23,7 +23,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.TrackThread;
@@ -37,7 +36,9 @@ import com.growingio.android.sdk.track.middleware.OaidHelper;
 import com.growingio.android.sdk.track.utils.PermissionUtil;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 public class DeviceInfoProvider implements TrackerLifecycleProvider {
@@ -45,8 +46,14 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     private static final String DEVICE_TYPE_PHONE = "PHONE";
     private static final String DEVICE_TYPE_PAD = "PAD";
-
-    private static final String MAGIC_ANDROID_ID = "9774d56d682e549c"; // Error AndroidID
+    private static final String DEVICE_TYPE_FOLD = "FOLD";
+    private static final List<String> MAGIC_ANDROID_IDS = new ArrayList<String>() {
+        {
+            add("9774d56d682e549c");
+            add("0123456789abcdef");
+            add("0000000000000000");
+        }
+    };
 
     private String mDeviceBrand;
     private String mDeviceModel;
@@ -59,12 +66,13 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
     private String mImei;
     private String mOaid;
     private String mGoogleAdId;
+    private String mFirebaseId;
     private String mDeviceId;
-    private PlatformInfo mPlatformInfo;
+    private String mPlatform;
+    private String mPlatformVersion;
     private int mTimezoneOffset = Integer.MIN_VALUE;
 
     private double mLatitude = 0;
-
     private double mLongitude = 0;
 
     private Context context;
@@ -81,6 +89,11 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         this.registry = context.getRegistry();
         this.configurationProvider = context.getConfigurationProvider();
         this.persistentDataProvider = context.getProvider(PersistentDataProvider.class);
+
+        this.mPlatform = ConstantPool.ANDROID;
+        this.mPlatformVersion = Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE;
+
+        loadPlatformInfo();
     }
 
     @Override
@@ -88,15 +101,37 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     }
 
-    public PlatformInfo getPlatformInfo() {
-        if (mPlatformInfo == null) {
-            mPlatformInfo = registry.executeData(null, PlatformHelper.class, PlatformInfo.class);
-            if (mPlatformInfo == null) {
-                mPlatformInfo = new PlatformInfo(ConstantPool.ANDROID,
-                        Build.VERSION.RELEASE == null ? ConstantPool.UNKNOWN : Build.VERSION.RELEASE);
+    private void loadPlatformInfo() {
+        PlatformInfo platformInfo = registry.executeData(null, PlatformHelper.class, PlatformInfo.class);
+        if (platformInfo != null) {
+            if (platformInfo.getPlatform() != null) {
+                this.mPlatform = platformInfo.getPlatform();
             }
+            if (platformInfo.getPlatformVersion() != null) {
+                this.mPlatformVersion = platformInfo.getPlatformVersion();
+            }
+            if (platformInfo.getDeviceType() != null) {
+                this.mDeviceType = platformInfo.getDeviceType();
+            }
+            mGoogleAdId = platformInfo.getGmsId();
+            mFirebaseId = platformInfo.getFirebaseId();
         }
-        return mPlatformInfo;
+    }
+
+    public void updateFoldScreenSize() {
+        if (getDeviceType().equalsIgnoreCase(DEVICE_TYPE_FOLD)) {
+            DisplayMetrics metrics = DeviceUtil.getDisplayMetrics(context);
+            mScreenWidth = metrics.widthPixels;
+            mScreenHeight = metrics.heightPixels;
+        }
+    }
+
+    public String getPlatformVersion() {
+        return mPlatformVersion;
+    }
+
+    public String getPlatform() {
+        return mPlatform;
     }
 
     public String getDeviceBrand() {
@@ -119,6 +154,7 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         }
         return mDeviceType;
     }
+
 
     public int getScreenHeight() {
         if (mScreenHeight <= 0) {
@@ -160,16 +196,16 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
         if (TextUtils.isEmpty(mAndroidId) && configurationProvider.core().isAndroidIdEnabled()) {
             try {
                 mAndroidId = Settings.System.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-                if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_ID.equals(mAndroidId)) {
-                    mAndroidId = MAGIC_ANDROID_ID;
+                if (TextUtils.isEmpty(mAndroidId) || MAGIC_ANDROID_IDS.contains(mAndroidId)) {
+                    mAndroidId = MAGIC_ANDROID_IDS.get(0);
                 } else {
                     Logger.i(TAG, "get AndroidId success, and androidId is " + mAndroidId);
                 }
             } catch (Throwable e) {
-                mAndroidId = MAGIC_ANDROID_ID;
+                mAndroidId = MAGIC_ANDROID_IDS.get(0);
             }
         }
-        return MAGIC_ANDROID_ID.equals(mAndroidId) ? null : mAndroidId;
+        return MAGIC_ANDROID_IDS.contains(mAndroidId) ? null : mAndroidId;
     }
 
     public String getOaid() {
@@ -181,6 +217,10 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
 
     public String getGoogleAdId() {
         return mGoogleAdId;
+    }
+
+    public String getFirebaseId() {
+        return mFirebaseId;
     }
 
     public String getDeviceId() {
@@ -209,26 +249,21 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
             Logger.w(TAG, "try get AndroidId and fail, sdk generate random uuid as AndroidId");
             result = UUID.randomUUID().toString();
         }
-        if (result != null && result.length() != 0) {
+        if (result != null && !result.isEmpty()) {
             persistentDataProvider.setDeviceId(result);
         }
         return result;
     }
 
+
     public String getUserAgent() {
         if (!TextUtils.isEmpty(mUserAgent)) return mUserAgent;
-        mUserAgent = System.getProperty("http.agent");
-        if (TextUtils.isEmpty(mUserAgent)
-                && PermissionUtil.hasInternetPermission()) {
+        if (TextUtils.isEmpty(mUserAgent)) {
             try {
-                mUserAgent = new WebView(context).getSettings().getUserAgentString();
-            } catch (Exception e) {
-                Logger.e(TAG, e.getMessage());
-                try {
-                    mUserAgent = WebSettings.getDefaultUserAgent(context);
-                } catch (Exception badException) {
-                    Logger.e(TAG, badException.getMessage());
-                }
+                mUserAgent = WebSettings.getDefaultUserAgent(context);
+            } catch (Exception badException) {
+                Logger.e(TAG, badException.getMessage());
+                mUserAgent = System.getProperty("http.agent");
             }
         }
         return mUserAgent;
@@ -263,7 +298,6 @@ public class DeviceInfoProvider implements TrackerLifecycleProvider {
     public double getLongitude() {
         return mLongitude;
     }
-
 
     public int getTimezoneOffset() {
         if (mTimezoneOffset == Integer.MIN_VALUE) {
