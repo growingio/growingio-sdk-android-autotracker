@@ -44,4 +44,4 @@ dependencies {
     androidTestImplementation(libs.kotlin.coroutines.test)
 }
 
-apply(from = "${rootProject.projectDir}/gradle/publishMaven.gradle")
+apply(from = "${rootProject.projectDir}/gradle/publishMavenCentral.gradle")

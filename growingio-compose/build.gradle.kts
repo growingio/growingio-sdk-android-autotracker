@@ -50,4 +50,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }
 
-apply(from = "${rootProject.projectDir}/gradle/publishMaven.gradle")
+apply(from = "${rootProject.projectDir}/gradle/publishMavenCentral.gradle")
