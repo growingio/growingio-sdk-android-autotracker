@@ -15,7 +15,5 @@ class NoOpLogger : ILogger {
     override fun log(priority: Int, throwable: Throwable?, message: String, vararg args: Any) {
     }
 
-    override fun isEnabled(priority: Int): Boolean {
-        return false
-    }
+    override fun isEnabled(priority: Int): Boolean = false
 }

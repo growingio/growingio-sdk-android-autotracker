@@ -28,8 +28,7 @@ import com.growingio.android.sdk.track.middleware.webservice.Debugger
 import com.growingio.android.sdk.track.middleware.webservice.WebService
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry
 
-internal class GrowingWindowCallback(val context: Context, private val window: Window, private val registry: TrackerRegistry?) :
-    WindowCallbackDelegate(window.callback) {
+internal class GrowingWindowCallback(val context: Context, private val window: Window, private val registry: TrackerRegistry?) : WindowCallbackDelegate(window.callback) {
 
     init {
         window.callback = this
@@ -65,9 +64,7 @@ internal class GrowingWindowCallback(val context: Context, private val window: W
         context.applicationContext,
         object : GestureDetector.OnGestureListener {
 
-            override fun onDown(e: MotionEvent): Boolean {
-                return false
-            }
+            override fun onDown(e: MotionEvent): Boolean = false
 
             override fun onShowPress(e: MotionEvent) {}
 
@@ -79,15 +76,11 @@ internal class GrowingWindowCallback(val context: Context, private val window: W
                 return false
             }
 
-            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-                return false
-            }
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = false
 
             override fun onLongPress(e: MotionEvent) {}
 
-            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                return false
-            }
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = false
         },
     )
 

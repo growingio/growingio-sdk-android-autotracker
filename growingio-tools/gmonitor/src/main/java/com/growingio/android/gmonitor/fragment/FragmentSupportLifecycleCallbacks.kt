@@ -11,8 +11,7 @@ import com.growingio.android.gmonitor.event.Breadcrumb.Companion.CATEGORY_PERFOR
 import java.util.*
 
 @Deprecated("Use the Jetpack Fragment Library androidx.fragment.app.Fragment instead.")
-class FragmentSupportLifecycleCallbacks(private val tracker: ITracker = TrackerProvider.instance) :
-    FragmentManager.FragmentLifecycleCallbacks() {
+class FragmentSupportLifecycleCallbacks(private val tracker: ITracker = TrackerProvider.instance) : FragmentManager.FragmentLifecycleCallbacks() {
 
     private val fragmentWithRunningOperation = WeakHashMap<Fragment, Operation>()
 

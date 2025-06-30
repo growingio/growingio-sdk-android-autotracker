@@ -121,10 +121,8 @@ internal class JsonSerializerGenerator(
     /**
      * private static volatile BaseEventJsonSerializableFactory instance;
      */
-    private fun generateInstanceField(instance: TypeName): FieldSpec {
-        return FieldSpec.builder(instance, "instance")
-            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.VOLATILE).build()
-    }
+    private fun generateInstanceField(instance: TypeName): FieldSpec = FieldSpec.builder(instance, "instance")
+        .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.VOLATILE).build()
 
     /**
      * public static BaseEventJsonSerializableFactory create() {
@@ -134,13 +132,11 @@ internal class JsonSerializerGenerator(
      *    return instance;
      * }
      */
-    private fun generateStaticCreateMethod(instance: TypeName, generatedName: String): MethodSpec {
-        return MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .beginControlFlow("if (instance == null)")
-            .addStatement("instance = new $generatedName()")
-            .endControlFlow()
-            .returns(instance).addStatement("return instance").build()
-    }
+    private fun generateStaticCreateMethod(instance: TypeName, generatedName: String): MethodSpec = MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .beginControlFlow("if (instance == null)")
+        .addStatement("instance = new $generatedName()")
+        .endControlFlow()
+        .returns(instance).addStatement("return instance").build()
 
     /**
      * @Override

@@ -42,4 +42,4 @@ dependencies {
 }
 
 // gmonitor 为工具库，固定版本为2.0.0，不随着sdk版本迭代
-// apply(from = "${rootProject.projectDir}/gradle/publishMaven.gradle")
+// apply(from = "${rootProject.projectDir}/gradle/publishMavenCentral.gradle")

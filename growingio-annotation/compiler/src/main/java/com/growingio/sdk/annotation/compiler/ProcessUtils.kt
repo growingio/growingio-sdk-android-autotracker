@@ -58,17 +58,11 @@ class ProcessUtils(val processEnv: ProcessingEnvironment) {
         processEnv.messager.printMessage(Diagnostic.Kind.NOTE, "$TAG:$msg")
     }
 
-    fun isGioModule(element: TypeElement): Boolean {
-        return processEnv.typeUtils.isAssignable(element.asType(), gioModuleType.asType())
-    }
+    fun isGioModule(element: TypeElement): Boolean = processEnv.typeUtils.isAssignable(element.asType(), gioModuleType.asType())
 
-    fun isGioConfig(element: TypeElement): Boolean {
-        return processEnv.typeUtils.isAssignable(element.asType(), gioConfigType.asType())
-    }
+    fun isGioConfig(element: TypeElement): Boolean = processEnv.typeUtils.isAssignable(element.asType(), gioConfigType.asType())
 
-    fun isAppGioModule(element: TypeElement): Boolean {
-        return processEnv.getTypeUtils().isAssignable(element.asType(), gioAppModuleType.asType())
-    }
+    fun isAppGioModule(element: TypeElement): Boolean = processEnv.getTypeUtils().isAssignable(element.asType(), gioAppModuleType.asType())
 
     fun getElementsFor(clazz: Class<out Annotation>, env: RoundEnvironment): List<TypeElement> {
         val annotatedElements: Collection<Element> = env.getElementsAnnotatedWith(clazz)

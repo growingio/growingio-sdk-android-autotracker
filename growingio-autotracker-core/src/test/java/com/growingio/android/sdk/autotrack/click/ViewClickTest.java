@@ -75,8 +75,8 @@ public class ViewClickTest {
             if (event.getEventType().equals("VIEW_CLICK")) {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
                 Truth.assertThat(clickEvent.getTextValue()).isEqualTo("this is cpacm");
-                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/LinearLayout/FrameLayout/LinearLayout/TextView");
-                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/0/0");
+                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/RobolectricActivity/DecorView/LinearLayout/FrameLayout/FitWindowsLinearLayout/ContentFrameLayout/LinearLayout/TextView");
+                Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0/0/0/action_bar_root/0/0/0");
             }
         };
 
@@ -87,7 +87,7 @@ public class ViewClickTest {
             if (event.getEventType().equals("VIEW_CLICK")) {
                 ViewElementEvent clickEvent = (ViewElementEvent) event;
                 Truth.assertThat(clickEvent.getTextValue()).isEqualTo("negative");
-                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/AlertDialogButtonLayout/Button");
+                Truth.assertThat(clickEvent.getXpath()).isEqualTo("/AlertDialogButtonLayout/AppCompatButton");
                 Truth.assertThat(clickEvent.getXIndex()).isEqualTo("/0/0");
             }
         };

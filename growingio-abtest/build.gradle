@@ -27,13 +27,6 @@ android {
 	}
 
 	testOptions {
-		unitTests.all {
-			jacoco {
-				jvmArgs '-noverify'
-				includeNoLocationClasses = true
-				excludes = ['jdk.internal.*']
-			}
-		}
 		unitTests {
 			returnDefaultValues = true
 			includeAndroidResources = true
@@ -54,5 +47,5 @@ dependencies {
 	annotationProcessor project(":growingio-annotation:compiler")
 }
 
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+apply from: "${rootProject.projectDir}/gradle/publishMavenCentral.gradle"
 apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"

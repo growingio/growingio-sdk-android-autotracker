@@ -16,8 +16,7 @@ import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Deprecated("Use the Jetpack Fragment Library androidx.fragment.app.Fragment instead.")
-class FragmentLifecycleCallbacks(private val tracker: ITracker = TrackerProvider.instance) :
-    FragmentManager.FragmentLifecycleCallbacks() {
+class FragmentLifecycleCallbacks(private val tracker: ITracker = TrackerProvider.instance) : FragmentManager.FragmentLifecycleCallbacks() {
 
     private val fragmentWithRunningOperation = WeakHashMap<Fragment, Operation>()
 

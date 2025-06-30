@@ -20,6 +20,10 @@ android {
 		buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
 	}
 
+	buildFeatures {
+		buildConfig = true
+	}
+
 	buildTypes {
 		//        debug {
 		//            testCoverageEnabled = true
@@ -77,5 +81,5 @@ dependencies {
 	annotationProcessor project(":growingio-annotation:compiler")
 }
 
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+apply from: "${rootProject.projectDir}/gradle/publishMavenCentral.gradle"
 apply from: "${rootProject.projectDir}/gradle/jacocoModule.gradle"
