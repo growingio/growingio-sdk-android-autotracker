@@ -13,7 +13,9 @@ import com.growingio.android.gmonitor.event.Breadcrumb
  *
  * @author cpacm 2022/9/9
  */
-class AnrIntegration(val context: Context) : Integration, AnrReportListener {
+class AnrIntegration(val context: Context) :
+    Integration,
+    AnrReportListener {
 
     private lateinit var tracker: ITracker
     private lateinit var options: GMonitorOption

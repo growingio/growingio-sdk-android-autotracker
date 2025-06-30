@@ -402,7 +402,5 @@ internal class ConfigurationGenerator(
         processUtils.writeClass(packageName, gio)
     }
 
-    private fun getAllMethods(type: TypeElement): List<ExecutableElement> {
-        return ElementFilter.methodsIn(type.enclosedElements)
-    }
+    private fun getAllMethods(type: TypeElement): List<ExecutableElement> = ElementFilter.methodsIn(type.enclosedElements)
 }

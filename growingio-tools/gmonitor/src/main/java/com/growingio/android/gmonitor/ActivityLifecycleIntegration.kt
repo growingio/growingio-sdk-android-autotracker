@@ -59,9 +59,7 @@ class ActivityLifecycleIntegration(val application: Application) :
         this.options.logger.log(Log.DEBUG, "ActivityLifecycleIntegration removed .")
     }
 
-    private fun isRunningOperation(activity: Activity): Boolean {
-        return activityWithRunningOperation.containsKey(activity)
-    }
+    private fun isRunningOperation(activity: Activity): Boolean = activityWithRunningOperation.containsKey(activity)
 
     private fun startOperation(activity: Activity) {
         if (!isRunningOperation(activity)) {

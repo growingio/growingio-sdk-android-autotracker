@@ -49,7 +49,7 @@ public class RobolectricActivity extends Activity {
         });
 
         ImageView imageView = new ImageView(this);
-        imageView.setTag(R.id.growing_tracker_view_page, new ActivityPage(this));
+        imageView.setTag(com.growingio.android.sdk.autotrack.R.id.growing_tracker_view_page, new ActivityPage(this));
 
         WebView webView = new WebView(this);
         webView.loadUrl("https://www.growingio.com/");

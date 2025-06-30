@@ -7,11 +7,7 @@ package com.growingio.android.gmonitor.utils
  */
 object ExceptionHelper {
 
-    fun getThrowableType(t: Throwable): String {
-        return t.javaClass.simpleName
-    }
+    fun getThrowableType(t: Throwable): String = t.javaClass.simpleName
 
-    fun getThrowableMessage(t: Throwable): String {
-        return t.message + " at " + t.stackTrace.first().toString()
-    }
+    fun getThrowableMessage(t: Throwable): String = t.message + " at " + t.stackTrace.first().toString()
 }

@@ -14,9 +14,7 @@ class GMonitorTracker : ITracker {
         Log.d("Tracker", breadcrumb.toString())
     }
 
-    override fun clone(): GMonitorTracker {
-        return GMonitorTracker()
-    }
+    override fun clone(): GMonitorTracker = GMonitorTracker()
 }
 
 class TrackerProvider : ITracker {
@@ -24,9 +22,7 @@ class TrackerProvider : ITracker {
         GMonitor.getInstance()?.trackBreadcrumb(breadcrumb)
     }
 
-    override fun clone(): ITracker {
-        return this
-    }
+    override fun clone(): ITracker = this
 
     companion object {
         val instance = TrackerProvider()

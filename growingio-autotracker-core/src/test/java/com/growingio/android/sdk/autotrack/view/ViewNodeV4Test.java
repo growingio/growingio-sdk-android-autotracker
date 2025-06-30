@@ -60,7 +60,7 @@ public class ViewNodeV4Test {
 
     @Before
     public void setup() {
-        CoreConfiguration coreConfiguration = new CoreConfiguration("ViewNodeV4Test", "growingio://apm");
+        CoreConfiguration coreConfiguration = new CoreConfiguration("ViewNodeV4Test", "growingio://autotracker");
         AutotrackConfig autotrackConfig = new AutotrackConfig();
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
         map.put(AutotrackConfig.class, autotrackConfig);
@@ -94,21 +94,21 @@ public class ViewNodeV4Test {
         ViewNodeV4Renderer renderer = new ViewNodeV4Renderer(viewNodeProvider);
 
         ViewNodeV4 viewNode = renderer.renderViewNode(activity.getTextView());
-        Truth.assertThat(viewNode.getXPath()).isEqualTo("/DecorView/LinearLayout/FrameLayout/LinearLayout/TextView");
-        Truth.assertThat(viewNode.getXIndex()).isEqualTo("/0/0/0/0/0");
+        Truth.assertThat(viewNode.getXPath()).isEqualTo("/DecorView/LinearLayout/FrameLayout/FitWindowsLinearLayout/ContentFrameLayout/LinearLayout/TextView");
+        Truth.assertThat(viewNode.getXIndex()).isEqualTo("/0/0/0/action_bar_root/0/0/0");
         Truth.assertThat(viewNode.getViewContent()).isEqualTo("this is cpacm");
         Truth.assertThat(viewNode.getNodeType()).isEqualTo("TEXT");
         Truth.assertThat(viewNode.getClickableParentXPath()).isNull();
         Truth.assertThat(viewNode.getIndex()).isEqualTo(-1);
         ViewNodeV4 newNode = viewNode.append(activity.getImageView(), 0);
-        Truth.assertThat(newNode.getXPath()).isEqualTo("/DecorView/LinearLayout/FrameLayout/LinearLayout/TextView/ImageView");
-        Truth.assertThat(newNode.getXIndex()).isEqualTo("/0/0/0/0/0/0");
+        Truth.assertThat(newNode.getXPath()).isEqualTo("/DecorView/LinearLayout/FrameLayout/FitWindowsLinearLayout/ContentFrameLayout/LinearLayout/TextView/ImageView");
+        Truth.assertThat(newNode.getXIndex()).isEqualTo("/0/0/0/action_bar_root/0/0/0/0");
 
         RecyclerView recyclerView = activity.getRecyclerView();
         View itemView = Objects.requireNonNull(recyclerView.findViewHolderForAdapterPosition(2)).itemView;
         ViewNodeV4 listItemNode = renderer.renderViewNode(itemView);
-        Truth.assertThat(listItemNode.getXPath()).isEqualTo("/DecorView/LinearLayout/FrameLayout/LinearLayout/RecyclerView/TextView");
-        Truth.assertThat(listItemNode.getXIndex()).isEqualTo("/0/0/0/0/0/-");
+        Truth.assertThat(listItemNode.getXPath()).isEqualTo("/DecorView/LinearLayout/FrameLayout/FitWindowsLinearLayout/ContentFrameLayout/LinearLayout/RecyclerView/TextView");
+        Truth.assertThat(listItemNode.getXIndex()).isEqualTo("/0/0/0/action_bar_root/0/0/0/-");
 
         ViewNodeV4 uniqueNode = renderer.renderViewNode(activity.getUniqueTagTv());
         Truth.assertThat(uniqueNode.getXPath()).isEqualTo("/tag");

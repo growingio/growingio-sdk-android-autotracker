@@ -53,15 +53,11 @@ class EmptyAppModuleTest : CompilationProvider {
             .hasSourceEquivalentTo(forResource("TestTrackConfiguration.java"))
     }
 
-    private fun forResource(name: String): JavaFileObject {
-        return TestUtil.forResource(javaClass.simpleName, name)
-    }
+    private fun forResource(name: String): JavaFileObject = TestUtil.forResource(javaClass.simpleName, name)
 
     companion object {
         private const val MODULE_NAME = "EmptyAppGioModule.java"
     }
 
-    override fun getCompilation(): Compilation {
-        return compilation!!
-    }
+    override fun getCompilation(): Compilation = compilation!!
 }

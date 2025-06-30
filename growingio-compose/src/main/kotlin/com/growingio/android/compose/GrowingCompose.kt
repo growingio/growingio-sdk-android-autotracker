@@ -63,39 +63,31 @@ object GrowingCompose {
         mergePolicy = { _, new -> new },
     )
 
-    fun Modifier.interruptClick(): Modifier {
-        return semantics(
-            properties = {
-                this[GROWING_INTERRUPT_CLICK] = true
-            },
-        )
-    }
+    fun Modifier.interruptClick(): Modifier = semantics(
+        properties = {
+            this[GROWING_INTERRUPT_CLICK] = true
+        },
+    )
 
     @JvmStatic
-    fun Modifier.autotrackElement(composableName: String, callName: String): Modifier {
-        return semantics(
-            properties = {
-                this[GROWING_COMPOSABLE] = composableName
-                this[GROWING_CALL] = callName
-            },
-        )
-    }
+    fun Modifier.autotrackElement(composableName: String, callName: String): Modifier = semantics(
+        properties = {
+            this[GROWING_COMPOSABLE] = composableName
+            this[GROWING_CALL] = callName
+        },
+    )
 
-    fun Modifier.growingTag(tag: String): Modifier {
-        return semantics(
-            properties = {
-                this[GROWING_TAG] = tag
-            },
-        )
-    }
+    fun Modifier.growingTag(tag: String): Modifier = semantics(
+        properties = {
+            this[GROWING_TAG] = tag
+        },
+    )
 
-    private fun Modifier.growingPage(alias: String): Modifier {
-        return semantics(
-            properties = {
-                this[GROWING_PAGE_TAG] = alias
-            },
-        )
-    }
+    private fun Modifier.growingPage(alias: String): Modifier = semantics(
+        properties = {
+            this[GROWING_PAGE_TAG] = alias
+        },
+    )
 
     @Suppress("FunctionName")
     @Composable

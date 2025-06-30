@@ -38,9 +38,7 @@ class ComposeAutotrackLoader(private val context: TrackerContext) : ModelLoader<
 }
 
 class Factory(private val context: TrackerContext) : ModelLoaderFactory<ComposeData, ComposeJson> {
-    override fun build(): ModelLoader<ComposeData, ComposeJson> {
-        return ComposeAutotrackLoader(context)
-    }
+    override fun build(): ModelLoader<ComposeData, ComposeJson> = ComposeAutotrackLoader(context)
 }
 
 class ComposeAutotrackFetcher(val model: ComposeData, private val provider: ComposeAutotrackProvider?) : DataFetcher<ComposeJson> {
@@ -128,7 +126,5 @@ class ComposeAutotrackFetcher(val model: ComposeData, private val provider: Comp
         return composeAndroidViews
     }
 
-    override fun getDataClass(): Class<ComposeJson> {
-        return ComposeJson::class.java
-    }
+    override fun getDataClass(): Class<ComposeJson> = ComposeJson::class.java
 }

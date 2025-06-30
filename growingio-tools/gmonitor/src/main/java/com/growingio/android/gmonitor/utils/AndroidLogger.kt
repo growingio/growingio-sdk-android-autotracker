@@ -46,7 +46,5 @@ class AndroidLogger : ILogger {
         }
     }
 
-    override fun isEnabled(priority: Int): Boolean {
-        return true
-    }
+    override fun isEnabled(priority: Int): Boolean = true
 }

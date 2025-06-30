@@ -48,9 +48,7 @@ class AnrWatchDog constructor(
         anrListeners.remove(listener)
     }
 
-    fun getAnrListenerCount(): Int {
-        return anrListeners.size
-    }
+    fun getAnrListenerCount(): Int = anrListeners.size
 
     override fun run() {
         name = "|GMonitor-ANR|"

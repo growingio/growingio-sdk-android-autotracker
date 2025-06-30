@@ -4,7 +4,7 @@ minSdk = "17"
 
 # https://developer.android.google.cn/jetpack/androidx/explorer?hl=en&case=all
 androidxlifecycle = "2.9.0"
-androidxtest = "1.6.1"
+androidxtest = "1.5.0"
 navigation = "2.9.0"
 androidx-compose-bom = "2024.09.00"
 androidx-activity-compose = "1.9.1"
@@ -13,7 +13,7 @@ pluginGradle = "8.10.0" # 4.2.2-7.4.2
 # pluginGradle = "8.5.2" # 4.2.2-7.4.2
 kotlin = "2.1.20"
 
-spotless = "6.25.0"
+spotless = "7.0.4"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-compiler
 # composeBom = "2023.04.00"

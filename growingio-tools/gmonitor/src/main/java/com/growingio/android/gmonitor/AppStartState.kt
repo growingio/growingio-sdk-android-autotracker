@@ -26,9 +26,7 @@ internal class AppStartState private constructor() {
     }
 
     @Synchronized
-    fun getAppStartTime(): Long {
-        return appStartMills
-    }
+    fun getAppStartTime(): Long = appStartMills
 
     @Synchronized
     fun setAppEndTime() {

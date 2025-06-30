@@ -27,8 +27,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,7 +45,7 @@ import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEv
 import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent.EVENT_TYPE.ON_STARTED;
 import static com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent.EVENT_TYPE.ON_STOPPED;
 
-public class RobolectricActivity extends FragmentActivity {
+public class RobolectricActivity extends AppCompatActivity {
 
     private ActivityLifecycleEvent.EVENT_TYPE state;
 
@@ -58,6 +58,7 @@ public class RobolectricActivity extends FragmentActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         state = ON_CREATED;
         super.onCreate(savedInstanceState);
+        setTheme(androidx.appcompat.R.style.Theme_AppCompat_Light_NoActionBar);
         textView = new TextView(this);
         textView.setText("this is cpacm");
 
