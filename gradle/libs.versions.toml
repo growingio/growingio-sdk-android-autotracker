@@ -31,7 +31,7 @@ protobufPlugin = "0.9.5"
 protobuf = "4.31.1"
 
 # !!! SDK VERSION !!!
-growingio = "4.4.4-SNAPSHOT"
+growingio = "4.4.4-volvo-SNAPSHOT"
 growingioCode = "40404"
 growingioPlugin = "4.4.0"
 junit = "1.1.5"
