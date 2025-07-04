@@ -25,6 +25,8 @@ import android.net.Uri;
 import android.os.RemoteException;
 
 import com.growingio.android.sdk.TrackerContext;
+import com.growingio.android.sdk.track.events.AutotrackEventType;
+import com.growingio.android.sdk.track.events.TrackEventType;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.EventDbResult;
@@ -78,7 +80,6 @@ public class EventDataManager {
         int count = 0;
         for (GEvent event : events) {
             Uri uri = insertEvent(event);
-            //GioDatabase.insertEvent(uri,event);
             if (uri != null) count++;
         }
         return count;
@@ -101,7 +102,7 @@ public class EventDataManager {
                     Logger.e(TAG, "event data is too large, ignore it.");
                     return null;
                 }
-                ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), gEvent.getEventType(), gEvent.getSendPolicy());
+                ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), getDatabaseEventType(gEvent), gEvent.getSendPolicy());
                 return contentResolver.insert(uri, contentValues);
             }
         } catch (SQLiteFullException e) {
@@ -190,7 +191,6 @@ public class EventDataManager {
         }
     }
 
-
     void queryEventsAndDelete(int policy, int limit, EventDbResult dbResult) {
         if (ignoreOperations) {
             dbResult.setSuccess(false);
@@ -238,6 +238,32 @@ public class EventDataManager {
         }
     }
 
+    int updateEventsWhenSendFailed(long lastId, String eventType) {
+        if (ignoreOperations) {
+            return -1;
+        }
+        if (eventType.equals(UNDELIVERED_EVENT_TYPE)) {
+            //does not need to be updated
+            return 0;
+        }
+        try {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_EVENT_TYPE, UNDELIVERED_EVENT_TYPE);
+            ContentResolver contentResolver = context.getContentResolver();
+            Uri uri = getContentUri();
+            return contentResolver.update(uri,
+                    contentValues,
+                    COLUMN_ID + "<=? AND " + COLUMN_EVENT_TYPE + "=?",
+                    new String[]{String.valueOf(lastId), eventType});
+        } catch (SQLiteFullException e) {
+            onDiskFull(e);
+            return -1;
+        } catch (Exception e) {
+            Logger.e(TAG, e, "updateEvents failed");
+            return -1;
+        }
+    }
+
     @SuppressLint("Recycle")
     private Cursor queryEvents(ContentProviderClient client, int policy, int limit) throws RemoteException {
         Uri uri = getContentUri();
@@ -267,7 +293,6 @@ public class EventDataManager {
             client.delete(uri, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
         }
     }
-
 
     int removeEvents(long lastId, int policy, String eventType) {
         if (ignoreOperations) {
@@ -315,4 +340,35 @@ public class EventDataManager {
         Logger.w(TAG, e, "Disk full, all operations will be ignored");
         ignoreOperations = true;
     }
+
+
+    private String getDatabaseEventType(GEvent gEvent) {
+        String eventType = gEvent.getEventType();
+        switch (eventType) {
+            case TrackEventType.VISIT:
+            case TrackEventType.ACTIVATE:
+            case TrackEventType.REENGAGE:
+                return INSTANT_EVENT_TYPE;
+
+            case AutotrackEventType.PAGE:
+            case AutotrackEventType.PAGE_ATTRIBUTES:
+            case AutotrackEventType.VIEW_CLICK:
+            case AutotrackEventType.VIEW_CHANGE:
+                return AUTOTRACK_EVENT_TYPE;
+
+            case TrackEventType.CUSTOM:
+            case TrackEventType.VISITOR_ATTRIBUTES:
+            case TrackEventType.LOGIN_USER_ATTRIBUTES:
+            case TrackEventType.CONVERSION_VARIABLES:
+                return TRACK_EVENT_TYPE;
+            default:
+                return OTHER_EVENT_TYPE;
+        }
+    }
+
+    private static final String INSTANT_EVENT_TYPE = "INSTANT";
+    private static final String AUTOTRACK_EVENT_TYPE = "AUTOTRACK";
+    private static final String TRACK_EVENT_TYPE = "TRACK";
+    private static final String OTHER_EVENT_TYPE = "OTHER";
+    private static final String UNDELIVERED_EVENT_TYPE = "UNDELIVERED";
 }

@@ -108,7 +108,7 @@ public class DbTest {
         EventDbResult dbResult = modelLoader.buildLoadData(EventDatabase.query(customEvent.getSendPolicy(), 10)).fetcher.executeData();
         Truth.assertThat(dbResult.getSum()).isEqualTo(1);
         Truth.assertThat(dbResult.isSuccess()).isEqualTo(true);
-        Truth.assertThat(dbResult.getEventType()).isEqualTo(customEvent.getEventType());
+        Truth.assertThat(dbResult.getEventType()).isEqualTo("TRACK");
 
         dbResult = modelLoader.buildLoadData(EventDatabase.delete(dbResult.getLastId(), customEvent.getSendPolicy(), dbResult.getEventType())).fetcher.executeData();
         Truth.assertThat(dbResult.getSum()).isEqualTo(1);

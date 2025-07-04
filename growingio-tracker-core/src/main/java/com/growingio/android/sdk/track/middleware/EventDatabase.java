@@ -118,6 +118,14 @@ public class EventDatabase {
         return ed;
     }
 
+    public static EventDatabase update(long lastId, String eventType) {
+        EventDatabase ed = new EventDatabase();
+        ed.dbOp = DATABASE_OP_UPDATE;
+        ed.eventType = eventType;
+        ed.lastId = lastId;
+        return ed;
+    }
+
     public static EventDatabase clear() {
         EventDatabase ed = new EventDatabase();
         ed.dbOp = DATABASE_OP_CLEAR;
