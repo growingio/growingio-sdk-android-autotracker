@@ -544,7 +544,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     }
 
     private void setPageTitle(Page<?> page, String title) {
-        if (page == null || title == null) return;
+        if (page == null) return;
         page.setTitle(title);
     }
 

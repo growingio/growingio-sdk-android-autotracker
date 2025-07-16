@@ -272,8 +272,8 @@ public class Autotracker extends Tracker {
 
     public void setPageTitle(final Activity activity, final String title) {
         if (!isInited) return;
-        if (activity == null || TextUtils.isEmpty(title)) {
-            Logger.e(TAG, "activity or title is NULL");
+        if (activity == null) {
+            Logger.e(TAG, "activity is NULL");
             return;
         }
         TrackMainThread.trackMain().runOnUiThread(() -> PageProvider.get().setPageTitle(activity, title));
@@ -281,8 +281,8 @@ public class Autotracker extends Tracker {
 
     public void setPageTitle(final androidx.fragment.app.Fragment page, final String title) {
         if (!isInited) return;
-        if (page == null || TextUtils.isEmpty(title)) {
-            Logger.e(TAG, "page or title is NULL");
+        if (page == null) {
+            Logger.e(TAG, "page is NULL");
             return;
         }
         TrackMainThread.trackMain().runOnUiThread(() -> PageProvider.get().setPageTitle(SuperFragment.makeX(page), title));
@@ -290,8 +290,8 @@ public class Autotracker extends Tracker {
 
     public void setPageTitleSystem(final android.app.Fragment page, final String title) {
         if (!isInited) return;
-        if (page == null || TextUtils.isEmpty(title)) {
-            Logger.e(TAG, "page or title is NULL");
+        if (page == null) {
+            Logger.e(TAG, "page is NULL");
             return;
         }
         TrackMainThread.trackMain().runOnUiThread(() -> PageProvider.get().setPageTitle(SuperFragment.make(page), title));
@@ -299,8 +299,8 @@ public class Autotracker extends Tracker {
 
     public void setPageTitleSupport(final android.support.v4.app.Fragment page, final String title) {
         if (!isInited) return;
-        if (page == null || TextUtils.isEmpty(title)) {
-            Logger.e(TAG, "page or title is NULL");
+        if (page == null) {
+            Logger.e(TAG, "page NULL");
             return;
         }
         TrackMainThread.trackMain().runOnUiThread(() -> PageProvider.get().setPageTitle(SuperFragment.makeSupport(page), title));
