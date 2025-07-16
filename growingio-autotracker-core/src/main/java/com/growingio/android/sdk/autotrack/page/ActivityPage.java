@@ -22,6 +22,7 @@ import android.view.View;
 
 public class ActivityPage extends Page<SuperActivity> {
 
+    private String customTitle;
     private PageConfig pageConfig;
 
     public ActivityPage(Activity carrier) {
@@ -79,11 +80,20 @@ public class ActivityPage extends Page<SuperActivity> {
 
     @Override
     public String getTitle() {
+        if (customTitle != null) {
+            return customTitle;
+        }
         Activity activity = getCarrier().getRealActivity();
         if (activity != null && !TextUtils.isEmpty(activity.getTitle())) {
             return activity.getTitle().toString();
         }
         return super.getTitle();
+    }
+
+    @Override
+    protected void setTitle(String title) {
+        this.customTitle = title;
+        super.setTitle(title);
     }
 
     @Override

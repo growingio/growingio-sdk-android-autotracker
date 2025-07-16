@@ -533,6 +533,21 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         page.setAttributes(attributes);
     }
 
+    public void setPageTitle(Activity activity, String title) {
+        Page page = findOrCreateActivityPage(activity);
+        setPageTitle(page, title);
+    }
+
+    public void setPageTitle(SuperFragment<?> fragment, String title) {
+        Page<?> page = findOrCreateFragmentPage(fragment);
+        setPageTitle(page, title);
+    }
+
+    private void setPageTitle(Page<?> page, String title) {
+        if (page == null || title == null) return;
+        page.setTitle(title);
+    }
+
     public Page<?> findPage(View view) {
         Page<?> page = ViewAttributeUtil.getViewPage(view);
         if (page != null) {
