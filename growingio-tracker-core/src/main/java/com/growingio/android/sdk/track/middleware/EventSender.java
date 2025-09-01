@@ -238,7 +238,7 @@ public class EventSender {
                             }
                             Logger.e(TAG, "action: sendEvents, delete events with responseCode: " + responseCode);
                             break;
-                        } else if (responseCode >= 400) {
+                        } else if (responseCode >= 400 || responseCode == 0) {
                             // mark the events as undeliverable
                             databaseOperation(EventDatabase.update(dbResult.getLastId(), dbResult.getEventType()));
                             // Logger.e(TAG, "action: sendEvents, backoff with some reasons,eg: Unavailable For Legal Reasons");
