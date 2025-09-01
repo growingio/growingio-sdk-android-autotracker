@@ -269,6 +269,7 @@ public class EventDataManager {
         Uri uri = getContentUri();
         String subSelect = "SELECT " + COLUMN_EVENT_TYPE
                 + " FROM " + TABLE_EVENTS + " WHERE " + COLUMN_POLICY + "=" + policy
+                + " ORDER BY " + COLUMN_ID + " DESC "
                 + " LIMIT 1";
         String sql = "SELECT " + COLUMN_ID + ", " + COLUMN_DATA + ", "
                 + COLUMN_EVENT_TYPE
