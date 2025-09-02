@@ -249,6 +249,8 @@ public class EventDataManager {
         try {
             ContentValues contentValues = new ContentValues();
             contentValues.put(COLUMN_EVENT_TYPE, UNDELIVERED_EVENT_TYPE);
+            // make event not instant send policy
+            contentValues.put(COLUMN_POLICY, GEvent.SEND_POLICY_MOBILE_DATA);
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = getContentUri();
             return contentResolver.update(uri,
