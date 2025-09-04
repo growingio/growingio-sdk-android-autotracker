@@ -60,6 +60,10 @@ public class ActivateEvent extends BaseAttributesEvent {
         androidId = eventBuilder.androidId;
         imei = eventBuilder.imei;
     }
+    @Override
+    public int getSendPolicy() {
+        return SEND_POLICY_INSTANT;
+    }
 
     public String getOaid() {
         return checkValueSafe(oaid);
