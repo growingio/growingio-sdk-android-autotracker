@@ -172,12 +172,12 @@ public class DbTest {
             sqLite.insertEvent(ce);
         }
         sqLite.queryEvents(customEvent.getSendPolicy(), 1, dbResult);
-        sqLite.removeEvents(dbResult.getLastId() + 4, customEvent.getSendPolicy(), customEvent.getEventType());
+
+        String type = sqLite.getDatabaseEventType(customEvent);
+        sqLite.removeEvents(dbResult.getLastId() + 4, customEvent.getSendPolicy(), type);
 
         sqLite.queryEvents(customEvent.getSendPolicy(), 10, dbResult);
         assertThat(dbResult.getSum()).isEqualTo(0);
-
-
     }
 
     @Test

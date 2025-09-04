@@ -345,7 +345,7 @@ public class EventDataManager {
     }
 
 
-    private String getDatabaseEventType(GEvent gEvent) {
+    String getDatabaseEventType(GEvent gEvent) {
         String eventType = gEvent.getEventType();
         switch (eventType) {
             case TrackEventType.VISIT:
