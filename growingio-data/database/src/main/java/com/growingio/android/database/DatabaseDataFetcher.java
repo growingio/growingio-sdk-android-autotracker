@@ -74,7 +74,7 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_DELETE) {
             assertCondition(database.getLastId() > 0
                     && database.getPolicy() >= SEND_POLICY_INSTANT
-                    && !TextUtils.isEmpty(database.getEventType()), "leak necessary param");
+                    && !TextUtils.isEmpty(database.getEventType()), "no event id to delete");
             int sum = dataManager.removeEvents(database.getLastId(), database.getPolicy(), database.getEventType());
             dbResult.setSum(sum);
             dbResult.setSuccess(sum >= 0);
@@ -82,8 +82,14 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_QUERY_DELETE) {
             assertCondition(database.getLimit() > 0
                             && database.getPolicy() >= SEND_POLICY_INSTANT,
-                    "leak necessary param");
+                    "no event id to query");
             dataManager.queryEventsAndDelete(database.getPolicy(), database.getLimit(), dbResult);
+            return dbResult;
+        } else if (database.getDbOp() == EventDatabase.DATABASE_OP_UPDATE) {
+            assertCondition(database.getLastId() > 0, "no event id to update");
+            int sum = dataManager.updateEventsWhenSendFailed(database.getLastId(), database.getEventType());
+            dbResult.setSum(sum);
+            dbResult.setSuccess(sum >= 0);
             return dbResult;
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_CLEAR) {
             dataManager.removeAllEvents();
