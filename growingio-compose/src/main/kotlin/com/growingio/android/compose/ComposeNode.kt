@@ -31,9 +31,7 @@ internal data class ComposePageNode(
         return false
     }
 
-    override fun hashCode(): Int {
-        return alias.hashCode()
-    }
+    override fun hashCode(): Int = alias.hashCode()
 }
 
 class ComposeNode(val layoutNode: Any) {
@@ -66,9 +64,7 @@ class ComposeNode(val layoutNode: Any) {
     private var originXIndexWithoutList: String? = null
     private var nodeType: String = "BUTTON"
 
-    override fun toString(): String {
-        return "ComposeNode(text=$text, composableName=$composableName, callName=$callName, isEnd=$isEnd, isClickNode=$isClickNode, alias=$alias, index=$index, tag=$tag, measurePolicy=$measurePolicy)"
-    }
+    override fun toString(): String = "ComposeNode(text=$text, composableName=$composableName, callName=$callName, isEnd=$isEnd, isClickNode=$isClickNode, alias=$alias, index=$index, tag=$tag, measurePolicy=$measurePolicy)"
 
     fun appendChildNode(layoutNode: Any): ComposeNode {
         val tempNode = ComposeNode(layoutNode)
@@ -93,21 +89,17 @@ class ComposeNode(val layoutNode: Any) {
         calculateXPathAndXIndex()
     }
 
-    private fun isInLazyList(): Boolean {
-        return parent?.callName == "LazyRow" ||
-            parent?.callName == "LazyColumn" ||
-            parent?.callName == "LazyVerticalGrid" ||
-            parent?.callName == "LazyHorizontalGrid"
-    }
+    private fun isInLazyList(): Boolean = parent?.callName == "LazyRow" ||
+        parent?.callName == "LazyColumn" ||
+        parent?.callName == "LazyVerticalGrid" ||
+        parent?.callName == "LazyHorizontalGrid"
 
-    private fun isList(): Boolean {
-        return callName == "LazyRow" ||
-            callName == "LazyColumn" ||
-            callName == "LazyVerticalGrid" ||
-            callName == "LazyHorizontalGrid" ||
-            callName == "Column" ||
-            callName == "Row"
-    }
+    private fun isList(): Boolean = callName == "LazyRow" ||
+        callName == "LazyColumn" ||
+        callName == "LazyVerticalGrid" ||
+        callName == "LazyHorizontalGrid" ||
+        callName == "Column" ||
+        callName == "Row"
 
     private fun calculatePath(): String {
         if (path != null) {

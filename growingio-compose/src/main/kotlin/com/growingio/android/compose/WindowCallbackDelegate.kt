@@ -29,53 +29,29 @@ import android.view.accessibility.AccessibilityEvent
 
 internal open class WindowCallbackDelegate(private val delegate: Window.Callback?) : Window.Callback {
 
-    fun getDelegate(): Window.Callback? {
-        return delegate
-    }
+    fun getDelegate(): Window.Callback? = delegate
 
-    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-        return delegate?.dispatchKeyEvent(event) ?: false
-    }
+    override fun dispatchKeyEvent(event: KeyEvent?): Boolean = delegate?.dispatchKeyEvent(event) ?: false
 
-    override fun dispatchKeyShortcutEvent(event: KeyEvent?): Boolean {
-        return delegate?.dispatchKeyShortcutEvent(event) ?: false
-    }
+    override fun dispatchKeyShortcutEvent(event: KeyEvent?): Boolean = delegate?.dispatchKeyShortcutEvent(event) ?: false
 
-    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-        return delegate?.dispatchTouchEvent(event) ?: false
-    }
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean = delegate?.dispatchTouchEvent(event) ?: false
 
-    override fun dispatchTrackballEvent(event: MotionEvent?): Boolean {
-        return delegate?.dispatchTrackballEvent(event) ?: false
-    }
+    override fun dispatchTrackballEvent(event: MotionEvent?): Boolean = delegate?.dispatchTrackballEvent(event) ?: false
 
-    override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
-        return delegate?.dispatchGenericMotionEvent(event) ?: false
-    }
+    override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean = delegate?.dispatchGenericMotionEvent(event) ?: false
 
-    override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent?): Boolean {
-        return delegate?.dispatchPopulateAccessibilityEvent(event) ?: false
-    }
+    override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent?): Boolean = delegate?.dispatchPopulateAccessibilityEvent(event) ?: false
 
-    override fun onCreatePanelView(featureId: Int): View? {
-        return delegate?.onCreatePanelView(featureId)
-    }
+    override fun onCreatePanelView(featureId: Int): View? = delegate?.onCreatePanelView(featureId)
 
-    override fun onCreatePanelMenu(featureId: Int, menu: Menu): Boolean {
-        return delegate?.onCreatePanelMenu(featureId, menu) ?: false
-    }
+    override fun onCreatePanelMenu(featureId: Int, menu: Menu): Boolean = delegate?.onCreatePanelMenu(featureId, menu) ?: false
 
-    override fun onPreparePanel(featureId: Int, view: View?, menu: Menu): Boolean {
-        return delegate?.onPreparePanel(featureId, view, menu) ?: false
-    }
+    override fun onPreparePanel(featureId: Int, view: View?, menu: Menu): Boolean = delegate?.onPreparePanel(featureId, view, menu) ?: false
 
-    override fun onMenuOpened(featureId: Int, menu: Menu): Boolean {
-        return delegate?.onMenuOpened(featureId, menu) ?: false
-    }
+    override fun onMenuOpened(featureId: Int, menu: Menu): Boolean = delegate?.onMenuOpened(featureId, menu) ?: false
 
-    override fun onMenuItemSelected(featureId: Int, item: MenuItem): Boolean {
-        return delegate?.onMenuItemSelected(featureId, item) ?: false
-    }
+    override fun onMenuItemSelected(featureId: Int, item: MenuItem): Boolean = delegate?.onMenuItemSelected(featureId, item) ?: false
 
     override fun onWindowAttributesChanged(attrs: WindowManager.LayoutParams?) {
         delegate?.onWindowAttributesChanged(attrs)
@@ -101,28 +77,20 @@ internal open class WindowCallbackDelegate(private val delegate: Window.Callback
         delegate?.onPanelClosed(featureId, menu)
     }
 
-    override fun onSearchRequested(): Boolean {
-        return delegate?.onSearchRequested() ?: false
+    override fun onSearchRequested(): Boolean = delegate?.onSearchRequested() ?: false
+
+    override fun onSearchRequested(searchEvent: SearchEvent?): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        delegate?.onSearchRequested(searchEvent) ?: false
+    } else {
+        false
     }
 
-    override fun onSearchRequested(searchEvent: SearchEvent?): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            delegate?.onSearchRequested(searchEvent) ?: false
-        } else {
-            false
-        }
-    }
+    override fun onWindowStartingActionMode(callback: ActionMode.Callback?): ActionMode? = delegate?.onWindowStartingActionMode(callback)
 
-    override fun onWindowStartingActionMode(callback: ActionMode.Callback?): ActionMode? {
-        return delegate?.onWindowStartingActionMode(callback)
-    }
-
-    override fun onWindowStartingActionMode(callback: ActionMode.Callback?, type: Int): ActionMode? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            delegate?.onWindowStartingActionMode(callback, type)
-        } else {
-            null
-        }
+    override fun onWindowStartingActionMode(callback: ActionMode.Callback?, type: Int): ActionMode? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        delegate?.onWindowStartingActionMode(callback, type)
+    } else {
+        null
     }
 
     override fun onActionModeStarted(mode: ActionMode?) {

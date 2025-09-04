@@ -260,7 +260,7 @@ public class ABTestTest extends MockServer {
         variables.put("game", "haven");
         abTestResponse.abExperiment = new ABExperiment(layerId, 100, 100, variables);
         String abTestKey = ObjectUtils.sha1(deviceId + layerId);
-        sharedPreferences.edit().putString(abTestKey, abTestResponse.toSavedJson()).apply();
+        sharedPreferences.edit().putString(abTestKey, abTestResponse.toSavedJson()).commit();
     }
 
     @Test

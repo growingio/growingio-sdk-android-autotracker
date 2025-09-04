@@ -28,7 +28,9 @@ import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider
 import com.growingio.android.sdk.track.view.OnDecorViewsObserver
 import com.growingio.android.sdk.track.view.WindowHelper
 
-class ComposeAutotrackProvider : TrackerLifecycleProvider, OnDecorViewsObserver {
+class ComposeAutotrackProvider :
+    TrackerLifecycleProvider,
+    OnDecorViewsObserver {
 
     companion object {
         private var pageCache: LinkedHashSet<ComposePageNode> = linkedSetOf()
@@ -55,9 +57,7 @@ class ComposeAutotrackProvider : TrackerLifecycleProvider, OnDecorViewsObserver 
             pageCache.remove(findPage)
         }
 
-        fun findComposePageAttribute(alias: String): Map<String, String>? {
-            return pageCache.findLast { it.alias == alias }?.attributes
-        }
+        fun findComposePageAttribute(alias: String): Map<String, String>? = pageCache.findLast { it.alias == alias }?.attributes
     }
 
     // Map<DecorView.HashCode,Window.Callback>

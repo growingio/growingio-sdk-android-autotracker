@@ -54,9 +54,7 @@ class GMonitor private constructor(val option: GMonitorOption, val tracker: ITra
         private var gMonitor: GMonitor? = null
 
         @JvmStatic
-        fun getInstance(): GMonitor? {
-            return gMonitor
-        }
+        fun getInstance(): GMonitor? = gMonitor
 
         private val appStart = SystemClock.uptimeMillis()
 

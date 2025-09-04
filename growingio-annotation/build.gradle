@@ -7,4 +7,4 @@ java {
 	targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+apply from: "${rootProject.projectDir}/gradle/publishMavenCentral.gradle"

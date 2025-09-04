@@ -53,4 +53,4 @@ dependencies {
 	annotationProcessor project(":growingio-annotation:compiler")
 }
 
-apply from: "${rootProject.projectDir}/gradle/publishMaven.gradle"
+apply from: "${rootProject.projectDir}/gradle/publishMavenCentral.gradle"

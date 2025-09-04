@@ -27,12 +27,10 @@ internal object GrowingComposeKt {
 
     private const val TAG = "GrowingComposeKt"
 
-    fun String.path(): String {
-        return if (this.startsWith("/")) {
-            this
-        } else {
-            "/$this"
-        }
+    fun String.path(): String = if (this.startsWith("/")) {
+        this
+    } else {
+        "/$this"
     }
 
     private const val OFFSET_NODE_CLASSNAME: String =

@@ -42,9 +42,7 @@ class Operation(op: String, startTimestamp: Long? = null) {
         data[key] = value
     }
 
-    fun isFinished(): Boolean {
-        return finished.get()
-    }
+    fun isFinished(): Boolean = finished.get()
 
     fun setStatus(status: OperationStatus, e: Throwable?) {
         this.status = status

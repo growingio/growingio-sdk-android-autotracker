@@ -11,7 +11,9 @@ import com.growingio.android.gmonitor.event.Breadcrumb
  *
  * @author cpacm 2022/9/6
  */
-class UncaughtExceptionHandlerIntegration : Integration, Thread.UncaughtExceptionHandler {
+class UncaughtExceptionHandlerIntegration :
+    Integration,
+    Thread.UncaughtExceptionHandler {
 
     private lateinit var tracker: ITracker
     private lateinit var options: GMonitorOption
@@ -82,9 +84,7 @@ interface UncaughtExceptionHandler {
             val instance: Adapter = Adapter()
         }
 
-        override fun getDefaultUncaughtExceptionHandler(): Thread.UncaughtExceptionHandler? {
-            return Thread.getDefaultUncaughtExceptionHandler()
-        }
+        override fun getDefaultUncaughtExceptionHandler(): Thread.UncaughtExceptionHandler? = Thread.getDefaultUncaughtExceptionHandler()
 
         override fun setDefaultUncaughtExceptionHandler(handler: Thread.UncaughtExceptionHandler?) {
             Thread.setDefaultUncaughtExceptionHandler(handler)

@@ -1,25 +1,25 @@
 [versions]
-compileSdk = "34"
+compileSdk = "35"
 minSdk = "17"
 
 # https://developer.android.google.cn/jetpack/androidx/explorer?hl=en&case=all
-androidxlifecycle = "2.8.2"
+androidxlifecycle = "2.9.0"
 androidxtest = "1.5.0"
-navigation = "2.5.3"
+navigation = "2.9.0"
 androidx-compose-bom = "2024.09.00"
 androidx-activity-compose = "1.9.1"
 
-pluginGradle = "7.4.2" # 4.2.2-7.4.2
+pluginGradle = "8.10.0" # 4.2.2-7.4.2
 # pluginGradle = "8.5.2" # 4.2.2-7.4.2
-kotlin = "2.0.0"
+kotlin = "2.1.20"
 
-spotless = "6.25.0"
+spotless = "7.0.4"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-compiler
 # composeBom = "2023.04.00"
 
 # https://github.com/Kotlin/kotlinx.coroutines
-coroutines = "1.8.1"
+coroutines = "1.10.2"
 # https://github.com/pinterest/ktlint
 ktlint = "0.48.2"
 # https://square.github.io/okhttp/changelogs/changelog_4x/
@@ -27,12 +27,12 @@ ktlint = "0.48.2"
 okhttp3 = "3.12.13"
 
 # https://github.com/google/protobuf-gradle-plugin
-protobufPlugin = "0.9.1"
-protobuf = "3.22.3"
+protobufPlugin = "0.9.5"
+protobuf = "4.31.1"
 
 # !!! SDK VERSION !!!
-growingio = "4.4.3"
-growingioCode = "40403"
+growingio = "4.4.4-SNAPSHOT"
+growingioCode = "40404"
 growingioPlugin = "4.4.0"
 junit = "1.1.5"
 
@@ -41,13 +41,14 @@ android-application = { id = "com.android.application", version.ref = "pluginGra
 android-library = { id = "com.android.library", version.ref = "pluginGradle" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-nexus-staging = { id = "io.codearte.nexus-staging", version = "0.30.0" }
 sonarqube = { id = "org.sonarqube", version = "3.4.0.2513" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 growingio-plugin = { id = "com.growingio.android.autotracker", version.ref = "growingioPlugin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+
+maven-publish = { id = "com.vanniktech.maven.publish", version = "0.33.0" }
 
 [libraries]
 # [growingio]
@@ -119,6 +120,8 @@ support-multidex = { module = "com.android.support:multidex", version = "1.0.3" 
 # [google]
 protobufc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
+protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
+protobuf-lite = "com.google.protobuf:protobuf-lite:3.0.0"
 
 google-material = "com.google.android.material:material:1.7.0"
 
