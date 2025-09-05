@@ -270,6 +270,42 @@ public class Autotracker extends Tracker {
         setPageAttributes(page, attributes);
     }
 
+    public void setPageTitle(final Activity activity, final String title) {
+        if (!isInited) return;
+        if (activity == null) {
+            Logger.e(TAG, "activity is NULL");
+            return;
+        }
+        TrackMainThread.trackMain().runOnUiThread(() -> PageProvider.get().setPageTitle(activity, title));
+    }
+
+    public void setPageTitle(final androidx.fragment.app.Fragment page, final String title) {
+        if (!isInited) return;
+        if (page == null) {
+            Logger.e(TAG, "page is NULL");
+            return;
+        }
+        TrackMainThread.trackMain().runOnUiThread(() -> PageProvider.get().setPageTitle(SuperFragment.makeX(page), title));
+    }
+
+    public void setPageTitleSystem(final android.app.Fragment page, final String title) {
+        if (!isInited) return;
+        if (page == null) {
+            Logger.e(TAG, "page is NULL");
+            return;
+        }
+        TrackMainThread.trackMain().runOnUiThread(() -> PageProvider.get().setPageTitle(SuperFragment.make(page), title));
+    }
+
+    public void setPageTitleSupport(final android.support.v4.app.Fragment page, final String title) {
+        if (!isInited) return;
+        if (page == null) {
+            Logger.e(TAG, "page NULL");
+            return;
+        }
+        TrackMainThread.trackMain().runOnUiThread(() -> PageProvider.get().setPageTitle(SuperFragment.makeSupport(page), title));
+    }
+
     public void trackViewImpression(View view, String impressionEventName) {
         if (!isInited) return;
         trackViewImpression(view, impressionEventName, null);
