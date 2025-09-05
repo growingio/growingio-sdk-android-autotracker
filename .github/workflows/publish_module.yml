@@ -38,6 +38,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -67,17 +71,14 @@ jobs:
           bash ./gradle/publishAllToMavenLocal.sh
 
       # 解码秘钥
-      - name: Decode
-        run: |
-          echo "${{secrets.SIGNING_SECRET_KEY_RING_FILE}}" > ~/.gradle/secring.gpg.b64
-          base64 -d ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
-      # $(echo ~/.gradle/secring.gpg)
+#      - name: Decode
+#        run: |
+#          echo "${{secrets.SIGNING_SECRET_KEY_RING_FILE}}" > ~/.gradle/secring.gpg.b64
+#          base64 -d ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
+#      # $(echo ~/.gradle/secring.gpg)
 
       - name: Publish to MavenCentral
         run: ./gradlew :${{ inputs.module }}:publishToMavenCentral -PCI_SELECT_VERSION="${{ inputs.version }}" --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.NEXUS_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.NEXUS_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
