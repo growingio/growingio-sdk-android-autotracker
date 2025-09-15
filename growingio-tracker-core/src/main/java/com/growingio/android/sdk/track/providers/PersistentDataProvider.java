@@ -198,7 +198,7 @@ public class PersistentDataProvider implements TrackerLifecycleProvider {
     }
 
     public boolean isSendVisitAfterRefreshSessionId() {
-        return dataSharer.getBoolean(KEY_SEND_VISIT_AFTER_REFRESH_SESSION_ID, false);
+        return dataSharer.getBoolean(KEY_SEND_VISIT_AFTER_REFRESH_SESSION_ID, true);
     }
 
     public void setSendVisitAfterRefreshSessionId(boolean sendVisitAfterRefreshSessionId) {

@@ -102,7 +102,7 @@ public class UserInfoProvider implements TrackerLifecycleProvider {
     @TrackThread
     private void needSendVisit(String newUserId) {
         String mLatestNonNullUserId = persistentDataProvider.getLatestNonNullUserId();
-        if (newUserId != null && newUserId.length() != 0) {
+        if (newUserId != null && !newUserId.isEmpty()) {
             if (!TextUtils.isEmpty(mLatestNonNullUserId) && !newUserId.equals(mLatestNonNullUserId)) {
                 Logger.d(TAG, "resend visit after UserIdChanged");
                 sessionProvider.refreshSessionId();
