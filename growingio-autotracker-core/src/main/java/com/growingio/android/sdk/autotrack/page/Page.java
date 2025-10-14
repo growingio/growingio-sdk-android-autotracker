@@ -108,10 +108,6 @@ public abstract class Page<T> {
     }
 
     public void setReferralPage(String referralPage) {
-        // 页面来源只记录第一次产生时的值
-        if (this.mReferralPage != null && !this.mReferralPage.isEmpty()) {
-            return;
-        }
         this.mReferralPage = referralPage;
     }
 
