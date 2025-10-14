@@ -59,6 +59,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
 
     private static class SingleInstance {
         private static final PageProvider INSTANCE = new PageProvider();
+        private static final String REFERRAL_PAGE = "referral_page";
     }
 
     private EventBuilderProvider eventBuilderProvider;
@@ -124,11 +125,32 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         }
     }
 
+    private String getReferralPage() {
+        Page<?> page = CACHE_PAGES.get(SingleInstance.REFERRAL_PAGE);
+        if (page == null) return null;
+        return page.getName();
+    }
+
+    private void setReferralPage(Page<?> page) {
+        if (page == null) return;
+        CACHE_PAGES.put(SingleInstance.REFERRAL_PAGE, page);
+    }
+
+    private void removeReferralPage(Page<?> page) {
+        if (page == null) return;
+        if (page == CACHE_PAGES.get(SingleInstance.REFERRAL_PAGE)) {
+            CACHE_PAGES.remove(SingleInstance.REFERRAL_PAGE);
+        }
+    }
+
+
     @UiThread
     private void createOrResumeActivity(Activity activity) {
         ActivityPage page = generateActivityPageInTree(activity);
         ViewAttributeUtil.setViewPage(activity.getWindow().getDecorView(), page);
         page.refreshShowTimestamp();
+        page.setReferralPage(getReferralPage());
+
         sendPage(page);
     }
 
@@ -229,6 +251,8 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         } else {
             Logger.d(TAG, "AutotrackOptions: page enable is false");
         }
+
+        setReferralPage(page);
     }
 
     private void generatePageEvent(Page<?> page) {
@@ -244,6 +268,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
                 new PageEvent.Builder()
                         .setPath(page.path())
                         .setTitle(page.getTitle())
+                        .setReferralPage(page.getReferralPage())
                         .setTimestamp(page.getShowTimestamp())
                         .setOrientation(orientation)
                         .setAttributes(page.getAttributes())
@@ -361,6 +386,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
         pageParent.addChildren(page);
         ViewAttributeUtil.setViewPage(fragment.getView(), page);
         page.refreshShowTimestamp();
+        page.setReferralPage(getReferralPage());
 
         sendPage(page);
     }

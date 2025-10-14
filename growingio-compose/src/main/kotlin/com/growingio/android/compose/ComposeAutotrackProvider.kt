@@ -38,11 +38,13 @@ class ComposeAutotrackProvider :
         fun addOrResumeComposePage(alias: String, attributes: Map<String, String>? = null) {
             if (!TrackerContext.initializedSuccessfully()) return
             val pageNode = ComposePageNode(alias, Rect.Zero, attributes)
+            val lastPage = pageCache.lastOrNull()
             pageCache.add(pageNode)
 
             TrackMainThread.trackMain().postEventToTrackMain(
                 PageEvent.Builder()
                     .setPath(alias.path())
+                    .setReferralPage(lastPage?.alias)
                     .setTitle(alias)
                     .setTimestamp(System.currentTimeMillis())
                     .setAttributes(attributes),
