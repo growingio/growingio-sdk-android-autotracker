@@ -128,7 +128,7 @@ public class PageProvider implements IActivityLifecycle, TrackerLifecycleProvide
     private String getReferralPage() {
         Page<?> page = CACHE_PAGES.get(SingleInstance.REFERRAL_PAGE);
         if (page == null) return null;
-        return page.getName();
+        return page.path();
     }
 
     private void setReferralPage(Page<?> page) {

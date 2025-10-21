@@ -44,7 +44,7 @@ class ComposeAutotrackProvider :
             TrackMainThread.trackMain().postEventToTrackMain(
                 PageEvent.Builder()
                     .setPath(alias.path())
-                    .setReferralPage(lastPage?.alias)
+                    .setReferralPage(lastPage?.alias?.path())
                     .setTitle(alias)
                     .setTimestamp(System.currentTimeMillis())
                     .setAttributes(attributes),
