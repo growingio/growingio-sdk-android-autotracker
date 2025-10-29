@@ -108,8 +108,6 @@ public class FlutterPluginProvider implements TrackerLifecycleProvider {
         }
     }
 
-    private String lastPagePath = null;
-
     public void trackFlutterPage(Map args) {
         try {
             String title = (String) args.get("title");
@@ -121,15 +119,18 @@ public class FlutterPluginProvider implements TrackerLifecycleProvider {
             if (args.containsKey("timestamp")) {
                 timeStamp = (Long) args.get("timestamp");
             }
+            String referralPage = "";
+            if (args.containsKey("referralPage")) {
+                referralPage = (String) args.get("referralPage");
+            }
             TrackMainThread.trackMain().postEventToTrackMain(
                     new PageEvent.Builder()
                             .setPath(path)
-                            .setReferralPage(lastPagePath)
+                            .setReferralPage(referralPage)
                             .setTitle(title)
                             .setTimestamp(timeStamp)
                             .setAttributes(builder.build())
             );
-            lastPagePath = path;
         } catch (Exception e) {
             Logger.e(TAG, e);
         }
