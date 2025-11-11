@@ -45,6 +45,7 @@ public abstract class Page<T> {
     private String mAlias;
     private String mTitle;
     private String mPath;
+    private String mReferralPage;
 
     protected String mOriginPath;
     private String xIndex;
@@ -101,6 +102,14 @@ public abstract class Page<T> {
     public abstract String getClassName();
 
     public abstract View getView();
+
+    public String getReferralPage() {
+        return mReferralPage;
+    }
+
+    public void setReferralPage(String referralPage) {
+        this.mReferralPage = referralPage;
+    }
 
     public String getTitle() {
         if (mTitle != null) return mTitle;

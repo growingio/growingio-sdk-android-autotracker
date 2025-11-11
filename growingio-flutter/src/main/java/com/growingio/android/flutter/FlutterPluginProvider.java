@@ -119,9 +119,14 @@ public class FlutterPluginProvider implements TrackerLifecycleProvider {
             if (args.containsKey("timestamp")) {
                 timeStamp = (Long) args.get("timestamp");
             }
+            String referralPage = "";
+            if (args.containsKey("referralPage")) {
+                referralPage = (String) args.get("referralPage");
+            }
             TrackMainThread.trackMain().postEventToTrackMain(
                     new PageEvent.Builder()
                             .setPath(path)
+                            .setReferralPage(referralPage)
                             .setTitle(title)
                             .setTimestamp(timeStamp)
                             .setAttributes(builder.build())
