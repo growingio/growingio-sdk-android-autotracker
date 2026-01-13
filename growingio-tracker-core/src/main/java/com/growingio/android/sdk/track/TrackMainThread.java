@@ -184,6 +184,16 @@ public final class TrackMainThread {
         if (eventSender != null) eventSender.sendEvent(event);
     }
 
+    public void flushEvents() {
+        postActionToTrackMain(() -> {
+            if (coreConfiguration != null && coreConfiguration.isDataCollectionEnabled()) {
+                if (eventSender != null) {
+                    eventSender.flush();
+                }
+            }
+        });
+    }
+
     public synchronized Activity getForegroundActivity() {
         if (activityStateProvider == null) return null;
         return activityStateProvider.getForegroundActivity();

@@ -74,6 +74,10 @@ public class EventSender {
         mSendHandler = new SendHandler(thread.getLooper(), dataUploadInterval * 1000L);
     }
 
+    public void flush(){
+        mSendHandler.flush();
+    }
+
     public void shutdown() {
         mProcessLock.release();
         mSendHandler.removeCallbacksAndMessages(null);
@@ -321,14 +325,18 @@ public class EventSender {
                 if (cacheEventNum >= EVENTS_BULK_SIZE && isNotBackoffState()) {
                     Logger.w(TAG, "cacheEventNum >= EVENTS_BULK_SIZE, merge events and send.");
                     cacheEventNum = 0;
-                    removeMessages(MSG_SEND_UNINSTANT_EVENTS);
-                    sendEmptyMessage(MSG_SEND_UNINSTANT_EVENTS);
+                    flush();
                 }
             } else {
-                removeMessages(MSG_SEND_UNINSTANT_EVENTS);
-                sendEmptyMessage(MSG_SEND_UNINSTANT_EVENTS);
+                flush();
             }
         }
+
+        private void flush(){
+            removeMessages(MSG_SEND_UNINSTANT_EVENTS);
+            sendEmptyMessage(MSG_SEND_UNINSTANT_EVENTS);
+        }
+
 
         @Override
         public void handleMessage(@NonNull Message msg) {

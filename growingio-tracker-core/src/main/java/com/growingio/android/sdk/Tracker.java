@@ -155,6 +155,11 @@ public class Tracker {
         TrackEventGenerator.generateCustomEvent(eventName, attributes);
     }
 
+    public void flushEvents() {
+        if (!isInited) return;
+        TrackMainThread.trackMain().flushEvents();
+    }
+
     public void setDynamicGeneralPropsGenerator(DynamicGeneralPropsGenerator generator) {
         if (!isInited) return;
         trackerContext.getEventBuilderProvider().setDynamicGeneralPropGenerator(generator);
