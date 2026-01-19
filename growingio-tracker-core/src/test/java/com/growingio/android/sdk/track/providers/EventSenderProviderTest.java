@@ -1,19 +1,19 @@
 /*
- * Copyright (C) 2023 Beijing Yishu Technology Co., Ltd.
+ *  Copyright (C) 2026 Beijing Yishu Technology Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
-package com.growingio.android.sdk.track.middleware;
+package com.growingio.android.sdk.track.providers;
 
 import android.app.Application;
 import android.content.pm.ProviderInfo;
@@ -28,6 +28,9 @@ import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.TrackEventType;
+import com.growingio.android.sdk.track.middleware.EventDatabase;
+import com.growingio.android.sdk.track.middleware.EventDbResult;
+import com.growingio.android.sdk.track.middleware.SendResponse;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.database.DatabaseDataLoader;
@@ -50,28 +53,28 @@ import java.util.concurrent.TimeUnit;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
-public class EventSenderTest {
+public class EventSenderProviderTest {
 
     private final ContentProviderController<EventDataContentProvider> controller =
             Robolectric.buildContentProvider(EventDataContentProvider.class);
     private final Application application = ApplicationProvider.getApplicationContext();
-    private EventSender eventSender;
 
     private TrackerContext context;
+    private EventSenderProvider eventSenderProvider;
 
     @Before
     public void setup() {
         context = new Tracker(application).getContext();
         ProviderInfo providerInfo = new ProviderInfo();
         providerInfo.authority = application.getPackageName() + "." + EventDataContentProvider.class.getSimpleName();
-
-        eventSender = new EventSender(application, context.getRegistry(), null, 0, 10);
         controller.create(providerInfo).get();
+
+        this.eventSenderProvider = context.getProvider(EventSenderProvider.class);
     }
 
     @Test
     public void eventSendTest() {
-        eventSender.setEventNetSender((events, mediaType) -> {
+        eventSenderProvider.setEventNetSender((events, mediaType) -> {
             try {
                 EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(events);
                 Truth.assertThat(list.getSerializedSize()).isEqualTo(1);
@@ -81,7 +84,7 @@ public class EventSenderTest {
             }
             return new SendResponse(204, 1000L);
         });
-        eventSender.sendEvent(new CustomEvent.Builder()
+        eventSenderProvider.sendEvent(new CustomEvent.Builder()
                 .setEventName("cpacm")
                 .build());
         Robolectric.flushForegroundThreadScheduler();
@@ -93,17 +96,17 @@ public class EventSenderTest {
     public void eventCacheTestPb() throws InvalidProtocolBufferException {
         context.getRegistry().register(EventDatabase.class, EventDbResult.class, new DatabaseDataLoader.Factory(context));
         context.getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
-        eventSender.removeAllEvents();
+        eventSenderProvider.removeAllEvents();
         CustomEvent ce = new CustomEvent.Builder()
                 .setEventName("cpacm").build();
-        eventSender.cacheEvent(ce);
-        eventSender.cacheEvent(ce);
-        eventSender.cacheEvent(ce);
-        EventDbResult dbResult = eventSender.getGEventsFromPolicy(ce.getSendPolicy());
+        eventSenderProvider.cacheEvent(ce);
+        eventSenderProvider.cacheEvent(ce);
+        eventSenderProvider.cacheEvent(ce);
+        EventDbResult dbResult = eventSenderProvider.getGEventsFromPolicy(ce.getSendPolicy());
         EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(dbResult.getData());
         Truth.assertThat(list.getValuesCount()).isEqualTo(3);
 
-        eventSender.setEventNetSender((events, mediaType) -> {
+        eventSenderProvider.setEventNetSender((events, mediaType) -> {
             try {
                 EventV3Protocol.EventV3List list1 = EventV3Protocol.EventV3List.parseFrom(events);
                 for (EventV3Protocol.EventV3Dto dto : list1.getValuesList()) {
@@ -116,9 +119,9 @@ public class EventSenderTest {
             }
             return new SendResponse(204, 1000L);
         });
-        eventSender.cacheEvent(ce);
-        eventSender.cacheEvent(ce);
-        eventSender.sendEvents(false);
+        eventSenderProvider.cacheEvent(ce);
+        eventSenderProvider.cacheEvent(ce);
+        eventSenderProvider.sendEvents(false);
         Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
     }
 
@@ -129,15 +132,15 @@ public class EventSenderTest {
 
         CustomEvent ce = new CustomEvent.Builder()
                 .setEventName("cpacm").build();
-        eventSender.cacheEvent(ce);
-        eventSender.cacheEvent(ce);
-        eventSender.cacheEvent(ce);
-        EventDbResult dbResult = eventSender.getGEventsFromPolicy(ce.getSendPolicy());
+        eventSenderProvider.cacheEvent(ce);
+        eventSenderProvider.cacheEvent(ce);
+        eventSenderProvider.cacheEvent(ce);
+        EventDbResult dbResult = eventSenderProvider.getGEventsFromPolicy(ce.getSendPolicy());
         String result = new String(dbResult.getData());
         JSONArray jsonArray = new JSONArray(result);
         Truth.assertThat(jsonArray.length()).isEqualTo(3);
 
-        eventSender.setEventNetSender((events, mediaType) -> {
+        eventSenderProvider.setEventNetSender((events, mediaType) -> {
             try {
                 JSONArray array = new JSONArray(new String(events));
                 for (int i = 0; i < array.length(); i++) {
@@ -153,9 +156,9 @@ public class EventSenderTest {
 
             return new SendResponse(204, 1000L);
         });
-        eventSender.cacheEvent(ce);
-        eventSender.cacheEvent(ce);
-        eventSender.sendEvents(false);
+        eventSenderProvider.cacheEvent(ce);
+        eventSenderProvider.cacheEvent(ce);
+        eventSenderProvider.sendEvents(false);
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
     }
 }

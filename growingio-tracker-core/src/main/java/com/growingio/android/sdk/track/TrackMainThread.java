@@ -25,15 +25,14 @@ import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.CircularFifoQueue;
 import com.growingio.android.sdk.track.providers.ActivityStateProvider;
+import com.growingio.android.sdk.track.providers.EventSenderProvider;
 import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
-import com.growingio.android.sdk.track.middleware.EventSender;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 import com.growingio.android.sdk.track.providers.SessionProvider;
-import com.growingio.android.sdk.track.middleware.EventHttpSender;
 
 /**
  * GrowingIO主线程
@@ -45,7 +44,7 @@ public final class TrackMainThread {
 
     private final Handler mainHandler;
     private final Handler uiHandler;
-    private EventSender eventSender;
+    private EventSenderProvider eventSenderProvider;
     private CoreConfiguration coreConfiguration;
     private EventBuilderProvider eventBuilderProvider;
     private PersistentDataProvider persistentDataProvider;
@@ -69,13 +68,7 @@ public final class TrackMainThread {
         this.persistentDataProvider = context.getProvider(PersistentDataProvider.class);
         this.sessionProvider = context.getProvider(SessionProvider.class);
         this.activityStateProvider = context.getActivityStateProvider();
-        int uploadInterval = coreConfiguration.isDebugEnabled() ? 0 : coreConfiguration.getDataUploadInterval();
-        eventSender = new EventSender(
-                this.context,
-                context.getRegistry(),
-                new EventHttpSender(context),
-                uploadInterval,
-                coreConfiguration.getCellularDataLimit());
+        this.eventSenderProvider = context.getProvider(EventSenderProvider.class);
     }
 
     public void shutdown() {
@@ -86,8 +79,7 @@ public final class TrackMainThread {
         this.persistentDataProvider = null;
         this.sessionProvider = null;
         this.activityStateProvider = null;
-        this.eventSender.shutdown();
-        this.eventSender = null;
+        this.eventSenderProvider = null;
     }
 
     private static class SingleInstance {
@@ -181,17 +173,7 @@ public final class TrackMainThread {
             // we should resend visitEvent when sessionId refreshed
             sessionProvider.generateVisit();
         }
-        if (eventSender != null) eventSender.sendEvent(event);
-    }
-
-    public void flushEvents() {
-        postActionToTrackMain(() -> {
-            if (coreConfiguration != null && coreConfiguration.isDataCollectionEnabled()) {
-                if (eventSender != null) {
-                    eventSender.flush();
-                }
-            }
-        });
+        if (eventSenderProvider != null) eventSenderProvider.sendEvent(event);
     }
 
     public synchronized Activity getForegroundActivity() {

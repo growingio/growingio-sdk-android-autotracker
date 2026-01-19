@@ -15,11 +15,22 @@
  */
 package com.growingio.android.sdk.track.providers;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.RequiresApi;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.listener.IActivityLifecycle;
@@ -37,8 +48,12 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
     private WeakReference<Activity> mResumeActivity = new WeakReference<>(null);
     private WeakReference<Activity> mForegroundActivity = new WeakReference<>(null);
     private ConfigurationProvider configurationProvider;
+    private EventSenderProvider eventSenderProvider;
 
     private WeakReference<Application> applicationWeakReference;
+
+    private ConnectivityManager.NetworkCallback networkCallback;
+    private BroadcastReceiver networkReceiver;
 
     ActivityStateProvider(Context context) {
         if (context instanceof Application) {
@@ -58,6 +73,18 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
     @Override
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
+        eventSenderProvider = context.getProvider(EventSenderProvider.class);
+
+        Application application = applicationWeakReference.get();
+        if (application == null) {
+            Logger.e(TAG, "Application is null, can't register network callback.");
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            registerNetworkCallback();
+        } else {
+            registerNetworkReceiver(application);
+        }
     }
 
     public void makeupActivityLifecycle() {
@@ -187,12 +214,75 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
         listener.onActivityLifecycle(action);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @SuppressLint("WrongConstant")
+    private void registerNetworkCallback() {
+        Application application = applicationWeakReference.get();
+        if (application == null) {
+            Logger.e(TAG, "Application is null, can't register network callback.");
+            return;
+        }
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
+            Logger.e(TAG, "ConnectivityManager is null, can't register network callback.");
+            return;
+        }
+
+        NetworkRequest request = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        this.networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                super.onAvailable(network);
+                Logger.i(TAG, "Network is available, flush messages.");
+                eventSenderProvider.flush();
+            }
+        };
+
+        connectivityManager.registerNetworkCallback(request, networkCallback);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void registerNetworkReceiver(Application application) {
+        networkReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                    ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    if (cm == null) return;
+                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                    if (activeNetwork != null && activeNetwork.isConnected()) {
+                        Logger.i(TAG, "Network is available, flush messages.");
+                        eventSenderProvider.flush();
+                    }
+                }
+            }
+        };
+        application.registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
     @Override
     public void shutdown() {
         if (applicationWeakReference != null) {
             Application application = applicationWeakReference.get();
             if (application != null) {
                 application.unregisterActivityLifecycleCallbacks(this);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (networkCallback != null) {
+                        ConnectivityManager connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
+                        if (connectivityManager != null) {
+                            connectivityManager.unregisterNetworkCallback(networkCallback);
+                        }
+                    }
+                } else {
+                    if (networkReceiver != null) {
+                        application.unregisterReceiver(networkReceiver);
+                    }
+                }
             }
         }
     }

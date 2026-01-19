@@ -37,6 +37,7 @@ import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeepLinkProvider;
+import com.growingio.android.sdk.track.providers.EventSenderProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.providers.SessionProvider;
@@ -157,7 +158,15 @@ public class Tracker {
 
     public void flushEvents() {
         if (!isInited) return;
-        TrackMainThread.trackMain().flushEvents();
+        TrackMainThread.trackMain().postActionToTrackMain(() -> {
+            ConfigurationProvider configurationProvider = trackerContext.getConfigurationProvider();
+            if (configurationProvider != null && configurationProvider.core()!=null  && configurationProvider.core().isDataCollectionEnabled()) {
+                EventSenderProvider eventSenderProvider = trackerContext.getProvider(EventSenderProvider.class);
+                if (eventSenderProvider != null) {
+                    eventSenderProvider.flush();
+                }
+            }
+        });
     }
 
     public void setDynamicGeneralPropsGenerator(DynamicGeneralPropsGenerator generator) {
