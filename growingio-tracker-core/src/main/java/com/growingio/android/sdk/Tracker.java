@@ -129,6 +129,7 @@ public class Tracker {
 
         // makeup activity lifecycle
         trackerContext.getActivityStateProvider().makeupActivityLifecycle();
+        trackerContext.getActivityStateProvider().listenNetworkChange();
 
     }
 
@@ -160,7 +161,7 @@ public class Tracker {
         if (!isInited) return;
         TrackMainThread.trackMain().postActionToTrackMain(() -> {
             ConfigurationProvider configurationProvider = trackerContext.getConfigurationProvider();
-            if (configurationProvider != null && configurationProvider.core()!=null  && configurationProvider.core().isDataCollectionEnabled()) {
+            if (configurationProvider != null && configurationProvider.core() != null && configurationProvider.core().isDataCollectionEnabled()) {
                 EventSenderProvider eventSenderProvider = trackerContext.getProvider(EventSenderProvider.class);
                 if (eventSenderProvider != null) {
                     eventSenderProvider.flush();

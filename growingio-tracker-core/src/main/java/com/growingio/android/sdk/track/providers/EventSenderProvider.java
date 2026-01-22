@@ -54,7 +54,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
     private EventSenderProvider.SendHandler sendHandler;
     private IEventNetSender eventNetSender;
     private ProcessLock processLock;
-    private SharedPreferences sharedPreferences;
+    private  SharedPreferences sharedPreferences;
 
     @Override
     @SuppressWarnings("WrongConstant")
@@ -64,17 +64,17 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
 
         sharedPreferences = context.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
         processLock = new ProcessLock(context, EventSenderProvider.class.getName());
-
         eventNetSender = new EventHttpSender(context);
 
         HandlerThread thread = new HandlerThread(EventSenderProvider.class.getName());
         thread.start();
         sendHandler = new EventSenderProvider.SendHandler(thread.getLooper(), dataUploadInterval * 1000L);
+
         this.context = context;
     }
 
-    public void flush(){
-        sendHandler.flush();
+    public void flush() {
+        if (sendHandler != null) sendHandler.flush();
     }
 
     @Override
@@ -188,7 +188,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
      * @param onlyInstant true -- 仅发送实时消息
      */
     void sendEvents(boolean onlyInstant) {
-        if (!processLock.isAcquired()) {
+        if (processLock == null || !processLock.isAcquired()) {
             Logger.w(TAG, "sdk sendEvents will in main process,not in sub process.");
             return;
         }
@@ -209,7 +209,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
 
         boolean succeeded = true;
         long cellularDataLimit = configurationProvider.core().getCellularDataLimit();
-        long cellularDataLimitTotal = cellularDataLimit* 1024L * 1024L;
+        long cellularDataLimitTotal = cellularDataLimit * 1024L * 1024L;
         for (int policy : uploadEvents) {
             if (!succeeded) {
                 Logger.e(TAG, "upload events break with http failed.");
@@ -334,7 +334,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
             }
         }
 
-        private void flush(){
+        private void flush() {
             removeMessages(MSG_SEND_UNINSTANT_EVENTS);
             sendEmptyMessage(MSG_SEND_UNINSTANT_EVENTS);
         }

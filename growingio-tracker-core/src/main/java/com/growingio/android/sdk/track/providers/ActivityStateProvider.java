@@ -74,7 +74,9 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
         eventSenderProvider = context.getProvider(EventSenderProvider.class);
+    }
 
+    public void listenNetworkChange() {
         Application application = applicationWeakReference.get();
         if (application == null) {
             Logger.e(TAG, "Application is null, can't register network callback.");
@@ -238,7 +240,7 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
             public void onAvailable(Network network) {
                 super.onAvailable(network);
                 Logger.i(TAG, "Network is available, flush messages.");
-                eventSenderProvider.flush();
+                if (eventSenderProvider != null) eventSenderProvider.flush();
             }
         };
 
@@ -256,7 +258,7 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
                     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                     if (activeNetwork != null && activeNetwork.isConnected()) {
                         Logger.i(TAG, "Network is available, flush messages.");
-                        eventSenderProvider.flush();
+                        if (eventSenderProvider != null) eventSenderProvider.flush();
                     }
                 }
             }
