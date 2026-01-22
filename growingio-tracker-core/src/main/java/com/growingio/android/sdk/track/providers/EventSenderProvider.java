@@ -62,12 +62,14 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
         configurationProvider = context.getConfigurationProvider();
         long dataUploadInterval = configurationProvider.core().getDataUploadInterval();
 
+        sharedPreferences = context.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
+        processLock = new ProcessLock(context, EventSenderProvider.class.getName());
+
+        eventNetSender = new EventHttpSender(context);
+
         HandlerThread thread = new HandlerThread(EventSenderProvider.class.getName());
         thread.start();
         sendHandler = new EventSenderProvider.SendHandler(thread.getLooper(), dataUploadInterval * 1000L);
-        eventNetSender = new EventHttpSender(context);
-        sharedPreferences = context.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
-        processLock = new ProcessLock(context, EventSenderProvider.class.getName());
         this.context = context;
     }
 
