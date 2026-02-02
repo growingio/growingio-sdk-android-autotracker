@@ -74,7 +74,9 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
     }
 
     public void flush() {
-        if (sendHandler != null) sendHandler.flush();
+        if (sendHandler != null && configurationProvider.core().isDataCollectionEnabled()) {
+            sendHandler.flush();
+        }
     }
 
     @Override
