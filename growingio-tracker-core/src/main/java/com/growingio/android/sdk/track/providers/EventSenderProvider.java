@@ -54,7 +54,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
     private EventSenderProvider.SendHandler sendHandler;
     private IEventNetSender eventNetSender;
     private ProcessLock processLock;
-    private  SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
 
     @Override
     @SuppressWarnings("WrongConstant")
