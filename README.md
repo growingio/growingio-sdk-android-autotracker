@@ -18,6 +18,10 @@ GrowingIO Autotracker
 
 [SDK 3.0 集成文档](https://growingio.github.io/growingio-sdk-docs/)
 
+## 开发者文档
+
+- [发布新版本指南](RELEASE.md) - 如何发布 SDK 新版本
+
 ## License
 ```
 Copyright (C) 2020 Beijing Yishu Technology Co., Ltd.
