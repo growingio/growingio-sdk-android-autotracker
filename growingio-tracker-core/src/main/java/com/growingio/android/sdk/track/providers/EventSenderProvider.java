@@ -60,7 +60,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
     @SuppressWarnings("WrongConstant")
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
-        long dataUploadInterval = configurationProvider.core().getDataUploadInterval();
+        long dataUploadInterval = configurationProvider.core().isDebugEnabled() ? 0L : configurationProvider.core().getDataUploadInterval();
 
         sharedPreferences = context.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
         processLock = new ProcessLock(context, EventSenderProvider.class.getName());
