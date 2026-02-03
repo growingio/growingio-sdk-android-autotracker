@@ -62,7 +62,7 @@ git push origin master
      - 性能优化或其他改进
      
      ## 完整更新日志
-     查看 [所有提交](https://github.com/growingio/growingio-sdk-android-autotracker/compare/vx.y.z-1...vx.y.z)
+     查看 [所有提交](https://github.com/growingio/growingio-sdk-android-autotracker/compare/v上一个版本...vx.y.z)
      ```
 4. 点击 "Publish release"
 
