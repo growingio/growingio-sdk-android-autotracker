@@ -36,6 +36,7 @@ public class SessionProvider implements IActivityLifecycle, TrackerLifecycleProv
     private ConfigurationProvider configurationProvider;
     private PersistentDataProvider persistentDataProvider;
     private ActivityStateProvider activityStateProvider;
+    private EventSenderProvider eventSenderProvider;
 
     protected SessionProvider() {
     }
@@ -46,6 +47,7 @@ public class SessionProvider implements IActivityLifecycle, TrackerLifecycleProv
         configurationProvider = context.getConfigurationProvider();
         sessionInterval = configurationProvider.core().getSessionInterval() * 1000L;
         persistentDataProvider = context.getProvider(PersistentDataProvider.class);
+        eventSenderProvider = context.getProvider(EventSenderProvider.class);
         activityList.clear();
         activityStateProvider = context.getActivityStateProvider();
         activityStateProvider.registerActivityLifecycleListener(this);
@@ -117,6 +119,7 @@ public class SessionProvider implements IActivityLifecycle, TrackerLifecycleProv
                         @Override
                         public void run() {
                             TrackEventGenerator.generateAppClosedEvent();
+                            eventSenderProvider.flush();
                         }
                     });
                 }

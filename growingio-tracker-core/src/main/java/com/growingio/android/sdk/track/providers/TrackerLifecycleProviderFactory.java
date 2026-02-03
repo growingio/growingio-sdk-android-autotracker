@@ -56,6 +56,7 @@ public class TrackerLifecycleProviderFactory {
         providerStore.put(EventBuilderProvider.class, new EventBuilderProvider());
         providerStore.put(TimingEventProvider.class, new TimingEventProvider());
         providerStore.put(UserInfoProvider.class, new UserInfoProvider());
+        providerStore.put(EventSenderProvider.class, new EventSenderProvider());
 
         return providerStore;
     }

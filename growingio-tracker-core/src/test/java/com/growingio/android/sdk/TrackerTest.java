@@ -80,6 +80,8 @@ public class TrackerTest {
         testLibraryGioModule.registerComponents(tracker.getContext());
 
         tracker.registerComponent(testLibraryGioModule);
+
+        tracker.flushEvents();
     }
 
     @Test
