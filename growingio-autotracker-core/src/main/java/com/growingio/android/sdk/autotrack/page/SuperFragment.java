@@ -17,7 +17,6 @@ package com.growingio.android.sdk.autotrack.page;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.res.Resources;
 import android.view.View;
 
 import androidx.annotation.Nullable;
