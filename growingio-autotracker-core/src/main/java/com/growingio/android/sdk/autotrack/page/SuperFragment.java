@@ -137,7 +137,7 @@ public abstract class SuperFragment<T> {
             if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
                 return getRealFragment().getResources().getResourceEntryName(id);
-            } catch (Resources.NotFoundException ignored) {
+            } catch (Exception ignored) {
             }
             return null;
         }
@@ -208,7 +208,7 @@ public abstract class SuperFragment<T> {
             if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
                 return getRealFragment().getResources().getResourceEntryName(id);
-            } catch (Resources.NotFoundException ignored) {
+            } catch (Exception ignored) {
             }
             return null;
         }
@@ -279,7 +279,7 @@ public abstract class SuperFragment<T> {
             if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
                 return getRealFragment().getResources().getResourceEntryName(id);
-            } catch (Resources.NotFoundException ignored) {
+            } catch (Exception ignored) {
             }
             return null;
         }
