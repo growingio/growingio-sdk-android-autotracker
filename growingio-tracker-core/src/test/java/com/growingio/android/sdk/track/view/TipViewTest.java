@@ -16,9 +16,12 @@
 package com.growingio.android.sdk.track.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.view.MotionEvent;
 import android.view.WindowManager;
+
+import androidx.test.core.app.ApplicationProvider;
 
 import com.growingio.android.sdk.track.providers.RobolectricActivity;
 import com.growingio.android.sdk.track.middleware.webservice.Circler;
@@ -62,6 +65,22 @@ public class TipViewTest {
 
         tipView.ready(activity);
         tipView.show(activity);
+        tipView.dismiss();
+    }
+
+    @Test
+    public void tipViewWithApplicationContextTest() {
+        Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
+        Context application = ApplicationProvider.getApplicationContext();
+
+        // circler/debugger 传入的是 application context，TipView 需要把它升级为 configuration context，
+        // 否则 Android 11+ 上 ViewConfiguration.get() 会触发 StrictMode 的 IncorrectContextUseViolation
+        TipView tipView = new TipView(application);
+        assertThat(tipView.getContext()).isNotSameInstanceAs(application);
+
+        tipView.setContent("this is test tip");
+        tipView.show(activity);
+        tipView.remove();
         tipView.dismiss();
     }
 
