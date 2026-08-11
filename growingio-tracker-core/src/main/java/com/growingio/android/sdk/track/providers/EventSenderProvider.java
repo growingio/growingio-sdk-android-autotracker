@@ -178,7 +178,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
             }
         } catch (Throwable e) {
             // binder call to system_server, see NetworkUtil#getActiveNetworkInfo
-            Logger.w(TAG, "getMemoryInfo failed: " + e.getMessage());
+            Logger.w(TAG, e, "getMemoryInfo failed");
         }
         return memoryInfo;
     }
@@ -357,7 +357,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
             try {
                 sendEvents(onlyInstant);
             } catch (Throwable e) {
-                Logger.e(TAG, "action: sendEvents failed: " + e.getMessage());
+                Logger.e(TAG, e, "action: sendEvents failed");
             }
         }
 

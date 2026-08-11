@@ -25,7 +25,6 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,6 +37,7 @@ import com.growingio.android.sdk.track.listener.ListenerContainer;
 import com.growingio.android.sdk.track.listener.event.ActivityLifecycleEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.ActivityUtil;
+import com.growingio.android.sdk.track.utils.NetworkUtil;
 import com.growingio.android.sdk.track.utils.SysTrace;
 
 import java.lang.ref.WeakReference;
@@ -253,10 +253,8 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                    ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                    if (cm == null) return;
-                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                    if (activeNetwork != null && activeNetwork.isConnected()) {
+                    // 复用 NetworkUtil，避免重复实现同一套 binder 调用（见 NetworkUtil#getActiveNetworkInfo 的兜底）
+                    if (NetworkUtil.getActiveNetworkState(context).isConnected()) {
                         Logger.i(TAG, "Network is available, flush messages.");
                         if (eventSenderProvider != null) eventSenderProvider.flush();
                     }

@@ -72,7 +72,7 @@ public class NetworkUtil {
             // getActiveNetworkInfo() is a binder call to system_server. Once system_server dies,
             // it throws DeadSystemRuntimeException(API 35+) or RuntimeException(DeadSystemException).
             // Some ROMs also throw SecurityException here. None of them should crash the host app.
-            Logger.w(TAG, "getActiveNetworkInfo failed: " + e.getMessage());
+            Logger.w(TAG, e, "getActiveNetworkInfo failed");
         }
         return null;
     }
