@@ -170,9 +170,16 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
 
     @SuppressLint("WrongConstant")
     private ActivityManager.MemoryInfo getMemoryInfo() {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        activityManager.getMemoryInfo(memoryInfo);
+        try {
+            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            if (activityManager != null) {
+                activityManager.getMemoryInfo(memoryInfo);
+            }
+        } catch (Throwable e) {
+            // binder call to system_server, see NetworkUtil#getActiveNetworkInfo
+            Logger.w(TAG, "getMemoryInfo failed: " + e.getMessage());
+        }
         return memoryInfo;
     }
 
@@ -342,15 +349,27 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
         }
 
 
+        /**
+         * 该方法运行在 SDK 自己的 HandlerThread 上，任何未捕获的异常都会导致宿主 App 进程崩溃。
+         * 这里兜底后循环仍能继续，等系统恢复后自动重新上报。
+         */
+        private void safelySendEvents(boolean onlyInstant) {
+            try {
+                sendEvents(onlyInstant);
+            } catch (Throwable e) {
+                Logger.e(TAG, "action: sendEvents failed: " + e.getMessage());
+            }
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {
                 case MSG_SEND_INSTANT_EVENTS:
-                    sendEvents(true);
+                    safelySendEvents(true);
                     break;
                 case MSG_SEND_UNINSTANT_EVENTS:
                     removeMessages(MSG_SEND_UNINSTANT_EVENTS);
-                    sendEvents(false);
+                    safelySendEvents(false);
                     if (backoffUploadInterval > 0) {
                         sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, backoffUploadInterval);
                     }
