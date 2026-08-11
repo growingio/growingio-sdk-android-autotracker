@@ -350,8 +350,8 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
 
 
         /**
-         * 该方法运行在 SDK 自己的 HandlerThread 上，任何未捕获的异常都会导致宿主 App 进程崩溃。
-         * 这里兜底后循环仍能继续，等系统恢复后自动重新上报。
+         * 运行在 SDK 自己的 HandlerThread 上，未捕获的异常会直接杀掉宿主 App 进程，因此这里必须兜底。
+         * 注意重新调度的逻辑要留在 catch 之外，否则一次异常会让上报循环永久停摆。
          */
         private void safelySendEvents(boolean onlyInstant) {
             try {

@@ -253,7 +253,6 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                    // 复用 NetworkUtil，避免重复实现同一套 binder 调用（见 NetworkUtil#getActiveNetworkInfo 的兜底）
                     if (NetworkUtil.getActiveNetworkState(context).isConnected()) {
                         Logger.i(TAG, "Network is available, flush messages.");
                         if (eventSenderProvider != null) eventSenderProvider.flush();
