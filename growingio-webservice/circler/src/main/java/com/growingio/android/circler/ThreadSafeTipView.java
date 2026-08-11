@@ -87,7 +87,10 @@ public class ThreadSafeTipView {
 
     public void setErrorMessage(int resid) {
         runOnUiThread(() -> {
-            tipView.setErrorMessage(context.getResources().getText(resid));
+            // 连接失败可能晚于 dismiss 到达，此时提示条已销毁，不再重建
+            if (tipView != null) {
+                tipView.setErrorMessage(context.getResources().getText(resid));
+            }
         });
     }
 
