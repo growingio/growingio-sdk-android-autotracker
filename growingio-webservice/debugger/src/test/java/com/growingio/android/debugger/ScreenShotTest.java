@@ -91,4 +91,16 @@ public class ScreenShotTest {
         screenshotProvider.sendScreenshotRefreshed("this test base64", 100);
     }
 
+    @Test
+    public void tipViewMessageAfterDismissTest() {
+        ScreenshotProvider screenshotProvider = context.getProvider(ScreenshotProvider.class);
+        Activity activity = Robolectric.buildActivity(RobolectricActivity.class).create().resume().get();
+        ShadowWH.activity = activity;
+
+        screenshotProvider.enableTipViewShow();
+        screenshotProvider.disableTipView();
+        // onFailed 可能晚于 cancel() 到达，此时提示条已销毁
+        screenshotProvider.setTipViewMessage(R.string.growing_debugger_connected_to_web_failed);
+    }
+
 }

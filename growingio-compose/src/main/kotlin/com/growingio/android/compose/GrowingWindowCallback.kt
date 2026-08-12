@@ -16,6 +16,7 @@
 package com.growingio.android.compose
 
 import android.content.Context
+import android.os.Build
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -23,12 +24,13 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.children
+import com.growingio.android.sdk.track.log.Logger
 import com.growingio.android.sdk.track.middleware.webservice.Circler
 import com.growingio.android.sdk.track.middleware.webservice.Debugger
 import com.growingio.android.sdk.track.middleware.webservice.WebService
 import com.growingio.android.sdk.track.modelloader.TrackerRegistry
 
-internal class GrowingWindowCallback(val context: Context, private val window: Window, private val registry: TrackerRegistry?) : WindowCallbackDelegate(window.callback) {
+internal class GrowingWindowCallback(context: Context, private val window: Window, private val registry: TrackerRegistry?) : WindowCallbackDelegate(window.callback) {
 
     init {
         window.callback = this
@@ -60,8 +62,10 @@ internal class GrowingWindowCallback(val context: Context, private val window: W
         }
     }
 
-    private val gestureDetect: GestureDetectorCompat = GestureDetectorCompat(
-        context.applicationContext,
+    // ViewConfiguration.get() 在 Android 15+ 会对非 UI Context 触发 StrictMode 违规，
+    // 因此这里必须用 decorView / window 的 UI Context，而不是 applicationContext。
+    private val gestureDetect: GestureDetectorCompat? = createGestureDetector(
+        uiContextOf(context, window),
         object : GestureDetector.OnGestureListener {
 
             override fun onDown(e: MotionEvent): Boolean = false
@@ -91,11 +95,13 @@ internal class GrowingWindowCallback(val context: Context, private val window: W
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
-            val obtain = MotionEvent.obtain(event)
-            try {
-                gestureDetect.onTouchEvent(obtain)
-            } finally {
-                obtain.recycle()
+            gestureDetect?.let { detector ->
+                val obtain = MotionEvent.obtain(event)
+                try {
+                    detector.onTouchEvent(obtain)
+                } finally {
+                    obtain.recycle()
+                }
             }
 
             if (event.action == MotionEvent.ACTION_UP) {
@@ -104,5 +110,24 @@ internal class GrowingWindowCallback(val context: Context, private val window: W
             }
         }
         return super.dispatchTouchEvent(event)
+    }
+
+    private companion object {
+        const val TAG = "GrowingWindowCallback"
+
+        fun uiContextOf(context: Context, window: Window): Context {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return context
+            if (context.isUiContext) return context
+            val windowContext = window.context
+            return if (windowContext.isUiContext) windowContext else context
+        }
+
+        fun createGestureDetector(context: Context, listener: GestureDetector.OnGestureListener): GestureDetectorCompat? = try {
+            GestureDetectorCompat(context, listener)
+        } catch (e: Exception) {
+            // StrictMode 可能配置了 penaltyDeath，此时构造会抛异常，降级为不采集 compose 点击
+            Logger.e(TAG, "create gesture detector failed: ${e.message}")
+            null
+        }
     }
 }
