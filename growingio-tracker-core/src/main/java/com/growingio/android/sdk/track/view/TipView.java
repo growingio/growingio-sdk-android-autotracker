@@ -15,7 +15,6 @@
  */
 package com.growingio.android.sdk.track.view;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -38,8 +37,10 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.utils.DeviceUtil;
 
 public class TipView extends FrameLayout {
-    private final Context mContext;
-    private final WindowManager mWindowManager;
+    private static final String TAG = "TipView";
+
+    // 挂载时取自宿主 Activity，remove 后置空，避免跨 Activity 持有
+    private WindowManager mWindowManager;
 
     private TextView mContent;
     private TextView mDragTip;
@@ -51,14 +52,22 @@ public class TipView extends FrameLayout {
     private int mViewLastY;
     private float mTouchDownY;
 
-    @SuppressLint("WrongConstant")
     public TipView(Context context) {
-        super(context);
-        mContext = context;
-        mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        super(configurationContext(context));
         setId(R.id.growing_webservices_tip_view);
         createView();
         setKeepScreenOn(true);
+    }
+
+    /**
+     * Android 11+ 的 StrictMode 会拒绝从非 UI Context 访问 ViewConfiguration 等配置相关 API。
+     * TipView 跨 Activity 复用，不能持有 Activity；而它挂载用的 TYPE_APPLICATION_PANEL 属于
+     * sub-window，无法通过 createWindowContext 升级，因此退而用 configuration context ——
+     * StrictMode#assertConfigurationContext 同样认可它。
+     */
+    private static Context configurationContext(Context context) {
+        if (context instanceof Activity) return context;
+        return context.createConfigurationContext(context.getResources().getConfiguration());
     }
 
     private void createView() {
@@ -81,7 +90,7 @@ public class TipView extends FrameLayout {
                 ViewGroup.LayoutParams.MATCH_PARENT));
         setBackgroundResource(R.color.growing_tracker_blue);
         mViewLastY = getStatusBarHeight();
-        mMinMoveDistance = ViewConfiguration.get(mContext).getScaledTouchSlop();
+        mMinMoveDistance = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }
 
     public void setContent(@StringRes int resid) {
@@ -119,7 +128,9 @@ public class TipView extends FrameLayout {
                 WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) getLayoutParams();
                 layoutParams.y += offsetY;
                 mViewLastY = layoutParams.y;
-                mWindowManager.updateViewLayout(this, layoutParams);
+                if (mWindowManager != null) {
+                    mWindowManager.updateViewLayout(this, layoutParams);
+                }
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
@@ -149,9 +160,10 @@ public class TipView extends FrameLayout {
         show(activity);
     }
 
-    private void addView(IBinder windowToken) {
+    private void addView(Activity activity, IBinder windowToken) {
         if (!mIsShowing) {
             mIsShowing = true;
+            mWindowManager = activity.getWindowManager();
             WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
             layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
             layoutParams.token = windowToken;
@@ -169,12 +181,14 @@ public class TipView extends FrameLayout {
     public void remove() {
         if (mIsShowing) {
             try {
-                WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-                windowManager.removeView(this);
+                if (mWindowManager != null) {
+                    mWindowManager.removeView(this);
+                }
             } catch (Exception e) {
-                Logger.e("TipView", e);
+                Logger.e(TAG, e);
             } finally {
                 mIsShowing = false;
+                mWindowManager = null;
             }
         }
     }
@@ -197,13 +211,13 @@ public class TipView extends FrameLayout {
                 public void onGlobalLayout() {
                     IBinder token = activity.getWindow().getDecorView().getWindowToken();
                     if (token != null) {
-                        addView(token);
+                        addView(activity, token);
                         decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     }
                 }
             });
         } else {
-            addView(windowToken);
+            addView(activity, windowToken);
         }
     }
 }

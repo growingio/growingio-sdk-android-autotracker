@@ -82,9 +82,8 @@ class ComposeAutotrackProvider :
         }
         // now we find some compose views in a new window.
         val window = WindowHelper.get().pullWindow(view)
-        val context = view.context.applicationContext
         if (window != null) {
-            val composeWindowCallback = GrowingWindowCallback(context, window, registry)
+            val composeWindowCallback = GrowingWindowCallback(view.context, window, registry)
             this.composeMaps[view.hashCode()] = composeWindowCallback
         }
     }
