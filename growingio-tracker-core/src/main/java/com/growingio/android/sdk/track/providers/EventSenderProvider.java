@@ -170,9 +170,16 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
 
     @SuppressLint("WrongConstant")
     private ActivityManager.MemoryInfo getMemoryInfo() {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        activityManager.getMemoryInfo(memoryInfo);
+        try {
+            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            if (activityManager != null) {
+                activityManager.getMemoryInfo(memoryInfo);
+            }
+        } catch (Throwable e) {
+            // binder call to system_server, see NetworkUtil#getActiveNetworkInfo
+            Logger.w(TAG, e, "getMemoryInfo failed");
+        }
         return memoryInfo;
     }
 
@@ -342,15 +349,27 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
         }
 
 
+        /**
+         * 运行在 SDK 自己的 HandlerThread 上，未捕获的异常会直接杀掉宿主 App 进程，因此这里必须兜底。
+         * 注意重新调度的逻辑要留在 catch 之外，否则一次异常会让上报循环永久停摆。
+         */
+        private void safelySendEvents(boolean onlyInstant) {
+            try {
+                sendEvents(onlyInstant);
+            } catch (Throwable e) {
+                Logger.e(TAG, e, "action: sendEvents failed");
+            }
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {
                 case MSG_SEND_INSTANT_EVENTS:
-                    sendEvents(true);
+                    safelySendEvents(true);
                     break;
                 case MSG_SEND_UNINSTANT_EVENTS:
                     removeMessages(MSG_SEND_UNINSTANT_EVENTS);
-                    sendEvents(false);
+                    safelySendEvents(false);
                     if (backoffUploadInterval > 0) {
                         sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, backoffUploadInterval);
                     }

@@ -23,7 +23,11 @@ import android.telephony.TelephonyManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 public class NetworkUtil {
+    private static final String TAG = "NetworkUtil";
+
     public static class NetworkState {
         private final boolean mIsConnected;
         private final boolean mIsMobileData;
@@ -59,9 +63,16 @@ public class NetworkUtil {
 
     @Nullable
     private static NetworkInfo getActiveNetworkInfo(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (manager != null) {
-            return manager.getActiveNetworkInfo();
+        try {
+            ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (manager != null) {
+                return manager.getActiveNetworkInfo();
+            }
+        } catch (Throwable e) {
+            // binder call to system_server: throws DeadSystemRuntimeException(API 35+) or
+            // RuntimeException(DeadSystemException) once system_server dies, SecurityException on some ROMs.
+            // 这类系统级失败不应该让宿主 App 崩溃，降级为「网络不可用」即可。
+            Logger.w(TAG, e, "getActiveNetworkInfo failed");
         }
         return null;
     }
