@@ -17,7 +17,6 @@ package com.growingio.android.sdk.autotrack.page;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.res.Resources;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -137,7 +136,7 @@ public abstract class SuperFragment<T> {
             if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
                 return getRealFragment().getResources().getResourceEntryName(id);
-            } catch (Resources.NotFoundException ignored) {
+            } catch (Exception ignored) {
             }
             return null;
         }
@@ -208,7 +207,7 @@ public abstract class SuperFragment<T> {
             if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
                 return getRealFragment().getResources().getResourceEntryName(id);
-            } catch (Resources.NotFoundException ignored) {
+            } catch (Exception ignored) {
             }
             return null;
         }
@@ -279,7 +278,7 @@ public abstract class SuperFragment<T> {
             if (getRealFragment() == null || id == View.NO_ID) return null;
             try {
                 return getRealFragment().getResources().getResourceEntryName(id);
-            } catch (Resources.NotFoundException ignored) {
+            } catch (Exception ignored) {
             }
             return null;
         }

@@ -21,6 +21,7 @@
 && ./gradlew :growingio-compose:publishMavenPublicationToMavenLocal \
 && ./gradlew :growingio-tools:platform:publishMavenPublicationToMavenLocal \
 && ./gradlew :growingio-tools:oaid:publishMavenPublicationToMavenLocal \
+&& ./gradlew :growingio-compose:publishMavenPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker:publishMavenPublicationToMavenLocal \
 && ./gradlew :gio-sdk:tracker-cdp:publishMavenPublicationToMavenLocal \
 && ./gradlew :gio-sdk:autotracker:publishMavenPublicationToMavenLocal \

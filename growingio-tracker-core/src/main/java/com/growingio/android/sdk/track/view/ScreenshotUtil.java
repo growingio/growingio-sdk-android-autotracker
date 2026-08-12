@@ -22,6 +22,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.PixelCopy;
@@ -110,9 +112,9 @@ public class ScreenshotUtil {
                         bitmap, copyResult -> {
                             if (copyResult == PixelCopy.SUCCESS) {
                                 Bitmap screenshot = WindowHelper.get().tryRenderDialog(activity, bitmap);
-                                callback.onScreenshot(scaleBitmap(screenshot, scale));
+                                TrackMainThread.trackMain().postActionToTrackMain(() -> callback.onScreenshot(scaleBitmap(screenshot, scale)));
                             }
-                        }, TrackMainThread.trackMain().getMainHandler());
+                        }, new Handler(Looper.getMainLooper()));
             } catch (IllegalArgumentException e) {
                 getScreenShotBitmapDefault(scale, callback);
             }
@@ -123,8 +125,10 @@ public class ScreenshotUtil {
     }
 
     private static void getScreenShotBitmapDefault(float scale, ScreenshotCallback callback) {
-        Bitmap originBitmap = getScreenshotBitmap();
-        callback.onScreenshot(scaleBitmap(originBitmap, scale));
+        TrackMainThread.trackMain().runOnUiThread(() -> {
+            Bitmap originBitmap = getScreenshotBitmap();
+            TrackMainThread.trackMain().postActionToTrackMain(() -> callback.onScreenshot(scaleBitmap(originBitmap, scale)));
+        });
     }
 
     private static Bitmap scaleBitmap(Bitmap bitmap, float scale) {
