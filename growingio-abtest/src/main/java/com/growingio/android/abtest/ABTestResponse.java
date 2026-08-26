@@ -97,6 +97,17 @@ class ABTestResponse {
         return code == 0;
     }
 
+    /**
+     * 只解析 naturalDaytime，供启动扫描清理判定；解析失败返回 -1（视作过期）。
+     */
+    static long parseNaturalDaytime(String json) {
+        try {
+            return new JSONObject(json).getLong("naturalDaytime");
+        } catch (JSONException e) {
+            return -1L;
+        }
+    }
+
     static long tomorrowMill() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DATE, cal.get(Calendar.DATE) + 1);

@@ -42,6 +42,8 @@ dependencies {
 	testImplementation project(':growingio-network:okhttp3')
 
 	implementation project(':growingio-tracker-core')
+	debugImplementation project(':growingio-tools:snappy')
+	releaseImplementation libs.growingio.snappy
 
 	implementation project(":growingio-annotation")
 	annotationProcessor project(":growingio-annotation:compiler")
