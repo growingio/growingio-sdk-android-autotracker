@@ -38,6 +38,7 @@ import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -141,7 +142,7 @@ public class HybridTest {
         ConfigurationProvider configurationProvider = context.getConfigurationProvider();
 
         WebViewJavascriptBridgeConfiguration configuration = new WebViewJavascriptBridgeConfiguration("test", "test", "test", "test", "test", "test", 23);
-        WebViewBridgeJavascriptInterface webInterface = new WebViewBridgeJavascriptInterface(configuration, hybridBridgeProvider, userInfoProvider);
+        WebViewBridgeJavascriptInterface webInterface = new WebViewBridgeJavascriptInterface(configuration, hybridBridgeProvider, context);
         webInterface.setNativeUserId("cpacm");
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
         Truth.assertThat(userInfoProvider.getLoginUserId()).isEqualTo("cpacm");
@@ -164,10 +165,46 @@ public class HybridTest {
         String testJson = "{\"eventType\":\"LOGIN_USER_ATTRIBUTES\",\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
         webInterface.dispatchEvent(testJson);
         Truth.assertThat(webInterface.getConfiguration()).contains("23");
+
+        // getNativeIdentity: logged out
+        JSONObject anonymous = niceParse(webInterface.getNativeIdentity());
+        Truth.assertThat(anonymous.optString("deviceId")).isNotEmpty();
+        Truth.assertThat(anonymous.has("userId")).isFalse();
+        Truth.assertThat(anonymous.has("userKey")).isFalse();
+        Truth.assertThat(anonymous.has("isNewDevice")).isTrue();
+
+        // getNativeIdentity: logged in with idMapping, values reflect the pull moment
+        configurationProvider.core().setIdMappingEnabled(true);
+        webInterface.setNativeUserIdAndUserKey("cpacm", "email");
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        JSONObject login = niceParse(webInterface.getNativeIdentity());
+        Truth.assertThat(login.optString("userId")).isEqualTo("cpacm");
+        Truth.assertThat(login.optString("userKey")).isEqualTo("email");
+        Truth.assertThat(login.optString("deviceId")).isEqualTo(anonymous.optString("deviceId"));
+
+        // getNativeIdentity: idMapping disabled drops userKey
+        webInterface.clearNativeUserIdAndUserKey();
+        configurationProvider.core().setIdMappingEnabled(false);
+        webInterface.setNativeUserIdAndUserKey("cpacm", "email");
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        JSONObject noMapping = niceParse(webInterface.getNativeIdentity());
+        Truth.assertThat(noMapping.optString("userId")).isEqualTo("cpacm");
+        Truth.assertThat(noMapping.has("userKey")).isFalse();
+        webInterface.clearNativeUserIdAndUserKey();
+        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
         webInterface.onDomChanged();
 
         Robolectric.flushForegroundThreadScheduler();
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
     }
 
+
+    private JSONObject niceParse(String json) {
+        Truth.assertThat(json).isNotNull();
+        try {
+            return new JSONObject(json);
+        } catch (JSONException e) {
+            throw new AssertionError("getNativeIdentity returned invalid json: " + json, e);
+        }
+    }
 }
