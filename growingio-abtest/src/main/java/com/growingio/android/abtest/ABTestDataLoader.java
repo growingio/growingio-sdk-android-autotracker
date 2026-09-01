@@ -47,12 +47,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * ABTest:
  * 1. ABTestConfig: Configure the parameters of ABTest, including the requested host and the validity period of ABTest data.（Request timeout follows okhttp request timeout）
  * 2. ABTest cache data will be stored in the sharedPreferences (dedicated file "growing_abtest"), keyed by device + login user + layerId,
- *    and the validity period of the cache data is a natural day. Expired entries are cleaned by a full scan on loader init.
+ *    and the validity period of the cache data is a natural day. Expired entries are cleaned by a full scan at the first fetch.
  * 3. ABTest data is requested by sdk api: getABTest(layerId,callback), carrying obfuscated userId/userKey for user-level diversion.
  *
  * @author cpacm 2023/11/24
@@ -65,23 +66,23 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
     static final String AB_TEST_PREF_NAME = "growing_abtest";
 
     private final TrackerContext context;
+    // 每个 loader 实例只做一次全量清理
+    private final AtomicBoolean cacheCleaned = new AtomicBoolean(false);
 
-    @SuppressLint("WrongConstant")
     public ABTestDataLoader(TrackerContext context) {
         this.context = context;
-        // 清理过期缓存：post 到 TrackMainThread，与 fetch 串行，先于任何后续请求执行
-        TrackMainThread.trackMain().postActionToTrackMain(() ->
-                cleanExpiredCache(context.getSharedPreferences(AB_TEST_PREF_NAME, Context.MODE_PRIVATE)));
     }
 
     @Override
     public LoadData<ABExperiment> buildLoadData(ABTest abTest) {
-        return new LoadData<>(new ABTestDataFetcher(context, abTest));
+        return new LoadData<>(new ABTestDataFetcher(context, abTest, cacheCleaned));
     }
 
     /**
      * 拆 key 后过期清理不能只靠惰性触发：某身份不再登录，其 entry 将永不被读取。
-     * 初始化时全量扫描，按既有的自然日规则清理。
+     * 首次 fetch 开头全量扫描，按既有的自然日规则清理（同线程先于缓存读取，无竞态；
+     * 也不在构造线程上引入额外的磁盘 IO——SP 首次加载本就发生在 fetch 线程）。
+     * 跨自然日的记录被清理后，重启后首次请求失败将直接返回失败，不再有 ABTEST_EXPIRED 兜底。
      */
     static void cleanExpiredCache(SharedPreferences sharedPreferences) {
         Map<String, ?> all = sharedPreferences.getAll();
@@ -136,12 +137,13 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
         private final PersistentDataProvider persistentDataProvider;
         private final UserInfoProvider userInfoProvider;
         private final SharedPreferences sharedPreferences;
+        private final AtomicBoolean cacheCleaned;
 
         private ABTestConfig abTestConfig;
         private final ABTest abTest;
 
         @SuppressLint("WrongConstant")
-        public ABTestDataFetcher(TrackerContext trackerContext, ABTest abTest) {
+        public ABTestDataFetcher(TrackerContext trackerContext, ABTest abTest, AtomicBoolean cacheCleaned) {
             this.trackerContext = trackerContext;
             this.deviceInfoProvider = trackerContext.getDeviceInfoProvider();
             this.persistentDataProvider = trackerContext.getProvider(PersistentDataProvider.class);
@@ -152,6 +154,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             }
             sharedPreferences = trackerContext.getSharedPreferences(AB_TEST_PREF_NAME, Context.MODE_PRIVATE);
             this.abTest = abTest;
+            this.cacheCleaned = cacheCleaned;
         }
 
         @Override
@@ -166,6 +169,9 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
 
         @Override
         public ABExperiment executeData() {
+            if (cacheCleaned.compareAndSet(false, true)) {
+                cleanExpiredCache(sharedPreferences);
+            }
             String deviceId = deviceInfoProvider.getDeviceId();
             String layerId = abTest.getLayerId();
             int timeout = (int) abTestConfig.getAbTestTimeout();

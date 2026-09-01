@@ -413,14 +413,43 @@ public class ABTestTest extends MockServer {
 
     @Test
     public void naturalDayABFailedTest() {
+        // 跨自然日的记录在首次 fetch 时被清理，请求再失败则直接返回失败，无 ABTEST_EXPIRED 兜底
         ABTestConfig abTestConfig = new ABTestConfig();
         abTestConfig.setAbTestServerHost("http://localhost:8080");
         context.getConfigurationProvider().addConfiguration(abTestConfig);
         setExpiredABTest("300", System.currentTimeMillis(), System.currentTimeMillis() - 10000L);
+        final AtomicBoolean failed = new AtomicBoolean(false);
         ABTest abTest = new ABTest("300", new ABTestCallback() {
             @Override
             public void onABExperimentReceived(ABExperiment experiment, int dataType) {
-                Truth.assertThat(experiment.getLayerId()).isEqualTo("300");
+                throw new AssertionError("cross-day expired cache should not be returned");
+            }
+
+            @Override
+            public void onABExperimentFailed(Exception error) {
+                System.out.println(error.getMessage());
+                failed.set(true);
+            }
+        });
+        ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
+        Truth.assertThat(abExperiment).isNull();
+        Truth.assertThat(failed.get()).isTrue();
+        // 跨自然日的记录已被清理
+        String deviceId = context.getDeviceInfoProvider().getDeviceId();
+        Truth.assertThat(sharedPreferences.contains(ABTestDataLoader.cacheKey(deviceId, null, null, "300"))).isFalse();
+    }
+
+    @Test
+    public void expiredABFailedTest() {
+        // 同日内仅 TTL 过期的记录不被清理，请求失败时返回过期数据兜底（ABTEST_EXPIRED）
+        ABTestConfig abTestConfig = new ABTestConfig();
+        abTestConfig.setAbTestServerHost("http://localhost:8080");
+        context.getConfigurationProvider().addConfiguration(abTestConfig);
+        setExpiredABTest("310", System.currentTimeMillis() - 10 * 60 * 1000, ABTestResponse.tomorrowMill());
+        ABTest abTest = new ABTest("310", new ABTestCallback() {
+            @Override
+            public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                Truth.assertThat(experiment.getLayerId()).isEqualTo("310");
                 Truth.assertThat(experiment.getExperimentId()).isEqualTo(100);
                 Truth.assertThat(experiment.getStrategyId()).isEqualTo(100);
                 Truth.assertThat(experiment.getVariables().size()).isEqualTo(2);
@@ -430,7 +459,7 @@ public class ABTestTest extends MockServer {
 
             @Override
             public void onABExperimentFailed(Exception error) {
-                System.out.println(error.getMessage());
+                throw new AssertionError("TTL-expired cache should be returned as ABTEST_EXPIRED fallback");
             }
         });
         ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
