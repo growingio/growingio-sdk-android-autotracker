@@ -32,7 +32,7 @@ import com.growingio.android.sdk.track.middleware.abtest.ABTest;
 import com.growingio.android.sdk.track.middleware.abtest.ABTestCallback;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.utils.ConstantPool;
-import com.growingio.android.sdk.track.utils.ObjectUtils;
+import com.growingio.android.snappy.XORUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,10 +45,13 @@ import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -72,7 +75,7 @@ public class ABTestTest extends MockServer {
         OkhttpLibraryGioModule httpModule = new OkhttpLibraryGioModule();
         httpModule.registerComponents(context);
 
-        sharedPreferences = context.getSharedPreferences(ConstantPool.PREF_FILE_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = context.getSharedPreferences(ABTestDataLoader.AB_TEST_PREF_NAME, Context.MODE_PRIVATE);
 
         ABTestLibraryGioModule module = new ABTestLibraryGioModule();
         ABTestConfig abTestConfig = new ABTestConfig();
@@ -104,6 +107,11 @@ public class ABTestTest extends MockServer {
                 Truth.assertThat(body).contains("datasourceId=");
                 Truth.assertThat(body).contains("distinctId=");
                 Truth.assertThat(body).contains("layerId=");
+                // 未登录时不携带用户标识
+                Truth.assertThat(body).doesNotContain("userId=");
+                Truth.assertThat(body).doesNotContain("userKey=");
+                // stm 恒挂在 query 上
+                Truth.assertThat(request.getRequestUrl().queryParameter("stm")).isNotNull();
                 return getMockResponse();
             }
         };
@@ -259,25 +267,36 @@ public class ABTestTest extends MockServer {
         variables.put("singer", "legend");
         variables.put("game", "haven");
         abTestResponse.abExperiment = new ABExperiment(layerId, 100, 100, variables);
-        String abTestKey = ObjectUtils.sha1(deviceId + layerId);
+        String userId = context.getUserInfoProvider().getLoginUserId();
+        String userKey = context.getUserInfoProvider().getLoginUserKey();
+        String abTestKey = ABTestDataLoader.cacheKey(deviceId, userId, userKey, layerId);
         sharedPreferences.edit().putString(abTestKey, abTestResponse.toSavedJson()).commit();
     }
 
     @Test
-    public void naturalDayABFailedTest() {
-        ABTestConfig abTestConfig = new ABTestConfig();
-        abTestConfig.setAbTestServerHost("http://localhost:8080");
-        context.getConfigurationProvider().addConfiguration(abTestConfig);
-        setExpiredABTest("300", System.currentTimeMillis(), System.currentTimeMillis() - 10000L);
-        ABTest abTest = new ABTest("300", new ABTestCallback() {
+    public void requestABTestWithLoginUser() {
+        context.getConfigurationProvider().core().setIdMappingEnabled(true);
+        context.getUserInfoProvider().setLoginUserId("cpacm", "phone");
+        final AtomicBoolean verified = new AtomicBoolean(false);
+        setDispatcher(new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+                String stmValue = request.getRequestUrl().queryParameter("stm");
+                Truth.assertThat(stmValue).isNotNull();
+                long stm = Long.parseLong(stmValue);
+                String body = request.getBody().readString(StandardCharsets.UTF_8);
+                Map<String, String> params = parseFormBody(body);
+                // 服务端视角：用 query 上的 stm & 0xFF 做 Base64 decode → XOR 还原
+                Truth.assertThat(deobfuscate(params.get("userId"), stm)).isEqualTo("cpacm");
+                Truth.assertThat(deobfuscate(params.get("userKey"), stm)).isEqualTo("phone");
+                verified.set(true);
+                return getMockResponse();
+            }
+        });
+        ABTest abTest = new ABTest("400", new ABTestCallback() {
             @Override
             public void onABExperimentReceived(ABExperiment experiment, int dataType) {
-                Truth.assertThat(experiment.getLayerId()).isEqualTo("300");
-                Truth.assertThat(experiment.getExperimentId()).isEqualTo(100);
-                Truth.assertThat(experiment.getStrategyId()).isEqualTo(100);
-                Truth.assertThat(experiment.getVariables().size()).isEqualTo(2);
-
-                Truth.assertThat(dataType).isEqualTo(ABTestCallback.ABTEST_EXPIRED);
+                Truth.assertThat(dataType).isEqualTo(ABTestCallback.ABTEST_HTTP);
             }
 
             @Override
@@ -287,5 +306,205 @@ public class ABTestTest extends MockServer {
         });
         ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
         Truth.assertThat(abExperiment).isNotNull();
+        Truth.assertThat(verified.get()).isTrue();
+    }
+
+    @Test
+    public void requestABTestWithLoginUserWithoutIdMapping() {
+        // idMappingEnabled 默认 false：userKey 被 UserInfoProvider 丢弃，body 只带 userId
+        context.getUserInfoProvider().setLoginUserId("cpacm", "phone");
+        final AtomicBoolean verified = new AtomicBoolean(false);
+        setDispatcher(new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+                String stmValue = request.getRequestUrl().queryParameter("stm");
+                String body = request.getBody().readString(StandardCharsets.UTF_8);
+                Map<String, String> params = parseFormBody(body);
+                Truth.assertThat(deobfuscate(params.get("userId"), Long.parseLong(stmValue))).isEqualTo("cpacm");
+                Truth.assertThat(params.containsKey("userKey")).isFalse();
+                verified.set(true);
+                return getMockResponse();
+            }
+        });
+        ABExperiment abExperiment = context.getRegistry().executeData(newSimpleABTest("401"), ABTest.class, ABExperiment.class);
+        Truth.assertThat(abExperiment).isNotNull();
+        Truth.assertThat(verified.get()).isTrue();
+    }
+
+    @Test
+    public void userSwitchCacheTest() {
+        final AtomicInteger requestCount = new AtomicInteger(0);
+        setDispatcher(new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+                requestCount.incrementAndGet();
+                return getMockResponse();
+            }
+        });
+
+        // 1. 匿名请求 → HTTP
+        Truth.assertThat(context.getRegistry().executeData(newSimpleABTest("500"), ABTest.class, ABExperiment.class)).isNotNull();
+        Truth.assertThat(requestCount.get()).isEqualTo(1);
+
+        // 2. 匿名再次请求 → 命中缓存，不发请求
+        Truth.assertThat(context.getRegistry().executeData(newSimpleABTest("500"), ABTest.class, ABExperiment.class)).isNotNull();
+        Truth.assertThat(requestCount.get()).isEqualTo(1);
+
+        // 3. 登录 userA → 身份进 key，缓存 miss，必须重新请求
+        context.getUserInfoProvider().setLoginUserId("userA");
+        Truth.assertThat(context.getRegistry().executeData(newSimpleABTest("500"), ABTest.class, ABExperiment.class)).isNotNull();
+        Truth.assertThat(requestCount.get()).isEqualTo(2);
+
+        // 4. 登出（A→匿名）→ 命中匿名自己的缓存，各身份记录并存
+        context.getUserInfoProvider().setLoginUserId(null);
+        Truth.assertThat(context.getRegistry().executeData(newSimpleABTest("500"), ABTest.class, ABExperiment.class)).isNotNull();
+        Truth.assertThat(requestCount.get()).isEqualTo(2);
+    }
+
+    @Test
+    public void cleanExpiredCacheTest() {
+        // 有效记录：TTL 内、自然日内
+        setExpiredABTest("600", System.currentTimeMillis() + 60_000L, ABTestResponse.tomorrowMill());
+        // 过期记录：已过自然日
+        setExpiredABTest("601", System.currentTimeMillis(), System.currentTimeMillis() - 10_000L);
+        // 脏记录：无法解析
+        sharedPreferences.edit().putString("broken", "not a json").commit();
+        Truth.assertThat(sharedPreferences.getAll().size()).isEqualTo(3);
+
+        ABTestDataLoader.cleanExpiredCache(sharedPreferences);
+
+        Map<String, ?> all = sharedPreferences.getAll();
+        Truth.assertThat(all.size()).isEqualTo(1);
+        String deviceId = context.getDeviceInfoProvider().getDeviceId();
+        Truth.assertThat(all.containsKey(ABTestDataLoader.cacheKey(deviceId, null, null, "600"))).isTrue();
+    }
+
+    private ABTest newSimpleABTest(String layerId) {
+        return new ABTest(layerId, new ABTestCallback() {
+            @Override
+            public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+            }
+
+            @Override
+            public void onABExperimentFailed(Exception error) {
+                System.out.println(error.getMessage());
+            }
+        });
+    }
+
+    private Map<String, String> parseFormBody(String body) {
+        Map<String, String> params = new HashMap<>();
+        try {
+            for (String pair : body.split("&")) {
+                int index = pair.indexOf('=');
+                params.put(URLDecoder.decode(pair.substring(0, index), "UTF-8"),
+                        URLDecoder.decode(pair.substring(index + 1), "UTF-8"));
+            }
+        } catch (IOException ignored) {
+        }
+        return params;
+    }
+
+    private String deobfuscate(String encoded, long stm) {
+        byte[] data = android.util.Base64.decode(encoded, android.util.Base64.NO_WRAP);
+        byte[] plain = XORUtils.encrypt(data, (int) (stm & 0xFF));
+        return new String(plain, StandardCharsets.UTF_8);
+    }
+
+    @Test
+    public void naturalDayABFailedTest() {
+        // 跨自然日的记录在首次 fetch 时被清理，请求再失败则直接返回失败，无 ABTEST_EXPIRED 兜底
+        ABTestConfig abTestConfig = new ABTestConfig();
+        abTestConfig.setAbTestServerHost("http://localhost:8080");
+        context.getConfigurationProvider().addConfiguration(abTestConfig);
+        setExpiredABTest("300", System.currentTimeMillis(), System.currentTimeMillis() - 10000L);
+        final AtomicBoolean failed = new AtomicBoolean(false);
+        ABTest abTest = new ABTest("300", new ABTestCallback() {
+            @Override
+            public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                throw new AssertionError("cross-day expired cache should not be returned");
+            }
+
+            @Override
+            public void onABExperimentFailed(Exception error) {
+                System.out.println(error.getMessage());
+                failed.set(true);
+            }
+        });
+        ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
+        Truth.assertThat(abExperiment).isNull();
+        Truth.assertThat(failed.get()).isTrue();
+        // 跨自然日的记录已被清理
+        String deviceId = context.getDeviceInfoProvider().getDeviceId();
+        Truth.assertThat(sharedPreferences.contains(ABTestDataLoader.cacheKey(deviceId, null, null, "300"))).isFalse();
+    }
+
+    @Test
+    public void expiredABFailedTest() {
+        // 同日仅 TTL 过期 + 请求失败：与 iOS 一致，不再返回过期数据，回调失败；记录保留用于后续去重比对
+        ABTestConfig abTestConfig = new ABTestConfig();
+        abTestConfig.setAbTestServerHost("http://localhost:8080");
+        context.getConfigurationProvider().addConfiguration(abTestConfig);
+        setExpiredABTest("310", System.currentTimeMillis() - 10 * 60 * 1000, ABTestResponse.tomorrowMill());
+        final AtomicBoolean failed = new AtomicBoolean(false);
+        ABTest abTest = new ABTest("310", new ABTestCallback() {
+            @Override
+            public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                throw new AssertionError("expired cache should not be returned when request fails");
+            }
+
+            @Override
+            public void onABExperimentFailed(Exception error) {
+                System.out.println(error.getMessage());
+                failed.set(true);
+            }
+        });
+        ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
+        Truth.assertThat(abExperiment).isNull();
+        Truth.assertThat(failed.get()).isTrue();
+        String deviceId = context.getDeviceInfoProvider().getDeviceId();
+        Truth.assertThat(sharedPreferences.contains(ABTestDataLoader.cacheKey(deviceId, null, null, "310"))).isTrue();
+    }
+
+    @Test
+    public void naturalDayInSessionFailedTest() {
+        // 进程内跨零点：首次 fetch 的清扫已过，之后出现的跨自然日记录在请求前被删除，请求失败即失败
+        requestABTest(); // 触发首次 fetch 清扫
+        ABTestConfig abTestConfig = new ABTestConfig();
+        abTestConfig.setAbTestServerHost("http://localhost:8080");
+        context.getConfigurationProvider().addConfiguration(abTestConfig);
+        setExpiredABTest("320", System.currentTimeMillis(), System.currentTimeMillis() - 10000L);
+        String deviceId = context.getDeviceInfoProvider().getDeviceId();
+        String key = ABTestDataLoader.cacheKey(deviceId, null, null, "320");
+        Truth.assertThat(sharedPreferences.contains(key)).isTrue();
+
+        final AtomicBoolean failed = new AtomicBoolean(false);
+        ABTest abTest = new ABTest("320", new ABTestCallback() {
+            @Override
+            public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                throw new AssertionError("cross-day expired cache should not be returned");
+            }
+
+            @Override
+            public void onABExperimentFailed(Exception error) {
+                failed.set(true);
+            }
+        });
+        ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
+        Truth.assertThat(abExperiment).isNull();
+        Truth.assertThat(failed.get()).isTrue();
+        // 跨自然日记录在请求前已被删除
+        Truth.assertThat(sharedPreferences.contains(key)).isFalse();
+    }
+
+    @Test
+    public void experimentHitConditionTest() {
+        // 与 iOS / Web 一致：experimentId 与 strategyId 均非空才命中
+        Map<String, String> variables = new HashMap<>();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(new ABExperiment("1", 1, 1, variables))).isTrue();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(new ABExperiment("1", 0, 1, variables))).isFalse();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(new ABExperiment("1", 1, 0, variables))).isFalse();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(new ABExperiment("1", 0, 0, variables))).isFalse();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(null)).isFalse();
     }
 }
