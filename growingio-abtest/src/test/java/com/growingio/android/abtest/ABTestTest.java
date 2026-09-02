@@ -441,28 +441,70 @@ public class ABTestTest extends MockServer {
 
     @Test
     public void expiredABFailedTest() {
-        // 同日内仅 TTL 过期的记录不被清理，请求失败时返回过期数据兜底（ABTEST_EXPIRED）
+        // 同日仅 TTL 过期 + 请求失败：与 iOS 一致，不再返回过期数据，回调失败；记录保留用于后续去重比对
         ABTestConfig abTestConfig = new ABTestConfig();
         abTestConfig.setAbTestServerHost("http://localhost:8080");
         context.getConfigurationProvider().addConfiguration(abTestConfig);
         setExpiredABTest("310", System.currentTimeMillis() - 10 * 60 * 1000, ABTestResponse.tomorrowMill());
+        final AtomicBoolean failed = new AtomicBoolean(false);
         ABTest abTest = new ABTest("310", new ABTestCallback() {
             @Override
             public void onABExperimentReceived(ABExperiment experiment, int dataType) {
-                Truth.assertThat(experiment.getLayerId()).isEqualTo("310");
-                Truth.assertThat(experiment.getExperimentId()).isEqualTo(100);
-                Truth.assertThat(experiment.getStrategyId()).isEqualTo(100);
-                Truth.assertThat(experiment.getVariables().size()).isEqualTo(2);
-
-                Truth.assertThat(dataType).isEqualTo(ABTestCallback.ABTEST_EXPIRED);
+                throw new AssertionError("expired cache should not be returned when request fails");
             }
 
             @Override
             public void onABExperimentFailed(Exception error) {
-                throw new AssertionError("TTL-expired cache should be returned as ABTEST_EXPIRED fallback");
+                System.out.println(error.getMessage());
+                failed.set(true);
             }
         });
         ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
-        Truth.assertThat(abExperiment).isNotNull();
+        Truth.assertThat(abExperiment).isNull();
+        Truth.assertThat(failed.get()).isTrue();
+        String deviceId = context.getDeviceInfoProvider().getDeviceId();
+        Truth.assertThat(sharedPreferences.contains(ABTestDataLoader.cacheKey(deviceId, null, null, "310"))).isTrue();
+    }
+
+    @Test
+    public void naturalDayInSessionFailedTest() {
+        // 进程内跨零点：首次 fetch 的清扫已过，之后出现的跨自然日记录在请求前被删除，请求失败即失败
+        requestABTest(); // 触发首次 fetch 清扫
+        ABTestConfig abTestConfig = new ABTestConfig();
+        abTestConfig.setAbTestServerHost("http://localhost:8080");
+        context.getConfigurationProvider().addConfiguration(abTestConfig);
+        setExpiredABTest("320", System.currentTimeMillis(), System.currentTimeMillis() - 10000L);
+        String deviceId = context.getDeviceInfoProvider().getDeviceId();
+        String key = ABTestDataLoader.cacheKey(deviceId, null, null, "320");
+        Truth.assertThat(sharedPreferences.contains(key)).isTrue();
+
+        final AtomicBoolean failed = new AtomicBoolean(false);
+        ABTest abTest = new ABTest("320", new ABTestCallback() {
+            @Override
+            public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                throw new AssertionError("cross-day expired cache should not be returned");
+            }
+
+            @Override
+            public void onABExperimentFailed(Exception error) {
+                failed.set(true);
+            }
+        });
+        ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
+        Truth.assertThat(abExperiment).isNull();
+        Truth.assertThat(failed.get()).isTrue();
+        // 跨自然日记录在请求前已被删除
+        Truth.assertThat(sharedPreferences.contains(key)).isFalse();
+    }
+
+    @Test
+    public void experimentHitConditionTest() {
+        // 与 iOS / Web 一致：experimentId 与 strategyId 均非空才命中
+        Map<String, String> variables = new HashMap<>();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(new ABExperiment("1", 1, 1, variables))).isTrue();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(new ABExperiment("1", 0, 1, variables))).isFalse();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(new ABExperiment("1", 1, 0, variables))).isFalse();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(new ABExperiment("1", 0, 0, variables))).isFalse();
+        Truth.assertThat(ABTestDataLoader.isExperimentHit(null)).isFalse();
     }
 }
