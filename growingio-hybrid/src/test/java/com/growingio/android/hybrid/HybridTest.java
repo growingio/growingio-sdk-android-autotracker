@@ -172,6 +172,11 @@ public class HybridTest {
         Truth.assertThat(anonymous.has("userId")).isFalse();
         Truth.assertThat(anonymous.has("userKey")).isFalse();
         Truth.assertThat(anonymous.has("isNewDevice")).isTrue();
+        // dataCollectionEnabled 恒返回，反映当前开关状态
+        Truth.assertThat(anonymous.optBoolean("dataCollectionEnabled", false)).isTrue();
+        configurationProvider.core().setDataCollectionEnabled(false);
+        Truth.assertThat(niceParse(webInterface.getNativeIdentity()).optBoolean("dataCollectionEnabled", true)).isFalse();
+        configurationProvider.core().setDataCollectionEnabled(true);
 
         // getNativeIdentity: logged in with idMapping, values reflect the pull moment
         configurationProvider.core().setIdMappingEnabled(true);

@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
 import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
@@ -38,6 +39,7 @@ class WebViewBridgeJavascriptInterface {
     private final UserInfoProvider mUserInfoProvider;
     private final DeviceInfoProvider mDeviceInfoProvider;
     private final PersistentDataProvider mPersistentDataProvider;
+    private final ConfigurationProvider mConfigurationProvider;
 
     WebViewBridgeJavascriptInterface(WebViewJavascriptBridgeConfiguration configuration,
                                      HybridBridgeProvider hybridBridgeProvider,
@@ -47,6 +49,7 @@ class WebViewBridgeJavascriptInterface {
         mUserInfoProvider = context.getUserInfoProvider();
         mDeviceInfoProvider = context.getDeviceInfoProvider();
         mPersistentDataProvider = context.getProvider(PersistentDataProvider.class);
+        mConfigurationProvider = context.getConfigurationProvider();
         mNativeBridge = new NativeBridge(mUserInfoProvider);
     }
 
@@ -74,6 +77,8 @@ class WebViewBridgeJavascriptInterface {
                 identity.put("userKey", userKey);
             }
             identity.put("isNewDevice", mPersistentDataProvider.isNewDevice());
+            // 数据采集开关状态下发给内嵌页：关闭时 Web 侧不应以原生身份发起 AB 请求
+            identity.put("dataCollectionEnabled", mConfigurationProvider.core().isDataCollectionEnabled());
         } catch (JSONException e) {
             Logger.e(TAG, e.getMessage(), e);
         }

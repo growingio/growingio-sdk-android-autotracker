@@ -176,6 +176,13 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
 
         @Override
         public ABExperiment executeData() {
+            ABTestCallback abTestCallback = abTest.getAbTestCallback();
+            // 数据采集关闭时 AB 功能一并关闭：不发请求、不读缓存、不上报，立即回调失败
+            if (!trackerContext.getConfigurationProvider().core().isDataCollectionEnabled()) {
+                Logger.w(TAG, "Request ABTestExperiment skipped: data collection is disabled.");
+                abTestCallback.onABExperimentFailed(new IllegalStateException("data collection is disabled"));
+                return null;
+            }
             if (cacheCleaned.compareAndSet(false, true)) {
                 cleanExpiredCache(sharedPreferences);
             }
@@ -183,7 +190,6 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             String layerId = abTest.getLayerId();
             int timeout = (int) abTestConfig.getAbTestTimeout();
             boolean requestImmediately = abTest.isRequestImmediately();
-            ABTestCallback abTestCallback = abTest.getAbTestCallback();
             String abTestKey = cacheKey(deviceId, userInfoProvider.getLoginUserId(), userInfoProvider.getLoginUserKey(), layerId);
 
             // 1. 缓存判定：只决定「TTL 内直接返回」与「lastCached 是什么」

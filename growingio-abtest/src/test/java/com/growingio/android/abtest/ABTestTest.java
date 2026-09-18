@@ -498,6 +498,50 @@ public class ABTestTest extends MockServer {
     }
 
     @Test
+    public void dataCollectionDisabledTest() {
+        // 数据采集关闭：立即失败，不发请求、不读缓存（即使缓存有效）、不上报
+        final AtomicInteger requestCount = new AtomicInteger(0);
+        setDispatcher(new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+                requestCount.incrementAndGet();
+                return getMockResponse();
+            }
+        });
+        // 预置一条 TTL 内、自然日内的有效缓存
+        setExpiredABTest("700", System.currentTimeMillis() + 60_000L, ABTestResponse.tomorrowMill());
+        context.getConfigurationProvider().core().setDataCollectionEnabled(false);
+        try {
+            final AtomicBoolean failed = new AtomicBoolean(false);
+            ABTest abTest = new ABTest("700", new ABTestCallback() {
+                @Override
+                public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                    throw new AssertionError("should not return any experiment when data collection is disabled");
+                }
+
+                @Override
+                public void onABExperimentFailed(Exception error) {
+                    Truth.assertThat(error.getMessage()).contains("data collection is disabled");
+                    failed.set(true);
+                }
+            });
+            ABExperiment abExperiment = context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class);
+            Truth.assertThat(abExperiment).isNull();
+            Truth.assertThat(failed.get()).isTrue();
+            Truth.assertThat(requestCount.get()).isEqualTo(0);
+            // 缓存未被触碰
+            String deviceId = context.getDeviceInfoProvider().getDeviceId();
+            Truth.assertThat(sharedPreferences.contains(ABTestDataLoader.cacheKey(deviceId, null, null, "700"))).isTrue();
+        } finally {
+            context.getConfigurationProvider().core().setDataCollectionEnabled(true);
+        }
+
+        // 重新开启后恢复正常：命中预置缓存
+        Truth.assertThat(context.getRegistry().executeData(newSimpleABTest("700"), ABTest.class, ABExperiment.class)).isNotNull();
+        Truth.assertThat(requestCount.get()).isEqualTo(0);
+    }
+
+    @Test
     public void experimentHitConditionTest() {
         // 与 iOS / Web 一致：experimentId 与 strategyId 均非空才命中
         Map<String, String> variables = new HashMap<>();
