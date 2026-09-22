@@ -16,6 +16,7 @@
 package com.growingio.android.sdk.autotrack;
 
 import com.growingio.android.sdk.Configurable;
+import com.growingio.android.sdk.autotrack.impression.ImpressionConfig;
 import com.growingio.android.sdk.autotrack.page.PageRule;
 
 import java.util.ArrayList;
@@ -23,7 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 public class AutotrackConfig implements Configurable {
-    private float mImpressionScale = 0;
+    private boolean impressionEnabled = true;
+    private ImpressionConfig impressionConfig = new ImpressionConfig();
+    private long impressionCheckInterval = 500L;
     private boolean enableFragmentTag = false;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
@@ -31,18 +34,55 @@ public class AutotrackConfig implements Configurable {
     private int pageXmlRes = 0;
     private final List<PageRule> pageRules = new ArrayList<>();
 
+    /**
+     * 曝光采集总开关，默认开启。关闭后所有曝光标记 API 均不生效。
+     */
+    public AutotrackConfig setImpressionEnabled(boolean impressionEnabled) {
+        this.impressionEnabled = impressionEnabled;
+        return this;
+    }
+
+    public boolean isImpressionEnabled() {
+        return impressionEnabled;
+    }
+
+    /**
+     * 可见面积占元素自身面积的比例阈值，范围 [0,1]，默认 0，即露出即算曝光。
+     * <p>它是 {@link #setImpressionConfig(ImpressionConfig)} 中同名配置项的快捷写法。
+     */
     public AutotrackConfig setImpressionScale(float scale) {
-        if (scale < 0) {
-            scale = 0;
-        } else if (scale > 1) {
-            scale = 1;
-        }
-        this.mImpressionScale = scale;
+        impressionConfig.setImpressionScale(scale);
         return this;
     }
 
     public float getImpressionScale() {
-        return mImpressionScale;
+        return impressionConfig.getImpressionScale();
+    }
+
+    /**
+     * 曝光条件的全局默认值。标记元素时未单独传 config 的，都按这份配置判定。
+     */
+    public AutotrackConfig setImpressionConfig(ImpressionConfig impressionConfig) {
+        if (impressionConfig != null) {
+            this.impressionConfig = impressionConfig;
+        }
+        return this;
+    }
+
+    public ImpressionConfig getImpressionConfig() {
+        return impressionConfig;
+    }
+
+    /**
+     * 曝光检测的节流间隔，单位毫秒，默认 500。置 0 表示每次视图状态变化都检测。
+     */
+    public AutotrackConfig setImpressionCheckInterval(long impressionCheckInterval) {
+        this.impressionCheckInterval = Math.max(impressionCheckInterval, 0L);
+        return this;
+    }
+
+    public long getImpressionCheckInterval() {
+        return impressionCheckInterval;
     }
 
     /**

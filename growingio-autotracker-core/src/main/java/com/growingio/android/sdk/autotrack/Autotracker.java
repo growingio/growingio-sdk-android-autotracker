@@ -22,6 +22,8 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.growingio.android.sdk.autotrack.inject.InjectorProvider;
+import com.growingio.android.sdk.autotrack.impression.ImpressionConfig;
+import com.growingio.android.sdk.autotrack.impression.ImpressionListener;
 import com.growingio.android.sdk.autotrack.impression.ImpressionProvider;
 import com.growingio.android.sdk.autotrack.page.PageProvider;
 import com.growingio.android.sdk.autotrack.page.SuperFragment;
@@ -308,11 +310,31 @@ public class Autotracker extends Tracker {
 
     public void trackViewImpression(View view, String impressionEventName) {
         if (!isInited) return;
-        trackViewImpression(view, impressionEventName, null);
+        trackViewImpression(view, impressionEventName, null, null, null);
     }
 
     public void trackViewImpression(final View view, final String impressionEventName,
                                     final Map<String, String> attributes) {
+        if (!isInited) return;
+        trackViewImpression(view, impressionEventName, attributes, null, null);
+    }
+
+    /**
+     * 标记一个视图，元素进入可视区域并满足曝光条件时发送对应的自定义事件。
+     * <p>列表场景下在绑定数据的地方直接标记即可，不需要在视图复用时清理：
+     * 同一个事件名在一个视图上只保留一个槽位，identifier 变了旧槽位随即丢弃；
+     * 事件名、属性、配置三者都没变化的重复标记则保留原有曝光状态，不会重复发送。
+     *
+     * @param view                视图
+     * @param impressionEventName 曝光事件名
+     * @param attributes          事件属性
+     * @param identifier          业务上能唯一标识这个元素的值（商品 ID、内容 ID 等），不是视图的标识。
+     *                            它决定了"只曝光一次"的判定口径，也是多槽位和精确移除的 key，可为 null
+     * @param config              该元素的曝光条件，为 null 时使用 AutotrackConfig 里的全局配置
+     */
+    public void trackViewImpression(final View view, final String impressionEventName,
+                                    final Map<String, String> attributes,
+                                    final String identifier, final ImpressionConfig config) {
         if (!isInited) return;
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
             Logger.e(TAG, "view or impressionEventName is NULL");
@@ -324,12 +346,33 @@ public class Autotracker extends Tracker {
         } else {
             attributesCopy = new HashMap<>(attributes);
         }
+        final ImpressionConfig configCopy = config == null ? null : config.copy();
         TrackMainThread.trackMain().runOnUiThread(() -> {
             ImpressionProvider impressionProvider = getContext().getProvider(ImpressionProvider.class);
-            impressionProvider.trackViewImpression(view, impressionEventName, attributesCopy);
+            impressionProvider.trackViewImpression(view, impressionEventName, attributesCopy, identifier, configCopy);
         });
     }
 
+    /**
+     * 只替换曝光属性，不影响曝光状态。重新标记会重置曝光状态，只想改属性时请用这个方法。
+     */
+    public void updateViewImpressionAttributes(final View view, final Map<String, String> attributes,
+                                               final String identifier) {
+        if (!isInited) return;
+        if (view == null) {
+            Logger.e(TAG, "view is NULL");
+            return;
+        }
+        final HashMap<String, String> attributesCopy = attributes == null ? null : new HashMap<>(attributes);
+        TrackMainThread.trackMain().runOnUiThread(() -> {
+            ImpressionProvider impressionProvider = getContext().getProvider(ImpressionProvider.class);
+            impressionProvider.updateViewImpressionAttributes(view, attributesCopy, identifier);
+        });
+    }
+
+    /**
+     * 移除该视图上的全部曝光标记。
+     */
     public void stopTrackViewImpression(final View trackedView) {
         if (!isInited) return;
         if (trackedView == null) {
@@ -340,6 +383,72 @@ public class Autotracker extends Tracker {
         TrackMainThread.trackMain().runOnUiThread(() -> {
             ImpressionProvider impressionProvider = getContext().getProvider(ImpressionProvider.class);
             impressionProvider.stopTrackViewImpression(trackedView);
+        });
+    }
+
+    /**
+     * 只移除该视图上 identifier 对应的那一个曝光标记，其他槽位不受影响。
+     */
+    public void stopTrackViewImpression(final View trackedView, final String identifier) {
+        if (!isInited) return;
+        if (trackedView == null) {
+            Logger.e(TAG, "trackedView is NULL");
+            return;
+        }
+
+        TrackMainThread.trackMain().runOnUiThread(() -> {
+            ImpressionProvider impressionProvider = getContext().getProvider(ImpressionProvider.class);
+            impressionProvider.stopTrackViewImpression(trackedView, identifier);
+        });
+    }
+
+    /**
+     * 清除一个元素的已曝光记录，用于下拉刷新、切换账号、切换数据源等场景。
+     * 仍停在可视区内的元素无需移出再移入，下一个检测周期就会再曝光一次。
+     */
+    public void resetViewImpressionState(final String identifier) {
+        if (!isInited) return;
+        TrackMainThread.trackMain().runOnUiThread(() -> {
+            ImpressionProvider impressionProvider = getContext().getProvider(ImpressionProvider.class);
+            impressionProvider.resetImpressionState(identifier);
+        });
+    }
+
+    /**
+     * 清除全部已曝光记录。
+     */
+    public void resetAllViewImpressionState() {
+        if (!isInited) return;
+        TrackMainThread.trackMain().runOnUiThread(() -> {
+            ImpressionProvider impressionProvider = getContext().getProvider(ImpressionProvider.class);
+            impressionProvider.resetAllImpressionState();
+        });
+    }
+
+    /**
+     * 注册曝光回调：发送前可否决、可补动态属性，发送后可感知。
+     * 回调均在主线程同步执行，处在曝光检测的链路上，实现中不要做耗时操作。
+     */
+    public void addViewImpressionListener(final ImpressionListener listener) {
+        if (!isInited) return;
+        if (listener == null) {
+            Logger.e(TAG, "listener is NULL");
+            return;
+        }
+        TrackMainThread.trackMain().runOnUiThread(() -> {
+            ImpressionProvider impressionProvider = getContext().getProvider(ImpressionProvider.class);
+            impressionProvider.addImpressionListener(listener);
+        });
+    }
+
+    public void removeViewImpressionListener(final ImpressionListener listener) {
+        if (!isInited) return;
+        if (listener == null) {
+            return;
+        }
+        TrackMainThread.trackMain().runOnUiThread(() -> {
+            ImpressionProvider impressionProvider = getContext().getProvider(ImpressionProvider.class);
+            impressionProvider.removeImpressionListener(listener);
         });
     }
 
