@@ -4,7 +4,7 @@
 
 实现在无埋点 SDK 的 `growingio-autotracker-core` 中，无需额外依赖。曝光事件带页面路径，页面体系本身属于无埋点能力，因此纯埋点 SDK（`growingio-tracker-core`）不提供该能力。
 
-曝光采集是主动标记的能力，与无埋点开关（`setAutotrack`）相互独立：关掉无埋点后标记的元素依然会曝光。总开关是 `setImpressionEnabled`。
+曝光采集属于无埋点能力的一部分，受 `setAutotrack` 约束：关掉无埋点后曝光同样不采集。`setImpressionEnabled` 用于在无埋点开启的前提下单独关掉曝光。
 
 ## 快速开始
 
@@ -67,7 +67,7 @@ GrowingAutotracker.get().trackViewImpression(itemView, "goods_impression", null,
 全局配置挂在 `AutotrackConfiguration` 上：
 
 ```java
-configuration.setImpressionEnabled(true)                  // 采集总开关，默认 true
+configuration.setImpressionEnabled(true)                  // 曝光开关，默认 true；setAutotrack(false) 时无论如何都不采集
         .setImpressionCheckInterval(500)                  // 检测节流间隔，单位毫秒，默认 500
         .setImpressionConfig(ImpressionConfig.create(0.5f, 1000L, true));
 ```

@@ -437,4 +437,26 @@ public class ImpressionTest {
         provider.onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.LAYOUT_CHANGED));
         Truth.assertThat(eventsNamed("disabled")).isEmpty();
     }
+
+    @Test
+    public void autotrackDisabledTest() {
+        // 曝光受无埋点开关约束：setAutotrack(false) 时 setImpressionEnabled(true) 也不采集
+        Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
+        map.put(AutotrackConfig.class, new AutotrackConfig()
+                .setImpressionCheckInterval(0)
+                .setImpressionEnabled(true)
+                .setAutotrack(false));
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(
+                new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
+        Autotracker tracker = new Autotracker(application);
+        ImpressionProvider provider = tracker.getContext().getProvider(ImpressionProvider.class);
+
+        RobolectricActivity disabledActivity = Robolectric.buildActivity(RobolectricActivity.class).setup().get();
+        makeWindowVisible(disabledActivity);
+
+        provider.trackViewImpression(disabledActivity.getTextView(), "autotrackOff", null);
+        Truth.assertThat(provider.hasTrackViewImpression(disabledActivity.getTextView())).isFalse();
+        provider.onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.LAYOUT_CHANGED));
+        Truth.assertThat(eventsNamed("autotrackOff")).isEmpty();
+    }
 }

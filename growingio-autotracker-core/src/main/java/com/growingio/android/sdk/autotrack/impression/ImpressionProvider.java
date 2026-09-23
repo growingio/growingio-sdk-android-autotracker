@@ -98,11 +98,15 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         activityStateProvider = context.getActivityStateProvider();
 
         AutotrackConfig autotrackConfig = context.getConfigurationProvider().getConfiguration(AutotrackConfig.class);
-        if (autotrackConfig != null) {
-            impressionEnabled = autotrackConfig.isImpressionEnabled();
-            globalImpressionConfig = autotrackConfig.getImpressionConfig().copy();
-            checkInterval = autotrackConfig.getImpressionCheckInterval();
+        if (autotrackConfig == null || !autotrackConfig.isAutotrack()) {
+            impressionEnabled = false;
+            Logger.i(TAG, "autotrack is disabled, impression collection won't work");
+            return;
         }
+
+        impressionEnabled = autotrackConfig.isImpressionEnabled();
+        globalImpressionConfig = autotrackConfig.getImpressionConfig().copy();
+        checkInterval = autotrackConfig.getImpressionCheckInterval();
 
         if (!impressionEnabled) {
             Logger.i(TAG, "impression collection is disabled");

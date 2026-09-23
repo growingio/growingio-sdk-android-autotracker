@@ -35,7 +35,9 @@ public class AutotrackConfig implements Configurable {
     private final List<PageRule> pageRules = new ArrayList<>();
 
     /**
-     * 曝光采集总开关，默认开启。关闭后所有曝光标记 API 均不生效。
+     * 曝光采集开关，默认开启。关闭后所有曝光标记 API 均不生效。
+     * <p>曝光采集属于无埋点能力的一部分，{@link #setAutotrack(boolean)} 关闭时曝光同样不采集，
+     * 此开关只用于在无埋点开启的前提下单独关掉曝光。
      */
     public AutotrackConfig setImpressionEnabled(boolean impressionEnabled) {
         this.impressionEnabled = impressionEnabled;
