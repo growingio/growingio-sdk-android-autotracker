@@ -31,8 +31,10 @@ import com.growingio.android.sdk.CoreConfiguration;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.autotrack.AutotrackConfig;
 import com.growingio.android.sdk.autotrack.Autotracker;
+import com.growingio.android.sdk.autotrack.IgnorePolicy;
 import com.growingio.android.sdk.autotrack.RobolectricActivity;
 import com.growingio.android.sdk.autotrack.TrackMainThreadShadow;
+import com.growingio.android.sdk.autotrack.view.ViewAttributeUtil;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
@@ -304,6 +306,24 @@ public class ImpressionTest {
     /**
      * 高 40 的子视图放进高 20 的裁剪容器，可见面积占比 0.5。
      */
+    /**
+     * 往内容区挂一条 container -> child 的可见视图链，两级都铺满 100x40，
+     * 用来构造"父容器设了忽略策略，子视图被连带忽略"的场景。
+     *
+     * @return 下标 0 是 container，1 是 child
+     */
+    private static View[] addVisibleChain(RobolectricActivity activity) {
+        FrameLayout container = new FrameLayout(activity);
+        View child = new View(activity);
+        container.addView(child, new ViewGroup.LayoutParams(100, 40));
+        ((ViewGroup) activity.findViewById(android.R.id.content))
+                .addView(container, new ViewGroup.LayoutParams(100, 40));
+        container.measure(View.MeasureSpec.makeMeasureSpec(100, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(40, View.MeasureSpec.EXACTLY));
+        container.layout(0, 0, 100, 40);
+        return new View[]{container, child};
+    }
+
     private static View addHalfClippedChild(RobolectricActivity activity) {
         FrameLayout clipper = new FrameLayout(activity);
         View child = new View(activity);
@@ -458,5 +478,97 @@ public class ImpressionTest {
         Truth.assertThat(provider.hasTrackViewImpression(disabledActivity.getTextView())).isFalse();
         provider.onViewStateChanged(new ViewStateChangedEvent(ViewStateChangedEvent.StateType.LAYOUT_CHANGED));
         Truth.assertThat(eventsNamed("autotrackOff")).isEmpty();
+    }
+
+    // ---------- 无埋点忽略规则 ----------
+
+    @Test
+    public void ignoreSelfSuppressesMarkTest() {
+        View view = activity.getTextView();
+        ViewAttributeUtil.setIgnorePolicy(view, IgnorePolicy.IGNORE_SELF);
+
+        impressionProvider.trackViewImpression(view, "ignore_self", null);
+        // 标记阶段就被拒绝，连槽位都不建
+        Truth.assertThat(impressionProvider.hasTrackViewImpression(view)).isFalse();
+        checkImpression();
+        Truth.assertThat(eventsNamed("ignore_self")).isEmpty();
+    }
+
+    @Test
+    public void ignoreAllOnSelfSuppressesMarkTest() {
+        View view = activity.getTextView();
+        ViewAttributeUtil.setIgnorePolicy(view, IgnorePolicy.IGNORE_ALL);
+
+        impressionProvider.trackViewImpression(view, "ignore_all_self", null);
+        Truth.assertThat(impressionProvider.hasTrackViewImpression(view)).isFalse();
+        checkImpression();
+        Truth.assertThat(eventsNamed("ignore_all_self")).isEmpty();
+    }
+
+    @Test
+    public void ignoreChildOnParentSuppressesMarkTest() {
+        View[] chain = addVisibleChain(activity);
+        ViewAttributeUtil.setIgnorePolicy(chain[0], IgnorePolicy.IGNORE_CHILD);
+
+        impressionProvider.trackViewImpression(chain[1], "ignore_child", null);
+        Truth.assertThat(impressionProvider.hasTrackViewImpression(chain[1])).isFalse();
+        checkImpression();
+        Truth.assertThat(eventsNamed("ignore_child")).isEmpty();
+    }
+
+    @Test
+    public void ignoreChildOnParentDoesNotSuppressItselfTest() {
+        View[] chain = addVisibleChain(activity);
+        ViewAttributeUtil.setIgnorePolicy(chain[0], IgnorePolicy.IGNORE_CHILD);
+
+        impressionProvider.trackViewImpression(chain[0], "ignore_child_self", null);
+        checkImpression();
+        Truth.assertThat(eventsNamed("ignore_child_self")).hasSize(1);
+    }
+
+    @Test
+    public void ignoreAllOnAncestorSuppressesMarkTest() {
+        // 忽略策略沿父链逐级上溯，不止看直接父容器
+        View[] chain = addVisibleChain(activity);
+        ViewAttributeUtil.setIgnorePolicy((View) chain[0].getParent(), IgnorePolicy.IGNORE_ALL);
+
+        impressionProvider.trackViewImpression(chain[1], "ignore_ancestor", null);
+        Truth.assertThat(impressionProvider.hasTrackViewImpression(chain[1])).isFalse();
+        checkImpression();
+        Truth.assertThat(eventsNamed("ignore_ancestor")).isEmpty();
+    }
+
+    @Test
+    public void ignoreSelfOnParentDoesNotSuppressChildTest() {
+        // IGNORE_SELF 只作用于设置它的那个视图，不影响子视图
+        View[] chain = addVisibleChain(activity);
+        ViewAttributeUtil.setIgnorePolicy(chain[0], IgnorePolicy.IGNORE_SELF);
+
+        impressionProvider.trackViewImpression(chain[1], "parent_ignore_self", null);
+        checkImpression();
+        Truth.assertThat(eventsNamed("parent_ignore_self")).hasSize(1);
+    }
+
+    @Test
+    public void ownPolicyShortCircuitsAncestorLookupTest() {
+        // ViewAttributeUtil.isIgnoredView 的既有行为：视图自身设了策略就不再上溯父链，
+        // 因此子视图的 IGNORE_CHILD 会屏蔽掉父容器的 IGNORE_ALL。这里把现状钉住
+        View[] chain = addVisibleChain(activity);
+        ViewAttributeUtil.setIgnorePolicy(chain[0], IgnorePolicy.IGNORE_ALL);
+        ViewAttributeUtil.setIgnorePolicy(chain[1], IgnorePolicy.IGNORE_CHILD);
+
+        impressionProvider.trackViewImpression(chain[1], "short_circuit", null);
+        checkImpression();
+        Truth.assertThat(eventsNamed("short_circuit")).hasSize(1);
+    }
+
+    @Test
+    public void noIgnorePolicyStillMarksTest() {
+        View[] chain = addVisibleChain(activity);
+
+        impressionProvider.trackViewImpression(chain[1], "no_ignore", null);
+        Truth.assertThat(impressionProvider.hasTrackViewImpression(chain[1])).isTrue();
+        checkImpression();
+        Truth.assertThat(eventsNamed("no_ignore")).hasSize(1);
     }
 }
