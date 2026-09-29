@@ -19,6 +19,11 @@ public interface ABTestCallback {
 
     public static final int ABTEST_CACHE = 0; //data load from cache.
     public static final int ABTEST_HTTP = 1; //data load from server.
+    /**
+     * @deprecated No longer delivered. Expired cache is never returned as a fallback anymore:
+     * when the cache has expired and the request fails, {@link #onABExperimentFailed(Exception)} is invoked instead.
+     */
+    @Deprecated
     public static final int ABTEST_EXPIRED = 2; //data expired and load from server failed.
 
     void onABExperimentReceived(ABExperiment experiment, int dataType);

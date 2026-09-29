@@ -28,7 +28,6 @@ import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
-import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,14 +42,14 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
 
     private ConfigurationProvider configurationProvider;
     private AppInfoProvider appInfoProvider;
-    private UserInfoProvider userInfoProvider;
+    private TrackerContext trackerContext;
     private boolean autoJsSdkInject = false;
 
     @Override
     public void setup(TrackerContext context) {
+        trackerContext = context;
         configurationProvider = context.getConfigurationProvider();
         appInfoProvider = context.getProvider(AppInfoProvider.class);
-        userInfoProvider = context.getUserInfoProvider();
         HybridConfig hybridConfig = configurationProvider.getConfiguration(HybridConfig.class);
         if (hybridConfig != null) {
             autoJsSdkInject = hybridConfig.isAutoGrowingJsSdk();
@@ -96,7 +95,7 @@ public class HybridBridgeProvider extends ListenerContainer<OnDomChangedListener
             return;
         }
         webView.addJavascriptInterface(
-                new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration(), this, userInfoProvider),
+                new WebViewBridgeJavascriptInterface(getJavascriptBridgeConfiguration(), this, trackerContext),
                 WebViewBridgeJavascriptInterface.JAVASCRIPT_INTERFACE_NAME);
         webView.setAddJavaScript();
     }

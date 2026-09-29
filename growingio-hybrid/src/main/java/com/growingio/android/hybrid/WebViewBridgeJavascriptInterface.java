@@ -18,8 +18,15 @@ package com.growingio.android.hybrid;
 import android.text.TextUtils;
 import android.webkit.JavascriptInterface;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
+import com.growingio.android.sdk.track.providers.ConfigurationProvider;
+import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 class WebViewBridgeJavascriptInterface {
     static final String JAVASCRIPT_INTERFACE_NAME = "GrowingWebViewJavascriptBridge";
@@ -29,19 +36,53 @@ class WebViewBridgeJavascriptInterface {
     private final NativeBridge mNativeBridge;
 
     private final HybridBridgeProvider mHybridBridgeProvider;
+    private final UserInfoProvider mUserInfoProvider;
+    private final DeviceInfoProvider mDeviceInfoProvider;
+    private final PersistentDataProvider mPersistentDataProvider;
+    private final ConfigurationProvider mConfigurationProvider;
 
     WebViewBridgeJavascriptInterface(WebViewJavascriptBridgeConfiguration configuration,
                                      HybridBridgeProvider hybridBridgeProvider,
-                                     UserInfoProvider userInfoProvider) {
+                                     TrackerContext context) {
         mConfiguration = configuration;
         this.mHybridBridgeProvider = hybridBridgeProvider;
-        mNativeBridge = new NativeBridge(userInfoProvider);
+        mUserInfoProvider = context.getUserInfoProvider();
+        mDeviceInfoProvider = context.getDeviceInfoProvider();
+        mPersistentDataProvider = context.getProvider(PersistentDataProvider.class);
+        mConfigurationProvider = context.getConfigurationProvider();
+        mNativeBridge = new NativeBridge(mUserInfoProvider);
     }
 
     @JavascriptInterface
     @com.uc.webview.export.JavascriptInterface
     public String getConfiguration() {
         return mConfiguration.toJSONObject().toString();
+    }
+
+    @JavascriptInterface
+    @com.uc.webview.export.JavascriptInterface
+    public String getNativeIdentity() {
+        // 身份值不落日志：与 setNativeUserId 打入参不同，这里输出的是 SDK 全量身份
+        Logger.d(TAG, "getNativeIdentity");
+        JSONObject identity = new JSONObject();
+        try {
+            identity.put("deviceId", mDeviceInfoProvider.getDeviceId());
+            String userId = mUserInfoProvider.getLoginUserId();
+            if (!TextUtils.isEmpty(userId)) {
+                identity.put("userId", userId);
+            }
+            // idMappingEnabled 关闭时 loginUserKey 恒为 null，自然不会带上
+            String userKey = mUserInfoProvider.getLoginUserKey();
+            if (!TextUtils.isEmpty(userKey)) {
+                identity.put("userKey", userKey);
+            }
+            identity.put("isNewDevice", mPersistentDataProvider.isNewDevice());
+            // 数据采集开关状态下发给内嵌页：关闭时 Web 侧不应以原生身份发起 AB 请求
+            identity.put("dataCollectionEnabled", mConfigurationProvider.core().isDataCollectionEnabled());
+        } catch (JSONException e) {
+            Logger.e(TAG, e.getMessage(), e);
+        }
+        return identity.toString();
     }
 
     @JavascriptInterface

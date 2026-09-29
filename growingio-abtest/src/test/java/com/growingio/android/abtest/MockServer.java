@@ -28,6 +28,8 @@ public class MockServer {
 
     public void setDispatcher(Dispatcher dispatcher) {
         mDispatcher = dispatcher;
+        // 允许单个用例在 start() 之后替换 dispatcher
+        mMockWebServer.setDispatcher(dispatcher);
     }
 
     public void start() throws IOException {
