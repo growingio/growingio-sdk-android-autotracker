@@ -26,6 +26,7 @@ import java.util.Map;
 public class AutotrackConfig implements Configurable {
     private boolean impressionEnabled = true;
     private ImpressionConfig impressionConfig = new ImpressionConfig();
+    private long impressionCheckInterval = 500L;
     private boolean enableFragmentTag = false;
     private final AutotrackOptions mAutotrackOptions = new AutotrackOptions();
 
@@ -72,6 +73,18 @@ public class AutotrackConfig implements Configurable {
 
     public ImpressionConfig getImpressionConfig() {
         return impressionConfig;
+    }
+
+    /**
+     * 曝光检测的节流间隔，单位毫秒，默认 500。置 0 表示每次视图状态变化都检测。
+     */
+    public AutotrackConfig setImpressionCheckInterval(long impressionCheckInterval) {
+        this.impressionCheckInterval = Math.max(impressionCheckInterval, 0L);
+        return this;
+    }
+
+    public long getImpressionCheckInterval() {
+        return impressionCheckInterval;
     }
 
     /**

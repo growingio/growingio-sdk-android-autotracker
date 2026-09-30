@@ -70,15 +70,14 @@ public class ImpressionTest {
     @Before
     public void setup() {
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
-        map.put(AutotrackConfig.class, new AutotrackConfig());
+        // 关掉节流，每次视图状态变化都立刻检测，用例才能逐步推进
+        map.put(AutotrackConfig.class, new AutotrackConfig().setImpressionCheckInterval(0));
         TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(
                 new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
 
         Autotracker tracker = new Autotracker(application);
         context = tracker.getContext();
         impressionProvider = context.getProvider(ImpressionProvider.class);
-        // 关掉节流，每次视图状态变化都立刻检测，用例才能逐步推进
-        impressionProvider.setCheckInterval(0);
         activity = Robolectric.buildActivity(RobolectricActivity.class).setup().get();
         makeWindowVisible(activity);
 
@@ -419,12 +418,12 @@ public class ImpressionTest {
         // 新的 tracker 要先于它所观察的 activity 建立，否则拿不到 resumedActivity
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
         map.put(AutotrackConfig.class, new AutotrackConfig()
+                .setImpressionCheckInterval(0)
                 .setImpressionConfig(ImpressionConfig.create(1.0f, 0L, true)));
         TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(
                 new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
         Autotracker tracker = new Autotracker(application);
         ImpressionProvider provider = tracker.getContext().getProvider(ImpressionProvider.class);
-        provider.setCheckInterval(0);
 
         RobolectricActivity globalActivity = Robolectric.buildActivity(RobolectricActivity.class).setup().get();
         makeWindowVisible(globalActivity);
@@ -444,12 +443,11 @@ public class ImpressionTest {
     @Test
     public void impressionDisabledTest() {
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
-        map.put(AutotrackConfig.class, new AutotrackConfig().setImpressionEnabled(false));
+        map.put(AutotrackConfig.class, new AutotrackConfig().setImpressionCheckInterval(0).setImpressionEnabled(false));
         TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(
                 new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
         Autotracker tracker = new Autotracker(application);
         ImpressionProvider provider = tracker.getContext().getProvider(ImpressionProvider.class);
-        provider.setCheckInterval(0);
 
         RobolectricActivity disabledActivity = Robolectric.buildActivity(RobolectricActivity.class).setup().get();
         makeWindowVisible(disabledActivity);
@@ -465,13 +463,13 @@ public class ImpressionTest {
         // 曝光受无埋点开关约束：setAutotrack(false) 时 setImpressionEnabled(true) 也不采集
         Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
         map.put(AutotrackConfig.class, new AutotrackConfig()
+                .setImpressionCheckInterval(0)
                 .setImpressionEnabled(true)
                 .setAutotrack(false));
         TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(
                 new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
         Autotracker tracker = new Autotracker(application);
         ImpressionProvider provider = tracker.getContext().getProvider(ImpressionProvider.class);
-        provider.setCheckInterval(0);
 
         RobolectricActivity disabledActivity = Robolectric.buildActivity(RobolectricActivity.class).setup().get();
         makeWindowVisible(disabledActivity);

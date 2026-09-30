@@ -76,7 +76,6 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
     private boolean impressionEnabled = true;
     private ImpressionConfig globalImpressionConfig = new ImpressionConfig();
-    /** 检测节流间隔，单位毫秒。检测节流配置为内部预留，待后续迭代再公开 */
     private long checkInterval = DEFAULT_CHECK_INTERVAL;
 
     private long lastCheckTime = 0L;
@@ -107,6 +106,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
         impressionEnabled = autotrackConfig.isImpressionEnabled();
         globalImpressionConfig = autotrackConfig.getImpressionConfig().copy();
+        checkInterval = autotrackConfig.getImpressionCheckInterval();
 
         if (!impressionEnabled) {
             Logger.i(TAG, "impression collection is disabled");
@@ -379,14 +379,6 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
             return;
         }
         impressionListeners.remove(listener);
-    }
-
-    /**
-     * 曝光检测的节流间隔，单位毫秒，默认 500。置 0 表示每次视图状态变化都检测。
-     * 内部预留，待后续迭代再公开。
-     */
-    void setCheckInterval(long checkInterval) {
-        this.checkInterval = Math.max(checkInterval, 0L);
     }
 
     public void trackViewImpression(View view, String impressionEventName, Map<String, String> attributes) {

@@ -47,8 +47,9 @@ public void onBindViewHolder(GoodsViewHolder holder, int position) {
 两项通过全局配置统一设置，挂在 `AutotrackConfiguration` 上：
 
 ```java
-configuration.setImpressionConfig(ImpressionConfig.create(0.5f, 1000L));
-configuration.setImpressionEnabled(true);  // 曝光开关，默认 true；setAutotrack(false) 时无论如何都不采集
+configuration.setImpressionEnabled(true)                  // 曝光开关，默认 true；setAutotrack(false) 时无论如何都不采集
+        .setImpressionCheckInterval(500)                  // 检测节流间隔，单位毫秒，默认 500
+        .setImpressionConfig(ImpressionConfig.create(0.5f, 1000L));
 ```
 
 配置在 SDK 启动时读取，启动之后再改不会生效。`setImpressionScale` 仍然可用，等价于只设置 `impressionConfig` 里的同名项。
@@ -65,7 +66,7 @@ configuration.setImpressionEnabled(true);  // 曝光开关，默认 true；setAu
 
 ## 实现要点
 
-- **检测由视图树变化驱动**：`ViewTreeStatusObserver` 监听所在 Activity 的布局、滚动与窗口事件，检测按 500ms 做首尾双触发的节流——间隔到了立刻检测，间隔内的变化合并为一次尾随检测，滚动停止瞬间入屏的元素不会漏判。
+- **检测由视图树变化驱动**：`ViewTreeStatusObserver` 监听所在 Activity 的布局、滚动与窗口事件，检测按 `impressionCheckInterval` 做首尾双触发的节流——间隔到了立刻检测，间隔内的变化合并为一次尾随检测，滚动停止瞬间入屏的元素不会漏判。
 - **停留时长靠一次性定时复检收口**：界面静止后视图树不再产生回调，元素上的令牌保证反复进出可视区不累积待执行任务。
 - **标记按 Activity 分组**，视图以弱引用持有，Activity 销毁时整组释放。
 
