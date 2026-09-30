@@ -23,8 +23,9 @@ import java.util.Map;
 
 /**
  * {@link ImpressionListener} 的空实现，按需覆写其中的方法。
+ * <p>内部预留，待后续迭代再公开。
  */
-public abstract class SimpleImpressionListener implements ImpressionListener {
+abstract class SimpleImpressionListener implements ImpressionListener {
 
     @Override
     public boolean shouldTrackImpression(View view, String eventName, @Nullable String identifier) {

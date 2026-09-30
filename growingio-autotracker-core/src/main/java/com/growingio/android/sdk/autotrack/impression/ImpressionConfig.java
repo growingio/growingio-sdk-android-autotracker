@@ -16,9 +16,8 @@
 package com.growingio.android.sdk.autotrack.impression;
 
 /**
- * 曝光条件。可以按元素单独配置，也可以通过
- * {@link com.growingio.android.sdk.autotrack.AutotrackConfig#setImpressionConfig(ImpressionConfig)} 配全局默认值。
- * <p>优先级：单元素 config &gt; 全局 config &gt; 默认值。
+ * 曝光条件的全局默认配置，通过
+ * {@link com.growingio.android.sdk.autotrack.AutotrackConfig#setImpressionConfig(ImpressionConfig)} 设置。
  */
 public class ImpressionConfig {
 
@@ -29,11 +28,16 @@ public class ImpressionConfig {
     public ImpressionConfig() {
     }
 
-    public static ImpressionConfig create(float impressionScale, long stayDuration, boolean repeatable) {
+    public static ImpressionConfig create(float impressionScale, long stayDuration) {
         return new ImpressionConfig()
                 .setImpressionScale(impressionScale)
-                .setStayDuration(stayDuration)
-                .setRepeatable(repeatable);
+                .setStayDuration(stayDuration);
+    }
+
+    // 以下能力为内部预留，待后续迭代再公开
+
+    static ImpressionConfig create(float impressionScale, long stayDuration, boolean repeatable) {
+        return create(impressionScale, stayDuration).setRepeatable(repeatable);
     }
 
     /**
@@ -68,13 +72,14 @@ public class ImpressionConfig {
     /**
      * 是否允许同一元素多次曝光，默认 true。
      * <p>置为 false 时必须指定 identifier，否则会被降级为 true 并输出告警日志。
+     * <p>内部预留，待后续迭代再公开。
      */
-    public ImpressionConfig setRepeatable(boolean repeatable) {
+    ImpressionConfig setRepeatable(boolean repeatable) {
         this.repeatable = repeatable;
         return this;
     }
 
-    public boolean isRepeatable() {
+    boolean isRepeatable() {
         return repeatable;
     }
 

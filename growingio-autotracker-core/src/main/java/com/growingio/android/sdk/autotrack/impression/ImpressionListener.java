@@ -24,8 +24,9 @@ import java.util.Map;
 /**
  * 曝光回调。三个方法都在主线程同步执行，处在曝光检测的链路上，实现中不要做耗时操作。
  * <p>只关心其中一两个方法时，继承 {@link SimpleImpressionListener}。
+ * <p>内部预留，待后续迭代再公开。
  */
-public interface ImpressionListener {
+interface ImpressionListener {
 
     /**
      * 返回 false 则本次不发送。元素离开可视区再次进入时会重新询问；

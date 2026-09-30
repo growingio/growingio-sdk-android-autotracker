@@ -76,6 +76,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
     private boolean impressionEnabled = true;
     private ImpressionConfig globalImpressionConfig = new ImpressionConfig();
+    /** 检测节流间隔，单位毫秒。检测节流配置为内部预留，待后续迭代再公开 */
     private long checkInterval = DEFAULT_CHECK_INTERVAL;
 
     private long lastCheckTime = 0L;
@@ -106,7 +107,6 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
         impressionEnabled = autotrackConfig.isImpressionEnabled();
         globalImpressionConfig = autotrackConfig.getImpressionConfig().copy();
-        checkInterval = autotrackConfig.getImpressionCheckInterval();
 
         if (!impressionEnabled) {
             Logger.i(TAG, "impression collection is disabled");
@@ -367,18 +367,26 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         iterator.remove();
     }
 
-    public void addImpressionListener(ImpressionListener listener) {
+    void addImpressionListener(ImpressionListener listener) {
         if (listener == null || impressionListeners.contains(listener)) {
             return;
         }
         impressionListeners.add(listener);
     }
 
-    public void removeImpressionListener(ImpressionListener listener) {
+    void removeImpressionListener(ImpressionListener listener) {
         if (listener == null) {
             return;
         }
         impressionListeners.remove(listener);
+    }
+
+    /**
+     * 曝光检测的节流间隔，单位毫秒，默认 500。置 0 表示每次视图状态变化都检测。
+     * 内部预留，待后续迭代再公开。
+     */
+    void setCheckInterval(long checkInterval) {
+        this.checkInterval = Math.max(checkInterval, 0L);
     }
 
     public void trackViewImpression(View view, String impressionEventName, Map<String, String> attributes) {
@@ -387,13 +395,14 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
     /**
      * 标记一个视图，元素进入可视区域并满足曝光条件时发送自定义事件。
+     * <p>内部预留，待后续迭代再公开。
      *
      * @param identifier 业务上能唯一标识这个元素的值（商品 ID、内容 ID 等），不是视图的标识。
      *                   它决定了"只曝光一次"的判定口径，也是多槽位和精确移除的 key，可为 null
      * @param config     该元素的曝光条件，为 null 时使用全局配置
      */
-    public void trackViewImpression(View view, String impressionEventName, Map<String, String> attributes,
-                                    @Nullable String identifier, @Nullable ImpressionConfig config) {
+    void trackViewImpression(View view, String impressionEventName, Map<String, String> attributes,
+                             @Nullable String identifier, @Nullable ImpressionConfig config) {
         if (view == null || TextUtils.isEmpty(impressionEventName)) {
             return;
         }
@@ -466,8 +475,9 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
     /**
      * 只替换属性，不影响曝光状态。只想改属性时用它，重新标记会重置曝光状态。
+     * <p>内部预留，待后续迭代再公开。
      */
-    public void updateViewImpressionAttributes(View view, Map<String, String> attributes, @Nullable String identifier) {
+    void updateViewImpressionAttributes(View view, Map<String, String> attributes, @Nullable String identifier) {
         if (view == null) {
             return;
         }
@@ -483,7 +493,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         return hasTrackViewImpression(trackedView, null);
     }
 
-    public boolean hasTrackViewImpression(View trackedView, @Nullable String identifier) {
+    boolean hasTrackViewImpression(View trackedView, @Nullable String identifier) {
         return findViewImpression(trackedView, identifier) != null;
     }
 
@@ -518,8 +528,9 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
     /**
      * 只移除一个标记，该视图上的其他槽位不受影响。
+     * <p>内部预留，待后续迭代再公开。
      */
-    public void stopTrackViewImpression(View trackedView, @Nullable String identifier) {
+    void stopTrackViewImpression(View trackedView, @Nullable String identifier) {
         stopTrackViewImpression(trackedView, identifier, false);
     }
 
@@ -566,8 +577,9 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
     /**
      * 清除一个元素的已曝光记录，连同该元素当前的曝光状态一起清掉，
      * 仍停在可视区内的元素无需移出再移入，下一个检测周期就会再曝光一次。
+     * <p>内部预留，待后续迭代再公开。
      */
-    public void resetImpressionState(String identifier) {
+    void resetImpressionState(String identifier) {
         if (TextUtils.isEmpty(identifier)) {
             return;
         }
@@ -575,7 +587,7 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         resetTrackedFlag(identifier);
     }
 
-    public void resetAllImpressionState() {
+    void resetAllImpressionState() {
         trackedIdentifiers.clear();
         trackedIdentifiersOverflowWarned = false;
         resetTrackedFlag(null);
