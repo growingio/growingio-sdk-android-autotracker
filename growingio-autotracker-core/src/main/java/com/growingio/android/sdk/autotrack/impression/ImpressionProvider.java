@@ -122,6 +122,13 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         }
         TrackMainThread.trackMain().removeOnUiThreadCallbacks(checkImpressionRunnable);
         trailingCheckScheduled = false;
+        // 先注销各 Activity 的视图树监听：监听和 monitoring tag 残留在 decorView 上的话，
+        // 之后新建的 provider 注册监听时会被旧 tag 挡住，视图变化回调全部漏掉
+        for (Activity activity : new ArrayList<>(activityScope.keySet())) {
+            if (activity != null && activity.getWindow() != null && activity.getWindow().getDecorView() != null) {
+                viewTreeStatusObserver.onActivityPaused(activity);
+            }
+        }
         activityScope.clear();
         trackedIdentifiers.clear();
         impressionListeners.clear();
@@ -451,6 +458,13 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         if (current != null) {
             // 列表刷新会对可见元素原样重标一次，内容没变就保留原有曝光状态，否则下一个检测周期必然多发一次
             if (current.matches(impressionEventName, attributes, effectiveConfig)) {
+                // 复用视图在绑定阶段重标时往往还没重新上屏，而节流检测可能错过了它的离屏状态，
+                // 这里立即判一次：不可见说明它离开过可视区，重置后按新周期重新曝光
+                if (!isVisibility(view, effectiveConfig.getImpressionScale())) {
+                    current.setTracked(false);
+                    current.setVisibleSince(0L);
+                    current.invalidateRecheck();
+                }
                 viewTreeStatusObserver.onActivityResumed(activity);
                 scheduleCheckImpression();
                 return;

@@ -179,6 +179,64 @@ public class ImpressionTest {
     }
 
     @Test
+    public void remarkWhileInvisibleRestartsExposureTest() {
+        // 必须带节流才能复现：检测间隔内离屏又回屏，尾随检测跑的时候视图已重新可见，
+        // 采不到离屏状态——无节流时重标触发的即时检测就会把 tracked 复位，盖住了问题
+        Map<Class<? extends Configurable>, Configurable> map = new HashMap<>();
+        map.put(AutotrackConfig.class, new AutotrackConfig().setImpressionCheckInterval(500L));
+        TrackerLifecycleProviderFactory.create().createConfigurationProviderWithConfig(
+                new CoreConfiguration("ImpressionTest", "growingio://impression"), map);
+        Autotracker tracker = new Autotracker(application);
+        ImpressionProvider provider = tracker.getContext().getProvider(ImpressionProvider.class);
+
+        RobolectricActivity throttleActivity = Robolectric.buildActivity(RobolectricActivity.class).setup().get();
+        makeWindowVisible(throttleActivity);
+        View view = throttleActivity.getTextView();
+
+        provider.trackViewImpression(view, "rebind", null);
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(600));
+        Truth.assertThat(eventsNamed("rebind")).hasSize(1);
+
+        // 节流窗口内离屏、同内容重标、回屏：重标时应识别出当前不可见，开始新的曝光周期
+        view.setVisibility(View.GONE);
+        provider.trackViewImpression(view, "rebind", null);
+        view.setVisibility(View.VISIBLE);
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(600));
+        Truth.assertThat(eventsNamed("rebind")).hasSize(2);
+    }
+
+    @Test
+    public void nonRepeatableRemarkWhileInvisibleStillOnceTest() {
+        // 同 identifier 的非重复元素即使离屏重标也只曝光一次：tracked 被重置，
+        // 但全局 identifier 记录仍挡住第二次发送，这里把这个语义钉住
+        View view = activity.getTextView();
+        ImpressionConfig config = ImpressionConfig.create(0f, 0L, false);
+        impressionProvider.trackViewImpression(view, "nr", null, "n1", config);
+        checkImpression();
+        Truth.assertThat(eventsNamed("nr")).hasSize(1);
+
+        view.setVisibility(View.GONE);
+        impressionProvider.trackViewImpression(view, "nr", null, "n1", config);
+        view.setVisibility(View.VISIBLE);
+        checkImpression();
+        Truth.assertThat(eventsNamed("nr")).hasSize(1);
+    }
+
+    @Test
+    public void shutdownClearsViewTreeMonitoringTest() {
+        View view = activity.getTextView();
+        impressionProvider.trackViewImpression(view, "shutdown", null);
+        View decorView = activity.getWindow().getDecorView();
+        int monitoringTagId = com.growingio.android.sdk.track.R.id.growing_tracker_monitoring_view_tree_enabled;
+        Truth.assertThat(decorView.getTag(monitoringTagId)).isEqualTo(true);
+
+        // shutdown 必须注销视图树监听并清掉 monitoring tag，
+        // 否则旧 tag 会挡住之后新建的 provider 注册监听，视图变化回调全部漏掉
+        impressionProvider.shutdown();
+        Truth.assertThat(decorView.getTag(monitoringTagId)).isEqualTo(false);
+    }
+
+    @Test
     public void reuseDropsStaleSlotTest() {
         View view = activity.getTextView();
         view.setVisibility(View.GONE);
