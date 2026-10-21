@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
@@ -95,6 +96,10 @@ public class ImpressionTest {
      * SDK 判可见的第一步就会挂掉，这里补上。
      */
     private static void makeWindowVisible(RobolectricActivity activity) {
+        setWindowVisibility(activity, View.VISIBLE);
+    }
+
+    private static void setWindowVisibility(RobolectricActivity activity, int visibility) {
         try {
             View decorView = activity.getWindow().getDecorView();
             Field attachInfoField = View.class.getDeclaredField("mAttachInfo");
@@ -102,9 +107,9 @@ public class ImpressionTest {
             Object attachInfo = attachInfoField.get(decorView);
             Field windowVisibilityField = attachInfo.getClass().getDeclaredField("mWindowVisibility");
             windowVisibilityField.setAccessible(true);
-            windowVisibilityField.setInt(attachInfo, View.VISIBLE);
+            windowVisibilityField.setInt(attachInfo, visibility);
         } catch (ReflectiveOperationException e) {
-            throw new AssertionError("failed to mark the test window visible", e);
+            throw new AssertionError("failed to set the test window visibility", e);
         }
     }
 
@@ -220,6 +225,78 @@ public class ImpressionTest {
         view.setVisibility(View.VISIBLE);
         checkImpression();
         Truth.assertThat(eventsNamed("nr")).hasSize(1);
+    }
+
+    /**
+     * 构造一个可以走 pause/stop/resume 的 Activity：后台窗口可见性为 GONE，
+     * 回前台的 ON_RESUMED 时仍是 GONE（WMS 的可见性消息还没到），之后才恢复 VISIBLE。
+     */
+    private ActivityController<RobolectricActivity> buildControllableActivity() {
+        ActivityController<RobolectricActivity> controller = Robolectric.buildActivity(RobolectricActivity.class).setup();
+        makeWindowVisible(controller.get());
+        return controller;
+    }
+
+    private static void moveToBackground(ActivityController<RobolectricActivity> controller) {
+        controller.pause().stop();
+        setWindowVisibility(controller.get(), View.GONE);
+    }
+
+    @Test
+    public void backToForegroundBeforeWindowVisibleNoRepeatTest() {
+        ActivityController<RobolectricActivity> controller = buildControllableActivity();
+        View view = controller.get().getTextView();
+        impressionProvider.trackViewImpression(view, "bg", null);
+        checkImpression();
+        Truth.assertThat(eventsNamed("bg")).hasSize(1);
+
+        moveToBackground(controller);
+        // ON_RESUMED 时窗口可见性还没同步回来，这一刻的检测不能把元素当成离开过可视区
+        controller.restart().resume();
+        makeWindowVisible(controller.get());
+        checkImpression();
+        Truth.assertThat(eventsNamed("bg")).hasSize(1);
+    }
+
+    @Test
+    public void remarkInBackgroundNoRepeatTest() {
+        ActivityController<RobolectricActivity> controller = buildControllableActivity();
+        RobolectricActivity bgActivity = controller.get();
+        View view = bgActivity.getTextView();
+        impressionProvider.trackViewImpression(view, "bgRebind", null);
+        checkImpression();
+        Truth.assertThat(eventsNamed("bgRebind")).hasSize(1);
+
+        moveToBackground(controller);
+        // 后台期间业务刷新列表原样重标：不复位曝光状态，也不把已注销的视图树监听挂回去
+        impressionProvider.trackViewImpression(view, "bgRebind", null);
+        int monitoringTagId = com.growingio.android.sdk.track.R.id.growing_tracker_monitoring_view_tree_enabled;
+        Truth.assertThat(bgActivity.getWindow().getDecorView().getTag(monitoringTagId)).isEqualTo(false);
+
+        controller.restart().resume();
+        Truth.assertThat(bgActivity.getWindow().getDecorView().getTag(monitoringTagId)).isEqualTo(true);
+        makeWindowVisible(bgActivity);
+        checkImpression();
+        Truth.assertThat(eventsNamed("bgRebind")).hasSize(1);
+    }
+
+    @Test
+    public void leaveWhileInBackgroundStillRepeatsTest() {
+        ActivityController<RobolectricActivity> controller = buildControllableActivity();
+        View view = controller.get().getTextView();
+        impressionProvider.trackViewImpression(view, "bgLeave", null);
+        checkImpression();
+        Truth.assertThat(eventsNamed("bgLeave")).hasSize(1);
+
+        // 后台期间元素真的被藏起来了，回前台窗口恢复后能判出离开，再出现时正常重复曝光
+        moveToBackground(controller);
+        view.setVisibility(View.GONE);
+        controller.restart().resume();
+        makeWindowVisible(controller.get());
+        checkImpression();
+        view.setVisibility(View.VISIBLE);
+        checkImpression();
+        Truth.assertThat(eventsNamed("bgLeave")).hasSize(2);
     }
 
     @Test

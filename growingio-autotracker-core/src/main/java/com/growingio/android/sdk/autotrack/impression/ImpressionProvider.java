@@ -191,6 +191,13 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
             Logger.w(TAG, "ResumedActivity is NULL or This activity has nothing impression");
             return;
         }
+        // 从后台回来时 ON_RESUMED 往往早于 WMS 把窗口可见性同步回来，此刻视图的 windowVisibility 仍是 GONE。
+        // 这时判出的"不可见"不代表元素离开过可视区，不能据此复位 tracked，否则窗口一恢复就重复曝光；
+        // 直接跳过，窗口真正显示后的 onGlobalLayout / onWindowFocusChanged 会再触发检测
+        if (!isWindowShowing(activityStateProvider.getResumedActivity())) {
+            Logger.d(TAG, "window of resumed activity is not showing yet, skip impression check");
+            return;
+        }
 
         // 回调里允许继续调标记/移除，遍历副本避免并发修改
         for (ViewImpression impression : new ArrayList<>(viewImpressions)) {
@@ -247,6 +254,10 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
                 if (viewImpressions == null || !viewImpressions.contains(impression)) {
                     return;
                 }
+                if (!isWindowShowing(activityStateProvider.getResumedActivity())) {
+                    // 窗口未显示时不动状态，恢复显示后的视图树回调会接着检测
+                    return;
+                }
                 checkViewImpression(impression);
             }
         }, stayDuration + RECHECK_SLACK);
@@ -258,6 +269,19 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
         Activity activity = activityStateProvider.getResumedActivity();
         if (activity == null) return null;
         return activityScope.get(activity);
+    }
+
+    /**
+     * Activity 窗口当前是否真正在显示。
+     * <p>必须看 decorView 而不是被标记的视图：RecyclerView 回收后被移除的 item 没有 AttachInfo，
+     * windowVisibility 同样是 GONE，那是真正离开了可视区，需要正常复位以支持重复曝光。
+     */
+    private static boolean isWindowShowing(@Nullable Activity activity) {
+        if (activity == null || activity.getWindow() == null) {
+            return false;
+        }
+        View decorView = activity.getWindow().peekDecorView();
+        return decorView != null && decorView.getWindowVisibility() == View.VISIBLE;
     }
 
     private boolean isVisibility(View view, float impressionScale) {
@@ -459,13 +483,14 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
             // 列表刷新会对可见元素原样重标一次，内容没变就保留原有曝光状态，否则下一个检测周期必然多发一次
             if (current.matches(impressionEventName, attributes, effectiveConfig)) {
                 // 复用视图在绑定阶段重标时往往还没重新上屏，而节流检测可能错过了它的离屏状态，
-                // 这里立即判一次：不可见说明它离开过可视区，重置后按新周期重新曝光
-                if (!isVisibility(view, effectiveConfig.getImpressionScale())) {
+                // 这里立即判一次：不可见说明它离开过可视区，重置后按新周期重新曝光。
+                // 窗口没在显示（App 在后台时业务刷新了列表）判不出离屏与否，保留原状态
+                if (isWindowShowing(activity) && !isVisibility(view, effectiveConfig.getImpressionScale())) {
                     current.setTracked(false);
                     current.setVisibleSince(0L);
                     current.invalidateRecheck();
                 }
-                viewTreeStatusObserver.onActivityResumed(activity);
+                monitorViewTree(activity);
                 scheduleCheckImpression();
                 return;
             }
@@ -475,8 +500,19 @@ public class ImpressionProvider implements IActivityLifecycle, OnViewStateChange
 
         Logger.d(TAG, "add view to impression list");
         viewImpressions.add(new ViewImpression(view, slot, impressionEventName, attributes, identifier, effectiveConfig));
-        viewTreeStatusObserver.onActivityResumed(activity);
+        monitorViewTree(activity);
         scheduleCheckImpression();
+    }
+
+    /**
+     * 标记时挂上视图树监听。Activity 已退到后台（paused 且窗口不显示）时不挂：
+     * 否则 ON_PAUSED 已注销的监听会被重新挂回去，后台期间白跑回调；回到前台的 ON_RESUMED 会负责挂上。
+     */
+    private void monitorViewTree(Activity activity) {
+        Activity resumed = activityStateProvider == null ? null : activityStateProvider.getResumedActivity();
+        if (activity == resumed || isWindowShowing(activity)) {
+            viewTreeStatusObserver.onActivityResumed(activity);
+        }
     }
 
     /**

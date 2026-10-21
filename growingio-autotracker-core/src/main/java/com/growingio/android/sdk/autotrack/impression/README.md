@@ -68,6 +68,7 @@ configuration.setImpressionEnabled(true)                  // 曝光开关，默�
 
 - **检测由视图树变化驱动**：`ViewTreeStatusObserver` 监听所在 Activity 的布局、滚动与窗口事件，检测按 `impressionCheckInterval` 做首尾双触发的节流——间隔到了立刻检测，间隔内的变化合并为一次尾随检测，滚动停止瞬间入屏的元素不会漏判。
 - **停留时长靠一次性定时复检收口**：界面静止后视图树不再产生回调，元素上的令牌保证反复进出可视区不累积待执行任务。
+- **窗口未显示时不判定**：从后台回来时 `ON_RESUMED` 往往早于窗口可见性恢复，此时视图的 `windowVisibility` 仍是 `GONE`。检测会跳过而不是把元素当成离开过可视区，等窗口显示后的视图树回调再判，避免回前台时偶发的重复曝光。
 - **标记按 Activity 分组**，视图以弱引用持有，Activity 销毁时整组释放。
 
 ## 限制
