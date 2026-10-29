@@ -235,7 +235,7 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 .build();
 
-        this.networkCallback = new ConnectivityManager.NetworkCallback() {
+        ConnectivityManager.NetworkCallback callback = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(Network network) {
                 super.onAvailable(network);
@@ -244,7 +244,17 @@ public class ActivityStateProvider extends ListenerContainer<IActivityLifecycle,
             }
         };
 
-        connectivityManager.registerNetworkCallback(request, networkCallback);
+        try {
+            connectivityManager.registerNetworkCallback(request, callback);
+            this.networkCallback = callback;
+        } catch (RuntimeException e) {
+            // The system limits outstanding network requests per UID (100). Once exceeded it throws
+            // ConnectivityManager$TooManyRequestsException on Android 11+, or a RuntimeException on older versions.
+            // This callback only flushes events sooner when the network comes back; events are still sent by the
+            // periodic upload, so a failure here must not break SDK initialization.
+            Logger.e(TAG, e, "Register network callback failed, events will be sent by periodic upload.");
+            this.networkCallback = null;
+        }
     }
 
     @SuppressWarnings("deprecation")
