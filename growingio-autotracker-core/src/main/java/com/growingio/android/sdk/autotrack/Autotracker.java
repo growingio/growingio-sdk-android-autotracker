@@ -311,6 +311,12 @@ public class Autotracker extends Tracker {
         trackViewImpression(view, impressionEventName, null);
     }
 
+    /**
+     * 标记一个视图，元素进入可视区域并满足曝光条件时发送对应的自定义事件。默认支持重复曝光：
+     * 元素离开可视区再次进入时会再发送一次。
+     * <p>列表场景下在绑定数据的地方直接标记即可，不需要在视图复用时清理：
+     * 重复标记时事件名、属性、配置三者都没变化则保留原有曝光状态，不会重复发送。
+     */
     public void trackViewImpression(final View view, final String impressionEventName,
                                     final Map<String, String> attributes) {
         if (!isInited) return;
@@ -330,6 +336,9 @@ public class Autotracker extends Tracker {
         });
     }
 
+    /**
+     * 移除该视图上的全部曝光标记。
+     */
     public void stopTrackViewImpression(final View trackedView) {
         if (!isInited) return;
         if (trackedView == null) {
