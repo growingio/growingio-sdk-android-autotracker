@@ -398,6 +398,7 @@ public class Tracker {
     }
 
     public boolean doDeepLinkByUrl(String url, DeepLinkCallback callback) {
+        if (!isInited) return false;
         DeepLinkProvider deepLinkProvider = trackerContext.getProvider(DeepLinkProvider.class);
         return deepLinkProvider.doDeepLinkByUrl(url, callback);
     }
@@ -437,10 +438,12 @@ public class Tracker {
      * @param module GIOLibraryModule
      */
     public void registerComponent(LibraryGioModule module) {
+        if (!isInited) return;
         addComponent(module, null);
     }
 
     public void registerComponent(LibraryGioModule module, Configurable config) {
+        if (!isInited) return;
         addComponent(module, config);
     }
 
@@ -448,6 +451,7 @@ public class Tracker {
      * uninstall module
      */
     protected void uninstallComponent(Class modelClazz, Class dataClazz, Class<? extends Configurable> configClazz, Class<? extends TrackerLifecycleProvider> providerClazz) {
+        if (!isInited) return;
         if (modelClazz == null) return;
         if (configClazz != null) {
             trackerContext.getConfigurationProvider().removeConfiguration(configClazz);

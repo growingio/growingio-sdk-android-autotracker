@@ -85,6 +85,18 @@ public class TrackerTest {
     }
 
     @Test
+    public void uninitializedApiTest() {
+        // GrowingTracker.get() / GrowingAutotracker.get() return new Tracker(null) when the SDK is not initialized
+        // (e.g. initialization failed or the API is called in a process that does not init the SDK).
+        // These APIs must be no-ops instead of throwing NullPointerException.
+        Tracker emptyTracker = new Tracker(null);
+        assertThat(emptyTracker.doDeepLinkByUrl("growing.test://growingio/webservice", null)).isFalse();
+        emptyTracker.registerComponent(new TestLibraryGioModule());
+        emptyTracker.registerComponent(new TestLibraryGioModule(), new TestLibraryGioModule());
+        emptyTracker.uninstallComponent(Object.class, Object.class, TestLibraryGioModule.class, null);
+    }
+
+    @Test
     public void coreConfiguration() {
         CoreConfiguration coreConfiguration = new CoreConfiguration("TrackerTest", "growingio://tracker");
         coreConfiguration.setDataCollectionServerHost("https://www.growingio.com/");
