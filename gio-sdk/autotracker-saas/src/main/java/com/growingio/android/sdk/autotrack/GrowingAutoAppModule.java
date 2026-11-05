@@ -16,10 +16,11 @@
 package com.growingio.android.sdk.autotrack;
 
 import com.growingio.android.sdk.AppGioModule;
+import com.growingio.android.sdk.track.middleware.SaaSConfig;
 import com.growingio.sdk.annotation.GIOAppModule;
 import com.growingio.sdk.annotation.GIOTracker;
 
-@GIOAppModule(name = "GrowingAutotracker", configName = "AutotrackConfiguration")
+@GIOAppModule(name = "GrowingAutotracker", configName = "AutotrackConfiguration", config = SaaSConfig.class)
 public class GrowingAutoAppModule extends AppGioModule {
 
     @GIOTracker(path = SaaSTracker.class)

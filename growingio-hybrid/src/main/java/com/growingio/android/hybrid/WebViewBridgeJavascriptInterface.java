@@ -22,6 +22,7 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.ForceLoginProvider;
 import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
@@ -38,6 +39,7 @@ class WebViewBridgeJavascriptInterface {
     private final HybridBridgeProvider mHybridBridgeProvider;
     private final UserInfoProvider mUserInfoProvider;
     private final DeviceInfoProvider mDeviceInfoProvider;
+    private final ForceLoginProvider mForceLoginProvider;
     private final PersistentDataProvider mPersistentDataProvider;
     private final ConfigurationProvider mConfigurationProvider;
 
@@ -48,6 +50,7 @@ class WebViewBridgeJavascriptInterface {
         this.mHybridBridgeProvider = hybridBridgeProvider;
         mUserInfoProvider = context.getUserInfoProvider();
         mDeviceInfoProvider = context.getDeviceInfoProvider();
+        mForceLoginProvider = context.getProvider(ForceLoginProvider.class);
         mPersistentDataProvider = context.getProvider(PersistentDataProvider.class);
         mConfigurationProvider = context.getConfigurationProvider();
         mNativeBridge = new NativeBridge(mUserInfoProvider);
@@ -66,7 +69,7 @@ class WebViewBridgeJavascriptInterface {
         Logger.d(TAG, "getNativeIdentity");
         JSONObject identity = new JSONObject();
         try {
-            identity.put("deviceId", mDeviceInfoProvider.getDeviceId());
+            identity.put("deviceId", mForceLoginProvider.getDeviceId(mDeviceInfoProvider.getDeviceId()));
             String userId = mUserInfoProvider.getLoginUserId();
             if (!TextUtils.isEmpty(userId)) {
                 identity.put("userId", userId);

@@ -137,6 +137,10 @@ public class EventDataManager {
     }
 
     void queryEvents(int policy, int limit, EventDbResult dbResult) {
+        queryEvents(policy, limit, "", dbResult);
+    }
+
+    void queryEvents(int policy, int limit, String deviceId, EventDbResult dbResult) {
         // query 判断磁盘空间是否已满，避免ignoreOperations的情况下，重复发送同一事件
         if (ignoreOperations) {
             dbResult.setSuccess(false);
@@ -167,7 +171,7 @@ public class EventDataManager {
                     removeEventById(client, delId);
                 }
             }
-            EventByteArray result = formatData(EventFormatData.merge(queryList));
+            EventByteArray result = formatData(EventFormatData.merge(queryList, deviceId));
             if (result != null && result.getBodyData() != null) {
                 dbResult.setSum(count);
                 dbResult.setSuccess(true);

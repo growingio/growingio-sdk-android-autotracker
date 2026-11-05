@@ -88,4 +88,24 @@ public class JsonDataTest {
 
     }
 
+    @Test
+    public void dataMergeWithDeviceIdOverride() throws JSONException {
+        CustomEvent customEvent = new CustomEvent.Builder()
+                .setEventName("cached")
+                .build();
+        JSONObject cachedJson = EventBuilderProvider.toJson(customEvent);
+        cachedJson.put("deviceId", "generated-device");
+        byte[] cachedData = cachedJson.toString().getBytes();
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        arrayList.add(cachedData);
+
+        EventFormatData eventData = EventFormatData.merge(arrayList, "visitor-001");
+        EventByteArray data = new JsonDataFetcher(eventData).executeData();
+
+        JSONArray jsonArray = new JSONArray(new String(data.getBodyData()));
+        Truth.assertThat(jsonArray.getJSONObject(0).getString("deviceId")).isEqualTo("visitor-001");
+        Truth.assertThat(jsonArray.getJSONObject(0).getString("eventName")).isEqualTo("cached");
+        Truth.assertThat(new JSONObject(new String(cachedData)).getString("deviceId")).isEqualTo("generated-device");
+    }
+
 }

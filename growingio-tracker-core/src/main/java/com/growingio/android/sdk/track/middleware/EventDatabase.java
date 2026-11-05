@@ -38,6 +38,7 @@ public class EventDatabase {
     private int limit;
     private long lastId;
     private String eventType;
+    private String deviceId;
 
     public int getDbOp() {
         return dbOp;
@@ -61,6 +62,10 @@ public class EventDatabase {
 
     public String getEventType() {
         return eventType;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
     }
 
     public static EventDatabase insert(GEvent event) {
@@ -94,10 +99,15 @@ public class EventDatabase {
     }
 
     public static EventDatabase query(int policy, int limit) {
+        return query(policy, limit, "");
+    }
+
+    public static EventDatabase query(int policy, int limit, String deviceId) {
         EventDatabase ed = new EventDatabase();
         ed.dbOp = DATABASE_OP_QUERY;
         ed.policy = policy;
         ed.limit = limit;
+        ed.deviceId = deviceId;
         return ed;
     }
 

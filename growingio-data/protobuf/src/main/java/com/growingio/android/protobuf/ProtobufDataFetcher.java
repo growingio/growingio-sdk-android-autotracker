@@ -63,18 +63,26 @@ public class ProtobufDataFetcher implements FormatDataFetcher<EventByteArray> {
 
     @Override
     public EventByteArray merge(List<byte[]> events) {
-        byte[] data = marshall(events);
+        byte[] data = marshall(events, eventData.getDeviceId());
         return new EventByteArray(data, "application/protobuf");
     }
 
-    private byte[] marshall(List<byte[]> events) {
+    private byte[] marshall(List<byte[]> events, String deviceId) {
         if (events == null || events.isEmpty()) {
             return new byte[]{};
         }
+        boolean replaceDeviceId = deviceId != null && !deviceId.isEmpty();
         EventV3Protocol.EventV3List.Builder listBuilder = EventV3Protocol.EventV3List.newBuilder();
         for (byte[] data : events) {
             EventV3Protocol.EventV3Dto event = EventProtocolTransfer.covertToProtobuf(data);
-            if (event != null) listBuilder.addValues(event);
+            if (event != null) {
+                if (replaceDeviceId) {
+                    event = event.toBuilder().setDeviceId(deviceId).build();
+                }
+                listBuilder.addValues(event);
+            } else if (replaceDeviceId) {
+                return null;
+            }
         }
         return listBuilder.build().toByteArray();
     }

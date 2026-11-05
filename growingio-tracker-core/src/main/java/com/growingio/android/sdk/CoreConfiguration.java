@@ -32,6 +32,7 @@ public class CoreConfiguration implements Configurable {
     private int mDataUploadInterval = 15;
     private int mSessionInterval = 30;
     private boolean mDataCollectionEnabled = true;
+    private boolean mForceLogin = false;
 
     private boolean mCustomEventWithPath = false;
     private boolean mRequireAppProcessesEnabled = false;
@@ -66,6 +67,19 @@ public class CoreConfiguration implements Configurable {
 
     public CoreConfiguration setDataCollectionEnabled(boolean dataCollectionEnabled) {
         mDataCollectionEnabled = dataCollectionEnabled;
+        return this;
+    }
+
+    /**
+     * Whether events must wait for the first valid identify call in each launch before upload.
+     * Only applies to NewSaaS. Default: false.
+     */
+    public boolean isForceLogin() {
+        return mForceLogin;
+    }
+
+    public CoreConfiguration setForceLogin(boolean forceLogin) {
+        mForceLogin = forceLogin;
         return this;
     }
 

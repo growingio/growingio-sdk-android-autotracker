@@ -85,4 +85,28 @@ public class ProtocolDataTest {
 
     }
 
+    @Test
+    public void dataMergeWithDeviceIdOverride() throws InvalidProtocolBufferException {
+        CustomEvent customEvent = new CustomEvent.Builder()
+                .setEventName("cached")
+                .build();
+        EventV3Protocol.EventV3Dto cachedEvent = EventV3Protocol.EventV3Dto
+                .parseFrom(EventProtocolTransfer.protocolByte(customEvent))
+                .toBuilder()
+                .setDeviceId("generated-device")
+                .build();
+        byte[] cachedData = cachedEvent.toByteArray();
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        arrayList.add(cachedData);
+
+        EventFormatData eventData = EventFormatData.merge(arrayList, "visitor-001");
+        EventByteArray data = new ProtobufDataFetcher(eventData).executeData();
+
+        EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(data.getBodyData());
+        Truth.assertThat(list.getValuesCount()).isEqualTo(1);
+        Truth.assertThat(list.getValues(0).getDeviceId()).isEqualTo("visitor-001");
+        Truth.assertThat(list.getValues(0).getEventName()).isEqualTo("cached");
+        Truth.assertThat(EventV3Protocol.EventV3Dto.parseFrom(cachedData).getDeviceId()).isEqualTo("generated-device");
+    }
+
 }

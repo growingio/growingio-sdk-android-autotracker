@@ -25,6 +25,7 @@ import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.format.FormatDataFetcher;
 import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -72,7 +73,10 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
 
     @Override
     public EventByteArray merge(List<byte[]> events) {
-        String data = marshall(events);
+        String data = marshall(events, eventData.getDeviceId());
+        if (data == null) {
+            return new EventByteArray(null);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return new EventByteArray(data.getBytes(StandardCharsets.UTF_8), "application/json");
         } else {
@@ -80,10 +84,11 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
         }
     }
 
-    private String marshall(List<byte[]> events) {
+    private String marshall(List<byte[]> events, String deviceId) {
         if (events == null || events.isEmpty()) {
             return "[]";
         }
+        boolean replaceDeviceId = deviceId != null && !deviceId.isEmpty();
         StringBuilder sb = new StringBuilder("[");
         int length = events.size();
         for (byte[] data : events) {
@@ -91,6 +96,16 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
             if (data.length > 0) {
                 String event = new String(data);
                 if (event.startsWith("{") && event.endsWith("}")) { //ensure json format
+                    if (replaceDeviceId) {
+                        try {
+                            JSONObject eventJson = new JSONObject(event);
+                            eventJson.put("deviceId", deviceId);
+                            event = eventJson.toString();
+                        } catch (JSONException e) {
+                            Logger.e(TAG, e, "failed to replace deviceId in cached event");
+                            return null;
+                        }
+                    }
                     sb.append(event);
                     if (length > 0) {
                         sb.append(",");

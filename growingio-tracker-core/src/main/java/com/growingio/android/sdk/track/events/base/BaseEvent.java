@@ -29,6 +29,7 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.ForceLoginProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
@@ -350,7 +351,8 @@ public abstract class BaseEvent extends GEvent {
 
             platformVersion = deviceInfo.getPlatformVersion();
             platform = deviceInfo.getPlatform();
-            deviceId = deviceInfo.getDeviceId();
+            ForceLoginProvider forceLoginProvider = context.getProvider(ForceLoginProvider.class);
+            deviceId = forceLoginProvider.getDeviceId(deviceInfo.getDeviceId());
             screenHeight = getFieldDefault(BaseField.SCREEN_HEIGHT) ? deviceInfo.getScreenHeight() : 0;
             screenWidth = getFieldDefault(BaseField.SCREEN_WIDTH) ? deviceInfo.getScreenWidth() : 0;
             deviceBrand = getFieldDefault(BaseField.DEVICE_BRAND) ? deviceInfo.getDeviceBrand() : null;

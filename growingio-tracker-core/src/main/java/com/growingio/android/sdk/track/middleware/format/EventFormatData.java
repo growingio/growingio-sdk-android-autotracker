@@ -33,6 +33,7 @@ public class EventFormatData {
     private int eventOp;
     private GEvent event;
     private List<byte[]> events;
+    private String deviceId;
 
     public GEvent getEvent() {
         return event;
@@ -46,6 +47,10 @@ public class EventFormatData {
         return events;
     }
 
+    public String getDeviceId() {
+        return deviceId;
+    }
+
     public static EventFormatData format(GEvent event) {
         EventFormatData fd = new EventFormatData();
         fd.event = event;
@@ -54,8 +59,13 @@ public class EventFormatData {
     }
 
     public static EventFormatData merge(List<byte[]> events) {
+        return merge(events, "");
+    }
+
+    public static EventFormatData merge(List<byte[]> events, String deviceId) {
         EventFormatData fd = new EventFormatData();
         fd.events = events;
+        fd.deviceId = deviceId;
         fd.eventOp = DATA_FORMAT_MERGE;
         return fd;
     }
