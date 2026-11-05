@@ -155,27 +155,6 @@ public class ForceLoginEventSenderTest {
         Truth.assertThat(queryEvents(event).getSum()).isEqualTo(0);
     }
 
-    @Test
-    public void identifyUploadsCachedEventsWhenDataCollectionDisabled() throws Exception {
-        context.getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
-        eventSenderProvider.cacheEvent(customEvent("cached-before-identify"));
-        CountDownLatch requestLatch = new CountDownLatch(1);
-        List<byte[]> requests = new ArrayList<>();
-        eventSenderProvider.setEventNetSender((events, mediaType) -> {
-            requests.add(events);
-            requestLatch.countDown();
-            return new SendResponse(204, 1000L);
-        });
-        context.getConfigurationProvider().core().setDataCollectionEnabled(false);
-
-        tracker.identify("visitor-disabled-collection");
-
-        Truth.assertThat(requestLatch.await(5, TimeUnit.SECONDS)).isTrue();
-        Truth.assertThat(requests).hasSize(1);
-        JSONArray sentEvents = new JSONArray(new String(requests.get(0)));
-        Truth.assertThat(sentEvents.getJSONObject(0).getString("deviceId")).isEqualTo("visitor-disabled-collection");
-    }
-
     private CustomEvent customEvent(String eventName) {
         CustomEvent.Builder builder = new CustomEvent.Builder().setEventName(eventName);
         builder.readPropertyInTrackThread(context);

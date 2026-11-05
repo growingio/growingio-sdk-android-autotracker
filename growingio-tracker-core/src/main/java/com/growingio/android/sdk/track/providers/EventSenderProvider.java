@@ -81,12 +81,6 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
         }
     }
 
-    public void flushAfterIdentify() {
-        if (sendHandler != null) {
-            sendHandler.flush();
-        }
-    }
-
     @Override
     public void shutdown() {
         processLock.release();

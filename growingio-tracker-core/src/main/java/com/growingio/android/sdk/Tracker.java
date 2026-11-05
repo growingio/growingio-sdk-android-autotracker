@@ -273,7 +273,7 @@ public class Tracker {
             ForceLoginProvider forceLoginProvider = trackerContext.getProvider(ForceLoginProvider.class);
             if (forceLoginProvider.identify(deviceId)) {
                 EventSenderProvider eventSenderProvider = trackerContext.getProvider(EventSenderProvider.class);
-                eventSenderProvider.flushAfterIdentify();
+                eventSenderProvider.flush();
             }
         });
     }
