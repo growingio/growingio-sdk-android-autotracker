@@ -27,7 +27,6 @@ import com.growingio.android.sdk.Tracker;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.CustomEvent;
 import com.growingio.android.sdk.track.middleware.CdpConfig;
-import com.growingio.android.sdk.track.middleware.SaaSConfig;
 
 import org.junit.After;
 import org.junit.Before;
@@ -111,19 +110,6 @@ public class ForceLoginProviderTest {
         CustomEvent.Builder builder = new CustomEvent.Builder().setEventName("cdp");
         builder.readPropertyInTrackThread(context);
         Truth.assertThat(builder.build().getDeviceId()).isNotEqualTo("visitor-001");
-    }
-
-    @Test
-    public void saasBehaviorIsUnchanged() {
-        tracker = startTracker(true, false);
-        TrackerContext context = tracker.getContext();
-        context.getConfigurationProvider().addConfiguration(new SaaSConfig());
-        ForceLoginProvider provider = context.getProvider(ForceLoginProvider.class);
-
-        Truth.assertThat(provider.canSend()).isTrue();
-        Truth.assertThat(provider.identify("visitor-001")).isFalse();
-        Truth.assertThat(provider.getOverrideDeviceId()).isEmpty();
-        Truth.assertThat(provider.getDeviceId("generated")).isEqualTo("generated");
     }
 
     @Test

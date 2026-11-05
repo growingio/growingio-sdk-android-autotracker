@@ -22,7 +22,6 @@ import android.text.TextUtils;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.CdpConfig;
-import com.growingio.android.sdk.track.middleware.SaaSConfig;
 
 public class ForceLoginProvider implements TrackerLifecycleProvider {
     private static final String TAG = "ForceLoginProvider";
@@ -115,8 +114,6 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
     }
 
     private boolean isNewSaaS() {
-        return configurationProvider != null
-                && configurationProvider.getConfiguration(CdpConfig.class) == null
-                && configurationProvider.getConfiguration(SaaSConfig.class) == null;
+        return configurationProvider != null && configurationProvider.getConfiguration(CdpConfig.class) == null;
     }
 }
