@@ -236,6 +236,7 @@ class EventProtocolTransfer {
         if (gEvent instanceof CustomEvent) {
             CustomEvent customEvent = (CustomEvent) gEvent;
             eventBuilder.setEventName(customEvent.getEventName()); //22
+            eventBuilder.setReferralPage(customEvent.getReferralPage()); //13
         }
         if (gEvent instanceof PageLevelCustomEvent) {
             PageLevelCustomEvent plEvent = (PageLevelCustomEvent) gEvent;

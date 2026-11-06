@@ -34,6 +34,7 @@ public class CoreConfiguration implements Configurable {
     private boolean mDataCollectionEnabled = true;
 
     private boolean mCustomEventWithPath = false;
+    private boolean mCustomEventWithReferralPath = false;
     private boolean mRequireAppProcessesEnabled = false;
     private String mDataCollectionServerHost = "https://napi.growingio.com";
     private EventFilterInterceptor mEventFilterInterceptor;
@@ -226,5 +227,14 @@ public class CoreConfiguration implements Configurable {
 
     public boolean isCustomEventWithPath() {
         return mCustomEventWithPath;
+    }
+
+    public CoreConfiguration setCustomEventWithReferralPath(boolean enable) {
+        this.mCustomEventWithReferralPath = enable;
+        return this;
+    }
+
+    public boolean isCustomEventWithReferralPath() {
+        return mCustomEventWithReferralPath;
     }
 }

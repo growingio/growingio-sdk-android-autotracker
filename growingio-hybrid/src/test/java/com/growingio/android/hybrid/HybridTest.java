@@ -70,10 +70,12 @@ public class HybridTest {
     public void transformTest() {
         HybridTransformerImp hybridTransformerImp = new HybridTransformerImp();
 
-        String customJson = "{\"eventType\":\"CUSTOM\",\"query\":\"something\",\"domain\":\"growingio.com\",\"path\":\"/webview/button/\",\"eventName\":\"test event\",\"pageShowTimestamp\":12345678,\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
+        String customJson = "{\"eventType\":\"CUSTOM\",\"query\":\"something\",\"domain\":\"growingio.com\",\"path\":\"/webview/button/\",\"referralPage\":\"/home/product/\",\"eventName\":\"test event\",\"pageShowTimestamp\":12345678,\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
         HybridCustomEvent customEvent = (HybridCustomEvent) hybridTransformerImp.transform(customJson).build();
         Truth.assertThat(customEvent.getQuery()).isEqualTo("something");
+        Truth.assertThat(customEvent.getReferralPage()).isEqualTo("/home/product/");
         Truth.assertThat(EventBuilderProvider.toJson(customEvent).toString()).contains("test event");
+        Truth.assertThat(EventBuilderProvider.toJson(customEvent).optString("referralPage")).isEqualTo("/home/product/");
         Truth.assertThat(customEvent.getAttributes().size()).isEqualTo(2);
 
         String userAttrJson = "{\"eventType\":\"LOGIN_USER_ATTRIBUTES\",\"attributes\":{\"grow_index\":\"苹果\",\"grow_click\":14}}";
@@ -107,6 +109,17 @@ public class HybridTest {
         HybridPageEvent pageEvent = (HybridPageEvent) hybridTransformerImp.transform(pageJson).build();
         Truth.assertThat(pageEvent.getProtocolType()).isEqualTo("webview");
         Truth.assertThat(pageEvent.getQuery()).isEqualTo("something");
+    }
+
+    @Test
+    public void transformCustomEventWithEmptyReferralPage() {
+        HybridTransformerImp hybridTransformerImp = new HybridTransformerImp();
+        String customJson = "{\"eventType\":\"CUSTOM\",\"path\":\"/current\",\"referralPage\":\"\",\"eventName\":\"test event\"}";
+        HybridCustomEvent event = (HybridCustomEvent) hybridTransformerImp.transform(customJson).build();
+
+        Truth.assertThat(event.getPath()).isEqualTo("/current");
+        Truth.assertThat(event.getReferralPage()).isEmpty();
+        Truth.assertThat(EventBuilderProvider.toJson(event).has("referralPage")).isFalse();
     }
 
     @Test

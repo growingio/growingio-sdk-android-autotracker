@@ -116,6 +116,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
     @TrackThread
     public BaseEvent onGenerateGEvent(BaseEvent.BaseBuilder<?> gEvent) {
+        updateCustomEventReferPage(gEvent);
         dispatchEventWillBuild(gEvent);
 
         BaseEvent.BaseBuilder<?> eventBuilder = transformEventBuilder(gEvent);
@@ -137,24 +138,42 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
 
     public void setCustomEventReferPage(String pagePath, long timeStamp) {
+        setCustomEventReferPage(pagePath, null, timeStamp);
+    }
+
+    public void setCustomEventReferPage(String pagePath, String referralPage, long timeStamp) {
         customEventReferPage.pagePath = pagePath;
+        customEventReferPage.referralPage = referralPage;
         customEventReferPage.timeStamp = timeStamp;
+    }
+
+    private void updateCustomEventReferPage(BaseEvent.BaseBuilder<?> gEvent) {
+        if (gEvent.getClass() == PageEvent.Builder.class) {
+            PageEvent.Builder pageBuilder = (PageEvent.Builder) gEvent;
+            setCustomEventReferPage(pageBuilder.getPath(), pageBuilder.getReferralPage(), pageBuilder.getTimestamp());
+        }
     }
 
     private BaseEvent.BaseBuilder<?> transformEventBuilder(BaseEvent.BaseBuilder<?> gEvent) {
         // only for custom event, exclude page level custom event
-        if (customEventReferPage.isPageRefer
-                && gEvent instanceof CustomEvent.Builder
+        if (gEvent instanceof CustomEvent.Builder
                 && !(gEvent instanceof PageLevelCustomEvent.Builder)) {
             CustomEvent.Builder customBuilder = (CustomEvent.Builder) gEvent;
-            PageLevelCustomEvent.Builder newBuilder = new PageLevelCustomEvent.Builder();
-            newBuilder.setAttributes(customBuilder.getAttributes());
-            newBuilder.setEventName(customBuilder.getEventName());
-            if (configurationProvider.isDowngrade()) {
-                newBuilder.setPageShowTimestamp(customEventReferPage.timeStamp);
+            if (!configurationProvider.isDowngrade()
+                    && configurationProvider.core().isCustomEventWithReferralPath()) {
+                customBuilder.setReferralPage(customEventReferPage.referralPage);
             }
-            newBuilder.setPath(customEventReferPage.pagePath);
-            return newBuilder;
+            if (customEventReferPage.isPageRefer) {
+                PageLevelCustomEvent.Builder newBuilder = new PageLevelCustomEvent.Builder();
+                newBuilder.setAttributes(customBuilder.getAttributes());
+                newBuilder.setEventName(customBuilder.getEventName());
+                newBuilder.setReferralPage(customBuilder.getReferralPage());
+                if (configurationProvider.isDowngrade()) {
+                    newBuilder.setPageShowTimestamp(customEventReferPage.timeStamp);
+                }
+                newBuilder.setPath(customEventReferPage.pagePath);
+                return newBuilder;
+            }
         }
         return gEvent;
     }
@@ -308,6 +327,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     private static class CustomEventReferPage {
         private boolean isPageRefer = false;
         private String pagePath = "/";
+        private String referralPage;
         private long timeStamp = 0L;
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.growingio.android.sdk.track.events.hybrid;
 
+import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.PageLevelCustomEvent;
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
@@ -43,6 +44,14 @@ public final class HybridCustomEvent extends PageLevelCustomEvent {
         public Builder setQuery(String query) {
             this.query = query;
             return this;
+        }
+
+        @Override
+        public void readPropertyInTrackThread(TrackerContext context) {
+            if (context.getConfigurationProvider().isDowngrade()) {
+                setReferralPage(null);
+            }
+            super.readPropertyInTrackThread(context);
         }
 
         @Override

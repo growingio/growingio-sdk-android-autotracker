@@ -55,6 +55,12 @@ public class PageLevelCustomEvent extends CustomEvent {
             return this;
         }
 
+        @Override
+        public Builder setReferralPage(String referralPage) {
+            super.setReferralPage(referralPage);
+            return this;
+        }
+
         public Builder setPageShowTimestamp(long pageShowTimestamp) {
             this.pageShowTimestamp = pageShowTimestamp;
             return this;

@@ -101,6 +101,10 @@ public class PageEvent extends BaseAttributesEvent {
             return path;
         }
 
+        public String getReferralPage() {
+            return referralPage;
+        }
+
         @Override
         public PageEvent build() {
             return new PageEvent(this);
@@ -117,6 +121,10 @@ public class PageEvent extends BaseAttributesEvent {
         public Builder setTimestamp(long timestamp) {
             this.timestamp = timestamp;
             return this;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
         }
     }
 }
