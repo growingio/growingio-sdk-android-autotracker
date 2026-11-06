@@ -141,7 +141,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
         setCustomEventReferPage(pagePath, null, timeStamp);
     }
 
-    public void setCustomEventReferPage(String pagePath, String referralPage, long timeStamp) {
+    private void setCustomEventReferPage(String pagePath, String referralPage, long timeStamp) {
         customEventReferPage.pagePath = pagePath;
         customEventReferPage.referralPage = referralPage;
         customEventReferPage.timeStamp = timeStamp;
