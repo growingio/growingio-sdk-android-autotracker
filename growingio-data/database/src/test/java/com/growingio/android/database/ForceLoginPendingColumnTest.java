@@ -101,6 +101,33 @@ public class ForceLoginPendingColumnTest {
         helper.close();
     }
 
+    @Test
+    public void pendingEventIsKeptWhenColumnIsMissing() {
+        // 模拟补列失败：表中没有待替换列
+        SQLiteDatabase db = application.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
+        db.execSQL(OLD_CREATE_TABLE_EVENTS);
+
+        long pendingRowId = EventDataTable.insertEvent(db, EventDataTable.putValues(new byte[]{1}, "CUSTOM", 2, true));
+        long normalRowId = EventDataTable.insertEvent(db, EventDataTable.putValues(new byte[]{2}, "CUSTOM", 2, false));
+
+        // 待替换事件去掉标志后按普通事件写入，不丢失
+        Truth.assertThat(pendingRowId).isGreaterThan(0L);
+        Truth.assertThat(normalRowId).isGreaterThan(0L);
+        try (Cursor cursor = db.rawQuery("SELECT _data FROM " + TABLE_EVENTS + " ORDER BY _id ASC", null)) {
+            Truth.assertThat(cursor.getCount()).isEqualTo(2);
+        }
+        db.close();
+    }
+
+    @Test
+    public void pendingEventKeepsFlagWhenColumnExists() {
+        EventDataSQLiteOpenHelper helper = new EventDataSQLiteOpenHelper(application, DATABASE_NAME);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Truth.assertThat(EventDataTable.insertEvent(db, EventDataTable.putValues(new byte[]{1}, "CUSTOM", 2, true))).isGreaterThan(0L);
+        Truth.assertThat(pendingFlags(db)).containsExactly(1);
+        helper.close();
+    }
+
     private List<String> columns(SQLiteDatabase db) {
         List<String> result = new ArrayList<>();
         try (Cursor cursor = db.rawQuery("PRAGMA table_info(" + TABLE_EVENTS + ")", null)) {

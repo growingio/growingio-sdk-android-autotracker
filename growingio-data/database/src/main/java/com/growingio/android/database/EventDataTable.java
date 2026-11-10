@@ -19,10 +19,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-
+import com.growingio.android.sdk.track.log.Logger;
 
 public class EventDataTable {
 
+    private static final String TAG = "EventDataTable";
     public static final String TABLE_EVENTS = "events";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_CREATE_TIME = "_created";
@@ -72,6 +73,21 @@ public class EventDataTable {
         if (!exists) {
             db.execSQL(ADD_COLUMN_FORCE_LOGIN_PENDING);
         }
+    }
+
+    /**
+     * 写入事件。补列失败时表中没有待替换列，带该列的写入会失败（insert 返回 -1）：
+     * 此时去掉待替换标志按普通事件写入，事件按自动生成的设备 ID 上报，不丢失。
+     */
+    static long insertEvent(SQLiteDatabase db, ContentValues values) {
+        long rowId = db.insert(TABLE_EVENTS, null, values);
+        if (rowId == -1 && values.containsKey(COLUMN_FORCE_LOGIN_PENDING)) {
+            Logger.w(TAG, "insert force login pending event failed, retry without the pending flag");
+            ContentValues fallback = new ContentValues(values);
+            fallback.remove(COLUMN_FORCE_LOGIN_PENDING);
+            rowId = db.insert(TABLE_EVENTS, null, fallback);
+        }
+        return rowId;
     }
 
     public static ContentValues putValues(byte[] data, String eventType, Integer policy) {

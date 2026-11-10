@@ -38,6 +38,9 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
     @Override
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
+        if (configurationProvider.core().isForceLogin() && !isNewSaaS()) {
+            Logger.w(TAG, "forceLogin is ignored, it only applies to NewSaaS");
+        }
         sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         synchronized (lock) {
             identifiedDeviceId = sharedPreferences.getString(KEY_IDENTIFY_DEVICE_ID, "");
@@ -124,16 +127,6 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
         synchronized (lock) {
             return TextUtils.isEmpty(identifiedDeviceId) ? generatedDeviceId : identifiedDeviceId;
         }
-    }
-
-    /**
-     * 构建事件使用的设备 ID：待替换时为自动生成的设备 ID（与老版本 SDK 一致，降级后按设备 ID 上报），否则为当前有效设备 ID。
-     */
-    public String getEventDeviceId(String generatedDeviceId) {
-        if (isPending()) {
-            return generatedDeviceId;
-        }
-        return getDeviceId(generatedDeviceId);
     }
 
     /**
