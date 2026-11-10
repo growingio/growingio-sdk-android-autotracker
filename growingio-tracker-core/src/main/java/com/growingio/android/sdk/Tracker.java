@@ -38,6 +38,7 @@ import com.growingio.android.sdk.track.middleware.hybrid.HybridBridge;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeepLinkProvider;
 import com.growingio.android.sdk.track.providers.EventSenderProvider;
+import com.growingio.android.sdk.track.providers.ForceLoginProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.providers.SessionProvider;
@@ -262,9 +263,26 @@ public class Tracker {
         TrackEventGenerator.generateVisitorAttributesEvent(new HashMap<>(attributes));
     }
 
+    /**
+     * Sets the visitor ID and unblocks event upload for this launch when force login is enabled.
+     * Only the first valid call in each launch is accepted.
+     */
+    public void identify(final String deviceId) {
+        if (!isInited) return;
+        TrackMainThread.trackMain().postActionToTrackMain(() -> {
+            ForceLoginProvider forceLoginProvider = trackerContext.getProvider(ForceLoginProvider.class);
+            if (forceLoginProvider.identify(deviceId)) {
+                EventSenderProvider eventSenderProvider = trackerContext.getProvider(EventSenderProvider.class);
+                eventSenderProvider.flush();
+            }
+        });
+    }
+
     public String getDeviceId() {
         if (!isInited) return "UNKNOWN";
-        return trackerContext.getDeviceInfoProvider().getDeviceId();
+        String generatedDeviceId = trackerContext.getDeviceInfoProvider().getDeviceId();
+        ForceLoginProvider forceLoginProvider = trackerContext.getProvider(ForceLoginProvider.class);
+        return forceLoginProvider.getDeviceId(generatedDeviceId);
     }
 
     public void setDataCollectionEnabled(boolean enabled) {

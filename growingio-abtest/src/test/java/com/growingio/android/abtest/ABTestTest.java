@@ -30,6 +30,7 @@ import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.middleware.abtest.ABExperiment;
 import com.growingio.android.sdk.track.middleware.abtest.ABTest;
 import com.growingio.android.sdk.track.middleware.abtest.ABTestCallback;
+import com.growingio.android.sdk.track.providers.ForceLoginProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.snappy.XORUtils;
@@ -539,6 +540,59 @@ public class ABTestTest extends MockServer {
         // 重新开启后恢复正常：命中预置缓存
         Truth.assertThat(context.getRegistry().executeData(newSimpleABTest("700"), ABTest.class, ABExperiment.class)).isNotNull();
         Truth.assertThat(requestCount.get()).isEqualTo(0);
+    }
+
+    @Test
+    public void forceLoginBlocksRequestBeforeIdentifyTest() {
+        final AtomicInteger requestCount = new AtomicInteger(0);
+        final Map<String, String> lastParams = new HashMap<>();
+        setDispatcher(new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+                requestCount.incrementAndGet();
+                lastParams.clear();
+                lastParams.putAll(parseFormBody(request.getBody().readString(StandardCharsets.UTF_8)));
+                return getMockResponse();
+            }
+        });
+        String generatedDeviceId = context.getDeviceInfoProvider().getDeviceId();
+        // 预置一条按自动生成 ID 存的有效缓存：identify 前不得读取
+        setExpiredABTest("800", System.currentTimeMillis() + 60_000L, ABTestResponse.tomorrowMill());
+        context.getConfigurationProvider().core().setForceLogin(true);
+        try {
+            // 1. 未 identify：立即失败，不发请求、不读缓存
+            final AtomicBoolean failed = new AtomicBoolean(false);
+            ABTest abTest = new ABTest("800", new ABTestCallback() {
+                @Override
+                public void onABExperimentReceived(ABExperiment experiment, int dataType) {
+                    throw new AssertionError("should not return any experiment before identify");
+                }
+
+                @Override
+                public void onABExperimentFailed(Exception error) {
+                    Truth.assertThat(error.getMessage()).contains("identify has not been called");
+                    failed.set(true);
+                }
+            });
+            Truth.assertThat(context.getRegistry().executeData(abTest, ABTest.class, ABExperiment.class)).isNull();
+            Truth.assertThat(failed.get()).isTrue();
+            Truth.assertThat(requestCount.get()).isEqualTo(0);
+            Truth.assertThat(sharedPreferences.contains(ABTestDataLoader.cacheKey(generatedDeviceId, null, null, "800"))).isTrue();
+
+            // 2. identify 后：按访问用户 ID 分流，缓存 key 也按访问用户 ID，不命中自动生成 ID 的缓存
+            ForceLoginProvider forceLoginProvider = context.getProvider(ForceLoginProvider.class);
+            Truth.assertThat(forceLoginProvider.identify("visitor-800")).isTrue();
+            Truth.assertThat(context.getRegistry().executeData(newSimpleABTest("800"), ABTest.class, ABExperiment.class)).isNotNull();
+            Truth.assertThat(requestCount.get()).isEqualTo(1);
+            Truth.assertThat(lastParams.get("distinctId")).isEqualTo("visitor-800");
+            Truth.assertThat(sharedPreferences.contains(ABTestDataLoader.cacheKey("visitor-800", null, null, "800"))).isTrue();
+        } finally {
+            context.getConfigurationProvider().core().setForceLogin(false);
+        }
+
+        // 3. 关闭 forceLogin 后：沿用已持久化的访问用户 ID，命中其缓存
+        Truth.assertThat(context.getRegistry().executeData(newSimpleABTest("800"), ABTest.class, ABExperiment.class)).isNotNull();
+        Truth.assertThat(requestCount.get()).isEqualTo(1);
     }
 
     @Test

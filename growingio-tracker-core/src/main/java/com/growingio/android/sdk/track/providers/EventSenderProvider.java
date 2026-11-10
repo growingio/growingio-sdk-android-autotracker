@@ -51,6 +51,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
 
     private TrackerContext context;
     private ConfigurationProvider configurationProvider;
+    private ForceLoginProvider forceLoginProvider;
     private EventSenderProvider.SendHandler sendHandler;
     private IEventNetSender eventNetSender;
     private ProcessLock processLock;
@@ -60,6 +61,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
     @SuppressWarnings("WrongConstant")
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
+        forceLoginProvider = context.getProvider(ForceLoginProvider.class);
         long dataUploadInterval = configurationProvider.core().isDebugEnabled() ? 0L : configurationProvider.core().getDataUploadInterval();
 
         sharedPreferences = context.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
@@ -201,6 +203,10 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
             Logger.w(TAG, "sdk sendEvents will in main process,not in sub process.");
             return;
         }
+        if (!forceLoginProvider.canSend()) {
+            Logger.d(TAG, "Force login is enabled, delay upload.");
+            return;
+        }
 
         NetworkUtil.NetworkState networkState = NetworkUtil.getActiveNetworkState(context);
         if (!networkState.isConnected()) {
@@ -231,7 +237,10 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
                     Logger.w(TAG, "Today's mobile data is exhausted");
                     break;
                 }
-                EventDbResult dbResult = databaseOperation(EventDatabase.query(policy, numOfMaxEventsPerRequest()));
+                // 强制登录：组包时只替换带待替换标志的事件，数据库原文不变
+                String pendingReplacement = forceLoginProvider.getPendingReplacement(context.getDeviceInfoProvider().getDeviceId());
+                EventDatabase query = EventDatabase.query(policy, numOfMaxEventsPerRequest(), pendingReplacement);
+                EventDbResult dbResult = databaseOperation(query);
                 if (dbResult.isSuccess() && dbResult.getSum() > 0) {
                     if (eventNetSender == null) {
                         succeeded = false;

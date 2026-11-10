@@ -29,9 +29,11 @@ import com.growingio.android.sdk.track.providers.ActivityStateProvider;
 import com.growingio.android.sdk.track.providers.AppInfoProvider;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.ForceLoginProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ConstantPool;
 import com.growingio.android.sdk.track.utils.NetworkUtil;
+import com.growingio.sdk.annotation.json.JsonIgnore;
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
 import java.util.HashMap;
@@ -96,10 +98,15 @@ public abstract class BaseEvent extends GEvent {
     @Nullable
     private final String timezoneOffset;
 
+    // 强制登录待替换标志：identify 前构建的事件为 true，入库时写入数据库 _force_login_pending 列，不进入事件数据
+    @JsonIgnore
+    private final boolean forceLoginPending;
+
     protected BaseEvent(BaseBuilder<?> eventBuilder) {
         platform = eventBuilder.platform;
         platformVersion = eventBuilder.platformVersion;
         deviceId = eventBuilder.deviceId;
+        forceLoginPending = eventBuilder.forceLoginPending;
         userKey = eventBuilder.userKey;
         userId = eventBuilder.userId;
         sessionId = eventBuilder.sessionId;
@@ -129,6 +136,10 @@ public abstract class BaseEvent extends GEvent {
 
     public String getDeviceId() {
         return checkValueSafe(deviceId);
+    }
+
+    public boolean isForceLoginPending() {
+        return forceLoginPending;
     }
 
     public String getUserKey() {
@@ -244,6 +255,7 @@ public abstract class BaseEvent extends GEvent {
         protected String platform;
         protected String platformVersion;
         protected String deviceId;
+        protected boolean forceLoginPending;
         protected String userKey;
         protected String userId;
         protected String sessionId;
@@ -350,7 +362,10 @@ public abstract class BaseEvent extends GEvent {
 
             platformVersion = deviceInfo.getPlatformVersion();
             platform = deviceInfo.getPlatform();
-            deviceId = deviceInfo.getDeviceId();
+            // 构建时一并确定 deviceId 与待替换标志：事件可能在调用方线程同步构建（如 cacheEventSync），不能等入库时再判断
+            ForceLoginProvider forceLoginProvider = context.getProvider(ForceLoginProvider.class);
+            forceLoginPending = forceLoginProvider.isPending();
+            deviceId = forceLoginPending ? deviceInfo.getDeviceId() : forceLoginProvider.getDeviceId(deviceInfo.getDeviceId());
             screenHeight = getFieldDefault(BaseField.SCREEN_HEIGHT) ? deviceInfo.getScreenHeight() : 0;
             screenWidth = getFieldDefault(BaseField.SCREEN_WIDTH) ? deviceInfo.getScreenWidth() : 0;
             deviceBrand = getFieldDefault(BaseField.DEVICE_BRAND) ? deviceInfo.getDeviceBrand() : null;

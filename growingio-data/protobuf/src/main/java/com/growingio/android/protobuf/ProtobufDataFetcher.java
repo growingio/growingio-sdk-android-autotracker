@@ -72,9 +72,15 @@ public class ProtobufDataFetcher implements FormatDataFetcher<EventByteArray> {
             return new byte[]{};
         }
         EventV3Protocol.EventV3List.Builder listBuilder = EventV3Protocol.EventV3List.newBuilder();
-        for (byte[] data : events) {
-            EventV3Protocol.EventV3Dto event = EventProtocolTransfer.covertToProtobuf(data);
-            if (event != null) listBuilder.addValues(event);
+        for (int i = 0; i < events.size(); i++) {
+            EventV3Protocol.EventV3Dto event = EventProtocolTransfer.covertToProtobuf(events.get(i));
+            if (event != null) {
+                // 强制登录：只在发送副本中替换带待替换标志事件的 deviceId，数据库原文不变
+                if (eventData.isForceLoginPending(i)) {
+                    event = event.toBuilder().setDeviceId(eventData.getPendingDeviceIdReplacement()).build();
+                }
+                listBuilder.addValues(event);
+            }
         }
         return listBuilder.build().toByteArray();
     }

@@ -19,8 +19,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.growingio.android.sdk.track.log.Logger;
+
 public class EventDataSQLiteOpenHelper extends SQLiteOpenHelper {
 
+    private static final String TAG = "EventDataSQLiteOpenHelper";
+    // 保持为 1：onUpgrade 会删表重建，且老版本 SDK 无法打开更高版本的数据库；新增列在 onOpen 中补充
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "growingio.db";
 
@@ -36,6 +40,19 @@ public class EventDataSQLiteOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(EventDataTable.CREATE_TABLE_EVENTS);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (db.isReadOnly()) {
+            return;
+        }
+        try {
+            EventDataTable.ensureForceLoginPendingColumn(db);
+        } catch (Exception e) {
+            Logger.e(TAG, e, "failed to add force login pending column");
+        }
     }
 
     @Override
