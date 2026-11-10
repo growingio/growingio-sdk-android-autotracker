@@ -67,13 +67,17 @@ public class ProtocolTest {
 
         CustomEvent customEvent = new CustomEvent.Builder()
                 .setEventName("databaseTest")
+                .setReferralPage("referralPage")
                 .build();
         Truth.assertThat(protocol(customEvent).getEventName()).isEqualTo("databaseTest");
+        Truth.assertThat(protocol(customEvent).getReferralPage()).isEqualTo("referralPage");
 
         PageLevelCustomEvent plcEnent = new PageLevelCustomEvent.Builder()
                 .setPath("PageLevelCustomEvent")
+                .setReferralPage("referralPage")
                 .build();
         Truth.assertThat(protocol(plcEnent).getPath()).isEqualTo("PageLevelCustomEvent");
+        Truth.assertThat(protocol(plcEnent).getReferralPage()).isEqualTo("referralPage");
 
         ViewElementEvent vEvent = new ViewElementEvent.Builder("VIEW_CHANGE")
                 .setXpath("xxxx")

@@ -38,6 +38,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,8 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
     private final AttributesBuilder generalProps = new AttributesBuilder();
     private final CustomEventReferPage customEventReferPage = new CustomEventReferPage();
+    private static final int MAX_PENDING_NATIVE_PAGES = 16;
+    private final LinkedList<NativePage> pendingNativePages = new LinkedList<>();
 
     EventBuilderProvider() {
     }
@@ -116,6 +119,7 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
     @TrackThread
     public BaseEvent onGenerateGEvent(BaseEvent.BaseBuilder<?> gEvent) {
+        updateCustomEventReferPage(gEvent);
         dispatchEventWillBuild(gEvent);
 
         BaseEvent.BaseBuilder<?> eventBuilder = transformEventBuilder(gEvent);
@@ -136,25 +140,75 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     }
 
 
+    /**
+     * 登记原生页面：由 PageProvider 在发送原生 PAGE 前调用（UI 线程）。
+     * 只有登记过的 PAGE 在 track 线程处理时才会更新 CUSTOM 的页面信息，Flutter / Compose 等其他来源的 PAGE 不更新，与 master 一致；
+     * 页面信息在 track 线程按事件处理顺序更新，同一 CUSTOM 的 path 与 referralPage 来自同一个 PAGE。
+     */
     public void setCustomEventReferPage(String pagePath, long timeStamp) {
+        synchronized (pendingNativePages) {
+            pendingNativePages.addLast(new NativePage(pagePath, timeStamp));
+            // 未进入 track 线程的 PAGE（如数据采集关闭时）不会被消费，限制登记数量
+            while (pendingNativePages.size() > MAX_PENDING_NATIVE_PAGES) {
+                pendingNativePages.removeFirst();
+            }
+        }
+    }
+
+    private void setCustomEventReferPage(String pagePath, String referralPage, long timeStamp) {
         customEventReferPage.pagePath = pagePath;
+        customEventReferPage.referralPage = referralPage;
         customEventReferPage.timeStamp = timeStamp;
+    }
+
+    private void updateCustomEventReferPage(BaseEvent.BaseBuilder<?> gEvent) {
+        if (gEvent.getClass() == PageEvent.Builder.class) {
+            PageEvent.Builder pageBuilder = (PageEvent.Builder) gEvent;
+            if (consumeNativePage(pageBuilder.getPath(), pageBuilder.getTimestamp())) {
+                setCustomEventReferPage(pageBuilder.getPath(), pageBuilder.getReferralPage(), pageBuilder.getTimestamp());
+            }
+        }
+    }
+
+    /**
+     * PAGE 是否为登记过的原生页面；命中时移除该登记及其之前未被消费的登记。
+     */
+    private boolean consumeNativePage(String pagePath, long timeStamp) {
+        synchronized (pendingNativePages) {
+            int index = 0;
+            for (NativePage page : pendingNativePages) {
+                if (page.timeStamp == timeStamp && TextUtils.equals(page.pagePath, pagePath)) {
+                    for (int i = 0; i <= index; i++) {
+                        pendingNativePages.removeFirst();
+                    }
+                    return true;
+                }
+                index++;
+            }
+            return false;
+        }
     }
 
     private BaseEvent.BaseBuilder<?> transformEventBuilder(BaseEvent.BaseBuilder<?> gEvent) {
         // only for custom event, exclude page level custom event
-        if (customEventReferPage.isPageRefer
-                && gEvent instanceof CustomEvent.Builder
+        if (gEvent instanceof CustomEvent.Builder
                 && !(gEvent instanceof PageLevelCustomEvent.Builder)) {
             CustomEvent.Builder customBuilder = (CustomEvent.Builder) gEvent;
-            PageLevelCustomEvent.Builder newBuilder = new PageLevelCustomEvent.Builder();
-            newBuilder.setAttributes(customBuilder.getAttributes());
-            newBuilder.setEventName(customBuilder.getEventName());
-            if (configurationProvider.isDowngrade()) {
-                newBuilder.setPageShowTimestamp(customEventReferPage.timeStamp);
+            if (!configurationProvider.isDowngrade()
+                    && configurationProvider.core().isCustomEventWithReferralPath()) {
+                customBuilder.setReferralPage(customEventReferPage.referralPage);
             }
-            newBuilder.setPath(customEventReferPage.pagePath);
-            return newBuilder;
+            if (customEventReferPage.isPageRefer) {
+                PageLevelCustomEvent.Builder newBuilder = new PageLevelCustomEvent.Builder();
+                newBuilder.setAttributes(customBuilder.getAttributes());
+                newBuilder.setEventName(customBuilder.getEventName());
+                newBuilder.setReferralPage(customBuilder.getReferralPage());
+                if (configurationProvider.isDowngrade()) {
+                    newBuilder.setPageShowTimestamp(customEventReferPage.timeStamp);
+                }
+                newBuilder.setPath(customEventReferPage.pagePath);
+                return newBuilder;
+            }
         }
         return gEvent;
     }
@@ -308,6 +362,17 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
     private static class CustomEventReferPage {
         private boolean isPageRefer = false;
         private String pagePath = "/";
+        private String referralPage;
         private long timeStamp = 0L;
+    }
+
+    private static class NativePage {
+        private final String pagePath;
+        private final long timeStamp;
+
+        private NativePage(String pagePath, long timeStamp) {
+            this.pagePath = pagePath;
+            this.timeStamp = timeStamp;
+        }
     }
 }

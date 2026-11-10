@@ -15,6 +15,8 @@
  */
 package com.growingio.android.sdk.track.events;
 
+import androidx.annotation.Nullable;
+
 import com.growingio.android.sdk.track.events.base.BaseAttributesEvent;
 import com.growingio.sdk.annotation.json.JsonSerializer;
 
@@ -23,18 +25,26 @@ public class CustomEvent extends BaseAttributesEvent {
     private static final long serialVersionUID = 1L;
 
     private final String eventName;
+    @Nullable
+    private final String referralPage;
 
     protected CustomEvent(Builder eventBuilder) {
         super(eventBuilder);
         eventName = eventBuilder.eventName;
+        referralPage = eventBuilder.referralPage;
     }
 
     public String getEventName() {
         return checkValueSafe(eventName);
     }
 
+    public String getReferralPage() {
+        return checkValueSafe(referralPage);
+    }
+
     public static class Builder extends BaseAttributesEvent.Builder<CustomEvent> {
         private String eventName;
+        private String referralPage;
 
         public Builder() {
             super(TrackEventType.CUSTOM);
@@ -45,8 +55,17 @@ public class CustomEvent extends BaseAttributesEvent {
             return this;
         }
 
+        public Builder setReferralPage(String referralPage) {
+            this.referralPage = referralPage;
+            return this;
+        }
+
         public String getEventName() {
             return eventName;
+        }
+
+        public String getReferralPage() {
+            return referralPage;
         }
 
         @Override
