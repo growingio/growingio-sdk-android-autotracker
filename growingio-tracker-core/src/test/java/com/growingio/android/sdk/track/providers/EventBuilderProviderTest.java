@@ -104,13 +104,55 @@ public class EventBuilderProviderTest {
                 .setCustomEventWithPath(true)
                 .setCustomEventWithReferralPath(true);
         EventBuilderProvider provider = setup(configuration);
-        sendPage(provider, "/flutter/previous", "");
-        sendPage(provider, "/flutter/current", "/flutter/previous");
+        sendPage(provider, "/previous", "");
+        sendPage(provider, "/current", "/previous");
 
         PageLevelCustomEvent event = (PageLevelCustomEvent) provider.onGenerateGEvent(new CustomEvent.Builder().setEventName("add_cart"));
         JSONObject json = EventBuilderProvider.toJson(event);
-        Truth.assertThat(json.optString("path")).isEqualTo("/flutter/current");
-        Truth.assertThat(json.optString("referralPage")).isEqualTo("/flutter/previous");
+        Truth.assertThat(json.optString("path")).isEqualTo("/current");
+        Truth.assertThat(json.optString("referralPage")).isEqualTo("/previous");
+    }
+
+    @Test
+    public void flutterPageDoesNotUpdateCustomPageInfo() {
+        // 与 master 一致：只有原生 PAGE 更新 CUSTOM 页面信息，Flutter / Compose 等未登记的 PAGE 不更新
+        CoreConfiguration configuration = new CoreConfiguration("EventBuilderProviderTest", "growingio://eventBuilder")
+                .setCustomEventWithPath(true)
+                .setCustomEventWithReferralPath(true);
+        EventBuilderProvider provider = setup(configuration);
+        sendPage(provider, "/native/current", "/native/previous");
+        sendUnregisteredPage(provider, "/flutter/current", "/native/current");
+
+        PageLevelCustomEvent event = (PageLevelCustomEvent) provider.onGenerateGEvent(new CustomEvent.Builder().setEventName("add_cart"));
+        JSONObject json = EventBuilderProvider.toJson(event);
+        Truth.assertThat(json.optString("path")).isEqualTo("/native/current");
+        Truth.assertThat(json.optString("referralPage")).isEqualTo("/native/previous");
+    }
+
+    @Test
+    public void customPageInfoFollowsTrackThreadOrder() {
+        // PageProvider 在 UI 线程先登记 A、B，track 线程按顺序处理 PAGE：处理 A 后的 CUSTOM 仍为 A 的页面信息
+        CoreConfiguration configuration = new CoreConfiguration("EventBuilderProviderTest", "growingio://eventBuilder")
+                .setCustomEventWithPath(true)
+                .setCustomEventWithReferralPath(true);
+        EventBuilderProvider provider = setup(configuration);
+        provider.setCustomEventReferPage("/a", 1L);
+        provider.setCustomEventReferPage("/b", 2L);
+
+        provider.onGenerateGEvent(pageBuilder("/a", "/start", 1L));
+        JSONObject jsonA = EventBuilderProvider.toJson(provider.onGenerateGEvent(new CustomEvent.Builder().setEventName("on_a")));
+        Truth.assertThat(jsonA.optString("path")).isEqualTo("/a");
+        Truth.assertThat(jsonA.optString("referralPage")).isEqualTo("/start");
+
+        provider.onGenerateGEvent(pageBuilder("/b", "/a", 2L));
+        JSONObject jsonB = EventBuilderProvider.toJson(provider.onGenerateGEvent(new CustomEvent.Builder().setEventName("on_b")));
+        Truth.assertThat(jsonB.optString("path")).isEqualTo("/b");
+        Truth.assertThat(jsonB.optString("referralPage")).isEqualTo("/a");
+
+        // 登记已被消费：再次处理同一 PAGE 不重复更新
+        sendUnregisteredPage(provider, "/a", "/start");
+        JSONObject jsonAgain = EventBuilderProvider.toJson(provider.onGenerateGEvent(new CustomEvent.Builder().setEventName("again")));
+        Truth.assertThat(jsonAgain.optString("path")).isEqualTo("/b");
     }
 
     @Test
@@ -183,10 +225,25 @@ public class EventBuilderProviderTest {
         return tracker.getContext().getEventBuilderProvider();
     }
 
+    /**
+     * 模拟原生 PAGE：PageProvider 先登记再发送
+     */
     private void sendPage(EventBuilderProvider provider, String path, String referralPage) {
-        provider.onGenerateGEvent(new PageEvent.Builder()
+        provider.setCustomEventReferPage(path, 123456789L);
+        provider.onGenerateGEvent(pageBuilder(path, referralPage, 123456789L));
+    }
+
+    /**
+     * 模拟 Flutter / Compose PAGE：不登记
+     */
+    private void sendUnregisteredPage(EventBuilderProvider provider, String path, String referralPage) {
+        provider.onGenerateGEvent(pageBuilder(path, referralPage, 123456789L));
+    }
+
+    private PageEvent.Builder pageBuilder(String path, String referralPage, long timestamp) {
+        return new PageEvent.Builder()
                 .setPath(path)
                 .setReferralPage(referralPage)
-                .setTimestamp(123456789L));
+                .setTimestamp(timestamp);
     }
 }
