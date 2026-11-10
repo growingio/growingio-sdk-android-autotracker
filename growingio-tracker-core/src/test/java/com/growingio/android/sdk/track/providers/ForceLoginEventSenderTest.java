@@ -52,6 +52,7 @@ import org.robolectric.annotation.Config;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -94,10 +95,18 @@ public class ForceLoginEventSenderTest {
     }
 
     @Test
-    public void identifyUploadsCachedJsonEvents() throws Exception {
+    public void identifyReplacesOnlyPendingJsonEvents() throws Exception {
         context.getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
-        CustomEvent event = customEvent("cached-json");
-        eventSenderProvider.cacheEvent(event);
+        String generatedDeviceId = context.getDeviceInfoProvider().getDeviceId();
+        // 老版本或此前启动已确认身份的事件：不带待替换标志
+        CustomEvent legacy = legacyEvent("legacy-json");
+        // 本次启动 identify 前的事件：自动生成的设备 ID + 待替换标志
+        CustomEvent pending = customEvent("pending-json");
+        Truth.assertThat(legacy.isForceLoginPending()).isFalse();
+        Truth.assertThat(pending.isForceLoginPending()).isTrue();
+        Truth.assertThat(pending.getDeviceId()).isEqualTo(generatedDeviceId);
+        eventSenderProvider.cacheEvent(legacy);
+        eventSenderProvider.cacheEvent(pending);
         CountDownLatch requestLatch = new CountDownLatch(1);
         List<byte[]> requests = new ArrayList<>();
         eventSenderProvider.setEventNetSender((events, mediaType) -> {
@@ -108,28 +117,28 @@ public class ForceLoginEventSenderTest {
 
         eventSenderProvider.sendEvents(false);
         Truth.assertThat(requests).isEmpty();
-        EventDbResult cached = queryEvents(event);
-        Truth.assertThat(cached.getSum()).isEqualTo(1);
-        Truth.assertThat(new JSONArray(new String(cached.getData())).getJSONObject(0).getString("deviceId"))
-                .isEqualTo(context.getDeviceInfoProvider().getDeviceId());
+        Map<String, String> stored = jsonDeviceIds(queryEvents(pending).getData());
+        Truth.assertThat(stored).containsExactly("legacy-json", generatedDeviceId, "pending-json", generatedDeviceId);
 
+        // 与 Web SDK 一致：不去除首尾空白
         tracker.identify("  visitor-json  ");
         Truth.assertThat(requestLatch.await(5, TimeUnit.SECONDS)).isTrue();
         Uninterruptibles.sleepUninterruptibly(200, TimeUnit.MILLISECONDS);
 
         Truth.assertThat(requests).hasSize(1);
-        JSONArray sentEvents = new JSONArray(new String(requests.get(0)));
-        Truth.assertThat(sentEvents.getJSONObject(0).getString("deviceId")).isEqualTo("visitor-json");
-        Truth.assertThat(sentEvents.getJSONObject(0).getString("eventName")).isEqualTo("cached-json");
-        Truth.assertThat(queryEvents(event).getSum()).isEqualTo(0);
+        Truth.assertThat(jsonDeviceIds(requests.get(0)))
+                .containsExactly("legacy-json", generatedDeviceId, "pending-json", "  visitor-json  ");
+        Truth.assertThat(queryEvents(pending).getSum()).isEqualTo(0);
     }
 
     @Test
-    public void protobufRetryReplacesOnlyOutgoingDeviceId() throws Exception {
+    public void protobufRetryReplacesOnlyPendingEventsAndKeepsDatabase() throws Exception {
         context.getRegistry().register(EventFormatData.class, EventByteArray.class, new ProtobufDataLoader.Factory());
-        CustomEvent event = customEvent("cached-protobuf");
         String generatedDeviceId = context.getDeviceInfoProvider().getDeviceId();
-        eventSenderProvider.cacheEvent(event);
+        CustomEvent legacy = legacyEvent("legacy-protobuf");
+        CustomEvent pending = customEvent("pending-protobuf");
+        eventSenderProvider.cacheEvent(legacy);
+        eventSenderProvider.cacheEvent(pending);
         List<byte[]> requests = new ArrayList<>();
         eventSenderProvider.setEventNetSender((events, mediaType) -> {
             requests.add(events);
@@ -143,16 +152,51 @@ public class ForceLoginEventSenderTest {
         eventSenderProvider.sendEvents(false);
 
         Truth.assertThat(requests).hasSize(1);
-        assertProtobufDeviceId(requests.get(0), "visitor-protobuf");
-        EventDbResult cachedAfterFailure = queryEvents(event);
-        Truth.assertThat(cachedAfterFailure.getSum()).isEqualTo(1);
-        EventV3Protocol.EventV3List cachedList = EventV3Protocol.EventV3List.parseFrom(cachedAfterFailure.getData());
-        Truth.assertThat(cachedList.getValues(0).getDeviceId()).isEqualTo(generatedDeviceId);
+        Truth.assertThat(protobufDeviceIds(requests.get(0)))
+                .containsExactly("legacy-protobuf", generatedDeviceId, "pending-protobuf", "visitor-protobuf");
+        // 上传失败：数据库原文不变
+        EventDbResult cachedAfterFailure = queryEvents(pending);
+        Truth.assertThat(cachedAfterFailure.getSum()).isEqualTo(2);
+        Truth.assertThat(protobufDeviceIds(cachedAfterFailure.getData()))
+                .containsExactly("legacy-protobuf", generatedDeviceId, "pending-protobuf", generatedDeviceId);
 
+        // 重试时再次替换
         eventSenderProvider.sendEvents(false);
         Truth.assertThat(requests).hasSize(2);
-        assertProtobufDeviceId(requests.get(1), "visitor-protobuf");
-        Truth.assertThat(queryEvents(event).getSum()).isEqualTo(0);
+        Truth.assertThat(protobufDeviceIds(requests.get(1)))
+                .containsExactly("legacy-protobuf", generatedDeviceId, "pending-protobuf", "visitor-protobuf");
+        Truth.assertThat(queryEvents(pending).getSum()).isEqualTo(0);
+    }
+
+    /**
+     * 未开启强制登录时构建的事件，模拟老版本 SDK 或此前启动已确认身份的事件
+     */
+    private CustomEvent legacyEvent(String eventName) {
+        CoreConfiguration core = context.getConfigurationProvider().core();
+        core.setForceLogin(false);
+        try {
+            return customEvent(eventName);
+        } finally {
+            core.setForceLogin(true);
+        }
+    }
+
+    private Map<String, String> jsonDeviceIds(byte[] data) throws Exception {
+        Map<String, String> result = new HashMap<>();
+        JSONArray events = new JSONArray(new String(data));
+        for (int i = 0; i < events.length(); i++) {
+            result.put(events.getJSONObject(i).getString("eventName"), events.getJSONObject(i).getString("deviceId"));
+        }
+        return result;
+    }
+
+    private Map<String, String> protobufDeviceIds(byte[] data) throws Exception {
+        Map<String, String> result = new HashMap<>();
+        EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(data);
+        for (EventV3Protocol.EventV3Dto event : list.getValuesList()) {
+            result.put(event.getEventName(), event.getDeviceId());
+        }
+        return result;
     }
 
     private CustomEvent customEvent(String eventName) {
@@ -165,12 +209,5 @@ public class ForceLoginEventSenderTest {
         ModelLoader<EventDatabase, EventDbResult> modelLoader =
                 context.getRegistry().getModelLoader(EventDatabase.class, EventDbResult.class);
         return modelLoader.buildLoadData(EventDatabase.query(event.getSendPolicy(), 10)).fetcher.executeData();
-    }
-
-    private void assertProtobufDeviceId(byte[] data, String deviceId) throws Exception {
-        EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(data);
-        Truth.assertThat(list.getValuesCount()).isEqualTo(1);
-        Truth.assertThat(list.getValues(0).getDeviceId()).isEqualTo(deviceId);
-        Truth.assertThat(list.getValues(0).getEventName()).isEqualTo("cached-protobuf");
     }
 }

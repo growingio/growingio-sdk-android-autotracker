@@ -38,7 +38,7 @@ public class EventDatabase {
     private int limit;
     private long lastId;
     private String eventType;
-    private String deviceId;
+    private String pendingDeviceIdReplacement;
 
     public int getDbOp() {
         return dbOp;
@@ -64,8 +64,11 @@ public class EventDatabase {
         return eventType;
     }
 
-    public String getDeviceId() {
-        return deviceId;
+    /**
+     * 强制登录：组包时替换带待替换标志事件 deviceId 所用的值，空字符串表示无需替换
+     */
+    public String getPendingDeviceIdReplacement() {
+        return pendingDeviceIdReplacement;
     }
 
     public static EventDatabase insert(GEvent event) {
@@ -102,12 +105,12 @@ public class EventDatabase {
         return query(policy, limit, "");
     }
 
-    public static EventDatabase query(int policy, int limit, String deviceId) {
+    public static EventDatabase query(int policy, int limit, String pendingDeviceIdReplacement) {
         EventDatabase ed = new EventDatabase();
         ed.dbOp = DATABASE_OP_QUERY;
         ed.policy = policy;
         ed.limit = limit;
-        ed.deviceId = deviceId;
+        ed.pendingDeviceIdReplacement = pendingDeviceIdReplacement;
         return ed;
     }
 

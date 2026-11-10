@@ -30,6 +30,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -86,27 +87,49 @@ public class ProtocolDataTest {
     }
 
     @Test
-    public void dataMergeWithDeviceIdOverride() throws InvalidProtocolBufferException {
-        CustomEvent customEvent = new CustomEvent.Builder()
-                .setEventName("cached")
-                .build();
-        EventV3Protocol.EventV3Dto cachedEvent = EventV3Protocol.EventV3Dto
-                .parseFrom(EventProtocolTransfer.protocolByte(customEvent))
-                .toBuilder()
-                .setDeviceId("generated-device")
-                .build();
-        byte[] cachedData = cachedEvent.toByteArray();
+    public void dataMergeReplacesOnlyPendingEvents() throws InvalidProtocolBufferException {
         ArrayList<byte[]> arrayList = new ArrayList<>();
-        arrayList.add(cachedData);
+        arrayList.add(cachedEvent("legacy", "generated-device"));
+        byte[] pendingData = cachedEvent("pending", "generated-device");
+        arrayList.add(pendingData);
 
-        EventFormatData eventData = EventFormatData.merge(arrayList, "visitor-001");
+        EventFormatData eventData = EventFormatData.merge(arrayList, Arrays.asList(false, true), "visitor-001");
         EventByteArray data = new ProtobufDataFetcher(eventData).executeData();
 
         EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(data.getBodyData());
+        Truth.assertThat(list.getValuesCount()).isEqualTo(2);
+        Truth.assertThat(list.getValues(0).getDeviceId()).isEqualTo("generated-device");
+        Truth.assertThat(list.getValues(1).getDeviceId()).isEqualTo("visitor-001");
+        Truth.assertThat(list.getValues(1).getEventName()).isEqualTo("pending");
+        // 数据库原文不变
+        Truth.assertThat(EventV3Protocol.EventV3Dto.parseFrom(pendingData).getDeviceId()).isEqualTo("generated-device");
+    }
+
+    @Test
+    public void malformedEventDoesNotBlockBatch() throws InvalidProtocolBufferException {
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        arrayList.add(new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF});
+        arrayList.add(cachedEvent("pending", "generated-device"));
+
+        EventFormatData eventData = EventFormatData.merge(arrayList, Arrays.asList(true, true), "visitor-001");
+        EventByteArray data = new ProtobufDataFetcher(eventData).executeData();
+
+        // 无法解析的事件被跳过（与改动前一致），其余事件照常替换
+        EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(data.getBodyData());
         Truth.assertThat(list.getValuesCount()).isEqualTo(1);
         Truth.assertThat(list.getValues(0).getDeviceId()).isEqualTo("visitor-001");
-        Truth.assertThat(list.getValues(0).getEventName()).isEqualTo("cached");
-        Truth.assertThat(EventV3Protocol.EventV3Dto.parseFrom(cachedData).getDeviceId()).isEqualTo("generated-device");
+    }
+
+    private byte[] cachedEvent(String eventName, String deviceId) throws InvalidProtocolBufferException {
+        CustomEvent customEvent = new CustomEvent.Builder()
+                .setEventName(eventName)
+                .build();
+        return EventV3Protocol.EventV3Dto
+                .parseFrom(EventProtocolTransfer.protocolByte(customEvent))
+                .toBuilder()
+                .setDeviceId(deviceId)
+                .build()
+                .toByteArray();
     }
 
 }

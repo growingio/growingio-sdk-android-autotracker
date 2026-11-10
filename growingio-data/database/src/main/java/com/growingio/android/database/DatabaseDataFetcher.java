@@ -69,7 +69,7 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
             assertCondition(database.getLimit() > 0
                             && database.getPolicy() >= SEND_POLICY_INSTANT,
                     "leak necessary param");
-            dataManager.queryEvents(database.getPolicy(), database.getLimit(), database.getDeviceId(), dbResult);
+            dataManager.queryEvents(database.getPolicy(), database.getLimit(), database.getPendingDeviceIdReplacement(), dbResult);
             return dbResult;
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_DELETE) {
             assertCondition(database.getLastId() > 0

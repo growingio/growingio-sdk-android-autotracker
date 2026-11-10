@@ -73,10 +73,7 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
 
     @Override
     public EventByteArray merge(List<byte[]> events) {
-        String data = marshall(events, eventData.getDeviceId());
-        if (data == null) {
-            return new EventByteArray(null);
-        }
+        String data = marshall(events);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return new EventByteArray(data.getBytes(StandardCharsets.UTF_8), "application/json");
         } else {
@@ -84,27 +81,20 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
         }
     }
 
-    private String marshall(List<byte[]> events, String deviceId) {
+    private String marshall(List<byte[]> events) {
         if (events == null || events.isEmpty()) {
             return "[]";
         }
-        boolean replaceDeviceId = deviceId != null && !deviceId.isEmpty();
         StringBuilder sb = new StringBuilder("[");
         int length = events.size();
-        for (byte[] data : events) {
+        for (int i = 0; i < events.size(); i++) {
+            byte[] data = events.get(i);
             length -= 1;
             if (data.length > 0) {
                 String event = new String(data);
                 if (event.startsWith("{") && event.endsWith("}")) { //ensure json format
-                    if (replaceDeviceId) {
-                        try {
-                            JSONObject eventJson = new JSONObject(event);
-                            eventJson.put("deviceId", deviceId);
-                            event = eventJson.toString();
-                        } catch (JSONException e) {
-                            Logger.e(TAG, e, "failed to replace deviceId in cached event");
-                            return null;
-                        }
+                    if (eventData.isForceLoginPending(i)) {
+                        event = replaceDeviceId(event, eventData.getPendingDeviceIdReplacement());
                     }
                     sb.append(event);
                     if (length > 0) {
@@ -117,6 +107,20 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    /**
+     * 强制登录：只在发送副本中替换 deviceId；替换失败时按入库时的数据（自动生成的设备 ID）发送，不阻塞整批
+     */
+    private String replaceDeviceId(String event, String deviceId) {
+        try {
+            JSONObject eventJson = new JSONObject(event);
+            eventJson.put("deviceId", deviceId);
+            return eventJson.toString();
+        } catch (JSONException e) {
+            Logger.e(TAG, e, "failed to replace deviceId of force login pending event");
+            return event;
+        }
     }
 
     private void assertCondition(boolean condition, String msg) throws IllegalArgumentException {

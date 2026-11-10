@@ -63,25 +63,23 @@ public class ProtobufDataFetcher implements FormatDataFetcher<EventByteArray> {
 
     @Override
     public EventByteArray merge(List<byte[]> events) {
-        byte[] data = marshall(events, eventData.getDeviceId());
+        byte[] data = marshall(events);
         return new EventByteArray(data, "application/protobuf");
     }
 
-    private byte[] marshall(List<byte[]> events, String deviceId) {
+    private byte[] marshall(List<byte[]> events) {
         if (events == null || events.isEmpty()) {
             return new byte[]{};
         }
-        boolean replaceDeviceId = deviceId != null && !deviceId.isEmpty();
         EventV3Protocol.EventV3List.Builder listBuilder = EventV3Protocol.EventV3List.newBuilder();
-        for (byte[] data : events) {
-            EventV3Protocol.EventV3Dto event = EventProtocolTransfer.covertToProtobuf(data);
+        for (int i = 0; i < events.size(); i++) {
+            EventV3Protocol.EventV3Dto event = EventProtocolTransfer.covertToProtobuf(events.get(i));
             if (event != null) {
-                if (replaceDeviceId) {
-                    event = event.toBuilder().setDeviceId(deviceId).build();
+                // 强制登录：只在发送副本中替换带待替换标志事件的 deviceId，数据库原文不变
+                if (eventData.isForceLoginPending(i)) {
+                    event = event.toBuilder().setDeviceId(eventData.getPendingDeviceIdReplacement()).build();
                 }
                 listBuilder.addValues(event);
-            } else if (replaceDeviceId) {
-                return null;
             }
         }
         return listBuilder.build().toByteArray();

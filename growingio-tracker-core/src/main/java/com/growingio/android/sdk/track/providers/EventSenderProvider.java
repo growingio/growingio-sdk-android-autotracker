@@ -237,7 +237,9 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
                     Logger.w(TAG, "Today's mobile data is exhausted");
                     break;
                 }
-                EventDatabase query = EventDatabase.query(policy, numOfMaxEventsPerRequest(), forceLoginProvider.getOverrideDeviceId());
+                // 强制登录：组包时只替换带待替换标志的事件，数据库原文不变
+                String pendingReplacement = forceLoginProvider.getPendingReplacement(context.getDeviceInfoProvider().getDeviceId());
+                EventDatabase query = EventDatabase.query(policy, numOfMaxEventsPerRequest(), pendingReplacement);
                 EventDbResult dbResult = databaseOperation(query);
                 if (dbResult.isSuccess() && dbResult.getSum() > 0) {
                     if (eventNetSender == null) {

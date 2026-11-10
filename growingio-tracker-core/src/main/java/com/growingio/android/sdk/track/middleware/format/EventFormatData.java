@@ -33,7 +33,9 @@ public class EventFormatData {
     private int eventOp;
     private GEvent event;
     private List<byte[]> events;
-    private String deviceId;
+    // 与 events 一一对应的强制登录待替换标志；为 null 时视为全部不替换
+    private List<Boolean> forceLoginPending;
+    private String pendingDeviceIdReplacement;
 
     public GEvent getEvent() {
         return event;
@@ -47,8 +49,19 @@ public class EventFormatData {
         return events;
     }
 
-    public String getDeviceId() {
-        return deviceId;
+    /**
+     * 第 index 个事件是否需要在组包时替换 deviceId
+     */
+    public boolean isForceLoginPending(int index) {
+        if (pendingDeviceIdReplacement == null || pendingDeviceIdReplacement.isEmpty()) {
+            return false;
+        }
+        return forceLoginPending != null && index < forceLoginPending.size()
+                && Boolean.TRUE.equals(forceLoginPending.get(index));
+    }
+
+    public String getPendingDeviceIdReplacement() {
+        return pendingDeviceIdReplacement;
     }
 
     public static EventFormatData format(GEvent event) {
@@ -59,13 +72,18 @@ public class EventFormatData {
     }
 
     public static EventFormatData merge(List<byte[]> events) {
-        return merge(events, "");
+        return merge(events, null, "");
     }
 
-    public static EventFormatData merge(List<byte[]> events, String deviceId) {
+    /**
+     * @param forceLoginPending          与 events 一一对应的强制登录待替换标志
+     * @param pendingDeviceIdReplacement 待替换事件组包时使用的 deviceId，空字符串表示不替换
+     */
+    public static EventFormatData merge(List<byte[]> events, List<Boolean> forceLoginPending, String pendingDeviceIdReplacement) {
         EventFormatData fd = new EventFormatData();
         fd.events = events;
-        fd.deviceId = deviceId;
+        fd.forceLoginPending = forceLoginPending;
+        fd.pendingDeviceIdReplacement = pendingDeviceIdReplacement;
         fd.eventOp = DATA_FORMAT_MERGE;
         return fd;
     }

@@ -27,6 +27,7 @@ import android.os.RemoteException;
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
 import com.growingio.android.sdk.track.events.TrackEventType;
+import com.growingio.android.sdk.track.events.base.BaseEvent;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.EventDbResult;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.growingio.android.database.EventDataTable.COLUMN_DATA;
+import static com.growingio.android.database.EventDataTable.COLUMN_FORCE_LOGIN_PENDING;
 import static com.growingio.android.database.EventDataTable.COLUMN_EVENT_TYPE;
 import static com.growingio.android.database.EventDataTable.COLUMN_ID;
 import static com.growingio.android.database.EventDataTable.COLUMN_POLICY;
@@ -102,7 +104,8 @@ public class EventDataManager {
                     Logger.e(TAG, "event data is too large, ignore it.");
                     return null;
                 }
-                ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), getDatabaseEventType(gEvent), gEvent.getSendPolicy());
+                boolean forceLoginPending = gEvent instanceof BaseEvent && ((BaseEvent) gEvent).isForceLoginPending();
+                ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), getDatabaseEventType(gEvent), gEvent.getSendPolicy(), forceLoginPending);
                 return contentResolver.insert(uri, contentValues);
             }
         } catch (SQLiteFullException e) {
@@ -140,17 +143,23 @@ public class EventDataManager {
         queryEvents(policy, limit, "", dbResult);
     }
 
-    void queryEvents(int policy, int limit, String deviceId, EventDbResult dbResult) {
+    /**
+     * @param pendingDeviceIdReplacement 强制登录：带待替换标志的事件在组包时替换为该 deviceId，空字符串表示不替换
+     */
+    void queryEvents(int policy, int limit, String pendingDeviceIdReplacement, EventDbResult dbResult) {
         // query 判断磁盘空间是否已满，避免ignoreOperations的情况下，重复发送同一事件
         if (ignoreOperations) {
             dbResult.setSuccess(false);
             return;
         }
         List<byte[]> queryList = new ArrayList<>();
+        List<Boolean> pendingList = new ArrayList<>();
         ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(eventsInfoAuthority);
         try (Cursor cursor = queryEvents(client, policy, limit)) {
             int count = 0;
             double dataSize = 0;
+            // 按结果集实际列判断：未补列的表（理论上不会出现）读不到该列时视为普通事件
+            int pendingIndex = cursor.getColumnIndex(COLUMN_FORCE_LOGIN_PENDING);
             while (cursor.moveToNext()) {
                 count++;
                 String eventType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EVENT_TYPE));
@@ -162,6 +171,7 @@ public class EventDataManager {
                         break;
                     }
                     queryList.add(data);
+                    pendingList.add(pendingIndex >= 0 && cursor.getInt(pendingIndex) == 1);
                     long lastId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
                     dbResult.setLastId(lastId);
                 } else {
@@ -171,7 +181,7 @@ public class EventDataManager {
                     removeEventById(client, delId);
                 }
             }
-            EventByteArray result = formatData(EventFormatData.merge(queryList, deviceId));
+            EventByteArray result = formatData(EventFormatData.merge(queryList, pendingList, pendingDeviceIdReplacement));
             if (result != null && result.getBodyData() != null) {
                 dbResult.setSum(count);
                 dbResult.setSuccess(true);
@@ -277,8 +287,8 @@ public class EventDataManager {
                 + " FROM " + TABLE_EVENTS + " WHERE " + COLUMN_POLICY + "=" + policy
                 + " ORDER BY " + COLUMN_ID + " DESC "
                 + " LIMIT 1";
-        String sql = "SELECT " + COLUMN_ID + ", " + COLUMN_DATA + ", "
-                + COLUMN_EVENT_TYPE
+        // SELECT *：包含强制登录待替换列（存在时）；不显式列出该列，避免补列失败时整个查询报错导致无法上报
+        String sql = "SELECT *"
                 + " FROM " + TABLE_EVENTS
                 + " WHERE " + COLUMN_EVENT_TYPE + "=(" + subSelect + ") AND " + COLUMN_POLICY + "=" + policy
                 + " ORDER BY " + COLUMN_ID + " ASC "

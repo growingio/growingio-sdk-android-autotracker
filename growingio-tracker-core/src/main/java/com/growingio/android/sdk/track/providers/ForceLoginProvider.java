@@ -53,35 +53,50 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
         }
     }
 
+    /**
+     * 与 Web SDK 校验规则一致：非空即有效，不去除首尾空白，超过 1000 字符截断（不拆开代理对）；每次启动仅首次有效调用生效。
+     */
     public boolean identify(String deviceId) {
         if (!isForceLoginEnabled()) {
             Logger.i(TAG, "Failed to identify, only available when NewSaaS forceLogin is enabled");
             return false;
         }
-        if (deviceId == null) {
+        if (TextUtils.isEmpty(deviceId)) {
             Logger.i(TAG, "Failed to identify, deviceId is empty");
             return false;
         }
 
-        String trimmedDeviceId = deviceId.trim();
-        if (TextUtils.isEmpty(trimmedDeviceId) || trimmedDeviceId.length() > MAX_DEVICE_ID_LENGTH) {
-            Logger.i(TAG, "Failed to identify, deviceId must contain 1 to 1000 non-whitespace characters");
-            return false;
-        }
-
+        String identified = truncateDeviceId(deviceId);
         synchronized (lock) {
             if (unlocked) {
                 Logger.i(TAG, "Failed to identify, deviceId has already been set in this launch");
                 return false;
             }
-            identifiedDeviceId = trimmedDeviceId;
+            identifiedDeviceId = identified;
             unlocked = true;
-            sharedPreferences.edit().putString(KEY_IDENTIFY_DEVICE_ID, trimmedDeviceId).apply();
+            sharedPreferences.edit().putString(KEY_IDENTIFY_DEVICE_ID, identified).apply();
         }
         Logger.i(TAG, "Identify deviceId for forced login");
         return true;
     }
 
+    /**
+     * 超过 1000 个 UTF-16 单元时截断；第 1000 个单元是代理对高位时在其前截断，不拆开 emoji 等代理对字符。
+     */
+    static String truncateDeviceId(String deviceId) {
+        if (deviceId.length() <= MAX_DEVICE_ID_LENGTH) {
+            return deviceId;
+        }
+        int end = MAX_DEVICE_ID_LENGTH;
+        if (Character.isHighSurrogate(deviceId.charAt(end - 1))) {
+            end--;
+        }
+        return deviceId.substring(0, end);
+    }
+
+    /**
+     * 未开启强制登录（或非 NewSaaS），或本次启动已 identify 时为 true。
+     */
     public boolean canSend() {
         if (!isForceLoginEnabled()) {
             return true;
@@ -91,6 +106,17 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
         }
     }
 
+    /**
+     * 当前构建的事件是否需要在上传时替换 deviceId（即 !canSend）。
+     * 待替换事件入库时 deviceId 为自动生成的设备 ID，并在数据库 _force_login_pending 列记 1。
+     */
+    public boolean isPending() {
+        return !canSend();
+    }
+
+    /**
+     * 当前有效设备 ID：NewSaaS 下已持久化的访问用户 ID，否则为自动生成的设备 ID。
+     */
     public String getDeviceId(String generatedDeviceId) {
         if (!isNewSaaS()) {
             return generatedDeviceId;
@@ -100,13 +126,24 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
         }
     }
 
-    public String getOverrideDeviceId() {
+    /**
+     * 构建事件使用的设备 ID：待替换时为自动生成的设备 ID（与老版本 SDK 一致，降级后按设备 ID 上报），否则为当前有效设备 ID。
+     */
+    public String getEventDeviceId(String generatedDeviceId) {
+        if (isPending()) {
+            return generatedDeviceId;
+        }
+        return getDeviceId(generatedDeviceId);
+    }
+
+    /**
+     * 上传时替换待替换事件 deviceId 所用的值；非 NewSaaS 不会产生待替换事件，返回空字符串表示无需替换。
+     */
+    public String getPendingReplacement(String generatedDeviceId) {
         if (!isNewSaaS()) {
             return "";
         }
-        synchronized (lock) {
-            return identifiedDeviceId;
-        }
+        return getDeviceId(generatedDeviceId);
     }
 
     private boolean isForceLoginEnabled() {

@@ -30,6 +30,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -89,23 +90,59 @@ public class JsonDataTest {
     }
 
     @Test
-    public void dataMergeWithDeviceIdOverride() throws JSONException {
-        CustomEvent customEvent = new CustomEvent.Builder()
-                .setEventName("cached")
-                .build();
-        JSONObject cachedJson = EventBuilderProvider.toJson(customEvent);
-        cachedJson.put("deviceId", "generated-device");
-        byte[] cachedData = cachedJson.toString().getBytes();
+    public void dataMergeReplacesOnlyPendingEvents() throws JSONException {
         ArrayList<byte[]> arrayList = new ArrayList<>();
-        arrayList.add(cachedData);
+        arrayList.add(cachedJson("legacy", "generated-device"));
+        byte[] pendingData = cachedJson("pending", "generated-device");
+        arrayList.add(pendingData);
 
-        EventFormatData eventData = EventFormatData.merge(arrayList, "visitor-001");
+        EventFormatData eventData = EventFormatData.merge(arrayList, Arrays.asList(false, true), "visitor-001");
         EventByteArray data = new JsonDataFetcher(eventData).executeData();
 
         JSONArray jsonArray = new JSONArray(new String(data.getBodyData()));
-        Truth.assertThat(jsonArray.getJSONObject(0).getString("deviceId")).isEqualTo("visitor-001");
-        Truth.assertThat(jsonArray.getJSONObject(0).getString("eventName")).isEqualTo("cached");
-        Truth.assertThat(new JSONObject(new String(cachedData)).getString("deviceId")).isEqualTo("generated-device");
+        Truth.assertThat(jsonArray.length()).isEqualTo(2);
+        Truth.assertThat(jsonArray.getJSONObject(0).getString("deviceId")).isEqualTo("generated-device");
+        Truth.assertThat(jsonArray.getJSONObject(1).getString("deviceId")).isEqualTo("visitor-001");
+        Truth.assertThat(jsonArray.getJSONObject(1).getString("eventName")).isEqualTo("pending");
+        // 数据库原文不变
+        Truth.assertThat(new JSONObject(new String(pendingData)).getString("deviceId")).isEqualTo("generated-device");
+    }
+
+    @Test
+    public void dataMergeWithoutReplacementKeepsPendingEvents() throws JSONException {
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        arrayList.add(cachedJson("pending", "generated-device"));
+
+        EventFormatData eventData = EventFormatData.merge(arrayList, Arrays.asList(true), "");
+        EventByteArray data = new JsonDataFetcher(eventData).executeData();
+
+        JSONArray jsonArray = new JSONArray(new String(data.getBodyData()));
+        Truth.assertThat(jsonArray.getJSONObject(0).getString("deviceId")).isEqualTo("generated-device");
+    }
+
+    @Test
+    public void malformedPendingEventDoesNotBlockBatch() throws JSONException {
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        arrayList.add("{broken}".getBytes());
+        arrayList.add(cachedJson("pending", "generated-device"));
+
+        EventFormatData eventData = EventFormatData.merge(arrayList, Arrays.asList(true, true), "visitor-001");
+        EventByteArray data = new JsonDataFetcher(eventData).executeData();
+
+        // 替换失败的事件按原数据拼接，其余事件照常替换，整批不失败
+        String body = new String(data.getBodyData());
+        Truth.assertThat(body).startsWith("[{broken},");
+        JSONObject pending = new JSONObject(body.substring("[{broken},".length(), body.length() - 1));
+        Truth.assertThat(pending.getString("deviceId")).isEqualTo("visitor-001");
+    }
+
+    private byte[] cachedJson(String eventName, String deviceId) throws JSONException {
+        CustomEvent customEvent = new CustomEvent.Builder()
+                .setEventName(eventName)
+                .build();
+        JSONObject cachedJson = EventBuilderProvider.toJson(customEvent);
+        cachedJson.put("deviceId", deviceId);
+        return cachedJson.toString().getBytes();
     }
 
 }
