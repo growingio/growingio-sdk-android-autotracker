@@ -46,6 +46,7 @@ import com.growingio.android.sdk.track.middleware.SendResponse;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
+import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,7 +62,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowConnectivityManager;
 import org.robolectric.util.ReflectionHelpers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -257,8 +260,18 @@ public class ForceLoginEventSenderTest {
     }
 
     @Test
-    public void confirmsEventsInsertedAfterIdentifyBeforeTheyCanBeSent() throws Exception {
-        context.getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
+    public void confirmsLateJsonEventsBeforeTheyCanBeSent() throws Exception {
+        assertConfirmsLateEventsBeforeSending(new JsonDataLoader.Factory(), this::jsonDeviceIds);
+    }
+
+    @Test
+    public void confirmsLateProtobufEventsBeforeTheyCanBeSent() throws Exception {
+        assertConfirmsLateEventsBeforeSending(new ProtobufDataLoader.Factory(), this::protobufDeviceIds);
+    }
+
+    private void assertConfirmsLateEventsBeforeSending(ModelLoaderFactory<EventFormatData, EventByteArray> formatter,
+                                                       DeviceIdsDecoder decoder) throws Exception {
+        context.getRegistry().register(EventFormatData.class, EventByteArray.class, formatter);
         CustomEvent lateLocalEvent = customEvent("late-local");
         CustomEvent lateSharedEvent = customEvent("late-shared");
         context.getConfigurationProvider().core().setDataCollectionEnabled(false);
@@ -267,16 +280,18 @@ public class ForceLoginEventSenderTest {
 
         eventSenderProvider.cacheEvent(lateLocalEvent);
         Truth.assertThat(pendingFlags()).containsExactly(0);
-        Truth.assertThat(jsonDeviceIds(queryEvents(lateLocalEvent).getData())).containsExactly("late-local", "visitor-A");
+        Truth.assertThat(decoder.decode(queryEvents(lateLocalEvent).getData())).containsExactly("late-local", "visitor-A");
 
         // Simulate a pending row inserted by another process sharing the provider.
-        contentProvider.dbHelper.getWritableDatabase().insertOrThrow(EventDataTable.TABLE_EVENTS, null,
-                EventDataTable.putValues(EventBuilderProvider.toJson(lateSharedEvent).toString().getBytes(),
-                        "TRACK", lateSharedEvent.getSendPolicy(), true));
+        byte[] sharedData = context.getRegistry().executeData(EventFormatData.format(lateSharedEvent),
+                EventFormatData.class, EventByteArray.class).getBodyData();
+        insertPendingEvent(sharedData, lateSharedEvent.getSendPolicy());
         Truth.assertThat(pendingFlags()).containsExactly(0, 1).inOrder();
         List<byte[]> requests = new ArrayList<>();
+        List<byte[]> storedAtSend = new ArrayList<>();
         eventSenderProvider.setEventNetSender((events, mediaType) -> {
             Truth.assertThat(pendingFlags()).containsExactly(0, 0).inOrder();
+            storedAtSend.add(queryEvents(lateLocalEvent).getData());
             requests.add(events);
             return new SendResponse(204, 1000L);
         });
@@ -285,19 +300,34 @@ public class ForceLoginEventSenderTest {
         context.getConfigurationProvider().core().setDataCollectionEnabled(true);
         eventSenderProvider.sendEvents(false);
         Truth.assertThat(requests).hasSize(1);
-        Truth.assertThat(jsonDeviceIds(requests.get(0)))
+        Truth.assertThat(decoder.decode(storedAtSend.get(0)))
                 .containsExactly("late-local", "visitor-A", "late-shared", "visitor-A");
+        Truth.assertThat(decoder.decode(requests.get(0)))
+                .containsExactly("late-local", "visitor-A", "late-shared", "visitor-A");
+        Truth.assertThat(pendingFlags()).isEmpty();
     }
 
     @Test
-    public void retriesFailedConfirmationWithTheSameDeviceId() throws Exception {
+    public void rollsBackAllPagesAndRetriesConfirmationWithTheSameDeviceId() throws Exception {
         context.getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
-        CustomEvent first = customEvent("first");
-        CustomEvent second = customEvent("second");
-        eventSenderProvider.cacheEvent(first);
-        eventSenderProvider.cacheEvent(second);
-        contentProvider.dbHelper.getWritableDatabase().execSQL("CREATE TRIGGER fail_pending_update BEFORE UPDATE OF _data ON events "
-                + "WHEN OLD._id = (SELECT MAX(_id) FROM events) BEGIN SELECT RAISE(ABORT, 'test failure'); END");
+        String generatedDeviceId = context.getDeviceInfoProvider().getDeviceId();
+        Map<String, String> expected = new HashMap<>();
+        long failingRowId = 0;
+        int eventCount = 105;
+        for (int i = 1; i <= eventCount; i++) {
+            String name = "pending-" + i;
+            CustomEvent event = customEvent(name);
+            long rowId = insertPendingEvent(EventBuilderProvider.toJson(event).toString().getBytes(StandardCharsets.UTF_8),
+                    event.getSendPolicy());
+            if (i == 101) {
+                failingRowId = rowId;
+            }
+            expected.put(name, "visitor-A");
+        }
+        SQLiteDatabase db = contentProvider.dbHelper.getWritableDatabase();
+        db.execSQL("CREATE TRIGGER fail_pending_update BEFORE UPDATE OF _data ON events "
+                + "WHEN OLD._id = " + failingRowId + " AND (SELECT COUNT(*) FROM events WHERE _force_login_pending = 0) = 100 "
+                + "BEGIN SELECT RAISE(ABORT, 'test failure on the second page'); END");
 
         List<byte[]> requests = new ArrayList<>();
         eventSenderProvider.setEventNetSender((events, mediaType) -> {
@@ -308,15 +338,72 @@ public class ForceLoginEventSenderTest {
         Truth.assertThat(forceLoginProvider.identify("visitor-A")).isTrue();
         eventSenderProvider.sendEvents(false);
         Truth.assertThat(requests).isEmpty();
-        Truth.assertThat(pendingFlags()).containsExactly(1, 1).inOrder();
-        Truth.assertThat(jsonDeviceIds(queryEvents(first).getData()))
-                .containsExactly("first", first.getDeviceId(), "second", second.getDeviceId());
+        try (Cursor rows = db.query(EventDataTable.TABLE_EVENTS,
+                new String[]{EventDataTable.COLUMN_FORCE_LOGIN_PENDING, EventDataTable.COLUMN_DATA},
+                null, null, null, null, EventDataTable.COLUMN_ID)) {
+            Truth.assertThat(rows.getCount()).isEqualTo(eventCount);
+            while (rows.moveToNext()) {
+                Truth.assertThat(rows.getInt(0)).isEqualTo(1);
+                JSONObject stored = new JSONObject(new String(rows.getBlob(1), StandardCharsets.UTF_8));
+                Truth.assertThat(stored.getString("deviceId")).isEqualTo(generatedDeviceId);
+            }
+        }
         Truth.assertThat(forceLoginProvider.identify("visitor-B")).isFalse();
 
-        contentProvider.dbHelper.getWritableDatabase().execSQL("DROP TRIGGER fail_pending_update");
+        db.execSQL("DROP TRIGGER fail_pending_update");
         eventSenderProvider.sendEvents(false);
-        Truth.assertThat(requests).hasSize(1);
-        Truth.assertThat(jsonDeviceIds(requests.get(0))).containsExactly("first", "visitor-A", "second", "visitor-A");
+        Map<String, String> sent = new HashMap<>();
+        int sentCount = 0;
+        for (byte[] request : requests) {
+            sentCount += new JSONArray(new String(request, StandardCharsets.UTF_8)).length();
+            sent.putAll(jsonDeviceIds(request));
+        }
+        Truth.assertThat(sentCount).isEqualTo(eventCount);
+        Truth.assertThat(sent).containsExactlyEntriesIn(expected);
+        Truth.assertThat(pendingFlags()).isEmpty();
+    }
+
+    @Test
+    public void sendsEventThatGrowsPastTheOriginalSizeLimitBeforeTheNextEvent() throws Exception {
+        context.getRegistry().register(EventFormatData.class, EventByteArray.class, new JsonDataLoader.Factory());
+        int originalSizeLimit = 2 * 1000 * 1024;
+        CustomEvent large = customEvent("large");
+        JSONObject data = EventBuilderProvider.toJson(large).put("padding", "");
+        int targetSize = originalSizeLimit - 64;
+        char[] padding = new char[targetSize - data.toString().getBytes(StandardCharsets.UTF_8).length];
+        Arrays.fill(padding, 'x');
+        data.put("padding", new String(padding));
+        byte[] original = data.toString().getBytes(StandardCharsets.UTF_8);
+        Truth.assertThat(original.length).isEqualTo(targetSize);
+        long largeRowId = insertPendingEvent(original, large.getSendPolicy());
+        eventSenderProvider.cacheEvent(customEvent("next"));
+
+        char[] id = new char[1000];
+        Arrays.fill(id, '"');
+        String visitorId = new String(id);
+        List<byte[]> requests = new ArrayList<>();
+        eventSenderProvider.setEventNetSender((events, mediaType) -> {
+            if (requests.isEmpty()) {
+                try (Cursor row = contentProvider.dbHelper.getReadableDatabase().query(EventDataTable.TABLE_EVENTS,
+                        new String[]{"length(" + EventDataTable.COLUMN_DATA + ")", EventDataTable.COLUMN_FORCE_LOGIN_PENDING},
+                        EventDataTable.COLUMN_ID + "=?", new String[]{Long.toString(largeRowId)}, null, null, null)) {
+                    Truth.assertThat(row.moveToFirst()).isTrue();
+                    Truth.assertThat(row.getInt(0)).isGreaterThan(originalSizeLimit);
+                    Truth.assertThat(row.getInt(1)).isEqualTo(0);
+                }
+            } else {
+                Truth.assertThat(pendingFlags()).containsExactly(0);
+            }
+            requests.add(events);
+            return new SendResponse(204, 1000L);
+        });
+
+        ForceLoginProvider forceLoginProvider = context.getProvider(ForceLoginProvider.class);
+        Truth.assertThat(forceLoginProvider.identify(visitorId)).isTrue();
+        eventSenderProvider.sendEvents(false);
+        Truth.assertThat(requests).hasSize(2);
+        Truth.assertThat(jsonDeviceIds(requests.get(0))).containsExactly("large", visitorId);
+        Truth.assertThat(jsonDeviceIds(requests.get(1))).containsExactly("next", visitorId);
         Truth.assertThat(pendingFlags()).isEmpty();
     }
 
@@ -366,6 +453,15 @@ public class ForceLoginEventSenderTest {
             }
         }
         return flags;
+    }
+
+    private long insertPendingEvent(byte[] data, int policy) {
+        return contentProvider.dbHelper.getWritableDatabase().insertOrThrow(EventDataTable.TABLE_EVENTS, null,
+                EventDataTable.putValues(data, "TRACK", policy, true));
+    }
+
+    private interface DeviceIdsDecoder {
+        Map<String, String> decode(byte[] data) throws Exception;
     }
 
     public static class TestEventDataContentProvider extends EventDataContentProvider {
