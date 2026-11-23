@@ -110,11 +110,19 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
     }
 
     /**
-     * 当前构建的事件是否需要在上传时替换 deviceId（即 !canSend）。
-     * 待替换事件入库时 deviceId 为自动生成的设备 ID，并在数据库 _force_login_pending 列记 1。
+     * 当前构建的事件是否等待首次有效 identify 确认 deviceId。
      */
     public boolean isPending() {
         return !canSend();
+    }
+
+    /**
+     * Returns the visitor ID accepted in this launch, or null while no identity has been accepted.
+     */
+    public String getCurrentLaunchDeviceId() {
+        synchronized (lock) {
+            return unlocked ? identifiedDeviceId : null;
+        }
     }
 
     /**
@@ -130,7 +138,7 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
     }
 
     /**
-     * 上传时替换待替换事件 deviceId 所用的值；非 NewSaaS 不会产生待替换事件，返回空字符串表示无需替换。
+     * 允许直接上报时，用于替换遗留待确认事件 deviceId 的值。
      */
     public String getPendingReplacement(String generatedDeviceId) {
         if (!isNewSaaS()) {
@@ -139,7 +147,7 @@ public class ForceLoginProvider implements TrackerLifecycleProvider {
         return getDeviceId(generatedDeviceId);
     }
 
-    private boolean isForceLoginEnabled() {
+    boolean isForceLoginEnabled() {
         return isNewSaaS() && configurationProvider.core().isForceLogin();
     }
 

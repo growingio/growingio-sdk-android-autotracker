@@ -16,11 +16,13 @@
 package com.growingio.android.protobuf;
 
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.middleware.format.FormatDataFetcher;
+import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 
 import java.util.List;
 
@@ -47,6 +49,8 @@ public class ProtobufDataFetcher implements FormatDataFetcher<EventByteArray> {
             } else if (eventData.getEventOp() == EventFormatData.DATA_FORMAT_MERGE) {
                 assertCondition(eventData.getEvents() != null, "leak necessary events");
                 return merge(eventData.getEvents());
+            } else if (eventData.getEventOp() == EventFormatData.DATA_REPLACE_DEVICE_ID) {
+                return replaceStoredDeviceId();
             }
             return new EventByteArray(null);
         } catch (IllegalArgumentException e) {
@@ -75,7 +79,7 @@ public class ProtobufDataFetcher implements FormatDataFetcher<EventByteArray> {
         for (int i = 0; i < events.size(); i++) {
             EventV3Protocol.EventV3Dto event = EventProtocolTransfer.covertToProtobuf(events.get(i));
             if (event != null) {
-                // 强制登录：只在发送副本中替换带待替换标志事件的 deviceId，数据库原文不变
+                // 关闭强制登录后，遗留的待确认事件仍可在发送副本中替换 deviceId。
                 if (eventData.isForceLoginPending(i)) {
                     event = event.toBuilder().setDeviceId(eventData.getPendingDeviceIdReplacement()).build();
                 }
@@ -83,6 +87,19 @@ public class ProtobufDataFetcher implements FormatDataFetcher<EventByteArray> {
             }
         }
         return listBuilder.build().toByteArray();
+    }
+
+    private EventByteArray replaceStoredDeviceId() {
+        byte[] data = eventData.getStoredEvent();
+        String deviceId = eventData.getPendingDeviceIdReplacement();
+        try {
+            byte[] updated = EventV3Protocol.EventV3Dto.parseFrom(data).toBuilder().setDeviceId(deviceId).build().toByteArray();
+            return new EventByteArray(updated, "application/protobuf");
+        } catch (InvalidProtocolBufferException e) {
+            // The Protobuf sender also reads JSON left by the JSON formatter. Keep its stored format.
+            String updated = EventBuilderProvider.replaceJsonDeviceId(new String(data), deviceId);
+            return new EventByteArray(updated == null ? null : updated.getBytes());
+        }
     }
 
     private void assertCondition(boolean condition, String msg) throws IllegalArgumentException {

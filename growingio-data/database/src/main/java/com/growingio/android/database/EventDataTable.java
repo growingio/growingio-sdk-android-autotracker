@@ -31,7 +31,7 @@ public class EventDataTable {
     public static final String COLUMN_DATA = "_data";
     public static final String COLUMN_EVENT_TYPE = "_event_type";
     public static final String COLUMN_POLICY = "_policy";
-    // 强制登录待替换标志：1 表示 identify 前构建、上传时需替换 deviceId；默认 0
+    // 强制登录待确认标志：1 表示 identify 前构建、尚未确认 deviceId；默认 0
     public static final String COLUMN_FORCE_LOGIN_PENDING = "_force_login_pending";
 
 
@@ -60,19 +60,21 @@ public class EventDataTable {
      * 列默认值为 0，老版本 SDK 写入时不带该列按普通事件处理，读取时忽略该列（待替换事件按自动生成的设备 ID 上报）。
      */
     static void ensureForceLoginPendingColumn(SQLiteDatabase db) {
-        boolean exists = false;
+        if (!hasForceLoginPendingColumn(db)) {
+            db.execSQL(ADD_COLUMN_FORCE_LOGIN_PENDING);
+        }
+    }
+
+    static boolean hasForceLoginPendingColumn(SQLiteDatabase db) {
         try (Cursor cursor = db.rawQuery("PRAGMA table_info(" + TABLE_EVENTS + ")", null)) {
             int nameIndex = cursor.getColumnIndex("name");
             while (nameIndex >= 0 && cursor.moveToNext()) {
                 if (COLUMN_FORCE_LOGIN_PENDING.equals(cursor.getString(nameIndex))) {
-                    exists = true;
-                    break;
+                    return true;
                 }
             }
         }
-        if (!exists) {
-            db.execSQL(ADD_COLUMN_FORCE_LOGIN_PENDING);
-        }
+        return false;
     }
 
     /**

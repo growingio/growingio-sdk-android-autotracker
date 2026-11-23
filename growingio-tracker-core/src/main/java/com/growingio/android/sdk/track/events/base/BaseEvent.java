@@ -98,7 +98,7 @@ public abstract class BaseEvent extends GEvent {
     @Nullable
     private final String timezoneOffset;
 
-    // 强制登录待替换标志：identify 前构建的事件为 true，入库时写入数据库 _force_login_pending 列，不进入事件数据
+    // 强制登录待确认标志：identify 前构建的事件为 true，不进入事件数据。
     @JsonIgnore
     private final boolean forceLoginPending;
 
@@ -362,7 +362,7 @@ public abstract class BaseEvent extends GEvent {
 
             platformVersion = deviceInfo.getPlatformVersion();
             platform = deviceInfo.getPlatform();
-            // 构建时一并确定 deviceId 与待替换标志：事件可能在调用方线程同步构建（如 cacheEventSync），不能等入库时再判断
+            // 构建时记录 deviceId 和待确认标志，入库时再为迟到的待确认事件补上本次 ID。
             ForceLoginProvider forceLoginProvider = context.getProvider(ForceLoginProvider.class);
             forceLoginPending = forceLoginProvider.isPending();
             deviceId = forceLoginPending ? deviceInfo.getDeviceId() : forceLoginProvider.getDeviceId(deviceInfo.getDeviceId());

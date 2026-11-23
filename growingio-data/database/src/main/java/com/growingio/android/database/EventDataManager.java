@@ -20,9 +20,13 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteFullException;
+import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.os.RemoteException;
+import android.util.LongSparseArray;
 
 import com.growingio.android.sdk.TrackerContext;
 import com.growingio.android.sdk.track.events.AutotrackEventType;
@@ -34,6 +38,7 @@ import com.growingio.android.sdk.track.middleware.EventDbResult;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
+import com.growingio.android.sdk.track.providers.ForceLoginProvider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,7 +55,12 @@ public class EventDataManager {
     private static final String TAG = "EventDataManager";
 
     private static final long EVENT_VALID_PERIOD_MILLS = 24 * 60 * 60_000L;
-    private static final double EVENT_DATA_MAX_SIZE = 2 * 1000 * 1024; // 2M
+    private static final int EVENT_DATA_MAX_SIZE = 2 * 1000 * 1024; // 2M
+    // Leave room under the CursorWindow limit for up to 1000 UTF-16 units of escaped visitor ID.
+    private static final int MAX_STORED_EVENT_SIZE = EVENT_DATA_MAX_SIZE + 8 * 1024;
+    private static final Object PENDING_INSERT_LOCK = new Object();
+    private static final String CONFIRM_PENDING_EVENT = "UPDATE " + TABLE_EVENTS + " SET " + COLUMN_DATA
+            + "=?, " + COLUMN_FORCE_LOGIN_PENDING + "=0 WHERE " + COLUMN_ID + "=? AND " + COLUMN_FORCE_LOGIN_PENDING + "=1";
 
     private final TrackerContext context;
     private final String eventsInfoAuthority;
@@ -69,13 +79,17 @@ public class EventDataManager {
     }
 
     private EventByteArray formatData(EventFormatData data) {
-        ModelLoader<EventFormatData, EventByteArray> modelLoader = context.getRegistry().getModelLoader(EventFormatData.class, EventByteArray.class);
+        ModelLoader<EventFormatData, EventByteArray> modelLoader = getEventFormatter();
         if (modelLoader == null) {
             Logger.e(TAG, "please register eventformat component first");
             return null;
         }
         ModelLoader.LoadData<EventByteArray> loadData = modelLoader.buildLoadData(data);
         return loadData.fetcher.executeData();
+    }
+
+    private ModelLoader<EventFormatData, EventByteArray> getEventFormatter() {
+        return context.getRegistry().getModelLoader(EventFormatData.class, EventByteArray.class);
     }
 
     int insertEvents(List<GEvent> events) {
@@ -106,7 +120,7 @@ public class EventDataManager {
                 }
                 boolean forceLoginPending = gEvent instanceof BaseEvent && ((BaseEvent) gEvent).isForceLoginPending();
                 ContentValues contentValues = EventDataTable.putValues(data.getBodyData(), getDatabaseEventType(gEvent), gEvent.getSendPolicy(), forceLoginPending);
-                return contentResolver.insert(uri, contentValues);
+                return forceLoginPending ? insertPendingEvent(contentResolver, uri, contentValues) : contentResolver.insert(uri, contentValues);
             }
         } catch (SQLiteFullException e) {
             onDiskFull(e);
@@ -115,6 +129,118 @@ public class EventDataManager {
             Logger.e(TAG, e, "insertEvent failed");
         }
         return null;
+    }
+
+    private Uri insertPendingEvent(ContentResolver resolver, Uri uri, ContentValues values) {
+        ForceLoginProvider forceLoginProvider = context.getProvider(ForceLoginProvider.class);
+        String deviceId;
+        synchronized (PENDING_INSERT_LOCK) {
+            deviceId = forceLoginProvider.getCurrentLaunchDeviceId();
+            if (deviceId == null) {
+                return resolver.insert(uri, values);
+            }
+        }
+        byte[] updated = replaceStoredDeviceId(getEventFormatter(), values.getAsByteArray(COLUMN_DATA), deviceId);
+        if (updated != null) {
+            values.put(COLUMN_DATA, updated);
+            values.remove(COLUMN_FORCE_LOGIN_PENDING);
+        }
+        return resolver.insert(uri, values);
+    }
+
+    boolean confirmPendingEvents(String deviceId) {
+        ModelLoader<EventFormatData, EventByteArray> formatter = getEventFormatter();
+        // Wait for writes that started with the generated ID before taking the database snapshot.
+        synchronized (PENDING_INSERT_LOCK) {
+            return updatePendingEvents(true, (db, update) -> confirmStoredEvents(db, update, formatter, deviceId));
+        }
+    }
+
+    private void confirmStoredEvents(SQLiteDatabase db, SQLiteStatement update,
+                                     ModelLoader<EventFormatData, EventByteArray> formatter, String deviceId) {
+        long lastId = 0;
+        while (true) {
+            LongSparseArray<byte[]> rows = new LongSparseArray<>();
+            int bytes = 0;
+            // Read a bounded page before changing the rows matched by the cursor.
+            try (Cursor cursor = db.query(TABLE_EVENTS, new String[]{COLUMN_ID, COLUMN_DATA},
+                    COLUMN_FORCE_LOGIN_PENDING + "=1 AND " + COLUMN_ID + ">?",
+                    new String[]{Long.toString(lastId)}, null, null, COLUMN_ID + " ASC", "100")) {
+                while (cursor.moveToNext()) {
+                    byte[] data = cursor.getBlob(1);
+                    if (rows.size() > 0 && bytes + data.length > EVENT_DATA_MAX_SIZE) {
+                        break;
+                    }
+                    lastId = cursor.getLong(0);
+                    rows.append(lastId, data);
+                    bytes += data.length;
+                }
+            }
+            if (rows.size() == 0) {
+                return;
+            }
+            for (int i = 0; i < rows.size(); i++) {
+                confirmPendingRow(update, formatter, rows.keyAt(i), rows.valueAt(i), deviceId);
+            }
+        }
+    }
+
+    private boolean updatePendingEvents(boolean allowMissingColumn, PendingEventUpdate work) {
+        try (EventDataSQLiteOpenHelper helper = new EventDataSQLiteOpenHelper(context)) {
+            SQLiteDatabase db = helper.getWritableDatabase();
+            if (allowMissingColumn && !EventDataTable.hasForceLoginPendingColumn(db)) {
+                return true;
+            }
+            db.beginTransaction();
+            try (SQLiteStatement update = db.compileStatement(CONFIRM_PENDING_EVENT)) {
+                work.run(db, update);
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+            return true;
+        } catch (RuntimeException e) {
+            Logger.e(TAG, e, "failed to confirm pending event device IDs");
+            return false;
+        }
+    }
+
+    private static byte[] replaceStoredDeviceId(ModelLoader<EventFormatData, EventByteArray> formatter,
+                                                byte[] data, String deviceId) {
+        if (formatter == null) {
+            throw new IllegalStateException("Missing event formatter for pending event device IDs");
+        }
+        return formatter.buildLoadData(EventFormatData.replaceDeviceId(data, deviceId)).fetcher.executeData().getBodyData();
+    }
+
+    private byte[] confirmPendingRow(SQLiteStatement update, ModelLoader<EventFormatData, EventByteArray> formatter,
+                                     long rowId, byte[] data, String deviceId) {
+        byte[] updated = replaceStoredDeviceId(formatter, data, deviceId);
+        if (updated == null) {
+            // The normal formatter handles a malformed record when assembling the batch.
+            return data;
+        }
+        update.bindBlob(1, updated);
+        update.bindLong(2, rowId);
+        if (update.executeUpdateDelete() != 1) {
+            throw new SQLException("Pending event changed before its device ID was saved");
+        }
+        return updated;
+    }
+
+    private interface PendingEventUpdate {
+        void run(SQLiteDatabase db, SQLiteStatement update);
+    }
+
+    private boolean confirmPendingBatch(String deviceId, LongSparseArray<Integer> pendingRows, List<byte[]> events) {
+        ModelLoader<EventFormatData, EventByteArray> formatter = getEventFormatter();
+        return updatePendingEvents(false, (db, update) -> {
+            for (int i = 0; i < pendingRows.size(); i++) {
+                int index = pendingRows.valueAt(i);
+                byte[] updated = confirmPendingRow(update, formatter, pendingRows.keyAt(i), events.get(index), deviceId);
+                events.set(index, updated);
+            }
+        });
     }
 
     int removeOverdueEvents(int day) {
@@ -140,13 +266,14 @@ public class EventDataManager {
     }
 
     void queryEvents(int policy, int limit, EventDbResult dbResult) {
-        queryEvents(policy, limit, "", dbResult);
+        queryEvents(policy, limit, "", null, dbResult);
     }
 
     /**
-     * @param pendingDeviceIdReplacement 强制登录：带待替换标志的事件在组包时替换为该 deviceId，空字符串表示不替换
+     * @param pendingDeviceIdReplacement 允许直接上报时供兼容组包使用的 deviceId
+     * @param confirmedDeviceId 本次启动确认的 deviceId，用于将晚到的待确认事件写回后再组包
      */
-    void queryEvents(int policy, int limit, String pendingDeviceIdReplacement, EventDbResult dbResult) {
+    void queryEvents(int policy, int limit, String pendingDeviceIdReplacement, String confirmedDeviceId, EventDbResult dbResult) {
         // query 判断磁盘空间是否已满，避免ignoreOperations的情况下，重复发送同一事件
         if (ignoreOperations) {
             dbResult.setSuccess(false);
@@ -154,32 +281,42 @@ public class EventDataManager {
         }
         List<byte[]> queryList = new ArrayList<>();
         List<Boolean> pendingList = new ArrayList<>();
+        LongSparseArray<Integer> pendingRows = confirmedDeviceId == null ? null : new LongSparseArray<>();
         ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(eventsInfoAuthority);
-        try (Cursor cursor = queryEvents(client, policy, limit)) {
+        try {
             int count = 0;
-            double dataSize = 0;
-            // 按结果集实际列判断：未补列的表（理论上不会出现）读不到该列时视为普通事件
-            int pendingIndex = cursor.getColumnIndex(COLUMN_FORCE_LOGIN_PENDING);
-            while (cursor.moveToNext()) {
-                count++;
-                String eventType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EVENT_TYPE));
-                dbResult.setEventType(eventType);
-                byte[] data = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DATA));
-                if (data != null && data.length < EVENT_DATA_MAX_SIZE) {
-                    dataSize += data.length;
-                    if (dataSize > EVENT_DATA_MAX_SIZE) {
-                        break;
+            int dataSize = 0;
+            try (Cursor cursor = queryEvents(client, policy, limit)) {
+                // 旧库缺列时按普通事件读取。
+                int pendingIndex = cursor.getColumnIndex(COLUMN_FORCE_LOGIN_PENDING);
+                while (cursor.moveToNext()) {
+                    count++;
+                    String eventType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EVENT_TYPE));
+                    dbResult.setEventType(eventType);
+                    byte[] data = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DATA));
+                    long rowId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                    if (data != null && data.length <= MAX_STORED_EVENT_SIZE) {
+                        dataSize += data.length;
+                        if (!queryList.isEmpty() && dataSize > EVENT_DATA_MAX_SIZE) {
+                            break;
+                        }
+                        boolean isPending = pendingIndex >= 0 && cursor.getInt(pendingIndex) == 1;
+                        if (isPending && pendingRows != null) {
+                            pendingRows.append(rowId, queryList.size());
+                        }
+                        queryList.add(data);
+                        pendingList.add(isPending);
+                        dbResult.setLastId(rowId);
+                    } else {
+                        Logger.e(TAG, "event data is too large or null, delete it.");
+                        removeEventById(client, rowId);
                     }
-                    queryList.add(data);
-                    pendingList.add(pendingIndex >= 0 && cursor.getInt(pendingIndex) == 1);
-                    long lastId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
-                    dbResult.setLastId(lastId);
-                } else {
-                    Logger.e(TAG, "event data is too large or null, delete it.");
-                    // event data is illegal, delete it.
-                    long delId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID));
-                    removeEventById(client, delId);
                 }
+            }
+            // A different process can insert pending events into the shared database after identify.
+            if (pendingRows != null && pendingRows.size() > 0 && !confirmPendingBatch(confirmedDeviceId, pendingRows, queryList)) {
+                dbResult.setSuccess(false);
+                return;
             }
             EventByteArray result = formatData(EventFormatData.merge(queryList, pendingList, pendingDeviceIdReplacement));
             if (result != null && result.getBodyData() != null) {
@@ -218,9 +355,9 @@ public class EventDataManager {
             while (cursor.moveToNext()) {
                 count++;
                 byte[] data = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DATA));
-                if (data != null && data.length < EVENT_DATA_MAX_SIZE) {
+                if (data != null && data.length <= MAX_STORED_EVENT_SIZE) {
                     dataSize += data.length;
-                    if (dataSize > EVENT_DATA_MAX_SIZE) {
+                    if (!queryList.isEmpty() && dataSize > EVENT_DATA_MAX_SIZE) {
                         break;
                     }
                     queryList.add(data);

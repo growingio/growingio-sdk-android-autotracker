@@ -24,6 +24,7 @@ import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -118,6 +119,19 @@ public class ProtocolDataTest {
         EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(data.getBodyData());
         Truth.assertThat(list.getValuesCount()).isEqualTo(1);
         Truth.assertThat(list.getValues(0).getDeviceId()).isEqualTo("visitor-001");
+    }
+
+    @Test
+    public void replacingStoredDeviceIdPreservesLegacyJson() throws Exception {
+        byte[] legacy = "{\"deviceId\":\"generated\",\"eventName\":\"legacy\"}".getBytes();
+        EventFormatData event = EventFormatData.replaceDeviceId(legacy, "  visitor-001  ");
+
+        EventByteArray updated = new ProtobufDataFetcher(event).executeData();
+
+        Truth.assertThat(updated.getMediaType()).isEqualTo("application/json");
+        JSONObject stored = new JSONObject(new String(updated.getBodyData()));
+        Truth.assertThat(stored.getString("deviceId")).isEqualTo("  visitor-001  ");
+        Truth.assertThat(stored.getString("eventName")).isEqualTo("legacy");
     }
 
     private byte[] cachedEvent(String eventName, String deviceId) throws InvalidProtocolBufferException {

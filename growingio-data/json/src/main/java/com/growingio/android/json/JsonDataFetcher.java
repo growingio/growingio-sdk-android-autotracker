@@ -25,7 +25,6 @@ import com.growingio.android.sdk.track.middleware.GEvent;
 import com.growingio.android.sdk.track.middleware.format.FormatDataFetcher;
 import com.growingio.android.sdk.track.providers.EventBuilderProvider;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -54,6 +53,10 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
             } else if (eventData.getEventOp() == EventFormatData.DATA_FORMAT_MERGE) {
                 assertCondition(eventData.getEvents() != null, "leak necessary events");
                 return merge(eventData.getEvents());
+            } else if (eventData.getEventOp() == EventFormatData.DATA_REPLACE_DEVICE_ID) {
+                String updated = EventBuilderProvider.replaceJsonDeviceId(
+                        new String(eventData.getStoredEvent()), eventData.getPendingDeviceIdReplacement());
+                return new EventByteArray(updated == null ? null : updated.getBytes());
             }
             return new EventByteArray(null);
         } catch (IllegalArgumentException e) {
@@ -94,7 +97,8 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
                 String event = new String(data);
                 if (event.startsWith("{") && event.endsWith("}")) { //ensure json format
                     if (eventData.isForceLoginPending(i)) {
-                        event = replaceDeviceId(event, eventData.getPendingDeviceIdReplacement());
+                        String updated = EventBuilderProvider.replaceJsonDeviceId(event, eventData.getPendingDeviceIdReplacement());
+                        if (updated != null) event = updated;
                     }
                     sb.append(event);
                     if (length > 0) {
@@ -107,20 +111,6 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
         }
         sb.append("]");
         return sb.toString();
-    }
-
-    /**
-     * 强制登录：只在发送副本中替换 deviceId；替换失败时按入库时的数据（自动生成的设备 ID）发送，不阻塞整批
-     */
-    private String replaceDeviceId(String event, String deviceId) {
-        try {
-            JSONObject eventJson = new JSONObject(event);
-            eventJson.put("deviceId", deviceId);
-            return eventJson.toString();
-        } catch (JSONException e) {
-            Logger.e(TAG, e, "failed to replace deviceId of force login pending event");
-            return event;
-        }
     }
 
     private void assertCondition(boolean condition, String msg) throws IllegalArgumentException {

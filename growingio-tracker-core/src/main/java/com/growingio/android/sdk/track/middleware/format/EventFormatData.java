@@ -29,9 +29,11 @@ public class EventFormatData {
 
     public static final int DATA_FORMAT_EVENT = 0;
     public static final int DATA_FORMAT_MERGE = 1;
+    public static final int DATA_REPLACE_DEVICE_ID = 2;
 
     private int eventOp;
     private GEvent event;
+    private byte[] storedEvent;
     private List<byte[]> events;
     // 与 events 一一对应的强制登录待替换标志；为 null 时视为全部不替换
     private List<Boolean> forceLoginPending;
@@ -47,6 +49,10 @@ public class EventFormatData {
 
     public List<byte[]> getEvents() {
         return events;
+    }
+
+    public byte[] getStoredEvent() {
+        return storedEvent;
     }
 
     /**
@@ -68,6 +74,14 @@ public class EventFormatData {
         EventFormatData fd = new EventFormatData();
         fd.event = event;
         fd.eventOp = DATA_FORMAT_EVENT;
+        return fd;
+    }
+
+    public static EventFormatData replaceDeviceId(byte[] storedEvent, String deviceId) {
+        EventFormatData fd = new EventFormatData();
+        fd.storedEvent = storedEvent;
+        fd.pendingDeviceIdReplacement = deviceId;
+        fd.eventOp = DATA_REPLACE_DEVICE_ID;
         return fd;
     }
 

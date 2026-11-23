@@ -31,6 +31,7 @@ public class EventDatabase {
     public static final int DATABASE_OP_OUTDATED = 4;
     public static final int DATABASE_OP_QUERY_DELETE = 5;
     public static final int DATABASE_OP_CLEAR = 6;
+    public static final int DATABASE_OP_CONFIRM_PENDING_EVENTS = 7;
 
     private int dbOp;
     private List<GEvent> events;
@@ -39,6 +40,7 @@ public class EventDatabase {
     private long lastId;
     private String eventType;
     private String pendingDeviceIdReplacement;
+    private String confirmedDeviceId;
 
     public int getDbOp() {
         return dbOp;
@@ -69,6 +71,10 @@ public class EventDatabase {
      */
     public String getPendingDeviceIdReplacement() {
         return pendingDeviceIdReplacement;
+    }
+
+    public String getConfirmedDeviceId() {
+        return confirmedDeviceId;
     }
 
     public static EventDatabase insert(GEvent event) {
@@ -111,6 +117,19 @@ public class EventDatabase {
         ed.policy = policy;
         ed.limit = limit;
         ed.pendingDeviceIdReplacement = pendingDeviceIdReplacement;
+        return ed;
+    }
+
+    public static EventDatabase queryWithConfirmedDeviceId(int policy, int limit, String deviceId) {
+        EventDatabase ed = query(policy, limit);
+        ed.confirmedDeviceId = deviceId;
+        return ed;
+    }
+
+    public static EventDatabase confirmPendingEvents(String deviceId) {
+        EventDatabase ed = new EventDatabase();
+        ed.dbOp = DATABASE_OP_CONFIRM_PENDING_EVENTS;
+        ed.confirmedDeviceId = deviceId;
         return ed;
     }
 

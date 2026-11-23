@@ -264,7 +264,8 @@ public class Tracker {
     }
 
     /**
-     * Sets the visitor ID and unblocks event upload for this launch when force login is enabled.
+     * Sets the visitor ID for this launch when force login is enabled.
+     * Event upload resumes after the visitor ID has been written to pending events.
      * Only the first valid call in each launch is accepted.
      */
     public void identify(final String deviceId) {
@@ -273,7 +274,7 @@ public class Tracker {
             ForceLoginProvider forceLoginProvider = trackerContext.getProvider(ForceLoginProvider.class);
             if (forceLoginProvider.identify(deviceId)) {
                 EventSenderProvider eventSenderProvider = trackerContext.getProvider(EventSenderProvider.class);
-                eventSenderProvider.flush();
+                eventSenderProvider.onIdentify();
             }
         });
     }

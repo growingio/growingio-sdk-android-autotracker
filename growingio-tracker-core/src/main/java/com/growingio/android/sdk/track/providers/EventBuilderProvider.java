@@ -34,6 +34,7 @@ import com.growingio.android.sdk.track.listener.TrackThread;
 import com.growingio.android.sdk.track.log.Logger;
 import com.growingio.android.sdk.track.middleware.GEvent;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -91,6 +92,17 @@ public class EventBuilderProvider implements TrackerLifecycleProvider {
 
     public static void parseFrom(BaseEvent.BaseBuilder builder, JSONObject jsonObject) {
         serializableFactory.parseFrom(builder, jsonObject);
+    }
+
+    public static String replaceJsonDeviceId(String data, String deviceId) {
+        try {
+            JSONObject event = new JSONObject(data);
+            event.put("deviceId", deviceId);
+            return event.toString();
+        } catch (JSONException e) {
+            Logger.e(TAG, e, "failed to replace the device ID of a pending event");
+            return null;
+        }
     }
 
     public void setGeneralProps(Map<String, String> properties) {
