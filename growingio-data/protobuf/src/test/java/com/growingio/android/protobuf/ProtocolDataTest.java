@@ -24,12 +24,14 @@ import com.growingio.android.sdk.track.middleware.format.EventByteArray;
 import com.growingio.android.sdk.track.middleware.format.EventFormatData;
 import com.growingio.android.sdk.track.modelloader.DataFetcher;
 
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -83,6 +85,65 @@ public class ProtocolDataTest {
             Truth.assertThat(true).isFalse();
         }
 
+    }
+
+    @Test
+    public void dataMergeReplacesOnlyPendingEvents() throws InvalidProtocolBufferException {
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        arrayList.add(cachedEvent("legacy", "generated-device"));
+        byte[] pendingData = cachedEvent("pending", "generated-device");
+        arrayList.add(pendingData);
+
+        EventFormatData eventData = EventFormatData.merge(arrayList, Arrays.asList(false, true), "visitor-001");
+        EventByteArray data = new ProtobufDataFetcher(eventData).executeData();
+
+        EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(data.getBodyData());
+        Truth.assertThat(list.getValuesCount()).isEqualTo(2);
+        Truth.assertThat(list.getValues(0).getDeviceId()).isEqualTo("generated-device");
+        Truth.assertThat(list.getValues(1).getDeviceId()).isEqualTo("visitor-001");
+        Truth.assertThat(list.getValues(1).getEventName()).isEqualTo("pending");
+        // 数据库原文不变
+        Truth.assertThat(EventV3Protocol.EventV3Dto.parseFrom(pendingData).getDeviceId()).isEqualTo("generated-device");
+    }
+
+    @Test
+    public void malformedEventDoesNotBlockBatch() throws InvalidProtocolBufferException {
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        arrayList.add(new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF});
+        arrayList.add(cachedEvent("pending", "generated-device"));
+
+        EventFormatData eventData = EventFormatData.merge(arrayList, Arrays.asList(true, true), "visitor-001");
+        EventByteArray data = new ProtobufDataFetcher(eventData).executeData();
+
+        // 无法解析的事件被跳过（与改动前一致），其余事件照常替换
+        EventV3Protocol.EventV3List list = EventV3Protocol.EventV3List.parseFrom(data.getBodyData());
+        Truth.assertThat(list.getValuesCount()).isEqualTo(1);
+        Truth.assertThat(list.getValues(0).getDeviceId()).isEqualTo("visitor-001");
+    }
+
+    @Test
+    public void replacingStoredDeviceIdPreservesLegacyJson() throws Exception {
+        byte[] legacy = "{\"deviceId\":\"generated\",\"eventName\":\"legacy\"}".getBytes();
+        EventFormatData event = EventFormatData.replaceDeviceId(legacy, "  visitor-001  ");
+
+        EventByteArray updated = new ProtobufDataFetcher(event).executeData();
+
+        Truth.assertThat(updated.getMediaType()).isEqualTo("application/json");
+        JSONObject stored = new JSONObject(new String(updated.getBodyData()));
+        Truth.assertThat(stored.getString("deviceId")).isEqualTo("  visitor-001  ");
+        Truth.assertThat(stored.getString("eventName")).isEqualTo("legacy");
+    }
+
+    private byte[] cachedEvent(String eventName, String deviceId) throws InvalidProtocolBufferException {
+        CustomEvent customEvent = new CustomEvent.Builder()
+                .setEventName(eventName)
+                .build();
+        return EventV3Protocol.EventV3Dto
+                .parseFrom(EventProtocolTransfer.protocolByte(customEvent))
+                .toBuilder()
+                .setDeviceId(deviceId)
+                .build()
+                .toByteArray();
     }
 
 }

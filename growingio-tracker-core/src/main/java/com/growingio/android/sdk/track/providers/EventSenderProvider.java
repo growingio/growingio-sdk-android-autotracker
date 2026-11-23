@@ -51,32 +51,40 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
 
     private TrackerContext context;
     private ConfigurationProvider configurationProvider;
+    private ForceLoginProvider forceLoginProvider;
     private EventSenderProvider.SendHandler sendHandler;
     private IEventNetSender eventNetSender;
     private ProcessLock processLock;
     private SharedPreferences sharedPreferences;
+    private boolean pendingEventsConfirmed;
 
     @Override
     @SuppressWarnings("WrongConstant")
     public void setup(TrackerContext context) {
         configurationProvider = context.getConfigurationProvider();
+        forceLoginProvider = context.getProvider(ForceLoginProvider.class);
         long dataUploadInterval = configurationProvider.core().isDebugEnabled() ? 0L : configurationProvider.core().getDataUploadInterval();
 
         sharedPreferences = context.getSharedPreferences("growing3_sender", Context.MODE_PRIVATE);
         processLock = new ProcessLock(context, EventSenderProvider.class.getName());
         eventNetSender = new EventHttpSender(context);
+        pendingEventsConfirmed = false;
+        this.context = context;
 
         HandlerThread thread = new HandlerThread(EventSenderProvider.class.getName());
         thread.start();
         sendHandler = new EventSenderProvider.SendHandler(thread.getLooper(), dataUploadInterval * 1000L);
-
-        this.context = context;
     }
 
     public void flush() {
         if (sendHandler != null && configurationProvider.core().isDataCollectionEnabled()) {
             sendHandler.flush();
         }
+    }
+
+    public void onIdentify() {
+        // Commit the identity locally even when collection is disabled or the network is unavailable.
+        sendHandler.flush();
     }
 
     @Override
@@ -197,8 +205,17 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
      * @param onlyInstant true -- 仅发送实时消息
      */
     void sendEvents(boolean onlyInstant) {
+        String confirmedDeviceId = forceLoginProvider.getCurrentLaunchDeviceId();
+        if (confirmedDeviceId == null && forceLoginProvider.isForceLoginEnabled()) {
+            Logger.d(TAG, "Force login is enabled, delay upload.");
+            return;
+        }
         if (processLock == null || !processLock.isAcquired()) {
             Logger.w(TAG, "sdk sendEvents will in main process,not in sub process.");
+            return;
+        }
+        if (confirmedDeviceId != null && (!confirmPendingEvents(confirmedDeviceId)
+                || !configurationProvider.core().isDataCollectionEnabled())) {
             return;
         }
 
@@ -217,6 +234,9 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
         }
 
         boolean succeeded = true;
+        String pendingReplacement = confirmedDeviceId == null
+                ? forceLoginProvider.getPendingReplacement(context.getDeviceInfoProvider().getDeviceId())
+                : "";
         long cellularDataLimit = configurationProvider.core().getCellularDataLimit();
         long cellularDataLimitTotal = cellularDataLimit * 1024L * 1024L;
         for (int policy : uploadEvents) {
@@ -231,7 +251,15 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
                     Logger.w(TAG, "Today's mobile data is exhausted");
                     break;
                 }
-                EventDbResult dbResult = databaseOperation(EventDatabase.query(policy, numOfMaxEventsPerRequest()));
+                int limit = numOfMaxEventsPerRequest();
+                EventDatabase query = confirmedDeviceId == null
+                        ? EventDatabase.query(policy, limit, pendingReplacement)
+                        : EventDatabase.queryWithConfirmedDeviceId(policy, limit, confirmedDeviceId);
+                EventDbResult dbResult = databaseOperation(query);
+                if (confirmedDeviceId != null && !dbResult.isSuccess()) {
+                    sendHandler.backoff();
+                    return;
+                }
                 if (dbResult.isSuccess() && dbResult.getSum() > 0) {
                     if (eventNetSender == null) {
                         succeeded = false;
@@ -270,6 +298,16 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
                 }
             } while (succeeded);
         }
+    }
+
+    private boolean confirmPendingEvents(String deviceId) {
+        if (!pendingEventsConfirmed) {
+            pendingEventsConfirmed = databaseOperation(EventDatabase.confirmPendingEvents(deviceId)).isSuccess();
+            if (!pendingEventsConfirmed) {
+                sendHandler.backoff();
+            }
+        }
+        return pendingEventsConfirmed;
     }
 
     EventDbResult getGEventsFromPolicy(int policy) {
@@ -370,7 +408,7 @@ public class EventSenderProvider implements TrackerLifecycleProvider {
                 case MSG_SEND_UNINSTANT_EVENTS:
                     removeMessages(MSG_SEND_UNINSTANT_EVENTS);
                     safelySendEvents(false);
-                    if (backoffUploadInterval > 0) {
+                    if (backoffUploadInterval > 0 && !hasMessages(MSG_SEND_UNINSTANT_EVENTS)) {
                         sendEmptyMessageDelayed(MSG_SEND_UNINSTANT_EVENTS, backoffUploadInterval);
                     }
                     break;

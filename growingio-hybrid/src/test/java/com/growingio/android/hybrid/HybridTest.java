@@ -35,6 +35,7 @@ import com.growingio.android.sdk.track.events.VisitorAttributesEvent;
 import com.growingio.android.sdk.track.listener.Callback;
 import com.growingio.android.sdk.track.providers.ConfigurationProvider;
 import com.growingio.android.sdk.track.providers.EventBuilderProvider;
+import com.growingio.android.sdk.track.providers.ForceLoginProvider;
 import com.growingio.android.sdk.track.providers.TrackerLifecycleProviderFactory;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 
@@ -197,6 +198,14 @@ public class HybridTest {
         Truth.assertThat(noMapping.has("userKey")).isFalse();
         webInterface.clearNativeUserIdAndUserKey();
         Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+
+        configurationProvider.core().setForceLogin(true);
+        ForceLoginProvider forceLoginProvider = context.getProvider(ForceLoginProvider.class);
+        Truth.assertThat(forceLoginProvider.identify("visitor-hybrid")).isTrue();
+        Truth.assertThat(niceParse(webInterface.getNativeIdentity()).optString("deviceId")).isEqualTo("visitor-hybrid");
+        context.getSharedPreferences("growing3_force_login", android.content.Context.MODE_PRIVATE).edit().clear().commit();
+        forceLoginProvider.setup(context);
+        configurationProvider.core().setForceLogin(false);
         webInterface.onDomChanged();
 
         Robolectric.flushForegroundThreadScheduler();

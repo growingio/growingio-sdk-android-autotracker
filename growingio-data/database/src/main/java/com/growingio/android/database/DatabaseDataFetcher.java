@@ -69,7 +69,8 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
             assertCondition(database.getLimit() > 0
                             && database.getPolicy() >= SEND_POLICY_INSTANT,
                     "leak necessary param");
-            dataManager.queryEvents(database.getPolicy(), database.getLimit(), dbResult);
+            dataManager.queryEvents(database.getPolicy(), database.getLimit(), database.getPendingDeviceIdReplacement(),
+                    database.getConfirmedDeviceId(), dbResult);
             return dbResult;
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_DELETE) {
             assertCondition(database.getLastId() > 0
@@ -94,6 +95,11 @@ public class DatabaseDataFetcher implements DataFetcher<EventDbResult> {
         } else if (database.getDbOp() == EventDatabase.DATABASE_OP_CLEAR) {
             dataManager.removeAllEvents();
             dbResult.setSuccess(true);
+            return dbResult;
+        } else if (database.getDbOp() == EventDatabase.DATABASE_OP_CONFIRM_PENDING_EVENTS) {
+            String deviceId = database.getConfirmedDeviceId();
+            assertCondition(!TextUtils.isEmpty(deviceId), "no device ID for pending events");
+            dbResult.setSuccess(dataManager.confirmPendingEvents(deviceId));
             return dbResult;
         }
         dbResult.setSuccess(false);

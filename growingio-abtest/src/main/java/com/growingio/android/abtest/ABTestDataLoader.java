@@ -36,6 +36,7 @@ import com.growingio.android.sdk.track.modelloader.LoadDataFetcher;
 import com.growingio.android.sdk.track.modelloader.ModelLoader;
 import com.growingio.android.sdk.track.modelloader.ModelLoaderFactory;
 import com.growingio.android.sdk.track.providers.DeviceInfoProvider;
+import com.growingio.android.sdk.track.providers.ForceLoginProvider;
 import com.growingio.android.sdk.track.providers.PersistentDataProvider;
 import com.growingio.android.sdk.track.providers.UserInfoProvider;
 import com.growingio.android.sdk.track.utils.ObjectUtils;
@@ -141,6 +142,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
 
         private final TrackerContext trackerContext;
         private final DeviceInfoProvider deviceInfoProvider;
+        private final ForceLoginProvider forceLoginProvider;
         private final PersistentDataProvider persistentDataProvider;
         private final UserInfoProvider userInfoProvider;
         private final SharedPreferences sharedPreferences;
@@ -153,6 +155,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
         public ABTestDataFetcher(TrackerContext trackerContext, ABTest abTest, AtomicBoolean cacheCleaned) {
             this.trackerContext = trackerContext;
             this.deviceInfoProvider = trackerContext.getDeviceInfoProvider();
+            this.forceLoginProvider = trackerContext.getProvider(ForceLoginProvider.class);
             this.persistentDataProvider = trackerContext.getProvider(PersistentDataProvider.class);
             this.userInfoProvider = trackerContext.getUserInfoProvider();
             this.abTestConfig = trackerContext.getConfigurationProvider().getConfiguration(ABTestConfig.class);
@@ -183,10 +186,17 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                 abTestCallback.onABExperimentFailed(new IllegalStateException("data collection is disabled"));
                 return null;
             }
+            // 强制登录开启且本次启动尚未 identify：访问用户 ID 未确认，不发请求、不读缓存，立即回调失败
+            if (forceLoginProvider.isPending()) {
+                Logger.w(TAG, "Request ABTestExperiment skipped: force login is enabled and identify has not been called.");
+                abTestCallback.onABExperimentFailed(new IllegalStateException("force login is enabled and identify has not been called"));
+                return null;
+            }
             if (cacheCleaned.compareAndSet(false, true)) {
                 cleanExpiredCache(sharedPreferences);
             }
-            String deviceId = deviceInfoProvider.getDeviceId();
+            // 与事件上报一致：按当前有效设备 ID（NewSaaS 下已持久化的访问用户 ID，否则为自动生成的设备 ID）分流和缓存
+            String deviceId = forceLoginProvider.getDeviceId(deviceInfoProvider.getDeviceId());
             String layerId = abTest.getLayerId();
             int timeout = (int) abTestConfig.getAbTestTimeout();
             boolean requestImmediately = abTest.isRequestImmediately();
@@ -219,7 +229,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
 
             // 2. 请求
             Logger.d(TAG, "Request ABTestExperiment from server.");
-            ABTestResponse abHttpResponse = requestABTestExperimentData(layerId, timeout);
+            ABTestResponse abHttpResponse = requestABTestExperimentData(deviceId, layerId, timeout);
             if (!abHttpResponse.isSucceed()) {
                 Logger.e(TAG, "Request ABTestExperiment failed with error: " + abHttpResponse.getErrorMsg());
                 abTestCallback.onABExperimentFailed(new IllegalAccessException(abHttpResponse.getErrorMsg()));
@@ -268,7 +278,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
             sharedPreferences.edit().putString(key, abTestResponse.toSavedJson()).apply();
         }
 
-        private ABTestResponse requestABTestExperimentData(String layerId, int timeout) {
+        private ABTestResponse requestABTestExperimentData(String deviceId, String layerId, int timeout) {
             //String path = "/diversion/specified-layer-variables";
             CoreConfiguration coreConfiguration = trackerContext.getConfigurationProvider().core();
             String host = abTestConfig.getAbTestServerHost();
@@ -284,7 +294,7 @@ public class ABTestDataLoader implements ModelLoader<ABTest, ABExperiment> {
                     .setMediaType("application/x-www-form-urlencoded");
             String sb = "accountId=" + Uri.encode(coreConfiguration.getProjectId()) +
                     "&datasourceId=" + Uri.encode(coreConfiguration.getDataSourceId()) +
-                    "&distinctId=" + Uri.encode(deviceInfoProvider.getDeviceId()) +
+                    "&distinctId=" + Uri.encode(deviceId) +
                     "&layerId=" + Uri.encode(layerId);
             boolean isNewDevice = persistentDataProvider.isNewDevice();
             if (isNewDevice) {

@@ -93,7 +93,7 @@ public class EventDataContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if (MATCHER.match(uri) == EVENT_DATA_CODE) {
-            long rowId = db.insert(TABLE_EVENTS, null, values);
+            long rowId = EventDataTable.insertEvent(db, values);
             Uri insertUri = ContentUris.withAppendedId(uri, rowId);
             this.getContext().getContentResolver().notifyChange(uri, null);
             return insertUri;

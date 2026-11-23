@@ -53,6 +53,10 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
             } else if (eventData.getEventOp() == EventFormatData.DATA_FORMAT_MERGE) {
                 assertCondition(eventData.getEvents() != null, "leak necessary events");
                 return merge(eventData.getEvents());
+            } else if (eventData.getEventOp() == EventFormatData.DATA_REPLACE_DEVICE_ID) {
+                String updated = EventBuilderProvider.replaceJsonDeviceId(
+                        new String(eventData.getStoredEvent()), eventData.getPendingDeviceIdReplacement());
+                return new EventByteArray(updated == null ? null : updated.getBytes());
             }
             return new EventByteArray(null);
         } catch (IllegalArgumentException e) {
@@ -86,11 +90,16 @@ public class JsonDataFetcher implements FormatDataFetcher<EventByteArray> {
         }
         StringBuilder sb = new StringBuilder("[");
         int length = events.size();
-        for (byte[] data : events) {
+        for (int i = 0; i < events.size(); i++) {
+            byte[] data = events.get(i);
             length -= 1;
             if (data.length > 0) {
                 String event = new String(data);
                 if (event.startsWith("{") && event.endsWith("}")) { //ensure json format
+                    if (eventData.isForceLoginPending(i)) {
+                        String updated = EventBuilderProvider.replaceJsonDeviceId(event, eventData.getPendingDeviceIdReplacement());
+                        if (updated != null) event = updated;
+                    }
                     sb.append(event);
                     if (length > 0) {
                         sb.append(",");
